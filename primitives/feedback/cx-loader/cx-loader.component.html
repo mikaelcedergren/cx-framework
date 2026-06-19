@@ -1,0 +1,32 @@
+@if (loading) {
+  <div
+    class="cx-loader"
+    [class.cx-loader--frozen]="loader.frozen"
+    [class.cx-loader--gap-4]="loader.gap === '4'"
+    [class.cx-loader--gap-8]="loader.gap === '8'"
+    [class.cx-loader--gap-16]="loader.gap === '16'"
+  >
+    @for (row of rows(); track rowIndex; let rowIndex = $index) {
+      <div
+        class="cx-loader__row"
+        [class.cx-loader__row--w-50]="rowWidth(row) === '50'"
+        [class.cx-loader__row--w-100]="rowWidth(row) === '100'"
+      >
+        @for (cell of row.cells; track cellIndex; let cellIndex = $index) {
+          <span
+            class="cx-loader__cell"
+            [class.cx-loader__cell--h-16]="cellHeight(cell) === '16'"
+            [class.cx-loader__cell--h-32]="cellHeight(cell) === '32'"
+            [class.cx-loader__cell--h-64]="cellHeight(cell) === '64'"
+            [class.cx-loader__cell--h-128]="cellHeight(cell) === '128'"
+            [class.cx-loader__cell--h-256]="cellHeight(cell) === '256'"
+            [style.animation-delay.ms]="animationDelay(rowIndex, cellIndex)"
+            aria-hidden="true"
+          ></span>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <ng-content />
+}

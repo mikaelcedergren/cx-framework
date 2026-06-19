@@ -1,0 +1,140 @@
+:host {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cx-code-field {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cx-code-field__shell {
+  position: relative;
+  display: inline-block;
+  cursor: text;
+}
+
+.cx-code-field__shell--disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled, 0.45);
+  pointer-events: none;
+}
+
+.cx-code-field__shell--readonly {
+  cursor: default;
+}
+
+.cx-code-field__shell:has(.cx-code-field__input:focus-visible) .cx-code-field__cells {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-code-field__input {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  caret-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cx-code-field__cells {
+  display: inline-flex;
+  flex-direction: row;
+  gap: var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.cx-code-field__cell {
+  position: relative;
+  display: flex;
+  width: 40px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--opacity-mid);
+  border-radius: var(--radius-sm);
+  background: var(--surface-mid);
+  color: var(--ink);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
+}
+
+.cx-code-field__cell--filled {
+  border-color: var(--opacity-high);
+}
+
+.cx-code-field__cell--active {
+  border-color: var(--primary);
+  background: var(--primary-opacity);
+}
+
+.cx-code-field__shell--readonly .cx-code-field__cell {
+  background: var(--opacity-low);
+}
+
+.cx-code-field__shell--error .cx-code-field__cell {
+  border-color: var(--danger);
+}
+
+.cx-code-field__shell--error .cx-code-field__cell--active,
+.cx-code-field__shell--error .cx-code-field__cell--filled {
+  background: var(--danger-opacity);
+}
+
+.cx-code-field--small .cx-code-field__cell {
+  width: 32px;
+  height: 40px;
+  font-size: var(--font-size-body);
+}
+
+.cx-code-field--large .cx-code-field__cell {
+  width: 48px;
+  height: 56px;
+  font-size: var(--font-size-title-1);
+}
+
+.cx-code-field__cell-char {
+  display: block;
+}
+
+.cx-code-field__caret {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: 1.5px;
+  height: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  animation: cx-code-field-caret 1s steps(2, start) infinite;
+}
+
+.cx-code-field__shell--error .cx-code-field__caret {
+  background: var(--danger);
+}
+
+.cx-code-field__messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+@keyframes cx-code-field-caret {
+  50% {
+    opacity: 0;
+  }
+}

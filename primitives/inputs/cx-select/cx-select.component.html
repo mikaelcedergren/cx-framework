@@ -1,0 +1,138 @@
+<div
+  class="cx-select"
+  [class.cx-select--small]="size === 'small'"
+  [class.cx-select--large]="size === 'large'"
+>
+  @if (labelText$()) {
+    <div class="cx-select__header">
+      <div class="cx-select__label" [id]="labelId">{{ labelText$() }}</div>
+      @if (optional) {
+        <div class="cx-select__optional">Optional</div>
+      }
+    </div>
+  }
+  <div
+    class="cx-select__field"
+    #fieldButton
+    [class.cx-select__field--small]="size === 'small'"
+    [class.cx-select__field--large]="size === 'large'"
+    [class.cx-select__field--open]="isOpen$()"
+    [class.cx-select__field--disabled]="disabled"
+    [class.cx-select__field--readonly]="readOnly"
+    [class.cx-select__field--loading]="loading"
+    [class.cx-select__field--error]="hasError$()"
+    [class.cx-select__field--transparent]="variant === 'transparent'"
+    [class.cx-select__field--inline-edit]="variant === 'inline-edit'"
+    [class.cx-select__field--discreet]="discreet"
+    [class.cx-select__field--inline]="inline"
+    [class.cx-select__field--has-value]="!showPlaceholder$()"
+    role="combobox"
+    [attr.tabindex]="isLocked$() ? -1 : 0"
+    [attr.aria-expanded]="isOpen$()"
+    [attr.aria-haspopup]="'listbox'"
+    [attr.aria-disabled]="isLocked$() ? 'true' : null"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-readonly]="readOnly ? 'true' : null"
+    [attr.aria-busy]="loading ? 'true' : null"
+    [attr.aria-controls]="isOpen$() ? popoverId : null"
+    [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+    [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+    [attr.aria-label]="resolvedFieldAriaLabel"
+    (click)="toggleOpen(fieldButton)"
+    (keydown)="onFieldKeydown($event, fieldButton)"
+    (focus)="onFocusChange(true)"
+    (blur)="onFocusChange(false)"
+  >
+    @if (icon; as iconName) {
+      <cx-icon class="cx-select__leading-icon" [name]="iconName" [size]="size === 'small' ? 12 : 16" />
+    }
+    <span
+      class="cx-select__value"
+      [class.cx-select__value--placeholder]="showPlaceholder$()"
+    >
+      {{ displayText$() }}
+    </span>
+    @if (loading) {
+      <span class="cx-select__loading" aria-hidden="true">
+        <cx-spinner size="16" mood="default" />
+      </span>
+    }
+    @if (hasClear$()) {
+      <button type="button" class="cx-select__clear" aria-label="Clear" (click)="clearSelection($event)">
+        <cx-icon name="remove" [size]="size === 'small' ? 12 : 14" />
+      </button>
+    }
+    <cx-icon class="cx-select__chevron" name="chevron-down" [size]="size === 'small' ? 12 : 16" />
+  </div>
+
+  @if (isOpen$() && isInteractive$()) {
+    <cx-popover
+      #popover
+      [open]="true"
+      [showBackdrop]="true"
+      [surfaceId]="popoverId"
+      [width]="overlayWidth$()"
+      [maxHeight]="overlayMaxHeight$()"
+      [left]="overlayLeft$()"
+      [top]="overlayTop$()"
+      [bottom]="overlayBottom$()"
+      [placement]="activePlacement$()"
+      surfaceClass="cx-select__popover"
+      (backdropPressed)="closePopover()"
+    >
+      @if (searchEnabled$()) {
+        <div class="cx-select__search">
+          <cx-input
+            #searchInput
+            label=""
+            ariaLabel="Search options"
+            placeholder=""
+            prependIcon="search"
+            [value]="searchQuery$()"
+            (valueChange)="onSearchChange($event)"
+          />
+        </div>
+      }
+
+      <div
+        class="cx-select__options"
+        data-cx-popover-scroll-container
+        role="listbox"
+        [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+        [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+        [attr.aria-label]="resolvedFieldAriaLabel"
+        [attr.aria-multiselectable]="multiple$() ? 'true' : null"
+      >
+        @if (filteredOptions$().length > 0) {
+          @for (option of filteredOptions$(); track option.id) {
+            <cx-option
+              [role]="'option'"
+              [label]="option.label"
+              [description]="option.description"
+              [prependIcon]="option.icon"
+              [selected]="isOptionSelected(option.id)"
+              [showCheckbox]="multiple$()"
+              [disabled]="isOptionDisabled(option)"
+              (click)="selectOption(option)"
+            />
+          }
+        } @else {
+          <div class="cx-select__empty">{{ emptyText$() }}</div>
+        }
+      </div>
+    </cx-popover>
+  }
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-select__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-select__hint">{{ hint!.trim() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message class="cx-select__error" [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+
+</div>

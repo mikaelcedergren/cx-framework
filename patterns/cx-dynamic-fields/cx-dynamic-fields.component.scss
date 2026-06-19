@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-dynamic-fields {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-dynamic-fields__list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cx-dynamic-fields__row {
+  display: grid;
+  align-items: center;
+  grid-template-columns: calc(var(--controller-size) * 5) minmax(0, 1fr) auto;
+  column-gap: var(--space-sm);
+}
+
+.cx-dynamic-fields__label {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-dynamic-fields__input {
+  min-width: 0;
+}
+
+.cx-dynamic-fields__remove {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+.cx-dynamic-fields__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}

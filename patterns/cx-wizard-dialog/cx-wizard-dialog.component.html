@@ -1,0 +1,142 @@
+@if (isOpen$()) {
+  <div class="cx-wizard-dialog-backdrop" role="presentation" (click)="onBackdropClick($event)">
+    <section
+      class="cx-wizard-dialog"
+      [class.cx-wizard-dialog--large]="isLarge$()"
+      [class.cx-wizard-dialog--feedback]="showFeedback$()"
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="showFeedback$() ? null : titleId"
+      (click)="$event.stopPropagation()"
+    >
+      @if (showFeedback$()) {
+        <div class="cx-wizard-dialog__feedback">
+          <div class="cx-wizard-dialog__feedback-content">
+            <ng-content select="[cxWizardDialogFeedback], [slot=feedback]" />
+          </div>
+
+          <div class="cx-wizard-dialog__feedback-actions">
+            <cx-button text="Close" mood="primary" [loading]="isLoading$()" (pressed)="onFeedbackClose()" />
+          </div>
+        </div>
+      } @else {
+        <div class="cx-wizard-dialog__main">
+          <header class="cx-wizard-dialog__steps-header">
+            <ol class="cx-wizard-dialog__steps" aria-label="Steps">
+              @for (step of visibleSteps$(); track step.id; let index = $index) {
+                <li
+                  class="cx-wizard-dialog__step"
+                  [class.cx-wizard-dialog__step--active]="isActiveStep(index)"
+                  [class.cx-wizard-dialog__step--complete]="isCompletedStep(step, index)"
+                  [attr.aria-current]="isActiveStep(index) ? 'step' : null"
+                >
+                  <span class="cx-wizard-dialog__step-marker">
+                    @if (isCompletedStep(step, index)) {
+                      <cx-icon name="check" [size]="12" />
+                    } @else {
+                      {{ index + 1 }}
+                    }
+                  </span>
+                  <span class="cx-wizard-dialog__step-label">{{ step.name }}</span>
+                  @if (index < visibleSteps$().length - 1) {
+                    <span
+                      class="cx-wizard-dialog__step-separator"
+                      [class.cx-wizard-dialog__step-separator--complete]="isConnectorComplete(index)"
+                      aria-hidden="true"
+                    ></span>
+                  }
+                </li>
+              }
+            </ol>
+          </header>
+
+          <div class="cx-wizard-dialog__content-shell">
+            <section class="cx-wizard-dialog__content-card">
+              <div class="cx-wizard-dialog__content-title">
+                <h2 [id]="titleId">{{ currentTitle$() }}</h2>
+                <div class="cx-wizard-dialog__content-divider" aria-hidden="true"></div>
+              </div>
+
+              <div class="cx-wizard-dialog__content-body">
+                @if (activeTemplate$(); as activeTemplate) {
+                  <ng-container [ngTemplateOutlet]="activeTemplate" />
+                } @else {
+                  <cx-empty-state
+                    icon="document"
+                    heading="Add a step template"
+                    text="Use ng-template with cxWizardDialogStep so each step has a real body."
+                  />
+                }
+              </div>
+            </section>
+          </div>
+
+          <footer class="cx-wizard-dialog__footer">
+            <div class="cx-wizard-dialog__footer-action cx-wizard-dialog__footer-action--start">
+              <cx-button
+                [text]="secondaryLabel$()"
+                mood="default"
+                [icon]="isFirstStep$() ? undefined : 'arrow-left'"
+                [loading]="loadingActionId$() === 'cancel'"
+                [disabled]="isLoading$()"
+                (pressed)="onSecondaryAction()"
+              />
+
+              <div class="cx-wizard-dialog__footer-shortcut" aria-hidden="true">
+                <cx-shortcut-key [parts]="['Esc']" />
+              </div>
+            </div>
+
+            <div class="cx-wizard-dialog__footer-action cx-wizard-dialog__footer-action--end">
+              <div class="cx-wizard-dialog__footer-shortcut cx-wizard-dialog__footer-shortcut--combo" aria-hidden="true">
+                <cx-shortcut-key [parts]="['Mod', 'Enter']" />
+              </div>
+
+              <ng-content select="[cxWizardDialogSecondaryAction], [slot=secondary-action]" />
+
+              <cx-button
+                [text]="primaryLabel$()"
+                mood="primary"
+                [appendIcon]="isLastStep$() ? undefined : 'arrow-right'"
+                [loading]="loadingActionId$() === 'confirm'"
+                [disabled]="isLoading$()"
+                (pressed)="onPrimaryAction()"
+              />
+            </div>
+          </footer>
+        </div>
+
+        <aside class="cx-wizard-dialog__sidebar" aria-label="Step guidance">
+          @if (dismissible$()) {
+            <cx-icon-button
+              class="cx-wizard-dialog__close"
+              icon="remove"
+              ariaLabel="Close wizard"
+              variant="transparent"
+              [disabled]="isLoading$()"
+              (pressed)="onDismiss()"
+            />
+          }
+
+          <div class="cx-wizard-dialog__sidebar-content">
+            @if (currentStep$()?.icon; as sidebarIcon) {
+              <cx-icon class="cx-wizard-dialog__sidebar-icon" [name]="sidebarIcon" [size]="32" />
+            }
+
+            <div class="cx-wizard-dialog__sidebar-copy">
+              <h3 class="cx-wizard-dialog__sidebar-heading">{{ currentInfoTitle$() }}</h3>
+
+              @if (currentStep$()?.infoCustom) {
+                <ng-content select="[cxWizardDialogInfo], [slot=info]" />
+              } @else if (currentInfoText$(); as infoText) {
+                <p class="cx-wizard-dialog__sidebar-description">{{ infoText }}</p>
+              }
+            </div>
+          </div>
+        </aside>
+      }
+    </section>
+  </div>
+}

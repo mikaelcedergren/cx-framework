@@ -1,0 +1,39 @@
+<div
+  class="cx-big-radio"
+  [class.cx-big-radio--selected]="selected$()"
+  [class.cx-big-radio--disabled]="disabled"
+  role="radio"
+  [attr.tabindex]="disabled ? -1 : 0"
+  [attr.aria-checked]="selected$()"
+  [attr.aria-disabled]="disabled ? 'true' : null"
+  [attr.aria-label]="heading || text || null"
+  (click)="activate()"
+  (keydown)="onKeydown($event)"
+  (focus)="onFocus(true)"
+  (blur)="onFocus(false)"
+  >
+  <div class="cx-big-radio__indicator" aria-hidden="true">
+    <span class="cx-big-radio__control" [class.cx-big-radio__control--selected]="selected$()">
+      @if (selected$()) {
+        <span class="cx-big-radio__dot"></span>
+      }
+    </span>
+  </div>
+  <div class="cx-big-radio__content">
+    @if (custom) {
+      <ng-content />
+    } @else {
+      <div class="cx-big-radio__title-row">
+        @if (icon; as iconName) {
+          <cx-icon class="cx-big-radio__icon" [name]="iconName" [size]="16" />
+        }
+        @if (heading) {
+          <div class="cx-big-radio__label">{{ heading }}</div>
+        }
+      </div>
+      @if (text) {
+        <div class="cx-big-radio__description">{{ text }}</div>
+      }
+    }
+  </div>
+</div>

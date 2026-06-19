@@ -1,0 +1,184 @@
+:root,
+:root.theme-light {
+  --blue: #057dff;
+  --blue-opacity: rgb(5 125 255 / 10%);
+  --blue-alt: #0358b2;
+
+  --cyan: #00ccc5;
+  --cyan-opacity: rgb(0 204 197 / 10%);
+  --cyan-alt: #018a86;
+
+  --lime: #88d33d;
+  --lime-opacity: rgb(136 211 61 / 10%);
+  --lime-alt: #6da82f;
+
+  --green: #37c45b;
+  --green-opacity: rgb(55 196 91 / 10%);
+  --green-alt: #299143;
+
+  --yellow: #edc31c;
+  --yellow-opacity: rgb(237 195 28 / 10%);
+  --yellow-alt: #a68712;
+
+  --orange: #ff980a;
+  --orange-opacity: rgb(255 152 10 / 10%);
+  --orange-alt: #b26b05;
+
+  --tangerine: #ff6c2e;
+  --tangerine-opacity: rgb(255 108 46 / 10%);
+  --tangerine-alt: #b24b20;
+
+  --red: #ff4043;
+  --red-opacity: rgb(255 64 67 / 10%);
+  --red-alt: #992629;
+
+  --pink: #f2559c;
+  --pink-opacity: rgb(242 85 156 / 10%);
+  --pink-alt: #a83d6d;
+
+  --purple: #ae4ede;
+  --purple-opacity: rgb(174 78 222 / 10%);
+  --purple-alt: #7a3d99;
+
+  --violet: #3057f2;
+  --violet-opacity: rgb(48 87 242 / 10%);
+  --violet-alt: #223da8;
+}
+
+:root.theme-dark {
+  --blue: #057dff;
+  --blue-opacity: rgb(5 125 255 / 15%);
+  --blue-alt: #0358b2;
+
+  --cyan: #00ccc5;
+  --cyan-opacity: rgb(0 204 197 / 15%);
+  --cyan-alt: #018a86;
+
+  --lime: #88d33d;
+  --lime-opacity: rgb(136 211 61 / 15%);
+  --lime-alt: #6da82f;
+
+  --green: #37c45b;
+  --green-opacity: rgb(55 196 91 / 15%);
+  --green-alt: #299143;
+
+  --yellow: #edc31c;
+  --yellow-opacity: rgb(237 195 28 / 15%);
+  --yellow-alt: #a68712;
+
+  --orange: #ff980a;
+  --orange-opacity: rgb(255 152 10 / 15%);
+  --orange-alt: #b26b05;
+
+  --tangerine: #ff6c2e;
+  --tangerine-opacity: rgb(255 108 46 / 15%);
+  --tangerine-alt: #b24b20;
+
+  --red: #ff4043;
+  --red-opacity: rgb(255 64 67 / 15%);
+  --red-alt: #992629;
+
+  --pink: #f2559c;
+  --pink-opacity: rgb(242 85 156 / 15%);
+  --pink-alt: #a83d6d;
+
+  --purple: #ae4ede;
+  --purple-opacity: rgb(174 78 222 / 15%);
+  --purple-alt: #7a3d99;
+
+  --violet: #3057f2;
+  --violet-opacity: rgb(48 87 242 / 15%);
+  --violet-alt: #223da8;
+}
+
+:root.theme-night {
+  --blue: #057dff;
+  --blue-opacity: rgb(5 125 255 / 15%);
+  --blue-alt: #0358b2;
+
+  --cyan: #00ccc5;
+  --cyan-opacity: rgb(0 204 197 / 15%);
+  --cyan-alt: #018a86;
+
+  --lime: #88d33d;
+  --lime-opacity: rgb(136 211 61 / 15%);
+  --lime-alt: #6da82f;
+
+  --green: #37c45b;
+  --green-opacity: rgb(55 196 91 / 15%);
+  --green-alt: #299143;
+
+  --yellow: #edc31c;
+  --yellow-opacity: rgb(237 195 28 / 15%);
+  --yellow-alt: #a68712;
+
+  --orange: #ff980a;
+  --orange-opacity: rgb(255 152 10 / 15%);
+  --orange-alt: #b26b05;
+
+  --tangerine: #ff6c2e;
+  --tangerine-opacity: rgb(255 108 46 / 15%);
+  --tangerine-alt: #b24b20;
+
+  --red: #ff4043;
+  --red-opacity: rgb(255 64 67 / 15%);
+  --red-alt: #992629;
+
+  --pink: #f2559c;
+  --pink-opacity: rgb(242 85 156 / 15%);
+  --pink-alt: #a83d6d;
+
+  --purple: #ae4ede;
+  --purple-opacity: rgb(174 78 222 / 15%);
+  --purple-alt: #7a3d99;
+
+  --violet: #3057f2;
+  --violet-opacity: rgb(48 87 242 / 15%);
+  --violet-alt: #223da8;
+}
+
+:root.theme-high-contrast {
+  --blue: #0047b8;
+  --blue-opacity: rgb(0 71 184 / 14%);
+  --blue-alt: #00358a;
+
+  --cyan: #005f5c;
+  --cyan-opacity: rgb(0 95 92 / 14%);
+  --cyan-alt: #004543;
+
+  --lime: #345607;
+  --lime-opacity: rgb(52 86 7 / 14%);
+  --lime-alt: #243d05;
+
+  --green: #0a6a2e;
+  --green-opacity: rgb(10 106 46 / 14%);
+  --green-alt: #074a20;
+
+  --yellow: #725700;
+  --yellow-opacity: rgb(114 87 0 / 14%);
+  --yellow-alt: #544100;
+
+  --orange: #8d4300;
+  --orange-opacity: rgb(141 67 0 / 14%);
+  --orange-alt: #693100;
+
+  --tangerine: #963300;
+  --tangerine-opacity: rgb(150 51 0 / 14%);
+  --tangerine-alt: #702600;
+
+  --red: #b00020;
+  --red-opacity: rgb(176 0 32 / 14%);
+  --red-alt: #7f0017;
+
+  --pink: #9a1a62;
+  --pink-opacity: rgb(154 26 98 / 14%);
+  --pink-alt: #701247;
+
+  --purple: #6a2ac0;
+  --purple-opacity: rgb(106 42 192 / 14%);
+  --purple-alt: #4d1f8c;
+
+  --violet: #1c3ebe;
+  --violet-opacity: rgb(28 62 190 / 14%);
+  --violet-alt: #142d8a;
+}

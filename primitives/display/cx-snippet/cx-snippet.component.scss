@@ -1,0 +1,53 @@
+:host {
+  position: relative;
+  display: block;
+  padding: var(--space-sm);
+  border: var(--line-discreet);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-darken);
+  color: var(--ink);
+}
+
+.cx-snippet__pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cx-snippet__pre code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.cx-snippet__label {
+  position: absolute;
+  inset-block-start: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-snippet__keyword,
+.cx-snippet__tag {
+  color: var(--pink);
+}
+
+.cx-snippet__type,
+.cx-snippet__json-key {
+  color: var(--cyan-alt);
+}
+
+.cx-snippet__attribute {
+  color: var(--green);
+}
+
+.cx-snippet__string {
+  color: var(--orange);
+}
+
+.cx-snippet__literal {
+  color: var(--purple);
+}

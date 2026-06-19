@@ -1,0 +1,9 @@
+// Single phone breakpoint. The desktop UI is primary; below this width the
+// shell switches to a top-bar + drawer layout. There is intentionally no
+// intermediate "tablet" breakpoint — viewports either get the desktop UI or
+// the phone UI.
+$mobile: 720px;
+
+:root {
+  --breakpoint-mobile: #{$mobile};
+}

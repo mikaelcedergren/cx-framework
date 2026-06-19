@@ -1,0 +1,15 @@
+<section
+  class="cx-context-dialog"
+  [class.cx-context-dialog--top]="align === 'topLeft'"
+  [class.cx-context-dialog--bottom]="align === 'bottomLeft'"
+  role="dialog"
+  aria-modal="false"
+  tabindex="-1"
+>
+  <div class="cx-context-dialog__heading">{{ heading }}</div>
+  <p class="cx-context-dialog__message">{{ text }}</p>
+  <footer class="cx-context-dialog__actions">
+    <cx-button [text]="cancelText" mood="default" (pressed)="onCancel()" />
+    <cx-button [text]="confirmText" [mood]="mood" (pressed)="onConfirm()" />
+  </footer>
+</section>

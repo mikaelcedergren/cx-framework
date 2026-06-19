@@ -1,0 +1,22 @@
+@if (iconDef; as icon) {
+  <svg
+    class="cx-icon"
+    [attr.viewBox]="icon.viewBox"
+    aria-hidden="true"
+  >
+    @for (node of icon.nodes; track $index) {
+      <path
+        class="cx-icon__path"
+        [attr.d]="node.d"
+        [attr.stroke]="node.stroke ?? null"
+        [attr.fill]="node.fill ?? null"
+        [attr.stroke-width]="node.strokeWidth ?? null"
+        [attr.stroke-dasharray]="node.strokeDasharray ?? null"
+        [attr.stroke-linecap]="node.strokeLinecap ?? null"
+        [attr.stroke-linejoin]="node.strokeLinejoin ?? null"
+        [attr.fill-rule]="node.fillRule ?? null"
+        [attr.clip-rule]="node.clipRule ?? null"
+      />
+    }
+  </svg>
+}

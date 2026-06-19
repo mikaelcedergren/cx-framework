@@ -1,0 +1,35 @@
+<span
+  class="cx-badge"
+  [class.cx-badge--inline]="placement === 'inline'"
+  [class.cx-badge--corner]="placement === 'corner'"
+  [class.cx-badge--visible]="visible"
+  [class.cx-badge--with-count]="visible && hasCount()"
+  [class.cx-badge--primary]="mood === 'primary'"
+  [class.cx-badge--accent]="mood === 'accent'"
+  [class.cx-badge--success]="mood === 'success'"
+  [class.cx-badge--warning]="mood === 'warning'"
+  [class.cx-badge--danger]="mood === 'danger'"
+  [class.cx-badge--info]="mood === 'info'"
+>
+  <span
+    class="cx-badge__content"
+    [class.cx-badge__content--cutout-dot]="placement === 'corner' && visible && !hasCount()"
+    [class.cx-badge__content--cutout-count]="placement === 'corner' && visible && hasCount()"
+  >
+    <ng-content />
+  </span>
+
+  @if (visible) {
+    <span
+      class="cx-badge__indicator"
+      [class.cx-badge__indicator--dot]="!hasCount()"
+      [class.cx-badge__indicator--count]="hasCount()"
+      [attr.role]="ariaLabel?.trim() ? 'img' : null"
+      [attr.aria-label]="ariaLabel?.trim() || null"
+    >
+      @if (hasCount()) {
+        <span class="cx-badge__value">{{ displayValue() }}</span>
+      }
+    </span>
+  }
+</span>

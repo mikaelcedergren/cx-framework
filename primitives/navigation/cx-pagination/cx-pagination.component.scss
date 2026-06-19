@@ -1,0 +1,136 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.cx-pagination {
+  display: flex;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  user-select: none;
+}
+
+.cx-pagination__summary {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+}
+
+.cx-pagination__controls {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-lg);
+}
+
+.cx-pagination__page-size,
+.cx-pagination__navigation {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-pagination__page-size-label {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+}
+
+.cx-pagination__page-size-select {
+  min-width: 0;
+  width: auto;
+}
+
+.cx-pagination__navigation {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cx-pagination__pages {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-pagination__page-button,
+.cx-pagination__ellipsis {
+  display: inline-flex;
+  min-width: var(--controller-size);
+  height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cx-pagination__page-button {
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-pagination__page-button:hover:not(:disabled),
+.cx-pagination__page-button:focus-visible {
+  background: var(--opacity-low);
+  color: var(--ink);
+  outline: 0;
+}
+
+.cx-pagination__page-button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-pagination__page-button:active:not(:disabled) {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-pagination__page-button:disabled {
+  cursor: default;
+}
+
+.cx-pagination__page-button--current {
+  color: var(--ink);
+  font-weight: var(--font-weight-bold);
+  cursor: default;
+  pointer-events: none;
+}
+
+.cx-pagination__ellipsis {
+  min-width: auto;
+  color: var(--opacity-high);
+}
+
+@media (max-width: 640px) {
+  .cx-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cx-pagination__controls {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cx-pagination__navigation {
+    justify-content: flex-start;
+  }
+}

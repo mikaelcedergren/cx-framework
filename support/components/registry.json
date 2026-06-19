@@ -1,0 +1,886 @@
+{
+  "components": [
+    {
+      "name": "cx-variant",
+      "selectors": [
+        "cx-variant"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-variant/cx-variant.component.ts"
+    },
+    {
+      "name": "cx-chat-message",
+      "selectors": [
+        "cx-chat-message"
+      ],
+      "area": "pattern",
+      "category": "conversation",
+      "path": "patterns/cx-chat-message/cx-chat-message.component.ts"
+    },
+    {
+      "name": "cx-chat-thread",
+      "selectors": [
+        "cx-chat-thread"
+      ],
+      "area": "pattern",
+      "category": "conversation",
+      "path": "patterns/cx-chat-thread/cx-chat-thread.component.ts"
+    },
+    {
+      "name": "cx-account-control",
+      "selectors": [
+        "cx-account-control"
+      ],
+      "area": "pattern",
+      "category": "cx-account-control",
+      "path": "patterns/cx-account-control/cx-account-control.component.ts"
+    },
+    {
+      "name": "cx-action-bar",
+      "selectors": [
+        "cx-action-bar"
+      ],
+      "area": "pattern",
+      "category": "cx-action-bar",
+      "path": "patterns/cx-action-bar/cx-action-bar.component.ts"
+    },
+    {
+      "name": "cx-detail-panel",
+      "selectors": [
+        "cx-detail-panel"
+      ],
+      "area": "pattern",
+      "category": "cx-detail-panel",
+      "path": "patterns/cx-detail-panel/cx-detail-panel.component.ts"
+    },
+    {
+      "name": "cx-dynamic-fields",
+      "selectors": [
+        "cx-dynamic-fields"
+      ],
+      "area": "pattern",
+      "category": "cx-dynamic-fields",
+      "path": "patterns/cx-dynamic-fields/cx-dynamic-fields.component.ts"
+    },
+    {
+      "name": "cx-empty-state",
+      "selectors": [
+        "cx-empty-state"
+      ],
+      "area": "pattern",
+      "category": "cx-empty-state",
+      "path": "patterns/cx-empty-state/cx-empty-state.component.ts"
+    },
+    {
+      "name": "cx-filter-bar",
+      "selectors": [
+        "cx-filter-bar"
+      ],
+      "area": "pattern",
+      "category": "cx-filter-bar",
+      "path": "patterns/cx-filter-bar/cx-filter-bar.component.ts"
+    },
+    {
+      "name": "cx-labeled-row",
+      "selectors": [
+        "cx-labeled-row"
+      ],
+      "area": "pattern",
+      "category": "cx-labeled-row",
+      "path": "patterns/cx-labeled-row/cx-labeled-row.component.ts"
+    },
+    {
+      "name": "cx-null-controller",
+      "selectors": [
+        "cx-null-controller"
+      ],
+      "area": "pattern",
+      "category": "cx-null-controller",
+      "path": "patterns/cx-null-controller/cx-null-controller.component.ts"
+    },
+    {
+      "name": "cx-page-header",
+      "selectors": [
+        "cx-page-header"
+      ],
+      "area": "pattern",
+      "category": "cx-page-header",
+      "path": "patterns/cx-page-header/cx-page-header.component.ts"
+    },
+    {
+      "name": "cx-utility-bar",
+      "selectors": [
+        "cx-utility-bar"
+      ],
+      "area": "pattern",
+      "category": "cx-utility-bar",
+      "path": "patterns/cx-utility-bar/cx-utility-bar.component.ts"
+    },
+    {
+      "name": "cx-radio-reveal",
+      "selectors": [
+        "cx-radio-reveal"
+      ],
+      "area": "pattern",
+      "category": "cx-radio-reveal",
+      "path": "patterns/cx-radio-reveal/cx-radio-reveal.component.ts"
+    },
+    {
+      "name": "cx-side-nav",
+      "selectors": [
+        "cx-side-nav"
+      ],
+      "area": "pattern",
+      "category": "cx-side-nav",
+      "path": "patterns/cx-side-nav/cx-side-nav.component.ts"
+    },
+    {
+      "name": "cx-table-view",
+      "selectors": [
+        "cx-table-view"
+      ],
+      "area": "pattern",
+      "category": "cx-table-view",
+      "path": "patterns/cx-table-view/cx-table-view.component.ts"
+    },
+    {
+      "name": "cx-topbar",
+      "selectors": [
+        "cx-topbar"
+      ],
+      "area": "pattern",
+      "category": "cx-topbar",
+      "path": "patterns/cx-topbar/cx-topbar.component.ts"
+    },
+    {
+      "name": "cx-wizard-dialog",
+      "selectors": [
+        "cx-wizard-dialog"
+      ],
+      "area": "pattern",
+      "category": "cx-wizard-dialog",
+      "path": "patterns/cx-wizard-dialog/cx-wizard-dialog.component.ts"
+    },
+    {
+      "name": "cxWizardDialogStep",
+      "selectors": [
+        "ng-template[cxWizardDialogStep]"
+      ],
+      "area": "pattern",
+      "category": "cx-wizard-dialog",
+      "path": "patterns/cx-wizard-dialog/cx-wizard-dialog-step.directive.ts"
+    },
+    {
+      "name": "cx-workbench",
+      "selectors": [
+        "cx-workbench"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-workbench/cx-workbench.component.ts"
+    },
+    {
+      "name": "cx-button",
+      "selectors": [
+        "cx-button"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-button/cx-button.component.ts"
+    },
+    {
+      "name": "cx-button-group",
+      "selectors": [
+        "cx-button-group"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-button-group/cx-button-group.component.ts"
+    },
+    {
+      "name": "cx-icon-button",
+      "selectors": [
+        "cx-icon-button"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-icon-button/cx-icon-button.component.ts"
+    },
+    {
+      "name": "cx-sso-button",
+      "selectors": [
+        "cx-sso-button"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-sso-button/cx-sso-button.component.ts"
+    },
+    {
+      "name": "cx-toggle-button",
+      "selectors": [
+        "cx-toggle-button"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-toggle-button/cx-toggle-button.component.ts"
+    },
+    {
+      "name": "cx-chart",
+      "selectors": [
+        "cx-chart"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-chart/cx-chart.component.ts"
+    },
+    {
+      "name": "cx-list-view",
+      "selectors": [
+        "cx-list-view"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-list-view/cx-list-view.component.ts"
+    },
+    {
+      "name": "cx-query-element",
+      "selectors": [
+        "cx-query-element"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-query-element/cx-query-element.component.ts"
+    },
+    {
+      "name": "cx-query-field",
+      "selectors": [
+        "cx-query-field"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-query-field/cx-query-field.component.ts"
+    },
+    {
+      "name": "cx-table",
+      "selectors": [
+        "cx-table"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-table/cx-table.component.ts"
+    },
+    {
+      "name": "cx-tree-view",
+      "selectors": [
+        "cx-tree-view"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-tree-view/cx-tree-view.component.ts"
+    },
+    {
+      "name": "cx-avatar",
+      "selectors": [
+        "cx-avatar"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-avatar/cx-avatar.component.ts"
+    },
+    {
+      "name": "cx-badge",
+      "selectors": [
+        "cx-badge"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-badge/cx-badge.component.ts"
+    },
+    {
+      "name": "cx-card",
+      "selectors": [
+        "cx-card"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-card/cx-card.component.ts"
+    },
+    {
+      "name": "cx-code-block",
+      "selectors": [
+        "cx-code-block"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-code-block/cx-code-block.component.ts"
+    },
+    {
+      "name": "cx-divider",
+      "selectors": [
+        "cx-divider"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-divider/cx-divider.component.ts"
+    },
+    {
+      "name": "cx-expansion-panel",
+      "selectors": [
+        "cx-expansion-panel"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-expansion-panel/cx-expansion-panel.component.ts"
+    },
+    {
+      "name": "cx-log",
+      "selectors": [
+        "cx-log"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-log/cx-log.component.ts"
+    },
+    {
+      "name": "cx-log-step",
+      "selectors": [
+        "cx-log-step"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-log-step/cx-log-step.component.ts"
+    },
+    {
+      "name": "cx-metric",
+      "selectors": [
+        "cx-metric"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-metric/cx-metric.component.ts"
+    },
+    {
+      "name": "cx-placeholder",
+      "selectors": [
+        "cx-placeholder"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-placeholder/cx-placeholder.component.ts"
+    },
+    {
+      "name": "cx-qr-code",
+      "selectors": [
+        "cx-qr-code"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-qr-code/cx-qr-code.component.ts"
+    },
+    {
+      "name": "cx-secret-display",
+      "selectors": [
+        "cx-secret-display"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-secret-display/cx-secret-display.component.ts"
+    },
+    {
+      "name": "cx-severity-tag",
+      "selectors": [
+        "cx-severity-tag"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-severity-tag/cx-severity-tag.component.ts"
+    },
+    {
+      "name": "cx-shortcut-key",
+      "selectors": [
+        "cx-shortcut-key"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-shortcut-key/cx-shortcut-key.component.ts"
+    },
+    {
+      "name": "cx-snippet",
+      "selectors": [
+        "cx-snippet"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-snippet/cx-snippet.component.ts"
+    },
+    {
+      "name": "cx-status-tag",
+      "selectors": [
+        "cx-status-tag"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-status-tag/cx-status-tag.component.ts"
+    },
+    {
+      "name": "cx-steps",
+      "selectors": [
+        "cx-steps"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-steps/cx-steps.component.ts"
+    },
+    {
+      "name": "cx-tag",
+      "selectors": [
+        "cx-tag"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-tag/cx-tag.component.ts"
+    },
+    {
+      "name": "cx-trend-tag",
+      "selectors": [
+        "cx-trend-tag"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-trend-tag/cx-trend-tag.component.ts"
+    },
+    {
+      "name": "cx-alert",
+      "selectors": [
+        "cx-alert"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-alert/cx-alert.component.ts"
+    },
+    {
+      "name": "cx-banner",
+      "selectors": [
+        "cx-banner"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-banner/cx-banner.component.ts"
+    },
+    {
+      "name": "cx-budget",
+      "selectors": [
+        "cx-budget"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-budget/cx-budget.component.ts"
+    },
+    {
+      "name": "cx-loader",
+      "selectors": [
+        "cx-loader"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-loader/cx-loader.component.ts"
+    },
+    {
+      "name": "cx-progress-bar",
+      "selectors": [
+        "cx-progress-bar"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-progress-bar/cx-progress-bar.component.ts"
+    },
+    {
+      "name": "cx-spinner",
+      "selectors": [
+        "cx-spinner"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-spinner/cx-spinner.component.ts"
+    },
+    {
+      "name": "cx-toast",
+      "selectors": [
+        "cx-toast"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-toast/cx-toast.component.ts"
+    },
+    {
+      "name": "cx-validation-message",
+      "selectors": [
+        "cx-validation-message"
+      ],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-validation-message/cx-validation-message.component.ts"
+    },
+    {
+      "name": "cx-big-checkbox",
+      "selectors": [
+        "cx-big-checkbox"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-big-checkbox/cx-big-checkbox.component.ts"
+    },
+    {
+      "name": "cx-big-radio",
+      "selectors": [
+        "cx-big-radio"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-big-radio/cx-big-radio.component.ts"
+    },
+    {
+      "name": "cx-calendar",
+      "selectors": [
+        "cx-calendar"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-calendar/cx-calendar.component.ts"
+    },
+    {
+      "name": "cx-checkbox",
+      "selectors": [
+        "cx-checkbox"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-checkbox/cx-checkbox.component.ts"
+    },
+    {
+      "name": "cx-code-field",
+      "selectors": [
+        "cx-code-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-code-field/cx-code-field.component.ts"
+    },
+    {
+      "name": "cx-color-picker",
+      "selectors": [
+        "cx-color-picker"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-color-picker/cx-color-picker.component.ts"
+    },
+    {
+      "name": "cx-date-picker",
+      "selectors": [
+        "cx-date-picker"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-date-picker/cx-date-picker.component.ts"
+    },
+    {
+      "name": "cx-date-span-picker",
+      "selectors": [
+        "cx-date-span-picker"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-date-span-picker/cx-date-span-picker.component.ts"
+    },
+    {
+      "name": "cx-file-upload",
+      "selectors": [
+        "cx-file-upload"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-file-upload/cx-file-upload.component.ts"
+    },
+    {
+      "name": "cx-hierarchical-select",
+      "selectors": [
+        "cx-hierarchical-select"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-hierarchical-select/cx-hierarchical-select.component.ts"
+    },
+    {
+      "name": "cx-input",
+      "selectors": [
+        "cx-input"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-input/cx-input.component.ts"
+    },
+    {
+      "name": "cx-number-field",
+      "selectors": [
+        "cx-number-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-number-field/cx-number-field.component.ts"
+    },
+    {
+      "name": "cx-radio",
+      "selectors": [
+        "cx-radio"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-radio/cx-radio.component.ts"
+    },
+    {
+      "name": "cx-search-field",
+      "selectors": [
+        "cx-search-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-search-field/cx-search-field.component.ts"
+    },
+    {
+      "name": "cx-select",
+      "selectors": [
+        "cx-select"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-select/cx-select.component.ts"
+    },
+    {
+      "name": "cx-slider",
+      "selectors": [
+        "cx-slider"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-slider/cx-slider.component.ts"
+    },
+    {
+      "name": "cx-switch",
+      "selectors": [
+        "cx-switch"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-switch/cx-switch.component.ts"
+    },
+    {
+      "name": "cx-tag-input",
+      "selectors": [
+        "cx-tag-input"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-tag-input/cx-tag-input.component.ts"
+    },
+    {
+      "name": "cx-textarea",
+      "selectors": [
+        "cx-textarea"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-textarea/cx-textarea.component.ts"
+    },
+    {
+      "name": "cx-time-input",
+      "selectors": [
+        "cx-time-input"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-time-input/cx-time-input.component.ts"
+    },
+    {
+      "name": "cx-toggle-chip",
+      "selectors": [
+        "cx-toggle-chip"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-toggle-chip/cx-toggle-chip.component.ts"
+    },
+    {
+      "name": "cx-toggle-chip-group",
+      "selectors": [
+        "cx-toggle-chip-group"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-toggle-chip-group/cx-toggle-chip-group.component.ts"
+    },
+    {
+      "name": "cx-grid",
+      "selectors": [
+        "cx-grid"
+      ],
+      "area": "primitive",
+      "category": "layout",
+      "path": "primitives/layout/cx-grid/cx-grid.component.ts"
+    },
+    {
+      "name": "cx-inline",
+      "selectors": [
+        "cx-inline"
+      ],
+      "area": "primitive",
+      "category": "layout",
+      "path": "primitives/layout/cx-inline/cx-inline.component.ts"
+    },
+    {
+      "name": "cx-split",
+      "selectors": [
+        "cx-split"
+      ],
+      "area": "primitive",
+      "category": "layout",
+      "path": "primitives/layout/cx-split/cx-split.component.ts"
+    },
+    {
+      "name": "cx-stack",
+      "selectors": [
+        "cx-stack"
+      ],
+      "area": "primitive",
+      "category": "layout",
+      "path": "primitives/layout/cx-stack/cx-stack.component.ts"
+    },
+    {
+      "name": "cx-icon",
+      "selectors": [
+        "cx-icon"
+      ],
+      "area": "primitive",
+      "category": "media",
+      "path": "primitives/media/cx-icon/cx-icon.component.ts"
+    },
+    {
+      "name": "cx-image",
+      "selectors": [
+        "cx-image"
+      ],
+      "area": "primitive",
+      "category": "media",
+      "path": "primitives/media/cx-image/cx-image.component.ts"
+    },
+    {
+      "name": "cx-breadcrumbs",
+      "selectors": [
+        "cx-breadcrumbs"
+      ],
+      "area": "primitive",
+      "category": "navigation",
+      "path": "primitives/navigation/cx-breadcrumbs/cx-breadcrumbs.component.ts"
+    },
+    {
+      "name": "cx-pagination",
+      "selectors": [
+        "cx-pagination"
+      ],
+      "area": "primitive",
+      "category": "navigation",
+      "path": "primitives/navigation/cx-pagination/cx-pagination.component.ts"
+    },
+    {
+      "name": "cx-tabs",
+      "selectors": [
+        "cx-tabs"
+      ],
+      "area": "primitive",
+      "category": "navigation",
+      "path": "primitives/navigation/cx-tabs/cx-tabs.component.ts"
+    },
+    {
+      "name": "cx-context-dialog",
+      "selectors": [
+        "cx-context-dialog"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-context-dialog/cx-context-dialog.component.ts"
+    },
+    {
+      "name": "cx-dialog",
+      "selectors": [
+        "cx-dialog"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-dialog/cx-dialog.component.ts"
+    },
+    {
+      "name": "cx-fullscreen-dialog",
+      "selectors": [
+        "cx-fullscreen-dialog"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-fullscreen-dialog/cx-fullscreen-dialog.component.ts"
+    },
+    {
+      "name": "cx-lightbox",
+      "selectors": [
+        "cx-lightbox"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-lightbox/cx-lightbox.component.ts"
+    },
+    {
+      "name": "cx-menu",
+      "selectors": [
+        "cx-menu"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-menu/cx-menu.component.ts"
+    },
+    {
+      "name": "cx-option",
+      "selectors": [
+        "cx-option"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-option/cx-option.component.ts"
+    },
+    {
+      "name": "cx-option-group",
+      "selectors": [
+        "cx-option-group"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-option-group/cx-option-group.component.ts"
+    },
+    {
+      "name": "cx-popover",
+      "selectors": [
+        "cx-popover"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-popover/cx-popover.component.ts"
+    },
+    {
+      "name": "cx-tooltip",
+      "selectors": [
+        "cx-tooltip"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-tooltip/cx-tooltip.component.ts"
+    }
+  ]
+}

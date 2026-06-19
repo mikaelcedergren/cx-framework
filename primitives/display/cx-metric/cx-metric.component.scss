@@ -1,0 +1,68 @@
+:host {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-xs);
+  color: var(--ink);
+}
+
+.cx-metric__label {
+  min-width: 0;
+  color: var(--opacity-high);
+  overflow-wrap: anywhere;
+}
+
+.cx-metric__value-row {
+  display: flex;
+  min-width: 0;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-metric__value {
+  min-width: 0;
+  color: var(--ink);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.cx-metric__value-row > [slot='trend'] {
+  flex: 0 0 auto;
+}
+
+:host(.cx-metric--small) .cx-metric__label {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+:host(.cx-metric--small) .cx-metric__value {
+  font-size: var(--font-size-title-1);
+}
+
+:host(.cx-metric--default) .cx-metric__label {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+}
+
+:host(.cx-metric--default) .cx-metric__value {
+  font-size: var(--controller-size);
+}
+
+:host(.cx-metric--large) {
+  gap: var(--space-sm);
+}
+
+:host(.cx-metric--large) .cx-metric__label {
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-heading);
+}
+
+:host(.cx-metric--large) .cx-metric__value {
+  font-size: calc(var(--controller-size) * 1.5);
+}

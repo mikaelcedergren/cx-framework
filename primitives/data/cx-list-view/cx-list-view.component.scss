@@ -1,0 +1,116 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.cx-list-view {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-mid);
+}
+
+.cx-list-view__item {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.cx-list-view--compact .cx-list-view__item {
+  padding: var(--space-sm);
+}
+
+.cx-list-view--divided .cx-list-view__item + .cx-list-view__item {
+  border-top: var(--line-discreet);
+}
+
+.cx-list-view__item:hover:not(:disabled) {
+  background: var(--opacity-low);
+}
+
+.cx-list-view__item:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(var(--outline-tab-offset) * -1);
+}
+
+.cx-list-view__item--selected {
+  background: var(--primary-opacity);
+}
+
+.cx-list-view__item:disabled {
+  cursor: default;
+}
+
+.cx-list-view__icon {
+  margin-block-start: var(--space-2xs);
+  color: var(--opacity-high);
+}
+
+.cx-list-view__content,
+.cx-list-view__main {
+  display: flex;
+  min-width: 0;
+}
+
+.cx-list-view__content {
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.cx-list-view__main {
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.cx-list-view__label,
+.cx-list-view__meta,
+.cx-list-view__description,
+.cx-list-view__empty {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cx-list-view__label {
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+}
+
+.cx-list-view__meta,
+.cx-list-view__description,
+.cx-list-view__empty {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+}
+
+.cx-list-view__description {
+  white-space: nowrap;
+}
+
+.cx-list-view__empty {
+  padding: var(--space-md);
+}
+
+.cx-list-view--disabled {
+  opacity: var(--opacity-disabled, 0.45);
+}

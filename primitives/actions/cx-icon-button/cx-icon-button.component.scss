@@ -1,0 +1,341 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+// block: stretch to the container width (full-row add buttons, etc.).
+:host(.cx-icon-button--block),
+:host(.cx-icon-button--block) .cx-icon-button {
+  width: 100%;
+}
+
+.cx-icon-button {
+  position: relative;
+  display: inline-flex;
+  width: var(--controller-size);
+  height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  margin: 0;
+  outline: none;
+  overflow: visible;
+  isolation: isolate;
+  transition:
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+}
+
+.cx-icon-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: var(--opacity-low);
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-icon-button--small {
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+}
+
+.cx-icon-button--default {
+  color: var(--ink);
+}
+
+.cx-icon-button--default::before {
+  background: var(--opacity-low);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--default:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--opacity-mid);
+  }
+}
+
+.cx-icon-button--transparent {
+  background: transparent;
+  color: var(--cx-icon-button-transparent-color, var(--ink));
+}
+
+.cx-icon-button--transparent::before {
+  background: var(--cx-icon-button-transparent-background, transparent);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--transparent:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--cx-icon-button-transparent-hover-background, var(--opacity-low));
+  }
+}
+
+.cx-icon-button--primary {
+  color: var(--on-ink);
+}
+
+.cx-icon-button--primary::before {
+  background: var(--primary);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--primary:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--primary-alt);
+  }
+}
+
+.cx-icon-button--accent {
+  color: var(--surface-mid);
+}
+
+.cx-icon-button--accent::before {
+  background: var(--accent);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--accent:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--accent-alt);
+  }
+}
+
+.cx-icon-button--info {
+  color: var(--on-ink);
+}
+
+.cx-icon-button--info::before {
+  background: var(--info);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--info:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--info-alt);
+  }
+}
+
+.cx-icon-button--warning {
+  color: var(--on-ink);
+}
+
+.cx-icon-button--warning::before {
+  background: var(--warning);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--warning:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--warning-alt);
+  }
+}
+
+.cx-icon-button--danger {
+  color: var(--on-ink);
+}
+
+.cx-icon-button--danger::before {
+  background: var(--danger);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--danger:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--danger-alt);
+  }
+}
+
+.cx-icon-button--success {
+  color: var(--on-ink);
+}
+
+.cx-icon-button--success::before {
+  background: var(--success);
+}
+
+.cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--success:not(.cx-icon-button--disabled) {
+  &::before {
+    background: var(--success-alt);
+  }
+}
+
+.cx-icon-button--active {
+  color: var(--ink);
+}
+
+.cx-icon-button--active::before {
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-raised);
+}
+
+.cx-icon-button--primary.cx-icon-button--active {
+  color: var(--primary);
+}
+
+.cx-icon-button--accent.cx-icon-button--active {
+  color: var(--accent);
+}
+
+.cx-icon-button--info.cx-icon-button--active {
+  color: var(--info);
+}
+
+.cx-icon-button--success.cx-icon-button--active {
+  color: var(--success);
+}
+
+.cx-icon-button--warning.cx-icon-button--active {
+  color: var(--warning);
+}
+
+.cx-icon-button--danger.cx-icon-button--active {
+  color: var(--danger);
+}
+
+.cx-icon-button--disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.cx-icon-button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-icon-button:active:not(.cx-icon-button--disabled) {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-icon-button__icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  color: currentColor;
+}
+
+.cx-icon-button__spinner-box {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.cx-icon-button__countdown {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.cx-icon-button__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  z-index: 2;
+  display: inline-flex;
+  pointer-events: none;
+}
+
+.cx-icon-button__badge cx-badge {
+  display: inline-flex;
+}
+
+.cx-icon-button--with-dot-badge::before {
+  -webkit-mask:
+    radial-gradient(circle 7px at calc(100% - 6px) 2px, transparent 98%, #000 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask:
+    radial-gradient(circle 7px at calc(100% - 6px) 2px, transparent 98%, #000 100%);
+  mask-repeat: no-repeat;
+}
+
+.cx-icon-button--with-badge-value::before {
+  -webkit-mask:
+    radial-gradient(circle 11px at calc(100% - 10px) 6px, transparent 98%, #000 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask:
+    radial-gradient(circle 11px at calc(100% - 10px) 6px, transparent 98%, #000 100%);
+  mask-repeat: no-repeat;
+}
+
+.cx-icon-button__countdown-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.cx-icon-button__countdown-track,
+.cx-icon-button__countdown-progress {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+
+.cx-icon-button__countdown-track {
+  stroke: currentColor;
+  opacity: 0.22;
+}
+
+.cx-icon-button__countdown-progress {
+  stroke: currentColor;
+  stroke-dasharray: 6 6;
+  animation: cx-icon-button-countdown 6s forwards;
+}
+
+.cx-icon-button--small .cx-icon-button__spinner-box {
+  width: 12px;
+  height: 12px;
+}
+
+.cx-icon-button--small .cx-icon-button__countdown {
+  width: 12px;
+  height: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-icon-button__countdown-progress {
+    animation: none;
+  }
+}
+
+@keyframes cx-icon-button-countdown {
+  0% {
+    stroke-dasharray: 6 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  16.6667% {
+    stroke-dasharray: 5 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  33.3333% {
+    stroke-dasharray: 4 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  50% {
+    stroke-dasharray: 3 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  66.6667% {
+    stroke-dasharray: 2 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  83.3333% {
+    stroke-dasharray: 1 6;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  100% {
+    stroke-dasharray: 0 6;
+  }
+}

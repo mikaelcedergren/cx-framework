@@ -1,0 +1,16 @@
+<div
+  class="cx-option-group"
+  [class.cx-option-group--header]="variant === 'header'"
+  [class.cx-option-group--label]="variant === 'label'"
+  aria-hidden="true"
+>
+  <span class="cx-option-group__label">{{ label }}</span>
+
+  @if (description) {
+    <span class="cx-option-group__description">{{ description }}</span>
+  }
+
+  <span class="cx-option-group__actions">
+    <ng-content select="[actions]" />
+  </span>
+</div>

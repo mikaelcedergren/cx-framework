@@ -1,0 +1,21 @@
+@if (loading$()) {
+  <div class="cx-image__fallback" aria-busy="true">
+    <cx-spinner mood="default" size="24" />
+  </div>
+} @else if (showImage$()) {
+  <img
+    class="cx-image"
+    [src]="image$().src"
+    [alt]="image$().alt"
+    (load)="onImageLoad()"
+    (error)="onImageError()"
+    (click)="onClick()"
+  />
+} @else if (showFallback$()) {
+  <div class="cx-image__fallback" role="img" [attr.aria-label]="fallbackText$() || null">
+    <cx-icon name="image" [size]="24" />
+    @if (fallbackText$()) {
+      <span>{{ fallbackText$() }}</span>
+    }
+  </div>
+}

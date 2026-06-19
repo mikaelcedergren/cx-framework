@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  width: 100%;
+  color: var(--ink);
+}
+
+.cx-code-block__surface {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.cx-code-block__heading {
+  min-width: 0;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-code-block__copy {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) ease;
+}
+
+:host(:hover) .cx-code-block__copy,
+:host(:focus-within) .cx-code-block__copy {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cx-code-block__box {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+}
+
+.cx-code-block__pre {
+  min-width: 0;
+  margin: 0;
+}
+
+.cx-code-block__code {
+  display: block;
+  color: var(--ink);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+  tab-size: 2;
+  white-space: pre-wrap;
+}
+
+:host(.cx-code-block--copyable) .cx-code-block__code {
+  padding-inline-end: calc(var(--controller-size-small) + var(--space-sm));
+}
+
+:host(.cx-code-block--no-wrap) .cx-code-block__box {
+  overflow-x: auto;
+}
+
+:host(.cx-code-block--no-wrap) .cx-code-block__code {
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+.cx-code-block__line {
+  display: block;
+  min-height: calc(var(--font-size-body) * var(--line-height-body));
+  border-radius: var(--radius-xs);
+}
+
+.cx-code-block__line--default,
+.cx-code-block__segment--default {
+  background: var(--opacity-mid);
+}
+
+.cx-code-block__line--info,
+.cx-code-block__segment--info {
+  color: var(--info);
+  background: var(--info-opacity);
+}
+
+.cx-code-block__line--success,
+.cx-code-block__segment--success {
+  color: var(--success);
+  background: var(--success-opacity);
+}
+
+.cx-code-block__line--warning,
+.cx-code-block__segment--warning {
+  color: var(--warning);
+  background: var(--warning-opacity);
+}
+
+.cx-code-block__line--danger,
+.cx-code-block__segment--danger {
+  color: var(--danger);
+  background: var(--danger-opacity);
+}
+
+.cx-code-block__segment {
+  border-radius: var(--radius-xs);
+}
+
+mark.cx-code-block__segment {
+  padding: 0 var(--space-2xs);
+}

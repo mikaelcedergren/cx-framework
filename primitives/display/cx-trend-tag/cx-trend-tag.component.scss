@@ -1,0 +1,45 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-trend-tag {
+  display: inline-flex;
+  width: max-content;
+  height: calc(var(--controller-size-small) - var(--space-xs));
+  align-items: center;
+  padding-inline-end: var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--success-opacity);
+  color: var(--success);
+  box-sizing: border-box;
+}
+
+.cx-trend-tag__icon {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.cx-trend-tag__value {
+  display: block;
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  color: currentColor;
+}
+
+.cx-trend-tag--up {
+  background: var(--success-opacity);
+  color: var(--success);
+}
+
+.cx-trend-tag--flat {
+  background: var(--info-opacity);
+  color: var(--info);
+}
+
+.cx-trend-tag--down {
+  background: var(--danger-opacity);
+  color: var(--danger);
+}

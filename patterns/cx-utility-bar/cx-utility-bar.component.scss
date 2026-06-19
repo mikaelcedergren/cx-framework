@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  min-width: 0;
+}
+
+.cx-utility-bar {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-sm);
+}
+
+.cx-utility-bar--end {
+  justify-content: flex-end;
+}
+
+.cx-utility-bar--space-between {
+  justify-content: space-between;
+}
+
+.cx-utility-bar--wrap {
+  flex-wrap: wrap;
+}

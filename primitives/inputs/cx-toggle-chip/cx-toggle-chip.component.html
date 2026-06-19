@@ -1,0 +1,16 @@
+<button
+  type="button"
+  class="cx-toggle-chip"
+  [class.cx-toggle-chip--small]="size === 'small'"
+  [class.cx-toggle-chip--large]="size === 'large'"
+  [class.cx-toggle-chip--selected]="selected$()"
+  [disabled]="disabled"
+  [attr.aria-label]="ariaLabel || null"
+  [attr.aria-pressed]="selected$()"
+  (click)="toggle()"
+>
+  <span class="cx-toggle-chip__check" aria-hidden="true">
+    <cx-icon name="check" [size]="size === 'small' ? 12 : size === 'large' ? 24 : 16" shape="circle-solid" mood="primary" />
+  </span>
+  <span class="cx-toggle-chip__label">{{ text }}</span>
+</button>

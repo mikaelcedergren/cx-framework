@@ -1,0 +1,16 @@
+<cx-badge [visible]="badgeVisible()" [mood]="badgeMood()" [count]="badgeCount()">
+  <span
+    class="cx-avatar"
+    [attr.role]="ariaLabel ? 'img' : null"
+    [attr.aria-label]="ariaLabel || null"
+    [attr.aria-hidden]="ariaLabel ? null : 'true'"
+  >
+    @if (showImage()) {
+      <img class="cx-avatar__image" [src]="src" alt="" (error)="onImageError()" />
+    } @else if (initials(); as avatarInitials) {
+      <span class="cx-avatar__initials" aria-hidden="true">{{ avatarInitials }}</span>
+    } @else {
+      <cx-icon class="cx-avatar__icon" name="user" size="auto" />
+    }
+  </span>
+</cx-badge>

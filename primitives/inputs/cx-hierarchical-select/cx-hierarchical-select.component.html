@@ -1,0 +1,53 @@
+<div class="cx-hierarchical-select" [class.cx-hierarchical-select--disabled]="disabled">
+  <button
+    type="button"
+    class="cx-hierarchical-select__trigger"
+    [disabled]="disabled"
+    [attr.aria-expanded]="open$()"
+    aria-haspopup="tree"
+    [attr.aria-readonly]="readOnly ? 'true' : null"
+    (click)="toggleOpen()"
+  >
+    @if (showIcons) {
+      @if (selectedItem$()?.icon; as icon) {
+        <cx-icon class="cx-hierarchical-select__leading" [name]="icon" [size]="16" />
+      }
+    }
+    <span
+      class="cx-hierarchical-select__value"
+      [class.cx-hierarchical-select__value--placeholder]="showPlaceholder()"
+    >
+      {{ displayText() }}
+    </span>
+    <cx-icon class="cx-hierarchical-select__chevron" name="chevron-down" [size]="16" />
+  </button>
+
+  @if (open$() && !isLocked()) {
+    <div class="cx-hierarchical-select__panel">
+      @if (searchable) {
+        <cx-input
+          class="cx-hierarchical-select__search"
+          label=""
+          ariaLabel="Search options"
+          placeholder=""
+          prependIcon="search"
+          [value]="query$()"
+          (valueChange)="onQueryChange($event)"
+        />
+      }
+      @if (clearable) {
+        <button type="button" class="cx-hierarchical-select__clear-row" (click)="onValueChange(undefined)">
+          None
+        </button>
+      }
+      <cx-tree-view
+        [items]="visibleItems$()"
+        [selectedId]="value$()"
+        [expandedIds]="expandedIds$()"
+        [showIcons]="showIcons"
+        (selectedIdChange)="onValueChange($event)"
+        (expandedIdsChange)="onExpandedIdsChange($event)"
+      />
+    </div>
+  }
+</div>

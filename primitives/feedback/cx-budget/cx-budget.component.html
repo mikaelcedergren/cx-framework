@@ -1,0 +1,15 @@
+<div class="cx-budget-track">
+  <div
+    class="cx-budget-fill"
+    [class.cx-budget-fill-success]="color$() === 'success'"
+    [class.cx-budget-fill-yellow]="color$() === 'yellow'"
+    [class.cx-budget-fill-orange]="color$() === 'orange'"
+    [class.cx-budget-fill-danger]="color$() === 'danger'"
+    [class.cx-budget-fill-connected]="isOverBudget$()"
+    [style.width.%]="fillWidth$()"
+  ></div>
+  @if (isOverBudget$()) {
+    <div class="cx-budget-overage" [style.width.%]="overageWidth$()"></div>
+  }
+</div>
+<div class="cx-budget-label">{{ percentage$() }}%</div>

@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 1px;
+  flex: 0 0 auto;
+  background: var(--opacity-mid);
+}
+
+:host(.cx-divider--discreet) {
+  background: var(--opacity-low);
+}
+
+:host(.cx-divider--thick) {
+  height: 3px;
+}

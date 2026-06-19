@@ -1,0 +1,26 @@
+<nav class="cx-breadcrumbs" [attr.aria-label]="ariaLabel$()">
+  <ol class="cx-breadcrumbs__list">
+    @for (item of items$(); track item.id; let last = $last) {
+      <li class="cx-breadcrumbs__item">
+        @if (isCurrent(item.id)) {
+          <span class="cx-breadcrumbs__current" aria-current="page">{{ item.label }}</span>
+        } @else {
+          <button
+            type="button"
+            class="cx-breadcrumbs__link"
+            [attr.data-text]="item.label"
+            (click)="selectItem(item.id)"
+          >
+            {{ item.label }}
+          </button>
+        }
+
+        @if (!last) {
+          <span class="cx-breadcrumbs__separator" aria-hidden="true">
+            <cx-icon name="chevron-right" [size]="16" />
+          </span>
+        }
+      </li>
+    }
+  </ol>
+</nav>

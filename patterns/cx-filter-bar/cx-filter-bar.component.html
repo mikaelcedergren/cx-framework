@@ -1,0 +1,267 @@
+<div class="cx-filter-bar">
+  <div class="cx-filter-bar__left">
+    @if (mode$() === 'filters') {
+      <div class="cx-filter-bar__filter-trigger" #filterTriggerAnchor>
+        <cx-icon-button
+          icon="filters"
+          ariaLabel="Open filters"
+          mood="default"
+          size="small"
+          (pressed)="toggleFilterPopover()"
+        />
+      </div>
+
+      @if (quickFilters$().length > 0) {
+        <cx-button-group
+          size="small"
+          [availableValues]="quickFilters$()"
+          [value]="selectedQuickFilterId$()"
+          (valueChange)="onQuickFilterSelect($event)"
+        />
+      }
+
+      @if (filterOptions$().length > 0) {
+        <div class="cx-filter-bar__select">
+          <cx-select
+            label=""
+            size="small"
+            [placeholder]="filterPlaceholder"
+            [availableValues]="filterOptions$()"
+            [value]="selectedFilterValue$()"
+            (valueChange)="onFilterValueChange($event)"
+          />
+        </div>
+      }
+    } @else {
+      <div class="cx-filter-bar__query">
+        <cx-input
+          label=""
+          [placeholder]="queryPlaceholder"
+          prependIcon="query"
+          [value]="queryValue$()"
+          (valueChange)="onQueryChange($event)"
+        />
+      </div>
+    }
+  </div>
+
+  <div class="cx-filter-bar__right">
+    @if (savedViews$().length > 0) {
+      <cx-menu
+        heading="Saved views"
+        [items]="resolvedSavedViews$()"
+        (openChange)="onSavedViewsOpenChange($event)"
+        (itemSelect)="onSavedViewSelect($event)"
+      >
+        <cx-icon-button
+          trigger
+          [icon]="savedViewIcon$()"
+          ariaLabel="Saved views"
+          variant="transparent"
+        />
+      </cx-menu>
+    }
+
+    <div class="cx-filter-bar__properties-trigger" #propertiesTriggerAnchor>
+      <cx-icon-button
+        icon="properties"
+        ariaLabel="Table properties"
+        variant="transparent"
+        (pressed)="togglePropertiesPopover()"
+      />
+    </div>
+
+    <cx-menu
+      [items]="overflowItems$()"
+      (openChange)="onOverflowOpenChange($event)"
+      (itemSelect)="onOverflowItemSelect($event)"
+    >
+      <cx-icon-button
+        trigger
+        icon="menu-vertical"
+        ariaLabel="Table actions"
+        variant="transparent"
+      />
+    </cx-menu>
+  </div>
+
+</div>
+
+<cx-popover
+  #filterPopover
+  [open]="filterPopoverOpen$() && mode$() === 'filters'"
+  [showBackdrop]="filterPopoverOpen$() || propertiesPopoverOpen$()"
+  [heading]="'Filters'"
+  [left]="filterPopoverLeft$()"
+  [top]="filterPopoverTop$()"
+  [bottom]="filterPopoverBottom$()"
+  [width]="filterPopoverWidth$()"
+  [maxHeight]="filterPopoverMaxHeight$()"
+  [placement]="filterPopoverPlacement$()"
+  surfaceClass="cx-filter-bar__popover"
+  (backdropPressed)="closeFloatingPopovers()"
+>
+  <div class="cx-filter-bar__popover-content">
+    <cx-button-group
+      size="small"
+      [availableValues]="presetOptions"
+      [value]="presetSelection$()"
+      (valueChange)="onPresetSelect($event)"
+    />
+
+    <div class="cx-filter-bar__sections">
+      @for (section of filterSections$(); track section.id) {
+        <cx-expansion-panel
+          [heading]="section.label"
+        >
+          <p class="cx-filter-bar__section-copy">{{ sectionBody(section) }}</p>
+        </cx-expansion-panel>
+      }
+    </div>
+  </div>
+</cx-popover>
+
+<cx-popover
+  #propertiesPopover
+  [open]="propertiesPopoverOpen$()"
+  [showBackdrop]="filterPopoverOpen$() || propertiesPopoverOpen$()"
+  [left]="propertiesPopoverLeft$()"
+  [top]="propertiesPopoverTop$()"
+  [bottom]="propertiesPopoverBottom$()"
+  [width]="propertiesPopoverWidth$()"
+  [maxHeight]="propertiesPopoverMaxHeight$()"
+  [placement]="propertiesPopoverPlacement$()"
+  surfaceVariant="raised"
+  surfaceClass="cx-filter-bar__popover cx-filter-bar__popover--properties"
+  (backdropPressed)="closeFloatingPopovers()"
+>
+  <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties">
+    <section class="cx-filter-bar__properties-section">
+      <cx-menu-label heading="Display" />
+      <div class="cx-filter-bar__properties-section-body">
+        <cx-button-group
+          class="cx-filter-bar__display-toggle"
+          size="small"
+          [availableValues]="displayOptions"
+          [value]="displayMode$()"
+          (valueChange)="onDisplayModeSelect($event)"
+        />
+      </div>
+    </section>
+
+    @if (hasGroupByControls$()) {
+      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
+      <section class="cx-filter-bar__properties-section">
+        <cx-menu-label heading="Group by" />
+        <div class="cx-filter-bar__properties-section-body">
+          <cx-toggle-chip-group
+            size="small"
+            [availableValues]="groupByChipOptions$()"
+            selection="single"
+            [selectedValues]="groupByValues$()"
+            (selectedValuesChange)="onGroupByValuesSelect($event)"
+          />
+        </div>
+      </section>
+    }
+
+    @if (hasSortControls$()) {
+      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
+      <section class="cx-filter-bar__properties-section">
+        <cx-menu-label heading="Sort by" />
+        <div class="cx-filter-bar__properties-section-body">
+          <div class="cx-filter-bar__sort-row">
+            <cx-select
+              class="cx-filter-bar__sort-select"
+              label=""
+              placeholder="Choose column"
+              [availableValues]="sortOptions$()"
+              [value]="sortBy$()"
+              (valueChange)="onSortByValueChange($event)"
+            />
+            <cx-icon-button
+              [icon]="directionIcon(sortDirection$())"
+              ariaLabel="Toggle primary sort direction"
+              variant="transparent"
+              size="small"
+              [disabled]="!hasActivePrimarySort()"
+              (pressed)="toggleSortDirection()"
+            />
+          </div>
+        </div>
+      </section>
+
+      @if (hasThenByControls$()) {
+      <section class="cx-filter-bar__properties-section">
+        <cx-menu-label heading="Then by" />
+        <div class="cx-filter-bar__properties-section-body">
+          <div class="cx-filter-bar__sort-row">
+            <cx-select
+              class="cx-filter-bar__sort-select"
+              label=""
+              placeholder="Choose column"
+              [availableValues]="sortOptions$()"
+              [value]="thenBy$()"
+              (valueChange)="onThenByValueChange($event)"
+            />
+            <cx-icon-button
+              [icon]="directionIcon(thenByDirection$())"
+              ariaLabel="Toggle secondary sort direction"
+              variant="transparent"
+              size="small"
+              [disabled]="!hasActiveSecondarySort()"
+              (pressed)="toggleThenByDirection()"
+            />
+          </div>
+        </div>
+      </section>
+      }
+    }
+
+    @if (hasColumnControls$()) {
+      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
+      <section class="cx-filter-bar__properties-section">
+      <cx-menu-label heading="Columns">
+        <button
+          type="button"
+          class="cx-filter-bar__properties-link"
+          (click)="resetColumns()"
+        >
+          Reset
+        </button>
+      </cx-menu-label>
+      <div class="cx-filter-bar__properties-section-body">
+        <cx-input
+          label=""
+          [placeholder]="columnSearchPlaceholder"
+          prependIcon="search"
+          [value]="columnSearchValue$()"
+          (valueChange)="onColumnSearchValueChange($event)"
+        />
+
+        <div class="cx-filter-bar__column-options">
+          @for (column of filteredColumnOptions$(); track column.id) {
+            <div class="cx-filter-bar__column-row">
+              <cx-switch
+                class="cx-filter-bar__column-switch"
+                [text]="column.label"
+                [selected]="isColumnVisible(column.id)"
+                (selectedChange)="onColumnOptionSelect(column.id)"
+              />
+              <cx-toggle-button
+                [icon]="'pin'"
+                [iconSelected]="'pin-off'"
+                [selected]="isColumnPinned(column.id)"
+                [ariaLabel]="isColumnPinned(column.id) ? 'Unpin column' : 'Pin column'"
+                size="small"
+                [disabled]="!canPinColumn(column.id)"
+                (selectedChange)="togglePinnedColumn(column.id)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+      </section>
+    }
+  </div>
+</cx-popover>

@@ -1,0 +1,10 @@
+:root {
+  --z-index-detail: 100;
+  --z-index-popover-backdrop: 1100;
+  --z-index-popover: 1110;
+  --z-index-dialog: 1200;
+  --z-index-toast: 1300;
+  --z-index-notification: var(--z-index-toast);
+  --z-index-tooltip: 1400;
+  --z-index-debug: 9999;
+}

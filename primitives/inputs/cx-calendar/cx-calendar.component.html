@@ -1,0 +1,33 @@
+<div class="cx-calendar" [class.cx-calendar--disabled]="disabled">
+  <div class="cx-calendar__header">
+    <cx-icon-button icon="arrow-left" variant="transparent" size="small" ariaLabel="Previous month" [disabled]="disabled" (pressed)="onPreviousMonth()" />
+    <div class="cx-calendar__controls">
+      <cx-select class="cx-calendar__select cx-calendar__select--month" label="" ariaLabel="Month" [availableValues]="monthOptions" [value]="viewMonthValue$()" [disabled]="disabled" (valueChange)="onMonthChange($event)" />
+      <cx-select class="cx-calendar__select cx-calendar__select--year" label="" ariaLabel="Year" [availableValues]="yearOptions$()" [value]="viewYearValue$()" [disabled]="disabled" (valueChange)="onYearChange($event)" />
+    </div>
+    <cx-icon-button icon="arrow-right" variant="transparent" size="small" ariaLabel="Next month" [disabled]="disabled" (pressed)="onNextMonth()" />
+  </div>
+
+  <div class="cx-calendar__weekdays">
+    @for (weekday of weekdayLabels$(); track weekday) {
+      <div class="cx-calendar__weekday">{{ weekday }}</div>
+    }
+  </div>
+
+  <div class="cx-calendar__grid">
+    @for (day of calendarDays$(); track day.key) {
+      <button
+        type="button"
+        class="cx-calendar__day"
+        [class.cx-calendar__day--outside]="!day.inCurrentMonth"
+        [class.cx-calendar__day--today]="day.isToday"
+        [class.cx-calendar__day--selected]="isSelectedDay(day)"
+        [disabled]="disabled || isOutsideRange(day)"
+        [attr.aria-label]="day.isoDate"
+        (click)="onDaySelect(day)"
+      >
+        {{ day.day }}
+      </button>
+    }
+  </div>
+</div>

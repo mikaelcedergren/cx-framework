@@ -1,0 +1,79 @@
+<div class="cx-number-field" [class.cx-number-field--small]="size$() === 'small'" [class.cx-number-field--large]="size$() === 'large'">
+  @if (label.trim() || optional) {
+    <div class="cx-number-field__header">
+      @if (label.trim()) {
+        <div class="cx-number-field__label" [id]="labelId">{{ label }}</div>
+      }
+
+      @if (optional && label.trim()) {
+        <div class="cx-number-field__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-number-field__field-shell"
+    [class.cx-number-field__field-shell--focused]="shellFocused$()"
+    [class.cx-number-field__field-shell--disabled]="disabled$()"
+    [class.cx-number-field__field-shell--readonly]="readOnly$()"
+    [class.cx-number-field__field-shell--loading]="loading$()"
+    [class.cx-number-field__field-shell--error]="hasError$()"
+    [attr.aria-busy]="loading$() ? 'true' : null"
+  >
+    @if (prependText$(); as prependText) {
+      <span class="cx-number-field__affix cx-number-field__affix--prepend">{{ prependText }}</span>
+    }
+
+    <input
+      #field
+      type="number"
+      inputmode="decimal"
+      class="cx-number-field__field"
+      [value]="draft$()"
+      [placeholder]="placeholder"
+      [disabled]="isLocked$()"
+      [readOnly]="readOnly$()"
+      [attr.min]="min$() ?? null"
+      [attr.max]="max$() ?? null"
+      [attr.step]="step$() ?? null"
+      [attr.aria-label]="resolvedAriaLabel"
+      [attr.aria-labelledby]="resolvedAriaLabelledBy"
+      [attr.aria-describedby]="resolvedAriaDescribedBy"
+      [attr.aria-invalid]="hasError$() ? 'true' : null"
+      [attr.aria-readonly]="readOnly$() ? 'true' : null"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown.enter)="onCommitOnEnter($event)"
+      (keydown.escape)="onEscapeKey()"
+    />
+
+    @if (appendText$(); as appendText) {
+      <span class="cx-number-field__affix cx-number-field__affix--append">{{ appendText }}</span>
+    }
+
+    @if (loading$()) {
+      <span class="cx-number-field__loading" aria-hidden="true">
+        <cx-spinner size="16" mood="default" />
+      </span>
+    }
+
+    @if (hasClear$()) {
+      <button type="button" class="cx-number-field__clear" aria-label="Clear" (click)="onClear($event)">
+        <cx-icon name="remove" [size]="14" />
+      </button>
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-number-field__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-number-field__hint">{{ hint$() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+:host([data-columns='1']) .cx-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+:host([data-columns='2']) .cx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+:host([data-columns='3']) .cx-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:host([data-columns='4']) .cx-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+:host([data-columns='5']) .cx-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+:host([data-columns='6']) .cx-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+:host([data-columns='7']) .cx-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+:host([data-columns='8']) .cx-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+:host([data-columns='9']) .cx-grid { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+:host([data-columns='10']) .cx-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+:host([data-columns='11']) .cx-grid { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+:host([data-columns='12']) .cx-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+:host([data-column-gap='2xs']) .cx-grid { column-gap: var(--space-2xs); }
+:host([data-column-gap='xs']) .cx-grid { column-gap: var(--space-xs); }
+:host([data-column-gap='sm']) .cx-grid { column-gap: var(--space-sm); }
+:host([data-column-gap='md']) .cx-grid { column-gap: var(--space-md); }
+:host([data-column-gap='lg']) .cx-grid { column-gap: var(--space-lg); }
+:host([data-column-gap='xl']) .cx-grid { column-gap: var(--space-xl); }
+:host([data-column-gap='2xl']) .cx-grid { column-gap: var(--space-2xl); }
+
+:host([data-row-gap='2xs']) .cx-grid { row-gap: var(--space-2xs); }
+:host([data-row-gap='xs']) .cx-grid { row-gap: var(--space-xs); }
+:host([data-row-gap='sm']) .cx-grid { row-gap: var(--space-sm); }
+:host([data-row-gap='md']) .cx-grid { row-gap: var(--space-md); }
+:host([data-row-gap='lg']) .cx-grid { row-gap: var(--space-lg); }
+:host([data-row-gap='xl']) .cx-grid { row-gap: var(--space-xl); }
+:host([data-row-gap='2xl']) .cx-grid { row-gap: var(--space-2xl); }
+
+:host([data-align='start']) .cx-grid { align-items: flex-start; }
+:host([data-align='center']) .cx-grid { align-items: center; }
+:host([data-align='end']) .cx-grid { align-items: flex-end; }
+:host([data-align='stretch']) .cx-grid { align-items: stretch; }

@@ -1,0 +1,56 @@
+<div class="cx-empty-state">
+  @if (showSpinner) {
+    <div class="cx-empty-state__icon">
+      <cx-spinner size="64" mood="default" />
+    </div>
+  } @else if (showIcon) {
+    <div class="cx-empty-state__icon">
+      <cx-icon [name]="resolvedIcon" size="64" />
+    </div>
+  }
+
+  @if (hasHeading) {
+    <div class="cx-empty-state__heading">{{ resolvedHeading }}</div>
+  }
+
+  @if (hasText) {
+    <div class="cx-empty-state__text">{{ resolvedText }}</div>
+  }
+
+  @if (customContent) {
+    <div class="cx-empty-state__content">
+      <ng-content />
+    </div>
+  }
+
+  @if (hasActions()) {
+    <div class="cx-empty-state__actions">
+      @if (visibleAction; as action) {
+        <cx-button
+          [text]="action.text"
+          [variant]="actionVariant(action)"
+          [mood]="resolveActionMood(action)"
+          [icon]="action.icon"
+          [appendIcon]="action.appendIcon"
+          [disabled]="action.disabled ?? false"
+          [loading]="action.loading ?? false"
+          [ariaLabel]="action.ariaLabel"
+          (pressed)="onActionPressed(action)"
+        />
+      }
+      @if (visibleSecondaryAction; as action) {
+        <cx-button
+          [text]="action.text"
+          [variant]="actionVariant(action)"
+          [mood]="resolveActionMood(action)"
+          [icon]="action.icon"
+          [appendIcon]="action.appendIcon"
+          [disabled]="action.disabled ?? false"
+          [loading]="action.loading ?? false"
+          [ariaLabel]="action.ariaLabel"
+          (pressed)="onSecondaryActionPressed(action)"
+        />
+      }
+    </div>
+  }
+</div>

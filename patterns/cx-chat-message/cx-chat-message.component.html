@@ -1,0 +1,22 @@
+<div class="cx-chat-message__bubble">
+  <div class="cx-chat-message__header">
+    <div class="cx-chat-message__meta">
+      <div class="cx-chat-message__author">{{ authorLabel$() }}</div>
+      @if (timestamp$().trim()) {
+        <div class="cx-chat-message__timestamp">{{ timestamp$() }}</div>
+      }
+    </div>
+
+    @if (status$(); as status) {
+      <cx-tag
+        [text]="status.label"
+        [color]="status.color"
+        [icon]="status.icon"
+      />
+    }
+  </div>
+
+  <div class="cx-chat-message__body">
+    <ng-content />
+  </div>
+</div>

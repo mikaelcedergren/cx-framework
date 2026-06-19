@@ -1,0 +1,23 @@
+@for (step of visibleSteps(); track index; let index = $index) {
+  <div
+    class="cx-step"
+    [class.cx-step--selected]="index === visibleIndex()"
+    [class.cx-step--completed]="index < visibleIndex()"
+    [attr.aria-current]="index === visibleIndex() ? 'step' : null"
+  >
+    <div class="cx-step__number">
+      @if (index < visibleIndex()) {
+        <cx-icon name="check" [size]="14" />
+      } @else {
+        {{ index + 1 }}
+      }
+    </div>
+    @if (!compact || index === visibleIndex()) {
+      <div class="cx-step__name">{{ step.name }}</div>
+    }
+  </div>
+
+  @if (index < lastVisibleIndex()) {
+    <div class="cx-step__divider"></div>
+  }
+}

@@ -1,0 +1,158 @@
+:host {
+  display: block;
+  width: 100%;
+  container-type: inline-size;
+}
+
+.cx-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(240px, calc(24vw + var(--space-xl)), 320px);
+  overflow: hidden;
+  border: var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--opacity-low);
+}
+
+.cx-workbench__main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cx-workbench__preview {
+  display: flex;
+  min-width: 0;
+  min-height: 200px;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--space-2xl);
+  background-color: var(--surface-mid);
+  --cx-workbench-checker: color-mix(in srgb, var(--ink) 0.6%, transparent);
+  background-image: conic-gradient(
+    var(--cx-workbench-checker) 25%,
+    transparent 0 50%,
+    var(--cx-workbench-checker) 0 75%,
+    transparent 0
+  );
+  background-size: var(--space-md) var(--space-md);
+}
+
+.cx-workbench--align-top .cx-workbench__preview {
+  align-items: flex-start;
+}
+
+.cx-workbench--align-bottom .cx-workbench__preview {
+  align-items: flex-end;
+}
+
+.cx-workbench__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-xl);
+  padding: var(--space-sm) var(--space-md);
+  border-top: var(--line);
+  background: var(--surface-low);
+}
+
+.cx-workbench__meta-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-workbench__meta-label {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+.cx-workbench__meta cx-select {
+  min-width: 120px;
+}
+
+.cx-workbench__controls {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: calc(var(--space-xl) + var(--space-sm)) var(--space-xl);
+  border-left: var(--line);
+}
+
+:host ::ng-deep [cxWorkbenchPreview] {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+:host ::ng-deep [cxWorkbenchControls] {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+:host(.cp-workbench--hidden),
+:host(.cx-workbench--hidden),
+.cx-workbench--hidden {
+  display: none;
+}
+
+:host ::ng-deep .cx-workbench--min-small [cxWorkbenchPreview] > * {
+  min-width: min(100%, 160px);
+}
+
+:host ::ng-deep .cx-workbench--min-medium [cxWorkbenchPreview] > * {
+  min-width: min(100%, 380px);
+}
+
+:host ::ng-deep .cx-workbench--min-large [cxWorkbenchPreview] > * {
+  min-width: min(100%, 600px);
+}
+
+:host ::ng-deep .cx-workbench--width-small [cxWorkbenchPreview] > * {
+  width: min(100%, 160px);
+}
+
+:host ::ng-deep .cx-workbench--width-medium [cxWorkbenchPreview] > * {
+  width: min(100%, 380px);
+}
+
+:host ::ng-deep .cx-workbench--width-large [cxWorkbenchPreview] > * {
+  width: min(100%, 600px);
+}
+
+:host ::ng-deep .cx-workbench--width-full [cxWorkbenchPreview] > * {
+  width: 100%;
+}
+
+@container (max-width: 640px) {
+  .cx-workbench__controls,
+  .cx-workbench__preview {
+    padding: var(--space-md);
+  }
+}
+
+@container (max-width: 360px) {
+  .cx-workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cx-workbench__controls {
+    border-left: 0;
+    border-top: var(--line-discreet);
+    padding: var(--space-lg);
+  }
+
+  .cx-workbench__preview {
+    padding: var(--space-lg);
+  }
+}

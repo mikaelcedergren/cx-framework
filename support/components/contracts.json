@@ -1,0 +1,1560 @@
+{
+  "contracts": [
+    {
+      "name": "cx-account-control",
+      "inputs": [
+        "disabled",
+        "menuItems",
+        "username"
+      ],
+      "outputs": [
+        "itemSelect",
+        "logout"
+      ]
+    },
+    {
+      "name": "cx-action-bar",
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "action",
+        "deselectAll"
+      ]
+    },
+    {
+      "name": "cx-alert",
+      "inputs": [
+        "action",
+        "dismissible",
+        "icon",
+        "mood",
+        "secondaryAction",
+        "text"
+      ],
+      "outputs": [
+        "action",
+        "dismissed",
+        "secondaryAction"
+      ]
+    },
+    {
+      "name": "cx-avatar",
+      "inputs": [
+        "ariaLabel",
+        "badge",
+        "color",
+        "name",
+        "size",
+        "src"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-badge",
+      "inputs": [
+        "ariaLabel",
+        "count",
+        "maxCount",
+        "mood",
+        "placement",
+        "visible"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-banner",
+      "inputs": [
+        "action",
+        "description",
+        "dismissible",
+        "heading",
+        "mood",
+        "secondaryAction",
+        "visible"
+      ],
+      "outputs": [
+        "action",
+        "secondaryAction",
+        "visibleChange"
+      ]
+    },
+    {
+      "name": "cx-big-checkbox",
+      "inputs": [
+        "custom",
+        "disabled",
+        "heading",
+        "selected",
+        "text",
+        "value"
+      ],
+      "outputs": [
+        "focusChange",
+        "selectedChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-big-radio",
+      "inputs": [
+        "custom",
+        "disabled",
+        "heading",
+        "icon",
+        "selected",
+        "text"
+      ],
+      "outputs": [
+        "focusChange",
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-breadcrumbs",
+      "inputs": [
+        "ariaLabel",
+        "currentId",
+        "items"
+      ],
+      "outputs": [
+        "itemSelect"
+      ]
+    },
+    {
+      "name": "cx-budget",
+      "inputs": [
+        "current",
+        "favor",
+        "maximum"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-button",
+      "inputs": [
+        "ariaLabel",
+        "appendIcon",
+        "disabled",
+        "icon",
+        "loading",
+        "mood",
+        "selected",
+        "size",
+        "text",
+        "variant"
+      ],
+      "outputs": [
+        "pressed"
+      ]
+    },
+    {
+      "name": "cx-button-group",
+      "inputs": [
+        "availableValues",
+        "disabled",
+        "size",
+        "value"
+      ],
+      "outputs": [
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-calendar",
+      "inputs": [
+        "disabled",
+        "max",
+        "min",
+        "value",
+        "weekStart",
+        "yearRange"
+      ],
+      "outputs": [
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-card",
+      "inputs": [
+        "heading",
+        "icon",
+        "mood",
+        "size"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-chart",
+      "inputs": [
+        "chart"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-chat-message",
+      "inputs": [
+        "author",
+        "authorId",
+        "status",
+        "timestamp"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-chat-thread",
+      "inputs": [
+        "viewerId"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-checkbox",
+      "inputs": [
+        "custom",
+        "disabled",
+        "hint",
+        "selected",
+        "text",
+        "value"
+      ],
+      "outputs": [
+        "focusChange",
+        "selectedChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-code-block",
+      "inputs": [
+        "annotations",
+        "code",
+        "copyable",
+        "heading",
+        "wrap"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-code-field",
+      "inputs": [
+        "ariaLabel",
+        "autoFocus",
+        "disabled",
+        "length",
+        "mode",
+        "readOnly",
+        "size",
+        "validationMessages",
+        "value"
+      ],
+      "outputs": [
+        "complete",
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-color-picker",
+      "inputs": [
+        "clearable",
+        "disabled",
+        "options",
+        "placeholder",
+        "readOnly",
+        "showValue",
+        "value"
+      ],
+      "outputs": [
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-context-dialog",
+      "inputs": [
+        "align",
+        "cancelText",
+        "confirmText",
+        "dismissible",
+        "heading",
+        "mood",
+        "text"
+      ],
+      "outputs": [
+        "cancel",
+        "confirm"
+      ]
+    },
+    {
+      "name": "cx-date-picker",
+      "inputs": [
+        "allDay",
+        "allDayEnabled",
+        "clearable",
+        "disabled",
+        "loading",
+        "max",
+        "min",
+        "placeholder",
+        "readOnly",
+        "size",
+        "timeEnabled",
+        "validationMessages",
+        "value",
+        "weekStart",
+        "yearRange"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-date-span-picker",
+      "inputs": [
+        "allDayEnabled",
+        "allDayEnd",
+        "allDayStart",
+        "clearable",
+        "closeOnSelect",
+        "disabled",
+        "disabledDates",
+        "hint",
+        "label",
+        "loading",
+        "max",
+        "maxSpan",
+        "min",
+        "optional",
+        "placeholder",
+        "quickRanges",
+        "readOnly",
+        "size",
+        "timeEnabled",
+        "validationMessages",
+        "value",
+        "weekStart"
+      ],
+      "outputs": [
+        "allDayEndChange",
+        "allDayStartChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-detail-panel",
+      "inputs": [
+        "ariaLabel",
+        "dismissGuardSelector",
+        "dismissOnClickOutside",
+        "dismissible",
+        "hasScrollbar",
+        "heading",
+        "icon",
+        "inline",
+        "menuAriaLabel",
+        "menuItems",
+        "minWidth",
+        "variant",
+        "width"
+      ],
+      "outputs": [
+        "dismissed",
+        "menuSelect"
+      ]
+    },
+    {
+      "name": "cx-dialog",
+      "inputs": [
+        "closeOnPrimary",
+        "closeOnSecondary",
+        "dismissible",
+        "heading",
+        "loading",
+        "mood",
+        "open",
+        "primaryDisabled",
+        "primaryLoading",
+        "primaryText",
+        "secondaryText",
+        "size",
+        "text",
+        "variant"
+      ],
+      "outputs": [
+        "dismiss",
+        "openChange",
+        "primary",
+        "secondary"
+      ]
+    },
+    {
+      "name": "cx-divider",
+      "inputs": [
+        "discreet",
+        "thick"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-dynamic-fields",
+      "inputs": [
+        "disabled",
+        "fields",
+        "options"
+      ],
+      "outputs": [
+        "fieldsChange"
+      ]
+    },
+    {
+      "name": "cx-empty-state",
+      "inputs": [
+        "action",
+        "customContent",
+        "heading",
+        "icon",
+        "secondaryAction",
+        "text",
+        "type",
+        "visual"
+      ],
+      "outputs": [
+        "action",
+        "secondaryAction"
+      ]
+    },
+    {
+      "name": "cx-expansion-panel",
+      "inputs": [
+        "active",
+        "expanded",
+        "heading",
+        "variant"
+      ],
+      "outputs": [
+        "expandedChange"
+      ]
+    },
+    {
+      "name": "cx-file-upload",
+      "inputs": [
+        "buttonIcon",
+        "buttonText",
+        "disabled",
+        "file"
+      ],
+      "outputs": [
+        "fileUpload"
+      ]
+    },
+    {
+      "name": "cx-filter-bar",
+      "inputs": [
+        "columnOptions",
+        "columnSearchPlaceholder",
+        "displayMode",
+        "filterOptions",
+        "filterPlaceholder",
+        "filterSections",
+        "groupBy",
+        "groupByOptions",
+        "mode",
+        "queryPlaceholder",
+        "queryValue",
+        "quickFilters",
+        "savedViews",
+        "selectedFilterValue",
+        "selectedQuickFilterId",
+        "sortBy",
+        "sortOptions",
+        "thenBy",
+        "visibleColumnIds"
+      ],
+      "outputs": [
+        "activeSavedViewIdChange",
+        "displayModeChange",
+        "exportTable",
+        "groupByChange",
+        "modeChange",
+        "queryValueChange",
+        "resetTable",
+        "savedViewSelect",
+        "selectedFilterValueChange",
+        "selectedQuickFilterIdChange",
+        "sortByChange",
+        "thenByChange",
+        "visibleColumnIdsChange"
+      ]
+    },
+    {
+      "name": "cx-fullscreen-dialog",
+      "inputs": [
+        "description",
+        "disabled",
+        "dismissible",
+        "heading",
+        "loading",
+        "open",
+        "primaryActionMood",
+        "primaryActionText",
+        "secondaryActionText"
+      ],
+      "outputs": [
+        "dismiss",
+        "openChange",
+        "primaryAction",
+        "secondaryAction"
+      ]
+    },
+    {
+      "name": "cx-grid",
+      "inputs": [
+        "align",
+        "columnGap",
+        "columns",
+        "gap",
+        "rowGap"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-hierarchical-select",
+      "inputs": [
+        "clearable",
+        "disabled",
+        "expandedIds",
+        "items",
+        "placeholder",
+        "readOnly",
+        "searchable",
+        "showIcons",
+        "value"
+      ],
+      "outputs": [
+        "expandedIdsChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-icon",
+      "inputs": [
+        "mood",
+        "name",
+        "shape",
+        "size"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-icon-button",
+      "inputs": [
+        "active",
+        "ariaLabel",
+        "ariaPressed",
+        "badgeValue",
+        "block",
+        "countdown",
+        "disabled",
+        "hover",
+        "icon",
+        "loading",
+        "mood",
+        "size",
+        "variant"
+      ],
+      "outputs": [
+        "countdownChange",
+        "pressed"
+      ]
+    },
+    {
+      "name": "cx-image",
+      "inputs": [
+        "fallbackText",
+        "image",
+        "loading"
+      ],
+      "outputs": [
+        "imageClick"
+      ]
+    },
+    {
+      "name": "cx-inline",
+      "inputs": [
+        "align",
+        "gap",
+        "justify",
+        "wrap"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-input",
+      "inputs": [
+        "appendIcon",
+        "appendIconClickable",
+        "appendText",
+        "ariaLabel",
+        "clearable",
+        "debounceMs",
+        "disabled",
+        "errorMessage",
+        "hint",
+        "label",
+        "loading",
+        "optional",
+        "placeholder",
+        "prependIcon",
+        "prependIconClickable",
+        "prependText",
+        "readOnly",
+        "size",
+        "type",
+        "updateOn",
+        "validationMessages",
+        "variant",
+        "value"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "iconClick",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-labeled-row",
+      "inputs": [
+        "content",
+        "label",
+        "optional",
+        "size"
+      ],
+      "outputs": [
+        "checkboxCheckedChange",
+        "dynamicFieldsChange",
+        "fileUploadChange",
+        "inputValueChange",
+        "radioValueChange",
+        "selectValueChange",
+        "selectValuesChange",
+        "switchCheckedChange"
+      ]
+    },
+    {
+      "name": "cx-lightbox",
+      "inputs": [
+        "alt",
+        "ariaLabel",
+        "caption",
+        "closeAriaLabel",
+        "open",
+        "src"
+      ],
+      "outputs": [
+        "openChange"
+      ]
+    },
+    {
+      "name": "cx-list-view",
+      "inputs": [
+        "density",
+        "disabled",
+        "divided",
+        "emptyText",
+        "items",
+        "selectable",
+        "selectedId"
+      ],
+      "outputs": [
+        "selectedIdChange"
+      ]
+    },
+    {
+      "name": "cx-loader",
+      "inputs": [
+        "loader",
+        "loading"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-log",
+      "inputs": [
+        "log",
+        "entries"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-log-step",
+      "inputs": [
+        "author",
+        "datestamp",
+        "description",
+        "step"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-markdown",
+      "inputs": [
+        "assetBasePath",
+        "markdown",
+        "text"
+      ],
+      "outputs": [
+        "linkClick"
+      ]
+    },
+    {
+      "name": "cx-menu",
+      "inputs": [
+        "align",
+        "ariaLabel",
+        "currentId",
+        "disabled",
+        "groups",
+        "items",
+        "menu",
+        "open",
+        "shortcutsEnabled",
+        "title",
+        "width"
+      ],
+      "outputs": [
+        "currentIdChange",
+        "itemSelect",
+        "openChange"
+      ]
+    },
+    {
+      "name": "cx-metric",
+      "inputs": [
+        "label",
+        "size",
+        "value"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-placeholder",
+      "inputs": [
+        "size",
+        "text"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-null-controller",
+      "inputs": [
+        "description",
+        "disabled",
+        "enabled",
+        "label",
+        "options",
+        "selectedId",
+        "switchLabel"
+      ],
+      "outputs": [
+        "enabledChange",
+        "selectedIdChange"
+      ]
+    },
+    {
+      "name": "cx-number-field",
+      "inputs": [
+        "appendText",
+        "ariaDescribedBy",
+        "ariaLabel",
+        "clearable",
+        "disabled",
+        "errorMessage",
+        "hint",
+        "label",
+        "loading",
+        "max",
+        "min",
+        "optional",
+        "placeholder",
+        "prependText",
+        "readOnly",
+        "size",
+        "step",
+        "debounceMs",
+        "updateOn",
+        "validationMessages",
+        "value"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-option",
+      "inputs": [
+        "appendIcon",
+        "description",
+        "disabled",
+        "hover",
+        "label",
+        "mood",
+        "prependIcon",
+        "role",
+        "selected",
+        "shortcutParts",
+        "showCheckbox",
+        "size",
+        "submenu"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-option-group",
+      "inputs": [
+        "description",
+        "label",
+        "variant"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-page-header",
+      "inputs": [
+        "description",
+        "editableDescription",
+        "heading"
+      ],
+      "outputs": [
+        "descriptionChange"
+      ]
+    },
+    {
+      "name": "cx-pagination",
+      "inputs": [
+        "page",
+        "pageSizes",
+        "totalMode"
+      ],
+      "outputs": [
+        "pageChange"
+      ]
+    },
+    {
+      "name": "cx-popover",
+      "inputs": [
+        "ariaLabel",
+        "bottom",
+        "description",
+        "heading",
+        "left",
+        "maxHeight",
+        "mood",
+        "open",
+        "placement",
+        "role",
+        "showBackdrop",
+        "surfaceClass",
+        "surfaceId",
+        "surfaceVariant",
+        "top",
+        "width"
+      ],
+      "outputs": [
+        "backdropPressed"
+      ]
+    },
+    {
+      "name": "cx-progress-bar",
+      "inputs": [
+        "hint",
+        "indeterminate",
+        "label",
+        "max",
+        "mood",
+        "showValue",
+        "value",
+        "valueLabel"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-utility-bar",
+      "inputs": [
+        "alignment",
+        "disabled",
+        "items",
+        "label",
+        "size",
+        "wrap"
+      ],
+      "outputs": [
+        "action"
+      ]
+    },
+    {
+      "name": "cx-qr-code",
+      "inputs": [
+        "ariaLabel",
+        "data",
+        "errorCorrection",
+        "size"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-query-element",
+      "inputs": [
+        "data"
+      ],
+      "outputs": [
+        "pressed"
+      ]
+    },
+    {
+      "name": "cx-query-field",
+      "inputs": [
+        "ariaDescribedBy",
+        "ariaLabel",
+        "clearable",
+        "disabled",
+        "hint",
+        "label",
+        "loading",
+        "optional",
+        "query",
+        "readOnly",
+        "size",
+        "validationMessages"
+      ],
+      "outputs": [
+        "queryChange"
+      ]
+    },
+    {
+      "name": "cx-radio",
+      "inputs": [
+        "custom",
+        "disabled",
+        "hint",
+        "selected",
+        "text",
+        "validationMessages"
+      ],
+      "outputs": [
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-radio-reveal",
+      "inputs": [
+        "disabled",
+        "label",
+        "options",
+        "revealValue",
+        "selectedId"
+      ],
+      "outputs": [
+        "revealValueChange",
+        "selectedIdChange"
+      ]
+    },
+    {
+      "name": "cx-search-field",
+      "inputs": [
+        "clearable",
+        "debounceMs",
+        "disabled",
+        "hint",
+        "label",
+        "loading",
+        "optional",
+        "placeholder",
+        "readOnly",
+        "size",
+        "updateOn",
+        "validationMessages",
+        "value"
+      ],
+      "outputs": [
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-secret-display",
+      "inputs": [
+        "ariaLabel",
+        "masked",
+        "value"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-select",
+      "inputs": [
+        "ariaDescribedBy",
+        "ariaLabel",
+        "availableValues",
+        "clearable",
+        "disabled",
+        "displayValue",
+        "discreet",
+        "emptyText",
+        "errorMessage",
+        "grow",
+        "hint",
+        "icon",
+        "inline",
+        "label",
+        "loading",
+        "mode",
+        "optional",
+        "placeholder",
+        "readOnly",
+        "size",
+        "validationMessages",
+        "value",
+        "values",
+        "variant"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "valueChange",
+        "valuesChange"
+      ]
+    },
+    {
+      "name": "cx-severity-tag",
+      "inputs": [
+        "display",
+        "favor",
+        "grade",
+        "kev",
+        "score",
+        "severity",
+        "variant"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-shortcut-key",
+      "inputs": [
+        "parts"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-side-nav",
+      "inputs": [
+        "groups",
+        "items",
+        "initials",
+        "loading",
+        "name",
+        "navbarVisible"
+      ],
+      "outputs": [
+        "itemSelect"
+      ]
+    },
+    {
+      "name": "cx-slider",
+      "inputs": [
+        "disabled",
+        "hint",
+        "label",
+        "max",
+        "min",
+        "optional",
+        "range",
+        "rangeValue",
+        "showTooltipOnDrag",
+        "showValue",
+        "step",
+        "validationMessages",
+        "value",
+        "valueFormatter"
+      ],
+      "outputs": [
+        "rangeValueChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-snippet",
+      "inputs": [
+        "snippet"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-spinner",
+      "inputs": [
+        "mood",
+        "size"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-split",
+      "inputs": [
+        "align",
+        "gap",
+        "startWidth"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-sso-button",
+      "inputs": [
+        "action",
+        "disabled",
+        "loading",
+        "provider",
+        "size"
+      ],
+      "outputs": [
+        "pressed"
+      ]
+    },
+    {
+      "name": "cx-stack",
+      "inputs": [
+        "align",
+        "gap",
+        "justify"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-status-tag",
+      "inputs": [
+        "icon",
+        "mood",
+        "text"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-steps",
+      "inputs": [
+        "compact",
+        "disabled",
+        "index",
+        "steps"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-switch",
+      "inputs": [
+        "custom",
+        "disabled",
+        "hint",
+        "selected",
+        "size",
+        "text",
+        "validationMessages"
+      ],
+      "outputs": [
+        "focusChange",
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-table",
+      "inputs": [
+        "activeRowId",
+        "columns",
+        "columnsReorderable",
+        "columnsResizable",
+        "density",
+        "emptyText",
+        "loading",
+        "rightClickMenu",
+        "rowActivation",
+        "rows",
+        "selectedRowIds",
+        "selectionMode",
+        "showHeaders",
+        "showRowActions",
+        "sort",
+        "stickyHeader",
+        "zebra"
+      ],
+      "outputs": [
+        "activeRowIdChange",
+        "columnOrderChange",
+        "rowActivate",
+        "rowMenuItemSelect",
+        "selectedRowIdsChange",
+        "sortChange"
+      ]
+    },
+    {
+      "name": "cx-table-view",
+      "inputs": [
+        "actionBarData",
+        "activeRowId",
+        "columnOptions",
+        "columns",
+        "columnsReorderable",
+        "columnsResizable",
+        "density",
+        "filterBarMode",
+        "filterOptions",
+        "filterPlaceholder",
+        "filterSections",
+        "groupBy",
+        "groupByOptions",
+        "loading",
+        "page",
+        "pageSizes",
+        "paginationMode",
+        "queryPlaceholder",
+        "queryValue",
+        "quickFilters",
+        "rightClickMenu",
+        "rowActivation",
+        "rows",
+        "savedViews",
+        "selectedFilterValue",
+        "selectedQuickFilterId",
+        "selectedRowIds",
+        "selectionMode",
+        "showFilterBar",
+        "showHeaders",
+        "showRowActions",
+        "sort",
+        "sortBy",
+        "sortDirection",
+        "sortOptions",
+        "stickyHeader",
+        "thenBy",
+        "thenByDirection",
+        "visibleColumnIds",
+        "zebra"
+      ],
+      "outputs": [
+        "actionBarAction",
+        "actionBarDeselectAll",
+        "activeRowIdChange",
+        "activeSavedViewIdChange",
+        "densityChange",
+        "exportTable",
+        "filterBarModeChange",
+        "groupByChange",
+        "queryValueChange",
+        "resetTable",
+        "rowActivate",
+        "rowMenuItemSelect",
+        "pageChange",
+        "savedViewSelect",
+        "selectedFilterValueChange",
+        "selectedQuickFilterIdChange",
+        "selectedRowIdsChange",
+        "sortByChange",
+        "sortChange",
+        "sortDirectionChange",
+        "thenByChange",
+        "thenByDirectionChange",
+        "visibleColumnIdsChange"
+      ]
+    },
+    {
+      "name": "cx-tabs",
+      "inputs": [
+        "ariaLabel",
+        "items",
+        "selectedId",
+        "variant"
+      ],
+      "outputs": [
+        "selectedIdChange"
+      ]
+    },
+    {
+      "name": "cx-tag",
+      "inputs": [
+        "color",
+        "disabled",
+        "icon",
+        "info",
+        "size",
+        "tags",
+        "text",
+        "variant"
+      ],
+      "outputs": [
+        "remove"
+      ]
+    },
+    {
+      "name": "cx-tag-input",
+      "inputs": [
+        "ariaDescribedBy",
+        "ariaLabel",
+        "clearable",
+        "disabled",
+        "emptyText",
+        "errorMessage",
+        "hint",
+        "label",
+        "loading",
+        "optional",
+        "placeholder",
+        "readOnly",
+        "searchable",
+        "size",
+        "tags",
+        "validationMessages",
+        "values"
+      ],
+      "outputs": [
+        "clear",
+        "createTag",
+        "tagsChange",
+        "valuesChange"
+      ]
+    },
+    {
+      "name": "cx-textarea",
+      "inputs": [
+        "annotations",
+        "ariaLabel",
+        "autoGrow",
+        "disabled",
+        "errorMessage",
+        "focusVariant",
+        "focused",
+        "hint",
+        "label",
+        "layout",
+        "lineNumbers",
+        "markdown",
+        "maxLength",
+        "maxLines",
+        "minLines",
+        "monospace",
+        "optional",
+        "placeholder",
+        "readOnly",
+        "resizable",
+        "rows",
+        "size",
+        "sizing",
+        "validationMessages",
+        "variant",
+        "value"
+      ],
+      "outputs": [
+        "blurred",
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-time-input",
+      "inputs": [
+        "ariaDescribedBy",
+        "ariaLabel",
+        "clearable",
+        "disabled",
+        "errorMessage",
+        "format",
+        "hint",
+        "hourAriaLabel",
+        "label",
+        "loading",
+        "max",
+        "min",
+        "minuteAriaLabel",
+        "minuteStep",
+        "mode",
+        "optional",
+        "readOnly",
+        "size",
+        "time",
+        "validationMessages",
+        "value"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "timeChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-toast",
+      "inputs": [
+        "action",
+        "description",
+        "dismissible",
+        "heading",
+        "mood",
+        "open",
+        "secondaryAction"
+      ],
+      "outputs": [
+        "action",
+        "dismissed",
+        "openChange",
+        "secondaryAction"
+      ]
+    },
+    {
+      "name": "cx-toggle-button",
+      "inputs": [
+        "ariaLabel",
+        "disabled",
+        "icon",
+        "iconSelected",
+        "selected",
+        "size",
+        "text"
+      ],
+      "outputs": [
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-toggle-chip",
+      "inputs": [
+        "ariaLabel",
+        "disabled",
+        "selected",
+        "size",
+        "text"
+      ],
+      "outputs": [
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-toggle-chip-group",
+      "inputs": [
+        "allowEmpty",
+        "availableValues",
+        "disabled",
+        "selectedValues",
+        "selection",
+        "size"
+      ],
+      "outputs": [
+        "selectedValuesChange"
+      ]
+    },
+    {
+      "name": "cx-tooltip",
+      "inputs": [
+        "delay",
+        "disabled",
+        "position",
+        "text"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-topbar",
+      "inputs": [
+        "actions",
+        "breadcrumbs",
+        "embedded",
+        "loading",
+        "navbarVisible",
+        "selectedTab",
+        "tabs"
+      ],
+      "outputs": [
+        "action",
+        "breadcrumbSelect",
+        "navbarShow",
+        "tabSelect"
+      ]
+    },
+    {
+      "name": "cx-tree-view",
+      "inputs": [
+        "density",
+        "disabled",
+        "expandedIds",
+        "items",
+        "selectable",
+        "selectedId",
+        "showIcons"
+      ],
+      "outputs": [
+        "expandedIdsChange",
+        "selectedIdChange"
+      ]
+    },
+    {
+      "name": "cx-trend-tag",
+      "inputs": [
+        "amount",
+        "favor",
+        "trend",
+        "unit",
+        "value"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-validation-message",
+      "inputs": [
+        "messages",
+        "showAll",
+        "type"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-variant",
+      "inputs": [
+        "ariaLabel",
+        "value",
+        "variants"
+      ],
+      "outputs": [
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-wizard-dialog",
+      "inputs": [
+        "buttonNextText",
+        "loading",
+        "open",
+        "wizard"
+      ],
+      "outputs": [
+        "action",
+        "openChange"
+      ]
+    },
+    {
+      "name": "cx-workbench",
+      "inputs": [
+        "align",
+        "minSize",
+        "previewWidth"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cxWizardDialogStep",
+      "inputs": [
+        "cxStepId",
+        "legacyStepId"
+      ],
+      "outputs": []
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+$layout-gaps: (
+  '2xs': var(--space-2xs),
+  'xs': var(--space-xs),
+  'sm': var(--space-sm),
+  'md': var(--space-md),
+  'lg': var(--space-lg),
+  'xl': var(--space-xl),
+  '2xl': var(--space-2xl),
+);
+
+$layout-alignments: (
+  'start': flex-start,
+  'center': center,
+  'end': flex-end,
+  'stretch': stretch,
+);
+
+$layout-justifications: (
+  'start': flex-start,
+  'center': center,
+  'end': flex-end,
+  'between': space-between,
+);
+
+@mixin gap-attr($selector, $attr: 'data-gap', $property: gap) {
+  @each $name, $token in $layout-gaps {
+    :host([#{$attr}='#{$name}']) #{$selector} {
+      #{$property}: $token;
+    }
+  }
+}
+
+@mixin align-attr($selector, $attr: 'data-align') {
+  @each $name, $value in $layout-alignments {
+    :host([#{$attr}='#{$name}']) #{$selector} {
+      align-items: $value;
+    }
+  }
+}
+
+@mixin justify-attr($selector, $attr: 'data-justify') {
+  @each $name, $value in $layout-justifications {
+    :host([#{$attr}='#{$name}']) #{$selector} {
+      justify-content: $value;
+    }
+  }
+}
+
+@mixin wrap-attr($selector, $attr: 'data-wrap') {
+  :host([#{$attr}='wrap']) #{$selector} {
+    flex-wrap: wrap;
+  }
+
+  :host([#{$attr}='nowrap']) #{$selector} {
+    flex-wrap: nowrap;
+  }
+}
+
+@mixin grid-columns-attr($selector, $attr: 'data-columns', $max: 12) {
+  @for $index from 1 through $max {
+    :host([#{$attr}='#{$index}']) #{$selector} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+  }
+}

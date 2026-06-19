@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-chat-thread__messages {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cx-chat-thread__footer {
+  display: contents;
+}
+
+.cx-chat-thread__footer:has(*) {
+  display: block;
+}

@@ -1,0 +1,179 @@
+<div class="cx-menu">
+  <span
+    #triggerWrap
+    class="cx-menu__trigger"
+    [class.cx-menu__trigger--disabled]="disabled"
+    [class.cx-menu__trigger--empty]="!hasTrigger$()"
+    (click)="onTriggerClick($event, triggerWrap)"
+    (keydown)="onTriggerKeydown($event, triggerWrap)"
+  >
+    <ng-content select="[trigger]" />
+  </span>
+
+  @if (hasTrigger$()) {
+    <cx-popover
+      [open]="isOpen$()"
+      [showBackdrop]="true"
+      [role]="'menu'"
+      [ariaLabel]="resolvedMenuAriaLabel"
+      [width]="surfaceWidth$()"
+      [maxHeight]="surfaceMaxHeight$()"
+      [left]="surfaceLeft$()"
+      [top]="surfaceTop$()"
+      [bottom]="surfaceBottom$()"
+      [surfaceClass]="['cx-menu__surface', scopeClass]"
+      (backdropPressed)="setOpen(false)"
+    >
+      @if (heading$()) {
+        <cx-menu-header [heading]="heading$()" />
+      }
+      @for (group of visibleGroups$(); track group.id) {
+        @if (group.label || group.description) {
+          @if ((group.variant ?? 'label') === 'header') {
+            <cx-menu-header [heading]="group.label || 'Menu'">
+              @if (group.description) {
+                <span class="cx-menu__group-description">{{ group.description }}</span>
+              }
+            </cx-menu-header>
+          } @else {
+            <cx-menu-label [heading]="group.label || 'Menu'">
+              @if (group.description) {
+                <span class="cx-menu__group-description">{{ group.description }}</span>
+              }
+            </cx-menu-label>
+          }
+        }
+        @for (item of group.items; track item.id) {
+          @if (item.dividerBeforeResolved) {
+            <div class="cx-menu__divider" aria-hidden="true"></div>
+          }
+          <div
+            class="cx-menu__option-wrap"
+            [attr.data-menu-item-path]="itemPath('', item.id)"
+            (pointerenter)="onResolvedItemPointerEnter(item, 0, '', $any($event.currentTarget))"
+            (focusin)="onResolvedItemFocused(item)"
+            (click)="onResolvedItemClick(item, 0, '', $any($event.currentTarget), $event)"
+            (keydown)="onResolvedItemKeydown($event, item, 0, '', $any($event.currentTarget))"
+          >
+            <cx-option
+              [role]="'menuitem'"
+              [label]="item.label"
+              [prependIcon]="item.prependIcon"
+              [appendIcon]="item.appendIcon"
+              [description]="item.hint ?? item.description"
+              [mood]="item.danger ? 'danger' : 'default'"
+              [disabled]="item.disabled ?? false"
+              [selected]="(item.selected ?? false) || currentId$() === item.id"
+              [shortcutParts]="item.shortcutParts"
+              [submenu]="itemSubmenuState('', item)"
+            />
+          </div>
+        }
+      }
+      @if (visibleGroups$().length === 0) {
+        <div class="cx-menu__empty">No actions available</div>
+      }
+    </cx-popover>
+  } @else {
+    <div
+      class="cx-menu__inline-surface cx-menu__surface"
+      [ngClass]="scopeClass"
+      role="menu"
+      [attr.aria-label]="resolvedMenuAriaLabel"
+      data-cx-popover-surface
+    >
+      @if (heading$()) {
+        <cx-menu-header [heading]="heading$()">
+          <ng-content select="[actions]" />
+        </cx-menu-header>
+      }
+      @for (group of visibleGroups$(); track group.id) {
+        @if (group.label || group.description) {
+          @if ((group.variant ?? 'label') === 'header') {
+            <cx-menu-header [heading]="group.label || 'Menu'">
+              @if (group.description) {
+                <span class="cx-menu__group-description">{{ group.description }}</span>
+              }
+            </cx-menu-header>
+          } @else {
+            <cx-menu-label [heading]="group.label || 'Menu'">
+              @if (group.description) {
+                <span class="cx-menu__group-description">{{ group.description }}</span>
+              }
+            </cx-menu-label>
+          }
+        }
+        @for (item of group.items; track item.id) {
+          @if (item.dividerBeforeResolved) {
+            <div class="cx-menu__divider" aria-hidden="true"></div>
+          }
+          <div
+            class="cx-menu__option-wrap"
+            [attr.data-menu-item-path]="itemPath('', item.id)"
+            (pointerenter)="onResolvedItemPointerEnter(item, 0, '', $any($event.currentTarget))"
+            (focusin)="onResolvedItemFocused(item)"
+            (click)="onResolvedItemClick(item, 0, '', $any($event.currentTarget), $event)"
+            (keydown)="onResolvedItemKeydown($event, item, 0, '', $any($event.currentTarget))"
+          >
+            <cx-option
+              [role]="'menuitem'"
+              [label]="item.label"
+              [prependIcon]="item.prependIcon"
+              [appendIcon]="item.appendIcon"
+              [description]="item.hint ?? item.description"
+              [mood]="item.danger ? 'danger' : 'default'"
+              [disabled]="item.disabled ?? false"
+              [selected]="(item.selected ?? false) || currentId$() === item.id"
+              [shortcutParts]="item.shortcutParts"
+              [submenu]="itemSubmenuState('', item)"
+            />
+          </div>
+        }
+      }
+      @if (visibleGroups$().length === 0) {
+        <div class="cx-menu__empty">No actions available</div>
+      }
+    </div>
+  }
+
+  @for (surface of submenuSurfaces$(); track surface.path) {
+    <cx-popover
+      [open]="true"
+      [showBackdrop]="false"
+      [role]="'menu'"
+      [ariaLabel]="surface.label"
+      [width]="surfaceWidth$()"
+      [maxHeight]="surface.maxHeight"
+      [left]="surface.left"
+      [top]="surface.top"
+      [surfaceClass]="['cx-menu__surface', 'cx-menu__surface--submenu', scopeClass]"
+    >
+      @for (item of surface.items; track item.id) {
+        @if (item.dividerBeforeResolved) {
+          <div class="cx-menu__divider" aria-hidden="true"></div>
+        }
+        <div
+          class="cx-menu__option-wrap"
+          [attr.data-menu-item-path]="itemPath(surface.path, item.id)"
+          (pointerenter)="onResolvedItemPointerEnter(item, surface.level, surface.path, $any($event.currentTarget))"
+          (focusin)="onResolvedItemFocused(item)"
+          (click)="onResolvedItemClick(item, surface.level, surface.path, $any($event.currentTarget), $event)"
+          (keydown)="onResolvedItemKeydown($event, item, surface.level, surface.path, $any($event.currentTarget))"
+        >
+          <cx-option
+            [role]="'menuitem'"
+            [label]="item.label"
+            [prependIcon]="item.prependIcon"
+            [appendIcon]="item.appendIcon"
+            [description]="item.hint ?? item.description"
+            [mood]="item.danger ? 'danger' : 'default'"
+            [disabled]="item.disabled ?? false"
+            [selected]="(item.selected ?? false) || currentId$() === item.id"
+            [shortcutParts]="item.shortcutParts"
+            [submenu]="itemSubmenuState(surface.path, item)"
+          />
+        </div>
+      }
+    </cx-popover>
+  }
+</div>

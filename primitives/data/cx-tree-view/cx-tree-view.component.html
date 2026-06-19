@@ -1,0 +1,57 @@
+<ng-template #tree let-items>
+  <ul class="cx-tree-view__list" role="group">
+    @for (item of items; track item.id) {
+      <li
+        class="cx-tree-view__node"
+        role="treeitem"
+        [attr.aria-expanded]="hasChildren(item) ? isExpanded(item) : null"
+      >
+        <div
+          class="cx-tree-view__row"
+          [class.cx-tree-view__row--selected]="selectedId$() === item.id"
+          [class.cx-tree-view__row--disabled]="disabled$() || item.disabled === true"
+        >
+          @if (hasChildren(item)) {
+            <button
+              type="button"
+              class="cx-tree-view__expander"
+              [disabled]="disabled$() || item.disabled === true"
+              [attr.aria-label]="isExpanded(item) ? 'Collapse' : 'Expand'"
+              (click)="onToggle(item)"
+            >
+              <cx-icon [name]="isExpanded(item) ? 'chevron-down' : 'chevron-right'" [size]="14" />
+            </button>
+          } @else {
+            <span class="cx-tree-view__expander-space"></span>
+          }
+
+          <button
+            type="button"
+            class="cx-tree-view__label-button"
+            [disabled]="disabled$() || item.disabled === true || !selectable$()"
+            [attr.aria-current]="selectedId$() === item.id ? 'true' : null"
+            (click)="onSelect(item)"
+          >
+            @if (showIcons$() && item.icon) {
+              <cx-icon class="cx-tree-view__icon" [name]="item.icon" [size]="16" />
+            }
+            <span class="cx-tree-view__label">{{ item.label }}</span>
+          </button>
+        </div>
+
+        @if (hasChildren(item) && isExpanded(item)) {
+          <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: item.children }" />
+        }
+      </li>
+    }
+  </ul>
+</ng-template>
+
+<div
+  class="cx-tree-view"
+  [class.cx-tree-view--compact]="density$() === 'compact'"
+  [class.cx-tree-view--disabled]="disabled$()"
+  role="tree"
+>
+  <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: items$() }" />
+</div>

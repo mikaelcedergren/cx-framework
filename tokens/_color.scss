@@ -1,0 +1,180 @@
+:root,
+:root.theme-light {
+    --primary: var(--violet);
+    --primary-opacity: var(--violet-opacity);
+    --primary-alt: var(--violet-alt);
+
+    --accent: var(--cyan);
+    --accent-opacity: var(--cyan-opacity);
+    --accent-alt: var(--cyan-alt);
+
+    --surface-low: #f9f9f9;
+    --surface-mid: #ffffff;
+    --surface-high: #959ca8;
+
+    --ink: #1f1f1f;
+    --on-ink: #ffffff;
+    --emphasis: #fff;
+    --on-emphasis: #171717;
+
+    --opacity-high: color-mix(in srgb, rgb(22 24 29 / 62%) 92%, color-mix(in srgb, var(--blue) 62%, transparent) 8%);
+    --opacity-mid: color-mix(in srgb, rgb(22 24 29 / 10%) 92%, color-mix(in srgb, var(--blue) 10%, transparent) 8%);
+    --opacity-low: color-mix(in srgb, rgb(22 24 29 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
+    --opacity-darken: rgb(22 24 29 / 1.5%);
+    --opacity-disabled: 0.55;
+    --overlay-backdrop: rgb(0 0 0 / 50%);
+
+    --success: var(--green);
+    --success-opacity: var(--green-opacity);
+    --success-alt: var(--green-alt);
+
+    --warning: var(--orange);
+    --warning-opacity: var(--orange-opacity);
+    --warning-alt: var(--orange-alt);
+
+    --danger: var(--red);
+    --danger-opacity: var(--red-opacity);
+    --danger-alt: var(--red-alt);
+
+    --info: var(--blue);
+    --info-opacity: var(--blue-opacity);
+    --info-alt: var(--blue-alt);
+
+    --link: var(--blue);
+    --placeholder: rgb(26 26 26 / 40%);
+}
+
+:root.theme-dark {
+    --primary: var(--violet);
+    --primary-opacity: var(--violet-opacity);
+    --primary-alt: var(--violet-alt);
+
+    --accent: var(--cyan);
+    --accent-opacity: var(--cyan-opacity);
+    --accent-alt: var(--cyan-alt);
+
+    --surface-low: #151523;
+    --surface-mid: #1a1a2b;
+    --surface-high: #1f1f33;
+
+    --ink: #f4f7fc;
+    --on-ink: #ffffff;
+    --emphasis: #fff;
+    --on-emphasis: #171717;
+
+    --opacity-high: color-mix(in srgb, rgb(255 255 255 / 60%) 92%, color-mix(in srgb, var(--blue) 60%, transparent) 8%);
+    --opacity-mid: color-mix(in srgb, rgb(255 255 255 / 14%) 92%, color-mix(in srgb, var(--blue) 14%, transparent) 8%);
+    --opacity-low: color-mix(in srgb, rgb(255 255 255 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
+    --opacity-darken: rgb(0 0 0 / 5%);
+    --opacity-disabled: 0.55;
+    --overlay-backdrop: rgb(0 0 0 / 64%);
+
+    --success: var(--green);
+    --success-opacity: var(--green-opacity);
+    --success-alt: var(--green-alt);
+
+    --warning: var(--orange);
+    --warning-opacity: var(--orange-opacity);
+    --warning-alt: var(--orange-alt);
+
+    --danger: var(--red);
+    --danger-opacity: var(--red-opacity);
+    --danger-alt: var(--red-alt);
+
+    --info: var(--blue);
+    --info-opacity: var(--blue-opacity);
+    --info-alt: var(--blue-alt);
+
+    --link: var(--blue);
+    --placeholder: rgb(244 247 252 / 30%);
+}
+
+:root.theme-night {
+    --primary: var(--violet);
+    --primary-opacity: var(--violet-opacity);
+    --primary-alt: var(--violet-alt);
+
+    --accent: var(--cyan);
+    --accent-opacity: var(--cyan-opacity);
+    --accent-alt: var(--cyan-alt);
+
+    --surface-low: #0a0a0a;
+    --surface-mid: #000000;
+    --surface-high: #222222;
+
+    --ink: #f4f7fc;
+    --on-ink: #ffffff;
+    --emphasis: #fff;
+    --on-emphasis: #171717;
+
+    --opacity-high: color-mix(in srgb, rgb(244 247 252 / 60%) 92%, color-mix(in srgb, var(--blue) 60%, transparent) 8%);
+    --opacity-mid: color-mix(in srgb, rgb(244 247 252 / 14%) 92%, color-mix(in srgb, var(--blue) 14%, transparent) 8%);
+    --opacity-low: color-mix(in srgb, rgb(244 247 252 / 4%) 92%, color-mix(in srgb, var(--blue) 4%, transparent) 8%);
+    --opacity-darken: rgb(0 0 0 / 5%);
+    --opacity-disabled: 0.55;
+    --overlay-backdrop: rgb(5 7 12 / 64%);
+
+    --success: var(--green);
+    --success-opacity: var(--green-opacity);
+    --success-alt: var(--green-alt);
+
+    --warning: var(--orange);
+    --warning-opacity: var(--orange-opacity);
+    --warning-alt: var(--orange-alt);
+
+    --danger: var(--red);
+    --danger-opacity: var(--red-opacity);
+    --danger-alt: var(--red-alt);
+
+    --info: var(--blue);
+    --info-opacity: var(--blue-opacity);
+    --info-alt: var(--blue-alt);
+
+    --link: var(--blue);
+    --placeholder: rgb(244 247 252 / 30%);
+}
+
+:root.theme-high-contrast {
+    --primary: var(--violet);
+    --primary-opacity: var(--violet-opacity);
+    --primary-alt: var(--violet-alt);
+
+    --accent: var(--cyan);
+    --accent-opacity: var(--cyan-opacity);
+    --accent-alt: var(--cyan-alt);
+
+    --surface-low: #ffffff;
+    --surface-mid: #ffffff;
+    --surface-high: #ececec;
+
+    --ink: #000000;
+    --on-ink: #ffffff;
+    --emphasis: #fff;
+    --on-emphasis: #171717;
+
+    --opacity-high: color-mix(in srgb, rgb(0 0 0 / 74%) 96%, color-mix(in srgb, var(--blue) 74%, transparent) 4%);
+    --opacity-mid: color-mix(in srgb, rgb(0 0 0 / 22%) 96%, color-mix(in srgb, var(--blue) 22%, transparent) 4%);
+    --opacity-low: color-mix(in srgb, rgb(0 0 0 / 8%) 96%, color-mix(in srgb, var(--blue) 8%, transparent) 4%);
+    --opacity-darken: rgb(0 0 0 / 3%);
+    --opacity-disabled: 0.55;
+    --overlay-backdrop: rgb(0 0 0 / 72%);
+
+    --success: var(--green);
+    --success-opacity: var(--green-opacity);
+    --success-alt: var(--green-alt);
+
+    --warning: var(--orange);
+    --warning-opacity: var(--orange-opacity);
+    --warning-alt: var(--orange-alt);
+
+    --danger: var(--red);
+    --danger-opacity: var(--red-opacity);
+    --danger-alt: var(--red-alt);
+
+    --info: var(--blue);
+    --info-opacity: var(--blue-opacity);
+    --info-alt: var(--blue-alt);
+
+    --link: var(--blue);
+    --placeholder: rgb(0 0 0 / 58%);
+}

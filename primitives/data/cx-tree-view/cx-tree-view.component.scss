@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.cx-tree-view {
+  min-width: 0;
+  color: var(--ink);
+}
+
+.cx-tree-view__list {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cx-tree-view__list .cx-tree-view__list {
+  margin-block-start: var(--space-2xs);
+  margin-inline-start: var(--space-md);
+}
+
+.cx-tree-view__row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: var(--controller-size-small) minmax(0, 1fr);
+  align-items: center;
+  border-radius: var(--radius-xs);
+}
+
+.cx-tree-view__row:hover:not(.cx-tree-view__row--disabled) {
+  background: var(--opacity-low);
+}
+
+.cx-tree-view__row--selected {
+  background: var(--primary-opacity);
+}
+
+.cx-tree-view__expander,
+.cx-tree-view__label-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.cx-tree-view__expander {
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cx-tree-view__expander-space {
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+}
+
+.cx-tree-view__label-button {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  cursor: pointer;
+  text-align: start;
+}
+
+.cx-tree-view--compact .cx-tree-view__label-button {
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.cx-tree-view__icon {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+}
+
+.cx-tree-view__label {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-tree-view__expander:focus-visible,
+.cx-tree-view__label-button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(var(--outline-tab-offset) * -1);
+}
+
+.cx-tree-view__row--disabled,
+.cx-tree-view--disabled {
+  opacity: var(--opacity-disabled, 0.45);
+}

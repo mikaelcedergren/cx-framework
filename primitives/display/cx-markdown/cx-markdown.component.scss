@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.cx-markdown {
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: var(--space-lg) 0 var(--space-sm);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: var(--font-size-title-1);
+  }
+
+  h2 {
+    font-size: var(--font-size-title-2);
+  }
+
+  h3 {
+    font-size: var(--font-size-title-3);
+  }
+
+  h4 {
+    font-size: var(--font-size-body);
+  }
+
+  p {
+    margin: 0 0 var(--space-md);
+  }
+
+  ul,
+  ol {
+    margin: 0 0 var(--space-md);
+    padding-left: var(--space-lg);
+  }
+
+  li {
+    margin-bottom: var(--space-xs);
+  }
+
+  li::marker {
+    color: var(--primary);
+  }
+
+  code {
+    padding: 1px 4px;
+    border-radius: var(--radius-xs);
+    background: var(--opacity-low);
+    font-family: var(--font-family-mono);
+    font-size: 0.95em;
+  }
+
+  pre {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    background: var(--opacity-low);
+    overflow-x: auto;
+  }
+
+  pre code {
+    padding: 0;
+    background: transparent;
+  }
+
+  blockquote {
+    margin: 0 0 var(--space-md);
+    padding-left: var(--space-md);
+    border-left: 2px solid var(--opacity-mid);
+    color: var(--opacity-high);
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  hr {
+    margin: var(--space-lg) 0;
+    border: 0;
+    border-top: var(--line-discreet);
+  }
+
+  table {
+    width: 100%;
+    margin: 0 0 var(--space-md);
+    border-collapse: collapse;
+    font-size: var(--font-size-body-sm);
+  }
+
+  th,
+  td {
+    padding: var(--space-sm);
+    border-bottom: var(--line-discreet);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    color: var(--ink);
+    font-weight: var(--font-weight-bold);
+  }
+}

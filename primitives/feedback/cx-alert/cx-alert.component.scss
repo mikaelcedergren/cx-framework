@@ -1,0 +1,110 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host(.cx-alert) {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  box-sizing: border-box;
+}
+
+:host(.cx-alert--default) {
+  color: var(--opacity-high);
+}
+
+:host(.cx-alert--info) {
+  background: var(--info-opacity);
+  border-color: var(--info-opacity);
+  color: var(--info-alt);
+}
+
+:host(.cx-alert--warning) {
+  background: var(--warning-opacity);
+  border-color: var(--warning-opacity);
+  color: var(--warning-alt);
+}
+
+:host(.cx-alert--success) {
+  background: var(--success-opacity);
+  border-color: var(--success-opacity);
+  color: var(--success-alt);
+}
+
+:host(.cx-alert--danger) {
+  background: var(--danger-opacity);
+  border-color: var(--danger-opacity);
+  color: var(--danger-alt);
+}
+
+:host(.cx-alert--hidden) {
+  display: none;
+}
+
+:host(.cx-alert--dismissible) {
+  padding-inline-end: calc(var(--space-sm) + var(--controller-size-small) + var(--space-sm));
+}
+
+.cx-alert__icon {
+  display: inline-flex;
+  height: var(--font-size-title-2);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.cx-alert__text {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  color: currentColor;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+.cx-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.cx-alert__dismiss {
+  position: absolute;
+  inset-block-start: var(--space-xs);
+  inset-inline-end: var(--space-sm);
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.cx-alert__dismiss:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.cx-alert__dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

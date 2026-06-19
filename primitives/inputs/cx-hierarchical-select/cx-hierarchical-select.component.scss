@@ -1,0 +1,102 @@
+:host {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.cx-hierarchical-select {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
+.cx-hierarchical-select__trigger {
+  display: inline-grid;
+  width: 100%;
+  min-width: min(100%, calc(var(--controller-size) * 8));
+  min-height: var(--controller-size);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-color: var(--opacity-mid);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-darken);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.cx-hierarchical-select__trigger:hover:not(:disabled) {
+  border-color: var(--border-hover);
+}
+
+.cx-hierarchical-select__trigger:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-hierarchical-select__leading,
+.cx-hierarchical-select__chevron {
+  color: var(--opacity-high);
+}
+
+.cx-hierarchical-select__value {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-hierarchical-select__value--placeholder {
+  color: var(--placeholder);
+}
+
+.cx-hierarchical-select__panel {
+  position: absolute;
+  z-index: var(--z-index-popover);
+  inset-block-start: calc(100% + var(--space-xs));
+  inset-inline-start: 0;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(calc(var(--controller-size) * 16), 90vw);
+  max-height: min(calc(var(--controller-size) * 16), 70vh);
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-popover);
+}
+
+.cx-hierarchical-select__search {
+  width: 100%;
+}
+
+.cx-hierarchical-select__clear-row {
+  align-self: flex-start;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  font: inherit;
+}
+
+.cx-hierarchical-select__clear-row:hover {
+  background: var(--opacity-low);
+}
+
+.cx-hierarchical-select--disabled {
+  opacity: var(--opacity-disabled);
+}

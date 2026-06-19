@@ -1,0 +1,9 @@
+:root {
+    --shadow-raised: 0 2px 8px rgb(0 0 0 / 12%);
+    --shadow-notification: 0 6px 12px rgb(0 0 0 / 10%);
+    --shadow-popover: 0 8px 16px rgb(0 0 0 / 10%);
+    --shadow-dialog: 0 16px 32px rgb(0 0 0 / 10%);
+    --shadow-notification-primary: 0 11px 13px color-mix(in srgb, var(--primary) 14%, transparent);
+    --shadow-notification-success: 0 11px 13px color-mix(in srgb, var(--success) 14%, transparent);
+    --shadow-notification-danger: 0 11px 13px color-mix(in srgb, var(--danger) 14%, transparent);
+}

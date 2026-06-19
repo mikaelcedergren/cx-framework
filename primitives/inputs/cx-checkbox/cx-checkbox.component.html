@@ -1,0 +1,37 @@
+<div class="cx-checkbox-wrapper" [class.cx-checkbox-wrapper--disabled]="disabled">
+  <div
+    class="cx-checkbox"
+    [class.cx-checkbox--selected]="selected$()"
+    [class.cx-checkbox--indeterminate]="indeterminate$()"
+    [class.cx-checkbox--has-content]="hasContent$()"
+    role="checkbox"
+    tabindex="0"
+    [attr.aria-checked]="indeterminate$() ? 'mixed' : selected$()"
+    [attr.aria-disabled]="disabled || null"
+    [attr.aria-describedby]="visibleHint$() ? hintId : null"
+    data-shortcut-ignore=" "
+    (click)="toggleValue($event)"
+    (keydown)="onKeydown($event)"
+    (focus)="onFocus(true)"
+    (blur)="onFocus(false)"
+  >
+    <span
+      class="cx-checkbox__icon"
+      [class.cx-checkbox__icon--selected]="selected$()"
+      [class.cx-checkbox__icon--indeterminate]="indeterminate$()"
+      aria-hidden="true"
+    >
+      <span class="cx-checkbox__check"></span>
+    </span>
+
+    @if (visibleText$()) {
+      <span class="cx-checkbox__label">{{ visibleText$() }}</span>
+    } @else if (custom) {
+      <span class="cx-checkbox__label"><ng-content /></span>
+    }
+  </div>
+
+  @if (visibleHint$()) {
+    <div class="cx-checkbox__hint" [attr.id]="hintId">{{ visibleHint$() }}</div>
+  }
+</div>

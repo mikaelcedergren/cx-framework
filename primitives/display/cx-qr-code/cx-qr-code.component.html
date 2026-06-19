@@ -1,0 +1,29 @@
+<div
+  class="cx-qr-code"
+  [attr.role]="ariaLabel$() ? 'img' : null"
+  [attr.aria-label]="ariaLabel$() ?? null"
+>
+  @if (renderError$()) {
+    <svg
+      class="cx-qr-code__footprint"
+      [attr.width]="size$()"
+      [attr.height]="size$()"
+      viewBox="0 0 1 1"
+      aria-hidden="true"
+    ></svg>
+    <div class="cx-qr-code__error" role="status">
+      <span class="cx-qr-code__error-label">QR render failed</span>
+      <span class="cx-qr-code__error-detail">{{ renderError$() }}</span>
+    </div>
+  } @else if (!data$()) {
+    <svg
+      class="cx-qr-code__footprint"
+      [attr.width]="size$()"
+      [attr.height]="size$()"
+      viewBox="0 0 1 1"
+      aria-hidden="true"
+    ></svg>
+    <div class="cx-qr-code__placeholder" aria-hidden="true">No data</div>
+  }
+  <div #svgHost class="cx-qr-code__svg" aria-hidden="true"></div>
+</div>

@@ -1,0 +1,19 @@
+<section class="cx-variant">
+  <div class="cx-variant__heading">Variants</div>
+
+  <div class="cx-variant__preview">
+    <ng-content select="[cxVariantPreview]" />
+  </div>
+
+  <div class="cx-variant__options" role="radiogroup" [attr.aria-label]="ariaLabel">
+    @for (variant of variants$(); track variant.id) {
+      <cx-radio
+        [text]="variant.name"
+        [hint]="variant.info"
+        [disabled]="variant.disabled === true"
+        [selected]="variant.id === value$()"
+        (selectedChange)="onVariantChange(variant, $event)"
+      />
+    }
+  </div>
+</section>

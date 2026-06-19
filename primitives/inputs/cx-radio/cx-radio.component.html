@@ -1,0 +1,44 @@
+<div class="cx-radio-field">
+  <div
+    class="cx-radio"
+    [class.cx-radio--selected]="selected$()"
+    [class.cx-radio--disabled]="disabled"
+    [class.cx-radio--error]="hasError$()"
+    role="radio"
+    [attr.tabindex]="disabled ? -1 : 0"
+    [attr.aria-checked]="selected$()"
+    [attr.aria-disabled]="disabled ? 'true' : null"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-describedby]="describedBy$()"
+    data-shortcut-ignore=" "
+    (click)="activate()"
+    (keydown)="onKeydown($event)"
+  >
+    <span class="cx-radio__control" aria-hidden="true">
+      @if (selected$()) {
+        <span class="cx-radio__dot"></span>
+      }
+    </span>
+    @if (hasText$() || custom || hint?.trim()) {
+      <span class="cx-radio__content">
+        @if (hasText$()) {
+          <span class="cx-radio__label">{{ text }}</span>
+        } @else if (custom) {
+          <span class="cx-radio__label"><ng-content /></span>
+        }
+        @if (showHint$()) {
+          <span [id]="hintId" class="cx-radio__hint">{{ hint!.trim() }}</span>
+        }
+      </span>
+    }
+  </div>
+
+  @if (validationMessages$().length > 0) {
+    <cx-validation-message
+      [id]="messagesId"
+      class="cx-radio-field__error"
+      [messages]="validationMessages$()"
+      [showAll]="true"
+    />
+  }
+</div>

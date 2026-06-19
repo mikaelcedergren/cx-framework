@@ -1,0 +1,440 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-textarea {
+  --cx-textarea-font-size: var(--font-size-body);
+  --cx-textarea-line-height: var(--line-height-body);
+  --cx-textarea-editor-padding: var(--space-sm);
+
+  width: 100%;
+}
+
+.cx-textarea--small {
+  --cx-textarea-font-size: var(--font-size-body-sm);
+  --cx-textarea-editor-padding: var(--space-xs) var(--space-sm);
+}
+
+.cx-textarea--large {
+  --cx-textarea-font-size: var(--font-size-title-3);
+  --cx-textarea-editor-padding: var(--space-md);
+}
+
+.cx-textarea__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.cx-textarea__label {
+  color: var(--ink);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.cx-textarea__optional {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+}
+
+.cx-textarea__shell {
+  width: 100%;
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-darken);
+  box-sizing: border-box;
+  overflow: hidden;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    outline-color var(--motion-fast) ease;
+}
+
+.cx-textarea__shell:hover:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error) {
+  border-color: var(--opacity-high);
+}
+
+// --- Focus appearance ------------------------------------------------------
+// Default focusVariant: framework's existing behavior — invisible mouse focus,
+// keyboard focus shows a 2px blue outline drawn inside the border.
+.cx-textarea__shell--focused {
+  outline: var(--outline-focus);
+  outline-offset: var(--outline-focus-offset);
+}
+
+.cx-textarea__shell:has(.cx-textarea__field:focus-visible) {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+// Ring focusVariant: border-color flips to primary and a 1px primary outline
+// sits right outside the border. Outline doesn't take layout space, so the
+// shell stays exactly the same size on focus. Reads as a 2px primary ring.
+.cx-textarea__shell--focus-ring.cx-textarea__shell--focused,
+.cx-textarea__shell--focus-ring:has(.cx-textarea__field:focus-visible) {
+  border-color: var(--primary);
+  outline: 1px solid var(--primary);
+  outline-offset: 0;
+}
+
+.cx-textarea__shell--error,
+.cx-textarea__shell--error:hover:not(.cx-textarea__shell--disabled) {
+  border-color: var(--danger);
+}
+
+.cx-textarea__shell--disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.cx-textarea__shell--read-only {
+  background: var(--opacity-low);
+}
+
+.cx-textarea__shell--inline-edit {
+  border-color: transparent;
+  background: transparent;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    outline-color var(--motion-fast) ease;
+}
+
+.cx-textarea__shell--inline-edit:hover:not(.cx-textarea__shell--disabled) {
+  border-color: var(--opacity-mid);
+  background: transparent;
+  outline: 0;
+}
+
+.cx-textarea__shell--inline-edit.cx-textarea__shell--focused,
+.cx-textarea__shell--inline-edit:has(.cx-textarea__field:focus-visible) {
+  border-color: var(--primary);
+  background: transparent;
+  outline: 0;
+}
+
+.cx-textarea__shell--inline-edit.cx-textarea__shell--error {
+  border-color: var(--danger);
+}
+
+.cx-textarea__editor {
+  display: grid;
+  grid-template-columns: 0px minmax(0, 1fr);
+  align-items: start;
+  padding: var(--cx-textarea-editor-padding);
+}
+
+.cx-textarea__editor--with-gutter {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+.cx-textarea__gutter {
+  overflow: hidden;
+  min-width: 0;
+  color: var(--opacity-high);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--cx-textarea-line-height);
+  text-align: right;
+  user-select: none;
+  letter-spacing: 0;
+}
+
+.cx-textarea__editor--with-gutter .cx-textarea__gutter {
+  min-width: 2ch;
+  padding-right: var(--space-sm);
+  border-right: var(--line);
+  border-color: var(--opacity-mid);
+}
+
+.cx-textarea__gutter-rows {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  will-change: transform;
+}
+
+.cx-textarea__gutter-row {
+  display: grid;
+  grid-template-columns: 12px minmax(2ch, auto);
+  column-gap: var(--space-2xs);
+  min-height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+  align-items: center;
+  justify-items: end;
+}
+
+.cx-textarea__gutter-row--error {
+  color: var(--danger);
+}
+
+.cx-textarea__gutter-row--success {
+  color: var(--success);
+}
+
+.cx-textarea__gutter-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.cx-textarea__gutter-number {
+  grid-column: 2;
+}
+
+.cx-textarea__field-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.cx-textarea__highlight {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cx-textarea__highlight-lines {
+  will-change: transform;
+}
+
+.cx-textarea__highlight-line {
+  height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+}
+
+.cx-textarea__highlight-line--error {
+  background: var(--danger-opacity);
+}
+
+.cx-textarea__highlight-line--success {
+  background: var(--success-opacity);
+}
+
+.cx-textarea__range-mirror {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--cx-textarea-font-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--cx-textarea-line-height);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cx-textarea__range-mirror--monospace {
+  font-family: var(--font-family-mono);
+}
+
+.cx-textarea__range-lines {
+  will-change: transform;
+}
+
+.cx-textarea__range-line {
+  min-height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+}
+
+.cx-textarea__range-segment--success {
+  background: var(--success-opacity);
+  color: var(--success-alt);
+}
+
+.cx-textarea__range-segment--error {
+  background: var(--danger-opacity);
+  color: var(--danger-alt);
+}
+
+.cx-textarea__field {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  resize: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--cx-textarea-font-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--cx-textarea-line-height);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.cx-textarea__field--monospace {
+  font-family: var(--font-family-mono);
+}
+
+.cx-textarea__field::placeholder {
+  color: var(--placeholder);
+}
+
+.cx-textarea__field:focus-visible {
+  outline: 0;
+}
+
+// When the markdown preview overlays the textarea, keep the textarea in
+// flow (so its intrinsic rows-based height keeps driving the field-wrap
+// size) but make it invisible and non-clickable. This eliminates the ~3px
+// height jump that used to happen when the preview was swapped for the
+// real textarea: previously the textarea was pulled out of flow, so the
+// container height was set by the markdown div alone (min-height: 80px),
+// and then on focus it snapped back to the textarea's intrinsic ~83px.
+// Now the textarea always sets the height; the markdown div is positioned
+// absolutely on top of it (see .cx-textarea__markdown below).
+.cx-textarea__field--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cx-textarea__field--auto-grow {
+  resize: none;
+  overflow: hidden;
+}
+
+.cx-textarea__field--resizable {
+  resize: vertical;
+  overflow: auto;
+}
+
+.cx-textarea__field--fixed {
+  resize: none;
+  overflow: auto;
+}
+
+.cx-textarea__field--with-range-annotations {
+  color: transparent;
+  caret-color: var(--ink);
+}
+
+// Container styles only. Rules targeting child elements (p, ul, ol, li, h1–h4,
+// code, pre, …) live in styles/_markdown.scss because the markdown
+// preview is injected via [innerHTML] and Angular's emulated encapsulation
+// would prevent component-scoped descendant rules from matching.
+//
+// Positioned absolutely so it overlays the textarea (which stays in flow
+// driving the field-wrap's height). overflow-y: auto means long markdown
+// content scrolls inside the fixed-size box instead of growing it.
+.cx-textarea__markdown {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  z-index: 2;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--cx-textarea-font-size);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--cx-textarea-line-height);
+  cursor: text;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
+.cx-textarea__messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.cx-textarea__hint {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+.cx-textarea__validation {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-xs);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+}
+
+.cx-textarea__validation--info {
+  color: var(--info);
+}
+
+.cx-textarea__validation--success {
+  color: var(--success);
+}
+
+.cx-textarea__validation--warning {
+  color: var(--warning);
+}
+
+.cx-textarea__validation--error {
+  color: var(--danger);
+}
+
+.cx-textarea__validation-icon {
+  display: inline-flex;
+  margin-top: 1px;
+}
+
+.cx-textarea__validation-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+// variant="title": render the field as an inline editable heading.
+.cx-textarea--title .cx-textarea__field {
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+// layout="fill": grow the editor (and markdown preview) to fill a flex-column
+// parent. The host element must be a growing flex item for this to take effect.
+.cx-textarea--fill {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+
+  .cx-textarea__shell {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .cx-textarea__editor {
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-rows: 1fr;
+    align-items: stretch;
+  }
+
+  .cx-textarea__field-wrap {
+    min-height: 0;
+  }
+
+  .cx-textarea__field,
+  .cx-textarea__markdown {
+    height: 100%;
+    min-height: 160px;
+  }
+
+  .cx-textarea__field {
+    resize: none;
+  }
+
+  .cx-textarea__markdown {
+    overflow-y: auto;
+  }
+}

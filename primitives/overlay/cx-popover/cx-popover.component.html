@@ -1,0 +1,32 @@
+@if (open) {
+  @if (showBackdrop) {
+    <cx-popover-backdrop #backdrop (pressed)="backdropPressed.emit()" />
+  }
+
+  <div
+    #surface
+    class="cx-popover"
+    [ngClass]="surfaceClass"
+    data-cx-popover-surface
+    [class.cx-popover--top]="placement === 'top'"
+    [class.cx-popover--bottom]="placement === 'bottom'"
+    [class.cx-popover--danger]="mood === 'danger'"
+    [class.cx-popover--raised]="surfaceVariant === 'raised'"
+    [attr.id]="surfaceId || null"
+    [attr.role]="role || null"
+    [attr.aria-label]="ariaLabel || null"
+    [style.width.px]="width"
+    [style.max-height]="resolvedMaxHeight"
+    [style.left.px]="left"
+    [style.top.px]="top"
+    [style.bottom.px]="bottom"
+  >
+    @if (normalizedTitle || normalizedTitleDescription) {
+      <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
+    }
+
+    <div class="cx-popover__body" data-cx-popover-scroll-container>
+      <ng-content />
+    </div>
+  </div>
+}

@@ -1,0 +1,35 @@
+@if (data$()) {
+  <div class="cx-action-bar__overlay">
+    <div class="cx-action-bar__container">
+      <div class="cx-action-bar" role="toolbar" aria-label="Selection actions">
+        <div class="cx-action-bar__info">
+          <span class="cx-action-bar__count">{{ countLabel }}</span>
+          <cx-button
+            text="Deselect all"
+            variant="transparent"
+            (pressed)="deselectAll.emit()"
+          />
+        </div>
+
+        <div class="cx-action-bar__actions">
+          @for (group of visibleGroups$(); track trackGroup($index, group)) {
+            <div class="cx-action-bar__group">
+              @for (item of group.items; track item.id) {
+                <cx-button
+                  [text]="actionText(item)"
+                  [icon]="item.icon"
+                  [variant]="actionVariant(item)"
+                  [ariaLabel]="actionAriaLabel(item)"
+                  [disabled]="item.disabled === true"
+                  (pressed)="onAction(item)"
+                />
+              }
+            </div>
+          } @empty {
+            <span class="cx-action-bar__empty">No actions</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

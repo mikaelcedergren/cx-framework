@@ -1,0 +1,150 @@
+:host {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+}
+
+:host::before {
+  position: absolute;
+  inset: 0;
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  content: '';
+  pointer-events: none;
+}
+
+:host(.cx-button-group-disabled) {
+  cursor: default;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+:host(.cx-button-group-host--compact),
+:host:has(.cx-button-group-button-small) {
+  border-radius: var(--radius-pill, 999px);
+  background: var(--opacity-low);
+}
+
+:host(.cx-button-group-host--compact)::before,
+:host:has(.cx-button-group-button-small)::before {
+  border: none;
+}
+
+.cx-button-group-row {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: var(--space-xs);
+  padding: var(--space-2xs);
+  white-space: nowrap;
+}
+
+.cx-button-group-indicator {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: var(--cx-button-group-indicator-width);
+  height: var(--cx-button-group-indicator-height);
+  border-radius: var(--radius-xs);
+  background: var(--emphasis);
+  box-shadow: var(--shadow-raised);
+  pointer-events: none;
+  transform: translate(var(--cx-button-group-indicator-x), var(--cx-button-group-indicator-y));
+  transition:
+    transform var(--motion-base) ease,
+    width var(--motion-base) ease,
+    height var(--motion-base) ease;
+}
+
+.cx-button-group-button {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  height: calc(var(--controller-size) - var(--space-xs));
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0 var(--space-md);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  outline: none;
+  transition:
+    color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
+  white-space: nowrap;
+}
+
+.cx-button-group-button:hover {
+  color: var(--ink);
+}
+
+.cx-button-group-button-icon {
+  padding-left: var(--space-sm);
+}
+
+.cx-button-group-button-no-text {
+  padding: 0 var(--space-sm);
+}
+
+.cx-button-group-button-small {
+  height: calc(var(--controller-size-small) - var(--space-xs));
+  padding: 0 var(--space-sm);
+  border-radius: var(--radius-pill, 999px);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-button-group-button-selected {
+  color: var(--on-emphasis);
+  background: var(--emphasis);
+  box-shadow: var(--shadow-raised);
+}
+
+.cx-button-group-row-has-indicator .cx-button-group-button-selected {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cx-button-group-row-has-indicator:has(.cx-button-group-button-small) .cx-button-group-indicator,
+:host(.cx-button-group-host--compact) .cx-button-group-indicator {
+  border-radius: calc(var(--space-sm) - var(--space-2xs));
+}
+
+.cx-button-group-button-selected:hover {
+  color: var(--on-emphasis);
+}
+
+.cx-button-group-button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-button-group-button:active:not(:disabled) {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-button-group-button-disabled,
+.cx-button-group-button:disabled {
+  cursor: default;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.cx-button-group-button-disabled:disabled {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-button-group-indicator {
+    transition: none;
+  }
+}

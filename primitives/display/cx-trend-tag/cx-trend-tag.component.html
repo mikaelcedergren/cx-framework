@@ -1,0 +1,9 @@
+<span
+  class="cx-trend-tag"
+  [class.cx-trend-tag--up]="trendClass() === 'up'"
+  [class.cx-trend-tag--flat]="trendClass() === 'flat'"
+  [class.cx-trend-tag--down]="trendClass() === 'down'"
+>
+  <cx-icon class="cx-trend-tag__icon" [name]="iconName()" [size]="16" />
+  <span class="cx-trend-tag__value">{{ displayValue() }}</span>
+</span>

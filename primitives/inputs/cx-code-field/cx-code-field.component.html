@@ -1,0 +1,53 @@
+<div class="cx-code-field" [class.cx-code-field--small]="size$() === 'small'" [class.cx-code-field--large]="size$() === 'large'">
+  <div
+    class="cx-code-field__shell"
+    [class.cx-code-field__shell--focused]="focused$()"
+    [class.cx-code-field__shell--disabled]="disabled$()"
+    [class.cx-code-field__shell--readonly]="readOnly$()"
+    [class.cx-code-field__shell--error]="hasError$()"
+    (mousedown)="onShellPointerDown($event)"
+    (touchstart)="onShellPointerDown($event)"
+  >
+    <input
+      #field
+      class="cx-code-field__input"
+      type="text"
+      autocomplete="one-time-code"
+      [attr.inputmode]="inputMode$()"
+      [attr.pattern]="pattern$()"
+      [attr.maxlength]="length$()"
+      [attr.aria-label]="resolvedAriaLabel"
+      [attr.aria-describedby]="resolvedAriaDescribedBy"
+      [attr.aria-invalid]="hasError$() ? 'true' : null"
+      [attr.aria-readonly]="readOnly$() ? 'true' : null"
+      [disabled]="disabled$()"
+      [readOnly]="readOnly$()"
+      [value]="value$()"
+      [autofocus]="autoFocus"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+    />
+
+    <div class="cx-code-field__cells" aria-hidden="true" [style.--cx-code-field-length]="length$()">
+      @for (cell of cells$(); track $index) {
+        <div
+          class="cx-code-field__cell"
+          [class.cx-code-field__cell--filled]="cell !== ''"
+          [class.cx-code-field__cell--active]="focused$() && $index === activeIndex$()"
+        >
+          <span class="cx-code-field__cell-char">{{ cell || ' ' }}</span>
+          @if (focused$() && $index === activeIndex$()) {
+            <span class="cx-code-field__caret"></span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (validationMessages$().length > 0) {
+    <div class="cx-code-field__messages" [id]="messagesId">
+      <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+    </div>
+  }
+</div>

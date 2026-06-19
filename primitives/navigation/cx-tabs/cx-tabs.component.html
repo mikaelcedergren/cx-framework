@@ -1,0 +1,22 @@
+<div
+  class="cx-tabs"
+  [class.cx-tabs--transparent]="variant$() === 'transparent'"
+  role="tablist"
+  [attr.aria-label]="ariaLabel"
+>
+  @for (item of items; track item.id; let index = $index) {
+    <button
+      #tabButton
+      type="button"
+      class="cx-tabs__tab"
+      role="tab"
+      [class.cx-tabs__tab--active]="selectedId$() === item.id"
+      [attr.aria-selected]="selectedId$() === item.id ? 'true' : 'false'"
+      [attr.tabindex]="selectedId$() === item.id ? '0' : '-1'"
+      (click)="select(item.id)"
+      (keydown)="onKeydown($event, index)"
+    >
+      {{ item.label }}
+    </button>
+  }
+</div>

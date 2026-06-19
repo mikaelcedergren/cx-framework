@@ -1,0 +1,51 @@
+<button
+  type="button"
+  class="cx-option"
+  [class.cx-option--danger]="mood === 'danger'"
+  [class.cx-option--hover]="hover"
+  [class.cx-option--selected]="selected"
+  [class.cx-option--small]="size === 'small'"
+  [class.cx-option--large]="size === 'large'"
+  [class.cx-option--submenu-open]="submenu === 'open'"
+  [class.cx-option--with-checkbox]="showCheckbox"
+  [class.cx-option--without-icons]="!showCheckbox && !prependIcon && !appendIconName()"
+  [class.cx-option--append-only]="hasAppendOnlyLayout()"
+  [class.cx-option--with-append]="!!appendIconName() || hasShortcut() || !!description"
+  [class.cx-option--disabled]="disabled"
+  [disabled]="disabled"
+  [attr.role]="role || null"
+  [attr.aria-disabled]="disabled ? 'true' : null"
+  [attr.aria-selected]="ariaSelectedValue()"
+>
+  @if (showCheckbox) {
+    <cx-checkbox class="cx-option__checkbox" [selected]="selected" [disabled]="disabled" [custom]="true">
+      <span class="cx-option__checkbox-label">{{ label }}</span>
+    </cx-checkbox>
+  }
+
+  @if (prependIcon; as prependIconValue) {
+    <span class="cx-option__icon cx-option__icon--prepend" aria-hidden="true">
+      <cx-icon [name]="prependIconValue" [size]="iconSize()" />
+    </span>
+  }
+
+  <span class="cx-option__content">
+    <span class="cx-option__label">{{ label }}</span>
+  </span>
+
+  @if (description) {
+    <span class="cx-option__description">{{ description }}</span>
+  }
+
+  @if (hasShortcut()) {
+    <span class="cx-option__shortcut" aria-hidden="true">
+      <cx-shortcut-key [parts]="shortcutParts ?? []" />
+    </span>
+  }
+
+  @if (appendIconName(); as appendIconValue) {
+    <span class="cx-option__icon cx-option__icon--append" aria-hidden="true">
+      <cx-icon [name]="appendIconValue" [size]="iconSize()" />
+    </span>
+  }
+</button>

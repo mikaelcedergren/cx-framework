@@ -1,0 +1,55 @@
+<nav class="cx-pagination" aria-label="Pagination">
+  @if (totalText$()) {
+    <div class="cx-pagination__summary" aria-label="Total items">{{ totalText$() }}</div>
+  }
+
+  <div class="cx-pagination__controls">
+    <div class="cx-pagination__navigation">
+      <cx-icon-button
+        icon="chevron-left"
+        ariaLabel="Previous page"
+        variant="transparent"
+        [disabled]="previousDisabled$()"
+        (pressed)="goToPreviousPage()"
+      />
+      <div class="cx-pagination__pages">
+        @for (item of pageItems$(); track item.id) {
+          @if (item.kind === 'page') {
+            @if (item.current) {
+              <div class="cx-pagination__page-button cx-pagination__page-button--current">
+                {{ item.label }}
+              </div>
+            } @else {
+              <button type="button" class="cx-pagination__page-button" (click)="goToPage(item.page)">
+                {{ item.label }}
+              </button>
+            }
+          } @else {
+            <span class="cx-pagination__ellipsis" aria-hidden="true">{{ item.label }}</span>
+          }
+        }
+      </div>
+      <cx-icon-button
+        icon="chevron-right"
+        ariaLabel="Next page"
+        variant="transparent"
+        [disabled]="nextDisabled$()"
+        (pressed)="goToNextPage()"
+      />
+    </div>
+
+    <div class="cx-pagination__page-size">
+      <span class="cx-pagination__page-size-label">Rows per page</span>
+      <cx-select
+        class="cx-pagination__page-size-select"
+        label=""
+        ariaLabel="Page size"
+        placeholder="25"
+        size="small"
+        [availableValues]="pageSizeOptions$()"
+        [value]="pageSizeValue$()"
+        (valueChange)="onPageSizeChange($event)"
+      />
+    </div>
+  </div>
+</nav>

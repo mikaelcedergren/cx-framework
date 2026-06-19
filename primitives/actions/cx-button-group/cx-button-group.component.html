@@ -1,0 +1,33 @@
+<div
+  #rowRef
+  class="cx-button-group-row"
+  [class.cx-button-group-row-has-indicator]="indicatorVisible$()"
+  role="group"
+>
+  @if (indicatorVisible$()) {
+    <span class="cx-button-group-indicator" aria-hidden="true"></span>
+  }
+
+  @for (button of buttons$(); track button.id; let buttonIndex = $index) {
+    <button
+      #buttonRef
+      type="button"
+      class="cx-button-group-button"
+      [class.cx-button-group-button-selected]="button.selected"
+      [class.cx-button-group-button-small]="size$() === 'small'"
+      [class.cx-button-group-button-icon]="button.icon !== undefined"
+      [class.cx-button-group-button-no-text]="!button.name"
+      [class.cx-button-group-button-disabled]="button.disabled"
+      [disabled]="disabled$() || button.disabled"
+      [attr.aria-pressed]="button.selected"
+      [attr.tabindex]="tabIndexFor(button, buttonIndex)"
+      (click)="select($event, button)"
+      (keydown)="onKeydown($event, buttonIndex)"
+    >
+      @if (button.icon; as iconName) {
+        <cx-icon [name]="iconName" />
+      }
+      {{ button.name }}
+    </button>
+  }
+</div>

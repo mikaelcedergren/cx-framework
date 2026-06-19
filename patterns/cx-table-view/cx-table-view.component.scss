@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-table-view {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-table-view__header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.cx-table-view__heading {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+}
+
+.cx-table-view__surface {
+  min-width: 0;
+}
+
+.cx-table-view__footer {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: var(--space-sm);
+}

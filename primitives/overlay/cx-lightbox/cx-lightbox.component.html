@@ -1,0 +1,29 @@
+@if (isOpen$() && hasImage()) {
+  <div
+    class="cx-lightbox"
+    role="dialog"
+    aria-modal="true"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    [attr.aria-label]="ariaLabel"
+    (click)="onBackdropClick()"
+  >
+    <button
+      type="button"
+      class="cx-lightbox__close"
+      [attr.aria-label]="closeAriaLabel"
+      (click)="onCloseClick($event)"
+    >
+      <cx-icon name="remove" [size]="20" aria-hidden="true" />
+    </button>
+
+    <div class="cx-lightbox__surface" (click)="onSurfaceClick($event)">
+      <div class="cx-lightbox__content">
+        <img class="cx-lightbox__image" [src]="src" [alt]="alt" />
+        @if (caption?.trim()) {
+          <div class="cx-lightbox__caption">{{ caption!.trim() }}</div>
+        }
+      </div>
+    </div>
+  </div>
+}

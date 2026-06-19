@@ -1,0 +1,35 @@
+<div
+  class="cx-progress-bar"
+  [class.cx-progress-bar--default]="mood === 'default'"
+  [class.cx-progress-bar--accent]="mood === 'accent'"
+  [class.cx-progress-bar--success]="mood === 'success'"
+  [class.cx-progress-bar--danger]="mood === 'danger'"
+  [class.cx-progress-bar--indeterminate]="indeterminate"
+>
+  @if (label.trim() || (showValue && resolvedValueLabel())) {
+    <div class="cx-progress-bar__header">
+      @if (label.trim()) {
+        <div class="cx-progress-bar__label">{{ label }}</div>
+      }
+      @if (showValue && resolvedValueLabel(); as valueLabelText) {
+        <div class="cx-progress-bar__value">{{ valueLabelText }}</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-progress-bar__track"
+    role="progressbar"
+    [style.--cx-progress-ratio]="progressRatio()"
+    aria-valuemin="0"
+    [attr.aria-valuemax]="max$()"
+    [attr.aria-valuenow]="indeterminate ? null : normalizedValue$()"
+    [attr.aria-valuetext]="resolvedValueLabel() ?? null"
+  >
+    <span class="cx-progress-bar__fill" aria-hidden="true"></span>
+  </div>
+
+  @if (hint?.trim()) {
+    <div class="cx-progress-bar__hint">{{ hint!.trim() }}</div>
+  }
+</div>

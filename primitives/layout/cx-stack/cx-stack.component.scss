@@ -1,0 +1,30 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-stack {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+:host([data-gap='2xs']) .cx-stack { gap: var(--space-2xs); }
+:host([data-gap='xs']) .cx-stack { gap: var(--space-xs); }
+:host([data-gap='sm']) .cx-stack { gap: var(--space-sm); }
+:host([data-gap='md']) .cx-stack { gap: var(--space-md); }
+:host([data-gap='lg']) .cx-stack { gap: var(--space-lg); }
+:host([data-gap='xl']) .cx-stack { gap: var(--space-xl); }
+:host([data-gap='2xl']) .cx-stack { gap: var(--space-2xl); }
+
+:host([data-align='start']) .cx-stack { align-items: flex-start; }
+:host([data-align='center']) .cx-stack { align-items: center; }
+:host([data-align='end']) .cx-stack { align-items: flex-end; }
+:host([data-align='stretch']) .cx-stack { align-items: stretch; }
+
+:host([data-justify='start']) .cx-stack { justify-content: flex-start; }
+:host([data-justify='center']) .cx-stack { justify-content: center; }
+:host([data-justify='end']) .cx-stack { justify-content: flex-end; }
+:host([data-justify='between']) .cx-stack { justify-content: space-between; }

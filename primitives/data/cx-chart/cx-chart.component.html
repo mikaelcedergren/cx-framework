@@ -1,0 +1,62 @@
+<div class="cx-chart" [attr.aria-label]="ariaLabel$()" role="img">
+  @if (hasData$()) {
+    <div class="cx-chart__plot">
+      @if (isCircular$()) {
+        <div class="cx-chart__circle" [style.background]="pieGradient$()" [class.cx-chart__circle--doughnut]="type$() === 'doughnut'"></div>
+      } @else {
+        <svg class="cx-chart__svg" viewBox="0 0 100 64" aria-hidden="true" preserveAspectRatio="none">
+          @for (tick of ticks$(); track tick.value) {
+            <line class="cx-chart__grid-line" x1="18" [attr.y1]="tick.y" x2="96" [attr.y2]="tick.y" />
+            <text class="cx-chart__tick-label" x="2" [attr.y]="tick.y + 1.5">{{ tick.value }}</text>
+          }
+          <line class="cx-chart__axis" x1="18" y1="52" x2="96" y2="52" />
+          @if (type$() === 'bar') {
+            @for (bar of bars$(); track bar.id) {
+              <rect
+                class="cx-chart__bar"
+                [attr.x]="bar.x"
+                [attr.y]="bar.y"
+                [attr.width]="bar.width"
+                [attr.height]="bar.height"
+                [attr.fill]="bar.color"
+              >
+                <title>{{ bar.seriesLabel }} / {{ bar.label }}: {{ bar.value }}</title>
+              </rect>
+            }
+          } @else {
+            @for (line of lines$(); track line.id) {
+              <polyline
+                class="cx-chart__line"
+                fill="none"
+                [attr.stroke]="line.color"
+                [attr.points]="line.points"
+              >
+                <title>{{ line.label }}</title>
+              </polyline>
+            }
+          }
+        </svg>
+
+        <div class="cx-chart__labels" aria-hidden="true">
+          @for (label of labels$(); track label) {
+            <span>{{ label }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="cx-chart__legend">
+      @for (item of legendItems$(); track item.id) {
+        <span class="cx-chart__legend-item">
+          <span class="cx-chart__swatch" [style.background]="item.color"></span>
+          <span class="cx-chart__legend-label">{{ item.label }}</span>
+          @if (item.value !== undefined) {
+            <span class="cx-chart__legend-value">{{ item.value }}</span>
+          }
+        </span>
+      }
+    </div>
+  } @else {
+    <div class="cx-chart__empty">{{ emptyText$() }}</div>
+  }
+</div>

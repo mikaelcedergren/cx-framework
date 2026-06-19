@@ -1,0 +1,25 @@
+<header class="cx-page-header">
+  <div class="cx-page-header__copy">
+    <h1 class="cx-page-header__title">{{ heading }}</h1>
+    @if (editableDescription) {
+      <p
+        #descEl
+        class="cx-page-header__description cx-page-header__description--editable"
+        [attr.contenteditable]="'plaintext-only'"
+        data-placeholder="Add a description..."
+        [attr.data-empty]="description.trim().length === 0 ? '' : null"
+        role="textbox"
+        spellcheck="true"
+        (blur)="commitDescription(descEl.innerText)"
+        (keydown.enter)="$event.preventDefault(); descEl.blur()"
+        (keydown.escape)="descEl.innerText = description; descEl.blur()"
+      >{{ description }}</p>
+    } @else if (description.trim()) {
+      <p class="cx-page-header__description">{{ description }}</p>
+    }
+  </div>
+
+  <div class="cx-page-header__actions">
+    <ng-content select="[actions]" />
+  </div>
+</header>

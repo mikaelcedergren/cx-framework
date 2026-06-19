@@ -1,0 +1,47 @@
+<button
+  type="button"
+  class="cx-icon-button"
+  [class.cx-icon-button--default]="mood === 'default'"
+  [class.cx-icon-button--primary]="mood === 'primary'"
+  [class.cx-icon-button--accent]="mood === 'accent'"
+  [class.cx-icon-button--info]="mood === 'info'"
+  [class.cx-icon-button--warning]="mood === 'warning'"
+  [class.cx-icon-button--danger]="mood === 'danger'"
+  [class.cx-icon-button--success]="mood === 'success'"
+  [class.cx-icon-button--transparent]="variant === 'transparent'"
+  [class.cx-icon-button--small]="size === 'small'"
+  [class.cx-icon-button--active]="active"
+  [class.cx-icon-button--hover]="hover"
+  [class.cx-icon-button--disabled]="disabled"
+  [class.cx-icon-button--loading]="showSpinner$()"
+  [class.cx-icon-button--countdown]="countdownActive$()"
+  [class.cx-icon-button--with-badge]="hasBadge()"
+  [class.cx-icon-button--with-dot-badge]="hasBadge() && !hasBadgeCount()"
+  [class.cx-icon-button--with-badge-value]="hasBadgeCount()"
+  [disabled]="disabled || loading$() || countdownActive$()"
+  [attr.aria-label]="ariaLabel"
+  [attr.aria-pressed]="ariaPressed === undefined ? null : ariaPressed"
+  [attr.aria-busy]="loading$() ? 'true' : null"
+  (click)="onClick()"
+>
+  @if (countdownActive$()) {
+    <span class="cx-icon-button__countdown" aria-hidden="true">
+      <svg class="cx-icon-button__countdown-svg" viewBox="0 0 16 16">
+        <circle class="cx-icon-button__countdown-track" cx="8" cy="8" r="6" pathLength="6" />
+        <circle class="cx-icon-button__countdown-progress" cx="8" cy="8" r="6" pathLength="6" />
+      </svg>
+    </span>
+  } @else if (showSpinner$()) {
+    <span class="cx-icon-button__spinner-box" aria-hidden="true">
+      <cx-spinner mood="default" size="auto" />
+    </span>
+  } @else {
+    <cx-icon class="cx-icon-button__icon" [name]="icon" [size]="size === 'small' ? 12 : 16" />
+  }
+
+  @if (hasBadge()) {
+    <span class="cx-icon-button__badge" aria-hidden="true">
+      <cx-badge [count]="badgeCount()" />
+    </span>
+  }
+</button>

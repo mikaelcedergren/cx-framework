@@ -1,0 +1,113 @@
+<div
+  class="cx-time-input"
+  [class.cx-time-input--small]="size$() === 'small'"
+  [class.cx-time-input--large]="size$() === 'large'"
+>
+  @if (label.trim() || optional) {
+    <div class="cx-time-input__header">
+      @if (label.trim()) {
+        <div class="cx-time-input__label" [id]="labelId">{{ label }}</div>
+      }
+
+      @if (optional && label.trim()) {
+        <div class="cx-time-input__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-time-input__field-shell"
+    [class.cx-time-input__field-shell--focused]="shellFocused$()"
+    [class.cx-time-input__field-shell--small]="size$() === 'small'"
+    [class.cx-time-input__field-shell--large]="size$() === 'large'"
+    [class.cx-time-input__field-shell--disabled]="disabled"
+    [class.cx-time-input__field-shell--readonly]="readOnly"
+    [class.cx-time-input__field-shell--loading]="loading"
+    [class.cx-time-input__field-shell--error]="hasError$()"
+    [class.cx-time-input__field-shell--empty]="isEmpty$()"
+    role="group"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-labelledby]="resolvedGroupAriaLabelledBy"
+    [attr.aria-describedby]="resolvedGroupAriaDescribedBy"
+    [attr.aria-label]="resolvedGroupAriaLabel"
+    [attr.aria-readonly]="readOnly ? 'true' : null"
+    [attr.aria-busy]="loading ? 'true' : null"
+    (mousedown)="onShellMousedown($event)"
+  >
+    <div class="cx-time-input__segments">
+      <div class="cx-time-input__clock">
+        <input
+          #hourField
+          class="cx-time-input__segment-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="2"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="--"
+          [value]="hourText$()"
+          [disabled]="isLocked$()"
+          [readOnly]="readOnly"
+          [attr.aria-label]="hourAriaLabel"
+          [attr.aria-readonly]="readOnly ? 'true' : null"
+          (focus)="onSegmentFocus('hour')"
+          (keydown)="onSegmentKeydown('hour', $event)"
+          (paste)="onSegmentPaste($event)"
+        />
+
+        <span class="cx-time-input__separator" aria-hidden="true">:</span>
+
+        <input
+          #minuteField
+          class="cx-time-input__segment-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="2"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="--"
+          [value]="minuteText$()"
+          [disabled]="isLocked$()"
+          [readOnly]="readOnly"
+          [attr.aria-label]="minuteAriaLabel"
+          [attr.aria-readonly]="readOnly ? 'true' : null"
+          (focus)="onSegmentFocus('minute')"
+          (keydown)="onSegmentKeydown('minute', $event)"
+          (paste)="onSegmentPaste($event)"
+        />
+      </div>
+
+      @if (is12h$()) {
+        <button
+          #meridiemButton
+          type="button"
+          class="cx-time-input__meridiem"
+          [disabled]="isLocked$() || readOnly"
+          [attr.aria-label]="'Meridiem ' + meridiem$()"
+          (click)="onMeridiemClick()"
+          (keydown)="onMeridiemKeydown($event)"
+        >
+          {{ meridiem$() }}
+        </button>
+      }
+    </div>
+
+    @if (hasClear$()) {
+      <button type="button" class="cx-time-input__clear" aria-label="Clear" (click)="onClear($event)">
+        <cx-icon name="remove" [size]="16" />
+      </button>
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-time-input__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-time-input__hint">{{ hint!.trim() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+</div>

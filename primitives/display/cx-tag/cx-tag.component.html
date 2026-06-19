@@ -1,0 +1,82 @@
+<div
+  class="cx-tag"
+  [class.cx-tag--outline]="variant === 'outline'"
+  [class.cx-tag--dismissible]="variant === 'dismissible'"
+  [class.cx-tag--interactive]="variant === 'interactive'"
+  [class.cx-tag--large]="size === 'large'"
+  [class.cx-tag--disabled]="disabled"
+  [class.cx-tag--with-icon]="!!icon"
+  [class.cx-tag--with-children]="hasChildren"
+  [class.cx-tag--default-color]="color === 'default'"
+  [class.cx-tag--blue]="color === 'blue'"
+  [class.cx-tag--cyan]="color === 'cyan'"
+  [class.cx-tag--green]="color === 'green'"
+  [class.cx-tag--yellow]="color === 'yellow'"
+  [class.cx-tag--orange]="color === 'orange'"
+  [class.cx-tag--tangerine]="color === 'tangerine'"
+  [class.cx-tag--red]="color === 'red'"
+  [class.cx-tag--pink]="color === 'pink'"
+  [class.cx-tag--purple]="color === 'purple'"
+  [class.cx-tag--violet]="color === 'violet'"
+>
+  <div class="cx-tag__main">
+    @if (icon; as iconName) {
+      <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+    }
+    @if (text.trim()) {
+      <span class="cx-tag__text">{{ text }}</span>
+    }
+    @if (info?.trim(); as infoText) {
+      <span class="cx-tag__info">{{ infoText }}</span>
+    }
+  </div>
+
+  @if (hasChildren) {
+    <div class="cx-tag__children">
+      @for (tag of tags; track $index) {
+        <span
+          class="cx-tag cx-tag__child"
+          [class.cx-tag--outline]="childVariant(tag) === 'outline'"
+          [class.cx-tag--interactive]="childVariant(tag) === 'interactive'"
+          [class.cx-tag--large]="tag.size === 'large'"
+          [class.cx-tag--disabled]="tag.disabled"
+          [class.cx-tag--with-icon]="!!tag.icon"
+          [class.cx-tag--default-color]="childColor(tag) === 'default'"
+          [class.cx-tag--blue]="childColor(tag) === 'blue'"
+          [class.cx-tag--cyan]="childColor(tag) === 'cyan'"
+          [class.cx-tag--green]="childColor(tag) === 'green'"
+          [class.cx-tag--yellow]="childColor(tag) === 'yellow'"
+          [class.cx-tag--orange]="childColor(tag) === 'orange'"
+          [class.cx-tag--tangerine]="childColor(tag) === 'tangerine'"
+          [class.cx-tag--red]="childColor(tag) === 'red'"
+          [class.cx-tag--pink]="childColor(tag) === 'pink'"
+          [class.cx-tag--purple]="childColor(tag) === 'purple'"
+          [class.cx-tag--violet]="childColor(tag) === 'violet'"
+        >
+          <span class="cx-tag__main">
+            @if (tag.icon; as iconName) {
+              <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+            }
+            @if (tag.text.trim()) {
+              <span class="cx-tag__text">{{ tag.text }}</span>
+            }
+            @if (tag.info?.trim(); as infoText) {
+              <span class="cx-tag__info">{{ infoText }}</span>
+            }
+          </span>
+        </span>
+      }
+    </div>
+  }
+
+  @if (showRemove) {
+    <button
+      type="button"
+      class="cx-tag__remove"
+      aria-label="Remove tag"
+      (click)="onRemove($event)"
+    >
+      <cx-icon [name]="removeIcon()" [size]="12" />
+    </button>
+  }
+</div>

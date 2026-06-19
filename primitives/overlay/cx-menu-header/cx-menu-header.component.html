@@ -1,0 +1,9 @@
+<div class="cx-menu-header">
+  @if (headingText()) {
+    <span class="cx-menu-header__heading">{{ headingText() }}</span>
+  }
+
+  <span class="cx-menu-header__actions">
+    <ng-content />
+  </span>
+</div>

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.cx-toggle-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.cx-toggle-chip-group--small {
+  gap: var(--space-xs);
+}
+
+.cx-toggle-chip-group--large {
+  gap: var(--space-md);
+}

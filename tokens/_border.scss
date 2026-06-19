@@ -1,0 +1,14 @@
+:root {
+  --border-width: 1px;
+  --line: var(--border-width) solid var(--opacity-mid);
+  --line-discreet: var(--border-width) solid var(--opacity-low);
+  --border-hover: var(--opacity-mid);
+  --border-open: var(--opacity-mid);
+  --border-active: var(--opacity-mid);
+  --outline-tab: 2px solid var(--blue);
+  --outline-tab-offset: -2px;
+  --outline-focus: none;
+  --outline-focus-offset: -2px;
+  --outline-active: none;
+  --outline-active-offset: -2px;
+}

@@ -1,0 +1,91 @@
+<div class="cx-table-view">
+  @if (hasHeading) {
+    <div class="cx-table-view__header">
+      <h2 class="cx-table-view__heading">{{ heading }}</h2>
+    </div>
+  }
+
+  @if (showFilterBar) {
+    <cx-filter-bar
+      [mode]="filterBarMode"
+      [quickFilters]="quickFilters"
+      [selectedQuickFilterId]="selectedQuickFilterId"
+      [filterOptions]="filterOptions"
+      [selectedFilterValue]="selectedFilterValue"
+      [filterPlaceholder]="filterPlaceholder"
+      [queryValue]="queryValue"
+      [queryPlaceholder]="queryPlaceholder"
+      [filterSections]="filterSections"
+      [savedViews]="savedViews"
+      [displayMode]="density === 'comfortable' ? 'comfortable' : 'compact'"
+      [groupByOptions]="groupByOptions"
+      [groupBy]="groupBy"
+      [sortOptions]="sortOptions"
+      [sortBy]="sortBy"
+      [sortDirection]="sortDirection"
+      [thenBy]="thenBy"
+      [thenByDirection]="thenByDirection"
+      [columnOptions]="columnOptions"
+      [visibleColumnIds]="visibleColumnIds"
+      [pinnedColumnIds]="pinnedColumnIds"
+      (modeChange)="filterBarModeChange.emit($event)"
+      (selectedQuickFilterIdChange)="selectedQuickFilterIdChange.emit($event)"
+      (selectedFilterValueChange)="selectedFilterValueChange.emit($event)"
+      (queryValueChange)="queryValueChange.emit($event)"
+      (savedViewSelect)="savedViewSelect.emit($event)"
+      (activeSavedViewIdChange)="activeSavedViewIdChange.emit($event)"
+      (displayModeChange)="densityChange.emit($event === 'comfortable' ? 'comfortable' : 'compact')"
+      (groupByChange)="groupByChange.emit($event)"
+      (sortByChange)="sortByChange.emit($event)"
+      (sortDirectionChange)="sortDirectionChange.emit($event)"
+      (thenByChange)="thenByChange.emit($event)"
+      (thenByDirectionChange)="thenByDirectionChange.emit($event)"
+      (visibleColumnIdsChange)="visibleColumnIdsChange.emit($event)"
+      (pinnedColumnIdsChange)="pinnedColumnIdsChange.emit($event)"
+      (exportTable)="exportTable.emit()"
+      (resetTable)="resetTable.emit()"
+    />
+  }
+
+  <div class="cx-table-view__surface">
+    <cx-table
+      [columns]="visibleColumns"
+      [rows]="rows"
+      [density]="density"
+      [rowActivation]="rowActivation"
+      [showHeaders]="showHeaders"
+      [columnsResizable]="columnsResizable"
+      [columnsReorderable]="columnsReorderable"
+      [stickyHeader]="stickyHeader"
+      [zebra]="zebra"
+      [loading]="loading"
+      [showRowActions]="showRowActions"
+      [rightClickMenu]="rightClickMenu"
+      [sort]="sort"
+      [activeRowId]="activeRowId"
+      [selectionMode]="selectionMode"
+      [selectedRowIds]="selectedRowIds"
+      (sortChange)="sortChange.emit($event)"
+      (activeRowIdChange)="activeRowIdChange.emit($event)"
+      (rowActivate)="rowActivate.emit($event)"
+      (selectedRowIdsChange)="selectedRowIdsChange.emit($event)"
+      (rowMenuItemSelect)="rowMenuItemSelect.emit($event)"
+    />
+  </div>
+
+  @if (showPagination) {
+    <div class="cx-table-view__footer">
+      <cx-pagination
+        [page]="page"
+        [pageSizes]="pageSizes"
+        (pageChange)="pageChange.emit($event)"
+      />
+    </div>
+  }
+
+  <cx-action-bar
+    [data]="actionBarData"
+    (deselectAll)="actionBarDeselectAll.emit()"
+    (action)="actionBarAction.emit($event)"
+  />
+</div>

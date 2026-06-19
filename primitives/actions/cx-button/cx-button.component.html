@@ -1,0 +1,47 @@
+<button
+  type="button"
+  class="cx-button"
+  [class.cx-button--default]="isDefault"
+  [class.cx-button--primary]="isPrimary"
+  [class.cx-button--accent]="isAccent"
+  [class.cx-button--info]="isInfo"
+  [class.cx-button--success]="isSuccess"
+  [class.cx-button--warning]="isWarning"
+  [class.cx-button--danger]="isDanger"
+  [class.cx-button--transparent]="isTransparent"
+  [class.cx-button--link]="isLink"
+  [class.cx-button--dashed]="isDashed"
+  [class.cx-button--icon]="isIconOnly"
+  [class.cx-button--small]="size === 'small'"
+  [class.cx-button--large]="size === 'large'"
+  [class.cx-button--selected]="selected === true"
+  [class.cx-button--disabled]="disabled"
+  [class.cx-button--loading]="showSpinner$()"
+  [disabled]="disabled || loading$()"
+  [attr.aria-label]="ariaLabel || null"
+  [attr.aria-pressed]="selected === undefined ? null : selected"
+  [attr.aria-busy]="loading$() ? 'true' : null"
+  (click)="onClick()"
+>
+  <span
+    class="cx-button__content"
+    [class.cx-button__content--hidden]="showSpinner$()"
+    [attr.aria-hidden]="showSpinner$() ? 'true' : null"
+  >
+    @if (icon; as iconName) {
+      <cx-icon class="cx-button__icon" [name]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
+    }
+    @if (visibleText) {
+      <span class="cx-button__label">{{ visibleText }}</span>
+    }
+    @if (appendIcon; as iconName) {
+      <cx-icon class="cx-button__icon" [name]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
+    }
+  </span>
+
+  @if (showSpinner$()) {
+    <span class="cx-button__spinner-box" aria-hidden="true">
+      <cx-spinner mood="default" size="auto" />
+    </span>
+  }
+</button>

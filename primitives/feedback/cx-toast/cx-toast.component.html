@@ -1,0 +1,78 @@
+@if (isRendered$()) {
+  <div
+    class="cx-toast"
+    [class.cx-toast--open]="isOpen$()"
+    [class.cx-toast--closing]="!isOpen$()"
+    [class.cx-toast--default]="mood === 'default'"
+    [class.cx-toast--info]="mood === 'info'"
+    [class.cx-toast--success]="mood === 'success'"
+    [class.cx-toast--warning]="mood === 'warning'"
+    [class.cx-toast--danger]="mood === 'danger'"
+    [class.cx-toast--multiline]="isMultiline"
+    [class.cx-toast--timed]="effectiveTimed"
+    role="status"
+    [attr.aria-live]="mood === 'danger' ? 'assertive' : 'polite'"
+    (transitionend)="onTransitionEnd($event)"
+  >
+    @if (moodIcon; as iconName) {
+      <cx-icon class="cx-toast__mood-icon" [name]="iconName" [mood]="mood" shape="circle-outline" size="24" />
+    }
+
+    @if (hasContent) {
+      <div class="cx-toast__content">
+        @if (hasHeading) {
+          <div class="cx-toast__heading">{{ heading }}</div>
+        }
+        @if (description?.trim()) {
+          <div class="cx-toast__description">{{ description }}</div>
+        }
+      </div>
+    }
+
+    @if (hasControls) {
+      <div class="cx-toast__controls">
+        @if (visibleSecondaryAction; as action) {
+          <cx-button
+            [text]="action.text"
+            [variant]="action.variant ?? 'transparent'"
+            [mood]="action.mood ?? 'default'"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onSecondaryActionPressed(action)"
+          />
+        }
+
+        @if (visibleAction; as action) {
+          <cx-button
+            [text]="action.text"
+            [variant]="action.variant ?? 'primary'"
+            [mood]="action.mood ?? actionButtonMood"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onActionPressed(action)"
+          />
+        }
+
+        @if (effectiveDismissible) {
+          <cx-icon-button
+            class="cx-toast__dismiss"
+            icon="remove"
+            ariaLabel="Dismiss notification"
+            variant="transparent"
+            (pressed)="dismiss()"
+          />
+        }
+      </div>
+    }
+
+    @if (effectiveTimed) {
+      <span class="cx-toast__timer" aria-hidden="true"></span>
+    }
+  </div>
+}

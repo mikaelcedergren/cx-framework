@@ -1,0 +1,187 @@
+:host {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.cx-color-picker {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
+.cx-color-picker--disabled {
+  opacity: var(--opacity-disabled, 0.45);
+}
+
+.cx-color-picker__trigger {
+  display: inline-grid;
+  min-width: calc(var(--controller-size) * 4);
+  min-height: var(--controller-size);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-mid);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.cx-color-picker__trigger:hover:not(:disabled) {
+  border-color: var(--opacity-mid);
+}
+
+.cx-color-picker__trigger:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-color-picker__trigger:disabled {
+  cursor: default;
+}
+
+.cx-color-picker__value {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-color-picker__swatch {
+  display: inline-flex;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  flex: 0 0 auto;
+  border: var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.cx-color-picker__swatch--empty {
+  background:
+    linear-gradient(
+      135deg,
+      transparent calc(50% - var(--space-2xs) / 4),
+      var(--danger) 50%,
+      transparent calc(50% + var(--space-2xs) / 4)
+    ),
+    var(--surface-mid);
+}
+
+.cx-color-picker__chevron {
+  color: var(--opacity-high);
+}
+
+.cx-color-picker__panel {
+  position: absolute;
+  z-index: var(--z-index-popover);
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  display: grid;
+  min-width: 100%;
+  gap: var(--space-2xs);
+  padding: var(--space-xs);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-popover);
+}
+
+.cx-color-picker__option {
+  display: grid;
+  min-width: calc(var(--controller-size) * 4);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+}
+
+.cx-color-picker__option:hover,
+.cx-color-picker__option--selected {
+  background: var(--opacity-low);
+}
+
+.cx-color-picker__option--clear {
+  color: var(--opacity-high);
+}
+
+.cx-color-picker__swatch[data-color='primary'] {
+  background: var(--primary);
+}
+
+.cx-color-picker__swatch[data-color='accent'] {
+  background: var(--accent);
+}
+
+.cx-color-picker__swatch[data-color='success'] {
+  background: var(--success);
+}
+
+.cx-color-picker__swatch[data-color='warning'] {
+  background: var(--warning);
+}
+
+.cx-color-picker__swatch[data-color='danger'] {
+  background: var(--danger);
+}
+
+.cx-color-picker__swatch[data-color='info'] {
+  background: var(--info);
+}
+
+.cx-color-picker__swatch[data-color='blue'] {
+  background: var(--blue);
+}
+
+.cx-color-picker__swatch[data-color='cyan'] {
+  background: var(--cyan);
+}
+
+.cx-color-picker__swatch[data-color='lime'] {
+  background: var(--lime);
+}
+
+.cx-color-picker__swatch[data-color='green'] {
+  background: var(--green);
+}
+
+.cx-color-picker__swatch[data-color='yellow'] {
+  background: var(--yellow);
+}
+
+.cx-color-picker__swatch[data-color='orange'] {
+  background: var(--orange);
+}
+
+.cx-color-picker__swatch[data-color='tangerine'] {
+  background: var(--tangerine);
+}
+
+.cx-color-picker__swatch[data-color='red'] {
+  background: var(--red);
+}
+
+.cx-color-picker__swatch[data-color='pink'] {
+  background: var(--pink);
+}
+
+.cx-color-picker__swatch[data-color='purple'] {
+  background: var(--purple);
+}
+
+.cx-color-picker__swatch[data-color='violet'] {
+  background: var(--violet);
+}

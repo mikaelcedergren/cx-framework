@@ -1,0 +1,14 @@
+:host {
+  display: contents;
+}
+
+.cx-popover-backdrop__surface {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-popover-backdrop);
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: default;
+}

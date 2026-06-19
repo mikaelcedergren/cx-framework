@@ -1,0 +1,172 @@
+<div class="cx-tag-input">
+  @if (label.trim()) {
+    <div class="cx-tag-input__header">
+      <div class="cx-tag-input__label" [id]="labelId">{{ label.trim() }}</div>
+      @if (optional) {
+        <div class="cx-tag-input__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-tag-input__field"
+    #fieldButton
+    [class.cx-tag-input__field--open]="isOpen$()"
+    [class.cx-tag-input__field--disabled]="disabled"
+    [class.cx-tag-input__field--readonly]="readOnly"
+    [class.cx-tag-input__field--loading]="loading"
+    [class.cx-tag-input__field--error]="hasError$()"
+    [class.cx-tag-input__field--small]="size === 'small'"
+    [class.cx-tag-input__field--large]="size === 'large'"
+    role="combobox"
+    [attr.tabindex]="isLocked$() ? -1 : 0"
+    [attr.aria-expanded]="isOpen$()"
+    [attr.aria-haspopup]="'listbox'"
+    [attr.aria-disabled]="isLocked$() ? 'true' : null"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-readonly]="readOnly ? 'true' : null"
+    [attr.aria-busy]="loading ? 'true' : null"
+    [attr.aria-controls]="isOpen$() ? popoverId : null"
+    [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+    [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+    [attr.aria-label]="resolvedFieldAriaLabel"
+    (click)="toggleOpen(fieldButton)"
+    (keydown)="onFieldKeydown($event, fieldButton)"
+  >
+    <div class="cx-tag-input__tokens">
+      @if (showPlaceholder$()) {
+        <span class="cx-tag-input__placeholder">{{ placeholder }}</span>
+      } @else {
+        @for (tag of selectedTags$(); track tag.id) {
+          <cx-tag
+            [text]="formatTagText(tag)"
+            [info]="formatTagInfo(tag)"
+            [color]="toTagColor(tag.color)"
+            [size]="size === 'large' ? 'large' : 'default'"
+            [variant]="isInteractive$() ? 'dismissible' : 'readOnly'"
+            (remove)="removeTag(tag.id)"
+          />
+        }
+      }
+    </div>
+    @if (hasClear$()) {
+      <button type="button" class="cx-tag-input__clear" aria-label="Clear tags" (click)="clearSelected($event)">
+        <cx-icon name="remove" [size]="16" />
+      </button>
+    }
+    <cx-icon class="cx-tag-input__chevron" name="chevron-down" [size]="16" />
+  </div>
+
+  @if (isOpen$() && isInteractive$()) {
+    <cx-popover
+      #popover
+      [open]="true"
+      [showBackdrop]="true"
+      [surfaceId]="popoverId"
+      [width]="overlayWidth$()"
+      [maxHeight]="overlayMaxHeight$()"
+      [left]="overlayLeft$()"
+      [top]="overlayTop$()"
+      [bottom]="overlayBottom$()"
+      [placement]="activePlacement$()"
+      surfaceClass="cx-tag-input__popover"
+      (backdropPressed)="closePopover()"
+    >
+      @if (searchable) {
+        <div class="cx-tag-input__search">
+          <cx-input
+            #searchInput
+            label=""
+            ariaLabel="Search tags"
+            placeholder=""
+            prependIcon="search"
+            [size]="size === 'large' ? 'large' : 'default'"
+            (valueChange)="onSearchChange($event)"
+          />
+        </div>
+      }
+
+      <div
+        class="cx-tag-input__options"
+        data-cx-popover-scroll-container
+        role="listbox"
+        [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+        [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+        [attr.aria-label]="resolvedFieldAriaLabel"
+        aria-multiselectable="true"
+      >
+        @if (filteredTags$().length > 0) {
+          @for (tag of filteredTags$(); track tag.id) {
+            <cx-option
+              [label]="formatOptionLabel(tag)"
+              [selected]="isTagSelected(tag.id)"
+              [showCheckbox]="true"
+              (click)="toggleTag(tag.id)"
+            />
+          }
+        } @else {
+          <div class="cx-tag-input__empty">{{ emptyText$() }}</div>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="cx-tag-input__create-action"
+        (click)="openCreateDialog()"
+      >
+        <cx-icon name="plus" [size]="16" />
+        <span>{{ createActionLabel }}</span>
+      </button>
+    </cx-popover>
+  }
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-tag-input__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-tag-input__hint">{{ hint!.trim() }}</div>
+      }
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+
+  <cx-dialog
+    [open]="createDialogOpen$()"
+    [heading]="createDialogHeading"
+    [text]="createDialogDescription"
+    [primaryText]="createDialogPrimaryLabel"
+    [secondaryText]="createDialogSecondaryLabel"
+    [closeOnPrimary]="false"
+    (openChange)="onCreateDialogOpenChange($event)"
+    (primary)="confirmCreateTag()"
+  >
+    <div body class="cx-tag-input__dialog-body">
+      <div class="cx-tag-input__dialog-key-row">
+        <cx-input
+          label="Name"
+          placeholder="Type a name"
+          [value]="draftKey$()"
+          [errorMessage]="draftKeyError$()"
+          (valueChange)="onDraftKeyChange($event)"
+        />
+        <div class="cx-tag-input__dialog-color-slot">
+          <div class="cx-tag-input__dialog-label-spacer" aria-hidden="true">&nbsp;</div>
+          <cx-color-picker
+            class="cx-tag-input__dialog-color-picker"
+            [value]="draftColor$()"
+            [options]="colorPickerOptions"
+            (valueChange)="onDraftColorChange($event)"
+          />
+        </div>
+      </div>
+      <cx-input
+        label="Key"
+        placeholder="Type a key"
+        [optional]="true"
+        [value]="draftValue$()"
+        (valueChange)="onDraftValueChange($event)"
+      />
+    </div>
+  </cx-dialog>
+</div>

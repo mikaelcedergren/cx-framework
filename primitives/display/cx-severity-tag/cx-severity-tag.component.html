@@ -1,0 +1,43 @@
+<div
+  class="cx-severity-tag"
+  [class.cx-severity-tag--dot]="variant === 'dot'"
+  [class.cx-severity-tag--bars]="variant === 'bars'"
+  [class.cx-severity-tag--critical]="stateClass() === 'critical'"
+  [class.cx-severity-tag--high]="stateClass() === 'high'"
+  [class.cx-severity-tag--medium]="stateClass() === 'medium'"
+  [class.cx-severity-tag--low]="stateClass() === 'low'"
+  [class.cx-severity-tag--recommended]="stateClass() === 'recommended'"
+  [class.cx-severity-tag--grade-a]="stateClass() === 'grade-a'"
+  [class.cx-severity-tag--grade-b]="stateClass() === 'grade-b'"
+  [class.cx-severity-tag--grade-c]="stateClass() === 'grade-c'"
+  [class.cx-severity-tag--grade-d]="stateClass() === 'grade-d'"
+  [class.cx-severity-tag--grade-e]="stateClass() === 'grade-e'"
+  [class.cx-severity-tag--grade-f]="stateClass() === 'grade-f'"
+>
+  @if (hasContent()) {
+    @if (variant === 'bars') {
+      <span class="cx-severity-tag__grade" aria-hidden="true">
+        @for (bar of bars(); track bar) {
+          <span
+            class="cx-severity-tag__bar"
+            [class.cx-severity-tag__bar--filled]="bar < filledBars()"
+          ></span>
+        }
+      </span>
+    } @else {
+      <span class="cx-severity-tag__dot" aria-hidden="true"></span>
+    }
+
+    <span class="cx-severity-tag__label">{{ label() }}</span>
+
+    @if (scoreVisible()) {
+      <span class="cx-severity-tag__score">{{ scoreText() }}</span>
+    }
+
+    @if (kev) {
+      <span class="cx-severity-tag__kev">KEV</span>
+    }
+  } @else {
+    <span class="cx-severity-tag__empty">&mdash;</span>
+  }
+</div>

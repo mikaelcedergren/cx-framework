@@ -1,0 +1,35 @@
+<span
+  class="cx-tooltip__trigger"
+  cdkOverlayOrigin
+  #triggerOrigin="cdkOverlayOrigin"
+  [attr.aria-describedby]="isOpen() ? tooltipId : null"
+  (mouseenter)="onTriggerMouseEnter()"
+  (mouseleave)="onTriggerLeave()"
+  (focusin)="onTriggerFocusIn()"
+  (focusout)="onTriggerLeave()"
+>
+  <ng-content />
+</span>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="triggerOrigin"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayPositions]="positions()"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  [cdkConnectedOverlayFlexibleDimensions]="false"
+  (positionChange)="onPositionChange($event)"
+>
+  <div
+    class="cx-tooltip__surface"
+    [id]="tooltipId"
+    [class.cx-tooltip__surface--top]="activePlacement() === 'top'"
+    [class.cx-tooltip__surface--right]="activePlacement() === 'right'"
+    [class.cx-tooltip__surface--bottom]="activePlacement() === 'bottom'"
+    [class.cx-tooltip__surface--left]="activePlacement() === 'left'"
+    role="tooltip"
+  >
+    <span class="cx-tooltip__content">{{ messageText() }}</span>
+  </div>
+</ng-template>

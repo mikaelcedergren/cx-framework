@@ -1,0 +1,32 @@
+:host {
+  display: flex;
+  width: 100%;
+}
+
+.cx-file-upload__native-input {
+  display: none;
+}
+
+.cx-file-upload__button {
+  width: 100%;
+  --cx-button-width: 100%;
+}
+
+.cx-file-upload__selected {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-file-upload__name {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

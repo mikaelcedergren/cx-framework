@@ -1,0 +1,38 @@
+<button
+  type="button"
+  class="cx-query-element"
+  [class.cx-query-element--insert]="kind === 'insert'"
+  [class.cx-query-element--field]="kind === 'field'"
+  [class.cx-query-element--operator]="kind === 'operator'"
+  [class.cx-query-element--boolean]="kind === 'boolean'"
+  [class.cx-query-element--parenthesis]="kind === 'parenthesis'"
+  [class.cx-query-element--values]="kind === 'values'"
+  [class.cx-query-element--focused]="focused"
+  [class.cx-query-element--disabled]="disabled"
+  [disabled]="disabled"
+  [attr.aria-pressed]="focused ? 'true' : null"
+  (click)="onPressed()"
+>
+  @if (isValues()) {
+    @if (valuesPrefix) {
+      <span class="cx-query-element__muted">{{ valuesPrefix }}</span>
+    }
+    @for (value of values; track $index) {
+      <span class="cx-query-element__value" [class.cx-query-element__value--empty]="!value">
+        @if (value) {
+          {{ value }}
+        } @else {
+          &lt;Empty&gt;
+        }
+      </span>
+      @if ($index < values.length - 1) {
+        <span class="cx-query-element__muted">{{ valuesDivider }}</span>
+      }
+    }
+    @if (valuesSuffix) {
+      <span class="cx-query-element__muted">{{ valuesSuffix }}</span>
+    }
+  } @else {
+    {{ resolvedLabel() }}
+  }
+</button>

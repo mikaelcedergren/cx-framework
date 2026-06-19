@@ -1,0 +1,113 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-tooltip__trigger {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-tooltip__surface {
+  position: relative;
+  z-index: var(--z-index-tooltip);
+  display: inline-flex;
+  max-width: calc(var(--controller-size) * 8);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--ink);
+  color: var(--surface-mid);
+  pointer-events: none;
+  animation: cx-tooltip-in var(--motion-base) var(--ease-out) forwards;
+  will-change: opacity, transform;
+}
+
+.cx-tooltip__content {
+  display: block;
+  color: currentColor;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.cx-tooltip__surface--top {
+  animation-name: cx-tooltip-in-top;
+}
+
+.cx-tooltip__surface--bottom {
+  animation-name: cx-tooltip-in-bottom;
+}
+
+.cx-tooltip__surface--left {
+  animation-name: cx-tooltip-in-left;
+}
+
+.cx-tooltip__surface--right {
+  animation-name: cx-tooltip-in-right;
+}
+
+@keyframes cx-tooltip-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cx-tooltip-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cx-tooltip-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cx-tooltip-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cx-tooltip-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-tooltip__surface {
+    animation: none;
+  }
+}

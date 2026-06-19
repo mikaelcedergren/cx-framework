@@ -1,0 +1,244 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-tag {
+  position: relative;
+  display: inline-flex;
+  width: max-content;
+  min-width: var(--controller-size-small);
+  flex-direction: column;
+  gap: var(--space-sm);
+  color: var(--opacity-high);
+}
+
+.cx-tag__main {
+  display: inline-flex;
+  width: max-content;
+  min-width: var(--controller-size-small);
+  height: var(--icon-size-md);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-xs);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  box-sizing: border-box;
+}
+
+.cx-tag--with-icon > .cx-tag__main {
+  padding-left: var(--space-2xs);
+}
+
+.cx-tag--with-children > .cx-tag__main {
+  padding-right: var(--space-2xs);
+}
+
+.cx-tag--large > .cx-tag__main {
+  height: var(--controller-size-small);
+}
+
+.cx-tag__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.cx-tag__text {
+  display: block;
+  min-width: 0;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+  white-space: nowrap;
+}
+
+.cx-tag--large > .cx-tag__main .cx-tag__text {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.cx-tag__info {
+  display: block;
+  color: currentColor;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+  white-space: nowrap;
+}
+
+.cx-tag__children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.cx-tag__remove {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: var(--surface-mid);
+  color: currentColor;
+  cursor: pointer;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.92);
+  transition:
+    opacity var(--motion-fast) var(--ease-out-in),
+    transform var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-tag:hover.cx-tag--dismissible .cx-tag__remove,
+.cx-tag:focus-within.cx-tag--dismissible .cx-tag__remove {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+.cx-tag--disabled {
+  opacity: var(--opacity-disabled);
+  pointer-events: none;
+}
+
+.cx-tag--interactive > .cx-tag__main {
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease-out-in),
+    border-color var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-tag--interactive:hover > .cx-tag__main {
+  background: var(--opacity-mid);
+}
+
+.cx-tag--default-color > .cx-tag__main {
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+}
+
+.cx-tag--outline.cx-tag--default-color > .cx-tag__main {
+  border-color: var(--opacity-mid);
+  background: transparent;
+  color: var(--opacity-high);
+}
+
+.cx-tag--blue > .cx-tag__main {
+  background: var(--blue-opacity);
+  color: var(--blue);
+}
+
+.cx-tag--outline.cx-tag--blue > .cx-tag__main {
+  border-color: var(--blue);
+  background: transparent;
+  color: var(--blue);
+}
+
+.cx-tag--cyan > .cx-tag__main {
+  background: var(--cyan-opacity);
+  color: var(--cyan);
+}
+
+.cx-tag--outline.cx-tag--cyan > .cx-tag__main {
+  border-color: var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+}
+
+.cx-tag--green > .cx-tag__main {
+  background: var(--green-opacity);
+  color: var(--green);
+}
+
+.cx-tag--outline.cx-tag--green > .cx-tag__main {
+  border-color: var(--green);
+  background: transparent;
+  color: var(--green);
+}
+
+.cx-tag--yellow > .cx-tag__main {
+  background: var(--yellow-opacity);
+  color: var(--yellow);
+}
+
+.cx-tag--outline.cx-tag--yellow > .cx-tag__main {
+  border-color: var(--yellow);
+  background: transparent;
+  color: var(--yellow);
+}
+
+.cx-tag--orange > .cx-tag__main {
+  background: var(--orange-opacity);
+  color: var(--orange);
+}
+
+.cx-tag--outline.cx-tag--orange > .cx-tag__main {
+  border-color: var(--orange);
+  background: transparent;
+  color: var(--orange);
+}
+
+.cx-tag--tangerine > .cx-tag__main {
+  background: var(--tangerine-opacity);
+  color: var(--tangerine);
+}
+
+.cx-tag--outline.cx-tag--tangerine > .cx-tag__main {
+  border-color: var(--tangerine);
+  background: transparent;
+  color: var(--tangerine);
+}
+
+.cx-tag--red > .cx-tag__main {
+  background: var(--red-opacity);
+  color: var(--red);
+}
+
+.cx-tag--outline.cx-tag--red > .cx-tag__main {
+  border-color: var(--red);
+  background: transparent;
+  color: var(--red);
+}
+
+.cx-tag--pink > .cx-tag__main {
+  background: var(--pink-opacity);
+  color: var(--pink);
+}
+
+.cx-tag--outline.cx-tag--pink > .cx-tag__main {
+  border-color: var(--pink);
+  background: transparent;
+  color: var(--pink);
+}
+
+.cx-tag--purple > .cx-tag__main {
+  background: var(--purple-opacity);
+  color: var(--purple);
+}
+
+.cx-tag--outline.cx-tag--purple > .cx-tag__main {
+  border-color: var(--purple);
+  background: transparent;
+  color: var(--purple);
+}
+
+.cx-tag--violet > .cx-tag__main {
+  background: var(--violet-opacity);
+  color: var(--violet);
+}
+
+.cx-tag--outline.cx-tag--violet > .cx-tag__main {
+  border-color: var(--violet);
+  background: transparent;
+  color: var(--violet);
+}

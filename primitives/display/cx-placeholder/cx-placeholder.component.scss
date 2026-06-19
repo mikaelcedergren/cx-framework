@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-placeholder {
+  position: relative;
+  display: flex;
+  min-height: 160px;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  border: 1px dashed var(--placeholder);
+  border-radius: var(--radius-md);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 12px,
+      color-mix(in srgb, var(--placeholder) 6%, transparent) 12px,
+      color-mix(in srgb, var(--placeholder) 6%, transparent) 13px
+    ),
+    color-mix(in srgb, var(--surface-low) 96%, var(--placeholder) 4%);
+  box-sizing: border-box;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.cx-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: var(--space-sm);
+  border: 1px dashed color-mix(in srgb, var(--placeholder) 48%, transparent);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.cx-placeholder__content {
+  position: relative;
+  display: flex;
+  max-width: min(100%, 420px);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+
+.cx-placeholder__text {
+  color: var(--opacity-mid);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+:host(.cx-placeholder-host--small) .cx-placeholder {
+  min-height: 96px;
+  padding: var(--space-md);
+}
+
+:host(.cx-placeholder-host--large) .cx-placeholder {
+  min-height: 260px;
+  padding: var(--space-xl);
+}

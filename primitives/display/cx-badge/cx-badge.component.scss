@@ -1,0 +1,120 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-badge {
+  position: relative;
+  display: inline-flex;
+  min-width: 8px;
+  min-height: 8px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--on-ink);
+  box-sizing: border-box;
+  --cx-badge-bg: var(--primary);
+}
+
+.cx-badge--primary {
+  --cx-badge-bg: var(--primary);
+}
+
+.cx-badge--accent {
+  --cx-badge-bg: var(--accent);
+}
+
+.cx-badge--success {
+  --cx-badge-bg: var(--success);
+}
+
+.cx-badge--warning {
+  --cx-badge-bg: var(--warning);
+}
+
+.cx-badge--danger {
+  --cx-badge-bg: var(--danger);
+}
+
+.cx-badge--info {
+  --cx-badge-bg: var(--info);
+}
+
+.cx-badge__content {
+  display: inline-flex;
+}
+
+.cx-badge__content--cutout-dot,
+.cx-badge__content--cutout-count {
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+}
+
+.cx-badge__content--cutout-dot {
+  mask-image: radial-gradient(circle at calc(100% - 2px) 2px, transparent 0 8px, #000 9px);
+  -webkit-mask-image: radial-gradient(circle at calc(100% - 2px) 2px, transparent 0 8px, #000 9px);
+}
+
+.cx-badge__content--cutout-count {
+  mask-image: radial-gradient(circle at calc(100% - 2px) 2px, transparent 0 11px, #000 12px);
+  -webkit-mask-image: radial-gradient(circle at calc(100% - 2px) 2px, transparent 0 11px, #000 12px);
+}
+
+.cx-badge__indicator {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(25%, -25%);
+  pointer-events: none;
+  background: var(--cx-badge-bg);
+  border-radius: var(--radius-pill);
+  color: var(--on-ink);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cx-badge--inline {
+  gap: var(--space-xs);
+}
+
+.cx-badge--inline .cx-badge__indicator {
+  position: static;
+  transform: none;
+  flex-shrink: 0;
+}
+
+.cx-badge__indicator--dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+}
+
+.cx-badge--with-count {
+  width: auto;
+  min-width: 14px;
+  min-height: 14px;
+}
+
+.cx-badge__indicator--count {
+  top: -2px;
+  right: -2px;
+  height: 14px;
+  min-width: 14px;
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-2xs);
+  color: var(--surface-mid);
+}
+
+.cx-badge__value {
+  display: block;
+  line-height: 1;
+  white-space: nowrap;
+  font-size: var(--font-size-body-xs);
+  font-weight: var(--font-weight-medium);
+  color: currentColor;
+}

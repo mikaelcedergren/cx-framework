@@ -1,0 +1,55 @@
+@if (hasText()) {
+  @if (resolvedIcon; as iconName) {
+    <div class="cx-alert__icon" aria-hidden="true">
+      <cx-icon [name]="iconName" />
+    </div>
+  }
+
+  <div class="cx-alert__text">
+    {{ text }}
+
+    @if (hasActions()) {
+      <div class="cx-alert__actions">
+        @if (visibleAction; as action) {
+          <cx-button
+            [mood]="action.mood ?? 'default'"
+            [variant]="action.variant ?? 'link'"
+            [text]="action.text"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            size="small"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onAction(action)"
+          />
+        }
+        @if (visibleSecondaryAction; as action) {
+          <cx-button
+            [mood]="action.mood ?? 'default'"
+            [variant]="action.variant ?? 'link'"
+            [text]="action.text"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            size="small"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onSecondaryAction(action)"
+          />
+        }
+      </div>
+    }
+  </div>
+
+  @if (dismissible) {
+    <button
+      type="button"
+      class="cx-alert__dismiss"
+      aria-label="Dismiss alert"
+      (click)="onDismiss()"
+    >
+      <cx-icon name="remove" [size]="16" aria-hidden="true" />
+    </button>
+  }
+}

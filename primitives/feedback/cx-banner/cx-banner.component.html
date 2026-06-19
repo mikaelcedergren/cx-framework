@@ -1,0 +1,74 @@
+@if (isRendered$()) {
+  <div
+    class="cx-banner"
+    [class.cx-banner--open]="isOpen$()"
+    [class.cx-banner--closing]="!isOpen$()"
+    [class.cx-banner--info]="mood === 'info'"
+    [class.cx-banner--warning]="mood === 'warning'"
+    [class.cx-banner--success]="mood === 'success'"
+    [class.cx-banner--danger]="mood === 'danger'"
+    [class.cx-banner--overlay]="dismissible"
+    [class.cx-banner--inline]="!dismissible"
+    [attr.role]="resolvedRole"
+    (transitionend)="onTransitionEnd($event)"
+  >
+    <div class="cx-banner__main">
+      <cx-icon class="cx-banner__icon" [name]="resolvedIcon" [size]="32" aria-hidden="true" />
+
+      <div class="cx-banner__copy">
+        @if (heading.trim()) {
+          <div class="cx-banner__title">{{ heading }}</div>
+        }
+
+        @if (description.trim()) {
+          <div class="cx-banner__description">{{ description }}</div>
+        }
+      </div>
+    </div>
+
+    @if (hasActions() || dismissible) {
+      <div class="cx-banner__actions">
+        @if (visibleAction; as action) {
+          <cx-button
+            class="cx-banner__action"
+            [variant]="action.variant ?? 'default'"
+            [mood]="actionButtonMood(action)"
+            [text]="action.text"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onActionPress(action)"
+          />
+        }
+
+        @if (visibleSecondaryAction; as action) {
+          <cx-button
+            class="cx-banner__action"
+            [variant]="action.variant ?? 'transparent'"
+            [mood]="action.mood ?? 'default'"
+            [text]="action.text"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onSecondaryActionPress(action)"
+          />
+        }
+
+        @if (dismissible) {
+          <button
+            type="button"
+            class="cx-banner__dismiss"
+            aria-label="Dismiss banner"
+            (click)="onDismissPress()"
+          >
+            <cx-icon name="remove" [size]="14" aria-hidden="true" />
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

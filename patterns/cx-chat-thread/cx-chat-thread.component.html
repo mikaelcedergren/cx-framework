@@ -1,0 +1,9 @@
+<div class="cx-chat-thread__messages" role="list" aria-label="Messages">
+  <ng-content select="cx-chat-message" />
+  <ng-content select="[cxChatMessage]" />
+</div>
+
+<div class="cx-chat-thread__footer">
+  <ng-content select="[cxChatThreadFooter]" />
+  <ng-content select="[slot=footer]" />
+</div>

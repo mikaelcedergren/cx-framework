@@ -1,0 +1,80 @@
+<aside
+  class="cx-detail-panel"
+  [class.cx-detail-panel--closing]="closing$()"
+  [class.cx-detail-panel--bar]="isBar"
+  [class.cx-detail-panel--fixed]="isFixed"
+  [class.cx-detail-panel--scrollable]="hasScrollbar"
+  [attr.aria-label]="ariaLabel"
+>
+  @if (isBar) {
+    <div class="cx-detail-panel__bar">
+      @if (dismissible) {
+        <cx-icon-button
+          icon="arrow-right"
+          ariaLabel="Close details panel"
+          variant="transparent"
+          (pressed)="dismiss()"
+        />
+      }
+      @if (menuItems.length > 0) {
+        <cx-menu align="end" [ariaLabel]="menuAriaLabel" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
+          <cx-icon-button
+            trigger
+            icon="menu-vertical"
+            [ariaLabel]="menuAriaLabel"
+            variant="transparent"
+          />
+        </cx-menu>
+      }
+    </div>
+  } @else {
+    <div class="cx-detail-panel__header">
+      <div class="cx-detail-panel__heading-group">
+        @if (icon; as iconName) {
+          <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
+        }
+        <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
+      </div>
+
+      <div class="cx-detail-panel__header-actions">
+        <ng-content select="[detail-panel-header-actions]" />
+        <ng-content select=".cx-detail-panel-slot-header-actions" />
+
+        @if (menuItems.length > 0) {
+          <cx-menu [items]="menuItems" (itemSelect)="onMenuSelect($event)">
+            <cx-icon-button
+              trigger
+              icon="menu-vertical"
+              [ariaLabel]="menuAriaLabel"
+              variant="transparent"
+            />
+          </cx-menu>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="cx-detail-panel__content-container">
+    <div class="cx-detail-panel__content">
+      <ng-content />
+    </div>
+  </div>
+
+  @if (!isBar) {
+    <footer class="cx-detail-panel__footer">
+      <div class="cx-detail-panel__footer-slot">
+        <ng-content select="[detail-panel-footer]" />
+        <ng-content select=".cx-detail-panel-slot-footer" />
+      </div>
+
+      @if (showFooterClose) {
+        <cx-icon-button
+          icon="arrow-right"
+          ariaLabel="Close details panel"
+          mood="default"
+          (pressed)="dismiss()"
+        />
+      }
+    </footer>
+  }
+</aside>

@@ -1,0 +1,134 @@
+<div
+  class="cx-textarea"
+  [class.cx-textarea--small]="size$() === 'small'"
+  [class.cx-textarea--large]="size$() === 'large'"
+  [class.cx-textarea--title]="variant === 'title'"
+  [class.cx-textarea--fill]="layout === 'fill'"
+>
+  @if (label.trim()) {
+    <div class="cx-textarea__header">
+      <div class="cx-textarea__label">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-textarea__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-textarea__shell"
+    [class.cx-textarea__shell--focused]="isFocused$()"
+    [class.cx-textarea__shell--disabled]="disabled$()"
+    [class.cx-textarea__shell--read-only]="readOnly$()"
+    [class.cx-textarea__shell--error]="hasError$()"
+    [class.cx-textarea__shell--inline-edit]="variant === 'inline-edit' || variant === 'title'"
+    [class.cx-textarea__shell--focus-ring]="focusVariant === 'ring'"
+  >
+    <div
+      class="cx-textarea__editor"
+      [class.cx-textarea__editor--with-gutter]="showGutter$()"
+    >
+      <div class="cx-textarea__gutter" aria-hidden="true">
+        @if (showGutter$()) {
+          <div class="cx-textarea__gutter-rows" [style.transform]="gutterTransform$()">
+            @for (line of renderedLines$(); track line.number) {
+              <div
+                class="cx-textarea__gutter-row"
+                [class.cx-textarea__gutter-row--success]="line.iconMood === 'success'"
+                [class.cx-textarea__gutter-row--error]="line.iconMood === 'danger'"
+                [attr.title]="line.title || null"
+              >
+                @if (line.iconMood === 'danger') {
+                  <cx-icon class="cx-textarea__gutter-icon" name="warning" [size]="12" />
+                } @else if (line.iconMood === 'success') {
+                  <cx-icon class="cx-textarea__gutter-icon" name="check" [size]="12" />
+                }
+                @if (showLineNumbers$()) {
+                  <span class="cx-textarea__gutter-number">{{ line.number }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="cx-textarea__field-wrap">
+        @if (showFullLineAnnotations$()) {
+          <div class="cx-textarea__highlight" aria-hidden="true">
+            <div class="cx-textarea__highlight-lines" [style.transform]="gutterTransform$()">
+              @for (line of renderedLines$(); track line.number) {
+                <div
+                  class="cx-textarea__highlight-line"
+                  [class.cx-textarea__highlight-line--success]="line.mood === 'success'"
+                  [class.cx-textarea__highlight-line--error]="line.mood === 'danger'"
+                ></div>
+              }
+            </div>
+          </div>
+        }
+        @if (showRangeAnnotations$()) {
+          <div
+            class="cx-textarea__range-mirror"
+            [class.cx-textarea__range-mirror--monospace]="monospace"
+            aria-hidden="true"
+          >
+            <div class="cx-textarea__range-lines" [style.transform]="gutterTransform$()">
+              @for (line of renderedLines$(); track line.number) {
+                <div class="cx-textarea__range-line">
+                  @for (segment of line.segments; track $index) {
+                    <span
+                      [class.cx-textarea__range-segment--success]="segment.mood === 'success'"
+                      [class.cx-textarea__range-segment--error]="segment.mood === 'danger'"
+                    >{{ segment.text }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+        @if (showMarkdownPreview$()) {
+          <div
+            class="cx-textarea__markdown"
+            [innerHTML]="renderedMarkdown$()"
+            (click)="onPreviewClick($event)"
+          ></div>
+        }
+        <textarea
+          #field
+          class="cx-textarea__field"
+          [class.cx-textarea__field--hidden]="showMarkdownPreview$()"
+          [class.cx-textarea__field--auto-grow]="sizing$() === 'auto'"
+          [class.cx-textarea__field--monospace]="monospace"
+          [class.cx-textarea__field--resizable]="sizing$() === 'resizable'"
+          [class.cx-textarea__field--fixed]="sizing$() === 'fixed'"
+          [class.cx-textarea__field--with-range-annotations]="showRangeAnnotations$()"
+          [value]="value$()"
+          [placeholder]="placeholder"
+          [rows]="minLines$()"
+          [disabled]="disabled$()"
+          [readOnly]="readOnly$()"
+          [attr.maxlength]="maxLength$() ?? null"
+          [attr.aria-label]="resolvedAriaLabel"
+          [attr.aria-invalid]="hasError$() ? 'true' : null"
+          [attr.aria-readonly]="readOnly$() ? 'true' : null"
+          (beforeinput)="onBeforeInput($event)"
+          (input)="onInput($event)"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
+          (scroll)="onScroll($event)"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-textarea__messages">
+      @if (showHint$()) {
+        <div class="cx-textarea__hint">{{ hint$() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+</div>

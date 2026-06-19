@@ -1,0 +1,24 @@
+<div
+  class="cx-search-field"
+  (keydown.escape)="onEscape($event)"
+  (focusin)="onFocusIn()"
+  (focusout)="onFocusOut($event)"
+>
+  <cx-input
+    [label]="label"
+    [placeholder]="placeholder"
+    [hint]="hint"
+    [optional]="optional"
+    [disabled]="disabled"
+    [readOnly]="readOnly"
+    [loading]="loading"
+    [clearable]="clearable"
+    [size]="size"
+    prependIcon="search"
+    [updateOn]="updateOn"
+    [debounceMs]="debounceMs"
+    [value]="value$()"
+    [validationMessages]="validationMessages"
+    (valueChange)="onValueChange($event)"
+  />
+</div>

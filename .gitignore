@@ -1,0 +1,6 @@
+node_modules/
+dist/
+out-tsc/
+.DS_Store
+.framework-build.status.json
+*.tsbuildinfo

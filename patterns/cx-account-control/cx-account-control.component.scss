@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep cx-menu,
+:host ::ng-deep cx-menu .cx-menu,
+:host ::ng-deep cx-menu .cx-menu__trigger {
+  display: flex;
+  width: 100%;
+}
+
+.cx-account-control {
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.cx-account-control:hover,
+.cx-account-control--open {
+  background: var(--opacity-low);
+}
+
+.cx-account-control:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-account-control:active {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-account-control--open {
+  background: var(--surface-low);
+}
+
+.cx-account-control--open .cx-account-control__icon {
+  color: var(--ink);
+}
+
+.cx-account-control:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cx-account-control__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.cx-account-control__icon {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+}

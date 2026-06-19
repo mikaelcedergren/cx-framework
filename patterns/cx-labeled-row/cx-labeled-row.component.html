@@ -1,0 +1,153 @@
+<div
+  class="cx-labeled-row"
+  [class.cx-labeled-row--no-label]="!hasLabel"
+  [class.cx-labeled-row--small]="size === 'small'"
+  [class.cx-labeled-row--large]="size === 'large'"
+>
+  @if (hasLabel) {
+    <div class="cx-labeled-row__label">
+      <span>{{ label }}</span>
+      @if (optional) {
+        <span class="cx-labeled-row__optional">Optional</span>
+      }
+    </div>
+  }
+
+  <div class="cx-labeled-row__content">
+    @if (contentInputBound) {
+      @switch (content.kind) {
+        @case ('text') {
+          <div class="cx-labeled-row__field-shell">
+            <div class="cx-labeled-row__plain-text">{{ content.text }}</div>
+          </div>
+        }
+
+        @case ('input') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-input
+              [label]="''"
+              [value]="content.value"
+              [placeholder]="content.placeholder ?? 'Type something'"
+              [prependText]="content.prependText"
+              [appendText]="content.appendText"
+              [disabled]="content.disabled ?? false"
+              [errorMessage]="content.errorMessage"
+              (valueChange)="onInputValueChange($event)"
+            />
+          </div>
+        }
+
+        @case ('textarea') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-textarea
+              [label]="''"
+              [value]="content.value"
+              [placeholder]="content.placeholder ?? 'Type something'"
+              [rows]="content.rows ?? 5"
+              [autoGrow]="content.autoGrow ?? false"
+              [disabled]="content.disabled ?? false"
+              [errorMessage]="content.errorMessage"
+              (valueChange)="onInputValueChange($event)"
+            />
+          </div>
+        }
+
+        @case ('select') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-select
+              [label]="''"
+              [availableValues]="content.options"
+              [value]="content.value"
+              [values]="content.values"
+              [displayValue]="content.displayValue"
+              [placeholder]="content.placeholder ?? 'Select'"
+              [mode]="content.multiple ? 'multiple' : content.searchable ? 'combobox' : 'single'"
+              [disabled]="content.disabled ?? false"
+              [errorMessage]="content.errorMessage"
+              (valueChange)="onSelectValueChange($event)"
+              (valuesChange)="onSelectValuesChange($event)"
+            />
+          </div>
+        }
+
+        @case ('radio-group') {
+          <div class="cx-labeled-row__field-shell">
+            <div class="cx-labeled-row__radio-group-field">
+              <div class="cx-labeled-row__radio-group">
+                @for (option of content.options; track option.id) {
+                  <cx-radio
+                    [text]="option.label"
+                    [selected]="isRadioSelected(option.id)"
+                    [disabled]="content.disabled ?? false"
+                    (selectedChange)="onRadioSelect(option.id)"
+                  />
+                }
+              </div>
+
+              @if (content.errorMessage) {
+                <cx-validation-message
+                  class="cx-labeled-row__group-error"
+                  [messages]="[{ type: 'error', text: content.errorMessage }]"
+                />
+              }
+            </div>
+          </div>
+        }
+
+        @case ('checkbox') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-checkbox
+              [text]="content.label"
+              [selected]="content.checked ?? false"
+              [disabled]="content.disabled ?? false"
+              (selectedChange)="onCheckboxCheckedChange($event)"
+            />
+            @if (content.errorMessage) {
+              <cx-validation-message
+                class="cx-labeled-row__group-error"
+                [messages]="[{ type: 'error', text: content.errorMessage }]"
+              />
+            }
+          </div>
+        }
+
+        @case ('switch') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-switch
+              [text]="content.label"
+              [selected]="content.checked ?? false"
+              [disabled]="content.disabled ?? false"
+              [validationMessages]="content.errorMessage ? [{ type: 'error', message: content.errorMessage }] : []"
+              (selectedChange)="onSwitchCheckedChange($event)"
+            />
+          </div>
+        }
+
+        @case ('file-upload') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-file-upload
+              [file]="content.file"
+              [buttonText]="content.buttonText ?? 'Upload file'"
+              [buttonIcon]="content.buttonIcon ?? 'upload'"
+              [disabled]="content.disabled ?? false"
+              (fileUpload)="onFileUpload($event)"
+            />
+          </div>
+        }
+
+        @case ('dynamic-fields') {
+          <div class="cx-labeled-row__field-shell">
+            <cx-dynamic-fields
+              [options]="content.options"
+              [fields]="content.fields ?? []"
+              [disabled]="content.disabled ?? false"
+              (fieldsChange)="onDynamicFieldsChange($event)"
+            />
+          </div>
+        }
+      }
+    } @else {
+      <ng-content />
+    }
+  </div>
+</div>

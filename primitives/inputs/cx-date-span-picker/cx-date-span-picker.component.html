@@ -1,0 +1,297 @@
+<div class="cx-date-span-picker">
+  @if (label.trim()) {
+    <div class="cx-date-span-picker__header">
+      <div class="cx-date-span-picker__label" [id]="labelId">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-date-span-picker__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-date-span-picker__field-wrap"
+    [class.cx-date-span-picker__field-wrap--clearable]="hasClear$()"
+    [class.cx-date-span-picker__field-wrap--small]="size === 'small'"
+    [class.cx-date-span-picker__field-wrap--large]="size === 'large'"
+  >
+    <button
+      #fieldButton
+      type="button"
+      class="cx-date-span-picker__field"
+      [class.cx-date-span-picker__field--open]="isOpen$()"
+      [class.cx-date-span-picker__field--disabled]="disabled"
+      [class.cx-date-span-picker__field--readonly]="readOnly"
+      [class.cx-date-span-picker__field--loading]="loading"
+      [class.cx-date-span-picker__field--error]="hasError$()"
+      [disabled]="isLocked$()"
+      [attr.aria-expanded]="isOpen$()"
+      [attr.aria-controls]="isOpen$() ? surfaceId : null"
+      [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+      [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+      [attr.aria-label]="resolvedFieldAriaLabel"
+      [attr.aria-readonly]="readOnly ? 'true' : null"
+      [attr.aria-busy]="loading ? 'true' : null"
+      aria-haspopup="dialog"
+      (click)="toggleOpen(fieldButton)"
+      (keydown)="onFieldKeydown($event, fieldButton)"
+    >
+      <cx-icon class="cx-date-span-picker__field-icon" name="calendar" size="16" />
+      <span
+        class="cx-date-span-picker__field-text"
+        [class.cx-date-span-picker__field-text--placeholder]="showPlaceholder$()"
+      >
+        {{ displayText$() }}
+      </span>
+    </button>
+
+    @if (hasClear$()) {
+      <button type="button" class="cx-date-span-picker__clear" aria-label="Clear date span" (click)="onClear($event)">
+        <cx-icon name="remove" size="16" />
+      </button>
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-date-span-picker__messages" [id]="messagesId">
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      } @else if (showHint$()) {
+        <div class="cx-date-span-picker__hint">{{ hint!.trim() }}</div>
+      }
+    </div>
+  }
+
+  @if (isOpen$()) {
+    <cx-popover
+      [open]="true"
+      [showBackdrop]="true"
+      [surfaceId]="surfaceId"
+      [width]="overlayWidth$()"
+      [maxHeight]="overlayMaxHeight$()"
+      [left]="overlayLeft$()"
+      [top]="overlayTop$()"
+      [bottom]="overlayBottom$()"
+      [role]="'dialog'"
+      [ariaLabel]="'Choose date span'"
+      surfaceClass="cx-date-span-picker__surface"
+      (backdropPressed)="toggleOpen()"
+    >
+      <div
+        class="cx-date-span-picker__surface-inner"
+        [class.cx-date-span-picker__surface-inner--with-quick-ranges]="quickRanges$().length > 0"
+      >
+        @if (quickRanges$().length > 0) {
+          <div class="cx-date-span-picker__quick-ranges">
+            @for (range of quickRanges$(); track range.id) {
+              <button
+                type="button"
+                class="cx-date-span-picker__quick-range"
+                [class.cx-date-span-picker__quick-range--active]="isQuickRangeActive(range)"
+                (click)="onQuickRangeSelect(range)"
+              >
+                {{ range.label }}
+              </button>
+            }
+          </div>
+        }
+
+        <div class="cx-date-span-picker__main">
+          <div class="cx-date-span-picker__calendars">
+            <div class="cx-date-span-picker__calendar">
+              <div class="cx-date-span-picker__calendar-header">
+                <cx-icon-button
+                  icon="chevron-left"
+                  variant="transparent"
+                  size="small"
+                  ariaLabel="Previous month"
+                  (pressed)="onLeftPreviousMonth()"
+                />
+
+                <div class="cx-date-span-picker__calendar-controls">
+                  <cx-select
+                    class="cx-date-span-picker__select cx-date-span-picker__select--month"
+                    label=""
+                    ariaLabel="Start month"
+                    placeholder="Start month"
+                    [availableValues]="monthOptions"
+                    [value]="leftViewMonthValue$()"
+                    (valueChange)="onLeftMonthChange($event)"
+                  />
+
+                  <cx-select
+                    class="cx-date-span-picker__select cx-date-span-picker__select--year"
+                    label=""
+                    ariaLabel="Start year"
+                    placeholder="Start year"
+                    [availableValues]="leftYearOptions$()"
+                    [value]="leftViewYearValue$()"
+                    (valueChange)="onLeftYearChange($event)"
+                  />
+                </div>
+
+                <cx-icon-button
+                  icon="chevron-right"
+                  variant="transparent"
+                  size="small"
+                  ariaLabel="Next month"
+                  (pressed)="onLeftNextMonth()"
+                />
+              </div>
+
+              <div class="cx-date-span-picker__weekdays">
+                @for (weekday of weekdayLabels$(); track weekday) {
+                  <div class="cx-date-span-picker__weekday">{{ weekday }}</div>
+                }
+              </div>
+
+              <div class="cx-date-span-picker__grid" (mouseleave)="onDayLeave()">
+                @for (day of leftCalendarDays$(); track day.key) {
+                  <button
+                    type="button"
+                    class="cx-date-span-picker__day"
+                    [class.cx-date-span-picker__day--outside]="!day.inCurrentMonth"
+                    [class.cx-date-span-picker__day--today]="day.isToday"
+                    [class.cx-date-span-picker__day--range]="isInRange(day)"
+                    [class.cx-date-span-picker__day--start]="isStartDay(day)"
+                    [class.cx-date-span-picker__day--end]="isEndDay(day)"
+                    [class.cx-date-span-picker__day--preview-end]="isPreviewEnd(day)"
+                    [class.cx-date-span-picker__day--disabled]="!isDaySelectable(day)"
+                    [disabled]="!isDaySelectable(day)"
+                    [attr.aria-label]="day.isoDate"
+                    (click)="onDaySelect(day)"
+                    (mouseenter)="onDayHover(day)"
+                  >
+                    {{ day.day }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="cx-date-span-picker__calendar">
+              <div class="cx-date-span-picker__calendar-header">
+                <cx-icon-button
+                  icon="chevron-left"
+                  variant="transparent"
+                  size="small"
+                  ariaLabel="Previous month"
+                  (pressed)="onRightPreviousMonth()"
+                />
+
+                <div class="cx-date-span-picker__calendar-controls">
+                  <cx-select
+                    class="cx-date-span-picker__select cx-date-span-picker__select--month"
+                    label=""
+                    ariaLabel="End month"
+                    placeholder="End month"
+                    [availableValues]="monthOptions"
+                    [value]="rightViewMonthValue$()"
+                    (valueChange)="onRightMonthChange($event)"
+                  />
+
+                  <cx-select
+                    class="cx-date-span-picker__select cx-date-span-picker__select--year"
+                    label=""
+                    ariaLabel="End year"
+                    placeholder="End year"
+                    [availableValues]="rightYearOptions$()"
+                    [value]="rightViewYearValue$()"
+                    (valueChange)="onRightYearChange($event)"
+                  />
+                </div>
+
+                <cx-icon-button
+                  icon="chevron-right"
+                  variant="transparent"
+                  size="small"
+                  ariaLabel="Next month"
+                  (pressed)="onRightNextMonth()"
+                />
+              </div>
+
+              <div class="cx-date-span-picker__weekdays">
+                @for (weekday of weekdayLabels$(); track weekday) {
+                  <div class="cx-date-span-picker__weekday">{{ weekday }}</div>
+                }
+              </div>
+
+              <div class="cx-date-span-picker__grid" (mouseleave)="onDayLeave()">
+                @for (day of rightCalendarDays$(); track day.key) {
+                  <button
+                    type="button"
+                    class="cx-date-span-picker__day"
+                    [class.cx-date-span-picker__day--outside]="!day.inCurrentMonth"
+                    [class.cx-date-span-picker__day--today]="day.isToday"
+                    [class.cx-date-span-picker__day--range]="isInRange(day)"
+                    [class.cx-date-span-picker__day--start]="isStartDay(day)"
+                    [class.cx-date-span-picker__day--end]="isEndDay(day)"
+                    [class.cx-date-span-picker__day--preview-end]="isPreviewEnd(day)"
+                    [class.cx-date-span-picker__day--disabled]="!isDaySelectable(day)"
+                    [disabled]="!isDaySelectable(day)"
+                    [attr.aria-label]="day.isoDate"
+                    (click)="onDaySelect(day)"
+                    (mouseenter)="onDayHover(day)"
+                  >
+                    {{ day.day }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          @if (timeEnabled) {
+            <div class="cx-date-span-picker__time-divider"></div>
+            <div class="cx-date-span-picker__time-row">
+              <div class="cx-date-span-picker__time-cell">
+                <cx-time-input
+                  class="cx-date-span-picker__time"
+                  label=""
+                  ariaLabel="Start time"
+                  [format]="timeFormat"
+                  [value]="startTimeValue$()"
+                  [disabled]="isLocked$() || !startDate$() || effectiveAllDayStart$()"
+                  [readOnly]="readOnly"
+                  [loading]="loading"
+                  (valueChange)="onStartTimeChange($event)"
+                />
+                @if (allDayEnabled) {
+                  <cx-checkbox
+                    text="All day"
+                    [selected]="effectiveAllDayStart$()"
+                    [disabled]="readOnly || loading"
+                    (selectedChange)="onAllDayStartChange($event)"
+                  />
+                }
+              </div>
+
+              <div class="cx-date-span-picker__time-cell">
+                <cx-time-input
+                  class="cx-date-span-picker__time"
+                  label=""
+                  ariaLabel="End time"
+                  [format]="timeFormat"
+                  [value]="endTimeValue$()"
+                  [disabled]="isLocked$() || !endDate$() || effectiveAllDayEnd$()"
+                  [readOnly]="readOnly"
+                  [loading]="loading"
+                  (valueChange)="onEndTimeChange($event)"
+                />
+                @if (allDayEnabled) {
+                  <cx-checkbox
+                    text="All day"
+                    [selected]="effectiveAllDayEnd$()"
+                    [disabled]="readOnly || loading"
+                    (selectedChange)="onAllDayEndChange($event)"
+                  />
+                }
+              </div>
+            </div>
+          }
+
+          @if (summaryText$(); as summaryText) {
+            <div class="cx-date-span-picker__summary">{{ summaryText }}</div>
+          }
+        </div>
+      </div>
+    </cx-popover>
+  }
+</div>

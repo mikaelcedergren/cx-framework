@@ -1,0 +1,162 @@
+:host {
+  display: inline-flex;
+  width: auto;
+  vertical-align: top;
+}
+
+.cx-switch-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  line-height: normal;
+}
+
+.cx-switch {
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: baseline;
+  gap: var(--space-sm);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  margin: 0;
+  outline: none;
+  padding: 0;
+  text-align: left;
+}
+
+.cx-switch--disabled {
+  opacity: var(--opacity-disabled);
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cx-switch__track {
+  --cx-switch-track-width: var(--controller-size);
+  --cx-switch-track-height: calc(var(--space-md) + var(--space-xs));
+  --cx-switch-thumb-size: calc(var(--space-sm) + var(--space-xs));
+  --cx-switch-thumb-inset: 3px;
+  --cx-switch-thumb-hover-x: var(--space-2xs);
+
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--cx-switch-track-width);
+  min-width: var(--cx-switch-track-width);
+  height: var(--cx-switch-track-height);
+  padding: 0 var(--cx-switch-thumb-inset);
+  flex: 0 0 auto;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-mid);
+  border: var(--line-discreet);
+  border-color: transparent;
+  line-height: 0;
+  overflow: hidden;
+  transition:
+    background var(--motion-fast) var(--ease-out-in),
+    border var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-switch:hover:not(.cx-switch--selected) .cx-switch__track {
+  background: var(--opacity-mid);
+}
+
+.cx-switch:hover:not(.cx-switch--selected) .cx-switch__thumb {
+  transform: translateX(var(--cx-switch-thumb-hover-x));
+}
+
+.cx-switch--selected .cx-switch__track {
+  background: var(--primary);
+}
+
+.cx-switch--error .cx-switch__track,
+.cx-switch--error:hover:not(.cx-switch--selected) .cx-switch__track {
+  border-color: var(--danger);
+}
+
+.cx-switch:focus-visible .cx-switch__track {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-switch:active:not(.cx-switch--disabled) .cx-switch__track {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-switch__thumb {
+  position: relative;
+  width: var(--cx-switch-thumb-size);
+  height: var(--cx-switch-thumb-size);
+  border-radius: var(--radius-xs);
+  background: var(--on-ink);
+  transition:
+    transform var(--motion-fast) var(--ease-out-in),
+    background var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-switch--selected .cx-switch__thumb {
+  transform: translateX(calc(var(--cx-switch-track-width) - (var(--cx-switch-thumb-inset) * 2) - var(--cx-switch-thumb-size) - var(--cx-switch-thumb-hover-x)));
+}
+
+.cx-switch--selected:hover:not(.cx-switch--disabled) .cx-switch__thumb {
+  transform: translateX(calc(var(--cx-switch-track-width) - (var(--cx-switch-thumb-inset) * 2) - var(--cx-switch-thumb-size) - (var(--cx-switch-thumb-hover-x) * 2)));
+}
+
+.cx-switch__label {
+  display: block;
+  color: currentColor;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  padding-top: var(--space-2xs);
+}
+
+.cx-switch__content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.cx-switch__hint {
+  display: block;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-switch-field__error {
+  padding-left: calc(var(--controller-size) + var(--space-sm));
+}
+
+.cx-switch--small {
+  gap: var(--space-xs);
+}
+
+.cx-switch--small .cx-switch__track {
+  --cx-switch-track-width: var(--space-lg);
+  --cx-switch-track-height: var(--space-md);
+  --cx-switch-thumb-size: calc(var(--space-sm) + var(--space-2xs));
+  --cx-switch-thumb-inset: var(--space-2xs);
+  --cx-switch-thumb-hover-x: var(--space-2xs);
+}
+
+.cx-switch--small .cx-switch__label {
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+  padding-top: 0;
+}
+
+.cx-switch-field--small .cx-switch-field__error {
+  padding-left: calc(var(--space-lg) + var(--space-xs));
+}

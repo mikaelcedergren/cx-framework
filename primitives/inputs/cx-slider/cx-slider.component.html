@@ -1,0 +1,108 @@
+<div class="cx-slider" [class.cx-slider--disabled]="disabled" [class.cx-slider--invalid]="hasError$()">
+  @if (label.trim() || optional || showValue) {
+    <div class="cx-slider__header">
+      @if (label.trim()) {
+        <div class="cx-slider__label-row">
+          <div class="cx-slider__label" [id]="labelId">{{ label }}</div>
+          @if (optional) {
+            <div class="cx-slider__optional">Optional</div>
+          }
+        </div>
+      } @else if (optional) {
+        <div class="cx-slider__optional">Optional</div>
+      }
+
+      @if (showValue) {
+        <div class="cx-slider__value">{{ valueLabel$() }}</div>
+      }
+    </div>
+  }
+
+  <div class="cx-slider__control" [class.cx-slider__control--with-tooltips]="showTooltipOnDrag$()">
+    @if (tooltipRendered$()) {
+      <div
+        class="cx-slider__tooltip"
+        [class.cx-slider__tooltip--open]="tooltipOpen$()"
+        [style.left.%]="tooltipPercent$()"
+      >
+        {{ tooltipLabel$() }}
+      </div>
+    }
+
+    <div class="cx-slider__track" aria-hidden="true"></div>
+    <div
+      class="cx-slider__fill"
+      aria-hidden="true"
+      [style.left.%]="fillOffsetPercent$()"
+      [style.width.%]="fillWidthPercent$()"
+    ></div>
+
+    @if (range$()) {
+      <input
+        class="cx-slider__field cx-slider__field--range cx-slider__field--start"
+        type="range"
+        [min]="min$()"
+        [max]="max$()"
+        [step]="step$()"
+        [value]="lowerValue$()"
+        [disabled]="disabled"
+        [attr.aria-label]="resolvedMinThumbAriaLabel"
+        [attr.aria-labelledby]="resolvedSliderAriaLabelledBy"
+        [attr.aria-describedby]="resolvedSliderAriaDescribedBy"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        (input)="onRangeInput($event, 'start')"
+        (pointerdown)="onThumbPointerDown('start')"
+        (focus)="onThumbFocus('start')"
+        (blur)="onThumbBlur()"
+      />
+
+      <input
+        class="cx-slider__field cx-slider__field--range cx-slider__field--end"
+        type="range"
+        [min]="min$()"
+        [max]="max$()"
+        [step]="step$()"
+        [value]="upperValue$()"
+        [disabled]="disabled"
+        [attr.aria-label]="resolvedMaxThumbAriaLabel"
+        [attr.aria-labelledby]="resolvedSliderAriaLabelledBy"
+        [attr.aria-describedby]="resolvedSliderAriaDescribedBy"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        (input)="onRangeInput($event, 'end')"
+        (pointerdown)="onThumbPointerDown('end')"
+        (focus)="onThumbFocus('end')"
+        (blur)="onThumbBlur()"
+      />
+    } @else {
+      <input
+        class="cx-slider__field"
+        type="range"
+        [min]="min$()"
+        [max]="max$()"
+        [step]="step$()"
+        [value]="value$()"
+        [disabled]="disabled"
+        [attr.aria-label]="resolvedSliderAriaLabel"
+        [attr.aria-labelledby]="resolvedSliderAriaLabelledBy"
+        [attr.aria-describedby]="resolvedSliderAriaDescribedBy"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        (input)="onSingleInput($event)"
+        (pointerdown)="onThumbPointerDown('single')"
+        (focus)="onThumbFocus('single')"
+        (blur)="onThumbBlur()"
+      />
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-slider__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-slider__hint">{{ hint!.trim() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+</div>

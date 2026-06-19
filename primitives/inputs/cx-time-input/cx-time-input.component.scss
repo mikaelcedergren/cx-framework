@@ -1,0 +1,224 @@
+:host {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+}
+
+.cx-time-input {
+  width: max-content;
+  max-width: 100%;
+}
+
+.cx-time-input__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.cx-time-input__label {
+  color: var(--ink);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.cx-time-input__optional {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+}
+
+.cx-time-input__field-shell {
+  box-sizing: border-box;
+  display: inline-flex;
+  width: max-content;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-darken);
+  transition: border-color var(--motion-fast) ease;
+}
+
+.cx-time-input__field-shell:hover:not(.cx-time-input__field-shell--disabled):not(.cx-time-input__field-shell--error) {
+  border-color: var(--opacity-high);
+}
+
+.cx-time-input__field-shell--small {
+  min-height: var(--controller-size-small);
+}
+
+.cx-time-input__field-shell--large {
+  min-height: calc(var(--controller-size) + var(--space-md));
+}
+
+.cx-time-input__field-shell--focused {
+  outline: var(--outline-focus);
+  outline-offset: var(--outline-focus-offset);
+}
+
+.cx-time-input__field-shell:has(.cx-time-input__segment-input:focus-visible) {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-time-input__field-shell--error {
+  border-color: var(--danger);
+}
+
+.cx-time-input__field-shell--disabled {
+  opacity: 0.55;
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+
+.cx-time-input__field-shell--readonly {
+  background: var(--surface-mid);
+  cursor: default;
+}
+
+.cx-time-input__field-shell--loading {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.cx-time-input__segments {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-time-input__clock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.cx-time-input__segment-input {
+  width: 2.4ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  text-align: center;
+  caret-color: var(--primary);
+}
+
+.cx-time-input--small .cx-time-input__segment-input,
+.cx-time-input--small .cx-time-input__separator {
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-time-input--large .cx-time-input__segment-input,
+.cx-time-input--large .cx-time-input__separator {
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.cx-time-input__segment-input::placeholder {
+  color: var(--placeholder);
+}
+
+.cx-time-input__segment-input:focus-visible {
+  outline: 0;
+}
+
+.cx-time-input__segment-input:disabled {
+  cursor: default;
+}
+
+.cx-time-input__segment-input:read-only:not(:disabled) {
+  cursor: default;
+}
+
+.cx-time-input__separator {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+}
+
+.cx-time-input__field-shell--empty .cx-time-input__separator {
+  color: var(--placeholder);
+}
+
+.cx-time-input__meridiem {
+  display: inline-flex;
+  min-width: var(--controller-size);
+  height: var(--icon-size-md);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-time-input__meridiem:hover:not(:disabled),
+.cx-time-input__meridiem:focus-visible {
+  background: var(--opacity-mid);
+  outline: 0;
+}
+
+.cx-time-input__meridiem:disabled {
+  cursor: default;
+}
+
+.cx-time-input--small .cx-time-input__meridiem {
+  height: var(--icon-size-sm);
+}
+
+.cx-time-input__clear {
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-time-input__clear:hover,
+.cx-time-input__clear:focus-visible {
+  background: var(--opacity-low);
+  color: var(--ink);
+  outline: 0;
+}
+
+.cx-time-input__messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.cx-time-input__hint {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}

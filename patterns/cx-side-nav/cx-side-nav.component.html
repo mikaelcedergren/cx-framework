@@ -1,0 +1,161 @@
+@if (navbarVisible) {
+  <aside class="cx-side-nav" aria-label="Main navigation">
+    <div class="cx-side-nav__header">
+      <ng-content select="[header]" />
+    </div>
+
+    @if (loading) {
+      <div class="cx-side-nav__skeleton" aria-hidden="true">
+        @for (item of skeletonItems; track item) {
+          <span class="cx-side-nav__skeleton-row"></span>
+        }
+      </div>
+    } @else {
+      <nav class="cx-side-nav__items">
+        <ng-template #navItems let-items let-level="level">
+          @for (item of items; track item.id) {
+            <div class="cx-side-nav__node">
+              @if (hasChildren(item)) {
+                <button
+                  class="cx-side-nav__item cx-side-nav__item--toggle"
+                  [class.cx-side-nav__item--active]="itemContainsActive(item)"
+                  [class.cx-side-nav__item--disabled]="item.disabled"
+                  type="button"
+                  [disabled]="item.disabled"
+                  [attr.aria-expanded]="isItemExpanded(item)"
+                  [style.padding-left.px]="itemPadding(level)"
+                  (click)="toggleItem(item)"
+                >
+                  @if (item.icon) {
+                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  }
+                  <span class="cx-side-nav__label">{{ item.label }}</span>
+                  @if (item.badge) {
+                    <span
+                      class="cx-side-nav__badge"
+                      [class.cx-side-nav__badge--dot]="item.badge === true"
+                      [class.cx-side-nav__badge--primary]="badgeTone(item) === 'primary'"
+                      [class.cx-side-nav__badge--accent]="badgeTone(item) === 'accent'"
+                      [class.cx-side-nav__badge--info]="badgeTone(item) === 'info'"
+                      [class.cx-side-nav__badge--success]="badgeTone(item) === 'success'"
+                      [class.cx-side-nav__badge--warning]="badgeTone(item) === 'warning'"
+                      [class.cx-side-nav__badge--danger]="badgeTone(item) === 'danger'"
+                    >
+                      {{ badgeLabel(item) }}
+                    </span>
+                  }
+                  <cx-icon
+                    class="cx-side-nav__item-chevron"
+                    [name]="isItemExpanded(item) ? 'chevron-up' : 'chevron-down'"
+                    [size]="16"
+                  />
+                </button>
+                <div
+                  class="cx-side-nav__children"
+                  [class.cx-side-nav__children--expanded]="showItemChildren(item)"
+                >
+                  <div class="cx-side-nav__children-inner">
+                    <ng-container
+                      [ngTemplateOutlet]="navItems"
+                      [ngTemplateOutletContext]="{ $implicit: item.children, level: level + 1 }"
+                    />
+                  </div>
+                </div>
+              } @else {
+                <a
+                  class="cx-side-nav__item"
+                  [class.cx-side-nav__item--disabled]="item.disabled"
+                  [routerLink]="item.disabled ? null : item.routerLink"
+                  [fragment]="item.disabled ? undefined : item.fragment"
+                  routerLinkActive="cx-side-nav__item--active"
+                  [routerLinkActiveOptions]="activeOptions(item)"
+                  #rla="routerLinkActive"
+                  [attr.aria-current]="rla.isActive && !item.disabled ? 'page' : null"
+                  [attr.aria-disabled]="item.disabled ? 'true' : null"
+                  [attr.tabindex]="item.disabled ? '-1' : null"
+                  [style.padding-left.px]="itemPadding(level)"
+                  (click)="onItemClick($event, item)"
+                >
+                  @if (item.icon) {
+                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  }
+                  <span class="cx-side-nav__label">{{ item.label }}</span>
+                  @if (item.badge) {
+                    <span
+                      class="cx-side-nav__badge"
+                      [class.cx-side-nav__badge--dot]="item.badge === true"
+                      [class.cx-side-nav__badge--primary]="badgeTone(item) === 'primary'"
+                      [class.cx-side-nav__badge--accent]="badgeTone(item) === 'accent'"
+                      [class.cx-side-nav__badge--info]="badgeTone(item) === 'info'"
+                      [class.cx-side-nav__badge--success]="badgeTone(item) === 'success'"
+                      [class.cx-side-nav__badge--warning]="badgeTone(item) === 'warning'"
+                      [class.cx-side-nav__badge--danger]="badgeTone(item) === 'danger'"
+                    >
+                      {{ badgeLabel(item) }}
+                    </span>
+                  }
+                </a>
+              }
+            </div>
+          }
+        </ng-template>
+
+        @for (group of normalizedGroups(); track group.id) {
+          <div class="cx-side-nav__group">
+            @if (group.collapsible && group.label) {
+              <button
+                class="cx-side-nav__item cx-side-nav__group-toggle"
+                [class.cx-side-nav__item--active]="groupContainsActive(group)"
+                type="button"
+                [attr.aria-expanded]="isGroupExpanded(group)"
+                (click)="toggleGroup(group)"
+              >
+                @if (group.icon) {
+                  <cx-icon class="cx-side-nav__icon" [name]="group.icon" [size]="16" />
+                }
+                <span class="cx-side-nav__label">{{ group.label }}</span>
+                <cx-icon
+                  class="cx-side-nav__group-chevron"
+                  [name]="isGroupExpanded(group) ? 'chevron-up' : 'chevron-down'"
+                  [size]="16"
+                />
+              </button>
+            } @else if (group.label) {
+              <div class="cx-side-nav__group-label">{{ group.label }}</div>
+            }
+            <div
+              class="cx-side-nav__group-items"
+              [class.cx-side-nav__group-items--collapsible]="group.collapsible"
+              [class.cx-side-nav__group-items--expanded]="showGroupItems(group)"
+            >
+              <div
+                class="cx-side-nav__group-items-inner"
+                [class.cx-side-nav__group-items-inner--nested]="group.collapsible"
+              >
+                <ng-container
+                  [ngTemplateOutlet]="navItems"
+                  [ngTemplateOutletContext]="{ $implicit: group.items, level: 0 }"
+                />
+              </div>
+            </div>
+          </div>
+        }
+      </nav>
+    }
+
+    <div class="cx-side-nav__footer">
+      @if (accountName()) {
+        <button
+          class="cx-side-nav__account"
+          type="button"
+          [attr.aria-label]="'Account actions for ' + accountName()"
+        >
+          <span class="cx-side-nav__account-avatar" aria-hidden="true">{{ accountInitials() }}</span>
+          <span class="cx-side-nav__account-name">{{ accountName() }}</span>
+          <cx-icon class="cx-side-nav__account-icon" name="chevrons-vertical" [size]="16" />
+        </button>
+      }
+      <ng-content select="[footer]" />
+    </div>
+  </aside>
+}

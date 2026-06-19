@@ -1,0 +1,47 @@
+<div class="cx-dynamic-fields">
+  @if (resolvedFields$().length > 0) {
+    <div class="cx-dynamic-fields__list">
+      @for (field of resolvedFields$(); track field.id) {
+        <div class="cx-dynamic-fields__row" [attr.data-field-id]="field.id">
+          <div class="cx-dynamic-fields__label">{{ field.label }}</div>
+
+          <cx-input
+            class="cx-dynamic-fields__input"
+            [label]="''"
+            [ariaLabel]="field.label"
+            [placeholder]="field.placeholder"
+            [type]="field.masked ? 'password' : 'text'"
+            [disabled]="disabled"
+            [value]="field.value"
+            (valueChange)="onFieldValueChange(field.id, $event)"
+          />
+
+          <cx-icon-button
+            class="cx-dynamic-fields__remove"
+            icon="delete"
+            variant="transparent"
+            ariaLabel="Remove field"
+            size="small"
+            [disabled]="disabled"
+            (pressed)="onRemoveField(field.id)"
+          />
+        </div>
+      }
+    </div>
+  }
+
+  @if (addableOptions$().length > 0) {
+    <div class="cx-dynamic-fields__add">
+      @for (option of addableOptions$(); track option.id) {
+        <cx-button
+          icon="plus"
+          variant="dashed"
+          size="small"
+          [text]="option.label"
+          [disabled]="disabled"
+          (pressed)="onAddField(option.id)"
+        />
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,9 @@
+:root {
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 240ms;
+
+  --ease-out: cubic-bezier(0, .3, .4, 1);
+  --ease-out-in: cubic-bezier(.4, 0, .2, 1);
+  --ease-in: cubic-bezier(0, 0.4, .2, 1);
+}

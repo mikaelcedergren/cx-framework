@@ -1,0 +1,8 @@
+@for (entry of renderedEntries(); track index; let index = $index) {
+  <cx-log-step
+    [step]="entry.step"
+    [datestamp]="entry.datestamp"
+    [description]="entry.description"
+    [author]="entry.author"
+  />
+}

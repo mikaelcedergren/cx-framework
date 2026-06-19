@@ -1,0 +1,62 @@
+@if (isOpen$()) {
+  <div class="cx-dialog-backdrop" role="presentation" (click)="onBackdropClick()">
+    <section
+      class="cx-dialog"
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      [class.cx-dialog--confirm]="variant === 'confirm'"
+      [class.cx-dialog--info]="variant === 'info'"
+      [class.cx-dialog--small]="size === 'small'"
+      [class.cx-dialog--large]="size === 'large'"
+      [class.cx-dialog--dismissible]="canDismiss()"
+      [attr.role]="dialogRole()"
+      aria-modal="true"
+      [attr.aria-labelledby]="titleId"
+      [attr.aria-describedby]="hasText() ? textId : null"
+      (click)="$event.stopPropagation()"
+      (keydown)="onEscape($event)"
+      (keydown)="onEnter($event)"
+    >
+      @if (canDismiss()) {
+        <cx-icon-button
+          class="cx-dialog__dismiss"
+          icon="remove"
+          ariaLabel="Dismiss dialog"
+          variant="transparent"
+          size="small"
+          (pressed)="onDismiss()"
+        />
+      }
+
+      <div class="cx-dialog__body">
+        <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+        @if (hasText()) {
+          <p class="cx-dialog__text" [id]="textId">{{ text }}</p>
+        }
+        <ng-content select="[body]" />
+      </div>
+
+      <footer
+        class="cx-dialog__footer"
+        [class.cx-dialog__footer--single]="!resolvedSecondaryText()"
+      >
+        @if (resolvedSecondaryText(); as secondaryText) {
+          <cx-button
+            [text]="secondaryText"
+            mood="default"
+            (pressed)="onSecondary()"
+          />
+        }
+
+        <cx-button
+          [text]="resolvedPrimaryText()"
+          [mood]="mood"
+          [disabled]="primaryDisabled"
+          [loading]="primaryLoading"
+          cdkFocusInitial
+          (pressed)="onPrimary()"
+        />
+      </footer>
+    </section>
+  </div>
+}

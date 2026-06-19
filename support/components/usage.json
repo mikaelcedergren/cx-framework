@@ -1,0 +1,494 @@
+{
+  "usage": [
+    {
+      "name": "cx-account-control",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-account-control/cx-account-control.component.ts"
+    },
+    {
+      "name": "cx-action-bar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-action-bar/cx-action-bar.component.ts"
+    },
+    {
+      "name": "cx-alert",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-alert/cx-alert.component.ts"
+    },
+    {
+      "name": "cx-avatar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-avatar/cx-avatar.component.ts"
+    },
+    {
+      "name": "cx-badge",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-badge/cx-badge.component.ts"
+    },
+    {
+      "name": "cx-banner",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-banner/cx-banner.component.ts"
+    },
+    {
+      "name": "cx-big-checkbox",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-big-checkbox/cx-big-checkbox.component.ts"
+    },
+    {
+      "name": "cx-big-radio",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-big-radio/cx-big-radio.component.ts"
+    },
+    {
+      "name": "cx-breadcrumbs",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/navigation/cx-breadcrumbs/cx-breadcrumbs.component.ts"
+    },
+    {
+      "name": "cx-budget",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-budget/cx-budget.component.ts"
+    },
+    {
+      "name": "cx-button",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-button/cx-button.component.ts"
+    },
+    {
+      "name": "cx-button-group",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-button-group/cx-button-group.component.ts"
+    },
+    {
+      "name": "cx-calendar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-calendar/cx-calendar.component.ts"
+    },
+    {
+      "name": "cx-card",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-card/cx-card.component.ts"
+    },
+    {
+      "name": "cx-chart",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-chart/cx-chart.component.ts"
+    },
+    {
+      "name": "cx-chat-message",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-chat-message/cx-chat-message.component.ts"
+    },
+    {
+      "name": "cx-chat-thread",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-chat-thread/cx-chat-thread.component.ts"
+    },
+    {
+      "name": "cx-checkbox",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-checkbox/cx-checkbox.component.ts"
+    },
+    {
+      "name": "cx-code-block",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-code-block/cx-code-block.component.ts"
+    },
+    {
+      "name": "cx-code-field",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-code-field/cx-code-field.component.ts"
+    },
+    {
+      "name": "cx-color-picker",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-color-picker/cx-color-picker.component.ts"
+    },
+    {
+      "name": "cx-context-dialog",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-context-dialog/cx-context-dialog.component.ts"
+    },
+    {
+      "name": "cx-date-picker",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-date-picker/cx-date-picker.component.ts"
+    },
+    {
+      "name": "cx-date-span-picker",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-date-span-picker/cx-date-span-picker.component.ts"
+    },
+    {
+      "name": "cx-detail-panel",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-detail-panel/cx-detail-panel.component.ts"
+    },
+    {
+      "name": "cx-dialog",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-dialog/cx-dialog.component.ts"
+    },
+    {
+      "name": "cx-divider",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-divider/cx-divider.component.ts"
+    },
+    {
+      "name": "cx-dynamic-fields",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-dynamic-fields/cx-dynamic-fields.component.ts"
+    },
+    {
+      "name": "cx-empty-state",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-empty-state/cx-empty-state.component.ts"
+    },
+    {
+      "name": "cx-expansion-panel",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-expansion-panel/cx-expansion-panel.component.ts"
+    },
+    {
+      "name": "cx-file-upload",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-file-upload/cx-file-upload.component.ts"
+    },
+    {
+      "name": "cx-filter-bar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-filter-bar/cx-filter-bar.component.ts"
+    },
+    {
+      "name": "cx-fullscreen-dialog",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-fullscreen-dialog/cx-fullscreen-dialog.component.ts"
+    },
+    {
+      "name": "cx-grid",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/layout/cx-grid/cx-grid.component.ts"
+    },
+    {
+      "name": "cx-hierarchical-select",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-hierarchical-select/cx-hierarchical-select.component.ts"
+    },
+    {
+      "name": "cx-icon",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/media/cx-icon/cx-icon.component.ts"
+    },
+    {
+      "name": "cx-icon-button",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-icon-button/cx-icon-button.component.ts"
+    },
+    {
+      "name": "cx-image",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/media/cx-image/cx-image.component.ts"
+    },
+    {
+      "name": "cx-inline",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/layout/cx-inline/cx-inline.component.ts"
+    },
+    {
+      "name": "cx-input",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-input/cx-input.component.ts"
+    },
+    {
+      "name": "cx-labeled-row",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-labeled-row/cx-labeled-row.component.ts"
+    },
+    {
+      "name": "cx-lightbox",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-lightbox/cx-lightbox.component.ts"
+    },
+    {
+      "name": "cx-list-view",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-list-view/cx-list-view.component.ts"
+    },
+    {
+      "name": "cx-loader",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-loader/cx-loader.component.ts"
+    },
+    {
+      "name": "cx-log",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-log/cx-log.component.ts"
+    },
+    {
+      "name": "cx-log-step",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-log-step/cx-log-step.component.ts"
+    },
+    {
+      "name": "cx-menu",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-menu/cx-menu.component.ts"
+    },
+    {
+      "name": "cx-metric",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-metric/cx-metric.component.ts"
+    },
+    {
+      "name": "cx-placeholder",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-placeholder/cx-placeholder.component.ts"
+    },
+    {
+      "name": "cx-null-controller",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-null-controller/cx-null-controller.component.ts"
+    },
+    {
+      "name": "cx-number-field",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-number-field/cx-number-field.component.ts"
+    },
+    {
+      "name": "cx-option",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-option/cx-option.component.ts"
+    },
+    {
+      "name": "cx-option-group",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-option-group/cx-option-group.component.ts"
+    },
+    {
+      "name": "cx-page-header",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-page-header/cx-page-header.component.ts"
+    },
+    {
+      "name": "cx-pagination",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/navigation/cx-pagination/cx-pagination.component.ts"
+    },
+    {
+      "name": "cx-popover",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-popover/cx-popover.component.ts"
+    },
+    {
+      "name": "cx-progress-bar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-progress-bar/cx-progress-bar.component.ts"
+    },
+    {
+      "name": "cx-utility-bar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-utility-bar/cx-utility-bar.component.ts"
+    },
+    {
+      "name": "cx-qr-code",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-qr-code/cx-qr-code.component.ts"
+    },
+    {
+      "name": "cx-query-element",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-query-element/cx-query-element.component.ts"
+    },
+    {
+      "name": "cx-query-field",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-query-field/cx-query-field.component.ts"
+    },
+    {
+      "name": "cx-radio",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-radio/cx-radio.component.ts"
+    },
+    {
+      "name": "cx-radio-reveal",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-radio-reveal/cx-radio-reveal.component.ts"
+    },
+    {
+      "name": "cx-search-field",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-search-field/cx-search-field.component.ts"
+    },
+    {
+      "name": "cx-secret-display",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-secret-display/cx-secret-display.component.ts"
+    },
+    {
+      "name": "cx-select",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-select/cx-select.component.ts"
+    },
+    {
+      "name": "cx-severity-tag",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-severity-tag/cx-severity-tag.component.ts"
+    },
+    {
+      "name": "cx-shortcut-key",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-shortcut-key/cx-shortcut-key.component.ts"
+    },
+    {
+      "name": "cx-side-nav",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-side-nav/cx-side-nav.component.ts"
+    },
+    {
+      "name": "cx-slider",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-slider/cx-slider.component.ts"
+    },
+    {
+      "name": "cx-snippet",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-snippet/cx-snippet.component.ts"
+    },
+    {
+      "name": "cx-spinner",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-spinner/cx-spinner.component.ts"
+    },
+    {
+      "name": "cx-split",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/layout/cx-split/cx-split.component.ts"
+    },
+    {
+      "name": "cx-sso-button",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-sso-button/cx-sso-button.component.ts"
+    },
+    {
+      "name": "cx-stack",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/layout/cx-stack/cx-stack.component.ts"
+    },
+    {
+      "name": "cx-status-tag",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-status-tag/cx-status-tag.component.ts"
+    },
+    {
+      "name": "cx-steps",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-steps/cx-steps.component.ts"
+    },
+    {
+      "name": "cx-switch",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-switch/cx-switch.component.ts"
+    },
+    {
+      "name": "cx-table",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-table/cx-table.component.ts"
+    },
+    {
+      "name": "cx-table-view",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-table-view/cx-table-view.component.ts"
+    },
+    {
+      "name": "cx-tabs",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/navigation/cx-tabs/cx-tabs.component.ts"
+    },
+    {
+      "name": "cx-tag",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-tag/cx-tag.component.ts"
+    },
+    {
+      "name": "cx-tag-input",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-tag-input/cx-tag-input.component.ts"
+    },
+    {
+      "name": "cx-textarea",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-textarea/cx-textarea.component.ts"
+    },
+    {
+      "name": "cx-time-input",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-time-input/cx-time-input.component.ts"
+    },
+    {
+      "name": "cx-toast",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-toast/cx-toast.component.ts"
+    },
+    {
+      "name": "cx-toggle-button",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-toggle-button/cx-toggle-button.component.ts"
+    },
+    {
+      "name": "cx-toggle-chip",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-toggle-chip/cx-toggle-chip.component.ts"
+    },
+    {
+      "name": "cx-toggle-chip-group",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/inputs/cx-toggle-chip-group/cx-toggle-chip-group.component.ts"
+    },
+    {
+      "name": "cx-tooltip",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/overlay/cx-tooltip/cx-tooltip.component.ts"
+    },
+    {
+      "name": "cx-topbar",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-topbar/cx-topbar.component.ts"
+    },
+    {
+      "name": "cx-tree-view",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/data/cx-tree-view/cx-tree-view.component.ts"
+    },
+    {
+      "name": "cx-trend-tag",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/display/cx-trend-tag/cx-trend-tag.component.ts"
+    },
+    {
+      "name": "cx-validation-message",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/feedback/cx-validation-message/cx-validation-message.component.ts"
+    },
+    {
+      "name": "cx-variant",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "tooling/cx-variant/cx-variant.component.ts"
+    },
+    {
+      "name": "cx-wizard-dialog",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-wizard-dialog/cx-wizard-dialog.component.ts"
+    },
+    {
+      "name": "cx-workbench",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "tooling/cx-workbench/cx-workbench.component.ts"
+    },
+    {
+      "name": "cxWizardDialogStep",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "patterns/cx-wizard-dialog/cx-wizard-dialog-step.directive.ts"
+    }
+  ]
+}

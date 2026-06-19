@@ -1,0 +1,23 @@
+<cx-menu
+  [items]="resolvedMenuItems$()"
+  [open]="open$()"
+  [disabled]="disabled"
+  [width]="208"
+  align="start"
+  (openChange)="onOpenChange($event)"
+  (itemSelect)="onItemSelect($event)"
+>
+  <button
+    trigger
+    class="cx-account-control"
+    [class.cx-account-control--open]="open$()"
+    [disabled]="disabled"
+    type="button"
+    [attr.aria-label]="'Account actions for ' + username"
+    [attr.aria-expanded]="open$()"
+    aria-haspopup="menu"
+  >
+    <span class="cx-account-control__label">{{ username }}</span>
+    <cx-icon class="cx-account-control__icon" name="chevrons-vertical" [size]="16" />
+  </button>
+</cx-menu>

@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+:host(.cx-validation-message--global) {
+  width: 100%;
+}
+
+.cx-validation-message__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cx-validation-message__list--inline {
+  gap: var(--space-xs);
+}
+
+.cx-validation-message__list--global {
+  gap: var(--space-sm);
+}
+
+.cx-validation-message__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-validation-message__item--without-icon {
+  display: block;
+}
+
+.cx-validation-message__item--status {
+  color: var(--opacity-high);
+}
+
+.cx-validation-message__item--info {
+  color: var(--info);
+}
+
+.cx-validation-message__item--success {
+  color: var(--success);
+}
+
+.cx-validation-message__item--warning {
+  color: var(--warning);
+}
+
+.cx-validation-message__item--error {
+  color: var(--danger);
+}
+
+.cx-validation-message__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.cx-validation-message__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

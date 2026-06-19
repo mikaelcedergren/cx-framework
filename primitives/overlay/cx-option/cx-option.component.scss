@@ -1,0 +1,164 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host(.cx-option-frame) {
+  width: 240px;
+  max-width: 100%;
+  padding: var(--space-xs);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-mid);
+}
+
+.cx-option {
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-xs);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-option--small {
+  min-height: var(--controller-size-small);
+  padding-block: 0;
+}
+
+.cx-option--large {
+  min-height: var(--controller-size-large);
+  padding-block: 0;
+}
+
+.cx-option--without-icons {
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-sm);
+}
+
+.cx-option--with-checkbox {
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-sm);
+}
+
+.cx-option--append-only {
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-sm);
+}
+
+.cx-option--with-append {
+  padding-right: var(--space-xs);
+}
+
+.cx-option:hover,
+.cx-option--hover {
+  background: var(--primary-opacity);
+}
+
+.cx-option:focus-visible {
+  background: var(--primary-opacity);
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-option:active:not(.cx-option--disabled) {
+  background: var(--opacity-mid);
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-option--selected,
+.cx-option--submenu-open {
+  background: var(--opacity-low);
+}
+
+.cx-option--danger {
+  color: var(--danger);
+}
+
+.cx-option--disabled,
+.cx-option--disabled:hover,
+.cx-option--disabled.cx-option--hover {
+  background: transparent;
+  opacity: var(--opacity-disabled);
+  cursor: default;
+}
+
+.cx-option__checkbox {
+  flex: 0 0 auto;
+}
+
+.cx-option__checkbox-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.cx-option__icon {
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.cx-option__icon--append {
+  margin-left: auto;
+}
+
+.cx-option__content {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cx-option__label {
+  display: block;
+  color: currentColor;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cx-option__description {
+  flex: 0 0 auto;
+  margin-left: var(--space-lg);
+  color: var(--placeholder);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.cx-option--small .cx-option__label,
+.cx-option--small .cx-option__description {
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-option--large .cx-option__label {
+  font-size: var(--font-size-title-2);
+}
+
+.cx-option__shortcut {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--opacity-high);
+}
+
+.cx-option--danger .cx-option__description {
+  color: var(--danger);
+}

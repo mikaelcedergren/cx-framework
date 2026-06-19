@@ -1,0 +1,56 @@
+// Global styles for content rendered into `.cx-textarea__markdown` via
+// `[innerHTML]`. These selectors target child elements (p, ul, ol, li, h1–h4,
+// code, pre, blockquote, a, hr) of the markdown preview. They live here, not
+// inside the cx-textarea component SCSS, because Angular's emulated view
+// encapsulation tags template elements with `_ngcontent-X` and rewrites
+// descendant selectors to require that attribute — but innerHTML-injected
+// elements never receive it, so component-scoped rules would silently miss.
+
+.cx-textarea__markdown {
+  h1, h2, h3, h4 {
+    margin: var(--space-sm) 0 var(--space-xs);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-heading);
+  }
+  h1 { font-size: var(--font-size-title-1); }
+  h2 { font-size: var(--font-size-title-2); }
+  h3 { font-size: var(--font-size-body); }
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+
+  p { margin: 0 0 var(--space-sm); }
+  ul, ol {
+    margin: 0 0 var(--space-sm);
+    padding-left: var(--space-sm);
+    list-style-position: inside;
+  }
+  li { margin-bottom: var(--space-2xs); }
+  li::marker { color: var(--primary); }
+  code {
+    font-family: var(--font-family-mono);
+    background: var(--opacity-low);
+    padding: 1px 4px;
+    border-radius: var(--radius-xs);
+  }
+  pre {
+    margin: 0 0 var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--opacity-low);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+  }
+  pre code { background: transparent; padding: 0; }
+  blockquote {
+    margin: 0 0 var(--space-sm);
+    padding-left: var(--space-sm);
+    border-left: calc(var(--border-width) * 2) solid var(--opacity-mid);
+    color: var(--opacity-high);
+  }
+  a { color: var(--accent, currentColor); text-decoration: underline; }
+  hr {
+    margin: var(--space-sm) 0;
+    border: 0;
+    border-top: var(--line);
+  }
+}

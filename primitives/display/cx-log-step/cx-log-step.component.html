@@ -1,0 +1,31 @@
+<div class="cx-log-step__indicator">
+  <div class="cx-log-step__line"></div>
+  @if (step.icon; as iconName) {
+    <div class="cx-log-step__icon-marker">
+      <cx-icon [name]="iconName" size="auto" shape="circle-outline" [mood]="step.mood" />
+    </div>
+  } @else {
+    <div class="cx-log-step__circle">
+      <div class="cx-log-step__circle-inner"></div>
+    </div>
+  }
+</div>
+<div class="cx-log-step__content">
+  @if (step.text.trim()) {
+    <div class="cx-log-step__title-row">
+      <div class="cx-log-step__text">
+        {{ step.text }}
+        @if (author.trim()) {
+          <span class="cx-log-step__author"> by {{ author }}</span>
+        }
+      </div>
+      @if (datestamp.trim()) {
+        <div class="cx-log-step__datestamp">{{ datestamp }}</div>
+      }
+    </div>
+  }
+  @if (description.trim()) {
+    <div class="cx-log-step__description">{{ description }}</div>
+  }
+  <ng-content />
+</div>

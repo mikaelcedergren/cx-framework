@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-option-group {
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size-small);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--opacity-high);
+  border-top: var(--line-discreet);
+  border-bottom: var(--line-discreet);
+}
+
+.cx-option-group--header {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+.cx-option-group--label {
+  background: transparent;
+  color: var(--placeholder);
+}
+
+.cx-option-group__label {
+  min-width: 0;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.cx-option-group__description {
+  margin-left: auto;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cx-option-group__actions {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+.cx-option-group__description + .cx-option-group__actions {
+  margin-left: 0;
+}

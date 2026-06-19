@@ -1,0 +1,116 @@
+:host {
+  display: block;
+}
+
+:host(.studio-preview-card) {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cx-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: var(--opacity-low);
+  box-sizing: border-box;
+}
+
+.cx-card__content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.cx-card__header {
+  display: flex;
+  min-height: var(--controller-size-small);
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: 0 0 var(--space-sm);
+  border-bottom: var(--line);
+}
+
+.cx-card__header:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__header-slot > *)) {
+  display: none;
+}
+
+.cx-card__heading {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: var(--ink);
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
+}
+
+.cx-card__icon {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  color: var(--ink);
+}
+
+.cx-card__header-slot {
+  display: inline-flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-inline-start: auto;
+}
+
+.cx-card__header-slot:empty {
+  display: none;
+}
+
+:host(.cx-card-host--mood-primary) .cx-card__icon {
+  color: var(--primary);
+}
+
+:host(.cx-card-host--mood-accent) .cx-card__icon {
+  color: var(--accent);
+}
+
+:host(.cx-card-host--mood-info) .cx-card__icon {
+  color: var(--info);
+}
+
+:host(.cx-card-host--mood-success) .cx-card__icon {
+  color: var(--success);
+}
+
+:host(.cx-card-host--mood-warning) .cx-card__icon {
+  color: var(--warning);
+}
+
+:host(.cx-card-host--mood-danger) .cx-card__icon {
+  color: var(--danger);
+}
+
+:host(.studio-preview-card) .cx-card {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+:host(.cx-card-host--legacy) .cx-card {
+  border: 0;
+  background: transparent;
+}
+
+:host(.cx-card-host--small) .cx-card {
+  max-width: 768px;
+  margin: auto;
+}
+
+:host(.cx-card-host--medium) .cx-card {
+  max-width: 1024px;
+  margin: auto;
+}

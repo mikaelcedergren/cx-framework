@@ -1,0 +1,321 @@
+<div
+  class="cx-table"
+  [class.cx-table--compact]="density === 'compact'"
+  [class.cx-table--comfortable]="density === 'comfortable'"
+  [class.cx-table--row-press]="rowActivation === 'press'"
+  [class.cx-table--row-active]="rowActivation === 'active'"
+  [class.cx-table--sticky-header]="stickyHeader && showHeaders"
+  [class.cx-table--zebra]="zebra"
+  [class.cx-table--loading]="loading"
+>
+  @if (loading || rows$().length > 0) {
+    <table #tableElement class="cx-table__table">
+      <colgroup>
+        @if (hasRowSelection$()) {
+          <col class="cx-table__selection-column" />
+        }
+        @for (column of columns$(); track trackColumn($index, column)) {
+          <col
+            [style.width]="columnWidth(column)"
+            [style.min-width]="columnWidth(column)"
+            [style.max-width]="columnWidth(column)"
+            [attr.data-column-id]="column.id"
+          />
+        }
+        @if (hasRowMenus$() && showRowActions) {
+          <col class="cx-table__menu-column" />
+        }
+      </colgroup>
+      @if (showHeaders) {
+        <thead>
+        <tr class="cx-table__head-row">
+          @if (hasRowSelection$()) {
+            <th class="cx-table__head-cell cx-table__head-cell--selection" scope="col">
+              <cx-checkbox
+                [value]="partiallySelectedRows$() ? 'indeterminate' : allRowsSelected$() ? 'selected' : 'deselected'"
+                [custom]="true"
+                (selectedChange)="toggleAllRowsSelection($event)"
+              >
+                <span class="cx-table__selection-label">Select all rows</span>
+              </cx-checkbox>
+            </th>
+          }
+          @for (column of columns$(); track trackColumn($index, column)) {
+            <th
+              class="cx-table__head-cell"
+              [class.cx-table__head-cell--interactive]="isColumnSortable(column) || columnsReorderable || columnsResizable"
+              [class.cx-table__head-cell--end]="column.align === 'end'"
+              [class.cx-table__head-cell--pinned]="isColumnPinned(column)"
+              [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
+              [class.cx-table__head-cell--dragging]="draggingColumnId$() === column.id"
+              [class.cx-table__head-cell--drop-before]="dropIndicator$()?.columnId === column.id && dropIndicator$()?.position === 'before'"
+              [class.cx-table__head-cell--drop-after]="dropIndicator$()?.columnId === column.id && dropIndicator$()?.position === 'after'"
+              [style.width]="columnWidth(column)"
+              [style.min-width]="columnWidth(column)"
+              [style.max-width]="columnWidth(column)"
+              [style.left]="columnPinnedLeft(column)"
+              [attr.data-column-id]="column.id"
+              [attr.aria-sort]="sortAria(column.id)"
+              scope="col"
+            >
+              <div class="cx-table__head-content">
+                @if (hasColumnHeaderMenu(column)) {
+                  <cx-menu
+                    class="cx-table__head-menu"
+                    [items]="columnHeaderMenuItems(column)"
+                    [align]="'start'"
+                    [width]="220"
+                    (itemSelect)="onColumnHeaderMenuSelect(column, $event)"
+                  >
+                    <button
+                      trigger
+                      type="button"
+                      class="cx-table__head-trigger"
+                      [attr.aria-label]="'Open ' + column.label + ' column menu'"
+                    >
+                      <span class="cx-table__head-label">{{ column.label }}</span>
+                      @if (sortIcon(column.id); as iconName) {
+                        <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
+                      }
+                    </button>
+                  </cx-menu>
+                } @else {
+                  <span class="cx-table__head-trigger cx-table__head-trigger--static">
+                    <span class="cx-table__head-label">{{ column.label }}</span>
+                  </span>
+                }
+                @if (columnsReorderable) {
+                  <button
+                    type="button"
+                    class="cx-table__column-grip"
+                    [class.cx-table__column-grip--active]="draggingColumnId$() === column.id"
+                    [attr.aria-label]="'Reorder ' + column.label + ' column'"
+                    (pointerdown)="onColumnGripPointerDown($event, column)"
+                    (pointermove)="onColumnGripPointerMove($event)"
+                    (pointerup)="onColumnGripPointerUp($event)"
+                    (pointercancel)="onColumnGripPointerUp($event)"
+                    (mousedown)="onColumnGripMouseDown($event, column)"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <cx-icon name="grip-vertical" [size]="16" />
+                  </button>
+                }
+              </div>
+              @if (columnsResizable) {
+                <div
+                  class="cx-table__column-resizer"
+                  [class.cx-table__column-resizer--active]="resizingColumnId$() === column.id"
+                  [attr.aria-label]="'Resize ' + column.label + ' column'"
+                  aria-orientation="vertical"
+                  role="separator"
+                  (pointerdown)="onColumnResizePointerDown($event, column)"
+                  (pointermove)="onColumnResizePointerMove($event)"
+                  (pointerup)="onColumnResizePointerUp($event)"
+                  (pointercancel)="onColumnResizePointerUp($event)"
+                  (mousedown)="onColumnResizeMouseDown($event, column)"
+                  (dblclick)="onColumnResizeDoubleClick($event, column)"
+                ></div>
+              }
+            </th>
+          }
+          @if (hasRowMenus$() && showRowActions) {
+            <th class="cx-table__head-cell cx-table__head-cell--menu" scope="col"></th>
+          }
+        </tr>
+        </thead>
+      }
+
+      <tbody class="cx-table__body">
+        @if (loading) {
+          @for (rowIndex of skeletonRows; track rowIndex) {
+            <tr class="cx-table__row cx-table__row--skeleton" aria-hidden="true">
+              @if (hasRowSelection$()) {
+                <td class="cx-table__cell cx-table__cell--selection">
+                  <span class="cx-table__skeleton cx-table__skeleton--control"></span>
+                </td>
+              }
+              @for (column of columns$(); track trackColumn($index, column)) {
+                <td
+                  class="cx-table__cell"
+                  [class.cx-table__cell--key]="column.key"
+                  [class.cx-table__cell--end]="column.align === 'end'"
+                  [class.cx-table__cell--pinned]="isColumnPinned(column)"
+                  [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
+                  [style.width]="columnWidth(column)"
+                  [style.min-width]="columnWidth(column)"
+                  [style.max-width]="columnWidth(column)"
+                  [style.left]="columnPinnedLeft(column)"
+                  [attr.data-column-id]="column.id"
+                >
+                  <span class="cx-table__skeleton" [class.cx-table__skeleton--short]="!column.key"></span>
+                </td>
+              }
+              @if (hasRowMenus$() && showRowActions) {
+                <td class="cx-table__cell cx-table__cell--menu"></td>
+              }
+            </tr>
+          }
+        } @else {
+          @for (row of rows$(); track trackRow($index, row)) {
+          <tr
+            class="cx-table__row"
+            [class.cx-table__row--active]="activeRowId$() === row.id"
+            [class.cx-table__row--folder]="rowKind(row) === 'folder'"
+            [class.cx-table__row--item]="rowKind(row) === 'item'"
+            [attr.tabindex]="rowIsKeyboardReachable() ? '0' : null"
+            [attr.aria-label]="rowLabel(row)"
+            (click)="onRowClick($event, row, $any($event.currentTarget))"
+            (mouseup)="onRowMouseUp($event, row, $any($event.currentTarget))"
+            (keydown)="onRowKeydown($event, row, $any($event.currentTarget))"
+            (contextmenu)="onRowContextMenu($event, row, $any($event.currentTarget))"
+          >
+            @if (hasRowSelection$()) {
+              <td class="cx-table__cell cx-table__cell--selection" (click)="$event.stopPropagation()">
+                <cx-checkbox
+                  [selected]="isRowSelected(row.id)"
+                  [custom]="true"
+                  (selectedChange)="toggleRowSelection(row.id, $event)"
+                >
+                  <span class="cx-table__selection-label">{{ selectionLabel(row) }}</span>
+                </cx-checkbox>
+              </td>
+            }
+            @for (column of columns$(); track trackColumn($index, column)) {
+              @if (cellFor(row, column.id); as cell) {
+                <td
+                  class="cx-table__cell"
+                  [class.cx-table__cell--key]="column.key"
+                  [class.cx-table__cell--end]="column.align === 'end'"
+                  [class.cx-table__cell--pinned]="isColumnPinned(column)"
+                  [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
+                  [style.width]="columnWidth(column)"
+                  [style.min-width]="columnWidth(column)"
+                  [style.max-width]="columnWidth(column)"
+                  [style.left]="columnPinnedLeft(column)"
+                  [attr.data-column-id]="column.id"
+                >
+                  <div class="cx-table__cell-content">
+                    <div class="cx-table__measure-target">
+                      @switch (cell.kind) {
+                        @case ('status-tag') {
+                          <cx-status-tag [mood]="cell.mood" [text]="cell.text" />
+                        }
+                        @case ('severity-tag') {
+                          <cx-severity-tag
+                            [severity]="cell.severity"
+                            [score]="cell.score"
+                            [kev]="cell.kev ?? false"
+                            [grade]="cell.grade ?? false"
+                          />
+                        }
+                        @case ('trend-tag') {
+                          <cx-trend-tag [trend]="cell.trend" [value]="cell.value" />
+                        }
+                        @case ('tag') {
+                          <cx-tag
+                            [text]="cell.label"
+                            [color]="cell.color ?? 'default'"
+                            [variant]="cell.variant ?? (cell.outline ? 'outline' : 'readOnly')"
+                          />
+                        }
+                        @default {
+                          <span
+                            class="cx-table__text"
+                            [class.cx-table__text--strong]="cell.strong || column.key"
+                            [class.cx-table__text--muted]="cell.muted"
+                          >
+                            @if (resolvedTextIcon(row, column, cell); as iconName) {
+                              <cx-icon class="cx-table__text-icon" [name]="iconName" [size]="16" />
+                            }
+                            <span class="cx-table__text-value">{{ cell.value }}</span>
+                          </span>
+                        }
+                      }
+                    </div>
+                  </div>
+                </td>
+              } @else {
+                <td class="cx-table__cell"></td>
+              }
+            }
+
+            @if (hasRowMenus$() && showRowActions) {
+              <td class="cx-table__cell cx-table__cell--menu" (click)="$event.stopPropagation()">
+                @if (row.menuItems?.length) {
+                  <cx-menu
+                    [items]="row.menuItems ?? []"
+                    (openChange)="onRowMenuOpenChange(row.id, $event)"
+                    (itemSelect)="onRowMenuItemSelect(row.id, $event)"
+                  >
+                    <span data-row-menu-trigger trigger>
+                      <cx-icon-button
+                        class="cx-table__row-menu-trigger"
+                        icon="menu-vertical"
+                        ariaLabel="Row actions"
+                        variant="transparent"
+                      />
+                    </span>
+                  </cx-menu>
+                }
+              </td>
+            }
+          </tr>
+          }
+        }
+      </tbody>
+    </table>
+
+    @if (contextMenuOpen$()) {
+      @if (contextMenuPosition$(); as contextMenuPosition) {
+        <cx-popover
+          [open]="true"
+          [showBackdrop]="true"
+          [left]="contextMenuPosition.left"
+          [top]="contextMenuPosition.top"
+          [width]="240"
+          [maxHeight]="320"
+          [role]="'menu'"
+          [ariaLabel]="'Row actions'"
+          surfaceClass="cx-table__context-menu-surface"
+          (backdropPressed)="closeContextMenu()"
+        >
+          @for (item of contextMenuItems$(); track item.id) {
+            @if (showContextMenuDividerBefore($index)) {
+              <div class="cx-table__context-menu-divider" aria-hidden="true"></div>
+            }
+            <button
+              type="button"
+              class="cx-table__context-menu-option"
+              [attr.data-context-menu-item-id]="item.id"
+              (click)="onContextMenuItemSelect(item.id)"
+            >
+              <cx-option
+                [label]="item.label"
+                [prependIcon]="item.prependIcon"
+                [description]="item.description"
+                [appendIcon]="item.appendIcon"
+                [mood]="item.danger ? 'danger' : 'default'"
+              />
+            </button>
+          }
+        </cx-popover>
+      }
+    }
+
+    @if (dragPreview$(); as dragPreview) {
+      <div
+        class="cx-table__drag-preview"
+        [style.left.px]="dragPreview.left"
+        [style.top.px]="dragPreview.top"
+        aria-hidden="true"
+      >
+        <cx-icon class="cx-table__drag-preview-icon" name="grip-vertical" [size]="16" />
+        <span class="cx-table__drag-preview-label">{{ dragPreview.label }}</span>
+      </div>
+    }
+  } @else {
+    <div class="cx-table__empty">
+      {{ emptyText }}
+    </div>
+  }
+</div>

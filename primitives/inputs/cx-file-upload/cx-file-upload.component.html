@@ -1,0 +1,29 @@
+<input
+  #nativeInput
+  class="cx-file-upload__native-input"
+  type="file"
+  aria-label="File upload"
+  [disabled]="disabled"
+  (change)="onNativeInputChange($event)"
+/>
+
+@if (!hasFile$()) {
+  <cx-button
+    class="cx-file-upload__button"
+    [text]="visibleButtonText$()"
+    [icon]="buttonIcon"
+    [disabled]="disabled"
+    (pressed)="openNativePicker()"
+  />
+} @else {
+  <div class="cx-file-upload__selected">
+    <div class="cx-file-upload__name">{{ fileName$() }}</div>
+    <cx-icon-button
+      icon="remove"
+      mood="default"
+      [disabled]="disabled"
+      [ariaLabel]="clearAriaLabel"
+      (pressed)="clearFile()"
+    />
+  </div>
+}

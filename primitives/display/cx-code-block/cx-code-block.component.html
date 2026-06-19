@@ -1,0 +1,22 @@
+<div class="cx-code-block__surface">
+  @if (hasHeading()) {
+    <div class="cx-code-block__heading">{{ heading!.trim() }}</div>
+  }
+
+  <div class="cx-code-block__box">
+    @if (copyable) {
+      <cx-icon-button
+        class="cx-code-block__copy"
+        size="small"
+        [icon]="copyIcon()"
+        [ariaLabel]="copyAriaLabel()"
+        [disabled]="copyDisabled()"
+        (pressed)="copy()"
+      />
+    }
+
+    <pre
+      class="cx-code-block__pre"
+    ><code class="cx-code-block__code">@for (line of lines(); track line.number) {<span class="cx-code-block__line" [class.cx-code-block__line--default]="line.mood === 'default'" [class.cx-code-block__line--info]="line.mood === 'info'" [class.cx-code-block__line--success]="line.mood === 'success'" [class.cx-code-block__line--warning]="line.mood === 'warning'" [class.cx-code-block__line--danger]="line.mood === 'danger'" [attr.aria-label]="line.message || null">@for (segment of line.segments; track segment.startIndex) {@if (segment.mood) {<mark class="cx-code-block__segment" [class.cx-code-block__segment--default]="segment.mood === 'default'" [class.cx-code-block__segment--info]="segment.mood === 'info'" [class.cx-code-block__segment--success]="segment.mood === 'success'" [class.cx-code-block__segment--warning]="segment.mood === 'warning'" [class.cx-code-block__segment--danger]="segment.mood === 'danger'" [attr.aria-label]="segment.message || null">{{ segment.text }}</mark>} @else {<span class="cx-code-block__segment">{{ segment.text }}</span>}}</span>}</code></pre>
+  </div>
+</div>

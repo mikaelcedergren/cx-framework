@@ -1,0 +1,45 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-shortcut-key-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.cx-shortcut-key {
+  display: inline-flex;
+  min-width: var(--space-md);
+  height: var(--space-md);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  border: var(--line);
+  color: var(--placeholder);
+  background: var(--opacity-low);
+  box-sizing: border-box;
+}
+
+.cx-shortcut-key--icon {
+  width: var(--space-md);
+}
+
+.cx-shortcut-key--text {
+  width: auto;
+  padding: 0 var(--space-2xs);
+}
+
+.cx-shortcut-key__icon {
+  display: inline-flex;
+  color: var(--placeholder);
+}
+
+.cx-shortcut-key__text {
+  display: block;
+  color: var(--placeholder);
+  font-size: var(--font-size-body-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-small);
+}

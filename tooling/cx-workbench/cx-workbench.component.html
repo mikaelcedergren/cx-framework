@@ -1,0 +1,55 @@
+<section
+  class="cx-workbench"
+  [class.cx-workbench--align-top]="align$() === 'top'"
+  [class.cx-workbench--align-bottom]="align$() === 'bottom'"
+  [class.cx-workbench--min-small]="minSize$() === 'small'"
+  [class.cx-workbench--min-medium]="minSize$() === 'medium'"
+  [class.cx-workbench--min-large]="minSize$() === 'large'"
+  [class.cx-workbench--width-small]="previewWidth$() === 'small'"
+  [class.cx-workbench--width-medium]="previewWidth$() === 'medium'"
+  [class.cx-workbench--width-large]="previewWidth$() === 'large'"
+  [class.cx-workbench--width-full]="previewWidth$() === 'full'"
+>
+  <div class="cx-workbench__main">
+    <div class="cx-workbench__preview">
+      <ng-content select="[cxWorkbenchPreview]" />
+    </div>
+
+    <div class="cx-workbench__meta">
+      <div class="cx-workbench__meta-field">
+        <span class="cx-workbench__meta-label">minSize</span>
+        <cx-select
+          label=""
+          ariaLabel="minSize"
+          [availableValues]="minSizeOptions"
+          [value]="minSize$()"
+          (valueChange)="onMinSizeChange($event)"
+        />
+      </div>
+      <div class="cx-workbench__meta-field">
+        <span class="cx-workbench__meta-label">previewWidth</span>
+        <cx-select
+          label=""
+          ariaLabel="previewWidth"
+          [availableValues]="previewWidthOptions"
+          [value]="previewWidth$()"
+          (valueChange)="onPreviewWidthChange($event)"
+        />
+      </div>
+      <div class="cx-workbench__meta-field">
+        <span class="cx-workbench__meta-label">align</span>
+        <cx-select
+          label=""
+          ariaLabel="align"
+          [availableValues]="alignOptions"
+          [value]="align$()"
+          (valueChange)="onAlignChange($event)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <aside class="cx-workbench__controls">
+    <ng-content select="[cxWorkbenchControls]" />
+  </aside>
+</section>

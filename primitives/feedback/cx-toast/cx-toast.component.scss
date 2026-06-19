@@ -1,0 +1,131 @@
+:host {
+  display: contents;
+}
+
+.cx-toast {
+  --cx-toast-timer-color: var(--primary);
+
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-md);
+  z-index: var(--z-index-toast);
+  box-sizing: border-box;
+  display: flex;
+  width: fit-content;
+  max-width: min(calc(var(--controller-size) * 15), calc(100vw - var(--space-xl)));
+  min-height: calc(var(--controller-size) + var(--space-md) + var(--space-2xs));
+  align-items: center;
+  gap: var(--space-sm);
+  overflow: hidden;
+  padding: var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-notification);
+  color: var(--ink);
+  line-height: 1.4;
+  transform: translate(-50%, calc(100% + var(--space-xl)));
+  transition: transform var(--motion-slow) var(--ease-out);
+  backdrop-filter: blur(var(--space-sm));
+}
+
+.cx-toast--open {
+  transform: translate(-50%, 0);
+}
+
+.cx-toast--closing {
+  transform: translate(-50%, calc(100% + var(--space-xl)));
+}
+
+.cx-toast--default {
+  padding-left: var(--space-md);
+}
+
+.cx-toast--success {
+  --cx-toast-timer-color: var(--success);
+  border-color: var(--success-opacity);
+  background: var(--success-opacity);
+}
+
+.cx-toast--info {
+  --cx-toast-timer-color: var(--info);
+  border-color: var(--info-opacity);
+  background: var(--info-opacity);
+}
+
+.cx-toast--warning {
+  --cx-toast-timer-color: var(--warning);
+  border-color: var(--warning-opacity);
+  background: var(--warning-opacity);
+}
+
+.cx-toast--danger {
+  --cx-toast-timer-color: var(--danger);
+  border-color: var(--danger-opacity);
+  background: var(--danger-opacity);
+}
+
+.cx-toast__mood-icon {
+  flex: 0 0 auto;
+}
+
+.cx-toast__content {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.cx-toast__heading {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.cx-toast__description {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+}
+
+.cx-toast__controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-left: var(--space-md);
+}
+
+.cx-toast__timer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--space-2xs);
+  background: var(--cx-toast-timer-color);
+  transform-origin: left center;
+  animation: cx-toast-timer 5s linear forwards;
+}
+
+@keyframes cx-toast-timer {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-toast {
+    transition: none;
+  }
+
+  .cx-toast__timer {
+    animation: none;
+  }
+}

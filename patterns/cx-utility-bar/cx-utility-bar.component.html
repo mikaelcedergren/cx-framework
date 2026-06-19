@@ -1,0 +1,23 @@
+<div
+  class="cx-utility-bar"
+  [class.cx-utility-bar--end]="alignment$() === 'end'"
+  [class.cx-utility-bar--space-between]="alignment$() === 'space-between'"
+  [class.cx-utility-bar--wrap]="wrap"
+  [attr.aria-label]="label$() ?? null"
+  role="toolbar"
+>
+  @for (item of items$(); track item.id) {
+    <cx-button
+      [text]="item.text ?? ''"
+      [ariaLabel]="item.ariaLabel"
+      [icon]="item.icon"
+      [appendIcon]="item.appendIcon"
+      [variant]="item.variant ?? 'default'"
+      [mood]="item.mood ?? 'default'"
+      [size]="size"
+      [selected]="item.selected"
+      [disabled]="disabled || item.disabled === true"
+      (pressed)="onItemPressed(item)"
+    />
+  }
+</div>

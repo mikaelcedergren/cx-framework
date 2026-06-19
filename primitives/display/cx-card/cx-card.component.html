@@ -1,0 +1,16 @@
+<div class="cx-card">
+  <div class="cx-card__header">
+    @if (hasHeading()) {
+      <div class="cx-card__heading">{{ heading!.trim() }}</div>
+    }
+    @if (icon; as iconName) {
+      <cx-icon class="cx-card__icon" [name]="iconName" [size]="20" />
+    }
+    <div class="cx-card__header-slot">
+      <ng-content select="[slot=header]" />
+    </div>
+  </div>
+  <div class="cx-card__content">
+    <ng-content />
+  </div>
+</div>

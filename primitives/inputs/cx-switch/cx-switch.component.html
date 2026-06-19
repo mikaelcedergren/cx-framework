@@ -1,0 +1,47 @@
+<div class="cx-switch-field" [class.cx-switch-field--small]="size === 'small'">
+  <div
+    class="cx-switch"
+    [class.cx-switch--selected]="selected$()"
+    [class.cx-switch--small]="size === 'small'"
+    [class.cx-switch--disabled]="disabled"
+    [class.cx-switch--error]="hasError$()"
+    role="switch"
+    tabindex="0"
+    [attr.aria-checked]="selected$()"
+    [attr.aria-disabled]="disabled"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-describedby]="describedByIds$() ?? null"
+    (click)="toggleSelected($event)"
+    (keydown)="onKeydown($event)"
+    (focus)="onFocusChange(true)"
+    (blur)="onFocusChange(false)"
+    data-shortcut-ignore=" "
+  >
+    <span class="cx-switch__track" aria-hidden="true">
+      <span class="cx-switch__thumb"></span>
+    </span>
+    <span class="cx-switch__content">
+      @if (text.trim()) {
+        <span class="cx-switch__label">
+          {{ text }}
+          @if (showHint$()) {
+            <span class="cx-switch__hint" [id]="hintId">{{ hint!.trim() }}</span>
+          }
+        </span>
+      } @else if (custom) {
+        <span class="cx-switch__label">
+          <ng-content />
+        </span>
+      }
+    </span>
+  </div>
+
+  @if (validationMessages$().length > 0) {
+    <cx-validation-message
+      class="cx-switch-field__error"
+      [id]="messagesId"
+      [messages]="validationMessages$()"
+      [showAll]="true"
+    />
+  }
+</div>

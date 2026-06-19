@@ -1,0 +1,10 @@
+<cx-button
+  [text]="text"
+  [icon]="displayIcon$()"
+  [size]="size"
+  [variant]="selected$() ? 'primary' : 'transparent'"
+  [selected]="selected$()"
+  [disabled]="disabled"
+  [ariaLabel]="ariaLabel || undefined"
+  (pressed)="toggle()"
+/>

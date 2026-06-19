@@ -1,0 +1,71 @@
+<div class="cx-query-field" [class.cx-query-field--small]="size === 'small'" [class.cx-query-field--large]="size === 'large'">
+  @if (label.trim()) {
+    <div class="cx-query-field__header">
+      <div class="cx-query-field__label" [id]="labelId">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-query-field__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    class="cx-query-field__container"
+    [class.cx-query-field__container--disabled]="disabled"
+    [class.cx-query-field__container--readonly]="readOnly"
+    [class.cx-query-field__container--loading]="loading"
+    [class.cx-query-field__container--error]="hasError$()"
+    role="search"
+    tabindex="0"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-disabled]="disabled ? 'true' : null"
+    [attr.aria-readonly]="readOnly ? 'true' : null"
+    [attr.aria-busy]="loading ? 'true' : null"
+    [attr.aria-labelledby]="resolvedAriaLabelledBy()"
+    [attr.aria-describedby]="resolvedAriaDescribedBy()"
+    [attr.aria-label]="ariaLabel ?? null"
+    data-shortcut-ignore="ArrowRight,ArrowLeft"
+    (click)="onContainerClick()"
+    (keydown)="onKeydown($event)"
+  >
+    <cx-icon class="cx-query-field__search-icon" name="query" [size]="16" />
+
+    <div class="cx-query-field__segments">
+      @if (hasSegments$()) {
+        @for (segment of segments$(); track segment.id; let index = $index) {
+          <cx-query-element
+            [data]="segmentData(segment, index)"
+            (pressed)="onSegmentPressed(index)"
+          />
+        }
+      } @else {
+        <span class="cx-query-field__placeholder" aria-hidden="true">&nbsp;</span>
+      }
+    </div>
+
+    @if (loading) {
+      <cx-spinner class="cx-query-field__spinner" size="16" mood="default" />
+    }
+
+    @if (hasSegments$() && clearable && !isLocked()) {
+      <cx-icon-button
+        class="cx-query-field__clear"
+        icon="remove"
+        ariaLabel="Clear query"
+        variant="transparent"
+        size="small"
+        (click)="onClear($event)"
+      />
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-query-field__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-query-field__hint">{{ hint!.trim() }}</div>
+      }
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      }
+    </div>
+  }
+</div>

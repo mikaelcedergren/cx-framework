@@ -1,0 +1,27 @@
+@if (display$() === 'global') {
+  <div class="cx-validation-message__list cx-validation-message__list--global">
+    @for (item of messages$(); track item.id) {
+      <cx-alert mood="danger" [text]="item.message" />
+    }
+  </div>
+} @else {
+  <div class="cx-validation-message__list cx-validation-message__list--inline">
+    @for (item of messages$(); track item.id) {
+      <div
+        class="cx-validation-message__item"
+        [class.cx-validation-message__item--status]="item.type === 'status'"
+        [class.cx-validation-message__item--info]="item.type === 'info'"
+        [class.cx-validation-message__item--success]="item.type === 'success'"
+        [class.cx-validation-message__item--warning]="item.type === 'warning'"
+        [class.cx-validation-message__item--error]="item.type === 'error'"
+        [class.cx-validation-message__item--without-icon]="!iconFor(item.type)"
+        [attr.role]="roleFor(item.type)"
+      >
+        @if (iconFor(item.type); as icon) {
+          <cx-icon class="cx-validation-message__icon" [name]="icon" [size]="14" />
+        }
+        <span class="cx-validation-message__text">{{ item.message }}</span>
+      </div>
+    }
+  </div>
+}

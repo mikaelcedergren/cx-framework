@@ -1,0 +1,39 @@
+<div
+  class="cx-big-checkbox"
+  [class.cx-big-checkbox--checked]="selected$()"
+  [class.cx-big-checkbox--indeterminate]="indeterminate$()"
+  [class.cx-big-checkbox--disabled]="disabled"
+  role="checkbox"
+  tabindex="0"
+  [attr.aria-checked]="indeterminate$() ? 'mixed' : selected$()"
+  [attr.aria-disabled]="disabled ? 'true' : null"
+  [attr.aria-label]="heading || text || null"
+  (click)="toggleChecked()"
+  (keydown)="onKeydown($event)"
+  (focus)="onFocus(true)"
+  (blur)="onFocus(false)"
+>
+  <div class="cx-big-checkbox__indicator" aria-hidden="true">
+    <span
+      class="cx-big-checkbox__control"
+      [class.cx-big-checkbox__control--checked]="selected$()"
+      [class.cx-big-checkbox__control--indeterminate]="indeterminate$()"
+    >
+      @if (selected$()) {
+        <span class="cx-big-checkbox__check"></span>
+      }
+    </span>
+  </div>
+  <div class="cx-big-checkbox__content">
+    @if (custom) {
+      <ng-content />
+    } @else {
+      @if (heading) {
+        <div class="cx-big-checkbox__label">{{ heading }}</div>
+      }
+      @if (text) {
+        <div class="cx-big-checkbox__description">{{ text }}</div>
+      }
+    }
+  </div>
+</div>

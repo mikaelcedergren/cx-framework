@@ -1,0 +1,38 @@
+<div
+  class="cx-list-view"
+  [class.cx-list-view--compact]="density === 'compact'"
+  [class.cx-list-view--disabled]="disabled"
+  [class.cx-list-view--divided]="divided"
+  role="list"
+>
+  @if (items$().length === 0) {
+    <div class="cx-list-view__empty">{{ emptyText }}</div>
+  } @else {
+    @for (item of items$(); track item.id) {
+      <button
+        type="button"
+        class="cx-list-view__item"
+        [class.cx-list-view__item--selected]="selectedId$() === item.id"
+        [disabled]="disabled || item.disabled === true || !selectable"
+        [attr.aria-current]="selectedId$() === item.id ? 'true' : null"
+        role="listitem"
+        (click)="onSelect(item)"
+      >
+        @if (item.icon) {
+          <cx-icon class="cx-list-view__icon" [name]="item.icon" [size]="16" />
+        }
+        <span class="cx-list-view__content">
+          <span class="cx-list-view__main">
+            <span class="cx-list-view__label">{{ item.label }}</span>
+            @if (item.meta) {
+              <span class="cx-list-view__meta">{{ item.meta }}</span>
+            }
+          </span>
+          @if (item.description) {
+            <span class="cx-list-view__description">{{ item.description }}</span>
+          }
+        </span>
+      </button>
+    }
+  }
+</div>

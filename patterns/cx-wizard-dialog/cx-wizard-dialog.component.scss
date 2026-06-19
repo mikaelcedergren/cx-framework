@@ -1,0 +1,296 @@
+:host {
+  display: contents;
+}
+
+.cx-wizard-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background: var(--overlay-backdrop);
+  backdrop-filter: blur(2px);
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog {
+  position: relative;
+  display: grid;
+  width: min(1280px, calc(100vw - (var(--space-lg) * 2)));
+  height: min(820px, calc(100vh - (var(--space-lg) * 2)));
+  min-height: 560px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+  overflow: hidden;
+  border: var(--line);
+  border-radius: calc(var(--radius-md) * 2);
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-dialog);
+  color: var(--ink);
+  animation: cx-wizard-dialog-enter calc(var(--motion-slow) * 2) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cx-wizard-dialog--large {
+  width: min(90vw, calc(100vw - (var(--space-lg) * 2)));
+  height: min(95vh, calc(100vh - (var(--space-lg) * 2)));
+}
+
+.cx-wizard-dialog--feedback {
+  display: flex;
+  min-height: min(520px, calc(100vh - (var(--space-lg) * 2)));
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.cx-wizard-dialog__feedback {
+  display: flex;
+  width: min(100%, 640px);
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.cx-wizard-dialog__feedback-content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.cx-wizard-dialog__feedback-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.cx-wizard-dialog__main {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog__steps-header {
+  display: flex;
+  min-width: 0;
+  min-height: 24px;
+  align-items: center;
+  padding-right: calc(var(--space-xl) * 2);
+}
+
+.cx-wizard-dialog__steps {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cx-wizard-dialog__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.cx-wizard-dialog__step-marker {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-pill);
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.cx-wizard-dialog__step-label {
+  min-width: 0;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+}
+
+.cx-wizard-dialog__step--active .cx-wizard-dialog__step-marker {
+  background: var(--primary);
+  color: var(--on-ink);
+}
+
+.cx-wizard-dialog__step--complete .cx-wizard-dialog__step-marker {
+  background: var(--success);
+  color: var(--surface-mid);
+}
+
+.cx-wizard-dialog__step--active .cx-wizard-dialog__step-label {
+  color: var(--ink);
+  font-weight: var(--font-weight-bold);
+}
+
+.cx-wizard-dialog__step--complete .cx-wizard-dialog__step-label {
+  color: var(--ink);
+}
+
+.cx-wizard-dialog__step-separator {
+  display: block;
+  width: 56px;
+  height: 1px;
+  flex: 0 0 auto;
+  margin-inline: var(--space-sm);
+  background: var(--opacity-mid);
+}
+
+.cx-wizard-dialog__content-shell {
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog__content-card {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  border: var(--line);
+  border-radius: calc(var(--radius-md) * 1.5);
+  background: var(--surface-mid);
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog__content-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-wizard-dialog__content-title h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--font-size-title-1);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+}
+
+.cx-wizard-dialog__content-divider {
+  height: 1px;
+  background: var(--opacity-low);
+}
+
+.cx-wizard-dialog__content-body {
+  min-height: 0;
+  overflow: auto;
+}
+
+.cx-wizard-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.cx-wizard-dialog__footer-action {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-wizard-dialog__footer-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  pointer-events: none;
+}
+
+.cx-wizard-dialog__footer:hover .cx-wizard-dialog__footer-shortcut,
+.cx-wizard-dialog__footer:focus-within .cx-wizard-dialog__footer-shortcut {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cx-wizard-dialog__sidebar {
+  position: relative;
+  min-width: 0;
+  border-left: var(--line-discreet);
+  background: var(--surface-low);
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog__sidebar-content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--space-lg);
+  justify-content: flex-start;
+  padding: calc((var(--space-lg) * 2) + 24px) var(--space-xl) var(--space-xl);
+  box-sizing: border-box;
+}
+
+.cx-wizard-dialog__sidebar-icon {
+  color: var(--accent);
+}
+
+.cx-wizard-dialog__sidebar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-wizard-dialog__sidebar-heading {
+  margin: 0;
+  color: var(--accent);
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.1;
+}
+
+.cx-wizard-dialog__sidebar-description {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  line-height: 1.4;
+}
+
+.cx-wizard-dialog__close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+}
+
+@keyframes cx-wizard-dialog-enter {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-wizard-dialog {
+    animation: none;
+  }
+}

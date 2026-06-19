@@ -1,0 +1,15 @@
+<span class="cx-shortcut-key-group" aria-hidden="true">
+  @for (item of items(); track $index) {
+    <span
+      class="cx-shortcut-key"
+      [class.cx-shortcut-key--icon]="item.icon"
+      [class.cx-shortcut-key--text]="!item.icon && item.text"
+    >
+      @if (item.icon; as iconName) {
+        <cx-icon class="cx-shortcut-key__icon" [name]="iconName" [size]="12" />
+      } @else if (item.text; as keyText) {
+        <span class="cx-shortcut-key__text">{{ keyText }}</span>
+      }
+    </span>
+  }
+</span>

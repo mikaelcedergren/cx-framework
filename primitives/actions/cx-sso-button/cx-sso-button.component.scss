@@ -1,0 +1,128 @@
+:host {
+  display: inline-flex;
+  width: auto;
+}
+
+.cx-sso-button {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  overflow: hidden;
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-mid);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  outline: none;
+  text-decoration: none;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+  white-space: nowrap;
+}
+
+.cx-sso-button:hover:not(:disabled) {
+  border-color: var(--opacity-high);
+  background: var(--opacity-low);
+}
+
+.cx-sso-button:active:not(:disabled) {
+  background: var(--opacity-mid);
+}
+
+.cx-sso-button:focus-visible:not(.cx-sso-button--loading) {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-sso-button:disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled);
+}
+
+.cx-sso-button--sm {
+  min-height: var(--controller-size-small);
+  padding: 0 var(--space-sm);
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-sso-button--md {
+  min-height: calc(var(--controller-size-small) + var(--space-sm));
+  padding: 0 var(--space-md);
+  font-size: var(--font-size-body);
+}
+
+.cx-sso-button--lg {
+  min-height: var(--controller-size-large);
+  padding: 0 var(--space-lg);
+  font-size: var(--font-size-body-lg);
+}
+
+.cx-sso-button__mark {
+  display: inline-flex;
+  width: calc(var(--space-md) + var(--space-2xs));
+  height: calc(var(--space-md) + var(--space-2xs));
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.cx-sso-button--sm .cx-sso-button__mark {
+  width: calc(var(--space-md) - var(--space-2xs));
+  height: calc(var(--space-md) - var(--space-2xs));
+}
+
+.cx-sso-button--lg .cx-sso-button__mark {
+  width: calc(var(--space-md) + var(--space-xs));
+  height: calc(var(--space-md) + var(--space-xs));
+}
+
+.cx-sso-button__mark > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cx-sso-button__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cx-sso-button--loading > .cx-sso-button__mark,
+.cx-sso-button--loading > .cx-sso-button__label {
+  opacity: 0;
+}
+
+.cx-sso-button--loading {
+  cursor: default;
+  pointer-events: none;
+}
+
+.cx-sso-button__spinner {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 1em;
+  height: 1em;
+  transform: translate(-50%, -50%);
+  border: var(--line);
+  border-block-start-color: transparent;
+  border-radius: var(--radius-pill);
+  animation: cx-sso-button-spin calc(var(--motion-slow) * 4) linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cx-sso-button-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
