@@ -13,10 +13,11 @@
       "default": "./dist/lib/public-api.js"
     },
     "./DESIGN-SYSTEM.md": "./DESIGN-SYSTEM.md",
-    "./icons/*": "./icons/*",
     "./package.json": "./package.json",
+    "./icons/*": "./icons/*",
     "./patterns/*": "./patterns/*",
     "./primitives/*": "./primitives/*",
+    "./scripts/*": "./scripts/*",
     "./styles/*": {
       "sass": "./styles/_*.scss",
       "default": "./styles/_*.scss"
@@ -38,12 +39,12 @@
     "icons/",
     "patterns/",
     "primitives/",
+    "public-api.ts",
     "scripts/",
     "styles/",
     "support/",
     "tokens/",
     "tooling/",
-    "public-api.ts",
     "tsconfig.lib.json"
   ],
   "scripts": {
