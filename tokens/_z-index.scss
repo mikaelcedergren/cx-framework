@@ -1,10 +1,14 @@
 :root {
+  /* Canonical stack: sticky app chrome, nav overlay, detail panel, dialogs,
+     popovers, tooltips, toasts, debug-only layer. */
+  --z-index-sticky: 80;
+  --z-index-nav-overlay-backdrop: 90;
+  --z-index-nav-overlay: 95;
   --z-index-detail: 100;
-  --z-index-popover-backdrop: 1100;
-  --z-index-popover: 1110;
   --z-index-dialog: 1200;
-  --z-index-toast: 1300;
-  --z-index-notification: var(--z-index-toast);
+  --z-index-popover-backdrop: 1250;
+  --z-index-popover: 1300;
   --z-index-tooltip: 1400;
+  --z-index-toast: 1500;
   --z-index-debug: 9999;
 }

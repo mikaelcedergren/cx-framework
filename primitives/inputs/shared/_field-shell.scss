@@ -1,0 +1,83 @@
+@mixin field-header($root, $margin-bottom: var(--space-xs)) {
+  .#{$root}__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: $margin-bottom;
+  }
+
+  .#{$root}__label {
+    color: var(--ink);
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+  }
+
+  .#{$root}__optional {
+    color: var(--opacity-high);
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.2;
+  }
+}
+
+@mixin field-messages($root, $margin-top: var(--space-sm)) {
+  .#{$root}__messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-top: $margin-top;
+  }
+
+  .#{$root}__hint {
+    color: var(--opacity-high);
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.4;
+  }
+}
+
+@mixin field-shell-state($selector, $focus-target: null, $readonly-background: transparent, $loading-cursor: progress) {
+  #{$selector} {
+    transition:
+      border-color var(--motion-fast) ease,
+      background-color var(--motion-fast) ease,
+      outline-color var(--motion-fast) ease;
+  }
+
+  #{$selector}:hover:not(#{$selector}--disabled):not(#{$selector}--error) {
+    border-color: var(--opacity-mid);
+  }
+
+  #{$selector}--focused {
+    outline: var(--outline-focus);
+    outline-offset: var(--outline-focus-offset);
+  }
+
+  @if $focus-target != null {
+    #{$selector}:has(#{$focus-target}:focus-visible) {
+      outline: var(--outline-tab);
+      outline-offset: var(--outline-tab-offset);
+    }
+  }
+
+  #{$selector}--error,
+  #{$selector}--error:hover:not(#{$selector}--disabled) {
+    border-color: var(--danger);
+  }
+
+  #{$selector}--disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  #{$selector}--readonly,
+  #{$selector}--read-only {
+    background: $readonly-background;
+  }
+
+  #{$selector}--loading {
+    cursor: $loading-cursor;
+  }
+}

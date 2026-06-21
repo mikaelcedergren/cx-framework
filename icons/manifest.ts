@@ -85,6 +85,7 @@ export type CxIconName =
   | "chevron-left"
   | "chevron-right"
   | "chevron-up"
+  | "chevrons-right"
   | "chevrons-vertical"
   | "circle-ban-small"
   | "circle-dashed-small"
@@ -1221,6 +1222,20 @@ export const cxIcons: CxIconDefinition[] = [
     "nodes": [
       {
         "d": "M8 14L12 10L16 14",
+        "stroke": "currentColor",
+        "fill": "none",
+        "strokeWidth": 1.5,
+        "strokeLinecap": "round",
+        "strokeLinejoin": "round"
+      }
+    ]
+  },
+  {
+    "name": "chevrons-right",
+    "viewBox": "0 0 24 24",
+    "nodes": [
+      {
+        "d": "M8 8L12 12L8 16M12 8L16 12L12 16",
         "stroke": "currentColor",
         "fill": "none",
         "strokeWidth": 1.5,

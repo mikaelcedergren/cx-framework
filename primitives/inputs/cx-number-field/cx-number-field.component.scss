@@ -1,3 +1,5 @@
+@use '../shared/field-shell' as field;
+
 :host {
   display: block;
   width: 100%;
@@ -7,27 +9,7 @@
   width: 100%;
 }
 
-.cx-number-field__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
-}
-
-.cx-number-field__label {
-  color: var(--ink);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
-}
-
-.cx-number-field__optional {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.2;
-}
+@include field.field-header('cx-number-field');
 
 .cx-number-field__field-shell {
   box-sizing: border-box;
@@ -41,43 +23,9 @@
   border-radius: var(--radius-sm);
   background: var(--opacity-darken);
   color: var(--ink);
-  transition:
-    border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease,
-    outline-color var(--motion-fast) ease;
 }
 
-.cx-number-field__field-shell:hover:not(.cx-number-field__field-shell--disabled):not(.cx-number-field__field-shell--error) {
-  border-color: var(--opacity-mid);
-}
-
-.cx-number-field__field-shell--focused {
-  outline: var(--outline-focus);
-  outline-offset: var(--outline-focus-offset);
-}
-
-.cx-number-field__field-shell:has(.cx-number-field__field:focus-visible) {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
-
-.cx-number-field__field-shell--error,
-.cx-number-field__field-shell--error:hover:not(.cx-number-field__field-shell--disabled) {
-  border-color: var(--danger);
-}
-
-.cx-number-field__field-shell--disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.cx-number-field__field-shell--loading {
-  cursor: default;
-}
-
-.cx-number-field__field-shell--readonly {
-  background: var(--opacity-low);
-}
+@include field.field-shell-state('.cx-number-field__field-shell', '.cx-number-field__field', var(--opacity-low), default);
 
 .cx-number-field--small .cx-number-field__field-shell {
   min-height: var(--controller-size-small);
@@ -171,19 +119,7 @@
   outline-offset: var(--outline-tab-offset);
 }
 
-.cx-number-field__messages {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
-}
-
-.cx-number-field__hint {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.4;
-}
+@include field.field-messages('cx-number-field');
 
 .cx-number-field__validation {
   display: inline-flex;

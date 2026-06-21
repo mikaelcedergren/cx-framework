@@ -1,9 +1,9 @@
 <button
   type="button"
   class="cx-sso-button"
-  [class.cx-sso-button--sm]="size === 'sm'"
-  [class.cx-sso-button--md]="size === 'md'"
-  [class.cx-sso-button--lg]="size === 'lg'"
+  [class.cx-sso-button--small]="size$() === 'small'"
+  [class.cx-sso-button--default]="size$() === 'default'"
+  [class.cx-sso-button--large]="size$() === 'large'"
   [class.cx-sso-button--loading]="loading$()"
   [disabled]="disabled"
   [attr.aria-disabled]="loading$() ? 'true' : null"

@@ -60,25 +60,18 @@
             >
               <div class="cx-table__head-content">
                 @if (hasColumnHeaderMenu(column)) {
-                  <cx-menu
-                    class="cx-table__head-menu"
-                    [items]="columnHeaderMenuItems(column)"
-                    [align]="'start'"
-                    [width]="220"
-                    (itemSelect)="onColumnHeaderMenuSelect(column, $event)"
+                  <button
+                    #headerTrigger
+                    type="button"
+                    class="cx-table__head-trigger"
+                    [attr.aria-label]="'Open ' + column.label + ' column menu'"
+                    (click)="onColumnHeaderTriggerClick($event, column, headerTrigger)"
                   >
-                    <button
-                      trigger
-                      type="button"
-                      class="cx-table__head-trigger"
-                      [attr.aria-label]="'Open ' + column.label + ' column menu'"
-                    >
-                      <span class="cx-table__head-label">{{ column.label }}</span>
-                      @if (sortIcon(column.id); as iconName) {
-                        <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
-                      }
-                    </button>
-                  </cx-menu>
+                    <span class="cx-table__head-label">{{ column.label }}</span>
+                    @if (sortIcon(column.id); as iconName) {
+                      <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
+                    }
+                  </button>
                 } @else {
                   <span class="cx-table__head-trigger cx-table__head-trigger--static">
                     <span class="cx-table__head-label">{{ column.label }}</span>
@@ -251,8 +244,7 @@
                       <cx-icon-button
                         class="cx-table__row-menu-trigger"
                         icon="menu-vertical"
-                        ariaLabel="Row actions"
-                        variant="transparent"
+                        ariaLabel="Row actions" variant="transparent"
                       />
                     </span>
                   </cx-menu>
@@ -265,6 +257,97 @@
       </tbody>
     </table>
 
+    @if (columnHeaderMenuColumn(); as column) {
+      @if (columnHeaderMenuPosition$(); as columnHeaderMenuPosition) {
+        <cx-popover
+          [open]="true"
+          [showBackdrop]="true"
+          [left]="columnHeaderMenuPosition.left"
+          [top]="columnHeaderMenuPosition.top"
+          [bottom]="columnHeaderMenuPosition.bottom"
+          [width]="280"
+          [maxHeight]="columnHeaderMenuPosition.maxHeight"
+          [placement]="columnHeaderMenuPosition.placement"
+          [role]="'menu'"
+          [ariaLabel]="columnHeaderMenuAriaLabel(column)"
+          (backdropPressed)="closeColumnHeaderMenu()"
+        >
+          <div class="cx-table__header-menu">
+            @if (isColumnSearchable(column)) {
+              <div
+                class="cx-table__header-menu-search"
+                [class.cx-table__header-menu-search--divided]="hasColumnHeaderMenuActions(column)"
+              >
+                <cx-text-field
+                  #columnSearchInput
+                  label=""
+                  [ariaLabel]="'Search ' + column.label"
+                  prependIcon="search"
+                  [clearable]="true"
+                  [value]="columnSearchValue(column)"
+                  (valueChange)="onColumnSearchValueChange(column, $event)"
+                  (keydown.enter)="onColumnSearchEnter($event)"
+                />
+              </div>
+            }
+
+            @if (hasColumnHeaderMenuActions(column)) {
+              <div class="cx-table__header-menu-actions">
+                @if (isColumnSortable(column)) {
+                  <cx-option
+                    [role]="'menuitem'"
+                    label="Sort ascending"
+                    prependIcon="arrow-up"
+                    (click)="onColumnHeaderAction(column, 'sort-asc')"
+                  />
+                  <cx-option
+                    [role]="'menuitem'"
+                    label="Sort descending"
+                    prependIcon="arrow-down"
+                    (click)="onColumnHeaderAction(column, 'sort-desc')"
+                  />
+                }
+
+                @if (isColumnSortable(column) && hasColumnHeaderMenuProperties(column)) {
+                  <div class="cx-table__header-menu-divider" aria-hidden="true"></div>
+                }
+
+                @if (isColumnPinnable(column)) {
+                  @if (isColumnPinned(column)) {
+                    <cx-option
+                      [role]="'menuitem'"
+                      label="Unpin"
+                      prependIcon="pin-off"
+                      [disabled]="!canPinColumn(column)"
+                      (click)="onColumnHeaderAction(column, 'unpin')"
+                    />
+                  } @else {
+                    <cx-option
+                      [role]="'menuitem'"
+                      label="Pin"
+                      prependIcon="pin"
+                      [disabled]="!canPinColumn(column)"
+                      (click)="onColumnHeaderAction(column, 'pin')"
+                    />
+                  }
+                }
+
+                @if (isColumnHideable(column)) {
+                  <cx-option
+                    [role]="'menuitem'"
+                    label="Hide"
+                    prependIcon="unwatch"
+                    [disabled]="!canHideColumn(column)"
+                    (click)="onColumnHeaderAction(column, 'hide')"
+                  />
+                }
+              </div>
+            }
+          </div>
+        </cx-popover>
+      }
+    }
+
     @if (contextMenuOpen$()) {
       @if (contextMenuPosition$(); as contextMenuPosition) {
         <cx-popover
@@ -276,7 +359,6 @@
           [maxHeight]="320"
           [role]="'menu'"
           [ariaLabel]="'Row actions'"
-          surfaceClass="cx-table__context-menu-surface"
           (backdropPressed)="closeContextMenu()"
         >
           @for (item of contextMenuItems$(); track item.id) {

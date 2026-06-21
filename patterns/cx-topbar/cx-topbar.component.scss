@@ -39,12 +39,6 @@
   max-width: 100%;
 }
 
-:host ::ng-deep .cx-topbar__center .cx-tabs {
-  width: auto;
-  border-bottom: 0;
-  background: transparent;
-}
-
 .cx-topbar__actions {
   display: inline-flex;
   min-width: 0;

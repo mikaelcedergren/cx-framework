@@ -1,20 +1,23 @@
 <div class="cx-checkbox-wrapper" [class.cx-checkbox-wrapper--disabled]="disabled">
-  <div
+  <label
     class="cx-checkbox"
     [class.cx-checkbox--selected]="selected$()"
     [class.cx-checkbox--indeterminate]="indeterminate$()"
     [class.cx-checkbox--has-content]="hasContent$()"
-    role="checkbox"
-    tabindex="0"
-    [attr.aria-checked]="indeterminate$() ? 'mixed' : selected$()"
-    [attr.aria-disabled]="disabled || null"
-    [attr.aria-describedby]="visibleHint$() ? hintId : null"
     data-shortcut-ignore=" "
-    (click)="toggleValue($event)"
-    (keydown)="onKeydown($event)"
-    (focus)="onFocus(true)"
-    (blur)="onFocus(false)"
   >
+    <input
+      class="cx-checkbox__input"
+      type="checkbox"
+      [checked]="selected$()"
+      [indeterminate]="indeterminate$()"
+      [disabled]="disabled"
+      [attr.aria-describedby]="visibleHint$() ? hintId : null"
+      (change)="onNativeChange($event)"
+      (focus)="onFocus(true)"
+      (blur)="onFocus(false)"
+    />
+
     <span
       class="cx-checkbox__icon"
       [class.cx-checkbox__icon--selected]="selected$()"
@@ -29,7 +32,7 @@
     } @else if (custom) {
       <span class="cx-checkbox__label"><ng-content /></span>
     }
-  </div>
+  </label>
 
   @if (visibleHint$()) {
     <div class="cx-checkbox__hint" [attr.id]="hintId">{{ visibleHint$() }}</div>

@@ -3,8 +3,13 @@
 }
 
 .cx-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  width: 100%;
+  z-index: var(--z-index-toast);
+  width: 100vw;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
@@ -18,24 +23,6 @@
     transform 320ms var(--ease-out);
 }
 
-.cx-banner--overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: var(--z-index-notification);
-  width: 100vw;
-}
-
-.cx-banner--inline {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-index-notification);
-  width: 100%;
-  transform: translateY(0);
-  transition: none;
-}
-
 .cx-banner--open {
   transform: translateY(0);
 }
@@ -44,7 +31,7 @@
   transform: translateY(calc(-100% - var(--space-sm)));
 }
 
-.cx-banner--info {
+.cx-banner--default {
   background: var(--info);
   color: var(--on-ink);
 }

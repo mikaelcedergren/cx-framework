@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  width: 100%;
+  container-type: inline-size;
+}
+
+.cx-usage-guidance {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-block-start: var(--space-xl);
+  border-top: var(--line);
+}
+
+.cx-usage-guidance__header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.cx-usage-guidance__title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  line-height: var(--line-height-heading);
+}
+
+.cx-usage-guidance__status {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-usage-guidance__status--error {
+  color: var(--danger);
+}
+
+.cx-usage-guidance__read {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  cursor: text;
+  font: inherit;
+  text-align: left;
+}
+
+.cx-usage-guidance__read:hover .cx-usage-guidance__body {
+  color: var(--ink);
+}
+
+.cx-usage-guidance__read:focus-visible,
+.cx-usage-guidance__editor:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-usage-guidance__body {
+  display: block;
+  column-count: 2;
+  column-gap: var(--space-2xl);
+  color: var(--opacity-high);
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.cx-usage-guidance__empty {
+  display: block;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.cx-usage-guidance__editor {
+  width: 100%;
+  min-height: 220px;
+  padding: var(--space-lg);
+  border: var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-mid);
+  color: var(--ink);
+  box-sizing: border-box;
+  font: inherit;
+  font-size: var(--font-size-title-3);
+  line-height: 1.8;
+  resize: vertical;
+}
+
+@container (max-width: 720px) {
+  .cx-usage-guidance__body {
+    column-count: 1;
+  }
+}
+
+@container (max-width: 420px) {
+  .cx-usage-guidance__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cx-usage-guidance__editor {
+    padding: var(--space-md);
+  }
+}

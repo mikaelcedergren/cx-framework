@@ -40,12 +40,4 @@ export class CxBigRadioComponent {
     this.focusChange.emit(focused);
   }
 
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key !== ' ' && event.key !== 'Enter') {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    this.activate();
-  }
 }

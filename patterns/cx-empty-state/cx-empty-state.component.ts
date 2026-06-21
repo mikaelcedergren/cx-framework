@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
-import { CxButtonComponent, type CxButtonMood, type CxButtonVariant } from '../../primitives/actions/cx-button';
+import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
 import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 
@@ -9,13 +9,13 @@ export type CxEmptyStateVisual = 'icon' | 'none';
 
 export interface CxEmptyStateAction {
   readonly text: string;
-  readonly variant?: CxButtonVariant;
   readonly mood?: CxButtonMood;
   readonly icon?: CxIconName;
   readonly appendIcon?: CxIconName;
   readonly disabled?: boolean;
   readonly loading?: boolean;
   readonly ariaLabel?: string;
+  readonly transparent?: boolean;
 }
 
 const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateType, 'default'>, {
@@ -46,8 +46,8 @@ const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateType, 'default'>, {
 };
 
 const CX_EMPTY_STATE_TYPE_ACTIONS: Partial<Record<CxEmptyStateType, CxEmptyStateAction>> = {
-  success: { text: 'Continue', variant: 'link' },
-  danger: { text: 'Try again', variant: 'link' },
+  success: { text: 'Continue', transparent: true },
+  danger: { text: 'Try again', transparent: true },
 };
 
 @Component({
@@ -157,8 +157,8 @@ export class CxEmptyStateComponent {
     return action.mood ?? 'default';
   }
 
-  protected actionVariant(action: CxEmptyStateAction): CxButtonVariant {
-    return action.variant ?? 'link';
+  protected isActionTransparent(action: CxEmptyStateAction): boolean {
+    return action.transparent ?? true;
   }
 
   protected onActionPressed(action: CxEmptyStateAction): void {

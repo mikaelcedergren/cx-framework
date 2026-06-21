@@ -29,6 +29,16 @@
     @if (info?.trim(); as infoText) {
       <span class="cx-tag__info">{{ infoText }}</span>
     }
+    @if (showRemove) {
+      <button
+        type="button"
+        class="cx-tag__remove"
+        aria-label="Remove tag"
+        (click)="onRemove($event)"
+      >
+        <cx-icon [name]="removeIcon()" [size]="12" />
+      </button>
+    }
   </div>
 
   @if (hasChildren) {
@@ -69,14 +79,4 @@
     </div>
   }
 
-  @if (showRemove) {
-    <button
-      type="button"
-      class="cx-tag__remove"
-      aria-label="Remove tag"
-      (click)="onRemove($event)"
-    >
-      <cx-icon [name]="removeIcon()" [size]="12" />
-    </button>
-  }
 </div>

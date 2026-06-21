@@ -1,22 +1,67 @@
 <div
+  #rootRef
   class="cx-tabs"
-  [class.cx-tabs--transparent]="variant$() === 'transparent'"
-  role="tablist"
-  [attr.aria-label]="ariaLabel"
+  [class.cx-tabs--transparent]="transparent$()"
+  [class.cx-tabs--equal-width]="equalWidth$()"
 >
-  @for (item of items; track item.id; let index = $index) {
-    <button
-      #tabButton
-      type="button"
-      class="cx-tabs__tab"
-      role="tab"
-      [class.cx-tabs__tab--active]="selectedId$() === item.id"
-      [attr.aria-selected]="selectedId$() === item.id ? 'true' : 'false'"
-      [attr.tabindex]="selectedId$() === item.id ? '0' : '-1'"
-      (click)="select(item.id)"
-      (keydown)="onKeydown($event, index)"
+  <div
+    #trackRef
+    class="cx-tabs__track"
+    role="tablist"
+    [attr.aria-label]="ariaLabel"
+    (scroll)="onTrackScroll()"
+  >
+    @for (item of items$(); track item.id; let index = $index) {
+      <button
+        #tabButton
+        type="button"
+        class="cx-tabs__tab"
+        role="tab"
+        [class.cx-tabs__tab--active]="selectedId$() === item.id"
+        [class.cx-tabs__tab--disabled]="item.disabled"
+        [disabled]="item.disabled"
+        [attr.aria-selected]="selectedId$() === item.id ? 'true' : 'false'"
+        [attr.tabindex]="tabIndexFor(item, index)"
+        (pointerdown)="onTabPointerDown($event)"
+        (click)="select(item.id, false)"
+        (keydown)="onKeydown($event, index)"
+      >
+        <span class="cx-tabs__label">{{ item.label }}</span>
+        @if (hasCount(item)) {
+          <span class="cx-tabs__count">{{ item.count }}</span>
+        }
+      </button>
+    }
+
+    @if (indicatorVisible$()) {
+      <span
+        class="cx-tabs__indicator"
+        [style.--cx-tabs-indicator-x]="indicatorX"
+        [style.--cx-tabs-indicator-width]="indicatorWidth"
+        aria-hidden="true"
+      ></span>
+    }
+  </div>
+
+  @if (overflowItems$().length > 0) {
+    <cx-menu
+      #overflowMenu
+      class="cx-tabs__overflow"
+      [items]="overflowMenuItems$()"
+      [currentId]="selectedId$()"
+      [disabled]="!hasOverflow$()"
+      ariaLabel="More tabs"
+      [class.cx-tabs__overflow--hidden]="!hasOverflow$()"
+      (itemSelect)="select($event, true)"
+      (openChange)="overflowOpen$.set($event)"
     >
-      {{ item.label }}
-    </button>
+      <cx-icon-button
+        trigger
+        icon="chevrons-right"
+        variant="transparent"
+        [active]="overflowOpen$() || selectedIsOverflow$()"
+        ariaLabel="More tabs"
+      />
+    </cx-menu>
   }
 </div>

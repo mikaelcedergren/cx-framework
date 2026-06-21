@@ -12,6 +12,9 @@ import {
   type CxTableDensity,
   type CxTableRowActivation,
   type CxTableSelectionMode,
+  type CxTableColumnPinChangeEvent,
+  type CxTableColumnSearchChangeEvent,
+  type CxTableColumnVisibilityChangeEvent,
   type CxTableRowActivateEvent,
   type CxTableRow,
   type CxTableRowMenuSelectEvent,
@@ -56,6 +59,7 @@ export class CxTableViewComponent {
   @Input() columnOptions: CxFilterBarColumnOption[] = [];
   @Input() visibleColumnIds: string[] = [];
   @Input() pinnedColumnIds: string[] = [];
+  @Input() columnSearchValues: Record<string, string> = {};
   @Input() columns: CxTableColumn[] = [];
   @Input() rows: CxTableRow[] = [];
   @Input() density: CxTableDensity = 'compact';
@@ -94,6 +98,7 @@ export class CxTableViewComponent {
   @Output() readonly exportTable = new EventEmitter<void>();
   @Output() readonly resetTable = new EventEmitter<void>();
   @Output() readonly sortChange = new EventEmitter<CxTableSort | undefined>();
+  @Output() readonly columnSearchChange = new EventEmitter<CxTableColumnSearchChangeEvent>();
   @Output() readonly activeRowIdChange = new EventEmitter<string>();
   @Output() readonly rowActivate = new EventEmitter<CxTableRowActivateEvent>();
   @Output() readonly selectedRowIdsChange = new EventEmitter<string[]>();
@@ -112,10 +117,13 @@ export class CxTableViewComponent {
 
   protected get visibleColumns(): CxTableColumn[] {
     const pinnedIds = new Set(this.pinnedColumnIds);
+    const columnOptionsById = new Map(this.columnOptions.map(option => [option.id, option]));
     if (this.visibleColumnIds.length === 0) {
       return this.columns.map(column => ({
         ...column,
         pinned: pinnedIds.has(column.id),
+        pinnable: this.columnIsPinnable(column, columnOptionsById),
+        hideable: this.columnIsHideable(column, columnOptionsById),
       }));
     }
     const visibleIds = new Set(this.visibleColumnIds);
@@ -124,6 +132,50 @@ export class CxTableViewComponent {
       .map(column => ({
         ...column,
         pinned: pinnedIds.has(column.id),
+        pinnable: this.columnIsPinnable(column, columnOptionsById),
+        hideable: this.columnIsHideable(column, columnOptionsById),
       }));
+  }
+
+  private columnIsPinnable(column: CxTableColumn, columnOptionsById: Map<string, CxFilterBarColumnOption>): boolean {
+    const option = columnOptionsById.get(column.id);
+    return column.pinnable ?? (option !== undefined && option.pinnable !== false);
+  }
+
+  private columnIsHideable(column: CxTableColumn, columnOptionsById: Map<string, CxFilterBarColumnOption>): boolean {
+    return column.hideable ?? columnOptionsById.has(column.id);
+  }
+
+  protected onColumnPinChange(event: CxTableColumnPinChangeEvent): void {
+    const visibleIds = this.resolvedVisibleColumnIds();
+    if (!visibleIds.includes(event.columnId)) {
+      return;
+    }
+    const current = this.pinnedColumnIds.filter(id => visibleIds.includes(id));
+    const next = event.pinned
+      ? current.includes(event.columnId)
+        ? current
+        : [...current, event.columnId]
+      : current.filter(id => id !== event.columnId);
+    this.pinnedColumnIdsChange.emit(next);
+  }
+
+  protected onColumnVisibilityChange(event: CxTableColumnVisibilityChangeEvent): void {
+    if (event.visible) {
+      return;
+    }
+    const current = this.resolvedVisibleColumnIds();
+    if (!current.includes(event.columnId) || current.length <= 1) {
+      return;
+    }
+    const next = current.filter(id => id !== event.columnId);
+    this.visibleColumnIdsChange.emit(next);
+    if (this.pinnedColumnIds.includes(event.columnId)) {
+      this.pinnedColumnIdsChange.emit(this.pinnedColumnIds.filter(id => id !== event.columnId));
+    }
+  }
+
+  private resolvedVisibleColumnIds(): string[] {
+    return this.visibleColumnIds.length > 0 ? this.visibleColumnIds : this.columns.map(column => column.id);
   }
 }

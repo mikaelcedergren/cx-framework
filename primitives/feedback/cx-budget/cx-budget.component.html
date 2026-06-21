@@ -1,15 +1,61 @@
-<div class="cx-budget-track">
-  <div
-    class="cx-budget-fill"
-    [class.cx-budget-fill-success]="color$() === 'success'"
-    [class.cx-budget-fill-yellow]="color$() === 'yellow'"
-    [class.cx-budget-fill-orange]="color$() === 'orange'"
-    [class.cx-budget-fill-danger]="color$() === 'danger'"
-    [class.cx-budget-fill-connected]="isOverBudget$()"
-    [style.width.%]="fillWidth$()"
-  ></div>
-  @if (isOverBudget$()) {
-    <div class="cx-budget-overage" [style.width.%]="overageWidth$()"></div>
+<div
+  class="cx-budget"
+  [class.cx-budget--compact]="variant$() === 'compact'"
+  [class.cx-budget--detailed]="variant$() === 'detailed'"
+  [class.cx-budget--invalid]="!hasValidMaximum$()"
+  [attr.role]="hasValidMaximum$() ? 'meter' : 'status'"
+  [attr.aria-label]="resolvedAriaLabel$()"
+  [attr.aria-invalid]="hasValidMaximum$() ? null : 'true'"
+  [attr.aria-valuemin]="hasValidMaximum$() ? 0 : null"
+  [attr.aria-valuemax]="ariaValueMax$()"
+  [attr.aria-valuenow]="ariaValueNow$()"
+  [attr.aria-valuetext]="hasValidMaximum$() ? ariaValueText$() : null"
+>
+  <div class="cx-budget-meter">
+    <div class="cx-budget-track" aria-hidden="true">
+      <div
+        class="cx-budget-fill"
+        [class.cx-budget-fill-success]="color$() === 'success'"
+        [class.cx-budget-fill-yellow]="color$() === 'yellow'"
+        [class.cx-budget-fill-orange]="color$() === 'orange'"
+        [class.cx-budget-fill-danger]="color$() === 'danger'"
+        [class.cx-budget-fill-connected]="isOverBudget$()"
+        [style.width.%]="fillWidth$()"
+      ></div>
+      @if (isOverBudget$()) {
+        <div class="cx-budget-overage" [style.width.%]="overageWidth$()"></div>
+      }
+    </div>
+
+    @if (!hasValidMaximum$()) {
+      <div class="cx-budget-invalid" role="status">Set maximum above 0.</div>
+    } @else if (isDetailed$()) {
+      <div class="cx-budget-values">
+        <span
+          class="cx-budget-label cx-budget-label--current"
+          [class.cx-budget-label--success]="color$() === 'success'"
+          [class.cx-budget-label--yellow]="color$() === 'yellow'"
+          [class.cx-budget-label--orange]="color$() === 'orange'"
+          [class.cx-budget-label--danger]="color$() === 'danger'"
+        >
+          {{ currentText$() }}
+        </span>
+        <span class="cx-budget-label cx-budget-label--maximum">{{ maximumText$() }}</span>
+      </div>
+    } @else {
+      <div
+        class="cx-budget-label cx-budget-label--current"
+        [class.cx-budget-label--success]="color$() === 'success'"
+        [class.cx-budget-label--yellow]="color$() === 'yellow'"
+        [class.cx-budget-label--orange]="color$() === 'orange'"
+        [class.cx-budget-label--danger]="color$() === 'danger'"
+      >
+        {{ currentText$() }}
+      </div>
+    }
+  </div>
+
+  @if (hasValidMaximum$() && hint$()) {
+    <div class="cx-budget-hint">{{ hint$() }}</div>
   }
 </div>
-<div class="cx-budget-label">{{ percentage$() }}%</div>

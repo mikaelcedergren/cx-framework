@@ -1,0 +1,148 @@
+@use '../shared/field-shell' as field;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-text-field {
+  width: 100%;
+}
+
+.cx-text-field--small {
+  --cx-text-field-min-height: var(--controller-size-small);
+  --cx-text-field-font-size: var(--font-size-body-sm);
+}
+
+.cx-text-field--large {
+  --cx-text-field-min-height: calc(var(--controller-size) + var(--space-md));
+  --cx-text-field-font-size: var(--font-size-body-lg);
+}
+
+@include field.field-header('cx-text-field');
+
+.cx-text-field__field-shell {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-height: var(--cx-text-field-min-height, var(--controller-size));
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--opacity-darken);
+}
+
+@include field.field-shell-state('.cx-text-field__field-shell', '.cx-text-field__field');
+
+.cx-text-field__prepend {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: var(--opacity-high);
+}
+
+.cx-text-field__append {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: var(--opacity-high);
+}
+
+.cx-text-field__icon--clickable {
+  cursor: pointer;
+  transition: color var(--motion-fast) ease;
+}
+
+.cx-text-field__icon--clickable:hover {
+  color: var(--ink);
+}
+
+.cx-text-field__loading {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.cx-text-field__clear {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-text-field__clear:hover {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+.cx-text-field__affix {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: var(--opacity-high);
+  font-size: var(--cx-text-field-font-size, var(--font-size-body));
+  font-weight: var(--font-weight-regular);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.cx-text-field__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--cx-text-field-font-size, var(--font-size-body));
+  font-weight: var(--font-weight-regular);
+  line-height: 1.1;
+}
+
+.cx-text-field__field::placeholder {
+  color: var(--placeholder);
+}
+
+.cx-text-field__field:focus-visible {
+  outline: 0;
+}
+
+.cx-text-field__field-shell--inline-edit {
+  border-color: transparent;
+  background: transparent;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    outline-color var(--motion-fast) ease;
+}
+
+.cx-text-field__field-shell--inline-edit:hover:not(.cx-text-field__field-shell--disabled),
+.cx-text-field__field-shell--inline-edit.cx-text-field__field-shell--focused,
+.cx-text-field__field-shell--inline-edit:has(.cx-text-field__field:focus-visible) {
+  border-color: var(--opacity-mid);
+  background: var(--opacity-darken);
+}
+
+.cx-text-field__field-shell--inline-edit.cx-text-field__field-shell--error {
+  border-color: var(--danger);
+}
+
+@include field.field-messages('cx-text-field');

@@ -20,10 +20,9 @@
 }
 
 .cx-code-block__copy {
-  position: absolute;
-  z-index: 1;
-  inset-block-start: var(--space-xs);
-  inset-inline-end: var(--space-xs);
+  grid-area: content;
+  justify-self: end;
+  align-self: start;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--motion-fast) ease;
@@ -36,7 +35,8 @@
 }
 
 .cx-code-block__box {
-  position: relative;
+  display: grid;
+  grid-template-areas: 'content';
   overflow: hidden;
   padding: var(--space-sm);
   border: var(--line);
@@ -45,6 +45,7 @@
 }
 
 .cx-code-block__pre {
+  grid-area: content;
   min-width: 0;
   margin: 0;
 }

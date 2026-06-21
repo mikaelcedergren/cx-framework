@@ -43,11 +43,14 @@ export class CxBigCheckboxComponent {
     return this.valueState() === 'indeterminate';
   }
 
-  protected toggleChecked(): void {
+  protected onNativeChange(event: Event): void {
     if (this.disabled) {
       return;
     }
-    const nextValue: CxBigCheckboxValue = this.valueState() === 'selected' ? 'deselected' : 'selected';
+
+    const target = event.target;
+    const checked = target instanceof HTMLInputElement ? target.checked : this.valueState() !== 'selected';
+    const nextValue: CxBigCheckboxValue = checked ? 'selected' : 'deselected';
     this.valueState.set(nextValue);
     this.selectedChange.emit(nextValue === 'selected');
     this.valueChange.emit(nextValue);
@@ -57,12 +60,4 @@ export class CxBigCheckboxComponent {
     this.focusChange.emit(focused);
   }
 
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key !== ' ' && event.key !== 'Enter') {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    this.toggleChecked();
-  }
 }

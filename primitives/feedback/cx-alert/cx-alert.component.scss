@@ -4,14 +4,16 @@
 }
 
 :host(.cx-alert) {
-  position: relative;
-  display: flex;
+  --cx-alert-dismiss-offset: 5px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   width: 100%;
   align-items: flex-start;
-  gap: var(--space-sm);
+  column-gap: var(--space-sm);
   padding: var(--space-sm);
   border: var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--opacity-low);
   color: var(--opacity-high);
   box-sizing: border-box;
@@ -22,27 +24,29 @@
 }
 
 :host(.cx-alert--info) {
-  background: var(--info-opacity);
-  border-color: var(--info-opacity);
-  color: var(--info-alt);
+  --cx-alert-text-color: var(--info-alt);
+  --cx-alert-background: var(--info-opacity);
 }
 
 :host(.cx-alert--warning) {
-  background: var(--warning-opacity);
-  border-color: var(--warning-opacity);
-  color: var(--warning-alt);
+  --cx-alert-text-color: var(--warning-alt);
+  --cx-alert-background: var(--warning-opacity);
 }
 
 :host(.cx-alert--success) {
-  background: var(--success-opacity);
-  border-color: var(--success-opacity);
-  color: var(--success-alt);
+  --cx-alert-text-color: var(--success-alt);
+  --cx-alert-background: var(--success-opacity);
 }
 
 :host(.cx-alert--danger) {
-  background: var(--danger-opacity);
-  border-color: var(--danger-opacity);
-  color: var(--danger-alt);
+  --cx-alert-text-color: var(--danger-alt);
+  --cx-alert-background: var(--danger-opacity);
+}
+
+:host(:is(.cx-alert--info, .cx-alert--warning, .cx-alert--success, .cx-alert--danger)) {
+  background: var(--cx-alert-background);
+  border-color: var(--cx-alert-background);
+  color: var(--cx-alert-text-color);
 }
 
 :host(.cx-alert--hidden) {
@@ -50,11 +54,24 @@
 }
 
 :host(.cx-alert--dismissible) {
-  padding-inline-end: calc(var(--space-sm) + var(--controller-size-small) + var(--space-sm));
+  grid-template-columns: minmax(0, 1fr) var(--controller-size-small);
+  min-height: calc(var(--controller-size-small) + var(--cx-alert-dismiss-offset) + var(--cx-alert-dismiss-offset));
+  padding-block: var(--cx-alert-dismiss-offset);
+  padding-inline-end: var(--cx-alert-dismiss-offset);
+}
+
+:host(.cx-alert--with-icon) {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+:host(.cx-alert--with-icon.cx-alert--dismissible) {
+  grid-template-columns: auto minmax(0, 1fr) var(--controller-size-small);
 }
 
 .cx-alert__icon {
   display: inline-flex;
+  grid-column: 1;
+  grid-row: 1;
   height: var(--font-size-title-2);
   flex: 0 0 auto;
   align-items: center;
@@ -64,6 +81,8 @@
 
 .cx-alert__text {
   display: flex;
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
@@ -73,6 +92,11 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+:host(.cx-alert--with-icon) .cx-alert__text {
+  grid-column: 2;
 }
 
 .cx-alert__actions {
@@ -81,15 +105,55 @@
   gap: var(--space-sm);
 }
 
-.cx-alert__dismiss {
-  position: absolute;
-  inset-block-start: var(--space-xs);
-  inset-inline-end: var(--space-sm);
+.cx-alert__action {
   display: inline-flex;
+  min-height: auto;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  line-height: inherit;
+  outline: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.cx-alert__action:hover {
+  color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+.cx-alert__action:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.cx-alert__action:disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled);
+}
+
+.cx-alert__action-icon {
+  flex: 0 0 auto;
+}
+
+.cx-alert__dismiss {
+  display: inline-flex;
+  grid-column: -2 / -1;
+  grid-row: 1;
   width: var(--controller-size-small);
   height: var(--controller-size-small);
   align-items: center;
   justify-content: center;
+  justify-self: end;
+  align-self: start;
   padding: 0;
   border: 0;
   border-radius: var(--radius-sm);

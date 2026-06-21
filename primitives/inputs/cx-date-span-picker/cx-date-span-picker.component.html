@@ -73,7 +73,6 @@
       [bottom]="overlayBottom$()"
       [role]="'dialog'"
       [ariaLabel]="'Choose date span'"
-      surfaceClass="cx-date-span-picker__surface"
       (backdropPressed)="toggleOpen()"
     >
       <div
@@ -100,8 +99,7 @@
             <div class="cx-date-span-picker__calendar">
               <div class="cx-date-span-picker__calendar-header">
                 <cx-icon-button
-                  icon="chevron-left"
-                  variant="transparent"
+                  icon="chevron-left" variant="transparent"
                   size="small"
                   ariaLabel="Previous month"
                   (pressed)="onLeftPreviousMonth()"
@@ -130,8 +128,7 @@
                 </div>
 
                 <cx-icon-button
-                  icon="chevron-right"
-                  variant="transparent"
+                  icon="chevron-right" variant="transparent"
                   size="small"
                   ariaLabel="Next month"
                   (pressed)="onLeftNextMonth()"
@@ -170,8 +167,7 @@
             <div class="cx-date-span-picker__calendar">
               <div class="cx-date-span-picker__calendar-header">
                 <cx-icon-button
-                  icon="chevron-left"
-                  variant="transparent"
+                  icon="chevron-left" variant="transparent"
                   size="small"
                   ariaLabel="Previous month"
                   (pressed)="onRightPreviousMonth()"
@@ -200,8 +196,7 @@
                 </div>
 
                 <cx-icon-button
-                  icon="chevron-right"
-                  variant="transparent"
+                  icon="chevron-right" variant="transparent"
                   size="small"
                   ariaLabel="Next month"
                   (pressed)="onRightNextMonth()"

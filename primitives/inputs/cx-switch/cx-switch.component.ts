@@ -55,21 +55,15 @@ export class CxSwitchComponent {
     return ids.length > 0 ? ids.join(' ') : undefined;
   });
 
-  protected toggleSelected(event?: Event): void {
+  protected onNativeChange(event: Event): void {
     if (this.disabled) {
       return;
     }
-    event?.preventDefault();
-    event?.stopPropagation();
-    this.selectedState.update(current => !current);
-    this.selectedChange.emit(this.selectedState());
-  }
 
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key !== ' ') {
-      return;
-    }
-    this.toggleSelected(event);
+    const target = event.target;
+    const checked = target instanceof HTMLInputElement ? target.checked : !this.selectedState();
+    this.selectedState.set(checked);
+    this.selectedChange.emit(this.selectedState());
   }
 
   protected onFocusChange(focused: boolean): void {

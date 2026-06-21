@@ -1,22 +1,25 @@
 <div class="cx-switch-field" [class.cx-switch-field--small]="size === 'small'">
-  <div
+  <label
     class="cx-switch"
     [class.cx-switch--selected]="selected$()"
     [class.cx-switch--small]="size === 'small'"
     [class.cx-switch--disabled]="disabled"
     [class.cx-switch--error]="hasError$()"
-    role="switch"
-    tabindex="0"
-    [attr.aria-checked]="selected$()"
-    [attr.aria-disabled]="disabled"
-    [attr.aria-invalid]="hasError$() ? 'true' : null"
-    [attr.aria-describedby]="describedByIds$() ?? null"
-    (click)="toggleSelected($event)"
-    (keydown)="onKeydown($event)"
-    (focus)="onFocusChange(true)"
-    (blur)="onFocusChange(false)"
     data-shortcut-ignore=" "
   >
+    <input
+      class="cx-switch__input"
+      type="checkbox"
+      role="switch"
+      [checked]="selected$()"
+      [disabled]="disabled"
+      [attr.aria-invalid]="hasError$() ? 'true' : null"
+      [attr.aria-describedby]="describedByIds$() ?? null"
+      (change)="onNativeChange($event)"
+      (focus)="onFocusChange(true)"
+      (blur)="onFocusChange(false)"
+    />
+
     <span class="cx-switch__track" aria-hidden="true">
       <span class="cx-switch__thumb"></span>
     </span>
@@ -34,7 +37,7 @@
         </span>
       }
     </span>
-  </div>
+  </label>
 
   @if (validationMessages$().length > 0) {
     <cx-validation-message

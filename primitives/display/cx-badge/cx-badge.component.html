@@ -4,17 +4,14 @@
   [class.cx-badge--corner]="placement === 'corner'"
   [class.cx-badge--visible]="visible"
   [class.cx-badge--with-count]="visible && hasCount()"
-  [class.cx-badge--primary]="mood === 'primary'"
-  [class.cx-badge--accent]="mood === 'accent'"
-  [class.cx-badge--success]="mood === 'success'"
-  [class.cx-badge--warning]="mood === 'warning'"
+  [class.cx-badge--default]="mood === 'default'"
   [class.cx-badge--danger]="mood === 'danger'"
-  [class.cx-badge--info]="mood === 'info'"
 >
   <span
     class="cx-badge__content"
-    [class.cx-badge__content--cutout-dot]="placement === 'corner' && visible && !hasCount()"
-    [class.cx-badge__content--cutout-count]="placement === 'corner' && visible && hasCount()"
+    [class.cx-badge__content--cutout]="placement === 'corner' && visible"
+    [style.--cx-badge-cutout-width]="cutoutWidth()"
+    [style.--cx-badge-cutout-height]="cutoutHeight()"
   >
     <ng-content />
   </span>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation, signal } from '@angular/core';
 import { CxSelectComponent, type CxSelectOption } from '../../primitives/inputs/cx-select';
 
 export type CxWorkbenchAlign = 'top' | 'center' | 'bottom';
@@ -10,6 +10,7 @@ export type CxWorkbenchPreviewWidth = 'auto' | 'small' | 'medium' | 'large' | 'f
   imports: [CxSelectComponent],
   templateUrl: './cx-workbench.component.html',
   styleUrl: './cx-workbench.component.scss',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxWorkbenchComponent {

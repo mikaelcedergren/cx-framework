@@ -28,7 +28,7 @@
       @if (visibleAction; as action) {
         <cx-button
           [text]="action.text"
-          [variant]="actionVariant(action)"
+          [transparent]="isActionTransparent(action)"
           [mood]="resolveActionMood(action)"
           [icon]="action.icon"
           [appendIcon]="action.appendIcon"
@@ -41,7 +41,7 @@
       @if (visibleSecondaryAction; as action) {
         <cx-button
           [text]="action.text"
-          [variant]="actionVariant(action)"
+          [transparent]="isActionTransparent(action)"
           [mood]="resolveActionMood(action)"
           [icon]="action.icon"
           [appendIcon]="action.appendIcon"

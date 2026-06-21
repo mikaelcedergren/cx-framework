@@ -10,6 +10,24 @@
       "path": "tooling/cx-variant/cx-variant.component.ts"
     },
     {
+      "name": "cx-usage-guidance",
+      "selectors": [
+        "cx-usage-guidance"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-usage-guidance/cx-usage-guidance.component.ts"
+    },
+    {
+      "name": "cx-slot-marker",
+      "selectors": [
+        "cx-slot-marker"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-slot-marker/cx-slot-marker.component.ts"
+    },
+    {
       "name": "cx-chat-message",
       "selectors": [
         "cx-chat-message"
@@ -100,13 +118,13 @@
       "path": "patterns/cx-null-controller/cx-null-controller.component.ts"
     },
     {
-      "name": "cx-page-header",
+      "name": "cx-top-bar",
       "selectors": [
-        "cx-page-header"
+        "cx-top-bar"
       ],
       "area": "pattern",
-      "category": "cx-page-header",
-      "path": "patterns/cx-page-header/cx-page-header.component.ts"
+      "category": "cx-top-bar",
+      "path": "patterns/cx-top-bar/cx-top-bar.component.ts"
     },
     {
       "name": "cx-utility-bar",
@@ -613,13 +631,13 @@
       "path": "primitives/inputs/cx-hierarchical-select/cx-hierarchical-select.component.ts"
     },
     {
-      "name": "cx-input",
+      "name": "cx-text-field",
       "selectors": [
-        "cx-input"
+        "cx-text-field"
       ],
       "area": "primitive",
       "category": "inputs",
-      "path": "primitives/inputs/cx-input/cx-input.component.ts"
+      "path": "primitives/inputs/cx-text-field/cx-text-field.component.ts"
     },
     {
       "name": "cx-number-field",

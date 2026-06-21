@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxButtonComponent, type CxButtonMood, type CxButtonVariant } from '../../actions/cx-button';
+import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
 
@@ -8,13 +8,13 @@ export type CxToastMood = 'default' | 'info' | 'success' | 'warning' | 'danger';
 
 export interface CxToastAction {
   readonly text: string;
-  readonly variant?: CxButtonVariant;
   readonly mood?: CxButtonMood;
   readonly icon?: CxIconName;
   readonly appendIcon?: CxIconName;
   readonly disabled?: boolean;
   readonly loading?: boolean;
   readonly ariaLabel?: string;
+  readonly transparent?: boolean;
 }
 
 @Component({

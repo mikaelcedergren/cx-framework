@@ -3,13 +3,6 @@
   width: 100%;
 }
 
-:host ::ng-deep cx-menu,
-:host ::ng-deep cx-menu .cx-menu,
-:host ::ng-deep cx-menu .cx-menu__trigger {
-  display: flex;
-  width: 100%;
-}
-
 .cx-account-control {
   display: flex;
   width: 100%;
@@ -47,6 +40,7 @@
   background: var(--surface-low);
 }
 
+.cx-account-control:hover .cx-account-control__icon,
 .cx-account-control--open .cx-account-control__icon {
   color: var(--ink);
 }
@@ -56,17 +50,30 @@
   cursor: default;
 }
 
+.cx-account-control__identity {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-account-control__avatar {
+  flex: 0 0 auto;
+}
+
 .cx-account-control__label {
   min-width: 0;
+  color: var(--opacity-high);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--font-size-body);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-regular);
   line-height: 1.2;
 }
 
 .cx-account-control__icon {
   flex: 0 0 auto;
-  color: var(--opacity-high);
+  color: var(--opacity-mid);
+  transition: color var(--motion-fast) ease;
 }

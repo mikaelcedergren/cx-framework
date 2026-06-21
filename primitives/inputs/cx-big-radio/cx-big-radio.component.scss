@@ -37,12 +37,6 @@
   background: var(--primary-opacity);
 }
 
-.cx-big-radio:focus-visible {
-  border-color: var(--primary);
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
-
 .cx-big-radio--disabled {
   opacity: 0.4;
   cursor: default;
@@ -50,8 +44,32 @@
   user-select: none;
 }
 
+.cx-big-radio__input {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  justify-self: center;
+  width: calc(var(--controller-size-small) - var(--space-sm));
+  height: calc(var(--controller-size-small) - var(--space-sm));
+  padding: 0;
+  border: 0;
+  margin: 0;
+  margin-top: var(--space-2xs);
+  appearance: none;
+  cursor: inherit;
+  opacity: 0;
+}
+
+.cx-big-radio:has(.cx-big-radio__input:focus-visible) {
+  border-color: var(--primary);
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
 .cx-big-radio__indicator {
   --cx-big-radio-control-size: calc(var(--controller-size-small) - var(--space-sm));
+  grid-column: 1;
+  grid-row: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -91,6 +109,8 @@
 }
 
 .cx-big-radio__content {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   min-width: 0;
   flex-direction: column;

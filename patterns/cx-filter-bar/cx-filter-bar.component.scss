@@ -48,10 +48,6 @@
   line-height: 1.2;
 }
 
-.cx-filter-bar__popover--properties {
-  width: min(320px, calc(100vw - var(--space-md)));
-}
-
 .cx-filter-bar__popover-content {
   display: flex;
   flex-direction: column;

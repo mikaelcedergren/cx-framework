@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
-import { CxButtonComponent, type CxButtonMood, type CxButtonVariant } from '../../primitives/actions/cx-button';
+import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
 import { CxBreadcrumbsComponent, type CxBreadcrumbItem } from '../../primitives/navigation/cx-breadcrumbs';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxLoader, CxLoaderComponent } from '../../primitives/feedback/cx-loader';
@@ -11,10 +11,10 @@ export interface CxTopbarAction {
   id: string;
   text?: string;
   icon?: CxIconName;
-  variant?: CxButtonVariant;
   mood?: CxButtonMood;
   disabled?: boolean;
   priority?: 'primary' | 'default';
+  transparent?: boolean;
 }
 
 @Component({

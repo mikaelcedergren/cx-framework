@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      ag-charts-community:
+        specifier: ^13.3.1
+        version: 13.3.1
       marked:
         specifier: ^18.0.2
         version: 18.0.5
@@ -692,6 +695,18 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  ag-charts-community@13.3.1:
+    resolution: {integrity: sha512-xRwyuP4xcMoyzaa27fccUhKqGyiWp/0h6vq0ZBuAtj2k0OC5UbV6IQUW6/0AgmLIQ4/K9QlRWFOe3sL/x5MHow==}
+
+  ag-charts-core@13.3.1:
+    resolution: {integrity: sha512-oDnK07/S6Z10EwIBxhC4tMDwdf2ck5MMcuSB/h+0/Q2XcL2l3S4jmlq3iKI7Kp9sh0H5JYDDc2sAdkUN87W8RA==}
+
+  ag-charts-locale@13.3.1:
+    resolution: {integrity: sha512-jF7iXI3PBFq/LFgBKwt72CykDBWcl3HYgP7B/hSJGsFdK+yuUTPrP67dA/wghgC6sg+Qw2U2GeykhZkG0yH8ww==}
+
+  ag-charts-types@13.3.1:
+    resolution: {integrity: sha512-m37eUe4g//swvGh8PWMlYQH3gknjSsPeW4sQwBhM3/auGAHmN0wvxEWlrdAn98pBPg4HoKbtOy+yf7gPCYsnvQ==}
 
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
@@ -1606,6 +1621,20 @@ snapshots:
       fsevents: 2.3.3
 
   '@types/estree@1.0.9': {}
+
+  ag-charts-community@13.3.1:
+    dependencies:
+      ag-charts-core: 13.3.1
+      ag-charts-locale: 13.3.1
+      ag-charts-types: 13.3.1
+
+  ag-charts-core@13.3.1:
+    dependencies:
+      ag-charts-types: 13.3.1
+
+  ag-charts-locale@13.3.1: {}
+
+  ag-charts-types@13.3.1: {}
 
   ajv@8.20.0:
     dependencies:

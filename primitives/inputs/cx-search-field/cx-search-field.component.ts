@@ -6,7 +6,7 @@ import {
   Output,
   signal,
 } from '@angular/core';
-import { CxInputComponent } from '../cx-input';
+import { CxTextFieldComponent } from '../cx-text-field';
 import {
   type CxFieldSize,
   type CxFieldUpdateOn,
@@ -15,7 +15,7 @@ import {
 
 @Component({
   selector: 'cx-search-field',
-  imports: [CxInputComponent],
+  imports: [CxTextFieldComponent],
   templateUrl: './cx-search-field.component.html',
   styleUrl: './cx-search-field.component.scss',
   host: { role: 'search' },

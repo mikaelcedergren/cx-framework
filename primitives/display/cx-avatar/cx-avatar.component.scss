@@ -26,51 +26,62 @@
   justify-content: center;
   overflow: hidden;
   border-radius: 16cqi;
-  background: var(--cx-avatar-color, var(--cyan));
-  color: var(--surface-mid);
+  background: var(--cx-avatar-background, var(--cyan-opacity));
+  color: var(--cx-avatar-color, var(--cyan));
 }
 
 :host(.cx-avatar-host--blue) {
+  --cx-avatar-background: var(--blue-opacity);
   --cx-avatar-color: var(--blue);
 }
 
 :host(.cx-avatar-host--cyan) {
+  --cx-avatar-background: var(--cyan-opacity);
   --cx-avatar-color: var(--cyan);
 }
 
 :host(.cx-avatar-host--lime) {
+  --cx-avatar-background: var(--lime-opacity);
   --cx-avatar-color: var(--lime);
 }
 
 :host(.cx-avatar-host--green) {
+  --cx-avatar-background: var(--green-opacity);
   --cx-avatar-color: var(--green);
 }
 
 :host(.cx-avatar-host--yellow) {
+  --cx-avatar-background: var(--yellow-opacity);
   --cx-avatar-color: var(--yellow);
 }
 
 :host(.cx-avatar-host--orange) {
+  --cx-avatar-background: var(--orange-opacity);
   --cx-avatar-color: var(--orange);
 }
 
 :host(.cx-avatar-host--tangerine) {
+  --cx-avatar-background: var(--tangerine-opacity);
   --cx-avatar-color: var(--tangerine);
 }
 
 :host(.cx-avatar-host--red) {
+  --cx-avatar-background: var(--red-opacity);
   --cx-avatar-color: var(--red);
 }
 
 :host(.cx-avatar-host--pink) {
+  --cx-avatar-background: var(--pink-opacity);
   --cx-avatar-color: var(--pink);
 }
 
 :host(.cx-avatar-host--purple) {
+  --cx-avatar-background: var(--purple-opacity);
   --cx-avatar-color: var(--purple);
 }
 
 :host(.cx-avatar-host--violet) {
+  --cx-avatar-background: var(--violet-opacity);
   --cx-avatar-color: var(--violet);
 }
 
@@ -92,5 +103,5 @@
 .cx-avatar__icon {
   width: 52%;
   height: 52%;
-  color: var(--surface-mid);
+  color: currentColor;
 }

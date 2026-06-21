@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-export type CxBadgeMood = 'primary' | 'accent' | 'success' | 'warning' | 'danger' | 'info';
+export type CxBadgeMood = 'default' | 'danger';
 export type CxBadgePlacement = 'corner' | 'inline';
+
+const CX_BADGE_MAX_COUNT = 99;
 
 @Component({
   selector: 'cx-badge',
@@ -13,8 +15,7 @@ export class CxBadgeComponent {
   @Input() visible = true;
   @Input() placement: CxBadgePlacement = 'corner';
   @Input() count: number | undefined;
-  @Input() mood: CxBadgeMood = 'primary';
-  @Input() maxCount = 99;
+  @Input() mood: CxBadgeMood = 'default';
   @Input() ariaLabel: string | undefined;
 
   protected hasCount(): boolean {
@@ -23,7 +24,17 @@ export class CxBadgeComponent {
 
   protected displayValue(): string {
     const count = Math.max(0, Math.floor(this.count ?? 0));
-    const cap = Number.isFinite(this.maxCount) && this.maxCount > 0 ? Math.floor(this.maxCount) : 99;
-    return count > cap ? `${cap}+` : `${count}`;
+    return count > CX_BADGE_MAX_COUNT ? `${CX_BADGE_MAX_COUNT}+` : `${count}`;
+  }
+
+  protected cutoutWidth(): string {
+    if (!this.hasCount()) {
+      return '8px';
+    }
+    return `max(14px, calc(${this.displayValue().length}ch + (2 * var(--space-2xs))))`;
+  }
+
+  protected cutoutHeight(): string {
+    return this.hasCount() ? '14px' : '8px';
   }
 }

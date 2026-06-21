@@ -1,48 +1,30 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
-import { CxButtonComponent, type CxButtonMood, type CxButtonVariant } from '../../actions/cx-button';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { type CxFeedbackAction } from '../cx-feedback-action';
 
 export type CxAlertMood = 'default' | 'info' | 'warning' | 'success' | 'danger';
-export type CxAlertIcon = CxIconName;
-
-export interface CxAlertAction {
-  readonly text: string;
-  readonly variant?: CxButtonVariant;
-  readonly mood?: CxButtonMood;
-  readonly icon?: CxIconName;
-  readonly appendIcon?: CxIconName;
-  readonly disabled?: boolean;
-  readonly loading?: boolean;
-  readonly ariaLabel?: string;
-}
+export type CxAlertIcon = 'auto' | 'none' | CxIconName;
+export type CxAlertAction = CxFeedbackAction;
 
 @Component({
   selector: 'cx-alert',
-  imports: [CxButtonComponent, CxIconComponent],
+  imports: [CxIconComponent],
   templateUrl: './cx-alert.component.html',
   styleUrl: './cx-alert.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxAlertComponent {
-  private iconInputBound = false;
-  private iconValue: CxAlertIcon | undefined;
-
   @Input() mood: CxAlertMood = 'default';
-  @Input() text = 'Something worth knowing happened.';
+  @Input() text = '';
+  @Input() icon: CxAlertIcon = 'auto';
   @Input() action: CxAlertAction | undefined;
   @Input() secondaryAction: CxAlertAction | undefined;
   @Input() dismissible = false;
 
-  @Input()
-  public set icon(icon: CxAlertIcon | undefined) {
-    this.iconInputBound = true;
-    this.iconValue = icon;
-  }
-
-  @Output() readonly dismissed = new EventEmitter<void>();
-  @Output('action') readonly actionEmitter = new EventEmitter<CxAlertAction>();
-  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxAlertAction>();
+  @Output() readonly dismiss = new EventEmitter<void>();
+  @Output() readonly actionSelect = new EventEmitter<CxAlertAction>();
+  @Output() readonly secondaryActionSelect = new EventEmitter<CxAlertAction>();
 
   @HostBinding('class')
   protected get hostClass(): string {
@@ -60,9 +42,16 @@ export class CxAlertComponent {
   }
 
   protected get resolvedIcon(): CxIconName | null {
-    if (this.iconInputBound) {
-      return this.iconValue ?? null;
+    if (this.icon === 'none') {
+      return null;
     }
+    if (this.icon !== 'auto') {
+      return this.icon;
+    }
+    return this.defaultIconForMood();
+  }
+
+  private defaultIconForMood(): CxIconName | null {
     switch (this.mood) {
       case 'danger':
         return 'error';
@@ -98,15 +87,15 @@ export class CxAlertComponent {
     return action?.text.trim() ? action : undefined;
   }
 
-  protected onAction(action: CxAlertAction): void {
-    this.actionEmitter.emit(action);
+  protected onActionSelect(action: CxAlertAction): void {
+    this.actionSelect.emit(action);
   }
 
-  protected onSecondaryAction(action: CxAlertAction): void {
-    this.secondaryActionEmitter.emit(action);
+  protected onSecondaryActionSelect(action: CxAlertAction): void {
+    this.secondaryActionSelect.emit(action);
   }
 
   protected onDismiss(): void {
-    this.dismissed.emit();
+    this.dismiss.emit();
   }
 }

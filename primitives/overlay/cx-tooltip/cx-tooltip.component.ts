@@ -15,7 +15,7 @@ import {
 } from '@angular/cdk/overlay';
 
 let cxTooltipId = 0;
-const CX_TOOLTIP_DEFAULT_DELAY_MS = 500;
+const CX_TOOLTIP_DEFAULT_DELAY_MS = 1000;
 
 export type CxTooltipDelay = 'default' | 'none';
 export type CxTooltipPosition = 'top' | 'right' | 'bottom' | 'left';

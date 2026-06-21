@@ -1,48 +1,45 @@
-<div class="cx-code-field" [class.cx-code-field--small]="size$() === 'small'" [class.cx-code-field--large]="size$() === 'large'">
+<div
+  class="cx-code-field"
+  [class.cx-code-field--disabled]="disabled$()"
+  [class.cx-code-field--readonly]="readOnly$()"
+  [class.cx-code-field--error]="hasError$()"
+>
   <div
-    class="cx-code-field__shell"
-    [class.cx-code-field__shell--focused]="focused$()"
-    [class.cx-code-field__shell--disabled]="disabled$()"
-    [class.cx-code-field__shell--readonly]="readOnly$()"
-    [class.cx-code-field__shell--error]="hasError$()"
-    (mousedown)="onShellPointerDown($event)"
-    (touchstart)="onShellPointerDown($event)"
+    #cells
+    class="cx-code-field__cells"
+    role="group"
+    [attr.aria-label]="resolvedAriaLabel"
   >
-    <input
-      #field
-      class="cx-code-field__input"
-      type="text"
-      autocomplete="one-time-code"
-      [attr.inputmode]="inputMode$()"
-      [attr.pattern]="pattern$()"
-      [attr.maxlength]="length$()"
-      [attr.aria-label]="resolvedAriaLabel"
-      [attr.aria-describedby]="resolvedAriaDescribedBy"
-      [attr.aria-invalid]="hasError$() ? 'true' : null"
-      [attr.aria-readonly]="readOnly$() ? 'true' : null"
-      [disabled]="disabled$()"
-      [readOnly]="readOnly$()"
-      [value]="value$()"
-      [autofocus]="autoFocus"
-      (input)="onInput($event)"
-      (focus)="onFocus()"
-      (blur)="onBlur()"
-    />
-
-    <div class="cx-code-field__cells" aria-hidden="true" [style.--cx-code-field-length]="length$()">
-      @for (cell of cells$(); track $index) {
-        <div
-          class="cx-code-field__cell"
-          [class.cx-code-field__cell--filled]="cell !== ''"
-          [class.cx-code-field__cell--active]="focused$() && $index === activeIndex$()"
-        >
-          <span class="cx-code-field__cell-char">{{ cell || ' ' }}</span>
-          @if (focused$() && $index === activeIndex$()) {
-            <span class="cx-code-field__caret"></span>
-          }
-        </div>
-      }
-    </div>
+    @for (cell of cells$(); track $index) {
+      <input
+        #cellInput
+        class="cx-code-field__cell"
+        type="text"
+        maxlength="1"
+        autocorrect="off"
+        spellcheck="false"
+        [class.cx-code-field__cell--filled]="cell !== ''"
+        [class.cx-code-field__cell--active]="focused$() && $index === activeIndex$()"
+        [attr.autocomplete]="$index === 0 ? 'one-time-code' : 'off'"
+        [attr.inputmode]="inputMode$()"
+        [attr.pattern]="pattern$()"
+        [attr.autocapitalize]="mode$() === 'alphanumeric' ? 'characters' : 'none'"
+        [attr.aria-label]="cellAriaLabel($index)"
+        [attr.aria-describedby]="resolvedAriaDescribedBy"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        [attr.aria-readonly]="readOnly$() ? 'true' : null"
+        [disabled]="disabled$()"
+        [readOnly]="readOnly$()"
+        [value]="cell"
+        [autofocus]="autoFocus && $index === 0"
+        (input)="onCellInput($index, $event)"
+        (focus)="onCellFocus($index)"
+        (blur)="onCellBlur()"
+        (click)="onCellClick($index)"
+        (keydown)="onCellKeydown($index, $event)"
+        (paste)="onCellPaste($index, $event)"
+      />
+    }
   </div>
 
   @if (validationMessages$().length > 0) {

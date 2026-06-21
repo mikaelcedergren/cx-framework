@@ -1,63 +1,115 @@
 :host {
   display: block;
-  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   container-type: inline-size;
 }
 
+:host(.cx-workbench--hidden) {
+  display: none;
+}
+
 .cx-variant {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(240px, calc(24vw + var(--space-xl)), 320px);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: calc(var(--controller-size) * 10);
   overflow: hidden;
   border: var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface-mid);
 }
 
-.cx-variant__heading {
-  position: absolute;
-  top: var(--space-xs);
-  left: var(--space-xs);
-  z-index: 1;
-  padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-sm);
+.cx-variant__tabs {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  border-bottom: var(--line);
   background: var(--opacity-low);
+}
+
+.cx-variant__tab {
+  position: relative;
+  display: inline-flex;
+  min-height: 40px;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 var(--space-md);
+  border: 0;
+  background: transparent;
   color: var(--opacity-high);
-  font-family: var(--font-family-mono);
-  font-size: var(--font-size-body-xs);
-  line-height: 1.2;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: var(--line-height-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-variant__tab::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: transparent;
+}
+
+.cx-variant__tab:is(:hover, :focus-visible),
+.cx-variant__tab--active {
+  color: var(--ink);
+}
+
+.cx-variant__tab:focus-visible {
+  z-index: 1;
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-variant__tab:active {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-variant__tab--active::after {
+  background: var(--ink);
 }
 
 .cx-variant__preview {
   display: flex;
   min-width: 0;
-  min-height: 220px;
+  min-height: calc(var(--controller-size) * 10);
   align-items: center;
   justify-content: center;
   overflow: auto;
-  padding: var(--space-2xl);
+  padding: var(--space-xl);
   background: var(--surface-mid);
   box-sizing: border-box;
 }
 
-.cx-variant__options {
+.cx-variant__specimen {
   display: flex;
+  width: 100%;
   min-width: 0;
-  flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-xl);
-  border-left: var(--line-discreet);
-  box-sizing: border-box;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
-@container (max-width: 640px) {
-  .cx-variant {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cx-variant__options {
-    border-left: 0;
-    border-top: var(--line-discreet);
+@container (max-width: 420px) {
+  .cx-variant__preview {
+    min-height: calc(var(--controller-size) * 8);
     padding: var(--space-lg);
   }
 }

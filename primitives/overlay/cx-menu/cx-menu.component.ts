@@ -13,7 +13,6 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxMenuHeaderComponent } from '../cx-menu-header';
 import { CxMenuLabelComponent } from '../cx-menu-label';
@@ -23,6 +22,7 @@ import { measureCxFloatingSurface } from '../floating-surface';
 
 export type CxMenuPriority = 'default' | 'primary' | 'secondary';
 export type CxMenuGroupVariant = 'label' | 'header';
+export type CxMenuLayout = 'inline' | 'fill';
 
 export type CxMenuItem = {
   id: string;
@@ -143,16 +143,20 @@ function measureCxSubmenuSurface(input: {
 
 @Component({
   selector: 'cx-menu',
-  imports: [CommonModule, CxMenuHeaderComponent, CxMenuLabelComponent, CxOptionComponent, CxPopoverComponent],
+  imports: [CxMenuHeaderComponent, CxMenuLabelComponent, CxOptionComponent, CxPopoverComponent],
   templateUrl: './cx-menu.component.html',
   styleUrl: './cx-menu.component.scss',
+  host: {
+    '[class.cx-menu-host--fill]': 'layout$() === "fill"',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxMenuComponent implements AfterViewInit, OnDestroy {
   private static instanceCounter = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly instanceId = ++CxMenuComponent.instanceCounter;
-  protected readonly scopeClass = `cx-menu__surface--scope-${this.instanceId}`;
+  protected readonly scopeId = `cx-menu-${this.instanceId}`;
+  protected readonly rootSurfaceId = `${this.scopeId}-surface`;
   private readonly itemsState = signal<CxMenuItem[]>([]);
   private readonly groupsState = signal<CxMenuGroup[]>([]);
   private readonly headingState = signal('');
@@ -162,6 +166,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   private readonly hasTriggerState = signal(true);
   private readonly submenuSurfacesState = signal<CxMenuSubmenuSurface[]>([]);
   private readonly alignState = signal<'start' | 'end'>('end');
+  private readonly layoutState = signal<CxMenuLayout>('inline');
   private readonly widthState = signal(240);
   private readonly surfaceTopState = signal<number | undefined>(undefined);
   private readonly surfaceBottomState = signal<number | undefined>(undefined);
@@ -172,6 +177,9 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('triggerWrap', { read: ElementRef })
   private triggerRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('rootPopover')
+  private rootPopoverRef?: CxPopoverComponent;
 
   @Input() disabled = false;
   @Input() ariaLabel = 'Menu';
@@ -224,6 +232,11 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
+  public set layout(value: CxMenuLayout | undefined) {
+    this.layoutState.set(value === 'fill' ? 'fill' : 'inline');
+  }
+
+  @Input()
   public set width(value: number) {
     this.widthState.set(Number.isFinite(value) ? Math.max(value, 160) : 240);
   }
@@ -234,6 +247,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   protected readonly hasTrigger$ = this.hasTriggerState.asReadonly();
   protected readonly isOpen$ = this.openState.asReadonly();
+  protected readonly layout$ = this.layoutState.asReadonly();
   protected readonly heading$ = this.headingState.asReadonly();
   protected readonly currentId$ = this.currentIdState.asReadonly();
   protected readonly surfaceTop$ = this.surfaceTopState.asReadonly();
@@ -414,6 +428,10 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     return buildItemPath(parentPath, itemId);
   }
 
+  protected submenuSurfaceId(path: string): string {
+    return `${this.scopeId}-submenu-${path.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+  }
+
   protected itemSubmenuState(parentPath: string, item: CxResolvedMenuItem): 'none' | 'open' | 'closed' {
     if (!item.hasChildren) {
       return 'none';
@@ -434,8 +452,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     if (this.host.nativeElement.contains(target)) {
       return;
     }
-    const targetElement = target instanceof Element ? target : target.parentElement;
-    if (targetElement?.closest(`.${this.scopeClass}`)) {
+    if (this.targetIsInsideMenuSurface(target)) {
       return;
     }
     this.closeSurface();
@@ -447,7 +464,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       return;
     }
     const active = typeof document !== 'undefined' ? document.activeElement : null;
-    const focusWasInside = active instanceof Element && !!active.closest(`.${this.scopeClass}`);
+    const focusWasInside = active instanceof Node && this.targetIsInsideMenuSurface(active);
     this.closeSurface();
     if (focusWasInside && this.hasTriggerState()) {
       this.focusTrigger();
@@ -591,9 +608,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
     const refreshedSurfaces: CxMenuSubmenuSurface[] = [];
     for (const surface of this.submenuSurfacesState()) {
-      const anchorElement = document.querySelector(
-        `.${this.scopeClass} [data-menu-item-path="${surface.path}"]`,
-      ) as HTMLElement | null;
+      const anchorElement = this.optionWrapByPath(surface.path);
       if (!anchorElement) {
         continue;
       }
@@ -640,7 +655,26 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     if (typeof document === 'undefined') {
       return null;
     }
-    return document.querySelector(`.${this.scopeClass}:not(.cx-menu__surface--submenu)`);
+    if (!this.hasTriggerState()) {
+      return this.host.nativeElement.querySelector('[data-cx-popover-surface]');
+    }
+    return this.rootPopoverRef?.surfaceElement() ?? document.getElementById(this.rootSurfaceId);
+  }
+
+  private menuSurfaceElements(): HTMLElement[] {
+    if (typeof document === 'undefined') {
+      return [];
+    }
+    return [
+      this.rootSurfaceElement(),
+      ...this.submenuSurfacesState()
+        .map(surface => document.getElementById(this.submenuSurfaceId(surface.path)))
+        .filter((surface): surface is HTMLElement => surface !== null),
+    ].filter((surface): surface is HTMLElement => surface instanceof HTMLElement);
+  }
+
+  private targetIsInsideMenuSurface(target: Node): boolean {
+    return this.menuSurfaceElements().some(surface => surface.contains(target));
   }
 
   private optionButtonsInSurface(surface: Element | null): HTMLElement[] {
@@ -653,12 +687,21 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   }
 
   private optionButtonByPath(path: string): HTMLElement | null {
-    if (typeof document === 'undefined') {
-      return null;
+    return this.optionWrapByPath(path)?.querySelector<HTMLElement>('.cx-option') ?? null;
+  }
+
+  private optionWrapByPath(path: string): HTMLElement | null {
+    for (const surface of this.menuSurfaceElements()) {
+      const option = Array.from(surface.querySelectorAll<HTMLElement>('[data-menu-item-path]'))
+        .find(element =>
+          element.getAttribute('data-cx-menu-scope') === this.scopeId
+          && element.getAttribute('data-menu-item-path') === path,
+        );
+      if (option) {
+        return option;
+      }
     }
-    return document.querySelector<HTMLElement>(
-      `.${this.scopeClass} [data-menu-item-path="${path}"] .cx-option`,
-    );
+    return null;
   }
 
   private focusWhenReady(resolve: () => HTMLElement | null, attempt = 0): void {

@@ -12,7 +12,9 @@
 >
   <div class="cx-workbench__main">
     <div class="cx-workbench__preview">
-      <ng-content select="[cxWorkbenchPreview]" />
+      <div class="cx-workbench__preview-content">
+        <ng-content select="[cxWorkbenchPreview]" />
+      </div>
     </div>
 
     <div class="cx-workbench__meta">
@@ -50,6 +52,8 @@
   </div>
 
   <aside class="cx-workbench__controls">
-    <ng-content select="[cxWorkbenchControls]" />
+    <div class="cx-workbench__controls-content">
+      <ng-content select="[cxWorkbenchControls]" />
+    </div>
   </aside>
 </section>

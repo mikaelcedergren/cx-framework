@@ -77,12 +77,11 @@
       [top]="overlayTop$()"
       [bottom]="overlayBottom$()"
       [placement]="activePlacement$()"
-      surfaceClass="cx-select__popover"
       (backdropPressed)="closePopover()"
     >
       @if (searchEnabled$()) {
         <div class="cx-select__search">
-          <cx-input
+          <cx-text-field
             #searchInput
             label=""
             ariaLabel="Search options"

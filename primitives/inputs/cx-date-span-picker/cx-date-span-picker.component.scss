@@ -176,11 +176,6 @@
   line-height: var(--line-height-body);
 }
 
-.cx-date-span-picker__surface {
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-
 .cx-date-span-picker__surface-inner {
   display: flex;
   flex-flow: row wrap;

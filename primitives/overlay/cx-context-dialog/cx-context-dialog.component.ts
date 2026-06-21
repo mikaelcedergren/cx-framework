@@ -23,11 +23,11 @@ export type CxContextDialogAlign = 'bottomLeft' | 'topLeft';
 export class CxContextDialogComponent {
   private readonly host = inject(ElementRef<HTMLElement>);
 
-  @Input() heading = 'Delete scan target';
-  @Input() text = 'This removes the target from the scan. The finding backlog will find a new hobby.';
-  @Input() confirmText = 'Delete target';
+  @Input() heading = 'Confirm action';
+  @Input() text = 'Review this before continuing.';
+  @Input() confirmText = 'Confirm';
   @Input() cancelText = 'Cancel';
-  @Input() mood: CxContextDialogMood = 'danger';
+  @Input() mood: CxContextDialogMood = 'default';
   @Input() align: CxContextDialogAlign = 'bottomLeft';
   @Input() dismissible = false;
 

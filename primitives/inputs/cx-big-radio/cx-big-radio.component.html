@@ -1,17 +1,19 @@
-<div
+<label
   class="cx-big-radio"
   [class.cx-big-radio--selected]="selected$()"
   [class.cx-big-radio--disabled]="disabled"
-  role="radio"
-  [attr.tabindex]="disabled ? -1 : 0"
-  [attr.aria-checked]="selected$()"
-  [attr.aria-disabled]="disabled ? 'true' : null"
-  [attr.aria-label]="heading || text || null"
-  (click)="activate()"
-  (keydown)="onKeydown($event)"
-  (focus)="onFocus(true)"
-  (blur)="onFocus(false)"
   >
+  <input
+    class="cx-big-radio__input"
+    type="radio"
+    [checked]="selected$()"
+    [disabled]="disabled"
+    [attr.aria-label]="heading || text || null"
+    (change)="activate()"
+    (focus)="onFocus(true)"
+    (blur)="onFocus(false)"
+  />
+
   <div class="cx-big-radio__indicator" aria-hidden="true">
     <span class="cx-big-radio__control" [class.cx-big-radio__control--selected]="selected$()">
       @if (selected$()) {
@@ -36,4 +38,4 @@
       }
     }
   </div>
-</div>
+</label>

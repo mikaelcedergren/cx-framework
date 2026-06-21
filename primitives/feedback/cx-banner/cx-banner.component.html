@@ -3,12 +3,10 @@
     class="cx-banner"
     [class.cx-banner--open]="isOpen$()"
     [class.cx-banner--closing]="!isOpen$()"
-    [class.cx-banner--info]="mood === 'info'"
+    [class.cx-banner--default]="mood === 'default'"
     [class.cx-banner--warning]="mood === 'warning'"
     [class.cx-banner--success]="mood === 'success'"
     [class.cx-banner--danger]="mood === 'danger'"
-    [class.cx-banner--overlay]="dismissible"
-    [class.cx-banner--inline]="!dismissible"
     [attr.role]="resolvedRole"
     (transitionend)="onTransitionEnd($event)"
   >
@@ -31,7 +29,7 @@
         @if (visibleAction; as action) {
           <cx-button
             class="cx-banner__action"
-            [variant]="action.variant ?? 'default'"
+            [transparent]="action.transparent ?? false"
             [mood]="actionButtonMood(action)"
             [text]="action.text"
             [icon]="action.icon"
@@ -39,22 +37,22 @@
             [disabled]="action.disabled ?? false"
             [loading]="action.loading ?? false"
             [ariaLabel]="action.ariaLabel"
-            (pressed)="onActionPress(action)"
+            (pressed)="onActionSelect(action)"
           />
         }
 
         @if (visibleSecondaryAction; as action) {
           <cx-button
             class="cx-banner__action"
-            [variant]="action.variant ?? 'transparent'"
-            [mood]="action.mood ?? 'default'"
+            [transparent]="action.transparent ?? false"
+            [mood]="actionButtonMood(action)"
             [text]="action.text"
             [icon]="action.icon"
             [appendIcon]="action.appendIcon"
             [disabled]="action.disabled ?? false"
             [loading]="action.loading ?? false"
             [ariaLabel]="action.ariaLabel"
-            (pressed)="onSecondaryActionPress(action)"
+            (pressed)="onSecondaryActionSelect(action)"
           />
         }
 

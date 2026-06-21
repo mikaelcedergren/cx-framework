@@ -42,6 +42,7 @@ type CxTextareaNormalizedAnnotation =
 export type CxTextareaVariant = 'default' | 'inline-edit' | 'title';
 export type CxTextareaFocusVariant = 'default' | 'ring';
 export type CxTextareaLayout = 'default' | 'fill';
+export type CxTextareaPresentation = 'default' | 'document';
 export type CxTextareaSize = 'small' | 'default' | 'large';
 export type CxTextareaSizing = 'fixed' | 'auto' | 'resizable';
 
@@ -93,6 +94,7 @@ export class CxTextareaComponent {
   @Input() variant: CxTextareaVariant = 'default';
   @Input() focusVariant: CxTextareaFocusVariant = 'default';
   @Input() layout: CxTextareaLayout = 'default';
+  @Input() presentation: CxTextareaPresentation = 'default';
 
   @Input()
   public set autoGrow(value: boolean) {

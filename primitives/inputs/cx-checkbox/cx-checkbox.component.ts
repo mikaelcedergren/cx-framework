@@ -46,15 +46,14 @@ export class CxCheckboxComponent {
   protected readonly visibleHint$ = () => this.hint?.trim();
   protected readonly hasContent$ = () => this.visibleText$().length > 0;
 
-  protected toggleValue(event?: Event): void {
+  protected onNativeChange(event: Event): void {
     if (this.disabled) {
       return;
     }
 
-    event?.preventDefault();
-    event?.stopPropagation();
-
-    const nextValue: CxCheckboxValue = this.selected$() ? 'deselected' : 'selected';
+    const target = event.target;
+    const checked = target instanceof HTMLInputElement ? target.checked : !this.selected$();
+    const nextValue: CxCheckboxValue = checked ? 'selected' : 'deselected';
     this.valueState.set(nextValue);
     this.selectedChange.emit(nextValue === 'selected');
     this.valueChange.emit(nextValue);
@@ -64,10 +63,4 @@ export class CxCheckboxComponent {
     this.focusChange.emit(focused);
   }
 
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key !== ' ') {
-      return;
-    }
-    this.toggleValue(event);
-  }
 }

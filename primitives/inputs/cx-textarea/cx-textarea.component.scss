@@ -1,3 +1,5 @@
+@use '../shared/field-shell' as field;
+
 :host {
   display: block;
   width: 100%;
@@ -21,27 +23,13 @@
   --cx-textarea-editor-padding: var(--space-md);
 }
 
-.cx-textarea__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xs);
+.cx-textarea--document {
+  --cx-textarea-font-size: 18px;
+  --cx-textarea-line-height: 1.75;
+  --cx-textarea-editor-padding: var(--space-md);
 }
 
-.cx-textarea__label {
-  color: var(--ink);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
-}
-
-.cx-textarea__optional {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.2;
-}
+@include field.field-header('cx-textarea');
 
 .cx-textarea__shell {
   width: 100%;
@@ -342,19 +330,7 @@
   overflow-wrap: anywhere;
 }
 
-.cx-textarea__messages {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
-}
-
-.cx-textarea__hint {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
-}
+@include field.field-messages('cx-textarea');
 
 .cx-textarea__validation {
   display: grid;
@@ -401,6 +377,7 @@
 // layout="fill": grow the editor (and markdown preview) to fill a flex-column
 // parent. The host element must be a growing flex item for this to take effect.
 .cx-textarea--fill {
+  height: 100%;
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -421,6 +398,7 @@
   }
 
   .cx-textarea__field-wrap {
+    height: 100%;
     min-height: 0;
   }
 

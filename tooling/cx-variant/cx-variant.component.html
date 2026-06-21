@@ -1,19 +1,27 @@
 <section class="cx-variant">
-  <div class="cx-variant__heading">Variants</div>
-
-  <div class="cx-variant__preview">
-    <ng-content select="[cxVariantPreview]" />
+  <div class="cx-variant__tabs" role="tablist" aria-label="Variants">
+    @for (variant of variants$(); track variant.id; let index = $index) {
+      <button
+        #tabButton
+        type="button"
+        class="cx-variant__tab"
+        role="tab"
+        [id]="tabId(index)"
+        [class.cx-variant__tab--active]="variant.id === selectedVariant$()"
+        [attr.aria-selected]="variant.id === selectedVariant$() ? 'true' : 'false'"
+        [attr.aria-controls]="panelId"
+        [attr.tabindex]="variant.id === selectedVariant$() ? '0' : '-1'"
+        (click)="selectVariant(variant.id)"
+        (keydown)="onTabKeydown($event, index)"
+      >
+        {{ variant.label }}
+      </button>
+    }
   </div>
 
-  <div class="cx-variant__options" role="radiogroup" [attr.aria-label]="ariaLabel">
-    @for (variant of variants$(); track variant.id) {
-      <cx-radio
-        [text]="variant.name"
-        [hint]="variant.info"
-        [disabled]="variant.disabled === true"
-        [selected]="variant.id === value$()"
-        (selectedChange)="onVariantChange(variant, $event)"
-      />
-    }
+  <div class="cx-variant__preview" role="tabpanel" [id]="panelId" [attr.aria-labelledby]="selectedTabId$()">
+    <div class="cx-variant__specimen">
+      <ng-content select="[cxVariantPreview]" />
+    </div>
   </div>
 </section>

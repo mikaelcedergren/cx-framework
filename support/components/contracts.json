@@ -33,9 +33,9 @@
         "text"
       ],
       "outputs": [
-        "action",
-        "dismissed",
-        "secondaryAction"
+        "actionSelect",
+        "dismiss",
+        "secondaryActionSelect"
       ]
     },
     {
@@ -55,7 +55,6 @@
       "inputs": [
         "ariaLabel",
         "count",
-        "maxCount",
         "mood",
         "placement",
         "visible"
@@ -74,8 +73,8 @@
         "visible"
       ],
       "outputs": [
-        "action",
-        "secondaryAction",
+        "actionSelect",
+        "secondaryActionSelect",
         "visibleChange"
       ]
     },
@@ -118,34 +117,67 @@
         "items"
       ],
       "outputs": [
-        "itemSelect"
+        "itemSelect",
+        "optionSelect"
       ]
     },
     {
       "name": "cx-budget",
       "inputs": [
+        "ariaLabel",
+        "currency",
         "current",
+        "currentLabel",
         "favor",
-        "maximum"
+        "format",
+        "hint",
+        "maximum",
+        "maximumLabel",
+        "unit",
+        "variant"
       ],
       "outputs": []
     },
     {
       "name": "cx-button",
       "inputs": [
-        "ariaLabel",
-        "appendIcon",
-        "disabled",
-        "icon",
-        "loading",
-        "mood",
-        "selected",
-        "size",
         "text",
-        "variant"
+        "icon",
+        "appendIcon",
+        "ariaLabel",
+        "type",
+        "mood",
+        "size",
+        "transparent",
+        "rounded",
+        "disabled",
+        "loading"
       ],
       "outputs": [
         "pressed"
+      ]
+    },
+    {
+      "name": "cx-split-button",
+      "inputs": [
+        "text",
+        "icon",
+        "ariaLabel",
+        "type",
+        "items",
+        "menuAriaLabel",
+        "mood",
+        "size",
+        "transparent",
+        "rounded",
+        "disabled",
+        "loading",
+        "open"
+      ],
+      "outputs": [
+        "pressed",
+        "itemSelect",
+        "openChange"
       ]
     },
     {
@@ -180,9 +212,14 @@
         "heading",
         "icon",
         "mood",
-        "size"
+        "background",
+        "padded",
+        "interactive",
+        "menuItems"
       ],
-      "outputs": []
+      "outputs": [
+        "menuItemSelect"
+      ]
     },
     {
       "name": "cx-chart",
@@ -241,10 +278,8 @@
         "ariaLabel",
         "autoFocus",
         "disabled",
-        "length",
         "mode",
         "readOnly",
-        "size",
         "validationMessages",
         "value"
       ],
@@ -591,12 +626,13 @@
       "outputs": []
     },
     {
-      "name": "cx-input",
+      "name": "cx-text-field",
       "inputs": [
         "appendIcon",
         "appendIconClickable",
         "appendText",
         "ariaLabel",
+        "autocomplete",
         "clearable",
         "debounceMs",
         "disabled",
@@ -604,6 +640,7 @@
         "hint",
         "label",
         "loading",
+        "name",
         "optional",
         "placeholder",
         "prependIcon",
@@ -823,14 +860,17 @@
       "outputs": []
     },
     {
-      "name": "cx-page-header",
+      "name": "cx-top-bar",
       "inputs": [
         "description",
         "editableDescription",
-        "heading"
+        "heading",
+        "menuAriaLabel",
+        "menuItems"
       ],
       "outputs": [
-        "descriptionChange"
+        "descriptionChange",
+        "menuItemSelect"
       ]
     },
     {
@@ -858,7 +898,6 @@
         "placement",
         "role",
         "showBackdrop",
-        "surfaceClass",
         "surfaceId",
         "surfaceVariant",
         "top",
@@ -1518,13 +1557,32 @@
     {
       "name": "cx-variant",
       "inputs": [
-        "ariaLabel",
-        "value",
+        "selectedVariant",
         "variants"
       ],
       "outputs": [
-        "valueChange"
+        "selectedVariantChange"
       ]
+    },
+    {
+      "name": "cx-usage-guidance",
+      "inputs": [
+        "componentName",
+        "error",
+        "saving",
+        "text"
+      ],
+      "outputs": [
+        "textChange"
+      ]
+    },
+    {
+      "name": "cx-slot-marker",
+      "inputs": [
+        "display",
+        "label"
+      ],
+      "outputs": []
     },
     {
       "name": "cx-wizard-dialog",

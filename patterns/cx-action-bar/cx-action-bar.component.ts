@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
-import { CxButtonComponent, type CxButtonVariant } from '../../primitives/actions/cx-button';
+import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
 
 export interface CxActionBarItem {
   id: string;
@@ -8,9 +8,9 @@ export interface CxActionBarItem {
   label?: string;
   icon?: CxIconName;
   priority?: 'primary';
-  type?: CxButtonVariant;
-  variant?: CxButtonVariant;
+  mood?: CxButtonMood;
   disabled?: boolean;
+  transparent?: boolean;
 }
 
 export interface CxActionBarGroup {
@@ -62,8 +62,12 @@ export class CxActionBarComponent {
     return item.name ?? item.label ?? item.id;
   }
 
-  protected actionVariant(item: CxActionBarItem): CxButtonVariant {
-    return item.type ?? item.variant ?? 'transparent';
+  protected actionTransparent(item: CxActionBarItem): boolean {
+    return item.transparent ?? true;
+  }
+
+  protected actionMood(item: CxActionBarItem): CxButtonMood {
+    return item.mood ?? 'default';
   }
 
   protected onAction(item: CxActionBarItem): void {

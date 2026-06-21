@@ -1,4 +1,4 @@
-import { CommonModule, DOCUMENT, NgClass } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,7 +21,7 @@ export type CxPopoverSurfaceVariant = 'default' | 'raised';
 
 @Component({
   selector: 'cx-popover',
-  imports: [CommonModule, NgClass, CxOptionGroupComponent, CxPopoverBackdropComponent],
+  imports: [CxOptionGroupComponent, CxPopoverBackdropComponent],
   templateUrl: './cx-popover.component.html',
   styleUrl: './cx-popover.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,7 +95,6 @@ export class CxPopoverComponent {
   @Input() placement: 'top' | 'bottom' | undefined;
   @Input() mood: CxPopoverMood = 'default';
   @Input() surfaceVariant: CxPopoverSurfaceVariant = 'default';
-  @Input() surfaceClass: NgClass['ngClass'];
 
   @Output() readonly backdropPressed = new EventEmitter<void>();
 

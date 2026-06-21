@@ -13,11 +13,17 @@
 }
 
 .cx-switch {
-  display: flex;
-  flex-direction: row;
+  --cx-switch-track-width: var(--controller-size);
+  --cx-switch-track-height: calc(var(--space-md) + var(--space-xs));
+  --cx-switch-thumb-size: calc(var(--space-sm) + var(--space-xs));
+  --cx-switch-thumb-inset: 3px;
+  --cx-switch-thumb-hover-x: var(--space-2xs);
+
+  display: inline-grid;
+  grid-template-columns: var(--cx-switch-track-width) minmax(0, auto);
   box-sizing: border-box;
-  align-items: baseline;
-  gap: var(--space-sm);
+  align-items: start;
+  column-gap: var(--space-sm);
   border: 0;
   background: transparent;
   color: var(--ink);
@@ -37,15 +43,23 @@
   user-select: none;
 }
 
-.cx-switch__track {
-  --cx-switch-track-width: var(--controller-size);
-  --cx-switch-track-height: calc(var(--space-md) + var(--space-xs));
-  --cx-switch-thumb-size: calc(var(--space-sm) + var(--space-xs));
-  --cx-switch-thumb-inset: 3px;
-  --cx-switch-thumb-hover-x: var(--space-2xs);
+.cx-switch__input {
+  grid-column: 1;
+  grid-row: 1;
+  width: var(--cx-switch-track-width);
+  height: var(--cx-switch-track-height);
+  padding: 0;
+  border: 0;
+  margin: 0;
+  appearance: none;
+  cursor: inherit;
+  opacity: 0;
+}
 
-  position: relative;
+.cx-switch__track {
   display: flex;
+  grid-column: 1;
+  grid-row: 1;
   box-sizing: border-box;
   align-items: center;
   justify-content: flex-start;
@@ -60,6 +74,7 @@
   border-color: transparent;
   line-height: 0;
   overflow: hidden;
+  pointer-events: none;
   transition:
     background var(--motion-fast) var(--ease-out-in),
     border var(--motion-fast) var(--ease-out-in);
@@ -82,7 +97,7 @@
   border-color: var(--danger);
 }
 
-.cx-switch:focus-visible .cx-switch__track {
+.cx-switch__input:focus-visible + .cx-switch__track {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
@@ -122,6 +137,8 @@
 
 .cx-switch__content {
   display: flex;
+  grid-column: 2;
+  grid-row: 1;
   min-width: 0;
   flex-direction: column;
   gap: var(--space-2xs);
@@ -140,15 +157,13 @@
 }
 
 .cx-switch--small {
-  gap: var(--space-xs);
-}
-
-.cx-switch--small .cx-switch__track {
   --cx-switch-track-width: var(--space-lg);
   --cx-switch-track-height: var(--space-md);
   --cx-switch-thumb-size: calc(var(--space-sm) + var(--space-2xs));
   --cx-switch-thumb-inset: var(--space-2xs);
   --cx-switch-thumb-hover-x: var(--space-2xs);
+
+  column-gap: var(--space-xs);
 }
 
 .cx-switch--small .cx-switch__label {

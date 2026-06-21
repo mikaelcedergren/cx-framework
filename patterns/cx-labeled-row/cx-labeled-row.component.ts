@@ -7,7 +7,7 @@ import {
   CxFileUploadComponent,
   type CxFileUploadValue,
 } from '../../primitives/inputs/cx-file-upload';
-import { CxInputComponent } from '../../primitives/inputs/cx-input';
+import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
 import { CxSelectComponent, type CxSelectOption } from '../../primitives/inputs/cx-select';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
@@ -103,7 +103,7 @@ export type CxLabeledRowContent =
     CxCheckboxComponent,
     CxDynamicFieldsComponent,
     CxFileUploadComponent,
-    CxInputComponent,
+    CxTextFieldComponent,
     CxRadioComponent,
     CxSelectComponent,
     CxSwitchComponent,

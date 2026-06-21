@@ -65,12 +65,4 @@ export class CxRadioComponent {
     this.selectedState.set(true);
     this.selectedChange.emit(true);
   }
-
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key !== ' ') {
-      return;
-    }
-    event.preventDefault();
-    this.activate();
-  }
 }

@@ -1,18 +1,21 @@
-<div
+<label
   class="cx-big-checkbox"
   [class.cx-big-checkbox--checked]="selected$()"
   [class.cx-big-checkbox--indeterminate]="indeterminate$()"
   [class.cx-big-checkbox--disabled]="disabled"
-  role="checkbox"
-  tabindex="0"
-  [attr.aria-checked]="indeterminate$() ? 'mixed' : selected$()"
-  [attr.aria-disabled]="disabled ? 'true' : null"
-  [attr.aria-label]="heading || text || null"
-  (click)="toggleChecked()"
-  (keydown)="onKeydown($event)"
-  (focus)="onFocus(true)"
-  (blur)="onFocus(false)"
 >
+  <input
+    class="cx-big-checkbox__input"
+    type="checkbox"
+    [checked]="selected$()"
+    [indeterminate]="indeterminate$()"
+    [disabled]="disabled"
+    [attr.aria-label]="heading || text || null"
+    (change)="onNativeChange($event)"
+    (focus)="onFocus(true)"
+    (blur)="onFocus(false)"
+  />
+
   <div class="cx-big-checkbox__indicator" aria-hidden="true">
     <span
       class="cx-big-checkbox__control"
@@ -36,4 +39,4 @@
       }
     }
   </div>
-</div>
+</label>

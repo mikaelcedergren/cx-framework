@@ -10,7 +10,6 @@
 }
 
 .cx-icon-button {
-  position: relative;
   display: inline-flex;
   width: var(--controller-size);
   height: var(--controller-size);
@@ -19,26 +18,16 @@
   padding: 0;
   border: 0;
   border-radius: var(--radius-sm);
-  background: transparent;
+  background: var(--cx-icon-button-background, transparent);
   color: var(--ink);
   cursor: pointer;
   margin: 0;
   outline: none;
   overflow: visible;
-  isolation: isolate;
   transition:
+    background-color var(--motion-fast) ease,
     color var(--motion-fast) ease,
     opacity var(--motion-fast) ease;
-}
-
-.cx-icon-button::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background: var(--opacity-low);
-  transition: background-color var(--motion-fast) ease;
 }
 
 .cx-icon-button--small {
@@ -47,124 +36,89 @@
 }
 
 .cx-icon-button--default {
-  color: var(--ink);
-}
+  --cx-icon-button-background: var(--opacity-low);
 
-.cx-icon-button--default::before {
-  background: var(--opacity-low);
+  color: var(--ink);
 }
 
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--default:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--opacity-mid);
-  }
+  --cx-icon-button-background: var(--opacity-mid);
 }
 
 .cx-icon-button--transparent {
-  background: transparent;
+  --cx-icon-button-background: var(--cx-icon-button-transparent-background, transparent);
+
   color: var(--cx-icon-button-transparent-color, var(--ink));
 }
 
-.cx-icon-button--transparent::before {
-  background: var(--cx-icon-button-transparent-background, transparent);
-}
-
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--transparent:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--cx-icon-button-transparent-hover-background, var(--opacity-low));
-  }
+  --cx-icon-button-background: var(--cx-icon-button-transparent-hover-background, var(--opacity-low));
 }
 
 .cx-icon-button--primary {
-  color: var(--on-ink);
-}
+  --cx-icon-button-background: var(--primary);
 
-.cx-icon-button--primary::before {
-  background: var(--primary);
+  color: var(--on-ink);
 }
 
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--primary:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--primary-alt);
-  }
+  --cx-icon-button-background: var(--primary-alt);
 }
 
 .cx-icon-button--accent {
+  --cx-icon-button-background: var(--accent);
+
   color: var(--surface-mid);
 }
 
-.cx-icon-button--accent::before {
-  background: var(--accent);
-}
-
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--accent:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--accent-alt);
-  }
+  --cx-icon-button-background: var(--accent-alt);
 }
 
 .cx-icon-button--info {
-  color: var(--on-ink);
-}
+  --cx-icon-button-background: var(--info);
 
-.cx-icon-button--info::before {
-  background: var(--info);
+  color: var(--on-ink);
 }
 
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--info:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--info-alt);
-  }
+  --cx-icon-button-background: var(--info-alt);
 }
 
 .cx-icon-button--warning {
-  color: var(--on-ink);
-}
+  --cx-icon-button-background: var(--warning);
 
-.cx-icon-button--warning::before {
-  background: var(--warning);
+  color: var(--on-ink);
 }
 
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--warning:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--warning-alt);
-  }
+  --cx-icon-button-background: var(--warning-alt);
 }
 
 .cx-icon-button--danger {
-  color: var(--on-ink);
-}
+  --cx-icon-button-background: var(--danger);
 
-.cx-icon-button--danger::before {
-  background: var(--danger);
+  color: var(--on-ink);
 }
 
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--danger:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--danger-alt);
-  }
+  --cx-icon-button-background: var(--danger-alt);
 }
 
 .cx-icon-button--success {
+  --cx-icon-button-background: var(--success);
+
   color: var(--on-ink);
 }
 
-.cx-icon-button--success::before {
-  background: var(--success);
-}
-
 .cx-icon-button:is(:hover, .cx-icon-button--hover).cx-icon-button--success:not(.cx-icon-button--disabled) {
-  &::before {
-    background: var(--success-alt);
-  }
+  --cx-icon-button-background: var(--success-alt);
 }
 
 .cx-icon-button--active {
-  color: var(--ink);
-}
+  --cx-icon-button-background: var(--surface-mid);
 
-.cx-icon-button--active::before {
-  background: var(--surface-mid);
+  color: var(--ink);
   box-shadow: var(--shadow-raised);
 }
 
@@ -208,15 +162,11 @@
 }
 
 .cx-icon-button__icon {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   color: currentColor;
 }
 
 .cx-icon-button__spinner-box {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   width: 16px;
   height: 16px;
@@ -224,8 +174,6 @@
 }
 
 .cx-icon-button__countdown {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   width: 16px;
   height: 16px;
@@ -236,13 +184,27 @@
   position: absolute;
   top: -2px;
   right: -2px;
-  z-index: 2;
   display: inline-flex;
   pointer-events: none;
 }
 
 .cx-icon-button__badge cx-badge {
   display: inline-flex;
+}
+
+.cx-icon-button--with-badge {
+  position: relative;
+  background: transparent;
+}
+
+.cx-icon-button--with-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--cx-icon-button-background, transparent);
+  transition: background-color var(--motion-fast) ease;
+  pointer-events: none;
 }
 
 .cx-icon-button--with-dot-badge::before {

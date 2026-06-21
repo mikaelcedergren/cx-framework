@@ -1,0 +1,44 @@
+<header class="cx-top-bar">
+  <div class="cx-top-bar__inner">
+    <div class="cx-top-bar__copy">
+      <h1 class="cx-top-bar__heading">{{ resolvedHeading() }}</h1>
+      @if (editableDescription) {
+        <p
+          #descriptionElement
+          class="cx-top-bar__description cx-top-bar__description--editable"
+          [attr.contenteditable]="'plaintext-only'"
+          data-placeholder="Add a description..."
+          [attr.data-empty]="(description ?? '').trim().length === 0 ? '' : null"
+          role="textbox"
+          spellcheck="true"
+          (blur)="commitDescription(descriptionElement.innerText)"
+          (keydown.enter)="$event.preventDefault(); descriptionElement.blur()"
+          (keydown.escape)="descriptionElement.innerText = description ?? ''; descriptionElement.blur()"
+        >{{ description }}</p>
+      } @else if (hasDescription()) {
+        <p class="cx-top-bar__description">{{ description }}</p>
+      }
+    </div>
+
+    <div class="cx-top-bar__actions">
+      <ng-content select="[actions], [cxTopBarActions]" />
+
+      @if (hasMenuItems()) {
+        <cx-menu
+          class="cx-top-bar__menu"
+          [items]="menuItems ?? []"
+          [ariaLabel]="resolvedMenuAriaLabel()"
+          align="end"
+          (itemSelect)="onMenuItemSelect($event)"
+        >
+          <cx-icon-button
+            trigger
+            icon="menu-vertical"
+            variant="transparent"
+            [ariaLabel]="resolvedMenuAriaLabel()"
+          />
+        </cx-menu>
+      }
+    </div>
+  </div>
+</header>

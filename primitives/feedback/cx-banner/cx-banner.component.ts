@@ -7,22 +7,13 @@ import {
   Output,
   signal,
 } from '@angular/core';
-import { CxButtonComponent, type CxButtonMood, type CxButtonVariant } from '../../actions/cx-button';
+import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { type CxFeedbackAction } from '../cx-feedback-action';
 
-export type CxBannerMood = 'info' | 'warning' | 'success' | 'danger';
-
-export interface CxBannerAction {
-  readonly text: string;
-  readonly variant?: CxButtonVariant;
-  readonly mood?: CxButtonMood;
-  readonly icon?: CxIconName;
-  readonly appendIcon?: CxIconName;
-  readonly disabled?: boolean;
-  readonly loading?: boolean;
-  readonly ariaLabel?: string;
-}
+export type CxBannerMood = 'default' | 'warning' | 'success' | 'danger';
+export type CxBannerAction = CxFeedbackAction;
 
 @Component({
   selector: 'cx-banner',
@@ -35,7 +26,7 @@ export class CxBannerComponent implements OnDestroy {
   private readonly renderedState = signal(false);
   private readonly openState = signal(false);
 
-  @Input() mood: CxBannerMood = 'info';
+  @Input() mood: CxBannerMood = 'default';
   @Input() heading = '';
   @Input() description = '';
   @Input() action: CxBannerAction | undefined;
@@ -47,8 +38,8 @@ export class CxBannerComponent implements OnDestroy {
     this.setOpen(Boolean(value));
   }
 
-  @Output('action') readonly actionEmitter = new EventEmitter<CxBannerAction>();
-  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxBannerAction>();
+  @Output() readonly actionSelect = new EventEmitter<CxBannerAction>();
+  @Output() readonly secondaryActionSelect = new EventEmitter<CxBannerAction>();
   @Output() readonly visibleChange = new EventEmitter<boolean>();
 
   protected readonly isRendered$ = this.renderedState.asReadonly();
@@ -62,7 +53,7 @@ export class CxBannerComponent implements OnDestroy {
         return 'warning';
       case 'success':
         return 'check';
-      case 'info':
+      case 'default':
       default:
         return 'info';
     }
@@ -86,7 +77,7 @@ export class CxBannerComponent implements OnDestroy {
         return 'danger';
       case 'warning':
         return 'warning';
-      case 'info':
+      case 'default':
       default:
         return 'info';
     }
@@ -109,12 +100,12 @@ export class CxBannerComponent implements OnDestroy {
     this.openState.set(false);
   }
 
-  protected onActionPress(action: CxBannerAction): void {
-    this.actionEmitter.emit(action);
+  protected onActionSelect(action: CxBannerAction): void {
+    this.actionSelect.emit(action);
   }
 
-  protected onSecondaryActionPress(action: CxBannerAction): void {
-    this.secondaryActionEmitter.emit(action);
+  protected onSecondaryActionSelect(action: CxBannerAction): void {
+    this.secondaryActionSelect.emit(action);
   }
 
   protected onDismissPress(): void {
@@ -132,10 +123,6 @@ export class CxBannerComponent implements OnDestroy {
   private setOpen(nextVisible: boolean): void {
     if (nextVisible) {
       this.renderedState.set(true);
-      if (!this.dismissible) {
-        this.openState.set(true);
-        return;
-      }
       this.openState.set(false);
       if (typeof window !== 'undefined') {
         window.requestAnimationFrame(() => {
@@ -148,7 +135,7 @@ export class CxBannerComponent implements OnDestroy {
     }
 
     this.openState.set(false);
-    if (!this.renderedState() || !this.dismissible || this.prefersReducedMotion()) {
+    if (!this.renderedState() || this.prefersReducedMotion()) {
       this.renderedState.set(false);
     }
   }

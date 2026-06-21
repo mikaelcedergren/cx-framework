@@ -48,19 +48,19 @@
   opacity: var(--opacity-disabled);
 }
 
-.cx-sso-button--sm {
+.cx-sso-button--small {
   min-height: var(--controller-size-small);
   padding: 0 var(--space-sm);
   font-size: var(--font-size-body-sm);
 }
 
-.cx-sso-button--md {
+.cx-sso-button--default {
   min-height: calc(var(--controller-size-small) + var(--space-sm));
   padding: 0 var(--space-md);
   font-size: var(--font-size-body);
 }
 
-.cx-sso-button--lg {
+.cx-sso-button--large {
   min-height: var(--controller-size-large);
   padding: 0 var(--space-lg);
   font-size: var(--font-size-body-lg);
@@ -76,12 +76,12 @@
   color: currentColor;
 }
 
-.cx-sso-button--sm .cx-sso-button__mark {
+.cx-sso-button--small .cx-sso-button__mark {
   width: calc(var(--space-md) - var(--space-2xs));
   height: calc(var(--space-md) - var(--space-2xs));
 }
 
-.cx-sso-button--lg .cx-sso-button__mark {
+.cx-sso-button--large .cx-sso-button__mark {
   width: calc(var(--space-md) + var(--space-xs));
   height: calc(var(--space-md) + var(--space-xs));
 }

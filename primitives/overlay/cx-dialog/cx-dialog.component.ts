@@ -33,8 +33,8 @@ export class CxDialogComponent implements OnDestroy {
   @Input() variant: CxDialogVariant = 'info';
   @Input() size: CxDialogSize = 'default';
   @Input() dismissible = false;
-  @Input() heading = 'Example dialog';
-  @Input() text = 'This is what an open dialog looks like in the playground.';
+  @Input() heading = '';
+  @Input() text = '';
   @Input() primaryText = 'Close';
   @Input() primaryDisabled = false;
   @Input() primaryLoading = false;
@@ -75,7 +75,7 @@ export class CxDialogComponent implements OnDestroy {
     if (trimmedLabel.length > 0) {
       return trimmedLabel;
     }
-    return this.variant === 'info' ? 'Close' : 'Action';
+    return this.variant === 'info' ? 'Close' : 'Confirm';
   }
 
   protected resolvedSecondaryText(): string | undefined {

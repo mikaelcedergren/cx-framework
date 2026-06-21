@@ -1,4 +1,4 @@
-<div class="cx-menu">
+<div class="cx-menu" [class.cx-menu--fill]="layout$() === 'fill'">
   <span
     #triggerWrap
     class="cx-menu__trigger"
@@ -12,8 +12,10 @@
 
   @if (hasTrigger$()) {
     <cx-popover
+      #rootPopover
       [open]="isOpen$()"
       [showBackdrop]="true"
+      [surfaceId]="rootSurfaceId"
       [role]="'menu'"
       [ariaLabel]="resolvedMenuAriaLabel"
       [width]="surfaceWidth$()"
@@ -21,7 +23,6 @@
       [left]="surfaceLeft$()"
       [top]="surfaceTop$()"
       [bottom]="surfaceBottom$()"
-      [surfaceClass]="['cx-menu__surface', scopeClass]"
       (backdropPressed)="setOpen(false)"
     >
       @if (heading$()) {
@@ -45,10 +46,11 @@
         }
         @for (item of group.items; track item.id) {
           @if (item.dividerBeforeResolved) {
-            <div class="cx-menu__divider" aria-hidden="true"></div>
+            <div class="cx-menu__divider" [attr.data-cx-menu-scope]="scopeId" aria-hidden="true"></div>
           }
           <div
             class="cx-menu__option-wrap"
+            [attr.data-cx-menu-scope]="scopeId"
             [attr.data-menu-item-path]="itemPath('', item.id)"
             (pointerenter)="onResolvedItemPointerEnter(item, 0, '', $any($event.currentTarget))"
             (focusin)="onResolvedItemFocused(item)"
@@ -77,7 +79,7 @@
   } @else {
     <div
       class="cx-menu__inline-surface cx-menu__surface"
-      [ngClass]="scopeClass"
+      [attr.data-cx-menu-scope]="scopeId"
       role="menu"
       [attr.aria-label]="resolvedMenuAriaLabel"
       data-cx-popover-surface
@@ -105,10 +107,11 @@
         }
         @for (item of group.items; track item.id) {
           @if (item.dividerBeforeResolved) {
-            <div class="cx-menu__divider" aria-hidden="true"></div>
+            <div class="cx-menu__divider" [attr.data-cx-menu-scope]="scopeId" aria-hidden="true"></div>
           }
           <div
             class="cx-menu__option-wrap"
+            [attr.data-cx-menu-scope]="scopeId"
             [attr.data-menu-item-path]="itemPath('', item.id)"
             (pointerenter)="onResolvedItemPointerEnter(item, 0, '', $any($event.currentTarget))"
             (focusin)="onResolvedItemFocused(item)"
@@ -146,14 +149,15 @@
       [maxHeight]="surface.maxHeight"
       [left]="surface.left"
       [top]="surface.top"
-      [surfaceClass]="['cx-menu__surface', 'cx-menu__surface--submenu', scopeClass]"
+      [surfaceId]="submenuSurfaceId(surface.path)"
     >
       @for (item of surface.items; track item.id) {
         @if (item.dividerBeforeResolved) {
-          <div class="cx-menu__divider" aria-hidden="true"></div>
+          <div class="cx-menu__divider" [attr.data-cx-menu-scope]="scopeId" aria-hidden="true"></div>
         }
         <div
           class="cx-menu__option-wrap"
+          [attr.data-cx-menu-scope]="scopeId"
           [attr.data-menu-item-path]="itemPath(surface.path, item.id)"
           (pointerenter)="onResolvedItemPointerEnter(item, surface.level, surface.path, $any($event.currentTarget))"
           (focusin)="onResolvedItemFocused(item)"

@@ -4,6 +4,7 @@
   [class.cx-textarea--large]="size$() === 'large'"
   [class.cx-textarea--title]="variant === 'title'"
   [class.cx-textarea--fill]="layout === 'fill'"
+  [class.cx-textarea--document]="presentation === 'document'"
 >
   @if (label.trim()) {
     <div class="cx-textarea__header">

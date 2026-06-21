@@ -34,7 +34,7 @@
       }
     } @else {
       <div class="cx-filter-bar__query">
-        <cx-input
+        <cx-text-field
           label=""
           [placeholder]="queryPlaceholder"
           prependIcon="query"
@@ -56,8 +56,7 @@
         <cx-icon-button
           trigger
           [icon]="savedViewIcon$()"
-          ariaLabel="Saved views"
-          variant="transparent"
+          ariaLabel="Saved views" variant="transparent"
         />
       </cx-menu>
     }
@@ -65,8 +64,7 @@
     <div class="cx-filter-bar__properties-trigger" #propertiesTriggerAnchor>
       <cx-icon-button
         icon="properties"
-        ariaLabel="Table properties"
-        variant="transparent"
+        ariaLabel="Table properties" variant="transparent"
         (pressed)="togglePropertiesPopover()"
       />
     </div>
@@ -79,8 +77,7 @@
       <cx-icon-button
         trigger
         icon="menu-vertical"
-        ariaLabel="Table actions"
-        variant="transparent"
+        ariaLabel="Table actions" variant="transparent"
       />
     </cx-menu>
   </div>
@@ -98,7 +95,6 @@
   [width]="filterPopoverWidth$()"
   [maxHeight]="filterPopoverMaxHeight$()"
   [placement]="filterPopoverPlacement$()"
-  surfaceClass="cx-filter-bar__popover"
   (backdropPressed)="closeFloatingPopovers()"
 >
   <div class="cx-filter-bar__popover-content">
@@ -132,7 +128,6 @@
   [maxHeight]="propertiesPopoverMaxHeight$()"
   [placement]="propertiesPopoverPlacement$()"
   surfaceVariant="raised"
-  surfaceClass="cx-filter-bar__popover cx-filter-bar__popover--properties"
   (backdropPressed)="closeFloatingPopovers()"
 >
   <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties">
@@ -181,8 +176,7 @@
             />
             <cx-icon-button
               [icon]="directionIcon(sortDirection$())"
-              ariaLabel="Toggle primary sort direction"
-              variant="transparent"
+              ariaLabel="Toggle primary sort direction" variant="transparent"
               size="small"
               [disabled]="!hasActivePrimarySort()"
               (pressed)="toggleSortDirection()"
@@ -206,8 +200,7 @@
             />
             <cx-icon-button
               [icon]="directionIcon(thenByDirection$())"
-              ariaLabel="Toggle secondary sort direction"
-              variant="transparent"
+              ariaLabel="Toggle secondary sort direction" variant="transparent"
               size="small"
               [disabled]="!hasActiveSecondarySort()"
               (pressed)="toggleThenByDirection()"
@@ -231,7 +224,7 @@
         </button>
       </cx-menu-label>
       <div class="cx-filter-bar__properties-section-body">
-        <cx-input
+        <cx-text-field
           label=""
           [placeholder]="columnSearchPlaceholder"
           prependIcon="search"

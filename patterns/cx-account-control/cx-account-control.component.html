@@ -4,6 +4,7 @@
   [disabled]="disabled"
   [width]="208"
   align="start"
+  layout="fill"
   (openChange)="onOpenChange($event)"
   (itemSelect)="onItemSelect($event)"
 >
@@ -17,7 +18,15 @@
     [attr.aria-expanded]="open$()"
     aria-haspopup="menu"
   >
-    <span class="cx-account-control__label">{{ username }}</span>
+    <span class="cx-account-control__identity">
+      <cx-avatar
+        class="cx-account-control__avatar"
+        [name]="username"
+        size="small"
+        color="cyan"
+      />
+      <span class="cx-account-control__label">{{ username }}</span>
+    </span>
     <cx-icon class="cx-account-control__icon" name="chevrons-vertical" [size]="16" />
   </button>
 </cx-menu>

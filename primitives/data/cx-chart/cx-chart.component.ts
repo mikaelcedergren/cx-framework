@@ -1,6 +1,23 @@
-import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  ViewChild,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import type {
+  AgChartInstance,
+  AgChartOptions,
+  AgChartTheme,
+} from 'ag-charts-community';
 
-export type CxChartType = 'bar' | 'line' | 'pie' | 'doughnut';
+export type CxChartType = 'bar' | 'line' | 'area' | 'pie' | 'doughnut';
 
 export interface CxChartSeries {
   readonly id?: string;
@@ -15,53 +32,68 @@ export interface CxChart {
   readonly series: readonly CxChartSeries[];
   readonly ariaLabel?: string;
   readonly emptyText?: string;
+  readonly xAxisLabel?: string;
+  readonly yAxisLabel?: string;
+  readonly showAxes?: boolean;
+  readonly showLegend?: boolean;
+  readonly showTooltip?: boolean;
+  readonly height?: number;
 }
 
-interface CxChartLegendItem {
-  readonly id: string;
-  readonly label: string;
-  readonly value?: number;
-  readonly color: string;
-}
+type CxChartDatum = Record<string, number | string>;
+type CxAgChartsModule = typeof import('ag-charts-community');
 
-interface CxChartBar {
-  readonly id: string;
-  readonly label: string;
-  readonly seriesLabel: string;
-  readonly value: number;
-  readonly x: number;
-  readonly y: number;
-  readonly width: number;
-  readonly height: number;
-  readonly color: string;
-}
+type CxResolvedChart = {
+  readonly type: CxChartType;
+  readonly labels: readonly string[];
+  readonly series: readonly CxChartSeries[];
+  readonly ariaLabel: string;
+  readonly emptyText: string;
+  readonly xAxisLabel?: string;
+  readonly yAxisLabel?: string;
+  readonly showAxes: boolean;
+  readonly showLegend: boolean;
+  readonly showTooltip: boolean;
+  readonly height?: number;
+};
 
-interface CxChartLine {
-  readonly id: string;
-  readonly label: string;
-  readonly color: string;
-  readonly points: string;
-}
-
-interface CxChartTick {
-  readonly value: number;
-  readonly y: number;
-}
-
-const CX_CHART_PLOT_LEFT = 18;
-const CX_CHART_PLOT_RIGHT = 96;
-const CX_CHART_PLOT_TOP = 6;
-const CX_CHART_PLOT_BOTTOM = 52;
-const CX_CHART_TICK_COUNT = 5;
-
-const CX_CHART_COLORS = [
-  'var(--primary)',
-  'var(--accent)',
-  'var(--success)',
-  'var(--warning)',
-  'var(--danger)',
-  'var(--info)',
+const CX_CHART_SERIES_KEY_PREFIX = 'series_';
+const CX_CHART_MIN_HEIGHT = 120;
+const CX_CHART_MAX_HEIGHT = 720;
+const CX_CHART_PALETTE = [
+  '--violet',
+  '--blue',
+  '--cyan',
+  '--green',
+  '--yellow',
+  '--orange',
+  '--red',
+  '--pink',
+  '--purple',
 ] as const;
+
+const CX_CHART_COLOR_FALLBACKS: Record<string, string> = {
+  '--violet': '#3057f2',
+  '--blue': '#057dff',
+  '--cyan': '#00ccc5',
+  '--green': '#37c45b',
+  '--yellow': '#edc31c',
+  '--orange': '#ff980a',
+  '--red': '#ff4043',
+  '--pink': '#f2559c',
+  '--purple': '#ae4ede',
+  '--primary': '#057dff',
+  '--accent': '#00ccc5',
+  '--success': '#37c45b',
+  '--warning': '#ff980a',
+  '--danger': '#ff4043',
+  '--info': '#057dff',
+  '--ink': '#1f1f1f',
+  '--opacity-high': 'rgb(22 24 29 / 62%)',
+  '--opacity-mid': 'rgb(22 24 29 / 10%)',
+  '--surface-mid': '#ffffff',
+  '--line': 'rgb(22 24 29 / 10%)',
+};
 
 @Component({
   selector: 'cx-chart',
@@ -69,162 +101,373 @@ const CX_CHART_COLORS = [
   styleUrl: './cx-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxChartComponent {
+export class CxChartComponent implements AfterViewInit, OnDestroy {
+  private static agModulePromise: Promise<CxAgChartsModule> | undefined;
+  private static agModulesRegistered = false;
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly chartState = signal<CxChart | undefined>(undefined);
+  private chartInstance: AgChartInstance | undefined;
+  private renderVersion = 0;
+
+  @ViewChild('chartContainer', { read: ElementRef })
+  private chartContainer: ElementRef<HTMLElement> | undefined;
+
+  constructor() {
+    effect(() => {
+      const options = this.options$();
+      const isReady = this.chartReady$();
+      const hasData = this.hasData$();
+      if (!isReady) {
+        return;
+      }
+      if (!hasData) {
+        this.destroyChart();
+        return;
+      }
+      void this.renderChart(options);
+    });
+  }
 
   @Input()
   public set chart(value: CxChart | null | undefined) {
     this.chartState.set(value ?? undefined);
   }
 
-  protected readonly type$ = computed(() => this.chartState()?.type ?? 'bar');
-  protected readonly labels$ = computed(() => this.chartState()?.labels ?? []);
-  protected readonly series$ = computed(() => this.chartState()?.series ?? []);
-  protected readonly emptyText$ = computed(() => this.chartState()?.emptyText ?? 'No chart data.');
-  protected readonly ariaLabel$ = computed(() => this.chartState()?.ariaLabel ?? 'Chart');
-  protected readonly hasData$ = computed(() =>
-    this.labels$().length > 0 &&
-    this.series$().some(series => series.data.some(value => this.valueOf(value) > 0)),
-  );
-  protected readonly bars$ = computed<CxChartBar[]>(() => this.buildBars());
-  protected readonly lines$ = computed<CxChartLine[]>(() => this.buildLines());
-  protected readonly ticks$ = computed<CxChartTick[]>(() => this.buildTicks());
-  protected readonly legendItems$ = computed<CxChartLegendItem[]>(() => this.buildLegendItems());
-  protected readonly pieGradient$ = computed(() => this.buildPieGradient());
-  protected readonly isCircular$ = computed(() => this.type$() === 'pie' || this.type$() === 'doughnut');
+  protected readonly chart$ = computed<CxResolvedChart>(() => this.normalizeChart(this.chartState()));
+  protected readonly hasData$ = computed(() => this.hasRenderableData(this.chart$()));
+  protected readonly emptyText$ = computed(() => this.chart$().emptyText);
+  protected readonly ariaLabel$ = computed(() => this.chart$().ariaLabel);
+  protected readonly chartReady$ = signal(false);
+  protected readonly heightStyle$ = computed(() => {
+    const height = this.chart$().height;
+    return height === undefined ? null : `${height}px`;
+  });
+  protected readonly options$ = computed<AgChartOptions>(() => this.buildOptions(this.chart$()));
 
-  private buildBars(): CxChartBar[] {
-    const labels = this.labels$();
-    const series = this.series$();
-    if (!labels.length || !series.length) {
-      return [];
-    }
-
-    const max = this.axisMax();
-    const plotWidth = CX_CHART_PLOT_RIGHT - CX_CHART_PLOT_LEFT;
-    const plotHeight = CX_CHART_PLOT_BOTTOM - CX_CHART_PLOT_TOP;
-    const groupWidth = plotWidth / labels.length;
-    const gap = 1;
-    const width = Math.max(1.5, Math.min(8, (groupWidth - gap * Math.max(0, series.length - 1)) / (series.length + 0.8)));
-
-    return labels.flatMap((label, labelIndex) => {
-      const totalWidth = series.length * width + Math.max(0, series.length - 1) * gap;
-      const startX = CX_CHART_PLOT_LEFT + labelIndex * groupWidth + (groupWidth - totalWidth) / 2;
-      return series.map((entry, seriesIndex) => {
-        const value = this.valueOf(entry.data[labelIndex]);
-        const height = max > 0 ? (value / max) * plotHeight : 0;
-        return {
-          id: `${entry.id ?? entry.label}-${label}-${seriesIndex}`,
-          label,
-          seriesLabel: entry.label,
-          value,
-          x: startX + seriesIndex * (width + gap),
-          y: CX_CHART_PLOT_BOTTOM - height,
-          width,
-          height,
-          color: this.colorFor(seriesIndex, entry.color),
-        };
-      });
-    });
+  public ngAfterViewInit(): void {
+    this.chartReady$.set(true);
   }
 
-  private buildLines(): CxChartLine[] {
-    const labels = this.labels$();
-    const series = this.series$();
-    if (!labels.length || !series.length) {
-      return [];
-    }
-
-    const max = this.axisMax();
-    const step = labels.length > 1 ? (CX_CHART_PLOT_RIGHT - CX_CHART_PLOT_LEFT) / (labels.length - 1) : 0;
-    return series.map((entry, seriesIndex) => ({
-      id: entry.id ?? entry.label,
-      label: entry.label,
-      color: this.colorFor(seriesIndex, entry.color),
-      points: labels.map((_, labelIndex) => {
-        const value = this.valueOf(entry.data[labelIndex]);
-        const x = labels.length > 1 ? CX_CHART_PLOT_LEFT + labelIndex * step : 50;
-        const y = max > 0
-          ? CX_CHART_PLOT_BOTTOM - (value / max) * (CX_CHART_PLOT_BOTTOM - CX_CHART_PLOT_TOP)
-          : CX_CHART_PLOT_BOTTOM;
-        return `${x.toFixed(2)},${y.toFixed(2)}`;
-      }).join(' '),
-    }));
+  public ngOnDestroy(): void {
+    this.destroyChart();
   }
 
-  private buildTicks(): CxChartTick[] {
-    const max = this.axisMax();
-    const step = max / CX_CHART_TICK_COUNT;
-    return Array.from({ length: CX_CHART_TICK_COUNT + 1 }, (_, index) => {
-      const value = Math.round(step * index);
-      const ratio = max > 0 ? value / max : 0;
-      return {
-        value,
-        y: CX_CHART_PLOT_BOTTOM - ratio * (CX_CHART_PLOT_BOTTOM - CX_CHART_PLOT_TOP),
+  private normalizeChart(chart: CxChart | undefined): CxResolvedChart {
+    return {
+      type: this.normalizeType(chart?.type),
+      labels: chart?.labels ?? [],
+      series: chart?.series ?? [],
+      ariaLabel: chart?.ariaLabel?.trim() || 'Chart',
+      emptyText: chart?.emptyText?.trim() || 'No chart data.',
+      xAxisLabel: chart?.xAxisLabel?.trim() || undefined,
+      yAxisLabel: chart?.yAxisLabel?.trim() || undefined,
+      showAxes: chart?.showAxes ?? true,
+      showLegend: chart?.showLegend ?? true,
+      showTooltip: chart?.showTooltip ?? true,
+      height: this.normalizeHeight(chart?.height),
+    };
+  }
+
+  private buildOptions(chart: CxResolvedChart): AgChartOptions {
+    if (chart.type === 'pie' || chart.type === 'doughnut') {
+      return this.buildCircularOptions(chart);
+    }
+    return this.buildCartesianOptions(chart);
+  }
+
+  private buildCartesianOptions(chart: CxResolvedChart): AgChartOptions {
+    const colors = this.colorsForChart();
+    const data = this.buildCartesianData(chart);
+    const series = chart.series.map((entry, index) => {
+      const key = `${CX_CHART_SERIES_KEY_PREFIX}${index}`;
+      const color = this.colorFor(index, entry.color, colors);
+      const base = {
+        type: chart.type,
+        xKey: 'label',
+        yKey: key,
+        yName: entry.label,
+        legendItemName: entry.label,
       };
-    }).reverse();
-  }
 
-  private buildLegendItems(): CxChartLegendItem[] {
-    if (this.isCircular$()) {
-      const firstSeries = this.series$()[0];
-      return this.labels$().map((label, index) => ({
-        id: label,
-        label,
-        value: this.valueOf(firstSeries?.data[index]),
-        color: this.colorFor(index),
-      }));
-    }
+      if (chart.type === 'bar') {
+        return {
+          ...base,
+          type: 'bar' as const,
+          direction: 'vertical' as const,
+          fill: color,
+          stroke: color,
+          cornerRadius: 3,
+        };
+      }
 
-    return this.series$().map((series, index) => ({
-      id: series.id ?? series.label,
-      label: series.label,
-      color: this.colorFor(index, series.color),
-    }));
-  }
+      if (chart.type === 'area') {
+        return {
+          ...base,
+          type: 'area' as const,
+          fill: color,
+          fillOpacity: 0.18,
+          stroke: color,
+          marker: {
+            enabled: true,
+            fill: color,
+            stroke: color,
+            size: 5,
+          },
+        };
+      }
 
-  private buildPieGradient(): string {
-    const firstSeries = this.series$()[0];
-    const labels = this.labels$();
-    const values = labels.map((_, index) => this.valueOf(firstSeries?.data[index]));
-    const total = values.reduce((sum, value) => sum + value, 0);
-    if (total <= 0) {
-      return 'conic-gradient(var(--opacity-low) 0deg 360deg)';
-    }
-
-    let start = 0;
-    const stops = values.map((value, index) => {
-      const end = start + (value / total) * 360;
-      const segment = `${this.colorFor(index)} ${start.toFixed(2)}deg ${end.toFixed(2)}deg`;
-      start = end;
-      return segment;
+      return {
+        ...base,
+        type: 'line' as const,
+        stroke: color,
+        marker: {
+          enabled: true,
+          fill: color,
+          stroke: color,
+          size: 5,
+        },
+      };
     });
 
-    return `conic-gradient(${stops.join(', ')})`;
+    return {
+      data,
+      series,
+      background: { visible: false },
+      padding: { top: 8, right: 8, bottom: 8, left: 8 },
+      theme: this.buildTheme(colors),
+      axes: this.buildAxes(chart),
+      legend: this.buildLegend(chart),
+      tooltip: this.buildTooltip(chart, true),
+    } as AgChartOptions;
   }
 
-  private maxValue(): number {
-    const values = this.series$().flatMap(series => series.data.map(value => this.valueOf(value)));
-    return Math.max(0, ...values);
+  private buildCircularOptions(chart: CxResolvedChart): AgChartOptions {
+    const colors = this.colorsForChart();
+    const firstSeries = chart.series[0];
+    const data = chart.labels.map((label, index) => ({
+      label,
+      value: Math.max(0, this.valueOf(firstSeries?.data[index])),
+    }));
+
+    return {
+      data,
+      series: [
+        {
+          type: chart.type === 'doughnut' ? 'donut' : 'pie',
+          angleKey: 'value',
+          calloutLabelKey: 'label',
+          legendItemKey: 'label',
+          angleName: firstSeries?.label ?? 'Value',
+          fills: colors,
+          strokes: colors,
+          strokeWidth: 0,
+          sectorSpacing: 2,
+          cornerRadius: 4,
+          calloutLabel: {
+            enabled: chart.showAxes,
+          },
+        },
+      ],
+      background: { visible: false },
+      padding: { top: 8, right: 8, bottom: 8, left: 8 },
+      theme: this.buildTheme(colors),
+      legend: this.buildLegend(chart),
+      tooltip: this.buildTooltip(chart, false),
+    } as AgChartOptions;
   }
 
-  private axisMax(): number {
-    const max = this.maxValue();
-    if (max <= 0) {
-      return CX_CHART_TICK_COUNT;
+  private buildCartesianData(chart: CxResolvedChart): CxChartDatum[] {
+    return chart.labels.map((label, labelIndex) => {
+      const item: CxChartDatum = { label };
+      chart.series.forEach((entry, seriesIndex) => {
+        item[`${CX_CHART_SERIES_KEY_PREFIX}${seriesIndex}`] = this.valueOf(entry.data[labelIndex]);
+      });
+      return item;
+    });
+  }
+
+  private buildAxes(chart: CxResolvedChart): NonNullable<Extract<AgChartOptions, { axes?: unknown }>['axes']> {
+    const textColor = this.token('--opacity-high');
+    const lineColor = this.token('--opacity-mid');
+    const axisBase = {
+      line: { enabled: chart.showAxes, stroke: lineColor },
+      tick: { enabled: chart.showAxes, stroke: lineColor },
+      label: {
+        enabled: chart.showAxes,
+        color: textColor,
+        fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+        fontSize: 12,
+      },
+    };
+
+    return {
+      x: {
+        ...axisBase,
+        type: 'category',
+        position: 'bottom',
+        gridLine: { enabled: false },
+        title: {
+          enabled: chart.showAxes && !!chart.xAxisLabel,
+          text: chart.xAxisLabel,
+          color: textColor,
+          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontSize: 12,
+        },
+      },
+      y: {
+        ...axisBase,
+        type: 'number',
+        position: 'left',
+        gridLine: {
+          enabled: chart.showAxes,
+          style: [{ stroke: lineColor, lineDash: [4, 4] }],
+        },
+        title: {
+          enabled: chart.showAxes && !!chart.yAxisLabel,
+          text: chart.yAxisLabel,
+          color: textColor,
+          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontSize: 12,
+        },
+      },
+    };
+  }
+
+  private buildLegend(chart: CxResolvedChart): AgChartOptions['legend'] {
+    return {
+      enabled: chart.showLegend,
+      position: 'bottom',
+      item: {
+        marker: {
+          size: 8,
+          shape: 'circle',
+        },
+        label: {
+          color: this.token('--opacity-high'),
+          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontSize: 12,
+        },
+        paddingX: 12,
+        paddingY: 6,
+      },
+    };
+  }
+
+  private buildTooltip(chart: CxResolvedChart, shared: boolean): AgChartOptions['tooltip'] {
+    return {
+      enabled: chart.showTooltip,
+      mode: shared ? 'shared' : 'single',
+      showArrow: false,
+      delay: 0,
+    };
+  }
+
+  private buildTheme(colors: readonly string[]): AgChartTheme {
+    return {
+      baseTheme: 'ag-default',
+      palette: {
+        fills: [...colors],
+        strokes: [...colors],
+      },
+      params: {
+        backgroundColor: 'transparent',
+        chartBackgroundColor: 'transparent',
+        fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+        fontSize: 12,
+        foregroundColor: this.token('--ink'),
+        textColor: this.token('--opacity-high'),
+        subtleTextColor: this.token('--opacity-high'),
+        axisColor: this.token('--opacity-mid'),
+        tooltipBackgroundColor: this.token('--surface-mid'),
+        tooltipTextColor: this.token('--ink'),
+        tooltipSubtleTextColor: this.token('--opacity-high'),
+        tooltipBorder: true,
+      },
+    };
+  }
+
+  private colorsForChart(): string[] {
+    const palette = CX_CHART_PALETTE.map(tokenName => this.token(tokenName));
+    return palette;
+  }
+
+  private colorFor(index: number, explicit: string | undefined, colors: readonly string[]): string {
+    const explicitColor = explicit?.trim();
+    if (explicitColor?.startsWith('--')) {
+      return this.token(explicitColor);
     }
-    const roughStep = max / CX_CHART_TICK_COUNT;
-    const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
-    const normalizedStep = roughStep / magnitude;
-    const niceStep = normalizedStep <= 1 ? 1 : normalizedStep <= 2 ? 2 : normalizedStep <= 5 ? 5 : 10;
-    return niceStep * magnitude * CX_CHART_TICK_COUNT;
+    return explicitColor || colors[index % colors.length] || CX_CHART_COLOR_FALLBACKS['--primary'];
+  }
+
+  private hasRenderableData(chart: CxResolvedChart): boolean {
+    if (!chart.labels.length || !chart.series.length) {
+      return false;
+    }
+    return chart.series.some(series => series.data.length > 0);
+  }
+
+  private normalizeType(value: CxChartType | undefined): CxChartType {
+    return value === 'line' || value === 'area' || value === 'pie' || value === 'doughnut' ? value : 'bar';
+  }
+
+  private normalizeHeight(value: number | undefined): number | undefined {
+    if (!Number.isFinite(value)) {
+      return undefined;
+    }
+    return Math.min(CX_CHART_MAX_HEIGHT, Math.max(CX_CHART_MIN_HEIGHT, Number(value)));
   }
 
   private valueOf(value: number | undefined): number {
-    return Number.isFinite(value) ? Math.max(0, Number(value)) : 0;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  private colorFor(index: number, explicit?: string): string {
-    return explicit?.trim() || CX_CHART_COLORS[index % CX_CHART_COLORS.length];
+  private token(name: string, fallback = CX_CHART_COLOR_FALLBACKS[name] ?? ''): string {
+    if (typeof getComputedStyle !== 'function') {
+      return fallback;
+    }
+    return getComputedStyle(this.host.nativeElement).getPropertyValue(name).trim() || fallback;
+  }
+
+  private async renderChart(options: AgChartOptions): Promise<void> {
+    const container = this.chartContainer?.nativeElement;
+    if (!container) {
+      return;
+    }
+
+    const renderVersion = ++this.renderVersion;
+    const agCharts = await CxChartComponent.loadAgCharts();
+    if (renderVersion !== this.renderVersion) {
+      return;
+    }
+
+    const nextOptions = { ...options, container } as AgChartOptions;
+    if (!this.chartInstance) {
+      this.chartInstance = agCharts.AgCharts.create(nextOptions);
+      return;
+    }
+
+    await this.chartInstance.update(nextOptions);
+  }
+
+  private destroyChart(): void {
+    this.renderVersion += 1;
+    this.chartInstance?.destroy();
+    this.chartInstance = undefined;
+  }
+
+  private static async loadAgCharts(): Promise<CxAgChartsModule> {
+    const agCharts = await (CxChartComponent.agModulePromise ??= import('ag-charts-community'));
+    CxChartComponent.registerAgModules(agCharts);
+    return agCharts;
+  }
+
+  private static registerAgModules(agCharts: CxAgChartsModule): void {
+    if (CxChartComponent.agModulesRegistered) {
+      return;
+    }
+    agCharts.ModuleRegistry.registerModules([agCharts.AllCommunityModule]);
+    CxChartComponent.agModulesRegistered = true;
   }
 }

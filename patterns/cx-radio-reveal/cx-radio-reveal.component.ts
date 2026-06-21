@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
-import { CxInputComponent } from '../../primitives/inputs/cx-input';
+import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
 
 export type CxRadioRevealOption = {
@@ -20,7 +20,7 @@ type CxResolvedRadioRevealOption = {
 
 @Component({
   selector: 'cx-radio-reveal',
-  imports: [CxInputComponent, CxRadioComponent],
+  imports: [CxTextFieldComponent, CxRadioComponent],
   templateUrl: './cx-radio-reveal.component.html',
   styleUrl: './cx-radio-reveal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

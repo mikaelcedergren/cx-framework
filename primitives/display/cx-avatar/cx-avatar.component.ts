@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
-import { CxBadgeComponent, type CxBadgeMood } from '../cx-badge';
+import { CxBadgeComponent } from '../cx-badge';
 import { CxIconComponent } from '../../media/cx-icon';
 
 export type CxAvatarSize = 'small' | 'default' | 'large';
@@ -18,7 +18,6 @@ export type CxAvatarColor =
   | 'violet';
 
 export interface CxAvatarBadge {
-  mood?: CxBadgeMood;
   count?: number;
 }
 
@@ -128,10 +127,6 @@ export class CxAvatarComponent {
 
   protected badgeVisible(): boolean {
     return this.badge !== undefined;
-  }
-
-  protected badgeMood(): CxBadgeMood {
-    return this.badge?.mood ?? 'primary';
   }
 
   protected badgeCount(): number | undefined {

@@ -1,3 +1,5 @@
+@use '../shared/field-shell' as field;
+
 :host {
   display: block;
   width: 100%;
@@ -31,27 +33,7 @@
   --cx-select-font-size: var(--font-size-body-lg);
 }
 
-.cx-select__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
-}
-
-.cx-select__label {
-  color: var(--ink);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
-}
-
-.cx-select__optional {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.2;
-}
+@include field.field-header('cx-select');
 
 .cx-select__field {
   box-sizing: border-box;
@@ -294,11 +276,6 @@
   color: var(--ink);
 }
 
-.cx-select__popover {
-  min-width: min-content;
-  overflow: hidden;
-}
-
 .cx-select__search {
   box-sizing: border-box;
   min-width: 0;
@@ -326,24 +303,4 @@
   color: var(--opacity-high);
 }
 
-.cx-select__popover.cx-popover--top {
-  transform-origin: bottom left;
-}
-
-.cx-select__popover.cx-popover--bottom {
-  transform-origin: top left;
-}
-
-.cx-select__messages {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
-}
-
-.cx-select__hint {
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1.4;
-}
+@include field.field-messages('cx-select');

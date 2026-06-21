@@ -1,0 +1,33 @@
+:host {
+  display: inline-flex;
+  min-width: 0;
+}
+
+:host(.cx-slot-marker-host--block) {
+  display: flex;
+  width: 100%;
+}
+
+.cx-slot-marker {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  min-height: calc(var(--space-md) + var(--space-xs));
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--opacity-mid);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2xs) var(--space-xs);
+  background: color-mix(in srgb, var(--opacity-low) 50%, transparent);
+  color: var(--opacity-high);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-small);
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+:host(.cx-slot-marker-host--block) .cx-slot-marker {
+  width: 100%;
+}

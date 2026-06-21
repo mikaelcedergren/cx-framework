@@ -21,7 +21,7 @@ import {
 } from '../../primitives/actions/cx-button-group';
 import { CxToggleButtonComponent } from '../../primitives/actions/cx-toggle-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
-import { CxInputComponent } from '../../primitives/inputs/cx-input';
+import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
 import { CxToggleChipGroupComponent } from '../../primitives/inputs/cx-toggle-chip-group';
 import {
@@ -66,7 +66,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CommonModule,
     CxButtonGroupComponent,
     CxIconButtonComponent,
-    CxInputComponent,
+    CxTextFieldComponent,
     CxSelectComponent,
     CxMenuComponent,
     CxMenuLabelComponent,

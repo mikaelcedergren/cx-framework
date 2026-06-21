@@ -1,19 +1,21 @@
 <div class="cx-radio-field">
-  <div
+  <label
     class="cx-radio"
     [class.cx-radio--selected]="selected$()"
     [class.cx-radio--disabled]="disabled"
     [class.cx-radio--error]="hasError$()"
-    role="radio"
-    [attr.tabindex]="disabled ? -1 : 0"
-    [attr.aria-checked]="selected$()"
-    [attr.aria-disabled]="disabled ? 'true' : null"
-    [attr.aria-invalid]="hasError$() ? 'true' : null"
-    [attr.aria-describedby]="describedBy$()"
     data-shortcut-ignore=" "
-    (click)="activate()"
-    (keydown)="onKeydown($event)"
   >
+    <input
+      class="cx-radio__input"
+      type="radio"
+      [checked]="selected$()"
+      [disabled]="disabled"
+      [attr.aria-invalid]="hasError$() ? 'true' : null"
+      [attr.aria-describedby]="describedBy$()"
+      (change)="activate()"
+    />
+
     <span class="cx-radio__control" aria-hidden="true">
       @if (selected$()) {
         <span class="cx-radio__dot"></span>
@@ -31,7 +33,7 @@
         }
       </span>
     }
-  </div>
+  </label>
 
   @if (validationMessages$().length > 0) {
     <cx-validation-message

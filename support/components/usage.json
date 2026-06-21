@@ -196,9 +196,9 @@
       "source": "primitives/layout/cx-inline/cx-inline.component.ts"
     },
     {
-      "name": "cx-input",
+      "name": "cx-text-field",
       "importFrom": "@mikaelcedergren/cx-framework",
-      "source": "primitives/inputs/cx-input/cx-input.component.ts"
+      "source": "primitives/inputs/cx-text-field/cx-text-field.component.ts"
     },
     {
       "name": "cx-labeled-row",
@@ -266,9 +266,9 @@
       "source": "primitives/overlay/cx-option-group/cx-option-group.component.ts"
     },
     {
-      "name": "cx-page-header",
+      "name": "cx-top-bar",
       "importFrom": "@mikaelcedergren/cx-framework",
-      "source": "patterns/cx-page-header/cx-page-header.component.ts"
+      "source": "patterns/cx-top-bar/cx-top-bar.component.ts"
     },
     {
       "name": "cx-pagination",
@@ -464,6 +464,16 @@
       "name": "cx-trend-tag",
       "importFrom": "@mikaelcedergren/cx-framework",
       "source": "primitives/display/cx-trend-tag/cx-trend-tag.component.ts"
+    },
+    {
+      "name": "cx-usage-guidance",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "tooling/cx-usage-guidance/cx-usage-guidance.component.ts"
+    },
+    {
+      "name": "cx-slot-marker",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "tooling/cx-slot-marker/cx-slot-marker.component.ts"
     },
     {
       "name": "cx-validation-message",

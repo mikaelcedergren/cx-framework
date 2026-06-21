@@ -4,7 +4,6 @@
 }
 
 .cx-tag {
-  position: relative;
   display: inline-flex;
   width: max-content;
   min-width: var(--controller-size-small);
@@ -76,12 +75,10 @@
 }
 
 .cx-tag__remove {
-  position: absolute;
-  top: 50%;
-  right: 0;
   display: inline-flex;
   width: 20px;
   height: 20px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -93,7 +90,7 @@
   margin: 0;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-50%) scale(0.92);
+  transform: scale(0.92);
   transition:
     opacity var(--motion-fast) var(--ease-out-in),
     transform var(--motion-fast) var(--ease-out-in);
@@ -103,7 +100,7 @@
 .cx-tag:focus-within.cx-tag--dismissible .cx-tag__remove {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-50%) scale(1);
+  transform: scale(1);
 }
 
 .cx-tag--disabled {

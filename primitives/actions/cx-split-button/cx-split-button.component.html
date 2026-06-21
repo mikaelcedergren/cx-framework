@@ -1,0 +1,68 @@
+<span
+  class="cx-split-button"
+  [class.cx-split-button--default]="mood === 'default'"
+  [class.cx-split-button--primary]="mood === 'primary'"
+  [class.cx-split-button--accent]="mood === 'accent'"
+  [class.cx-split-button--info]="mood === 'info'"
+  [class.cx-split-button--success]="mood === 'success'"
+  [class.cx-split-button--warning]="mood === 'warning'"
+  [class.cx-split-button--danger]="mood === 'danger'"
+  [class.cx-split-button--transparent]="transparent"
+  [class.cx-split-button--small]="size === 'small'"
+  [class.cx-split-button--large]="size === 'large'"
+  [class.cx-split-button--rounded]="rounded"
+  [class.cx-split-button--disabled]="isDisabled"
+  [class.cx-split-button--loading]="showSpinner$()"
+  [class.cx-split-button--open]="open$()"
+>
+  <button
+    class="cx-split-button__main"
+    [type]="nativeType"
+    [disabled]="isDisabled"
+    [attr.aria-label]="mainAriaLabel"
+    [attr.aria-busy]="loading$() ? 'true' : null"
+    (click)="onMainPressed()"
+  >
+    <span
+      class="cx-split-button__content"
+      [class.cx-split-button__content--hidden]="showSpinner$()"
+      [attr.aria-hidden]="showSpinner$() ? 'true' : null"
+    >
+      @if (icon; as iconName) {
+        <cx-icon class="cx-split-button__icon" [name]="iconName" [size]="iconSize" />
+      }
+      @if (visibleText) {
+        <span class="cx-split-button__label">{{ visibleText }}</span>
+      }
+    </span>
+
+    @if (showSpinner$()) {
+      <span class="cx-split-button__spinner-box" aria-hidden="true">
+        <cx-spinner mood="default" size="auto" />
+      </span>
+    }
+  </button>
+
+  <cx-menu
+    class="cx-split-button__menu"
+    [items]="items$()"
+    [open]="open$()"
+    [disabled]="isDisabled"
+    [ariaLabel]="resolvedMenuAriaLabel"
+    align="end"
+    (openChange)="onOpenChange($event)"
+    (itemSelect)="onItemSelect($event)"
+  >
+    <button
+      trigger
+      type="button"
+      class="cx-split-button__trigger"
+      [disabled]="isDisabled"
+      [attr.aria-label]="resolvedMenuAriaLabel"
+      [attr.aria-expanded]="open$()"
+      aria-haspopup="menu"
+    >
+      <cx-icon class="cx-split-button__chevron" name="chevron-down" [size]="iconSize" />
+    </button>
+  </cx-menu>
+</span>

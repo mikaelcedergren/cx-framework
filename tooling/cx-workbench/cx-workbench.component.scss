@@ -5,12 +5,18 @@
 }
 
 .cx-workbench {
+  --cx-workbench-control-gap: var(--space-md);
+
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(240px, calc(24vw + var(--space-xl)), 320px);
   overflow: hidden;
   border: var(--line);
   border-radius: var(--radius-lg);
   background: var(--opacity-low);
+}
+
+:host(.cx-workbench--overflow-visible) .cx-workbench {
+  overflow: visible;
 }
 
 .cx-workbench__main {
@@ -84,7 +90,7 @@
   border-left: var(--line);
 }
 
-:host ::ng-deep [cxWorkbenchPreview] {
+.cx-workbench__preview-content {
   display: flex;
   width: 100%;
   min-width: 0;
@@ -93,44 +99,59 @@
   gap: var(--space-md);
 }
 
-:host ::ng-deep [cxWorkbenchControls] {
+.cx-workbench__controls-content {
   display: flex;
+  width: 100%;
   min-width: 0;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--cx-workbench-control-gap);
 }
 
-:host(.cp-workbench--hidden),
+.cx-workbench__controls-content > [cxWorkbenchControls] {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--cx-workbench-control-gap);
+}
+
+.cx-workbench__controls-content > *,
+.cx-workbench__controls-content > [cxWorkbenchControls] > * {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
 :host(.cx-workbench--hidden),
 .cx-workbench--hidden {
   display: none;
 }
 
-:host ::ng-deep .cx-workbench--min-small [cxWorkbenchPreview] > * {
+.cx-workbench--min-small .cx-workbench__preview-content {
   min-width: min(100%, 160px);
 }
 
-:host ::ng-deep .cx-workbench--min-medium [cxWorkbenchPreview] > * {
+.cx-workbench--min-medium .cx-workbench__preview-content {
   min-width: min(100%, 380px);
 }
 
-:host ::ng-deep .cx-workbench--min-large [cxWorkbenchPreview] > * {
+.cx-workbench--min-large .cx-workbench__preview-content {
   min-width: min(100%, 600px);
 }
 
-:host ::ng-deep .cx-workbench--width-small [cxWorkbenchPreview] > * {
+.cx-workbench--width-small .cx-workbench__preview-content {
   width: min(100%, 160px);
 }
 
-:host ::ng-deep .cx-workbench--width-medium [cxWorkbenchPreview] > * {
+.cx-workbench--width-medium .cx-workbench__preview-content {
   width: min(100%, 380px);
 }
 
-:host ::ng-deep .cx-workbench--width-large [cxWorkbenchPreview] > * {
+.cx-workbench--width-large .cx-workbench__preview-content {
   width: min(100%, 600px);
 }
 
-:host ::ng-deep .cx-workbench--width-full [cxWorkbenchPreview] > * {
+.cx-workbench--width-full .cx-workbench__preview-content {
   width: 100%;
 }
 

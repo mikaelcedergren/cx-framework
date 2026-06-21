@@ -69,12 +69,11 @@
       [top]="overlayTop$()"
       [bottom]="overlayBottom$()"
       [placement]="activePlacement$()"
-      surfaceClass="cx-tag-input__popover"
       (backdropPressed)="closePopover()"
     >
       @if (searchable) {
         <div class="cx-tag-input__search">
-          <cx-input
+          <cx-text-field
             #searchInput
             label=""
             ariaLabel="Search tags"
@@ -143,7 +142,7 @@
   >
     <div body class="cx-tag-input__dialog-body">
       <div class="cx-tag-input__dialog-key-row">
-        <cx-input
+        <cx-text-field
           label="Name"
           placeholder="Type a name"
           [value]="draftKey$()"
@@ -160,7 +159,7 @@
           />
         </div>
       </div>
-      <cx-input
+      <cx-text-field
         label="Key"
         placeholder="Type a key"
         [optional]="true"

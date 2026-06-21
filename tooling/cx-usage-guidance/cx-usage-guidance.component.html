@@ -1,0 +1,36 @@
+<section class="cx-usage-guidance">
+  <header class="cx-usage-guidance__header">
+    <h2 class="cx-usage-guidance__title">Usage guidance</h2>
+
+    @if (saving || error) {
+      <span class="cx-usage-guidance__status" [class.cx-usage-guidance__status--error]="!!error">
+        {{ error || 'Saving' }}
+      </span>
+    }
+  </header>
+
+  @if (editing$()) {
+    <textarea
+      #editor
+      class="cx-usage-guidance__editor"
+      [attr.aria-label]="editLabel$()"
+      [value]="draft$()"
+      (input)="onDraftInput($event)"
+      (keydown)="onEditorKeydown($event)"
+      (blur)="commitEditing()"
+    ></textarea>
+  } @else {
+    <button
+      class="cx-usage-guidance__read"
+      type="button"
+      [attr.aria-label]="editLabel$()"
+      (click)="startEditing()"
+    >
+      @if (hasText$()) {
+        <span class="cx-usage-guidance__body">{{ displayText$() }}</span>
+      } @else {
+        <span class="cx-usage-guidance__empty">No usage guidance yet.</span>
+      }
+    </button>
+  }
+</section>

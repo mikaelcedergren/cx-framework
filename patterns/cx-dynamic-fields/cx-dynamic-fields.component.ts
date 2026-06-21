@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
-import { CxInputComponent } from '../../primitives/inputs/cx-input';
+import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 
 export type CxDynamicFieldOption = {
   id: string;
@@ -31,7 +31,7 @@ type CxResolvedDynamicField = CxDynamicFieldValue & {
 
 @Component({
   selector: 'cx-dynamic-fields',
-  imports: [CxButtonComponent, CxIconButtonComponent, CxInputComponent],
+  imports: [CxButtonComponent, CxIconButtonComponent, CxTextFieldComponent],
   templateUrl: './cx-dynamic-fields.component.html',
   styleUrl: './cx-dynamic-fields.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

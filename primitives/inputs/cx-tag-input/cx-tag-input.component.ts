@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { CxDialogComponent } from '../../overlay/cx-dialog';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
-import { CxInputComponent } from '../cx-input';
+import { CxTextFieldComponent } from '../cx-text-field';
 import {
   CxColorPickerComponent,
   type CxColorPickerOption,
@@ -51,7 +51,7 @@ type CxTagPickerColor = Extract<CxTagColor, CxColorPickerValue>;
     CxColorPickerComponent,
     CxDialogComponent,
     CxIconComponent,
-    CxInputComponent,
+    CxTextFieldComponent,
     CxOptionComponent,
     CxPopoverComponent,
     CxTagComponent,
@@ -98,7 +98,7 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
   @ViewChild('popover')
   private popoverRef?: CxPopoverComponent;
   @ViewChild('searchInput')
-  private searchInputRef?: CxInputComponent;
+  private searchInputRef?: CxTextFieldComponent;
 
   @Input() label = 'Tags';
   @Input() ariaLabel: string | undefined;

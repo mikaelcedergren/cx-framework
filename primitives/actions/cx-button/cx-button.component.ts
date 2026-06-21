@@ -6,7 +6,7 @@ import { createDelayedLoadingState } from '../shared/delayed-loading-state';
 
 export type CxButtonMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxButtonSize = 'default' | 'small' | 'large';
-export type CxButtonVariant = 'default' | 'primary' | 'transparent' | 'link' | 'dashed' | 'accent' | 'danger';
+export type CxButtonType = 'button' | 'submit' | 'reset';
 
 @Component({
   selector: 'cx-button',
@@ -18,15 +18,16 @@ export type CxButtonVariant = 'default' | 'primary' | 'transparent' | 'link' | '
 export class CxButtonComponent implements OnDestroy {
   private readonly delayedLoading = createDelayedLoadingState(0);
 
-  @Input() text = 'Button';
-  @Input() variant: CxButtonVariant = 'default';
+  @Input() text = '';
   @Input() mood: CxButtonMood = 'default';
   @Input() icon: CxIconName | undefined;
   @Input() appendIcon: CxIconName | undefined;
+  @Input() type: CxButtonType = 'button';
   @Input() size: CxButtonSize = 'default';
-  @Input() selected: boolean | undefined;
   @Input() ariaLabel: string | undefined;
   @Input() disabled = false;
+  @Input() transparent = false;
+  @Input() rounded = false;
 
   @Input()
   public set loading(value: boolean) {
@@ -43,19 +44,34 @@ export class CxButtonComponent implements OnDestroy {
   }
 
   protected get isIconOnly(): boolean {
-    return !this.visibleText && !!this.icon && !this.appendIcon;
+    return !this.visibleText && this.visibleIconCount === 1;
+  }
+
+  protected get resolvedAriaLabel(): string | null {
+    const label = this.ariaLabel?.trim();
+    if (label) {
+      return label;
+    }
+    if (this.isIconOnly) {
+      return this.humanizeIconName(this.icon ?? this.appendIcon);
+    }
+    return null;
+  }
+
+  protected get nativeType(): CxButtonType {
+    return this.type === 'submit' || this.type === 'reset' ? this.type : 'button';
   }
 
   protected get isDefault(): boolean {
-    return this.mood === 'default' && this.variant === 'default';
+    return this.mood === 'default';
   }
 
   protected get isPrimary(): boolean {
-    return this.mood === 'primary' || (this.mood === 'default' && this.variant === 'primary');
+    return this.mood === 'primary';
   }
 
   protected get isAccent(): boolean {
-    return this.mood === 'accent' || (this.mood === 'default' && this.variant === 'accent');
+    return this.mood === 'accent';
   }
 
   protected get isInfo(): boolean {
@@ -71,19 +87,23 @@ export class CxButtonComponent implements OnDestroy {
   }
 
   protected get isDanger(): boolean {
-    return this.mood === 'danger' || (this.mood === 'default' && this.variant === 'danger');
+    return this.mood === 'danger';
   }
 
   protected get isTransparent(): boolean {
-    return this.mood === 'default' && this.variant === 'transparent';
+    return this.transparent;
   }
 
-  protected get isLink(): boolean {
-    return this.mood === 'default' && this.variant === 'link';
+  private get visibleIconCount(): number {
+    return Number(Boolean(this.icon)) + Number(Boolean(this.appendIcon));
   }
 
-  protected get isDashed(): boolean {
-    return this.mood === 'default' && this.variant === 'dashed';
+  private humanizeIconName(name: CxIconName | undefined): string {
+    return name
+      ?.split('-')
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ') || 'Button';
   }
 
   public ngOnDestroy(): void {

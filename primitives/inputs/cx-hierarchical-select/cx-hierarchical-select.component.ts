@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output, computed, inject, signal } from '@angular/core';
 import { CxTreeViewComponent, type CxTreeViewItem } from '../../data/cx-tree-view';
-import { CxInputComponent } from '../cx-input';
+import { CxTextFieldComponent } from '../cx-text-field';
 import { CxIconComponent } from '../../media/cx-icon';
 
 export type CxHierarchicalSelectItem = CxTreeViewItem;
@@ -9,7 +9,7 @@ export type CxHierarchicalSelectItem = CxTreeViewItem;
   selector: 'cx-hierarchical-select',
   imports: [
     CxIconComponent,
-    CxInputComponent,
+    CxTextFieldComponent,
     CxTreeViewComponent,
   ],
   templateUrl: './cx-hierarchical-select.component.html',

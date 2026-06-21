@@ -50,15 +50,6 @@
   background: var(--opacity-mid);
 }
 
-.cx-button--transparent {
-  background: var(--cx-button-transparent-background, transparent);
-  color: var(--cx-button-transparent-color, var(--ink));
-}
-
-.cx-button:is(:hover, .cx-button--hover).cx-button--transparent:not(.cx-button--disabled):not(.cx-button--loading) {
-  background: var(--cx-button-transparent-hover-background, var(--opacity-low));
-}
-
 .cx-button--primary {
   background: var(--primary);
   color: var(--on-ink);
@@ -113,36 +104,61 @@
   background: var(--success-alt);
 }
 
-.cx-button--dashed {
-  border: 1px dashed var(--opacity-high);
+.cx-button--transparent {
   background: transparent;
   color: var(--ink);
 }
 
-.cx-button:is(:hover, .cx-button--hover).cx-button--dashed:not(.cx-button--disabled):not(.cx-button--loading) {
-  border-color: var(--primary);
-  background: var(--primary-opacity);
+.cx-button--transparent.cx-button--primary {
   color: var(--primary);
 }
 
-.cx-button--link {
-  min-height: 0;
-  justify-content: flex-start;
-  padding: 0;
-  background: transparent;
-  color: var(--link);
-  text-decoration: underline;
+.cx-button--transparent.cx-button--accent {
+  color: var(--accent);
 }
 
-.cx-button--link .cx-button__label {
-  overflow: hidden;
-  padding: var(--space-xs) 0;
-  text-overflow: ellipsis;
+.cx-button--transparent.cx-button--info {
+  color: var(--info);
 }
 
-.cx-button:is(:hover, .cx-button--hover).cx-button--link:not(.cx-button--disabled):not(.cx-button--loading) {
-  background: transparent;
-  color: var(--link);
+.cx-button--transparent.cx-button--success {
+  color: var(--success);
+}
+
+.cx-button--transparent.cx-button--warning {
+  color: var(--warning);
+}
+
+.cx-button--transparent.cx-button--danger {
+  color: var(--danger);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--opacity-low);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--primary:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--primary-opacity);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--accent:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--accent-opacity);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--info:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--info-opacity);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--success:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--success-opacity);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--warning:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--warning-opacity);
+}
+
+.cx-button:is(:hover, .cx-button--hover).cx-button--transparent.cx-button--danger:not(.cx-button--disabled):not(.cx-button--loading) {
+  background: var(--danger-opacity);
 }
 
 .cx-button--icon {
@@ -158,37 +174,8 @@
   min-width: var(--controller-size-large);
 }
 
-.cx-button--selected {
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-raised);
-}
-
-.cx-button--primary.cx-button--selected {
-  color: var(--primary);
-}
-
-.cx-button--accent.cx-button--selected {
-  color: var(--accent);
-}
-
-.cx-button--info.cx-button--selected {
-  color: var(--info);
-}
-
-.cx-button--success.cx-button--selected {
-  color: var(--success);
-}
-
-.cx-button--warning.cx-button--selected {
-  color: var(--warning);
-}
-
-.cx-button--danger.cx-button--selected {
-  color: var(--danger);
-}
-
-.cx-button--dashed.cx-button--selected {
-  color: var(--primary);
+.cx-button--rounded {
+  border-radius: var(--radius-pill);
 }
 
 .cx-button--disabled {
@@ -243,7 +230,6 @@
   inset-block-start: 50%;
   inset-inline-start: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
   display: inline-flex;
   width: 16px;
   height: 16px;

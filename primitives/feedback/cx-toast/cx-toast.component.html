@@ -34,7 +34,7 @@
         @if (visibleSecondaryAction; as action) {
           <cx-button
             [text]="action.text"
-            [variant]="action.variant ?? 'transparent'"
+            [transparent]="action.transparent ?? true"
             [mood]="action.mood ?? 'default'"
             [icon]="action.icon"
             [appendIcon]="action.appendIcon"
@@ -48,7 +48,7 @@
         @if (visibleAction; as action) {
           <cx-button
             [text]="action.text"
-            [variant]="action.variant ?? 'primary'"
+            [transparent]="action.transparent ?? false"
             [mood]="action.mood ?? actionButtonMood"
             [icon]="action.icon"
             [appendIcon]="action.appendIcon"
@@ -63,8 +63,7 @@
           <cx-icon-button
             class="cx-toast__dismiss"
             icon="remove"
-            ariaLabel="Dismiss notification"
-            variant="transparent"
+            ariaLabel="Dismiss notification" variant="transparent"
             (pressed)="dismiss()"
           />
         }

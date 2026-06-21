@@ -128,7 +128,7 @@ Use `none` only when something is absent: no icon, no action, no badge, no selec
 Current semantic mappings:
 
 - `default` uses neutral surface, ink, and opacity tokens rather than a colored mood
-- `--primary` uses `--violet`
+- `--primary` uses `--blue` in light mode and `--violet` in dark and night modes
 - `--accent` uses `--cyan`
 - `--info` uses `--blue`
 - `--success` uses `--green`
@@ -251,6 +251,8 @@ Controls should default to:
 - `--font-weight-regular`: 450, or `--font-weight-medium`: 550 for action labels
 
 Use `small` only when the component is genuinely secondary, compact, metadata-like, or inside a dense repeated structure. Do not use `small` as the default just because it looks tidy in isolation.
+
+Icon-only controls, including kebab menus, use default size by default. Only make them `small` when the surrounding component is explicitly compact or repeated densely enough that the smaller target is part of the component's role.
 
 Use `large` rarely, for deliberately prominent controls, editor surfaces, or roomy inputs where the larger touch target or type size carries meaning.
 
@@ -379,6 +381,8 @@ Do not fix component behavior from the outside with deep selectors, parent style
 
 Fix behavior at the deepest piece that owns it. If the clean fix belongs in a primitive, grow the primitive API first.
 
+Prefer normal document flow for component layout. Use absolute positioning and `z-index` only when the component genuinely needs layering, not for ordinary spacing, sizing, or click targets. A large hit area should come from the interactive element's natural box, such as a button or label, not from an invisible overlay.
+
 Each component should make clear what it controls and what the page is allowed to control. A button controls its own padding, color, radius, and states. The page controls where the button appears and the space around it.
 
 Conditional content should vanish from the DOM when empty. No empty wrappers, headings, labels, or slots.
@@ -386,6 +390,36 @@ Conditional content should vanish from the DOM when empty. No empty wrappers, he
 Invalid prop combinations should fail clearly in the component's own surface instead of quietly rendering broken chrome.
 
 Two elements that look similar must behave similarly. Visual consistency is a behavioral contract.
+
+## Component Design Principles
+
+Design the role before the props.
+
+A component should start by answering what job it has for the user, where it belongs, and how strongly it should ask for attention. Props only exist to expose meaningful variation inside that role. If the role is vague, the API becomes a pile of knobs.
+
+Prefer opinionated components that prevent misuse.
+
+The design system should make the good path obvious and the wrong path hard. A component does not need to support every technically possible version of itself. It should support the versions that make sense for Cortex, with clear defaults and clear limits.
+
+Defaults should show normal use, not a demo.
+
+The default state should be the version that should appear most often in the product. Intrusive components should fully own that intrusive role and stay rare. Quiet components should stay quiet by default.
+
+The workbench is a trust surface.
+
+The user reads the component through the workbench, not through the code. Every public prop must be visible there, named exactly as it is named in the API, and controlled with the right input type. The right column must not include fake controls, scenario toggles, or implementation helpers that are not public props.
+
+Variants should show real product use.
+
+Use variants to show believable examples of how a component appears in context, not just permutations of props. A good variant teaches when the component is useful.
+
+Usage guidance should explain when and why.
+
+Usage guidance is part of the component's documentation. Write it from a UX point of view: what role the component plays, when to use it, when not to use it, and what misuse would make the product worse.
+
+Stress-test before calling a component done.
+
+Try long text, unbroken strings, empty values, max values, missing optional props, all relevant moods, hover/focus/active states, narrow widths, and awkward combinations. Choose the tests that match the component's risk, but do not judge the component only from the happy path.
 
 ## Component APIs
 
@@ -468,6 +502,19 @@ Components own padding. Containers own gaps. Pages own big spacing between secti
 Show the needed information, but use less UI around it. Dense data is fine; dense chrome is the problem.
 
 Desktop is primary. Below the mobile breakpoint, the shell switches to a phone layout. There is intentionally no separate tablet design tier.
+
+Authenticated pages use the shared page rhythm:
+
+- the page root uses `cx-page`
+- `cx-top-bar` is the first direct child and is not wrapped in a local header
+- normal page content lives in `cx-page__content`
+- bounded board or editor pages use `cx-page--bounded` with `cx-page__fill`
+- desktop page padding is `--space-lg`; narrow pages fall back to `--space-md`
+- authenticated pages take the full canvas width by default; do not cap the page itself with local max-widths
+- `cx-top-bar` and visible page content share `--cx-page-padding`, so heading text and page content align on the same rail
+- if a specific text block needs a readable measure, cap that inner element only, not the page shell
+
+Do not put custom page padding on each page root. If a page needs a different content relationship, adjust the local content layout, not the top-level page rhythm.
 
 Navigation should mirror the user's mental model, not the code structure. Important destinations should live close to where the cursor naturally lives. Active state should be obvious, not merely slightly tinted.
 

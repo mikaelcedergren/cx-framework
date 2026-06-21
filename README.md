@@ -20,7 +20,7 @@ without carrying over a large legacy variable surface.
 
 ## Extending the framework
 
-When an app feature reaches for behavior that logically belongs to a primitive or pattern, extend the framework component rather than inlining one-off logic in the page. Add the prop/API to the `cx-*` component, keep sibling components consistent (e.g., the same prop name/semantics across `cx-input` and `cx-textarea`), and consume it from the page. Only deviate when the feature genuinely does not belong in a shared component/pattern.
+When an app feature reaches for behavior that logically belongs to a primitive or pattern, extend the framework component rather than inlining one-off logic in the page. Add the prop/API to the `cx-*` component, keep sibling components consistent (e.g., the same prop name/semantics across `cx-text-field` and `cx-textarea`), and consume it from the page. Only deviate when the feature genuinely does not belong in a shared component/pattern.
 
 ## Component discipline
 
@@ -55,6 +55,51 @@ When an app feature reaches for behavior that logically belongs to a primitive o
 ## Component reference
 
 The component reference page is live documentation. When adding or changing a public prop or slot, expose it there with a visible control. The plain default state should appear first, optional props should start inactive or empty, and each control should reveal the prop type: switches for booleans, sliders or number fields for bounded numbers, button groups for small option sets, and selects for larger sets.
+
+## Repackaging cx-framework
+
+`framework/` is exported to the separate GitHub package repo `mikaelcedergren/cx-framework`, published for personal app installs as `@mikaelcedergren/cx-framework`.
+
+Make framework changes in Cortex first. New components, patterns, tokens, icons, support files, and scripts should live under this folder, and public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting.
+
+Run the package command from the Cortex repo root:
+
+```bash
+pnpm framework:package
+```
+
+That is a dry run: it reports the next version and checks the export without changing files. When it looks correct, package the new patch version:
+
+```bash
+pnpm framework:package -- --apply
+```
+
+Use `--bump minor`, `--bump major`, or `--version x.y.z` when the default patch bump is not right:
+
+```bash
+pnpm framework:package -- --apply --bump minor
+pnpm framework:package -- --apply --version 0.2.0
+```
+
+By default the target is `../cx-framework`. For another checkout, use `CX_FRAMEWORK_REPO=/path/to/cx-framework` or pass `--target /path/to/cx-framework`.
+
+The package command bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
+
+The package should include `DESIGN-SYSTEM.md`, `tokens/`, `styles/`, `icons/`, `primitives/`, `patterns/`, `support/`, `scripts/`, `public-api.ts`, `tsconfig.lib.json`, `README.md`, `package.json`, and built `dist/` from the prepare/build step. It should not include generated or local junk such as `node_modules/`, `out-tsc/`, `.DS_Store`, `.framework-build.status.json`, or empty junk folders.
+
+Keep Cortex and `cx-framework` on the same Angular major. The current baseline is Angular 22 with Node 24.17+ preferred. The package keeps Angular/CDK/RxJS as peer dependencies for consuming apps and as dev dependencies so GitHub installs can run the `prepare` build.
+
+After the package repo is committed and pushed, consuming apps using:
+
+```json
+{
+  "dependencies": {
+    "@mikaelcedergren/cx-framework": "github:mikaelcedergren/cx-framework#main"
+  }
+}
+```
+
+must refresh their lockfile/install so the GitHub dependency points at the new commit. If an app exposes something wrong, fix the source here and re-export rather than patching the app locally.
 
 
 ## Install

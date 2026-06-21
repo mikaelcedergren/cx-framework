@@ -1,15 +1,39 @@
 <div class="cx-card">
   <div class="cx-card__header">
-    @if (hasHeading()) {
-      <div class="cx-card__heading">{{ heading!.trim() }}</div>
-    }
-    @if (icon; as iconName) {
-      <cx-icon class="cx-card__icon" [name]="iconName" [size]="20" />
-    }
-    <div class="cx-card__header-slot">
-      <ng-content select="[slot=header]" />
+    <div class="cx-card__identity">
+      @if (icon; as iconName) {
+        <cx-icon class="cx-card__icon" [name]="iconName" [size]="20" />
+      }
+      @if (hasHeading()) {
+        <div class="cx-card__heading">{{ heading!.trim() }}</div>
+      }
+    </div>
+
+    <div class="cx-card__header-actions">
+      <div class="cx-card__meta">
+        <ng-content select="[slot=meta], [cxCardMeta]" />
+      </div>
+
+      @if (hasMenuItems()) {
+        <cx-menu
+          class="cx-card__menu"
+          [items]="menuItems ?? []"
+          [ariaLabel]="resolvedMenuAriaLabel()"
+          align="end"
+          (itemSelect)="onMenuItemSelect($event)"
+        >
+          <cx-icon-button
+            trigger
+            icon="menu-vertical"
+            size="small"
+            variant="transparent"
+            [ariaLabel]="resolvedMenuAriaLabel()"
+          />
+        </cx-menu>
+      }
     </div>
   </div>
+
   <div class="cx-card__content">
     <ng-content />
   </div>

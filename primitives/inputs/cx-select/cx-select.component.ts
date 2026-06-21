@@ -16,7 +16,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
-import { CxInputComponent } from '../cx-input';
+import { CxTextFieldComponent } from '../cx-text-field';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
@@ -48,7 +48,7 @@ const CX_SELECT_SEARCH_THRESHOLD = 32;
     CommonModule,
     CxValidationMessageComponent,
     CxIconComponent,
-    CxInputComponent,
+    CxTextFieldComponent,
     CxOptionComponent,
     CxPopoverComponent,
     CxSpinnerComponent,
@@ -94,7 +94,7 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
   @ViewChild('popover')
   private popoverRef?: CxPopoverComponent;
   @ViewChild('searchInput')
-  private searchInputRef?: CxInputComponent;
+  private searchInputRef?: CxTextFieldComponent;
 
   protected readonly selectedOption$ = computed(() =>
     this.optionsState().find((option) => option.id === this.selectedValueState()),

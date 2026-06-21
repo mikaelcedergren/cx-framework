@@ -21,17 +21,17 @@ import {
   normalizeCxValidationMessages,
 } from '../shared/field.types';
 
-export type CxInputType = 'text' | 'password';
-export type CxInputVariant = 'default' | 'inline-edit';
+export type CxTextFieldType = 'text' | 'password';
+export type CxTextFieldVariant = 'default' | 'inline-edit';
 
 @Component({
-  selector: 'cx-input',
+  selector: 'cx-text-field',
   imports: [CxValidationMessageComponent, CxIconComponent, CxSpinnerComponent],
-  templateUrl: './cx-input.component.html',
-  styleUrl: './cx-input.component.scss',
+  templateUrl: './cx-text-field.component.html',
+  styleUrl: './cx-text-field.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxInputComponent implements OnDestroy {
+export class CxTextFieldComponent implements OnDestroy {
   private readonly valueState = signal('');
   private readonly focusedState = signal(false);
   private readonly errorMessageState = signal<string | undefined>(undefined);
@@ -44,9 +44,11 @@ export class CxInputComponent implements OnDestroy {
 
   @Input() label = 'Label';
   @Input() ariaLabel: string | undefined;
+  @Input() name: string | undefined;
+  @Input() autocomplete: string | undefined;
   @Input() placeholder = '';
-  @Input() type: CxInputType = 'text';
-  @Input() variant: CxInputVariant = 'default';
+  @Input() type: CxTextFieldType = 'text';
+  @Input() variant: CxTextFieldVariant = 'default';
   @Input() optional = false;
   @Input() disabled = false;
   @Input() readOnly = false;
@@ -103,6 +105,14 @@ export class CxInputComponent implements OnDestroy {
     }
     const label = this.label.trim();
     return label || undefined;
+  }
+
+  protected get resolvedName(): string | null {
+    return this.name?.trim() || null;
+  }
+
+  protected get resolvedAutocomplete(): string | null {
+    return this.autocomplete?.trim() || null;
   }
 
   protected get effectiveType(): 'text' | 'password' {

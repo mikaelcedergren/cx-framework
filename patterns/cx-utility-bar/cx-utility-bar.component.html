@@ -12,10 +12,9 @@
       [ariaLabel]="item.ariaLabel"
       [icon]="item.icon"
       [appendIcon]="item.appendIcon"
-      [variant]="item.variant ?? 'default'"
+      [transparent]="item.transparent ?? false"
       [mood]="item.mood ?? 'default'"
       [size]="size"
-      [selected]="item.selected"
       [disabled]="disabled || item.disabled === true"
       (pressed)="onItemPressed(item)"
     />

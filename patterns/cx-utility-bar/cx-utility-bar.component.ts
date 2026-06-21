@@ -4,7 +4,6 @@ import {
   CxButtonComponent,
   type CxButtonMood,
   type CxButtonSize,
-  type CxButtonVariant,
 } from '../../primitives/actions/cx-button';
 
 export type CxUtilityBarAlignment = 'start' | 'end' | 'space-between';
@@ -15,10 +14,9 @@ export interface CxUtilityBarItem {
   readonly ariaLabel?: string;
   readonly icon?: CxIconName;
   readonly appendIcon?: CxIconName;
-  readonly variant?: CxButtonVariant;
   readonly mood?: CxButtonMood;
   readonly disabled?: boolean;
-  readonly selected?: boolean;
+  readonly transparent?: boolean;
 }
 
 @Component({

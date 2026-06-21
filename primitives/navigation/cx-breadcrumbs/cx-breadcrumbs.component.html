@@ -1,20 +1,132 @@
 <nav class="cx-breadcrumbs" [attr.aria-label]="ariaLabel$()">
-  <ol class="cx-breadcrumbs__list">
-    @for (item of items$(); track item.id; let last = $last) {
-      <li class="cx-breadcrumbs__item">
-        @if (isCurrent(item.id)) {
-          <span class="cx-breadcrumbs__current" aria-current="page">{{ item.label }}</span>
-        } @else {
+  <ng-template #breadcrumbItem let-item let-last="last" let-kind="kind">
+    <li
+      class="cx-breadcrumbs__item"
+      [class.cx-breadcrumbs__item--anchor]="kind === 'anchor'"
+      [class.cx-breadcrumbs__item--current]="isCurrent(item.id)"
+    >
+      @if (hasOptions(item)) {
+        <cx-menu
+          class="cx-breadcrumbs__menu"
+          [ariaLabel]="'Switch ' + item.label"
+          [items]="optionMenuItems(item)"
+          [currentId]="item.selectedOptionId ?? item.id"
+          align="start"
+          [width]="220"
+          (itemSelect)="selectOption(item, $event)"
+        >
           <button
+            trigger
             type="button"
-            class="cx-breadcrumbs__link"
-            [attr.data-text]="item.label"
-            (click)="selectItem(item.id)"
+            class="cx-breadcrumbs__control cx-breadcrumbs__control--menu"
+            [class.cx-breadcrumbs__current]="isCurrent(item.id)"
+            [attr.aria-current]="isCurrent(item.id) ? 'page' : null"
+            [attr.title]="item.label"
           >
-            {{ item.label }}
+            <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+            <cx-icon class="cx-breadcrumbs__menu-icon" name="chevron-down" [size]="16" aria-hidden="true" />
           </button>
-        }
+        </cx-menu>
+      } @else if (isCurrent(item.id)) {
+        <span class="cx-breadcrumbs__current" aria-current="page" [attr.title]="item.label">
+          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+        </span>
+      } @else if (hasRouterLink(item)) {
+        <a
+          class="cx-breadcrumbs__control"
+          [routerLink]="item.routerLink"
+          [fragment]="item.fragment"
+          [attr.title]="item.label"
+          (click)="selectItem(item.id)"
+        >
+          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+        </a>
+      } @else if (hasHref(item)) {
+        <a
+          class="cx-breadcrumbs__control"
+          [href]="item.href"
+          [attr.target]="item.target ?? null"
+          [attr.rel]="item.rel ?? null"
+          [attr.title]="item.label"
+          (click)="selectItem(item.id)"
+        >
+          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+        </a>
+      } @else {
+        <button
+          type="button"
+          class="cx-breadcrumbs__control"
+          [attr.title]="item.label"
+          (click)="selectItem(item.id)"
+        >
+          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+        </button>
+      }
 
+      @if (!last) {
+        <span class="cx-breadcrumbs__separator" aria-hidden="true">
+          <cx-icon name="chevron-right" [size]="16" />
+        </span>
+      }
+    </li>
+  </ng-template>
+
+  <ol #list class="cx-breadcrumbs__list">
+    @if (shouldCompact$()) {
+      @if (firstItem$(); as firstItem) {
+        <ng-container
+          [ngTemplateOutlet]="breadcrumbItem"
+          [ngTemplateOutletContext]="{ $implicit: firstItem, last: false, kind: 'anchor' }"
+        />
+      }
+
+      <li class="cx-breadcrumbs__item cx-breadcrumbs__item--ellipsis">
+        <cx-menu
+          class="cx-breadcrumbs__menu"
+          ariaLabel="Hidden breadcrumb levels"
+          [items]="hiddenMenuItems$()"
+          align="start"
+          [width]="220"
+          (itemSelect)="selectItem($event)"
+        >
+          <button
+            trigger
+            type="button"
+            class="cx-breadcrumbs__control cx-breadcrumbs__control--ellipsis"
+            aria-label="Show hidden breadcrumb levels"
+          >
+            <span aria-hidden="true">...</span>
+          </button>
+        </cx-menu>
+
+        <span class="cx-breadcrumbs__separator" aria-hidden="true">
+          <cx-icon name="chevron-right" [size]="16" />
+        </span>
+      </li>
+
+      @if (lastItem$(); as lastItem) {
+        <ng-container
+          [ngTemplateOutlet]="breadcrumbItem"
+          [ngTemplateOutletContext]="{ $implicit: lastItem, last: true, kind: 'current' }"
+        />
+      }
+    } @else {
+      @for (item of pathItems$(); track item.id; let last = $last) {
+        <ng-container
+          [ngTemplateOutlet]="breadcrumbItem"
+          [ngTemplateOutletContext]="{ $implicit: item, last, kind: last ? 'current' : 'middle' }"
+        />
+      }
+    }
+  </ol>
+
+  <ol #measureList class="cx-breadcrumbs__measure" aria-hidden="true">
+    @for (item of pathItems$(); track item.id; let last = $last) {
+      <li class="cx-breadcrumbs__item">
+        <span class="cx-breadcrumbs__measure-label">{{ item.label }}</span>
+        @if (hasOptions(item)) {
+          <cx-icon class="cx-breadcrumbs__menu-icon" name="chevron-down" [size]="16" aria-hidden="true" />
+        }
         @if (!last) {
           <span class="cx-breadcrumbs__separator" aria-hidden="true">
             <cx-icon name="chevron-right" [size]="16" />

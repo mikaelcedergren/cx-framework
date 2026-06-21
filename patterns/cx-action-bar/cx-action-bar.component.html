@@ -6,7 +6,7 @@
           <span class="cx-action-bar__count">{{ countLabel }}</span>
           <cx-button
             text="Deselect all"
-            variant="transparent"
+            [transparent]="true"
             (pressed)="deselectAll.emit()"
           />
         </div>
@@ -18,7 +18,8 @@
                 <cx-button
                   [text]="actionText(item)"
                   [icon]="item.icon"
-                  [variant]="actionVariant(item)"
+                  [transparent]="actionTransparent(item)"
+                  [mood]="actionMood(item)"
                   [ariaLabel]="actionAriaLabel(item)"
                   [disabled]="item.disabled === true"
                   (pressed)="onAction(item)"

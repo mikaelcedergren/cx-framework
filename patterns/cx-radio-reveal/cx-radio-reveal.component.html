@@ -19,7 +19,7 @@
 
         @if (selectedRevealOption$()?.id === option.id) {
           <div class="cx-radio-reveal__field">
-            <cx-input
+            <cx-text-field
               [label]="''"
               [ariaLabel]="getRevealAriaLabel(option)"
               [placeholder]="option.revealPlaceholder ?? ''"
