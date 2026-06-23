@@ -7,4 +7,9 @@
   --controller-size: 32px;
   --controller-size-small: 24px;
   --controller-size-large: 48px;
+
+  /* Content measure — max width of a centred content column (cx-measure-*). */
+  --measure-sm: 360px;
+  --measure-md: 640px;
+  --measure-lg: 960px;
 }

@@ -15,6 +15,8 @@ It is organized into:
 
 Applications should consume this package from GitHub instead of defining design-system source files ad hoc inside app folders.
 
+To arrange screens — the layout primitives, spacing utilities, responsive model, and page frame — read the [layout guide](primitives/layout/README.md).
+
 The token layer is intentionally reduced to the high-level foundations Cortex needs
 without carrying over a large legacy variable surface.
 

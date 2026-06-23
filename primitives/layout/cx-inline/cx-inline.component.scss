@@ -1,3 +1,5 @@
+@use '../_layout-variants' as layout;
+
 :host {
   display: block;
   width: 100%;
@@ -10,23 +12,7 @@
   box-sizing: border-box;
 }
 
-:host([data-gap='2xs']) .cx-inline { gap: var(--space-2xs); }
-:host([data-gap='xs']) .cx-inline { gap: var(--space-xs); }
-:host([data-gap='sm']) .cx-inline { gap: var(--space-sm); }
-:host([data-gap='md']) .cx-inline { gap: var(--space-md); }
-:host([data-gap='lg']) .cx-inline { gap: var(--space-lg); }
-:host([data-gap='xl']) .cx-inline { gap: var(--space-xl); }
-:host([data-gap='2xl']) .cx-inline { gap: var(--space-2xl); }
-
-:host([data-align='start']) .cx-inline { align-items: flex-start; }
-:host([data-align='center']) .cx-inline { align-items: center; }
-:host([data-align='end']) .cx-inline { align-items: flex-end; }
-:host([data-align='stretch']) .cx-inline { align-items: stretch; }
-
-:host([data-justify='start']) .cx-inline { justify-content: flex-start; }
-:host([data-justify='center']) .cx-inline { justify-content: center; }
-:host([data-justify='end']) .cx-inline { justify-content: flex-end; }
-:host([data-justify='between']) .cx-inline { justify-content: space-between; }
-
-:host([data-wrap='wrap']) .cx-inline { flex-wrap: wrap; }
-:host([data-wrap='nowrap']) .cx-inline { flex-wrap: nowrap; }
+@include layout.gap-attr('.cx-inline', $mobile-attr: 'data-gap-mobile');
+@include layout.align-attr('.cx-inline');
+@include layout.justify-attr('.cx-inline');
+@include layout.wrap-attr('.cx-inline');

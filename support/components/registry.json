@@ -199,6 +199,15 @@
       "path": "tooling/cx-workbench/cx-workbench.component.ts"
     },
     {
+      "name": "cx-action-area",
+      "selectors": [
+        "cx-action-area"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-action-area/cx-action-area.component.ts"
+    },
+    {
       "name": "cx-button",
       "selectors": [
         "cx-button"

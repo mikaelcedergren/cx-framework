@@ -17,18 +17,42 @@
       (keydown)="onEscape($event)"
       (keydown)="onEnter($event)"
     >
-      @if (canDismiss()) {
-        <cx-icon-button
-          class="cx-dialog__dismiss"
-          icon="remove"
-          ariaLabel="Dismiss dialog" variant="transparent"
-          size="small"
-          (pressed)="onDismiss()"
-        />
-      }
+      <header class="cx-dialog__header">
+        <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+
+        @if (hasHeaderActions()) {
+          <div class="cx-dialog__header-actions">
+            @if (hasMenuItems()) {
+              <cx-menu
+                class="cx-dialog__menu"
+                [items]="menuItems ?? []"
+                [ariaLabel]="resolvedMenuAriaLabel()"
+                align="end"
+                (openChange)="onMenuOpenChange($event)"
+                (itemSelect)="onMenuItemSelect($event)"
+              >
+                <cx-icon-button
+                  trigger
+                  icon="menu-vertical"
+                  variant="transparent"
+                  [ariaLabel]="resolvedMenuAriaLabel()"
+                />
+              </cx-menu>
+            }
+
+            @if (canDismiss()) {
+              <cx-icon-button
+                icon="remove"
+                ariaLabel="Dismiss dialog"
+                variant="transparent"
+                (pressed)="onDismiss()"
+              />
+            }
+          </div>
+        }
+      </header>
 
       <div class="cx-dialog__body">
-        <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
         @if (hasText()) {
           <p class="cx-dialog__text" [id]="textId">{{ text }}</p>
         }

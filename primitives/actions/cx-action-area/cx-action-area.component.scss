@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  position: relative;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--motion-fast) ease;
+}
+
+:host(.cx-action-area-host--active),
+:host(:focus),
+:host(:focus-within) {
+  outline-color: var(--primary);
+}
+
+:host(.cx-action-area-host--disabled) {
+  outline-color: transparent;
+}
+
+.cx-action-area__actions {
+  position: absolute;
+  inset-block-start: var(--space-sm);
+  inset-inline-end: var(--space-sm);
+  display: flex;
+  width: max-content;
+  max-width: calc(100% - var(--space-md));
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-mid);
+  box-shadow: var(--shadow-floating);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(var(--space-xs) * -1));
+  transition:
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+:host(.cx-action-area-host--active) .cx-action-area__actions,
+:host(:focus-within) .cx-action-area__actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.cx-action-area__action {
+  display: inline-flex;
+  min-height: var(--controller-size-small);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  margin: 0;
+  outline: none;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+  white-space: nowrap;
+}
+
+.cx-action-area__action:hover:not(:disabled) {
+  background: var(--opacity-mid);
+}
+
+.cx-action-area__action:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-action-area__action:active:not(:disabled) {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
+.cx-action-area__action:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.cx-action-area__action-icon,
+.cx-action-area__action-shortcut {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.cx-action-area__action-icon {
+  color: currentColor;
+}
+
+.cx-action-area__action-label {
+  display: block;
+  color: currentColor;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host(.cx-action-area-host--compact) .cx-action-area__action-shortcut,
+:host(.cx-action-area-host--icon) .cx-action-area__action-shortcut {
+  display: none;
+}
+
+:host(.cx-action-area-host--icon) .cx-action-area__action--has-icon {
+  width: var(--controller-size-small);
+  padding: 0;
+}
+
+:host(.cx-action-area-host--icon) .cx-action-area__action--has-icon .cx-action-area__action-label {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .cx-action-area__actions,
+  .cx-action-area__action {
+    transition: none;
+  }
+}

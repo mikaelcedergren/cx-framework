@@ -1,0 +1,79 @@
+@use '../tokens/breakpoints-scale' as bp;
+
+// Page container — the outermost frame an app screen sits in.
+//
+// A full-height flex column that owns the screen's outer padding and the
+// vertical gap between its blocks. Pages compose their content inside
+// .cx-page__content and may add their own classes alongside these.
+//
+// Spacing is driven by custom properties so a page can retune the frame
+// without overriding the structural rules:
+//   --cx-page-padding  outer padding of the content column
+//   --cx-page-gap      vertical gap between blocks in the content column
+//   --cx-page-measure  optional max width for the content column (default
+//                      none); set it to cap and centre content on wide screens.
+//
+// Structure:
+//   .cx-page                 the frame (flex column, full height)
+//     .cx-page__notice       full-bleed notice strip above the content (optional)
+//     .cx-page__content      the padded, gapped content column
+//       .cx-page__content--fill / .cx-page__fill   block that grows to fill
+//     .cx-page__loading      centred loading area
+//   .cx-page--bounded        clip overflow to the viewport (for inner scrolling)
+
+.cx-page {
+  --cx-page-padding: var(--space-lg);
+  --cx-page-gap: var(--space-lg);
+  --cx-page-measure: none;
+
+  display: flex;
+  min-width: 0;
+  min-height: 100%;
+  flex-direction: column;
+  color: var(--ink);
+}
+
+.cx-page--bounded {
+  height: 100%;
+  overflow: hidden;
+}
+
+.cx-page__content {
+  display: flex;
+  width: 100%;
+  max-width: var(--cx-page-measure, none);
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--cx-page-gap);
+  margin-inline: auto;
+  padding: var(--cx-page-padding);
+  box-sizing: border-box;
+}
+
+.cx-page__content--fill,
+.cx-page__fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.cx-page__notice {
+  flex-shrink: 0;
+  padding: var(--space-md) var(--cx-page-padding) 0;
+}
+
+.cx-page__loading {
+  display: flex;
+  min-height: 300px;
+  align-items: center;
+  justify-content: center;
+}
+
+// Phone widths tighten the frame one spacing step. Uses the framework mobile
+// breakpoint (< $mobile), matching the layout primitives and visibility
+// utilities so every responsive boundary in the system flips at the same width.
+@media (max-width: #{bp.$mobile - 1px}) {
+  .cx-page {
+    --cx-page-padding: var(--space-md);
+    --cx-page-gap: var(--space-md);
+  }
+}

@@ -1,0 +1,181 @@
+// Cortex utility classes.
+//
+// A curated set of single-purpose helpers for the raw elements and wrappers
+// you write yourself — spacing, typography, colour, sizing, visibility. They
+// are NOT for patching a sealed cx-* component from outside (ux-foundation,
+// must: "no global utility patches to fix a component from outside — fix the
+// component itself").
+//
+// They live in the low-priority `cx-utilities` cascade layer, so any unlayered
+// style — every cx-* component, plus your own app CSS — always wins over a
+// utility. A utility can style your own <p> or <div>, but it cannot override a
+// component's internals; to affect a component, wrap it.
+//
+// Every value is a token reference, so there are no magic numbers and a token
+// change flows through automatically. Spacing follows the system model
+// (components own padding, containers own gap, margin is avoided): there are
+// padding helpers but no margin or gap helpers — reach for cx-stack /
+// cx-inline / cx-grid when you need gap between children.
+
+@use 'sass:map';
+@use '../tokens/spacing-scale' as space;
+@use '../tokens/breakpoints-scale' as breakpoints;
+
+// < $mobile is the phone range; $mobile and up is desktop (tokens/_breakpoints.scss).
+$mobile-max: breakpoints.$mobile - 1px;
+
+// Type ramp — each size pairs a font-size token with its line-height token.
+$text-sizes: (
+  'title-1': ('size': var(--font-size-title-1), 'line': var(--line-height-heading)),
+  'title-2': ('size': var(--font-size-title-2), 'line': var(--line-height-heading)),
+  'title-3': ('size': var(--font-size-title-3), 'line': var(--line-height-heading)),
+  'body-lg': ('size': var(--font-size-body-lg), 'line': var(--line-height-body)),
+  'body': ('size': var(--font-size-body), 'line': var(--line-height-body)),
+  'body-sm': ('size': var(--font-size-body-sm), 'line': var(--line-height-small)),
+  'body-xs': ('size': var(--font-size-body-xs), 'line': var(--line-height-small)),
+);
+
+$font-weights: (
+  'regular': var(--font-weight-regular),
+  'medium': var(--font-weight-medium),
+  'bold': var(--font-weight-bold),
+);
+
+// Semantic text colours. 'muted' is the system's high-opacity ink for
+// secondary text.
+$text-colors: (
+  'ink': var(--ink),
+  'muted': var(--opacity-high),
+  'primary': var(--primary),
+  'accent': var(--accent),
+  'success': var(--success),
+  'warning': var(--warning),
+  'danger': var(--danger),
+  'info': var(--info),
+  'link': var(--link),
+);
+
+// Content measure — max width of a centred content column.
+$measures: (
+  'sm': var(--measure-sm),
+  'md': var(--measure-md),
+  'lg': var(--measure-lg),
+);
+
+@layer cx-utilities {
+  // Padding — all-sides, then axis, then single-side, so the more specific
+  // direction wins at equal specificity within the layer.
+  @each $step, $token in space.$scale {
+    .cx-p-#{$step} {
+      padding: $token;
+    }
+  }
+
+  @each $step, $token in space.$scale {
+    .cx-px-#{$step} {
+      padding-inline: $token;
+    }
+
+    .cx-py-#{$step} {
+      padding-block: $token;
+    }
+  }
+
+  @each $step, $token in space.$scale {
+    .cx-pt-#{$step} {
+      padding-top: $token;
+    }
+
+    .cx-pr-#{$step} {
+      padding-right: $token;
+    }
+
+    .cx-pb-#{$step} {
+      padding-bottom: $token;
+    }
+
+    .cx-pl-#{$step} {
+      padding-left: $token;
+    }
+  }
+
+  // Typography — font size paired with its line-height; weight is separate.
+  @each $name, $ramp in $text-sizes {
+    .cx-text-#{$name} {
+      font-size: map.get($ramp, 'size');
+      line-height: map.get($ramp, 'line');
+    }
+  }
+
+  @each $name, $weight in $font-weights {
+    .cx-font-#{$name} {
+      font-weight: $weight;
+    }
+  }
+
+  // Text colour — semantic, theme-aware tokens.
+  @each $name, $color in $text-colors {
+    .cx-text-#{$name} {
+      color: $color;
+    }
+  }
+
+  // Text alignment + truncation.
+  .cx-text-start {
+    text-align: start;
+  }
+
+  .cx-text-center {
+    text-align: center;
+  }
+
+  .cx-text-end {
+    text-align: end;
+  }
+
+  .cx-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Sizing — content measure (capped + centred), plus raw-page helpers.
+  @each $name, $measure in $measures {
+    .cx-measure-#{$name} {
+      max-inline-size: $measure;
+      margin-inline: auto;
+    }
+  }
+
+  .cx-w-full {
+    inline-size: 100%;
+  }
+
+  .cx-min-h-screen {
+    min-block-size: 100svh;
+  }
+
+  .cx-fill {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  .cx-center-inline {
+    margin-inline: auto;
+  }
+
+  // Responsive visibility — across the single mobile breakpoint. Apply to your
+  // own wrapper; a layered utility cannot override a component's :host display.
+  @media (max-width: $mobile-max) {
+    .cx-hide-mobile {
+      display: none;
+    }
+  }
+
+  @media (min-width: breakpoints.$mobile) {
+    .cx-hide-desktop {
+      display: none;
+    }
+  }
+}

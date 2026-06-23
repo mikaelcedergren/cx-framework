@@ -5,6 +5,7 @@ import { type CxLayoutAlign, type CxLayoutGap, type CxLayoutJustify } from '../l
   selector: 'cx-inline',
   host: {
     '[attr.data-gap]': 'gap',
+    '[attr.data-gap-mobile]': 'gapMobile',
     '[attr.data-align]': 'align',
     '[attr.data-justify]': 'justify',
     '[attr.data-wrap]': "wrap ? 'wrap' : 'nowrap'",
@@ -15,6 +16,7 @@ import { type CxLayoutAlign, type CxLayoutGap, type CxLayoutJustify } from '../l
 })
 export class CxInlineComponent {
   @Input() gap: CxLayoutGap = 'sm';
+  @Input() gapMobile: CxLayoutGap | undefined;
   @Input() align: CxLayoutAlign = 'center';
   @Input() justify: CxLayoutJustify = 'start';
   @Input() wrap = false;

@@ -11,6 +11,11 @@
       "source": "patterns/cx-action-bar/cx-action-bar.component.ts"
     },
     {
+      "name": "cx-action-area",
+      "importFrom": "@mikaelcedergren/cx-framework",
+      "source": "primitives/actions/cx-action-area/cx-action-area.component.ts"
+    },
+    {
       "name": "cx-alert",
       "importFrom": "@mikaelcedergren/cx-framework",
       "source": "primitives/feedback/cx-alert/cx-alert.component.ts"

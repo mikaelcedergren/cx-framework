@@ -15,7 +15,6 @@ export * from './patterns/cx-radio-reveal';
 export * from './patterns/cx-side-nav';
 export * from './patterns/cx-table-view';
 export * from './patterns/cx-top-bar';
-export * from './patterns/cx-topbar';
 export * from './patterns/cx-wizard-dialog';
 
 export * from './tooling/cx-variant';
@@ -24,6 +23,7 @@ export * from './tooling/cx-workbench';
 export * from './tooling/cx-slot-marker';
 
 export * from './primitives/actions/cx-button';
+export * from './primitives/actions/cx-action-area';
 export * from './primitives/actions/cx-split-button';
 export * from './primitives/actions/cx-button-group';
 export * from './primitives/actions/cx-icon-button';

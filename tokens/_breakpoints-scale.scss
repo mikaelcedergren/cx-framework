@@ -1,0 +1,12 @@
+// Breakpoint values as Sass variables, with no CSS output.
+//
+// Single phone breakpoint. The desktop UI is primary; below this width the
+// shell switches to a top-bar + drawer layout. There is intentionally no
+// intermediate "tablet" breakpoint — viewports either get the desktop UI or
+// the phone UI.
+//
+// Kept CSS-less so compile-time consumers (layout mixins, utility classes) can
+// read the value without re-emitting the --breakpoint-* custom properties,
+// which live in _breakpoints.scss.
+
+$mobile: 720px;

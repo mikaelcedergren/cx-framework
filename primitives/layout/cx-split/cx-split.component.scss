@@ -1,3 +1,5 @@
+@use '../_layout-variants' as layout;
+
 :host {
   display: block;
   width: 100%;
@@ -25,18 +27,8 @@
   align-items: inherit;
 }
 
-:host([data-gap='2xs']) .cx-split { column-gap: var(--space-2xs); }
-:host([data-gap='xs']) .cx-split { column-gap: var(--space-xs); }
-:host([data-gap='sm']) .cx-split { column-gap: var(--space-sm); }
-:host([data-gap='md']) .cx-split { column-gap: var(--space-md); }
-:host([data-gap='lg']) .cx-split { column-gap: var(--space-lg); }
-:host([data-gap='xl']) .cx-split { column-gap: var(--space-xl); }
-:host([data-gap='2xl']) .cx-split { column-gap: var(--space-2xl); }
-
-:host([data-align='start']) .cx-split { align-items: flex-start; }
-:host([data-align='center']) .cx-split { align-items: center; }
-:host([data-align='end']) .cx-split { align-items: flex-end; }
-:host([data-align='stretch']) .cx-split { align-items: stretch; }
+@include layout.gap-attr('.cx-split', 'data-gap', column-gap, $mobile-attr: 'data-gap-mobile');
+@include layout.align-attr('.cx-split');
 
 :host([data-start-width='sm']) .cx-split__start {
   flex: 0 0 min(280px, 32%);

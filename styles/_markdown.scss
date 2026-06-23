@@ -6,6 +6,8 @@
 // descendant selectors to require that attribute — but innerHTML-injected
 // elements never receive it, so component-scoped rules would silently miss.
 
+@use 'prose';
+
 .cx-textarea__markdown {
   h1, h2, h3, h4 {
     margin: var(--space-sm) 0 var(--space-xs);
@@ -61,76 +63,8 @@
   }
 }
 
+// Document mode shares the editorial prose scale (styles/_prose.scss)
+// instead of duplicating it.
 .cx-textarea--document .cx-textarea__markdown {
-  h1, h2, h3, h4 {
-    margin: var(--space-lg) 0 var(--space-sm);
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-heading);
-    letter-spacing: 0;
-  }
-
-  h1 { font-size: 2em; }
-  h2 { font-size: 1.5em; }
-  h3 { font-size: 1.2em; }
-  h4 { font-size: 1.05em; }
-
-  p {
-    margin: 0 0 1em;
-  }
-
-  ul, ol {
-    margin: 0 0 1em;
-    padding-left: 1.5em;
-    list-style-position: outside;
-  }
-
-  ul ul, ul ol, ol ul, ol ol {
-    margin: 0.4em 0 0;
-  }
-
-  li {
-    margin-bottom: 0.4em;
-    padding-left: 0.25em;
-  }
-
-  li::marker {
-    color: var(--accent);
-    font-weight: var(--font-weight-bold);
-  }
-
-  ul > li::marker {
-    font-size: 1.1em;
-  }
-
-  blockquote {
-    margin: 0 0 1em;
-    padding: 0.1em 0 0.1em 1em;
-    border-left: calc(var(--border-width) * 3) solid var(--accent);
-    color: var(--opacity-high);
-    font-style: italic;
-  }
-
-  code {
-    font-size: 0.9em;
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-  }
-
-  pre {
-    margin: 0 0 1em;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    font-size: 0.9em;
-    line-height: 1.5;
-  }
-
-  hr {
-    margin: var(--space-lg) 0;
-    border-top: 1px solid var(--opacity-mid);
-  }
-
-  a {
-    color: var(--link);
-    text-underline-offset: 2px;
-  }
+  @include prose.cx-editorial-type;
 }

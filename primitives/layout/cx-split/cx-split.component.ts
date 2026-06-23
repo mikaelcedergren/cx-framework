@@ -5,6 +5,7 @@ import { type CxLayoutAlign, type CxLayoutGap } from '../layout.types';
   selector: 'cx-split',
   host: {
     '[attr.data-gap]': 'gap',
+    '[attr.data-gap-mobile]': 'gapMobile',
     '[attr.data-align]': 'align',
     '[attr.data-start-width]': 'startWidth',
   },
@@ -14,6 +15,7 @@ import { type CxLayoutAlign, type CxLayoutGap } from '../layout.types';
 })
 export class CxSplitComponent {
   @Input() gap: CxLayoutGap = 'md';
+  @Input() gapMobile: CxLayoutGap | undefined;
   @Input() align: CxLayoutAlign = 'center';
   @Input() startWidth: 'auto' | 'sm' | 'md' | 'lg' = 'auto';
 }

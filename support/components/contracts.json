@@ -23,6 +23,21 @@
       ]
     },
     {
+      "name": "cx-action-area",
+      "inputs": [
+        "actions",
+        "info",
+        "askAi",
+        "editable",
+        "ariaLabel",
+        "disabled",
+        "shortcutsEnabled"
+      ],
+      "outputs": [
+        "actionSelect"
+      ]
+    },
+    {
       "name": "cx-alert",
       "inputs": [
         "action",

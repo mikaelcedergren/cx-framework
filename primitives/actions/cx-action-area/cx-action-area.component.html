@@ -1,0 +1,25 @@
+<ng-content />
+
+@if (isInteractive$()) {
+  <div #actionsRail class="cx-action-area__actions" role="group" aria-label="Actions">
+    @for (action of visibleActions$(); track action.key) {
+      <button
+        type="button"
+        class="cx-action-area__action"
+        [class.cx-action-area__action--has-icon]="action.icon"
+        [disabled]="action.disabled"
+        [attr.aria-label]="actionAriaLabel(action)"
+        (pointerdown)="onActionPointerDown($event)"
+        (click)="onActionClick(action, $event)"
+      >
+        @if (action.icon; as iconName) {
+          <cx-icon class="cx-action-area__action-icon" [name]="iconName" [size]="14" />
+        }
+        <span class="cx-action-area__action-label">{{ action.text }}</span>
+        @if (hasShortcut(action)) {
+          <cx-shortcut-key class="cx-action-area__action-shortcut" [parts]="action.shortcutParts" />
+        }
+      </button>
+    }
+  </div>
+}

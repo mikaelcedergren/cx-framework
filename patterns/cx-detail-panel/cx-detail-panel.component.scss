@@ -42,6 +42,7 @@
 
 :host(.cx-detail-panel-host--inline) {
   position: absolute;
+  z-index: var(--z-index-detail);
   inset-block: 0;
   inset-inline-end: 0;
   width: var(--cx-detail-panel-width, min(450px, 100%));

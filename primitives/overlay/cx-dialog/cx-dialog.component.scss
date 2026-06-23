@@ -49,20 +49,41 @@
   max-height: min(86vh, calc(100vh - (var(--space-md) * 2)));
 }
 
-.cx-dialog--dismissible .cx-dialog__body {
-  padding-inline-end: calc(var(--space-lg) + var(--controller-size-small));
+.cx-dialog__header {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md) 0;
 }
 
-.cx-dialog__dismiss {
-  position: absolute;
-  z-index: 1;
-  top: var(--space-sm);
-  right: var(--space-sm);
+.cx-dialog__title {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin: 0;
+  color: currentColor;
+  font-size: var(--font-size-title-1);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.cx-dialog__header-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.cx-dialog__menu {
+  display: inline-flex;
 }
 
 .cx-dialog__body {
   display: flex;
-  min-height: calc(var(--controller-size) * 3.5);
+  min-height: 0;
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-md);
@@ -70,12 +91,8 @@
   line-height: var(--line-height-body);
 }
 
-.cx-dialog__title {
-  margin: 0;
-  color: currentColor;
-  font-size: var(--font-size-title-1);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.15;
+.cx-dialog__header + .cx-dialog__body {
+  padding-block-start: var(--space-sm);
 }
 
 .cx-dialog__text {
