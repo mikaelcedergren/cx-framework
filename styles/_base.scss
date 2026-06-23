@@ -1,0 +1,67 @@
+// Base layer — the minimal global reset every cx-framework app shares: box
+// model, page canvas, body type, links, focus ring, and reduced-motion. It is
+// token-driven, so it follows the active theme. Opt in once per app with
+// `@use '@mikaelcedergren/cx-styles/base'` instead of hand-rolling
+// resets. Font *files* are loaded by the app; this only sets the family token.
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  background: var(--surface-mid);
+}
+
+body {
+  margin: 0;
+  background: var(--surface-mid);
+  color: var(--ink);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+a,
+a:visited,
+a:hover,
+a:active {
+  color: var(--link);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
