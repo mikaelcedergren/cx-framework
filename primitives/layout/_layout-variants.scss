@@ -23,9 +23,15 @@ $layout-justifications: (
 // overrides the base value only on phone widths.
 $mobile-max: bp.$mobile - 1px;
 
+// All variant selectors use a child combinator (`:host([...]) > #{$selector}`),
+// not a descendant one. Every layout primitive renders `<div class="cx-...">`
+// as the host's direct child and they all share one Angular encapsulation id, so
+// a descendant selector would let a parent's gap/align/justify/wrap cascade into
+// any nested layout primitive.
+
 @mixin gap-attr($selector, $attr: 'data-gap', $property: gap, $mobile-attr: null) {
   @each $name, $token in $layout-gaps {
-    :host([#{$attr}='#{$name}']) #{$selector} {
+    :host([#{$attr}='#{$name}']) > #{$selector} {
       #{$property}: $token;
     }
   }
@@ -33,7 +39,7 @@ $mobile-max: bp.$mobile - 1px;
   @if $mobile-attr {
     @media (max-width: $mobile-max) {
       @each $name, $token in $layout-gaps {
-        :host([#{$mobile-attr}='#{$name}']) #{$selector} {
+        :host([#{$mobile-attr}='#{$name}']) > #{$selector} {
           #{$property}: $token;
         }
       }
@@ -43,7 +49,7 @@ $mobile-max: bp.$mobile - 1px;
 
 @mixin align-attr($selector, $attr: 'data-align') {
   @each $name, $value in $layout-alignments {
-    :host([#{$attr}='#{$name}']) #{$selector} {
+    :host([#{$attr}='#{$name}']) > #{$selector} {
       align-items: $value;
     }
   }
@@ -51,25 +57,25 @@ $mobile-max: bp.$mobile - 1px;
 
 @mixin justify-attr($selector, $attr: 'data-justify') {
   @each $name, $value in $layout-justifications {
-    :host([#{$attr}='#{$name}']) #{$selector} {
+    :host([#{$attr}='#{$name}']) > #{$selector} {
       justify-content: $value;
     }
   }
 }
 
 @mixin wrap-attr($selector, $attr: 'data-wrap') {
-  :host([#{$attr}='wrap']) #{$selector} {
+  :host([#{$attr}='wrap']) > #{$selector} {
     flex-wrap: wrap;
   }
 
-  :host([#{$attr}='nowrap']) #{$selector} {
+  :host([#{$attr}='nowrap']) > #{$selector} {
     flex-wrap: nowrap;
   }
 }
 
 @mixin grid-columns-attr($selector, $attr: 'data-columns', $max: 12, $mobile-attr: null) {
   @for $index from 1 through $max {
-    :host([#{$attr}='#{$index}']) #{$selector} {
+    :host([#{$attr}='#{$index}']) > #{$selector} {
       grid-template-columns: repeat($index, minmax(0, 1fr));
     }
   }
@@ -77,7 +83,7 @@ $mobile-max: bp.$mobile - 1px;
   @if $mobile-attr {
     @media (max-width: $mobile-max) {
       @for $index from 1 through $max {
-        :host([#{$mobile-attr}='#{$index}']) #{$selector} {
+        :host([#{$mobile-attr}='#{$index}']) > #{$selector} {
           grid-template-columns: repeat($index, minmax(0, 1fr));
         }
       }

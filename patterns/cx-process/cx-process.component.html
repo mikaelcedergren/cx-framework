@@ -1,0 +1,52 @@
+<div
+  class="cx-process"
+  [class.cx-process--clear]="isClear$()"
+  [class.cx-process--editable]="editable$()"
+>
+  <div #rowRef class="cx-process__row" role="tablist" [attr.aria-label]="ariaLabel$()">
+    @for (tab of tabs$(); track tab.key; let i = $index) {
+      @if (tab.dividerBefore) {
+        <span class="cx-process__divider" aria-hidden="true"></span>
+      }
+
+      <button
+        #tabRef
+        type="button"
+        role="tab"
+        class="cx-process__tab"
+        [class.cx-process__tab--open]="tab.open"
+        [class.cx-process__tab--terminal]="tab.terminal"
+        [attr.aria-selected]="tab.selected"
+        [attr.aria-label]="tab.ariaLabel"
+        [attr.title]="tab.label"
+        [disabled]="tab.disabled"
+        [attr.tabindex]="i === focusIndex$() ? '0' : '-1'"
+        (click)="select(tab)"
+        (keydown)="onKeydown($event, i)"
+      >
+        <cx-process-pill
+          [label]="tab.label"
+          [count]="tab.count"
+          [mood]="tab.mood"
+          [icon]="tab.icon"
+          [selected]="tab.selected"
+          [terminal]="tab.terminal"
+          [muted]="tab.muted"
+          [disabled]="tab.disabled"
+          [dense]="condensed$()"
+        />
+      </button>
+    }
+  </div>
+
+  @if (editable$()) {
+    <cx-icon-button
+      class="cx-process__edit"
+      icon="settings"
+      variant="transparent"
+      size="small"
+      ariaLabel="Customise stages"
+      (pressed)="customize.emit()"
+    />
+  }
+</div>

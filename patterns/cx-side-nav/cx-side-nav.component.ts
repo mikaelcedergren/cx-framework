@@ -21,6 +21,16 @@ export type CxSideNavItem = {
   fragment?: string;
   /** How `routerLinkActive` decides this item is active. Defaults to exact-path. */
   routerLinkActiveOptions?: { exact: boolean } | IsActiveMatchOptions;
+  /**
+   * External link target. When set, the item renders as a plain `<a href>`
+   * instead of an in-app router link — use it to point at a different app or
+   * open a destination in a new browser tab (see {@link target}).
+   */
+  href?: string;
+  /** Anchor target for {@link href}, e.g. `'_blank'` to open in a new tab. */
+  target?: string;
+  /** Anchor `rel` for {@link href}; defaults to `'noopener'` for `_blank`. */
+  rel?: string;
 };
 
 export type CxSideNavGroup = {
@@ -114,10 +124,13 @@ export class CxSideNavComponent {
     if (!group.collapsible) {
       return;
     }
-    this.expandedGroups = {
-      ...this.expandedGroups,
-      [group.id]: !this.isGroupExpanded(group),
-    };
+    const nextExpanded = !this.isGroupExpanded(group);
+    this.expandedGroups = this.normalizedGroups().reduce<Record<string, boolean>>((expandedGroups, candidate) => {
+      if (candidate.collapsible) {
+        expandedGroups[candidate.id] = candidate.id === group.id ? nextExpanded : false;
+      }
+      return expandedGroups;
+    }, {});
   }
 
   protected itemPadding(level: number): number | null {

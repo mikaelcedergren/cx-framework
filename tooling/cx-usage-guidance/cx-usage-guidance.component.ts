@@ -26,6 +26,8 @@ export class CxUsageGuidanceComponent {
   @Input() componentName = '';
   @Input() saving = false;
   @Input() error = '';
+  /** When false, guidance is read-only — no edit affordance, no editing. */
+  @Input() editable = true;
 
   @Input()
   public set text(value: string | null | undefined) {
@@ -46,6 +48,7 @@ export class CxUsageGuidanceComponent {
   });
 
   protected startEditing(): void {
+    if (!this.editable) return;
     this.draft$.set(this.textState());
     this.editing$.set(true);
     requestAnimationFrame(() => this.editor?.nativeElement.focus());

@@ -77,6 +77,7 @@
         <cx-icon [name]="iconName" [size]="16" />
       </span>
     }
+    <ng-content select="[cxTrailing]" />
   </div>
 
   @if (showHint$() || validationMessages$().length > 0) {

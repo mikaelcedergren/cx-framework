@@ -19,7 +19,7 @@
       (keydown)="onEditorKeydown($event)"
       (blur)="commitEditing()"
     ></textarea>
-  } @else {
+  } @else if (editable) {
     <button
       class="cx-usage-guidance__read"
       type="button"
@@ -32,5 +32,13 @@
         <span class="cx-usage-guidance__empty">No usage guidance yet.</span>
       }
     </button>
+  } @else {
+    <div class="cx-usage-guidance__read">
+      @if (hasText$()) {
+        <span class="cx-usage-guidance__body">{{ displayText$() }}</span>
+      } @else {
+        <span class="cx-usage-guidance__empty">No usage guidance yet.</span>
+      }
+    </div>
   }
 </section>

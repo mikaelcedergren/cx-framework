@@ -3,12 +3,18 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { access, cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
+import * as sass from 'sass';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frameworkRoot = path.resolve(scriptDir, '..');
 const outRoot = path.join(frameworkRoot, 'out-tsc');
 const distRoot = path.join(frameworkRoot, 'dist');
 const ngcPath = path.join(frameworkRoot, 'node_modules', '@angular', 'compiler-cli', 'bundles', 'src', 'bin', 'ngc.js');
+
+// ngc inlines each component's `styleUrl` verbatim; it does not run a stylesheet
+// preprocessor. Compile component SCSS to CSS in place, run ngc, then restore
+// the original sources so package builds contain browser-readable styles.
+const styleSourceDirs = ['primitives', 'patterns'];
 
 function run(command, args, cwd) {
   return new Promise((resolve, reject) => {
@@ -29,12 +35,70 @@ function run(command, args, cwd) {
   });
 }
 
+async function collectComponentStyles(dir) {
+  const found = [];
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+
+  for (const entry of entries) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      found.push(...(await collectComponentStyles(entryPath)));
+    } else if (entry.isFile() && entry.name.endsWith('.component.scss')) {
+      found.push(entryPath);
+    }
+  }
+
+  return found;
+}
+
+async function compileComponentStyles() {
+  const files = [];
+  for (const dir of styleSourceDirs) {
+    files.push(...(await collectComponentStyles(path.join(frameworkRoot, dir))));
+  }
+
+  const originals = new Map();
+  for (const file of files) {
+    originals.set(file, await readFile(file, 'utf8'));
+  }
+
+  const compiled = new Map();
+  for (const file of files) {
+    try {
+      compiled.set(file, sass.compile(file, { style: 'compressed', loadPaths: [frameworkRoot] }).css);
+    } catch (error) {
+      throw new Error(
+        `Failed to compile component stylesheet ${path.relative(frameworkRoot, file)}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+
+  await Promise.all([...compiled].map(([file, css]) => writeFile(file, css)));
+  return originals;
+}
+
+async function restoreComponentStyles(originals) {
+  await Promise.all([...originals].map(([file, content]) => writeFile(file, content)));
+}
+
 async function buildFramework() {
   await access(ngcPath);
   await rm(outRoot, { recursive: true, force: true });
   await rm(distRoot, { recursive: true, force: true });
 
-  await run('node', [ngcPath, '-p', 'tsconfig.lib.json', '--sourceMap', 'false', '--inlineSources', 'false'], frameworkRoot);
+  const styleBackups = await compileComponentStyles();
+  try {
+    await run('node', [ngcPath, '-p', 'tsconfig.lib.json', '--sourceMap', 'false', '--inlineSources', 'false'], frameworkRoot);
+  } finally {
+    await restoreComponentStyles(styleBackups);
+  }
 
   await mkdir(distRoot, { recursive: true });
   await cp(path.join(outRoot, 'lib'), path.join(distRoot, 'lib'), { recursive: true });

@@ -1,0 +1,15 @@
+<span class="cx-process-pill__indicator" aria-hidden="true">
+  @if (icon) {
+    <cx-icon class="cx-process-pill__icon" [name]="icon" size="16" />
+  } @else {
+    <span class="cx-process-pill__dot"></span>
+  }
+</span>
+
+@if (label) {
+  <span class="cx-process-pill__label">{{ label }}</span>
+}
+
+@if (hasCount()) {
+  <span class="cx-process-pill__count">{{ count }}</span>
+}

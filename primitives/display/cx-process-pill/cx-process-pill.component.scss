@@ -1,0 +1,118 @@
+:host {
+  display: inline-flex;
+  min-height: var(--controller-size);
+  box-sizing: border-box;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--opacity-high);
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+}
+
+:host(:hover) {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+:host(.cx-process-pill--selected) {
+  background: var(--opacity-mid);
+  color: var(--ink);
+}
+
+:host(.cx-process-pill--muted) {
+  opacity: 0.5;
+}
+
+:host(.cx-process-pill--disabled) {
+  opacity: var(--opacity-disabled);
+  pointer-events: none;
+}
+
+.cx-process-pill__indicator {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.cx-process-pill__icon {
+  color: var(--opacity-high);
+}
+
+.cx-process-pill__dot {
+  width: var(--space-sm);
+  height: var(--space-sm);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--opacity-high);
+}
+
+.cx-process-pill__label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+:host(.cx-process-pill--selected) .cx-process-pill__label {
+  font-weight: var(--font-weight-bold);
+}
+
+.cx-process-pill__count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mood drives only the indicator colour; selection/hover own the surface. */
+:host(.cx-process-pill--info) .cx-process-pill__dot {
+  background: var(--info);
+}
+:host(.cx-process-pill--info) .cx-process-pill__icon {
+  color: var(--info);
+}
+
+:host(.cx-process-pill--success) .cx-process-pill__dot {
+  background: var(--success);
+}
+:host(.cx-process-pill--success) .cx-process-pill__icon {
+  color: var(--success);
+}
+
+:host(.cx-process-pill--warning) .cx-process-pill__dot {
+  background: var(--warning);
+}
+:host(.cx-process-pill--warning) .cx-process-pill__icon {
+  color: var(--warning);
+}
+
+:host(.cx-process-pill--danger) .cx-process-pill__dot {
+  background: var(--danger);
+}
+:host(.cx-process-pill--danger) .cx-process-pill__icon {
+  color: var(--danger);
+}
+
+/*
+ * Condensed: indicator + count only. The rail toggles this when the row runs
+ * out of room, before falling back to horizontal scrolling. The full text still
+ * lives in the tab's accessible name, so hiding the label is purely visual.
+ */
+:host(.cx-process-pill--dense) .cx-process-pill__label {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    transition: none;
+  }
+}

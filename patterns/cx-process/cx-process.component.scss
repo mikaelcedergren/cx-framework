@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-process {
+  display: flex;
+  min-height: var(--controller-size);
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.cx-process__row {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.cx-process__row::-webkit-scrollbar {
+  height: var(--space-xs);
+}
+
+.cx-process__row::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill, 999px);
+  background: var(--opacity-mid);
+}
+
+.cx-process__tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill, 999px);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  outline: none;
+}
+
+.cx-process__tab:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-process__tab:disabled {
+  cursor: default;
+}
+
+/* The seam between open work and the settled, end-of-flow stages. */
+.cx-process__divider {
+  flex: 0 0 auto;
+  align-self: center;
+  width: var(--border-width, 1px);
+  height: var(--space-md);
+  margin-inline: var(--space-2xs);
+  background: var(--opacity-mid);
+}
+
+/*
+ * The customise affordance stays out of the way: it holds its place in the
+ * layout but only surfaces on hover or keyboard focus, so the resting rail is
+ * calm. Focus reveals it too, so keyboard and touch users can reach it.
+ */
+.cx-process__edit {
+  flex: 0 0 auto;
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+  transition:
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.cx-process--editable:hover .cx-process__edit,
+.cx-process--editable:focus-within .cx-process__edit {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-process__edit {
+    transition: none;
+  }
+}

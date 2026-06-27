@@ -42,7 +42,7 @@
 
 .cx-side-nav__skeleton-row {
   display: block;
-  height: 28px;
+  height: calc(28px + var(--space-sm) + var(--space-sm));
   border-radius: var(--radius-sm);
   background:
     linear-gradient(
@@ -176,7 +176,7 @@
   min-height: 28px;
   align-items: center;
   gap: var(--space-sm);
-  padding: 0 var(--space-xs);
+  padding: var(--space-sm) var(--space-xs);
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;
@@ -192,7 +192,7 @@
 }
 
 .cx-side-nav__item:hover {
-  background: var(--opacity-low);
+  background: var(--primary-opacity);
   color: var(--ink);
 }
 
@@ -223,7 +223,12 @@
 }
 
 .cx-side-nav__icon {
-  flex: 0 0 auto;
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  flex: 0 0 var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
 }
 
 .cx-side-nav__label {

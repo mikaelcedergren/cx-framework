@@ -61,6 +61,37 @@
                     />
                   </div>
                 </div>
+              } @else if (item.href) {
+                <a
+                  class="cx-side-nav__item"
+                  [class.cx-side-nav__item--disabled]="item.disabled"
+                  [attr.href]="item.disabled ? null : item.href"
+                  [attr.target]="item.target ?? null"
+                  [attr.rel]="item.rel ?? (item.target === '_blank' ? 'noopener' : null)"
+                  [attr.aria-disabled]="item.disabled ? 'true' : null"
+                  [attr.tabindex]="item.disabled ? '-1' : null"
+                  [style.padding-left.px]="itemPadding(level)"
+                  (click)="onItemClick($event, item)"
+                >
+                  @if (item.icon) {
+                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  }
+                  <span class="cx-side-nav__label">{{ item.label }}</span>
+                  @if (item.badge) {
+                    <span
+                      class="cx-side-nav__badge"
+                      [class.cx-side-nav__badge--dot]="item.badge === true"
+                      [class.cx-side-nav__badge--primary]="badgeTone(item) === 'primary'"
+                      [class.cx-side-nav__badge--accent]="badgeTone(item) === 'accent'"
+                      [class.cx-side-nav__badge--info]="badgeTone(item) === 'info'"
+                      [class.cx-side-nav__badge--success]="badgeTone(item) === 'success'"
+                      [class.cx-side-nav__badge--warning]="badgeTone(item) === 'warning'"
+                      [class.cx-side-nav__badge--danger]="badgeTone(item) === 'danger'"
+                    >
+                      {{ badgeLabel(item) }}
+                    </span>
+                  }
+                </a>
               } @else {
                 <a
                   class="cx-side-nav__item"
