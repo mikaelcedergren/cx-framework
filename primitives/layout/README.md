@@ -137,9 +137,9 @@ Single-purpose helpers for the raw elements and wrappers *you* write — not for
 
 There are deliberately **no margin or gap utilities** — gap belongs to the layout primitives above.
 
-## Long-form text
+## Article
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-prose` (add `.cx-prose--lg` for hero scale) and its headings, paragraphs, lists, quotes, and code get a reading-optimised treatment with no per-element classes. It styles plain semantic HTML, so the source doesn't matter; the whole block scales from one custom property, `--cx-prose-base`.
+Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its headings, paragraphs, lists, quotes, and code get a reading-optimised treatment with no per-element classes. It styles plain semantic HTML, so the source doesn't matter; the whole block scales from one custom property, `--cx-article-base`.
 
 ## The page frame
 

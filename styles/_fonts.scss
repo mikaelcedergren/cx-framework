@@ -1,0 +1,44 @@
+// Self-hosted webfonts. The framework ships the woff2 files (framework/fonts)
+// and owns these @font-face declarations so every product that consumes the
+// design system gets the same fonts served from its own origin — no Google
+// Fonts request, deterministic offline, and `font-display: swap` so text is
+// never invisible while a face loads.
+//
+// Consuming apps copy framework/fonts/*.woff2 to `/assets/fonts/` at build time
+// (in this repo: tools/framework/sync-fonts.mjs). The latin subset covers en + sv.
+//
+//   Inter             — base UI font  (--font-family-base),  variable 100–900
+//   Roboto Mono       — code / mono   (--font-family-mono),  variable 100–700
+//   DM Serif Display  — article heads (--font-family-fancy), 400 only
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/InterVariable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/InterVariable-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/assets/fonts/RobotoMono.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Serif Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/DMSerifDisplay.woff2') format('woff2');
+}

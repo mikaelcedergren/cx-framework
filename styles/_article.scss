@@ -1,18 +1,18 @@
-// Long-form / editorial typography.
+// Article — editorial typography.
 //
 // Wrap any semantic HTML — an article body, landing-page copy, markdown or CMS
-// output — in `.cx-prose`, and its headings, text, lists, quotes, and code get
+// output — in `.cx-article`, and its headings, text, lists, quotes, and code get
 // a reading-optimised treatment. You never class individual elements.
 //
 // Sizing is em-relative off a single base, so a whole block scales from one
-// number: `--cx-prose-base`. `.cx-prose--lg` bumps that base for hero/landing
-// contexts; set `--cx-prose-base` inline for anything in between.
+// number: `--cx-article-base`. `.cx-article--lg` bumps that base for hero/landing
+// contexts; set `--cx-article-base` inline for anything in between.
 //
-// Global (not component-scoped) on purpose: prose is usually injected via
+// Global (not component-scoped) on purpose: an article is usually injected via
 // [innerHTML] (markdown, CMS), which Angular's view encapsulation never tags —
 // component-scoped descendant rules would silently miss it.
 //
-// Prose is a content stream, so blocks own their vertical margins. This is the
+// An article is a content stream, so blocks own their vertical margins. This is the
 // one place margin is the right tool — the "containers own gap" rule is about
 // composing UI, not flowing text.
 //
@@ -124,20 +124,52 @@
     height: auto;
     border-radius: var(--radius-md);
   }
+
+  table {
+    width: 100%;
+    margin: 0 0 1em;
+    border-collapse: collapse;
+    font-size: 0.9em;
+  }
+
+  th,
+  td {
+    padding: 0.5em 0.75em;
+    border-bottom: var(--line-discreet);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  th {
+    color: var(--ink);
+    font-weight: var(--font-weight-bold);
+  }
 }
 
-.cx-prose {
-  --cx-prose-base: 18px;
+.cx-article {
+  --cx-article-base: 18px;
 
   max-inline-size: var(--measure-md);
   margin-inline: auto;
   color: var(--ink);
-  font-size: var(--cx-prose-base);
+  font-size: var(--cx-article-base);
   line-height: 1.6;
 
   @include cx-editorial-type;
+
+  // Headings carry the editorial display serif. DM Serif Display ships a single
+  // weight, so let it stand at its natural weight rather than faux-bolding the
+  // 700 the mixin sets. Scoped to .cx-article on purpose — other surfaces sharing
+  // cx-editorial-type (e.g. the markdown preview) keep the base sans headings.
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-family-fancy);
+    font-weight: var(--font-weight-regular);
+  }
 }
 
-.cx-prose--lg {
-  --cx-prose-base: 22px;
+.cx-article--lg {
+  --cx-article-base: 22px;
 }

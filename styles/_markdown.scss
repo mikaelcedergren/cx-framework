@@ -6,7 +6,7 @@
 // descendant selectors to require that attribute — but innerHTML-injected
 // elements never receive it, so component-scoped rules would silently miss.
 
-@use 'prose';
+@use 'article';
 
 .cx-textarea__markdown {
   h1, h2, h3, h4 {
@@ -63,8 +63,8 @@
   }
 }
 
-// Document mode shares the editorial prose scale (styles/_prose.scss)
+// Document mode shares the editorial type scale (styles/_article.scss)
 // instead of duplicating it.
 .cx-textarea--document .cx-textarea__markdown {
-  @include prose.cx-editorial-type;
+  @include article.cx-editorial-type;
 }

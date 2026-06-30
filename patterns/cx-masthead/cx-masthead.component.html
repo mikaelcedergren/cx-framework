@@ -1,0 +1,125 @@
+<header class="cx-masthead" [class.cx-masthead--sticky]="sticky">
+  <div class="cx-masthead__inner">
+    <div class="cx-masthead__brand">
+      <ng-content select="[brand], [cxMastheadBrand]" />
+      @if (hasDefaultBrand()) {
+        @if (homeHref) {
+          <a class="cx-masthead__home" [href]="homeHref">
+            <ng-container [ngTemplateOutlet]="brandContent" />
+          </a>
+        } @else {
+          <span class="cx-masthead__home cx-masthead__home--static">
+            <ng-container [ngTemplateOutlet]="brandContent" />
+          </span>
+        }
+      }
+    </div>
+
+    <div class="cx-masthead__cluster">
+      @if (items.length) {
+        <nav class="cx-masthead__nav" aria-label="Primary">
+          <ul class="cx-masthead__links">
+            @for (item of items; track item.id) {
+              <li class="cx-masthead__links-item">
+                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+              </li>
+            }
+          </ul>
+        </nav>
+      }
+
+      <div class="cx-masthead__actions">
+        <ng-content select="[actions], [cxMastheadActions]" />
+      </div>
+
+      @if (items.length) {
+        <button
+          class="cx-masthead__toggle"
+          type="button"
+          [attr.aria-expanded]="menuOpen()"
+          [attr.aria-controls]="panelId"
+          [attr.aria-label]="resolvedMenuAriaLabel()"
+          (click)="toggleMenu()"
+        >
+          <cx-icon [name]="menuOpen() ? 'cross-circle' : 'menu-horizontal'" [size]="20" />
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (items.length) {
+    <div
+      class="cx-masthead__panel"
+      [class.cx-masthead__panel--open]="menuOpen()"
+      [id]="panelId"
+    >
+      <div class="cx-masthead__panel-inner">
+        <nav class="cx-masthead__panel-nav" aria-label="Primary">
+          <ul class="cx-masthead__panel-links">
+            @for (item of items; track item.id) {
+              <li class="cx-masthead__links-item">
+                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+              </li>
+            }
+          </ul>
+        </nav>
+      </div>
+    </div>
+  }
+</header>
+
+<ng-template #brandContent>
+  @if (logoSrc) {
+    <img class="cx-masthead__logo" [src]="logoSrc" alt="" aria-hidden="true" />
+  } @else if (logo) {
+    <cx-icon class="cx-masthead__logo-icon" [name]="logo" [size]="24" />
+  }
+  @if (heading) {
+    <span class="cx-masthead__title">{{ heading }}</span>
+  }
+</ng-template>
+
+<ng-template #navLink let-item>
+  @if (item.href !== undefined) {
+    <a
+      class="cx-masthead__link"
+      [class.cx-masthead__link--active]="item.active"
+      [class.cx-masthead__link--disabled]="item.disabled"
+      [attr.href]="item.disabled ? null : item.href"
+      [attr.target]="item.target ?? null"
+      [attr.rel]="item.rel ?? (item.target === '_blank' ? 'noopener' : null)"
+      [attr.aria-current]="item.active && !item.disabled ? 'page' : null"
+      [attr.aria-disabled]="item.disabled ? 'true' : null"
+      [attr.tabindex]="item.disabled ? '-1' : null"
+      (click)="onItemClick($event, item)"
+      >{{ item.label }}</a
+    >
+  } @else if (item.routerLink !== undefined) {
+    <a
+      class="cx-masthead__link"
+      [class.cx-masthead__link--disabled]="item.disabled"
+      [routerLink]="item.disabled ? null : item.routerLink"
+      [fragment]="item.disabled ? undefined : item.fragment"
+      routerLinkActive="cx-masthead__link--active"
+      [routerLinkActiveOptions]="activeOptions(item)"
+      #rla="routerLinkActive"
+      [attr.aria-current]="rla.isActive && !item.disabled ? 'page' : null"
+      [attr.aria-disabled]="item.disabled ? 'true' : null"
+      [attr.tabindex]="item.disabled ? '-1' : null"
+      (click)="onItemClick($event, item)"
+      >{{ item.label }}</a
+    >
+  } @else {
+    <button
+      class="cx-masthead__link"
+      type="button"
+      [class.cx-masthead__link--active]="item.active"
+      [class.cx-masthead__link--disabled]="item.disabled"
+      [disabled]="item.disabled"
+      [attr.aria-current]="item.active ? 'page' : null"
+      (click)="onItemClick($event, item)"
+    >
+      {{ item.label }}
+    </button>
+  }
+</ng-template>

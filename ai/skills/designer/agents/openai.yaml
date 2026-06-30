@@ -1,0 +1,6 @@
+interface:
+  display_name: "Designer"
+  short_description: "Product design guardrails"
+  default_prompt: "Use $designer to shape UX/UI direction, critique user-facing work, and prepare a clear design brief before implementation."
+policy:
+  allow_implicit_invocation: true

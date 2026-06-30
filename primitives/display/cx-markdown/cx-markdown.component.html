@@ -1,1 +1,5 @@
-<div class="cx-markdown" [innerHTML]="renderedMarkdown$()"></div>
+<div
+  [class.cx-markdown]="variant !== 'article'"
+  [class.cx-article]="variant === 'article'"
+  [innerHTML]="renderedMarkdown$()"
+></div>

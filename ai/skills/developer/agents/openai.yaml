@@ -1,0 +1,6 @@
+interface:
+  display_name: "Developer"
+  short_description: "Finished-product implementation"
+  default_prompt: "Use $developer to implement approved work with maintainable code, correct framework usage, and appropriate verification."
+policy:
+  allow_implicit_invocation: true

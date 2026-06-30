@@ -1,0 +1,6 @@
+interface:
+  display_name: "Custodian"
+  short_description: "Design-quality gate"
+  default_prompt: "Use $custodian to review UX/UI quality, accessibility, states, copy, and design-system consistency before work progresses."
+policy:
+  allow_implicit_invocation: true

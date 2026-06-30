@@ -1,7 +1,7 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.3.2",
-  "description": "Personal Angular UI framework shared by Cortex apps.",
+  "version": "0.3.3",
+  "description": "Personal Angular UI framework and AI design package.",
   "type": "module",
   "packageManager": "pnpm@10.7.1",
   "main": "./dist/lib/public-api.js",
@@ -13,7 +13,11 @@
       "default": "./dist/lib/public-api.js"
     },
     "./DESIGN-SYSTEM.md": "./DESIGN-SYSTEM.md",
+    "./PACKAGING.md": "./PACKAGING.md",
+    "./README.md": "./README.md",
     "./package.json": "./package.json",
+    "./ai/*": "./ai/*",
+    "./fonts/*": "./fonts/*",
     "./icons/*": "./icons/*",
     "./patterns/*": "./patterns/*",
     "./primitives/*": "./primitives/*",
@@ -34,8 +38,12 @@
     "./tooling/*": "./tooling/*"
   },
   "files": [
+    "README.md",
+    "PACKAGING.md",
     "DESIGN-SYSTEM.md",
     "dist/",
+    "ai/",
+    "fonts/",
     "icons/",
     "patterns/",
     "primitives/",
@@ -50,6 +58,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "icons": "node scripts/generate-icon-manifest.mjs",
+    "icons:check": "node scripts/generate-icon-index.mjs --check",
+    "icons:index": "node scripts/generate-icon-index.mjs",
     "prepare": "node scripts/build.mjs"
   },
   "dependencies": {

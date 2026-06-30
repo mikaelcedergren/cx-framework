@@ -16,6 +16,13 @@ export interface CxMarkdownLinkClick {
   event: MouseEvent;
 }
 
+/**
+ * `default` — compact UI markdown (notes, inline copy).
+ * `article` — editorial reading treatment via the global `.cx-article` styling
+ * (serif headings, reading measure). Use for long-form bodies.
+ */
+export type CxMarkdownVariant = 'default' | 'article';
+
 @Component({
   selector: 'cx-markdown',
   templateUrl: './cx-markdown.component.html',
@@ -39,6 +46,7 @@ export class CxMarkdownComponent {
   }
 
   @Input() assetBasePath: string | undefined;
+  @Input() variant: CxMarkdownVariant = 'default';
 
   protected readonly renderedMarkdown$ = computed(() => {
     const raw = this.markdownState().trim();

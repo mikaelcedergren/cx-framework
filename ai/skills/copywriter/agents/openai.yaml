@@ -1,0 +1,6 @@
+interface:
+  display_name: "Copywriter"
+  short_description: "Concise product copy"
+  default_prompt: "Use $copywriter to write or review clear UI copy, microcopy, validation, alerts, empty states, and guidance."
+policy:
+  allow_implicit_invocation: true

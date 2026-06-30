@@ -1,0 +1,164 @@
+<aside
+  class="cx-index-nav"
+  [class.cx-index-nav--collapsed]="collapsedState()"
+  [attr.aria-label]="ariaLabel"
+>
+  <div class="cx-index-nav__top">
+    @if (!collapsedState()) {
+      @if (filterable) {
+        <cx-search-field
+          class="cx-index-nav__filter"
+          [label]="heading || 'Search'"
+          [placeholder]="filterPlaceholder"
+          [value]="query()"
+          updateOn="input"
+          [debounceMs]="120"
+          [clearable]="true"
+          (valueChange)="onQueryChange($event)"
+        />
+      } @else if (heading) {
+        <div class="cx-index-nav__heading">{{ heading }}</div>
+      }
+    }
+
+    @if (collapsible) {
+      <cx-icon-button
+        class="cx-index-nav__toggle"
+        [icon]="collapsedState() ? 'sidebar-right' : 'sidebar-left'"
+        variant="transparent"
+        [ariaLabel]="collapsedState() ? 'Expand navigation' : 'Collapse navigation'"
+        [attr.aria-expanded]="!collapsedState()"
+        [attr.aria-controls]="bodyId"
+        (pressed)="toggleCollapsed()"
+      />
+    }
+  </div>
+
+  <div
+    class="cx-index-nav__body"
+    [id]="bodyId"
+    [attr.aria-hidden]="collapsedState() ? 'true' : null"
+    [attr.inert]="collapsedState() ? '' : null"
+  >
+    @if (loading) {
+      <div class="cx-index-nav__skeleton" aria-hidden="true">
+        @for (row of skeletonItems; track row) {
+          <span class="cx-index-nav__skeleton-row"></span>
+        }
+      </div>
+    } @else {
+      <nav class="cx-index-nav__groups">
+        <ng-template #navLink let-item>
+          @if (item.href !== undefined) {
+            <a
+              class="cx-index-nav__item"
+              [class.cx-index-nav__item--active]="item.active"
+              [class.cx-index-nav__item--disabled]="item.disabled"
+              [attr.href]="item.disabled ? null : item.href"
+              [attr.target]="item.target ?? null"
+              [attr.rel]="item.rel ?? (item.target === '_blank' ? 'noopener' : null)"
+              [attr.aria-current]="item.active && !item.disabled ? 'page' : null"
+              [attr.aria-disabled]="item.disabled ? 'true' : null"
+              [attr.tabindex]="item.disabled ? '-1' : null"
+              (click)="onItemClick($event, item)"
+            >
+              <span class="cx-index-nav__label">{{ item.label }}</span>
+              <ng-container [ngTemplateOutlet]="itemBadge" [ngTemplateOutletContext]="{ $implicit: item }" />
+            </a>
+          } @else if (item.routerLink !== undefined) {
+            <a
+              class="cx-index-nav__item"
+              [class.cx-index-nav__item--disabled]="item.disabled"
+              [routerLink]="item.disabled ? null : item.routerLink"
+              [fragment]="item.disabled ? undefined : item.fragment"
+              routerLinkActive="cx-index-nav__item--active"
+              [routerLinkActiveOptions]="activeOptions(item)"
+              #rla="routerLinkActive"
+              [attr.aria-current]="rla.isActive && !item.disabled ? 'page' : null"
+              [attr.aria-disabled]="item.disabled ? 'true' : null"
+              [attr.tabindex]="item.disabled ? '-1' : null"
+              (click)="onItemClick($event, item)"
+            >
+              <span class="cx-index-nav__label">{{ item.label }}</span>
+              <ng-container [ngTemplateOutlet]="itemBadge" [ngTemplateOutletContext]="{ $implicit: item }" />
+            </a>
+          } @else {
+            <button
+              class="cx-index-nav__item"
+              type="button"
+              [class.cx-index-nav__item--active]="item.active"
+              [class.cx-index-nav__item--disabled]="item.disabled"
+              [disabled]="item.disabled"
+              [attr.aria-current]="item.active ? 'page' : null"
+              (click)="onItemClick($event, item)"
+            >
+              <span class="cx-index-nav__label">{{ item.label }}</span>
+              <ng-container [ngTemplateOutlet]="itemBadge" [ngTemplateOutletContext]="{ $implicit: item }" />
+            </button>
+          }
+        </ng-template>
+
+        @for (group of visibleGroups(); track group.id) {
+          <div class="cx-index-nav__group">
+            @if (group.label) {
+              @if (group.collapsible) {
+                <button
+                  class="cx-index-nav__folder cx-index-nav__folder--toggle"
+                  type="button"
+                  [attr.aria-expanded]="isGroupExpanded(group)"
+                  [attr.aria-label]="(isGroupExpanded(group) ? 'Collapse ' : 'Expand ') + group.label"
+                  (click)="toggleGroup(group)"
+                >
+                  <cx-icon class="cx-index-nav__folder-icon" [name]="folderIcon(group)" [size]="16" />
+                  <span class="cx-index-nav__folder-label">{{ group.label }}</span>
+                  <cx-icon
+                    class="cx-index-nav__folder-chevron"
+                    [name]="isGroupExpanded(group) ? 'chevron-up' : 'chevron-down'"
+                    [size]="16"
+                  />
+                </button>
+              } @else {
+                <div class="cx-index-nav__folder">
+                  <cx-icon class="cx-index-nav__folder-icon" [name]="folderIcon(group)" [size]="16" />
+                  <span class="cx-index-nav__folder-label">{{ group.label }}</span>
+                </div>
+              }
+            }
+
+            <div
+              class="cx-index-nav__items"
+              [class.cx-index-nav__items--collapsible]="group.collapsible"
+              [class.cx-index-nav__items--expanded]="showGroupItems(group)"
+              [attr.inert]="showGroupItems(group) ? null : ''"
+            >
+              <div class="cx-index-nav__items-inner">
+                @for (item of group.items; track item.id) {
+                  <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="cx-index-nav__empty">{{ emptyText }}</p>
+        }
+      </nav>
+    }
+  </div>
+</aside>
+
+<ng-template #itemBadge let-item>
+  @if (item.badge) {
+    <span
+      class="cx-index-nav__badge"
+      [class.cx-index-nav__badge--dot]="item.badge === true"
+      [class.cx-index-nav__badge--primary]="badgeTone(item) === 'primary'"
+      [class.cx-index-nav__badge--accent]="badgeTone(item) === 'accent'"
+      [class.cx-index-nav__badge--info]="badgeTone(item) === 'info'"
+      [class.cx-index-nav__badge--success]="badgeTone(item) === 'success'"
+      [class.cx-index-nav__badge--warning]="badgeTone(item) === 'warning'"
+      [class.cx-index-nav__badge--danger]="badgeTone(item) === 'danger'"
+    >
+      {{ badgeLabel(item) }}
+    </span>
+  }
+</ng-template>
