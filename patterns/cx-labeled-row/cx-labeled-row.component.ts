@@ -9,9 +9,10 @@ import {
 } from '../../primitives/inputs/cx-file-upload';
 import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
-import { CxSelectComponent, type CxSelectOption } from '../../primitives/inputs/cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
 import { CxTextareaComponent } from '../../primitives/inputs/cx-textarea';
+import { type CxFieldValidation, normalizeCxValidation } from '../../primitives/inputs/shared/field.types';
 import {
   CxDynamicFieldsComponent,
   type CxDynamicFieldOption,
@@ -33,53 +34,52 @@ export type CxLabeledRowContent =
   | {
       kind: 'input';
       value?: string;
-      placeholder?: string;
+      hint?: string;
       prependText?: string;
       appendText?: string;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'textarea';
       value?: string;
-      placeholder?: string;
+      hint?: string;
       rows?: number;
       autoGrow?: boolean;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'select';
-      options: CxSelectOption[];
+      options: CxDropdownOption[];
       value?: string;
       values?: string[];
-      displayValue?: string;
       placeholder?: string;
       searchable?: boolean;
       multiple?: boolean;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'radio-group';
       options: CxLabeledRowRadioOption[];
       value?: string;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'checkbox';
       label: string;
       checked?: boolean;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'switch';
       label: string;
       checked?: boolean;
       disabled?: boolean;
-      errorMessage?: string;
+      validation?: CxFieldValidation;
     }
   | {
       kind: 'file-upload';
@@ -105,7 +105,7 @@ export type CxLabeledRowContent =
     CxFileUploadComponent,
     CxTextFieldComponent,
     CxRadioComponent,
-    CxSelectComponent,
+    CxDropdownComponent,
     CxSwitchComponent,
     CxTextareaComponent,
   ],
@@ -187,5 +187,9 @@ export class CxLabeledRowComponent {
 
   protected isRadioSelected(optionId: string): boolean {
     return this.radioValueState() === optionId;
+  }
+
+  protected validationMessages(validation: CxFieldValidation | null | undefined) {
+    return normalizeCxValidation(validation);
   }
 }

@@ -4,7 +4,6 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnDestroy,
   Output,
   ViewChild,
   computed,
@@ -15,14 +14,10 @@ import { CxValidationMessageComponent } from '../../feedback/cx-validation-messa
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxFieldUpdateOn,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
-
-export type CxTextFieldType = 'text' | 'password';
-export type CxTextFieldVariant = 'default' | 'inline-edit';
 
 @Component({
   selector: 'cx-text-field',
@@ -31,13 +26,13 @@ export type CxTextFieldVariant = 'default' | 'inline-edit';
   styleUrl: './cx-text-field.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxTextFieldComponent implements OnDestroy {
+export class CxTextFieldComponent {
+  private static nextId = 0;
   private readonly valueState = signal('');
   private readonly focusedState = signal(false);
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
-  private lastEmittedValue = '';
-  private debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
+  protected readonly labelId = `cx-text-field-label-${CxTextFieldComponent.nextId}`;
+  protected readonly messagesId = `cx-text-field-messages-${CxTextFieldComponent.nextId++}`;
 
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLInputElement>;
@@ -46,45 +41,30 @@ export class CxTextFieldComponent implements OnDestroy {
   @Input() ariaLabel: string | undefined;
   @Input() name: string | undefined;
   @Input() autocomplete: string | undefined;
-  @Input() placeholder = '';
-  @Input() type: CxTextFieldType = 'text';
-  @Input() variant: CxTextFieldVariant = 'default';
+  @Input() inlineEdit = false;
   @Input() optional = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() size: CxFieldSize = 'default';
   @Input() loading = false;
   @Input() clearable = false;
-  @Input() updateOn: CxFieldUpdateOn = 'input';
-  @Input() debounceMs = 300;
   @Input() prependIcon: CxIconName | undefined;
-  @Input() prependIconClickable = false;
   @Input() appendIcon: CxIconName | undefined;
-  @Input() appendIconClickable = false;
   @Input() prependText: string | undefined;
   @Input() appendText: string | undefined;
   @Input() hint: string | undefined;
 
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
   public set value(value: string | undefined) {
-    const nextValue = value ?? '';
-    this.valueState.set(nextValue);
-    this.lastEmittedValue = nextValue;
+    this.valueState.set(value ?? '');
   }
 
   @Output() readonly valueChange = new EventEmitter<string>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
-  @Output() readonly iconClick = new EventEmitter<'prepend' | 'append'>();
   @Output() readonly clear = new EventEmitter<void>();
 
   protected readonly value$ = this.valueState.asReadonly();
@@ -92,11 +72,11 @@ export class CxTextFieldComponent implements OnDestroy {
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState(), this.errorMessageState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly hasClear$ = () =>
-    this.clearable && !!this.valueState() && !this.disabled && !this.readOnly && !this.loading;
+    this.clearable && !!this.valueState() && !this.disabled && !this.loading;
 
   protected get resolvedAriaLabel(): string | undefined {
     const ariaLabel = this.ariaLabel?.trim();
@@ -107,6 +87,17 @@ export class CxTextFieldComponent implements OnDestroy {
     return label || undefined;
   }
 
+  protected get resolvedAriaLabelledBy(): string | undefined {
+    if (this.ariaLabel?.trim()) {
+      return undefined;
+    }
+    return this.label.trim() ? this.labelId : undefined;
+  }
+
+  protected get resolvedAriaDescribedBy(): string | undefined {
+    return this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined;
+  }
+
   protected get resolvedName(): string | null {
     return this.name?.trim() || null;
   }
@@ -115,20 +106,12 @@ export class CxTextFieldComponent implements OnDestroy {
     return this.autocomplete?.trim() || null;
   }
 
-  protected get effectiveType(): 'text' | 'password' {
-    return this.type === 'password' ? 'password' : 'text';
-  }
-
-  public ngOnDestroy(): void {
-    this.clearDebounce();
-  }
-
   public focus(): void {
     this.fieldRef?.nativeElement.focus();
   }
 
   protected onInput(event: Event): void {
-    if (this.disabled || this.readOnly || this.loading) {
+    if (this.disabled || this.loading) {
       return;
     }
     const target = event.target;
@@ -136,14 +119,7 @@ export class CxTextFieldComponent implements OnDestroy {
       return;
     }
     this.valueState.set(target.value);
-    if (this.updateOn === 'input') {
-      this.clearDebounce();
-      this.emitValue(target.value);
-      return;
-    }
-    if (this.updateOn === 'debounced') {
-      this.scheduleDebouncedValue(target.value);
-    }
+    this.valueChange.emit(target.value);
   }
 
   protected onFocus(): void {
@@ -155,16 +131,12 @@ export class CxTextFieldComponent implements OnDestroy {
   }
 
   protected onBlur(): void {
-    if (this.updateOn !== 'input') {
-      this.commitValue();
-    }
     this.focusedState.set(false);
     this.focusChange.emit(false);
   }
 
   protected onEnterKey(event: Event): void {
-    this.commitValue();
-    if (this.variant === 'inline-edit') {
+    if (this.inlineEdit) {
       event.preventDefault();
       this.fieldRef?.nativeElement.blur();
     }
@@ -174,59 +146,15 @@ export class CxTextFieldComponent implements OnDestroy {
     this.fieldRef?.nativeElement.blur();
   }
 
-  protected onIconPress(position: 'prepend' | 'append', event: MouseEvent): void {
-    const clickable = position === 'prepend' ? this.prependIconClickable : this.appendIconClickable;
-    if (!clickable || this.disabled || this.loading) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    this.iconClick.emit(position);
-  }
-
   protected onClear(event: MouseEvent): void {
-    if (this.disabled || this.readOnly || this.loading) {
+    if (this.disabled || this.loading) {
       return;
     }
     event.preventDefault();
     event.stopPropagation();
     this.valueState.set('');
-    this.emitValue('');
+    this.valueChange.emit('');
     this.clear.emit();
     queueMicrotask(() => this.fieldRef?.nativeElement.focus());
-  }
-
-  private commitValue(): void {
-    this.clearDebounce();
-    const value = this.valueState();
-    if (value === this.lastEmittedValue) {
-      return;
-    }
-    this.emitValue(value);
-  }
-
-  private emitValue(value: string): void {
-    this.lastEmittedValue = value;
-    this.valueChange.emit(value);
-  }
-
-  private scheduleDebouncedValue(value: string): void {
-    this.clearDebounce();
-    this.debounceTimer = setTimeout(() => {
-      this.debounceTimer = undefined;
-      this.emitValue(value);
-    }, this.normalizedDebounceMs());
-  }
-
-  private clearDebounce(): void {
-    if (!this.debounceTimer) {
-      return;
-    }
-    clearTimeout(this.debounceTimer);
-    this.debounceTimer = undefined;
-  }
-
-  private normalizedDebounceMs(): number {
-    return Number.isFinite(this.debounceMs) ? Math.max(0, Math.floor(this.debounceMs)) : 300;
   }
 }

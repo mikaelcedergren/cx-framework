@@ -18,8 +18,7 @@ import { CxValidationMessageComponent } from '../../feedback/cx-validation-messa
 import { CxTextFieldComponent } from '../cx-text-field';
 import {
   CxColorPickerComponent,
-  type CxColorPickerOption,
-  type CxColorPickerValue,
+  type CxColorPickerColor,
 } from '../cx-color-picker';
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
@@ -31,9 +30,9 @@ import {
 import { CxIconComponent } from '../../media/cx-icon';
 import { measureCxFloatingSurface } from '../../overlay/floating-surface';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxTagInputTag = {
@@ -43,7 +42,7 @@ export type CxTagInputTag = {
   color?: string;
 };
 
-type CxTagPickerColor = Extract<CxTagColor, CxColorPickerValue>;
+type CxTagPickerColor = Extract<CxTagColor, CxColorPickerColor>;
 
 @Component({
   selector: 'cx-tag-input',
@@ -66,8 +65,7 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly tagsState = signal<CxTagInputTag[]>([]);
   private readonly selectedIdsState = signal<string[]>([]);
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly emptyTextState = signal('');
   private readonly searchQueryState = signal('');
   private readonly openState = signal(false);
@@ -76,10 +74,6 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
   private readonly draftValueState = signal('');
   private readonly draftColorState = signal<CxTagPickerColor>('violet');
   private readonly draftKeyErrorState = signal<string | undefined>(undefined);
-  protected readonly colorPickerOptions: readonly CxColorPickerOption[] = CX_TAG_COLOR_PICKER_OPTIONS.map(color => ({
-    value: color as CxTagPickerColor,
-    label: this.toColorLabel(color),
-  }));
   private readonly overlayWidthState = signal<number | undefined>(undefined);
   private readonly overlayMaxHeightState = signal<number | undefined>(undefined);
   private readonly overlayLeftState = signal<number | undefined>(undefined);
@@ -102,11 +96,9 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
 
   @Input() label = 'Tags';
   @Input() ariaLabel: string | undefined;
-  @Input() ariaDescribedBy: string | undefined;
   @Input() placeholder = '';
   @Input() optional = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() clearable = false;
   @Input() size: CxFieldSize = 'default';
@@ -124,13 +116,8 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -148,11 +135,11 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState(), this.errorMessageState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly isLocked$ = () => this.disabled || this.loading;
-  protected readonly isInteractive$ = () => !this.disabled && !this.loading && !this.readOnly;
+  protected readonly isInteractive$ = () => !this.disabled && !this.loading;
   protected readonly overlayWidth$ = this.overlayWidthState.asReadonly();
   protected readonly overlayMaxHeight$ = this.overlayMaxHeightState.asReadonly();
   protected readonly overlayLeft$ = this.overlayLeftState.asReadonly();
@@ -176,8 +163,9 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     });
   });
   protected readonly showPlaceholder$ = computed(
-    () => this.selectedTags$().length === 0 && this.placeholder.trim().length > 0,
+    () => this.selectedTags$().length === 0,
   );
+  protected readonly placeholderText$ = computed(() => this.placeholder.trim() || this.defaultPlaceholderText());
   protected readonly hasClear$ = computed(
     () => this.clearable && this.selectedTags$().length > 0 && this.isInteractive$(),
   );
@@ -200,7 +188,18 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     if (this.label.trim()) {
       return undefined;
     }
-    return this.placeholder.trim() || 'Tags';
+    return 'Tags';
+  }
+
+  private defaultPlaceholderText(): string {
+    const label = this.label.trim() || this.ariaLabel?.trim() || '';
+    if (!label) {
+      return 'Select tags';
+    }
+    if (label === label.toUpperCase()) {
+      return `Select ${label}`;
+    }
+    return `Select ${label.charAt(0).toLowerCase()}${label.slice(1)}`;
   }
 
   protected get resolvedFieldAriaLabelledBy(): string | undefined {
@@ -212,10 +211,6 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
 
   protected get resolvedFieldAriaDescribedBy(): string | undefined {
     const ids: string[] = [];
-    const external = this.ariaDescribedBy?.trim();
-    if (external) {
-      ids.push(external);
-    }
     if (this.showHint$() || this.validationMessages$().length > 0) {
       ids.push(this.messagesId);
     }
@@ -318,15 +313,6 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     this.valuesChange.emit(nextSelectedIds);
   }
 
-  protected formatTagText(tag: CxTagInputTag): string {
-    return tag.name;
-  }
-
-  protected formatTagInfo(tag: CxTagInputTag): string | undefined {
-    const trimmedKey = tag.key?.trim();
-    return trimmedKey || undefined;
-  }
-
   protected formatOptionLabel(tag: CxTagInputTag): string {
     const trimmedKey = tag.key?.trim();
     return trimmedKey ? `${tag.name}: ${trimmedKey}` : tag.name;
@@ -336,6 +322,7 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     switch (color) {
       case 'blue':
       case 'cyan':
+      case 'lime':
       case 'green':
       case 'orange':
       case 'pink':
@@ -387,7 +374,7 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     this.draftValueState.set(value);
   }
 
-  protected onDraftColorChange(color: CxColorPickerValue | undefined): void {
+  protected onDraftColorChange(color: CxColorPickerColor | undefined): void {
     this.draftColorState.set(this.isTagColor(color) ? color : 'violet');
   }
 
@@ -509,12 +496,8 @@ export class CxTagInputComponent implements AfterViewInit, OnDestroy {
     };
   }
 
-  private isTagColor(color: CxColorPickerValue | undefined): color is CxTagPickerColor {
+  private isTagColor(color: CxColorPickerColor | undefined): color is CxTagPickerColor {
     return !!color && (CX_TAG_COLOR_PICKER_OPTIONS as readonly string[]).includes(color);
-  }
-
-  private toColorLabel(color: CxTagColor): string {
-    return color.charAt(0).toUpperCase() + color.slice(1);
   }
 
   private ensureSelected(tagId: string): void {

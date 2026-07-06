@@ -79,11 +79,6 @@
   pointer-events: none;
 }
 
-.cx-time-input__field-shell--readonly {
-  background: var(--surface-mid);
-  cursor: default;
-}
-
 .cx-time-input__field-shell--loading {
   opacity: 0.7;
   cursor: progress;
@@ -135,10 +130,6 @@
 }
 
 .cx-time-input__segment-input:disabled {
-  cursor: default;
-}
-
-.cx-time-input__segment-input:read-only:not(:disabled) {
   cursor: default;
 }
 

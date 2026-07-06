@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation, signal } from '@angular/core';
-import { CxSelectComponent, type CxSelectOption } from '../../primitives/inputs/cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 
 export type CxWorkbenchAlign = 'top' | 'center' | 'bottom';
-export type CxWorkbenchMinSize = 'none' | 'small' | 'medium' | 'large';
+export type CxWorkbenchPreviewHeight = 'auto' | 'small' | 'medium' | 'large';
 export type CxWorkbenchPreviewWidth = 'auto' | 'small' | 'medium' | 'large' | 'full';
 
 @Component({
   selector: 'cx-workbench',
-  imports: [CxSelectComponent],
+  imports: [CxDropdownComponent],
   templateUrl: './cx-workbench.component.html',
   styleUrl: './cx-workbench.component.scss',
   encapsulation: ViewEncapsulation.None,
@@ -15,23 +15,23 @@ export type CxWorkbenchPreviewWidth = 'auto' | 'small' | 'medium' | 'large' | 'f
 })
 export class CxWorkbenchComponent {
   protected readonly align$ = signal<CxWorkbenchAlign>('center');
-  protected readonly minSize$ = signal<CxWorkbenchMinSize>('none');
+  protected readonly previewHeight$ = signal<CxWorkbenchPreviewHeight>('auto');
   protected readonly previewWidth$ = signal<CxWorkbenchPreviewWidth>('auto');
 
-  protected readonly alignOptions: CxSelectOption[] = [
+  protected readonly alignOptions: CxDropdownOption[] = [
     { id: 'top', label: 'top' },
     { id: 'center', label: 'center' },
     { id: 'bottom', label: 'bottom' },
   ];
 
-  protected readonly minSizeOptions: CxSelectOption[] = [
-    { id: 'none', label: 'none' },
+  protected readonly previewHeightOptions: CxDropdownOption[] = [
+    { id: 'auto', label: 'auto' },
     { id: 'small', label: 'small' },
     { id: 'medium', label: 'medium' },
     { id: 'large', label: 'large' },
   ];
 
-  protected readonly previewWidthOptions: CxSelectOption[] = [
+  protected readonly previewWidthOptions: CxDropdownOption[] = [
     { id: 'auto', label: 'auto' },
     { id: 'small', label: 'small' },
     { id: 'medium', label: 'medium' },
@@ -47,8 +47,8 @@ export class CxWorkbenchComponent {
   }
 
   @Input()
-  public set minSize(value: CxWorkbenchMinSize | boolean | '' | undefined) {
-    this.minSize$.set(this.normalizeMinSize(value));
+  public set previewHeight(value: CxWorkbenchPreviewHeight | undefined) {
+    this.previewHeight$.set(this.normalizePreviewHeight(value));
   }
 
   @Input()
@@ -62,18 +62,17 @@ export class CxWorkbenchComponent {
     }
   }
 
-  protected onMinSizeChange(value: string | undefined): void {
-    this.minSize$.set(this.normalizeMinSize(value));
+  protected onPreviewHeightChange(value: string | undefined): void {
+    this.previewHeight$.set(this.normalizePreviewHeight(value));
   }
 
   protected onPreviewWidthChange(value: string | undefined): void {
     this.previewWidth$.set(this.normalizePreviewWidth(value));
   }
 
-  private normalizeMinSize(value: CxWorkbenchMinSize | boolean | string | undefined): CxWorkbenchMinSize {
-    if (value === true || value === '') return 'small';
+  private normalizePreviewHeight(value: CxWorkbenchPreviewHeight | string | undefined): CxWorkbenchPreviewHeight {
     if (value === 'small' || value === 'medium' || value === 'large') return value;
-    return 'none';
+    return 'auto';
   }
 
   private normalizePreviewWidth(value: CxWorkbenchPreviewWidth | string | undefined): CxWorkbenchPreviewWidth {

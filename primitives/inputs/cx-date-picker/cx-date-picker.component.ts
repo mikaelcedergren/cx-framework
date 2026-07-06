@@ -17,7 +17,7 @@ import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
-import { CxSelectComponent, type CxSelectOption } from '../cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../cx-dropdown';
 import { CxCheckboxComponent } from '../cx-checkbox';
 import {
   CxTimeInputComponent,
@@ -43,9 +43,9 @@ import {
 } from '../shared/cx-date.utils';
 import { measureCxFloatingSurface } from '../../overlay/floating-surface';
 import {
+  type CxFieldValidation,
   type CxRenderedValidationMessage,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxDatePickerSize = 'small' | 'default' | 'large';
@@ -58,7 +58,7 @@ export type CxDatePickerWeekStart = CxCalendarWeekStart;
     CxIconButtonComponent,
     CxIconComponent,
     CxPopoverComponent,
-    CxSelectComponent,
+    CxDropdownComponent,
     CxTimeInputComponent,
     CxValidationMessageComponent,
   ],
@@ -70,7 +70,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   private static nextId = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly valueState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly openState = signal(false);
   private readonly focusedState = signal(false);
   private readonly overlayWidthState = signal<number | undefined>(undefined);
@@ -82,6 +82,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   private readonly viewMonthState = signal(getCxTodayParts().month);
   private triggerElement?: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  protected readonly labelId = `cx-date-picker-label-${CxDatePickerComponent.nextId}`;
   protected readonly messagesId = `cx-date-picker-messages-${CxDatePickerComponent.nextId}`;
   protected readonly surfaceId = `cx-date-picker-surface-${CxDatePickerComponent.nextId++}`;
   protected readonly timeFormat: CxTimeInputFormat = '24';
@@ -89,7 +90,11 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLElement>;
 
-  @Input() placeholder = '';
+  @Input() label = 'Date';
+  @Input() hint: string | undefined;
+  @Input() optional = false;
+  @Input() ariaLabel: string | undefined;
+  @Input() placeholder = 'Select date';
   @Input() size: CxDatePickerSize = 'default';
   @Input() weekStart: CxDatePickerWeekStart = 'mon';
   @Input() yearRange = 50;
@@ -99,13 +104,12 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   @Input() allDayEnabled = false;
   @Input() allDay = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() clearable = false;
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -118,7 +122,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   @Output() readonly clear = new EventEmitter<void>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
 
-  protected readonly monthOptions: CxSelectOption[] = CX_MONTH_OPTIONS.map(option => ({
+  protected readonly monthOptions: CxDropdownOption[] = CX_MONTH_OPTIONS.map(option => ({
     id: String(option.value),
     label: option.label,
   }));
@@ -138,14 +142,14 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   protected readonly displayText$ = computed(
     () =>
       formatCxDateDisplay(this.valueState(), this.timeEnabled && !this.effectiveAllDay$(), this.timeFormat) ??
-      this.placeholder,
+      (this.placeholder.trim() || 'Select date'),
   );
   protected readonly showPlaceholder$ = computed(() => !this.selectedDate$());
   protected readonly weekdayLabels$ = computed(() => getCxWeekdayLabels(this.weekStart));
   protected readonly calendarDays$ = computed(() =>
     buildCxCalendarDays(this.viewYearState(), this.viewMonthState(), this.weekStart),
   );
-  protected readonly yearOptions$ = computed<CxSelectOption[]>(() =>
+  protected readonly yearOptions$ = computed<CxDropdownOption[]>(() =>
     getCxYearOptions(this.viewYearState(), this.yearRange).map(year => ({
       id: String(year),
       label: String(year),
@@ -159,7 +163,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     return formatCxTimeValue(selectedDate.hours, selectedDate.minutes, this.timeFormat);
   });
   protected readonly hasClear$ = computed(
-    () => this.clearable && !!this.selectedDate$() && !this.disabled && !this.readOnly && !this.loading,
+    () => this.clearable && !!this.selectedDate$() && !this.disabled && !this.loading,
   );
   protected readonly outOfRange$ = computed(() => {
     const selectedDate = this.selectedDate$();
@@ -172,22 +176,44 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     if (this.disabled) {
       return [];
     }
-    const messages = [...normalizeCxValidationMessages(this.validationMessagesState())];
+    const explicitValidation = normalizeCxValidation(this.validationState());
+    if (explicitValidation.length > 0) {
+      return explicitValidation;
+    }
     if (this.outOfRange$()) {
-      messages.push({
+      return [{
         id: 'error:Date must be within the allowed range.',
         type: 'error',
         message: 'Date must be within the allowed range.',
-      });
+      }];
     }
-    return messages;
+    return [];
   });
   protected readonly hasError$ = computed(() => this.validationMessages$().some(message => message.type === 'error'));
+  protected readonly showHint$ = computed(() => !!this.hint?.trim() && this.validationMessages$().length === 0);
   protected readonly isLocked$ = () => this.disabled || this.loading;
-  protected readonly isInteractive$ = () => !this.disabled && !this.loading && !this.readOnly;
+  protected readonly isInteractive$ = () => !this.disabled && !this.loading;
 
-  protected get resolvedFieldAriaLabel(): string {
-    return this.host.nativeElement.getAttribute('aria-label')?.trim() || this.placeholder.trim() || 'Date';
+  protected get resolvedFieldAriaLabel(): string | undefined {
+    const ariaLabel = this.ariaLabel?.trim();
+    if (ariaLabel) {
+      return ariaLabel;
+    }
+    if (this.label.trim()) {
+      return undefined;
+    }
+    return 'Date';
+  }
+
+  protected get resolvedFieldAriaLabelledBy(): string | undefined {
+    if (this.ariaLabel?.trim()) {
+      return undefined;
+    }
+    return this.label.trim() ? this.labelId : undefined;
+  }
+
+  protected get resolvedFieldAriaDescribedBy(): string | undefined {
+    return this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined;
   }
 
   public ngAfterViewInit(): void {

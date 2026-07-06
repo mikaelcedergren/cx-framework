@@ -1021,7 +1021,7 @@ const html = `<!doctype html>
       </header>
 
       <section class="toolbar" aria-label="Icon filters">
-        <input class="search" id="search" type="search" placeholder="Search icons" autocomplete="off">
+        <input class="search" id="search" type="search" aria-label="Search icons" autocomplete="off">
         <div class="filters" id="filters"></div>
         <div class="result-count" id="result-count" aria-live="polite"></div>
       </section>

@@ -56,11 +56,7 @@ export class CxBreadcrumbsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('list', { read: ElementRef }) private readonly listRef?: ElementRef<HTMLElement>;
   @ViewChild('measureList', { read: ElementRef }) private readonly measureListRef?: ElementRef<HTMLElement>;
 
-  private readonly itemsState = signal<CxBreadcrumbItem[]>([
-    { id: 'environments', label: 'Environments' },
-    { id: 'staging-eu-01', label: 'Staging-EU-01' },
-    { id: 'assets', label: 'Assets' },
-  ]);
+  private readonly itemsState = signal<CxBreadcrumbItem[]>([]);
   private readonly currentIdState = signal<string | undefined>(undefined);
   private readonly ariaLabelState = signal('Breadcrumbs');
   private readonly compactState = signal(false);

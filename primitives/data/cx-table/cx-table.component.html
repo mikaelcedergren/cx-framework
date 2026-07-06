@@ -33,11 +33,9 @@
             <th class="cx-table__head-cell cx-table__head-cell--selection" scope="col">
               <cx-checkbox
                 [value]="partiallySelectedRows$() ? 'indeterminate' : allRowsSelected$() ? 'selected' : 'deselected'"
-                [custom]="true"
+                ariaLabel="Select all rows"
                 (selectedChange)="toggleAllRowsSelection($event)"
-              >
-                <span class="cx-table__selection-label">Select all rows</span>
-              </cx-checkbox>
+              />
             </th>
           }
           @for (column of columns$(); track trackColumn($index, column)) {
@@ -166,11 +164,9 @@
               <td class="cx-table__cell cx-table__cell--selection" (click)="$event.stopPropagation()">
                 <cx-checkbox
                   [selected]="isRowSelected(row.id)"
-                  [custom]="true"
+                  [ariaLabel]="selectionLabel(row)"
                   (selectedChange)="toggleRowSelection(row.id, $event)"
-                >
-                  <span class="cx-table__selection-label">{{ selectionLabel(row) }}</span>
-                </cx-checkbox>
+                />
               </td>
             }
             @for (column of columns$(); track trackColumn($index, column)) {
@@ -208,7 +204,7 @@
                           <cx-tag
                             [text]="cell.label"
                             [color]="cell.color ?? 'default'"
-                            [variant]="cell.variant ?? (cell.outline ? 'outline' : 'readOnly')"
+                            [outline]="cell.outline ?? false"
                           />
                         }
                         @default {

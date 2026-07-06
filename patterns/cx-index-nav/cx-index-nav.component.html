@@ -9,10 +9,7 @@
         <cx-search-field
           class="cx-index-nav__filter"
           [label]="heading || 'Search'"
-          [placeholder]="filterPlaceholder"
           [value]="query()"
-          updateOn="input"
-          [debounceMs]="120"
           [clearable]="true"
           (valueChange)="onQueryChange($event)"
         />

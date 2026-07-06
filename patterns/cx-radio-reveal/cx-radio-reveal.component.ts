@@ -93,7 +93,7 @@ export class CxRadioRevealComponent {
   }
 
   protected getRevealAriaLabel(option: CxResolvedRadioRevealOption): string {
-    return option.revealPlaceholder || option.label;
+    return option.label;
   }
 
   private ensureValidSelection(): void {

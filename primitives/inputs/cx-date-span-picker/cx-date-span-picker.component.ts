@@ -18,7 +18,7 @@ import { CxValidationMessageComponent } from '../../feedback/cx-validation-messa
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { CxCheckboxComponent } from '../cx-checkbox';
-import { CxSelectComponent, type CxSelectOption } from '../cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../cx-dropdown';
 import {
   CxTimeInputComponent,
   type CxTimeInputFormat,
@@ -45,10 +45,10 @@ import {
 } from '../shared/cx-date.utils';
 import { measureCxFloatingSurface } from '../../overlay/floating-surface';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
   type CxRenderedValidationMessage,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxDateSpanValue = {
@@ -74,7 +74,7 @@ export type CxDateSpanPickerWeekStart = CxCalendarWeekStart;
     CxIconButtonComponent,
     CxIconComponent,
     CxPopoverComponent,
-    CxSelectComponent,
+    CxDropdownComponent,
     CxTimeInputComponent,
     CxValidationMessageComponent,
   ],
@@ -88,7 +88,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   private readonly startValueState = signal<string | undefined>(undefined);
   private readonly endValueState = signal<string | undefined>(undefined);
   private readonly quickRangesState = signal<CxDateSpanQuickRange[]>([]);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly openState = signal(false);
   private readonly overlayWidthState = signal<number | undefined>(undefined);
   private readonly overlayMaxHeightState = signal<number | undefined>(undefined);
@@ -111,10 +111,10 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   private readonly fieldButtonRef?: ElementRef<HTMLElement>;
 
   @Input() label = 'Date span';
-  @Input() placeholder = '';
+  @Input() ariaLabel: string | undefined;
+  @Input() placeholder = 'Select date range';
   @Input() hint: string | undefined;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() optional = false;
   @Input() size: CxDateSpanPickerSize = 'default';
@@ -136,8 +136,8 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -151,7 +151,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   @Output() readonly allDayStartChange = new EventEmitter<boolean>();
   @Output() readonly allDayEndChange = new EventEmitter<boolean>();
 
-  protected readonly monthOptions: CxSelectOption[] = CX_MONTH_OPTIONS.map(option => ({
+  protected readonly monthOptions: CxDropdownOption[] = CX_MONTH_OPTIONS.map(option => ({
     id: String(option.value),
     label: option.label,
   }));
@@ -169,7 +169,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   protected readonly startDate$ = computed(() => parseCxDateValue(this.startValueState()));
   protected readonly endDate$ = computed(() => parseCxDateValue(this.endValueState()));
   protected readonly displayText$ = computed(
-    () => formatCxDateSpanDisplay(this.startValueState(), this.endValueState()) ?? this.placeholder,
+    () => formatCxDateSpanDisplay(this.startValueState(), this.endValueState()) ?? (this.placeholder.trim() || 'Select date range'),
   );
   protected readonly showPlaceholder$ = computed(() => !this.startDate$() && !this.endDate$());
   protected readonly weekdayLabels$ = computed(() => getCxWeekdayLabels(this.weekStart));
@@ -179,13 +179,13 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   protected readonly rightCalendarDays$ = computed(() =>
     buildCxCalendarDays(this.rightViewYearState(), this.rightViewMonthState(), this.weekStart),
   );
-  protected readonly leftYearOptions$ = computed<CxSelectOption[]>(() =>
+  protected readonly leftYearOptions$ = computed<CxDropdownOption[]>(() =>
     getCxYearOptions(this.leftViewYearState(), 12).map(year => ({
       id: String(year),
       label: String(year),
     })),
   );
-  protected readonly rightYearOptions$ = computed<CxSelectOption[]>(() =>
+  protected readonly rightYearOptions$ = computed<CxDropdownOption[]>(() =>
     getCxYearOptions(this.rightViewYearState(), 12).map(year => ({
       id: String(year),
       label: String(year),
@@ -210,16 +210,15 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
       this.clearable &&
       (!!this.startDate$() || !!this.endDate$()) &&
       !this.disabled &&
-      !this.readOnly &&
       !this.loading,
   );
   protected readonly validationMessages$ = computed<ReadonlyArray<CxRenderedValidationMessage>>(() =>
-    this.disabled ? [] : normalizeCxValidationMessages(this.validationMessagesState()),
+    this.disabled ? [] : normalizeCxValidation(this.validationState()),
   );
   protected readonly hasError$ = computed(() => this.validationMessages$().some(message => message.type === 'error'));
   protected readonly showHint$ = computed(() => !!this.hint?.trim() && this.validationMessages$().length === 0);
   protected readonly isLocked$ = () => this.disabled || this.loading;
-  protected readonly isInteractive$ = () => !this.disabled && !this.loading && !this.readOnly;
+  protected readonly isInteractive$ = () => !this.disabled && !this.loading;
   protected readonly summaryText$ = computed(() => {
     const startText = formatCxDateDisplay(this.startValueState(), this.timeEnabled, this.timeFormat);
     const endText = formatCxDateDisplay(this.endValueState(), this.timeEnabled, this.timeFormat);
@@ -236,6 +235,10 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   });
 
   protected get resolvedFieldAriaLabel(): string | undefined {
+    const ariaLabel = this.ariaLabel?.trim();
+    if (ariaLabel) {
+      return ariaLabel;
+    }
     if (this.label.trim()) {
       return undefined;
     }
@@ -243,6 +246,9 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   }
 
   protected get resolvedFieldAriaLabelledBy(): string | undefined {
+    if (this.ariaLabel?.trim()) {
+      return undefined;
+    }
     return this.label.trim() ? this.labelId : undefined;
   }
 

@@ -20,7 +20,6 @@
       class="cx-date-span-picker__field"
       [class.cx-date-span-picker__field--open]="isOpen$()"
       [class.cx-date-span-picker__field--disabled]="disabled"
-      [class.cx-date-span-picker__field--readonly]="readOnly"
       [class.cx-date-span-picker__field--loading]="loading"
       [class.cx-date-span-picker__field--error]="hasError$()"
       [disabled]="isLocked$()"
@@ -29,7 +28,6 @@
       [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
       [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
       [attr.aria-label]="resolvedFieldAriaLabel"
-      [attr.aria-readonly]="readOnly ? 'true' : null"
       [attr.aria-busy]="loading ? 'true' : null"
       aria-haspopup="dialog"
       (click)="toggleOpen(fieldButton)"
@@ -54,7 +52,7 @@
   @if (showHint$() || validationMessages$().length > 0) {
     <div class="cx-date-span-picker__messages" [id]="messagesId">
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       } @else if (showHint$()) {
         <div class="cx-date-span-picker__hint">{{ hint!.trim() }}</div>
       }
@@ -106,21 +104,21 @@
                 />
 
                 <div class="cx-date-span-picker__calendar-controls">
-                  <cx-select
+                  <cx-dropdown
                     class="cx-date-span-picker__select cx-date-span-picker__select--month"
                     label=""
                     ariaLabel="Start month"
-                    placeholder="Start month"
+                    placeholder="Select start month"
                     [availableValues]="monthOptions"
                     [value]="leftViewMonthValue$()"
                     (valueChange)="onLeftMonthChange($event)"
                   />
 
-                  <cx-select
+                  <cx-dropdown
                     class="cx-date-span-picker__select cx-date-span-picker__select--year"
                     label=""
                     ariaLabel="Start year"
-                    placeholder="Start year"
+                    placeholder="Select start year"
                     [availableValues]="leftYearOptions$()"
                     [value]="leftViewYearValue$()"
                     (valueChange)="onLeftYearChange($event)"
@@ -174,21 +172,21 @@
                 />
 
                 <div class="cx-date-span-picker__calendar-controls">
-                  <cx-select
+                  <cx-dropdown
                     class="cx-date-span-picker__select cx-date-span-picker__select--month"
                     label=""
                     ariaLabel="End month"
-                    placeholder="End month"
+                    placeholder="Select end month"
                     [availableValues]="monthOptions"
                     [value]="rightViewMonthValue$()"
                     (valueChange)="onRightMonthChange($event)"
                   />
 
-                  <cx-select
+                  <cx-dropdown
                     class="cx-date-span-picker__select cx-date-span-picker__select--year"
                     label=""
                     ariaLabel="End year"
-                    placeholder="End year"
+                    placeholder="Select end year"
                     [availableValues]="rightYearOptions$()"
                     [value]="rightViewYearValue$()"
                     (valueChange)="onRightYearChange($event)"
@@ -244,7 +242,6 @@
                   [format]="timeFormat"
                   [value]="startTimeValue$()"
                   [disabled]="isLocked$() || !startDate$() || effectiveAllDayStart$()"
-                  [readOnly]="readOnly"
                   [loading]="loading"
                   (valueChange)="onStartTimeChange($event)"
                 />
@@ -252,7 +249,7 @@
                   <cx-checkbox
                     text="All day"
                     [selected]="effectiveAllDayStart$()"
-                    [disabled]="readOnly || loading"
+                    [disabled]="loading"
                     (selectedChange)="onAllDayStartChange($event)"
                   />
                 }
@@ -266,7 +263,6 @@
                   [format]="timeFormat"
                   [value]="endTimeValue$()"
                   [disabled]="isLocked$() || !endDate$() || effectiveAllDayEnd$()"
-                  [readOnly]="readOnly"
                   [loading]="loading"
                   (valueChange)="onEndTimeChange($event)"
                 />
@@ -274,7 +270,7 @@
                   <cx-checkbox
                     text="All day"
                     [selected]="effectiveAllDayEnd$()"
-                    [disabled]="readOnly || loading"
+                    [disabled]="loading"
                     (selectedChange)="onAllDayEndChange($event)"
                   />
                 }

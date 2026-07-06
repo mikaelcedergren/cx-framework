@@ -15,11 +15,22 @@
     class="cx-number-field__field-shell"
     [class.cx-number-field__field-shell--focused]="shellFocused$()"
     [class.cx-number-field__field-shell--disabled]="disabled$()"
-    [class.cx-number-field__field-shell--readonly]="readOnly$()"
     [class.cx-number-field__field-shell--loading]="loading$()"
     [class.cx-number-field__field-shell--error]="hasError$()"
     [attr.aria-busy]="loading$() ? 'true' : null"
   >
+    @if (steppers$()) {
+      <button
+        type="button"
+        class="cx-number-field__stepper cx-number-field__stepper--decrement"
+        aria-label="Decrease"
+        [disabled]="!canDecrement$()"
+        (click)="onStep(-1)"
+      >
+        <cx-icon name="minus" [size]="16" />
+      </button>
+    }
+
     @if (prependText$(); as prependText) {
       <span class="cx-number-field__affix cx-number-field__affix--prepend">{{ prependText }}</span>
     }
@@ -29,10 +40,9 @@
       type="number"
       inputmode="decimal"
       class="cx-number-field__field"
+      [class.cx-number-field__field--stepper]="steppers$()"
       [value]="draft$()"
-      [placeholder]="placeholder"
       [disabled]="isLocked$()"
-      [readOnly]="readOnly$()"
       [attr.min]="min$() ?? null"
       [attr.max]="max$() ?? null"
       [attr.step]="step$() ?? null"
@@ -40,7 +50,6 @@
       [attr.aria-labelledby]="resolvedAriaLabelledBy"
       [attr.aria-describedby]="resolvedAriaDescribedBy"
       [attr.aria-invalid]="hasError$() ? 'true' : null"
-      [attr.aria-readonly]="readOnly$() ? 'true' : null"
       (input)="onInput($event)"
       (focus)="onFocus()"
       (blur)="onBlur()"
@@ -63,6 +72,18 @@
         <cx-icon name="remove" [size]="14" />
       </button>
     }
+
+    @if (steppers$()) {
+      <button
+        type="button"
+        class="cx-number-field__stepper cx-number-field__stepper--increment"
+        aria-label="Increase"
+        [disabled]="!canIncrement$()"
+        (click)="onStep(1)"
+      >
+        <cx-icon name="plus" [size]="16" />
+      </button>
+    }
   </div>
 
   @if (showHint$() || validationMessages$().length > 0) {
@@ -72,7 +93,7 @@
       }
 
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       }
     </div>
   }

@@ -17,8 +17,9 @@ import {
   signal,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
-import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipComponent } from '../../overlay/cx-tooltip';
+import { CxButtonComponent } from '../cx-button';
+import { eventMatchesShortcut, isTypingTarget, normalizeShortcutParts } from '../shared/shortcuts';
 
 export interface CxActionAreaAction {
   id: string;
@@ -44,6 +45,8 @@ type CxResolvedActionAreaAction = CxActionAreaAction & {
 
 type CxActionAreaFitMode = 'full' | 'compact' | 'icon';
 
+const CX_ACTION_AREA_REVEAL_DELAY_MS = 300;
+
 const CX_ACTION_AREA_INFO_ACTION: CxResolvedActionAreaAction = {
   id: 'info',
   text: 'Info',
@@ -63,6 +66,16 @@ const CX_ACTION_AREA_AI_ACTION: CxResolvedActionAreaAction = {
   key: 'feature-ai',
 };
 
+const CX_ACTION_AREA_SUPPORT_ACTION: CxResolvedActionAreaAction = {
+  id: 'support',
+  text: 'Support',
+  icon: 'support',
+  ariaLabel: 'Get support',
+  shortcutParts: ['shift', 's'],
+  disabled: false,
+  key: 'feature-support',
+};
+
 const CX_ACTION_AREA_EDIT_ACTION: CxResolvedActionAreaAction = {
   id: 'edit',
   text: 'Edit',
@@ -74,7 +87,7 @@ const CX_ACTION_AREA_EDIT_ACTION: CxResolvedActionAreaAction = {
 
 @Component({
   selector: 'cx-action-area',
-  imports: [CxIconComponent, CxShortcutKeyComponent],
+  imports: [CxButtonComponent, CxTooltipComponent],
   templateUrl: './cx-action-area.component.html',
   styleUrl: './cx-action-area.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,21 +101,28 @@ export class CxActionAreaComponent implements OnDestroy {
   private readonly actionsState = signal<readonly CxResolvedActionAreaAction[]>([]);
   private readonly infoState = signal(false);
   private readonly askAiState = signal(false);
+  private readonly supportState = signal(false);
   private readonly editableState = signal(false);
   private readonly ariaLabelState = signal('Action area');
   private readonly disabledState = signal(false);
   private readonly shortcutsEnabledState = signal(true);
   private readonly hoveringState = signal(false);
   private readonly focusWithinState = signal(false);
+  private readonly visualActiveState = signal(false);
   private readonly fitModeState = signal<CxActionAreaFitMode>('full');
   private actionsRail: HTMLElement | undefined;
   private resizeObserver: ResizeObserver | undefined;
   private measurementFrame: number | undefined;
+  private activeRevealTimer: number | undefined;
   private measuring = false;
 
   @Input()
   public set actions(value: readonly CxActionAreaAction[] | undefined) {
-    this.actionsState.set(this.normalizeActions(value));
+    const actions = this.normalizeActions(value);
+    this.actionsState.set(actions);
+    if (actions.length === 0 && !this.infoState() && !this.askAiState() && !this.supportState() && !this.editableState()) {
+      this.hideActiveVisual();
+    }
   }
 
   @Input()
@@ -113,6 +133,11 @@ export class CxActionAreaComponent implements OnDestroy {
   @Input()
   public set askAi(value: boolean) {
     this.askAiState.set(Boolean(value));
+  }
+
+  @Input()
+  public set support(value: boolean) {
+    this.supportState.set(Boolean(value));
   }
 
   @Input()
@@ -127,7 +152,11 @@ export class CxActionAreaComponent implements OnDestroy {
 
   @Input()
   public set disabled(value: boolean) {
-    this.disabledState.set(Boolean(value));
+    const disabled = Boolean(value);
+    this.disabledState.set(disabled);
+    if (disabled) {
+      this.hideActiveVisual();
+    }
   }
 
   @Input()
@@ -145,6 +174,9 @@ export class CxActionAreaComponent implements OnDestroy {
     if (this.askAiState()) {
       actions.push(CX_ACTION_AREA_AI_ACTION);
     }
+    if (this.supportState()) {
+      actions.push(CX_ACTION_AREA_SUPPORT_ACTION);
+    }
     actions.push(...this.actionsState());
     if (this.editableState()) {
       actions.push(CX_ACTION_AREA_EDIT_ACTION);
@@ -153,9 +185,10 @@ export class CxActionAreaComponent implements OnDestroy {
   });
   protected readonly visibleActions$ = this.allActions$;
   protected readonly isInteractive$ = computed(() => !this.disabledState() && this.allActions$().length > 0);
-  protected readonly isActive$ = computed(() =>
+  protected readonly hasInteractionIntent$ = computed(() =>
     this.isInteractive$() && (this.hoveringState() || this.focusWithinState()),
   );
+  protected readonly isActive$ = computed(() => this.isInteractive$() && this.visualActiveState());
   private readonly fitMeasurementEffect = effect(() => {
     this.allActions$();
     this.shortcutsEnabledState();
@@ -214,6 +247,7 @@ export class CxActionAreaComponent implements OnDestroy {
     this.releaseActiveInstance();
     this.fitMeasurementEffect.destroy();
     this.resizeObserver?.disconnect();
+    this.clearActiveRevealTimer();
     if (this.measurementFrame !== undefined && typeof cancelAnimationFrame !== 'undefined') {
       cancelAnimationFrame(this.measurementFrame);
     }
@@ -226,6 +260,7 @@ export class CxActionAreaComponent implements OnDestroy {
     }
     this.hoveringState.set(true);
     this.claimActiveInstance();
+    this.scheduleActiveReveal();
   }
 
   @HostListener('pointerleave')
@@ -233,9 +268,11 @@ export class CxActionAreaComponent implements OnDestroy {
     this.hoveringState.set(false);
     if (this.focusWithinState()) {
       this.claimActiveInstance();
+      this.scheduleActiveReveal();
       return;
     }
     this.releaseActiveInstance();
+    this.hideActiveVisual();
   }
 
   @HostListener('focusin')
@@ -245,6 +282,7 @@ export class CxActionAreaComponent implements OnDestroy {
     }
     this.focusWithinState.set(true);
     this.claimActiveInstance();
+    this.scheduleActiveReveal();
   }
 
   @HostListener('focus')
@@ -261,9 +299,11 @@ export class CxActionAreaComponent implements OnDestroy {
     this.focusWithinState.set(false);
     if (this.hoveringState()) {
       this.claimActiveInstance();
+      this.scheduleActiveReveal();
       return;
     }
     this.releaseActiveInstance();
+    this.hideActiveVisual();
   }
 
   @HostListener('blur', ['$event'])
@@ -276,18 +316,18 @@ export class CxActionAreaComponent implements OnDestroy {
     const hasDomFocus = this.hasDomFocus();
     if (
       (CxActionAreaComponent.activeInstance !== this && !hasDomFocus) ||
-      (!this.isActive$() && !hasDomFocus) ||
+      (!this.hasInteractionIntent$() && !hasDomFocus) ||
       !this.shortcutsEnabledState() ||
       event.repeat ||
       event.isComposing ||
-      this.isTypingTarget(event.target) ||
-      this.isTypingTarget(typeof document === 'undefined' ? null : document.activeElement)
+      isTypingTarget(event.target) ||
+      isTypingTarget(typeof document === 'undefined' ? null : document.activeElement)
     ) {
       return;
     }
 
     const action = this.allActions$().find(item =>
-      !item.disabled && item.shortcutParts && this.eventMatchesShortcut(item.shortcutParts, event),
+      !item.disabled && item.shortcutParts && eventMatchesShortcut(item.shortcutParts, event),
     );
     if (!action) {
       return;
@@ -305,6 +345,18 @@ export class CxActionAreaComponent implements OnDestroy {
     return this.shortcutsEnabledState() && (action.shortcutParts?.length ?? 0) > 0;
   }
 
+  protected actionText(action: CxResolvedActionAreaAction): string {
+    return this.fitModeState() === 'icon' && action.icon ? '' : action.text;
+  }
+
+  protected actionShortcutParts(action: CxResolvedActionAreaAction): readonly string[] | undefined {
+    return this.fitModeState() === 'full' && this.hasShortcut(action) ? action.shortcutParts : undefined;
+  }
+
+  protected actionTooltipText(action: CxResolvedActionAreaAction): string | undefined {
+    return this.fitModeState() === 'icon' && action.icon ? action.text : undefined;
+  }
+
   protected actionAriaLabel(action: CxResolvedActionAreaAction): string {
     const label = action.ariaLabel?.trim();
     if (label) {
@@ -319,9 +371,12 @@ export class CxActionAreaComponent implements OnDestroy {
     event.stopPropagation();
   }
 
-  protected onActionClick(action: CxResolvedActionAreaAction, event: MouseEvent): void {
+  protected onActionClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
+  }
+
+  protected onActionPressed(action: CxResolvedActionAreaAction): void {
     if (action.disabled) {
       return;
     }
@@ -339,6 +394,53 @@ export class CxActionAreaComponent implements OnDestroy {
     if (CxActionAreaComponent.activeInstance === this) {
       CxActionAreaComponent.activeInstance = undefined;
     }
+  }
+
+  private scheduleActiveReveal(): void {
+    if (!this.hasInteractionIntent$()) {
+      this.hideActiveVisual();
+      return;
+    }
+    if (this.visualActiveState() || this.activeRevealTimer !== undefined) {
+      return;
+    }
+    if (typeof window === 'undefined') {
+      this.showActiveVisual();
+      return;
+    }
+
+    this.zone.runOutsideAngular(() => {
+      this.activeRevealTimer = window.setTimeout(() => {
+        this.activeRevealTimer = undefined;
+        this.zone.run(() => this.showActiveVisual());
+      }, CX_ACTION_AREA_REVEAL_DELAY_MS);
+    });
+  }
+
+  private showActiveVisual(): void {
+    if (!this.hasInteractionIntent$() || this.visualActiveState()) {
+      return;
+    }
+    this.visualActiveState.set(true);
+    this.changeDetector.detectChanges();
+  }
+
+  private hideActiveVisual(): void {
+    this.clearActiveRevealTimer();
+    if (!this.visualActiveState()) {
+      return;
+    }
+    this.visualActiveState.set(false);
+    this.changeDetector.detectChanges();
+  }
+
+  private clearActiveRevealTimer(): void {
+    if (this.activeRevealTimer === undefined || typeof window === 'undefined') {
+      this.activeRevealTimer = undefined;
+      return;
+    }
+    window.clearTimeout(this.activeRevealTimer);
+    this.activeRevealTimer = undefined;
   }
 
   private emitAction(action: CxResolvedActionAreaAction, source: CxActionAreaActionSource): void {
@@ -440,7 +542,7 @@ export class CxActionAreaComponent implements OnDestroy {
       .map((action, index) => {
         const id = action.id.trim();
         const text = action.text?.trim() || this.humanizeActionId(id);
-        const shortcutParts = this.normalizeShortcutParts(action.shortcutParts);
+        const shortcutParts = normalizeShortcutParts(action.shortcutParts);
         return {
           ...action,
           id,
@@ -455,16 +557,6 @@ export class CxActionAreaComponent implements OnDestroy {
       .filter(action => action.id.length > 0);
   }
 
-  private normalizeShortcutParts(parts: readonly string[] | undefined): readonly string[] {
-    if (!Array.isArray(parts)) {
-      return [];
-    }
-    return parts
-      .filter(part => typeof part === 'string')
-      .map(part => part.trim())
-      .filter(Boolean);
-  }
-
   private humanizeActionId(id: string): string {
     return id
       .split(/[-_\s]+/)
@@ -473,60 +565,12 @@ export class CxActionAreaComponent implements OnDestroy {
       .join(' ') || 'Action';
   }
 
-  private eventMatchesShortcut(parts: readonly string[], event: KeyboardEvent): boolean {
-    const normalizedParts = parts.map(part => part.trim().toLowerCase()).filter(Boolean);
-    if (normalizedParts.length === 0) {
-      return false;
-    }
-    const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform);
-    const wantsCtrl =
-      normalizedParts.includes('ctrl') ||
-      normalizedParts.includes('control') ||
-      (!isMac && normalizedParts.includes('mod'));
-    const wantsMeta =
-      normalizedParts.includes('cmd') ||
-      normalizedParts.includes('command') ||
-      (isMac && normalizedParts.includes('mod'));
-    const wantsAlt =
-      normalizedParts.includes('alt') ||
-      normalizedParts.includes('option') ||
-      normalizedParts.includes('opt');
-    const wantsShift = normalizedParts.includes('shift');
-    if (
-      event.ctrlKey !== wantsCtrl ||
-      event.metaKey !== wantsMeta ||
-      event.altKey !== wantsAlt ||
-      event.shiftKey !== wantsShift
-    ) {
-      return false;
-    }
-    const keyPart = normalizedParts.find(
-      part => !['mod', 'cmd', 'command', 'ctrl', 'control', 'alt', 'option', 'opt', 'shift'].includes(part),
-    );
-    return keyPart ? this.normalizeShortcutKey(event.key) === this.normalizeShortcutKey(keyPart) : false;
-  }
-
-  private normalizeShortcutKey(value: string): string {
-    const key = value.trim().toLowerCase();
-    if (key === 'esc') return 'escape';
-    if (key === 'return') return 'enter';
-    if (key === 'space') return ' ';
-    return key;
-  }
-
   private hasDomFocus(): boolean {
     const activeElement = typeof document === 'undefined' ? null : document.activeElement;
     return activeElement instanceof Node && this.host.nativeElement.contains(activeElement);
   }
 
   private shortcutLabel(parts: readonly string[] | undefined): string {
-    return this.normalizeShortcutParts(parts).join('+');
-  }
-
-  private isTypingTarget(target: EventTarget | null): boolean {
-    return (
-      target instanceof HTMLElement &&
-      Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
-    );
+    return normalizeShortcutParts(parts).join('+');
   }
 }

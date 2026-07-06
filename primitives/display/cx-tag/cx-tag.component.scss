@@ -1,42 +1,33 @@
 :host {
   display: inline-flex;
+  max-width: 100%;
   width: auto;
 }
 
 .cx-tag {
-  display: inline-flex;
-  width: max-content;
-  min-width: var(--controller-size-small);
-  flex-direction: column;
-  gap: var(--space-sm);
-  color: var(--opacity-high);
-}
+  --cx-tag-background: var(--opacity-low);
+  --cx-tag-border: transparent;
+  --cx-tag-foreground: var(--opacity-high);
 
-.cx-tag__main {
+  position: relative;
   display: inline-flex;
   width: max-content;
+  max-width: 100%;
   min-width: var(--controller-size-small);
-  height: var(--icon-size-md);
+  min-height: var(--icon-size-md);
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   padding: 0 var(--space-xs);
-  border: 1px solid transparent;
+  border: 1px solid var(--cx-tag-border);
   border-radius: var(--radius-sm);
-  background: var(--opacity-low);
-  color: var(--opacity-high);
+  background: var(--cx-tag-background);
   box-sizing: border-box;
+  color: var(--cx-tag-foreground);
+  vertical-align: middle;
 }
 
-.cx-tag--with-icon > .cx-tag__main {
+.cx-tag--with-icon {
   padding-left: var(--space-2xs);
-}
-
-.cx-tag--with-children > .cx-tag__main {
-  padding-right: var(--space-2xs);
-}
-
-.cx-tag--large > .cx-tag__main {
-  height: var(--controller-size-small);
 }
 
 .cx-tag__icon {
@@ -48,194 +39,157 @@
 .cx-tag__text {
   display: block;
   min-width: 0;
+  overflow: hidden;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-small);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.cx-tag--large > .cx-tag__main .cx-tag__text {
-  font-size: var(--font-size-body);
-  line-height: var(--line-height-body);
-}
-
-.cx-tag__info {
-  display: block;
-  color: currentColor;
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
-  white-space: nowrap;
-}
-
-.cx-tag__children {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs);
-}
-
-.cx-tag__remove {
+.cx-tag__dismiss {
+  position: absolute;
+  top: 50%;
+  right: 0;
   display: inline-flex;
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
-  border-radius: inherit;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
   background: var(--surface-mid);
-  color: currentColor;
+  color: var(--ink);
   cursor: pointer;
   margin: 0;
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.92);
+  transform: translate(38%, -50%) scale(0.94);
   transition:
     opacity var(--motion-fast) var(--ease-out-in),
-    transform var(--motion-fast) var(--ease-out-in);
-}
-
-.cx-tag:hover.cx-tag--dismissible .cx-tag__remove,
-.cx-tag:focus-within.cx-tag--dismissible .cx-tag__remove {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-.cx-tag--disabled {
-  opacity: var(--opacity-disabled);
-  pointer-events: none;
-}
-
-.cx-tag--interactive > .cx-tag__main {
-  cursor: pointer;
-  transition:
+    transform var(--motion-fast) var(--ease-out-in),
     background var(--motion-fast) var(--ease-out-in),
     border-color var(--motion-fast) var(--ease-out-in);
 }
 
-.cx-tag--interactive:hover > .cx-tag__main {
-  background: var(--opacity-mid);
+.cx-tag--dismissible:hover .cx-tag__dismiss,
+.cx-tag--dismissible:focus-within .cx-tag__dismiss {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(38%, -50%) scale(1);
 }
 
-.cx-tag--default-color > .cx-tag__main {
+.cx-tag__dismiss:hover {
   background: var(--opacity-low);
-  color: var(--opacity-high);
-}
-
-.cx-tag--outline.cx-tag--default-color > .cx-tag__main {
   border-color: var(--opacity-mid);
-  background: transparent;
-  color: var(--opacity-high);
 }
 
-.cx-tag--blue > .cx-tag__main {
-  background: var(--blue-opacity);
-  color: var(--blue);
+.cx-tag__dismiss:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
 }
 
-.cx-tag--outline.cx-tag--blue > .cx-tag__main {
-  border-color: var(--blue);
-  background: transparent;
-  color: var(--blue);
+.cx-tag--blue {
+  --cx-tag-background: var(--blue-opacity);
+  --cx-tag-foreground: var(--blue);
 }
 
-.cx-tag--cyan > .cx-tag__main {
-  background: var(--cyan-opacity);
-  color: var(--cyan);
+.cx-tag--outline.cx-tag--blue {
+  --cx-tag-border: var(--blue);
 }
 
-.cx-tag--outline.cx-tag--cyan > .cx-tag__main {
-  border-color: var(--cyan);
-  background: transparent;
-  color: var(--cyan);
+.cx-tag--cyan {
+  --cx-tag-background: var(--cyan-opacity);
+  --cx-tag-foreground: var(--cyan);
 }
 
-.cx-tag--green > .cx-tag__main {
-  background: var(--green-opacity);
-  color: var(--green);
+.cx-tag--outline.cx-tag--cyan {
+  --cx-tag-border: var(--cyan);
 }
 
-.cx-tag--outline.cx-tag--green > .cx-tag__main {
-  border-color: var(--green);
-  background: transparent;
-  color: var(--green);
+.cx-tag--lime {
+  --cx-tag-background: var(--lime-opacity);
+  --cx-tag-foreground: var(--lime);
 }
 
-.cx-tag--yellow > .cx-tag__main {
-  background: var(--yellow-opacity);
-  color: var(--yellow);
+.cx-tag--outline.cx-tag--lime {
+  --cx-tag-border: var(--lime);
 }
 
-.cx-tag--outline.cx-tag--yellow > .cx-tag__main {
-  border-color: var(--yellow);
-  background: transparent;
-  color: var(--yellow);
+.cx-tag--green {
+  --cx-tag-background: var(--green-opacity);
+  --cx-tag-foreground: var(--green);
 }
 
-.cx-tag--orange > .cx-tag__main {
-  background: var(--orange-opacity);
-  color: var(--orange);
+.cx-tag--outline.cx-tag--green {
+  --cx-tag-border: var(--green);
 }
 
-.cx-tag--outline.cx-tag--orange > .cx-tag__main {
-  border-color: var(--orange);
-  background: transparent;
-  color: var(--orange);
+.cx-tag--yellow {
+  --cx-tag-background: var(--yellow-opacity);
+  --cx-tag-foreground: var(--yellow);
 }
 
-.cx-tag--tangerine > .cx-tag__main {
-  background: var(--tangerine-opacity);
-  color: var(--tangerine);
+.cx-tag--outline.cx-tag--yellow {
+  --cx-tag-border: var(--yellow);
 }
 
-.cx-tag--outline.cx-tag--tangerine > .cx-tag__main {
-  border-color: var(--tangerine);
-  background: transparent;
-  color: var(--tangerine);
+.cx-tag--orange {
+  --cx-tag-background: var(--orange-opacity);
+  --cx-tag-foreground: var(--orange);
 }
 
-.cx-tag--red > .cx-tag__main {
-  background: var(--red-opacity);
-  color: var(--red);
+.cx-tag--outline.cx-tag--orange {
+  --cx-tag-border: var(--orange);
 }
 
-.cx-tag--outline.cx-tag--red > .cx-tag__main {
-  border-color: var(--red);
-  background: transparent;
-  color: var(--red);
+.cx-tag--tangerine {
+  --cx-tag-background: var(--tangerine-opacity);
+  --cx-tag-foreground: var(--tangerine);
 }
 
-.cx-tag--pink > .cx-tag__main {
-  background: var(--pink-opacity);
-  color: var(--pink);
+.cx-tag--outline.cx-tag--tangerine {
+  --cx-tag-border: var(--tangerine);
 }
 
-.cx-tag--outline.cx-tag--pink > .cx-tag__main {
-  border-color: var(--pink);
-  background: transparent;
-  color: var(--pink);
+.cx-tag--red {
+  --cx-tag-background: var(--red-opacity);
+  --cx-tag-foreground: var(--red);
 }
 
-.cx-tag--purple > .cx-tag__main {
-  background: var(--purple-opacity);
-  color: var(--purple);
+.cx-tag--outline.cx-tag--red {
+  --cx-tag-border: var(--red);
 }
 
-.cx-tag--outline.cx-tag--purple > .cx-tag__main {
-  border-color: var(--purple);
-  background: transparent;
-  color: var(--purple);
+.cx-tag--pink {
+  --cx-tag-background: var(--pink-opacity);
+  --cx-tag-foreground: var(--pink);
 }
 
-.cx-tag--violet > .cx-tag__main {
-  background: var(--violet-opacity);
-  color: var(--violet);
+.cx-tag--outline.cx-tag--pink {
+  --cx-tag-border: var(--pink);
 }
 
-.cx-tag--outline.cx-tag--violet > .cx-tag__main {
-  border-color: var(--violet);
-  background: transparent;
-  color: var(--violet);
+.cx-tag--purple {
+  --cx-tag-background: var(--purple-opacity);
+  --cx-tag-foreground: var(--purple);
+}
+
+.cx-tag--outline.cx-tag--purple {
+  --cx-tag-border: var(--purple);
+}
+
+.cx-tag--violet {
+  --cx-tag-background: var(--violet-opacity);
+  --cx-tag-foreground: var(--violet);
+}
+
+.cx-tag--outline.cx-tag--violet {
+  --cx-tag-border: var(--violet);
+}
+
+.cx-tag--outline {
+  --cx-tag-background: transparent;
+  --cx-tag-border: var(--opacity-mid);
 }

@@ -1,8 +1,10 @@
 @if (isRendered$()) {
   <div
     class="cx-banner"
+    [class.cx-banner--dismissible]="isDismissible$()"
+    [class.cx-banner--persistent]="!isDismissible$()"
     [class.cx-banner--open]="isOpen$()"
-    [class.cx-banner--closing]="!isOpen$()"
+    [class.cx-banner--closing]="!isOpen$() && isDismissible$()"
     [class.cx-banner--default]="mood === 'default'"
     [class.cx-banner--warning]="mood === 'warning'"
     [class.cx-banner--success]="mood === 'success'"
@@ -24,7 +26,7 @@
       </div>
     </div>
 
-    @if (hasActions() || dismissible) {
+    @if (hasActions() || isDismissible$()) {
       <div class="cx-banner__actions">
         @if (visibleAction; as action) {
           <cx-button
@@ -56,7 +58,7 @@
           />
         }
 
-        @if (dismissible) {
+        @if (isDismissible$()) {
           <button
             type="button"
             class="cx-banner__dismiss"

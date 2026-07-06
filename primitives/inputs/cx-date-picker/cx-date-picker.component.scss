@@ -1,3 +1,5 @@
+@use '../shared/field-shell' as field;
+
 :host {
   display: inline-flex;
   max-width: 100%;
@@ -9,6 +11,8 @@
   flex-direction: column;
   gap: var(--space-xs);
 }
+
+@include field.field-header('cx-date-picker', 0);
 
 .cx-date-picker__field {
   display: inline-flex;
@@ -64,11 +68,6 @@
 .cx-date-picker__field--loading {
   cursor: default;
   pointer-events: none;
-}
-
-.cx-date-picker__field--readonly {
-  background: var(--opacity-low);
-  cursor: default;
 }
 
 .cx-date-picker__field--error {
@@ -128,11 +127,7 @@
   outline-offset: var(--outline-tab-offset);
 }
 
-.cx-date-picker__messages {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
+@include field.field-messages('cx-date-picker', 0);
 
 .cx-date-picker__surface-inner {
   display: flex;

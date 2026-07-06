@@ -61,7 +61,9 @@ RULE: Keep paired actions visibly distinct. TYPE: should TOPIC: buttons DESCRIPT
 
 RULE: Labels name the thing the user is providing or choosing. TYPE: must TOPIC: forms DESCRIPTION: A label should make the field understandable even when the field is empty.
 
-RULE: Do not rely on placeholder text as the only label. TYPE: must TOPIC: forms DESCRIPTION: Placeholder text disappears once the user types and does not provide stable context.
+RULE: Do not use placeholders in text fields, textareas, search fields, number fields, password fields, or editable text surfaces. TYPE: must TOPIC: forms DESCRIPTION: Typed fields stay visually empty with clear labels; examples, constraints, and format help belong in helper text.
+
+RULE: Write empty dropdown and picker placeholders as Select [thing], or Select when no specific thing fits. TYPE: must TOPIC: forms DESCRIPTION: Use copy like Select severity or Select language. Do not use vague prompts like Choose, Pick, or Optional.
 
 RULE: Use helper text only when it changes the user's behavior. TYPE: should TOPIC: microcopy DESCRIPTION: Do not add help text that repeats the label or explains the obvious.
 

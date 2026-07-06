@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
-import { CxSelectComponent, type CxSelectOption } from '../../inputs/cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../../inputs/cx-dropdown';
 
 export interface CxPaginationPage {
   number: number;
@@ -95,19 +95,19 @@ function normalizePage(value: CxPaginationPage | undefined): CxPaginationPage {
   return {
     number: toPositiveInteger(value?.number, 1),
     size: toPositiveInteger(value?.size, 25),
-    total: toNonNegativeInteger(value?.total, 157),
+    total: toNonNegativeInteger(value?.total, 0),
   };
 }
 
 @Component({
   selector: 'cx-pagination',
-  imports: [CxIconButtonComponent, CxSelectComponent],
+  imports: [CxIconButtonComponent, CxDropdownComponent],
   templateUrl: './cx-pagination.component.html',
   styleUrl: './cx-pagination.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxPaginationComponent {
-  private readonly pageState = signal<CxPaginationPage>({ number: 1, size: 25, total: 157 });
+  private readonly pageState = signal<CxPaginationPage>({ number: 1, size: 25, total: 0 });
   private readonly pageSizesState = signal<number[]>([10, 25, 50, 100]);
   private readonly totalModeState = signal<CxPaginationTotalMode>('known');
 
@@ -134,7 +134,7 @@ export class CxPaginationComponent {
   protected readonly availablePageSizes$ = computed(() =>
     normalizePageSizeOptions(this.pageSizesState()),
   );
-  protected readonly pageSizeOptions$ = computed<CxSelectOption[]>(() =>
+  protected readonly pageSizeOptions$ = computed<CxDropdownOption[]>(() =>
     this.availablePageSizes$().map(value => ({
       id: String(value),
       label: String(value),

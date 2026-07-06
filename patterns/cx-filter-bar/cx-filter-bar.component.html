@@ -22,10 +22,10 @@
 
       @if (filterOptions$().length > 0) {
         <div class="cx-filter-bar__select">
-          <cx-select
+          <cx-dropdown
             label=""
             size="small"
-            [placeholder]="filterPlaceholder"
+            [placeholder]="resolvedFilterPlaceholder$()"
             [availableValues]="filterOptions$()"
             [value]="selectedFilterValue$()"
             (valueChange)="onFilterValueChange($event)"
@@ -36,7 +36,7 @@
       <div class="cx-filter-bar__query">
         <cx-text-field
           label=""
-          [placeholder]="queryPlaceholder"
+          [ariaLabel]="queryAriaLabel"
           prependIcon="query"
           [value]="queryValue$()"
           (valueChange)="onQueryChange($event)"
@@ -166,10 +166,10 @@
         <cx-menu-label heading="Sort by" />
         <div class="cx-filter-bar__properties-section-body">
           <div class="cx-filter-bar__sort-row">
-            <cx-select
+            <cx-dropdown
               class="cx-filter-bar__sort-select"
               label=""
-              placeholder="Choose column"
+              placeholder="Select column"
               [availableValues]="sortOptions$()"
               [value]="sortBy$()"
               (valueChange)="onSortByValueChange($event)"
@@ -190,10 +190,10 @@
         <cx-menu-label heading="Then by" />
         <div class="cx-filter-bar__properties-section-body">
           <div class="cx-filter-bar__sort-row">
-            <cx-select
+            <cx-dropdown
               class="cx-filter-bar__sort-select"
               label=""
-              placeholder="Choose column"
+              placeholder="Select column"
               [availableValues]="sortOptions$()"
               [value]="thenBy$()"
               (valueChange)="onThenByValueChange($event)"
@@ -226,7 +226,7 @@
       <div class="cx-filter-bar__properties-section-body">
         <cx-text-field
           label=""
-          [placeholder]="columnSearchPlaceholder"
+          [ariaLabel]="columnSearchAriaLabel"
           prependIcon="search"
           [value]="columnSearchValue$()"
           (valueChange)="onColumnSearchValueChange($event)"

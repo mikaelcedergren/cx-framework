@@ -30,7 +30,7 @@ export class CxBudgetComponent {
   private readonly formatState = signal<CxBudgetFormat>('percent');
   private readonly currencyState = signal<CxBudgetCurrency>('EUR');
   private readonly variantState = signal<CxBudgetVariant>('compact');
-  private readonly unitState = signal('');
+  private readonly unitLabelState = signal('');
   private readonly currentLabelState = signal('');
   private readonly maximumLabelState = signal('');
   private readonly hintState = signal('');
@@ -71,8 +71,8 @@ export class CxBudgetComponent {
   }
 
   @Input()
-  public set unit(value: string | null | undefined) {
-    this.unitState.set(value?.trim() ?? '');
+  public set unitLabel(value: string | null | undefined) {
+    this.unitLabelState.set(value?.trim() ?? '');
   }
 
   @Input()
@@ -111,6 +111,8 @@ export class CxBudgetComponent {
   protected readonly isOverBudget$ = computed(() => this.currentState() > this.maximumState() && this.maximumState() > 0);
   protected readonly color$ = computed<CxBudgetColor>(() => this.colorFor(this.percentage$(), this.favorState()));
   protected readonly resolvedAriaLabel$ = this.ariaLabelState.asReadonly();
+  protected readonly currentValueText$ = computed(() => this.formattedCurrentValue());
+  protected readonly currentLabelText$ = this.currentLabelState.asReadonly();
   protected readonly ariaValueMax$ = computed(() => this.hasValidMaximum$() ? this.maximumState() : null);
   protected readonly ariaValueNow$ = computed(() => {
     if (!this.hasValidMaximum$()) {
@@ -194,7 +196,7 @@ export class CxBudgetComponent {
   }
 
   private formatUnit(value: number): string {
-    const unit = this.unitState();
+    const unit = this.unitLabelState();
     const number = this.formatNumber(value);
     return unit ? `${number} ${unit}` : number;
   }

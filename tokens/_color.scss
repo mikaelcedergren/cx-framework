@@ -149,11 +149,11 @@
 
     --ink: #000000;
     --on-ink: #ffffff;
-    --emphasis: #fff;
-    --on-emphasis: #171717;
+    --emphasis: #000;
+    --on-emphasis: #ffffff;
 
     --opacity-high: color-mix(in srgb, rgb(0 0 0 / 74%) 96%, color-mix(in srgb, var(--blue) 74%, transparent) 4%);
-    --opacity-mid: color-mix(in srgb, rgb(0 0 0 / 22%) 96%, color-mix(in srgb, var(--blue) 22%, transparent) 4%);
+    --opacity-mid: color-mix(in srgb, rgb(0 0 0 / 50%) 96%, color-mix(in srgb, var(--blue) 50%, transparent) 4%);
     --opacity-low: color-mix(in srgb, rgb(0 0 0 / 8%) 96%, color-mix(in srgb, var(--blue) 8%, transparent) 4%);
     --opacity-darken: rgb(0 0 0 / 3%);
     --opacity-disabled: 0.55;
@@ -176,5 +176,5 @@
     --info-alt: var(--blue-alt);
 
     --link: var(--blue);
-    --placeholder: rgb(0 0 0 / 58%);
+    --placeholder: rgb(0 0 0 / 66%);
 }

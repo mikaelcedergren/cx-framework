@@ -11,3 +11,8 @@ export interface CxFeedbackAction {
   readonly ariaLabel?: string;
   readonly transparent?: boolean;
 }
+
+/** An action renders only when it has visible text; otherwise it vanishes. */
+export function visibleCxFeedbackAction<T extends CxFeedbackAction>(action: T | undefined): T | undefined {
+  return action?.text.trim() ? action : undefined;
+}

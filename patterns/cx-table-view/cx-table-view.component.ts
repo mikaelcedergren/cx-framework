@@ -22,7 +22,7 @@ import {
   type CxTableSortDirection,
 } from '../../primitives/data/cx-table';
 import { type CxButtonGroupOption } from '../../primitives/actions/cx-button-group';
-import { type CxSelectOption } from '../../primitives/inputs/cx-select';
+import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
 import { CxPaginationComponent, type CxPaginationPage } from '../../primitives/navigation/cx-pagination';
 import { CxActionBarComponent, type CxActionBarData } from '../cx-action-bar';
@@ -42,16 +42,16 @@ export class CxTableViewComponent {
   @Input() filterBarMode: CxFilterBarMode = 'filters';
   @Input() quickFilters: CxButtonGroupOption[] = [];
   @Input() selectedQuickFilterId: string | undefined;
-  @Input() filterOptions: CxSelectOption[] = [];
+  @Input() filterOptions: CxDropdownOption[] = [];
   @Input() selectedFilterValue: string | undefined;
-  @Input() filterPlaceholder = 'Status';
+  @Input() filterPlaceholder = 'Select status';
   @Input() queryValue = '';
-  @Input() queryPlaceholder = 'Type query';
+  @Input() queryAriaLabel = 'Search query';
   @Input() filterSections: CxFilterBarSection[] = [];
   @Input() savedViews: CxMenuItem[] = [];
   @Input() groupByOptions: CxButtonGroupOption[] = [];
   @Input() groupBy = 'none';
-  @Input() sortOptions: CxSelectOption[] = [];
+  @Input() sortOptions: CxDropdownOption[] = [];
   @Input() sortBy: string | undefined = 'none';
   @Input() sortDirection: CxTableSortDirection = 'asc';
   @Input() thenBy: string | undefined = 'none';

@@ -63,9 +63,9 @@ Children side by side, wrapping to the next line when they run out of room.
 
 ```html
 <cx-inline gap="sm" [wrap]="true">
-  <cx-tag>open</cx-tag>
-  <cx-tag>kev</cx-tag>
-  <cx-tag>internet-facing</cx-tag>
+  <cx-tag text="open" />
+  <cx-tag text="kev" />
+  <cx-tag text="internet-facing" />
 </cx-inline>
 ```
 

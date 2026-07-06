@@ -604,7 +604,7 @@ RULE: Show the plain default state first in the component reference and start op
 
 ---
 
-RULE: Reveal each prop's type with the matching reference control. TYPE: must TOPIC: components DESCRIPTION: Switches for booleans, text for strings, number fields for numbers, sliders for bounded ranges, button groups for small sets, selects for larger sets.
+RULE: Reveal each prop's type with the matching reference control. TYPE: must TOPIC: components DESCRIPTION: Switches for booleans, text for strings, number fields for numbers, sliders for bounded ranges, button groups for small sets, dropdowns for larger sets.
 
 ---
 
@@ -612,7 +612,7 @@ RULE: Remove or deliberately flag reference props that are not represented, rath
 
 ---
 
-RULE: Keep shared workbench controls in the workbench and component-specific controls in the component section. TYPE: must TOPIC: components DESCRIPTION: Preview width, min size, alignment belong to the workbench.
+RULE: Keep shared workbench controls in the workbench and component-specific controls in the component section. TYPE: must TOPIC: components DESCRIPTION: Preview width, preview height, and alignment belong to the workbench.
 
 ---
 
@@ -732,7 +732,11 @@ RULE: Use the danger mood for destructive actions instead of a separate destruct
 
 ---
 
-RULE: Do not use placeholders as labels or as pre-filled-looking text; default fields empty with clear labels. TYPE: must TOPIC: forms DESCRIPTION: Placeholders are not labels. EXCEPTION: Unless a placeholder is genuinely needed.
+RULE: Do not use placeholders in text fields, textareas, search fields, number fields, password fields, or editable text surfaces. TYPE: must TOPIC: forms DESCRIPTION: Typed fields stay visually empty with clear labels; examples, constraints, and format help belong in helper text.
+
+---
+
+RULE: Empty dropdowns and picker-style choice controls must show a placeholder shaped as Select [thing], or Select when no specific thing fits. TYPE: must TOPIC: forms DESCRIPTION: Use Select severity, Select language, or Select. Preselected controls do not need visible placeholder text.
 
 ---
 

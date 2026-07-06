@@ -5,7 +5,6 @@
     [disabled]="disabled"
     [attr.aria-expanded]="open$()"
     aria-haspopup="tree"
-    [attr.aria-readonly]="readOnly ? 'true' : null"
     (click)="toggleOpen()"
   >
     @if (showIcons) {
@@ -29,7 +28,6 @@
           class="cx-hierarchical-select__search"
           label=""
           ariaLabel="Search options"
-          placeholder=""
           prependIcon="search"
           [value]="query$()"
           (valueChange)="onQueryChange($event)"

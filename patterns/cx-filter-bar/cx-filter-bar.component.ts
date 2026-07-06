@@ -25,9 +25,9 @@ import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
 import { CxToggleChipGroupComponent } from '../../primitives/inputs/cx-toggle-chip-group';
 import {
-  CxSelectComponent,
-  type CxSelectOption,
-} from '../../primitives/inputs/cx-select';
+  CxDropdownComponent,
+  type CxDropdownOption,
+} from '../../primitives/inputs/cx-dropdown';
 import {
   CxMenuComponent,
   type CxMenuItem,
@@ -67,7 +67,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CxButtonGroupComponent,
     CxIconButtonComponent,
     CxTextFieldComponent,
-    CxSelectComponent,
+    CxDropdownComponent,
     CxMenuComponent,
     CxMenuLabelComponent,
     CxPopoverComponent,
@@ -85,7 +85,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly modeState = signal<CxFilterBarResolvedMode>('filters');
   private readonly quickFiltersState = signal<CxButtonGroupOption[]>([]);
   private readonly selectedQuickFilterIdState = signal<string | undefined>(undefined);
-  private readonly filterOptionsState = signal<CxSelectOption[]>([]);
+  private readonly filterOptionsState = signal<CxDropdownOption[]>([]);
   private readonly selectedFilterValueState = signal<string | undefined>(undefined);
   private readonly queryValueState = signal('');
   private readonly filterSectionsState = signal<CxFilterBarSection[]>([]);
@@ -94,7 +94,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly displayModeState = signal<CxFilterBarDisplayMode>('compact');
   private readonly groupByOptionsState = signal<CxButtonGroupOption[]>([]);
   private readonly groupByState = signal('none');
-  private readonly sortOptionsState = signal<CxSelectOption[]>([]);
+  private readonly sortOptionsState = signal<CxDropdownOption[]>([]);
   private readonly sortByState = signal<string | undefined>('none');
   private readonly sortDirectionState = signal<CxFilterBarSortDirection>('asc');
   private readonly thenByState = signal<string | undefined>('none');
@@ -132,9 +132,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @ViewChild('propertiesPopover')
   private propertiesPopoverRef?: CxPopoverComponent;
 
-  @Input() filterPlaceholder = 'Status';
-  @Input() queryPlaceholder = 'Type query';
-  @Input() columnSearchPlaceholder = 'Search columns';
+  @Input() filterPlaceholder = 'Select status';
+  @Input() queryAriaLabel = 'Search query';
+  @Input() columnSearchAriaLabel = 'Search columns';
 
   @Input()
   public set mode(value: CxFilterBarMode | undefined) {
@@ -152,7 +152,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  public set filterOptions(value: CxSelectOption[]) {
+  public set filterOptions(value: CxDropdownOption[]) {
     this.filterOptionsState.set(value ?? []);
   }
 
@@ -192,7 +192,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  public set sortOptions(value: CxSelectOption[] | undefined) {
+  public set sortOptions(value: CxDropdownOption[] | undefined) {
     this.sortOptionsState.set(value ?? []);
   }
 
@@ -252,6 +252,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly quickFilters$ = this.quickFiltersState.asReadonly();
   protected readonly selectedQuickFilterId$ = this.selectedQuickFilterIdState.asReadonly();
   protected readonly filterOptions$ = this.filterOptionsState.asReadonly();
+  protected readonly resolvedFilterPlaceholder$ = computed(() => this.selectPlaceholder(this.filterPlaceholder));
   protected readonly selectedFilterValue$ = this.selectedFilterValueState.asReadonly();
   protected readonly queryValue$ = this.queryValueState.asReadonly();
   protected readonly filterSections$ = this.filterSectionsState.asReadonly();
@@ -676,6 +677,21 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.filterPopoverBottomState.set(surface.bottom);
     this.filterPopoverMaxHeightState.set(surface.maxHeight);
     this.filterPopoverPlacementState.set(surface.placement);
+  }
+
+  private selectPlaceholder(label: string): string {
+    const trimmed = label.trim();
+    if (!trimmed) {
+      return 'Select';
+    }
+    const lower = trimmed.toLowerCase();
+    if (lower === 'select' || lower.startsWith('select ')) {
+      return trimmed;
+    }
+    const subject = trimmed === trimmed.toUpperCase()
+      ? trimmed
+      : trimmed.charAt(0).toLowerCase() + trimmed.slice(1);
+    return `Select ${subject}`;
   }
 
   private syncPropertiesPopoverMetrics(): void {

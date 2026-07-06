@@ -1,0 +1,93 @@
+:host {
+  display: inline-flex;
+}
+
+.cx-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: var(--controller-size);
+  padding: 0 var(--space-sm);
+  border: var(--border-width) solid var(--opacity-mid);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-small);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.cx-reaction__emoji {
+  font-size: var(--font-size-body-lg);
+  line-height: 1;
+}
+
+.cx-reaction__count {
+  color: var(--opacity-high);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-medium);
+}
+
+button.cx-reaction:hover {
+  border-color: var(--border-hover);
+  background: var(--opacity-low);
+}
+
+button.cx-reaction:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: 2px;
+}
+
+button.cx-reaction:active {
+  transform: scale(0.96);
+}
+
+.cx-reaction--selected {
+  border-color: var(--primary);
+  background: var(--primary-opacity);
+}
+
+.cx-reaction--selected .cx-reaction__count {
+  color: var(--primary);
+}
+
+button.cx-reaction--selected:hover {
+  border-color: var(--primary);
+  background: var(--primary-opacity);
+}
+
+button.cx-reaction:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.cx-reaction--readonly {
+  cursor: default;
+}
+
+/* Small */
+:host(.cx-reaction-host--small) .cx-reaction {
+  height: calc(var(--controller-size) - var(--space-sm));
+  padding: 0 var(--space-xs);
+  font-size: var(--font-size-body-sm);
+}
+
+:host(.cx-reaction-host--small) .cx-reaction__emoji {
+  font-size: var(--font-size-body);
+}
+
+/* Large */
+:host(.cx-reaction-host--large) .cx-reaction {
+  height: calc(var(--controller-size) + var(--space-sm));
+  padding: 0 var(--space-md);
+  font-size: var(--font-size-body-lg);
+}
+
+:host(.cx-reaction-host--large) .cx-reaction__emoji {
+  font-size: var(--font-size-title-3);
+}

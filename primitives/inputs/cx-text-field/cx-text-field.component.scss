@@ -17,6 +17,7 @@
 .cx-text-field--large {
   --cx-text-field-min-height: calc(var(--controller-size) + var(--space-md));
   --cx-text-field-font-size: var(--font-size-body-lg);
+  --cx-text-field-border-radius: var(--radius-lg);
 }
 
 @include field.field-header('cx-text-field');
@@ -30,7 +31,7 @@
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--cx-text-field-border-radius, var(--radius-md));
   background: var(--opacity-darken);
 }
 
@@ -50,15 +51,6 @@
   align-items: center;
   justify-content: center;
   color: var(--opacity-high);
-}
-
-.cx-text-field__icon--clickable {
-  cursor: pointer;
-  transition: color var(--motion-fast) ease;
-}
-
-.cx-text-field__icon--clickable:hover {
-  color: var(--ink);
 }
 
 .cx-text-field__loading {

@@ -35,6 +35,10 @@
   height: var(--controller-size-small);
 }
 
+.cx-icon-button--rounded {
+  border-radius: var(--radius-pill);
+}
+
 .cx-icon-button--default {
   --cx-icon-button-background: var(--opacity-low);
 
@@ -247,6 +251,7 @@
 .cx-icon-button__countdown-progress {
   stroke: currentColor;
   stroke-dasharray: 6 6;
+  // 6s must match the 6000ms createCountdownState duration in the component TS.
   animation: cx-icon-button-countdown 6s forwards;
 }
 

@@ -1,0 +1,47 @@
+:host {
+  --cx-text-shimmer-base: var(--opacity-high);
+  --cx-text-shimmer-highlight: var(--ink);
+
+  display: inline-block;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: var(--line-height-body);
+}
+
+.cx-text-shimmer__text {
+  color: var(--cx-text-shimmer-base);
+}
+
+:host(.cx-text-shimmer--active) .cx-text-shimmer__text {
+  background-image: linear-gradient(
+    100deg,
+    var(--cx-text-shimmer-base) 0%,
+    var(--cx-text-shimmer-base) 40%,
+    var(--cx-text-shimmer-highlight) 50%,
+    var(--cx-text-shimmer-base) 60%,
+    var(--cx-text-shimmer-base) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: cx-text-shimmer-sweep 1.8s linear infinite;
+}
+
+@keyframes cx-text-shimmer-sweep {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.cx-text-shimmer--active) .cx-text-shimmer__text {
+    animation: none;
+    background: none;
+    color: var(--cx-text-shimmer-base);
+  }
+}

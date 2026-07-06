@@ -9,12 +9,13 @@ import {
 } from '@angular/core';
 import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
+import { CxPasswordFieldComponent } from '../../primitives/inputs/cx-password-field';
 import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 
 export type CxDynamicFieldOption = {
   id: string;
   label: string;
-  placeholder?: string;
+  hint?: string;
   masked?: boolean;
 };
 
@@ -25,13 +26,13 @@ export type CxDynamicFieldValue = {
 
 type CxResolvedDynamicField = CxDynamicFieldValue & {
   label: string;
-  placeholder: string;
+  hint: string;
   masked: boolean;
 };
 
 @Component({
   selector: 'cx-dynamic-fields',
-  imports: [CxButtonComponent, CxIconButtonComponent, CxTextFieldComponent],
+  imports: [CxButtonComponent, CxIconButtonComponent, CxPasswordFieldComponent, CxTextFieldComponent],
   templateUrl: './cx-dynamic-fields.component.html',
   styleUrl: './cx-dynamic-fields.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,7 +61,7 @@ export class CxDynamicFieldsComponent {
         option.id,
         {
           label: option.label,
-          placeholder: option.placeholder?.trim() || '',
+          hint: option.hint?.trim() || '',
           masked: option.masked === true,
         },
       ]),

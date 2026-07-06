@@ -14,7 +14,11 @@ import {
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
+  type CxFieldSize,
+  type CxFieldValidation,
+  type CxRenderedValidationMessage,
   type CxValidationMessage,
+  normalizeCxValidation,
   normalizeCxValidationMessages,
 } from '../shared/field.types';
 
@@ -23,7 +27,7 @@ type CxTimeMeridiem = 'AM' | 'PM';
 
 export type CxTimeInputMode = 'default' | '12h';
 export type CxTimeInputFormat = '24';
-export type CxTimeInputSize = 'small' | 'default' | 'large';
+export type CxTimeInputSize = CxFieldSize;
 
 export interface CxTimeInputModel {
   value?: string;
@@ -123,8 +127,7 @@ export class CxTimeInputComponent {
   private readonly minuteStepState = signal(1);
   private readonly minState = signal<string | undefined>(undefined);
   private readonly maxState = signal<string | undefined>(undefined);
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly focusedState = signal(false);
   protected readonly labelId = `cx-time-input-label-${CxTimeInputComponent.nextId}`;
   protected readonly messagesId = `cx-time-input-messages-${CxTimeInputComponent.nextId++}`;
@@ -138,12 +141,10 @@ export class CxTimeInputComponent {
 
   @Input() label = 'Time';
   @Input() ariaLabel: string | undefined;
-  @Input() ariaDescribedBy: string | undefined;
   @Input() hourAriaLabel = 'Hours';
   @Input() minuteAriaLabel = 'Minutes';
   @Input() optional = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() clearable = false;
   @Input() hint: string | undefined;
@@ -199,13 +200,8 @@ export class CxTimeInputComponent {
   }
 
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -242,23 +238,28 @@ export class CxTimeInputComponent {
     const currentMinutes = this.totalMinutes(value);
     return (min && currentMinutes < this.totalMinutes(min)) || (max && currentMinutes > this.totalMinutes(max));
   });
-  protected readonly validationMessages$ = () => {
+  protected readonly validationMessages$ = (): ReadonlyArray<CxRenderedValidationMessage> => {
     if (this.disabled) {
       return [];
     }
 
-    const messages: CxValidationMessage[] = [...this.validationMessagesState()];
+    const explicitValidation = normalizeCxValidation(this.validationState());
+    if (explicitValidation.length > 0) {
+      return explicitValidation;
+    }
+
+    const messages: CxValidationMessage[] = [];
     if (this.outOfRange$()) {
       messages.push({ type: 'error', message: 'Time must be within the allowed range.' });
     }
-    return normalizeCxValidationMessages(messages, this.errorMessageState());
+    return normalizeCxValidationMessages(messages).slice(0, 1);
   };
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly isLocked$ = () => this.disabled || this.loading;
   protected readonly shellFocused$ = this.focusedState.asReadonly();
   protected readonly hasClear$ = () =>
-    this.clearable && !this.isEmpty$() && !this.disabled && !this.readOnly && !this.loading;
+    this.clearable && !this.isEmpty$() && !this.disabled && !this.loading;
 
   protected get resolvedGroupAriaLabel(): string | undefined {
     const ariaLabel = this.ariaLabel?.trim();
@@ -280,10 +281,6 @@ export class CxTimeInputComponent {
 
   protected get resolvedGroupAriaDescribedBy(): string | undefined {
     const ids: string[] = [];
-    const external = this.ariaDescribedBy?.trim();
-    if (external) {
-      ids.push(external);
-    }
     if (this.showHint$() || this.validationMessages$().length > 0) {
       ids.push(this.messagesId);
     }
@@ -312,7 +309,7 @@ export class CxTimeInputComponent {
   }
 
   protected onShellMousedown(event: MouseEvent): void {
-    if (this.isLocked$() || this.readOnly) {
+    if (this.isLocked$()) {
       return;
     }
     const target = event.target as HTMLElement | null;
@@ -324,14 +321,14 @@ export class CxTimeInputComponent {
   }
 
   protected onSegmentFocus(segment: CxTimeSegment): void {
-    if (this.isLocked$() || this.readOnly) {
+    if (this.isLocked$()) {
       return;
     }
     this.selectSegmentText(segment);
   }
 
   protected onSegmentKeydown(segment: CxTimeSegment, event: KeyboardEvent): void {
-    if (this.isLocked$() || this.readOnly) {
+    if (this.isLocked$()) {
       return;
     }
 
@@ -389,7 +386,7 @@ export class CxTimeInputComponent {
   }
 
   protected onSegmentPaste(event: ClipboardEvent): void {
-    if (this.isLocked$() || this.readOnly) {
+    if (this.isLocked$()) {
       return;
     }
 
@@ -405,14 +402,14 @@ export class CxTimeInputComponent {
   }
 
   protected onMeridiemClick(): void {
-    if (this.isLocked$() || this.readOnly || !this.is12h$()) {
+    if (this.isLocked$() || !this.is12h$()) {
       return;
     }
     this.toggleMeridiem();
   }
 
   protected onMeridiemKeydown(event: KeyboardEvent): void {
-    if (this.isLocked$() || this.readOnly || !this.is12h$()) {
+    if (this.isLocked$() || !this.is12h$()) {
       return;
     }
     switch (event.key) {

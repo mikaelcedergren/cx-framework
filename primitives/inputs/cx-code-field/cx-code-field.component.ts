@@ -14,8 +14,8 @@ import {
 } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import {
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  type CxFieldValidation,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxCodeFieldMode = 'numeric' | 'alphanumeric';
@@ -52,13 +52,13 @@ export class CxCodeFieldComponent implements OnDestroy {
   private readonly focusedState = signal(false);
   private readonly focusedIndexState = signal(0);
   private readonly disabledState = signal(false);
-  private readonly readOnlyState = signal(false);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private blurTimer: ReturnType<typeof setTimeout> | undefined;
   private inputRunComplete = false;
   private lastEmittedValue: string | undefined;
 
-  protected readonly messagesId = `cx-code-field-messages-${++CxCodeFieldComponent.nextId}`;
+  protected readonly labelId = `cx-code-field-label-${++CxCodeFieldComponent.nextId}`;
+  protected readonly messagesId = `cx-code-field-messages-${CxCodeFieldComponent.nextId}`;
 
   @ViewChild('cells', { read: ElementRef })
   private readonly cellsRef?: ElementRef<HTMLElement>;
@@ -66,7 +66,10 @@ export class CxCodeFieldComponent implements OnDestroy {
   @ViewChildren('cellInput', { read: ElementRef })
   private readonly cellInputs?: QueryList<ElementRef<HTMLInputElement>>;
 
+  @Input() label = 'Verification code';
   @Input() ariaLabel: string | undefined;
+  @Input() hint: string | undefined;
+  @Input() optional = false;
   @Input() autoFocus = false;
 
   @Input()
@@ -93,13 +96,8 @@ export class CxCodeFieldComponent implements OnDestroy {
   }
 
   @Input()
-  public set readOnly(value: boolean | null | undefined) {
-    this.readOnlyState.set(value === true);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Output() readonly valueChange = new EventEmitter<string>();
@@ -108,9 +106,8 @@ export class CxCodeFieldComponent implements OnDestroy {
 
   protected readonly mode$ = this.modeState.asReadonly();
   protected readonly disabled$ = this.disabledState.asReadonly();
-  protected readonly readOnly$ = this.readOnlyState.asReadonly();
   protected readonly focused$ = this.focusedState.asReadonly();
-  protected readonly isInteractive$ = computed(() => !this.disabledState() && !this.readOnlyState());
+  protected readonly isInteractive$ = computed(() => !this.disabledState());
   protected readonly inputMode$ = computed<'numeric' | 'text'>(() => (this.modeState() === 'numeric' ? 'numeric' : 'text'));
   protected readonly pattern$ = computed(() => (this.modeState() === 'numeric' ? '[0-9]*' : '[A-Z0-9]*'));
   protected readonly cells$ = this.cellsState.asReadonly();
@@ -124,16 +121,31 @@ export class CxCodeFieldComponent implements OnDestroy {
     if (this.disabledState()) {
       return [];
     }
-    return normalizeCxValidationMessages(this.validationMessagesState());
+    return normalizeCxValidation(this.validationState());
   });
   protected readonly hasError$ = computed(() => this.validationMessages$().some((message) => message.type === 'error'));
+  protected readonly showHint$ = computed(() => !!this.hint?.trim() && this.validationMessages$().length === 0);
 
   protected get resolvedAriaLabel(): string | undefined {
-    return this.ariaLabel?.trim() || 'Verification code';
+    const ariaLabel = this.ariaLabel?.trim();
+    if (ariaLabel) {
+      return ariaLabel;
+    }
+    if (this.label.trim()) {
+      return undefined;
+    }
+    return 'Verification code';
+  }
+
+  protected get resolvedAriaLabelledBy(): string | undefined {
+    if (this.ariaLabel?.trim()) {
+      return undefined;
+    }
+    return this.label.trim() ? this.labelId : undefined;
   }
 
   protected get resolvedAriaDescribedBy(): string | undefined {
-    return this.validationMessages$().length > 0 ? this.messagesId : undefined;
+    return this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined;
   }
 
   public ngOnDestroy(): void {
@@ -153,7 +165,7 @@ export class CxCodeFieldComponent implements OnDestroy {
   }
 
   protected cellAriaLabel(index: number): string {
-    const base = this.resolvedAriaLabel;
+    const base = this.ariaLabel?.trim() || this.label.trim() || 'Verification code';
     return `${base}, character ${index + 1} of ${CODE_FIELD_LENGTH}`;
   }
 

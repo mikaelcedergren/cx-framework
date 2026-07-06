@@ -13,7 +13,6 @@
     #fieldButton
     [class.cx-tag-input__field--open]="isOpen$()"
     [class.cx-tag-input__field--disabled]="disabled"
-    [class.cx-tag-input__field--readonly]="readOnly"
     [class.cx-tag-input__field--loading]="loading"
     [class.cx-tag-input__field--error]="hasError$()"
     [class.cx-tag-input__field--small]="size === 'small'"
@@ -24,7 +23,6 @@
     [attr.aria-haspopup]="'listbox'"
     [attr.aria-disabled]="isLocked$() ? 'true' : null"
     [attr.aria-invalid]="hasError$() ? 'true' : null"
-    [attr.aria-readonly]="readOnly ? 'true' : null"
     [attr.aria-busy]="loading ? 'true' : null"
     [attr.aria-controls]="isOpen$() ? popoverId : null"
     [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
@@ -35,16 +33,14 @@
   >
     <div class="cx-tag-input__tokens">
       @if (showPlaceholder$()) {
-        <span class="cx-tag-input__placeholder">{{ placeholder }}</span>
+        <span class="cx-tag-input__placeholder">{{ placeholderText$() }}</span>
       } @else {
         @for (tag of selectedTags$(); track tag.id) {
           <cx-tag
-            [text]="formatTagText(tag)"
-            [info]="formatTagInfo(tag)"
+            [text]="formatOptionLabel(tag)"
             [color]="toTagColor(tag.color)"
-            [size]="size === 'large' ? 'large' : 'default'"
-            [variant]="isInteractive$() ? 'dismissible' : 'readOnly'"
-            (remove)="removeTag(tag.id)"
+            [dismissible]="isInteractive$()"
+            (dismiss)="removeTag(tag.id)"
           />
         }
       }
@@ -77,7 +73,6 @@
             #searchInput
             label=""
             ariaLabel="Search tags"
-            placeholder=""
             prependIcon="search"
             [size]="size === 'large' ? 'large' : 'default'"
             (valueChange)="onSearchChange($event)"
@@ -125,7 +120,7 @@
         <div class="cx-tag-input__hint">{{ hint!.trim() }}</div>
       }
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       }
     </div>
   }
@@ -144,24 +139,21 @@
       <div class="cx-tag-input__dialog-key-row">
         <cx-text-field
           label="Name"
-          placeholder="Type a name"
           [value]="draftKey$()"
-          [errorMessage]="draftKeyError$()"
+          [validation]="draftKeyError$()"
           (valueChange)="onDraftKeyChange($event)"
         />
         <div class="cx-tag-input__dialog-color-slot">
           <div class="cx-tag-input__dialog-label-spacer" aria-hidden="true">&nbsp;</div>
           <cx-color-picker
             class="cx-tag-input__dialog-color-picker"
-            [value]="draftColor$()"
-            [options]="colorPickerOptions"
-            (valueChange)="onDraftColorChange($event)"
+            [color]="draftColor$()"
+            (colorChange)="onDraftColorChange($event)"
           />
         </div>
       </div>
       <cx-text-field
         label="Key"
-        placeholder="Type a key"
         [optional]="true"
         [value]="draftValue$()"
         (valueChange)="onDraftValueChange($event)"

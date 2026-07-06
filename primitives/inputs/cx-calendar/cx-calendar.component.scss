@@ -43,6 +43,11 @@
   min-width: 0;
 }
 
+.cx-calendar__select--month {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .cx-calendar__weekdays,
 .cx-calendar__grid {
   display: grid;
@@ -68,6 +73,7 @@
   height: 32px;
   align-items: center;
   justify-content: center;
+  appearance: none;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -76,11 +82,15 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-small);
-  cursor: pointer;
+  cursor: default;
   transition:
     background-color var(--motion-fast) ease,
     color var(--motion-fast) ease,
     border-color var(--motion-fast) ease;
+}
+
+.cx-calendar__day:not(:disabled) {
+  cursor: pointer;
 }
 
 .cx-calendar__day:hover:not(:disabled) {
@@ -91,7 +101,7 @@
   color: var(--opacity-mid);
 }
 
-.cx-calendar__day--today {
+.cx-calendar__day--today:not(:disabled) {
   border-color: var(--opacity-mid);
 }
 
@@ -108,5 +118,14 @@
 .cx-calendar__day:disabled,
 .cx-calendar--disabled {
   opacity: var(--opacity-disabled, 0.55);
-  cursor: not-allowed;
+}
+
+.cx-calendar__day:disabled {
+  color: var(--opacity-mid);
+  -webkit-text-fill-color: var(--opacity-mid);
+}
+
+.cx-calendar--disabled,
+.cx-calendar--disabled .cx-calendar__day {
+  cursor: default;
 }

@@ -7,8 +7,6 @@
           #descriptionElement
           class="cx-top-bar__description cx-top-bar__description--editable"
           [attr.contenteditable]="'plaintext-only'"
-          data-placeholder="Add a description..."
-          [attr.data-empty]="(description ?? '').trim().length === 0 ? '' : null"
           role="textbox"
           spellcheck="true"
           (blur)="commitDescription(descriptionElement.innerText)"

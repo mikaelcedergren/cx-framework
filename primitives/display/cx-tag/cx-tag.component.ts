@@ -6,6 +6,7 @@ export const CX_TAG_COLORS = [
   'default',
   'blue',
   'cyan',
+  'lime',
   'green',
   'yellow',
   'orange',
@@ -17,23 +18,11 @@ export const CX_TAG_COLORS = [
 ] as const;
 
 export type CxTagColor = (typeof CX_TAG_COLORS)[number];
-export type CxTagSize = 'default' | 'large';
-export type CxTagVariant = 'readOnly' | 'outline' | 'dismissible' | 'interactive';
-
-export interface CxTag {
-  text: string;
-  info?: string;
-  icon?: CxIconName;
-  color?: CxTagColor;
-  variant?: CxTagVariant;
-  size?: CxTagSize;
-  disabled?: boolean;
-  tags?: CxTag[];
-}
 
 export const CX_TAG_COLOR_PICKER_OPTIONS = [
   'blue',
   'cyan',
+  'lime',
   'green',
   'yellow',
   'orange',
@@ -53,42 +42,27 @@ export const CX_TAG_COLOR_PICKER_OPTIONS = [
 })
 export class CxTagComponent {
   @Input() text = 'Tag';
-  @Input() info: string | undefined;
   @Input() icon: CxIconName | undefined;
   @Input() color: CxTagColor = 'default';
-  @Input() variant: CxTagVariant = 'readOnly';
-  @Input() size: CxTagSize | undefined;
-  @Input() disabled = false;
-  @Input() tags: CxTag[] = [];
+  @Input() outline = false;
+  @Input() dismissible = false;
 
-  @Output() readonly remove = new EventEmitter<void>();
+  @Output() readonly dismiss = new EventEmitter<void>();
 
-  protected get hasChildren(): boolean {
-    return this.tags.length > 0;
+  protected get visibleText(): string {
+    return this.text?.trim() ?? '';
   }
 
-  protected get showRemove(): boolean {
-    return this.variant === 'dismissible' && !this.disabled;
+  protected get dismissLabel(): string {
+    return this.visibleText ? `Dismiss ${this.visibleText}` : 'Dismiss tag';
   }
 
-  protected childColor(tag: CxTag): CxTagColor {
-    return tag.color ?? 'default';
-  }
-
-  protected childVariant(tag: CxTag): CxTagVariant {
-    return tag.variant ?? 'readOnly';
-  }
-
-  protected removeIcon(): CxIconName {
-    return 'remove';
-  }
-
-  protected onRemove(event: MouseEvent): void {
+  protected onDismiss(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    if (!this.showRemove) {
+    if (!this.dismissible) {
       return;
     }
-    this.remove.emit();
+    this.dismiss.emit();
   }
 }

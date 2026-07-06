@@ -119,6 +119,43 @@
   outline-offset: var(--outline-tab-offset);
 }
 
+.cx-number-field__stepper {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-number-field__stepper:hover:not(:disabled) {
+  background: var(--opacity-darken);
+  color: var(--ink);
+}
+
+.cx-number-field__stepper:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-number-field__stepper:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: default;
+}
+
+.cx-number-field__field--stepper {
+  text-align: center;
+}
+
 @include field.field-messages('cx-number-field');
 
 .cx-number-field__validation {

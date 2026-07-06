@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxIconComponent } from '../../media/cx-icon';
+import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 
 @Component({
   selector: 'cx-big-radio',
@@ -15,7 +15,7 @@ export class CxBigRadioComponent {
   @Input() heading = '';
   @Input() text = '';
   @Input() icon: CxIconName | undefined;
-  @Input() custom = false;
+  @Input() iconMood: CxIconMood = 'default';
   @Input() disabled = false;
 
   @Input()
@@ -27,6 +27,14 @@ export class CxBigRadioComponent {
   @Output() readonly focusChange = new EventEmitter<boolean>();
 
   protected readonly selected$ = this.selectedState.asReadonly();
+
+  protected visibleHeading$(): string {
+    return this.heading.trim();
+  }
+
+  protected visibleText$(): string {
+    return this.text.trim();
+  }
 
   protected activate(): void {
     if (this.disabled || this.selectedState()) {

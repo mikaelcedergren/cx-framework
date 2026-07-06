@@ -2,9 +2,9 @@
 //
 // A curated set of single-purpose helpers for the raw elements and wrappers
 // you write yourself — spacing, typography, colour, sizing, visibility. They
-// are NOT for patching a sealed cx-* component from outside (ux-foundation,
-// must: "no global utility patches to fix a component from outside — fix the
-// component itself").
+// are NOT for patching a sealed cx-* component from outside. Design rule (must):
+// no global utility patches to fix a component from outside — fix the component
+// itself.
 //
 // They live in the low-priority `cx-utilities` cascade layer, so any unlayered
 // style — every cx-* component, plus your own app CSS — always wins over a
@@ -60,6 +60,7 @@ $measures: (
   'sm': var(--measure-sm),
   'md': var(--measure-md),
   'lg': var(--measure-lg),
+  'xl': var(--measure-xl),
 );
 
 @layer cx-utilities {
@@ -145,6 +146,16 @@ $measures: (
       max-inline-size: $measure;
       margin-inline: auto;
     }
+  }
+
+  // Page container — a gutter-aware centred column: content caps at the xl measure and always
+  // keeps a page gutter of air against the viewport edge. Full-bleed sections that need their
+  // content aligned with this column pad with --gutter-centered instead.
+  .cx-container {
+    inline-size: 100%;
+    max-inline-size: calc(var(--measure-xl) + (var(--gutter-page) * 2));
+    margin-inline: auto;
+    padding-inline: var(--gutter-page);
   }
 
   .cx-w-full {

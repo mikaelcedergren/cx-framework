@@ -50,7 +50,10 @@
         [class.cx-budget-label--orange]="color$() === 'orange'"
         [class.cx-budget-label--danger]="color$() === 'danger'"
       >
-        {{ currentText$() }}
+        <span class="cx-budget-label__value">{{ currentValueText$() }}</span>
+        @if (currentLabelText$()) {
+          <span class="cx-budget-label__context">{{ currentLabelText$() }}</span>
+        }
       </div>
     }
   </div>

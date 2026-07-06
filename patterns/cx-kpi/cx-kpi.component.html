@@ -1,0 +1,29 @@
+<div class="cx-kpi">
+  @if (icon) {
+    <div class="cx-kpi__icon">
+      <cx-icon [name]="icon" size="20" />
+    </div>
+  }
+
+  <cx-metric class="cx-kpi__metric" [label]="heading" [value]="value" size="large">
+    @if (hasTrend) {
+      <cx-trend-tag slot="trend" [value]="trendValue" [favor]="trendFavor" />
+    }
+  </cx-metric>
+
+  @if (hasProgress) {
+    <cx-progress-bar
+      class="cx-kpi__progress"
+      [label]="progressLabel"
+      [value]="progress ?? 0"
+      [max]="progressMax"
+      [mood]="progressMood"
+    />
+  }
+
+  @if (hasFooter) {
+    <div class="cx-kpi__footer">{{ footer }}</div>
+  }
+
+  <ng-content select="[cxKpiChart]" />
+</div>

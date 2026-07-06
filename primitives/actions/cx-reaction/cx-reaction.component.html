@@ -1,0 +1,29 @@
+@if (readonly) {
+  <span
+    class="cx-reaction cx-reaction--readonly"
+    [class.cx-reaction--selected]="selected"
+    role="img"
+    [attr.aria-label]="ariaLabel"
+  >
+    <ng-container [ngTemplateOutlet]="body" />
+  </span>
+} @else {
+  <button
+    class="cx-reaction"
+    type="button"
+    [class.cx-reaction--selected]="selected"
+    [disabled]="disabled"
+    [attr.aria-pressed]="selected"
+    [attr.aria-label]="ariaLabel"
+    (click)="toggle()"
+  >
+    <ng-container [ngTemplateOutlet]="body" />
+  </button>
+}
+
+<ng-template #body>
+  <span class="cx-reaction__emoji" aria-hidden="true">{{ emoji }}</span>
+  @if (hasCount) {
+    <span class="cx-reaction__count">{{ count }}</span>
+  }
+</ng-template>

@@ -14,6 +14,7 @@ import {
   signal,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
+import { eventMatchesShortcut, isTypingTarget } from '../../actions/shared/shortcuts';
 import { CxMenuHeaderComponent } from '../cx-menu-header';
 import { CxMenuLabelComponent } from '../cx-menu-label';
 import { CxOptionComponent } from '../cx-option';
@@ -473,7 +474,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   protected onDocumentKeydown(event: KeyboardEvent): void {
-    if (!this.shortcutsEnabledState() || !this.isSurfaceActive() || this.isTypingTarget(event.target)) {
+    if (!this.shortcutsEnabledState() || !this.isSurfaceActive() || isTypingTarget(event.target)) {
       return;
     }
     const item = this.findShortcutItem(this.normalizedGroups$().flatMap(group => group.items), event);
@@ -744,7 +745,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   private findShortcutItem(items: readonly CxResolvedMenuItem[], event: KeyboardEvent): CxResolvedMenuItem | undefined {
     for (const item of items) {
-      if (item.shortcutParts && this.eventMatchesShortcut(item.shortcutParts, event)) {
+      if (item.shortcutParts && eventMatchesShortcut(item.shortcutParts, event)) {
         return item;
       }
       const childMatch = item.items ? this.findShortcutItem(item.items, event) : undefined;
@@ -755,51 +756,4 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     return undefined;
   }
 
-  private eventMatchesShortcut(parts: readonly string[], event: KeyboardEvent): boolean {
-    const normalizedParts = parts.map(part => part.trim().toLowerCase()).filter(Boolean);
-    if (normalizedParts.length === 0) {
-      return false;
-    }
-    const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform);
-    const wantsCtrl =
-      normalizedParts.includes('ctrl') ||
-      normalizedParts.includes('control') ||
-      (!isMac && normalizedParts.includes('mod'));
-    const wantsMeta =
-      normalizedParts.includes('cmd') ||
-      normalizedParts.includes('command') ||
-      (isMac && normalizedParts.includes('mod'));
-    const wantsAlt =
-      normalizedParts.includes('alt') ||
-      normalizedParts.includes('option') ||
-      normalizedParts.includes('opt');
-    const wantsShift = normalizedParts.includes('shift');
-    if (
-      event.ctrlKey !== wantsCtrl ||
-      event.metaKey !== wantsMeta ||
-      event.altKey !== wantsAlt ||
-      event.shiftKey !== wantsShift
-    ) {
-      return false;
-    }
-    const keyPart = normalizedParts.find(
-      part => !['mod', 'cmd', 'command', 'ctrl', 'control', 'alt', 'option', 'opt', 'shift'].includes(part),
-    );
-    return keyPart ? this.normalizeShortcutKey(event.key) === this.normalizeShortcutKey(keyPart) : false;
-  }
-
-  private normalizeShortcutKey(value: string): string {
-    const key = value.trim().toLowerCase();
-    if (key === 'esc') return 'escape';
-    if (key === 'return') return 'enter';
-    if (key === 'space') return ' ';
-    return key;
-  }
-
-  private isTypingTarget(target: EventTarget | null): boolean {
-    return (
-      target instanceof HTMLElement &&
-      Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
-    );
-  }
 }

@@ -68,7 +68,7 @@
 
 .cx-spinner__segment {
   opacity: 0.18;
-  transition: opacity var(--motion-medium, 260ms) ease;
+  transition: opacity var(--motion-slow) ease;
 }
 
 .cx-spinner__segment--filled {

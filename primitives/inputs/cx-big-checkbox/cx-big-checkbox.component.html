@@ -1,14 +1,13 @@
 <label
   class="cx-big-checkbox"
   [class.cx-big-checkbox--checked]="selected$()"
-  [class.cx-big-checkbox--indeterminate]="indeterminate$()"
   [class.cx-big-checkbox--disabled]="disabled"
+  [class.cx-big-checkbox--has-icon]="!!icon"
 >
   <input
     class="cx-big-checkbox__input"
     type="checkbox"
     [checked]="selected$()"
-    [indeterminate]="indeterminate$()"
     [disabled]="disabled"
     [attr.aria-label]="heading || text || null"
     (change)="onNativeChange($event)"
@@ -20,7 +19,6 @@
     <span
       class="cx-big-checkbox__control"
       [class.cx-big-checkbox__control--checked]="selected$()"
-      [class.cx-big-checkbox__control--indeterminate]="indeterminate$()"
     >
       @if (selected$()) {
         <span class="cx-big-checkbox__check"></span>
@@ -28,15 +26,22 @@
     </span>
   </div>
   <div class="cx-big-checkbox__content">
-    @if (custom) {
-      <ng-content />
-    } @else {
-      @if (heading) {
-        <div class="cx-big-checkbox__label">{{ heading }}</div>
-      }
-      @if (text) {
-        <div class="cx-big-checkbox__description">{{ text }}</div>
-      }
+    @if (visibleHeading$()) {
+      <div class="cx-big-checkbox__label">{{ visibleHeading$() }}</div>
     }
+    @if (visibleText$()) {
+      <div class="cx-big-checkbox__description">{{ visibleText$() }}</div>
+    }
+    <ng-content />
   </div>
+  @if (icon; as iconName) {
+    <cx-icon
+      class="cx-big-checkbox__icon"
+      [name]="iconName"
+      [mood]="iconMood"
+      size="24"
+      shape="square-subtle"
+      aria-hidden="true"
+    />
+  }
 </label>

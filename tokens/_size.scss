@@ -8,8 +8,15 @@
   --controller-size-small: 24px;
   --controller-size-large: 48px;
 
-  /* Content measure — max width of a centred content column (cx-measure-*). */
+  /* Content measure — max width of a centred content column (cx-measure-*).
+     xl is the page-container measure (cx-container). */
   --measure-sm: 360px;
   --measure-md: 640px;
   --measure-lg: 960px;
+  --measure-xl: 1180px;
+
+  /* Page gutter — horizontal air between content and the viewport edge. The centred variant
+     pads a full-bleed section so its content lines up with a cx-container column. */
+  --gutter-page: var(--space-xl);
+  --gutter-centered: max(var(--gutter-page), calc(((100vw - var(--measure-xl)) / 2) + var(--gutter-page)));
 }

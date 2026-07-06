@@ -16,6 +16,7 @@ Use these when there is no exact message in the catalog. Keep the same grammar a
 | Format with a useful example | `Enter a valid [thing], like [example].` | `Enter a valid IP address, like 192.168.0.1.` |
 | Numeric or bounded range | `Enter a [thing] between [min] and [max].` | `Enter a port between 1024 and 65535.` |
 | Picker or choice input | `Select a [thing].` | `Select a date.` |
+| Empty dropdown or picker placeholder | `Select [thing]` | `Select severity` |
 | Multi-choice input | `Select at least one [thing].` | `Select at least one option.` |
 | Specific cleanup action | `Remove [what to remove].` | `Remove spaces or invalid characters.` |
 | Required value or protocol | `Use [correct value] only.` | `Use an https:// URL only.` |
@@ -160,10 +161,12 @@ These messages appear directly beneath form fields. If the product uses a more s
 
 ### Dropdown
 
+Placeholder text for an empty dropdown is `Select [thing]`, such as `Select language`. Use `Select` only when no clearer object fits. This is display copy, not a validation error.
+
 | Scenario | Error message |
 | --- | --- |
-| Single select dropdown, no selection | `Select an option.` |
-| Multi select dropdown, no selection | `Select at least one option.` |
+| Single-choice dropdown, no selection | `Select an option.` |
+| Multi-choice dropdown, no selection | `Select at least one option.` |
 
 ### Radio buttons
 

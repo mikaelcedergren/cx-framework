@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
+import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import { createDelayedLoadingState } from '../shared/delayed-loading-state';
+import { normalizeShortcutParts } from '../shared/shortcuts';
 
 export type CxButtonMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxButtonSize = 'default' | 'small' | 'large';
@@ -10,7 +12,7 @@ export type CxButtonType = 'button' | 'submit' | 'reset';
 
 @Component({
   selector: 'cx-button',
-  imports: [CxSpinnerComponent, CxIconComponent],
+  imports: [CxSpinnerComponent, CxIconComponent, CxShortcutKeyComponent],
   templateUrl: './cx-button.component.html',
   styleUrl: './cx-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +24,7 @@ export class CxButtonComponent implements OnDestroy {
   @Input() mood: CxButtonMood = 'default';
   @Input() icon: CxIconName | undefined;
   @Input() appendIcon: CxIconName | undefined;
+  @Input() shortcutParts: readonly string[] | undefined;
   @Input() type: CxButtonType = 'button';
   @Input() size: CxButtonSize = 'default';
   @Input() ariaLabel: string | undefined;
@@ -54,6 +57,9 @@ export class CxButtonComponent implements OnDestroy {
     }
     if (this.isIconOnly) {
       return this.humanizeIconName(this.icon ?? this.appendIcon);
+    }
+    if (this.hasShortcut) {
+      return `${this.visibleText} (${this.shortcutLabel})`;
     }
     return null;
   }
@@ -92,6 +98,18 @@ export class CxButtonComponent implements OnDestroy {
 
   protected get isTransparent(): boolean {
     return this.transparent;
+  }
+
+  protected get hasShortcut(): boolean {
+    return Boolean(this.visibleText) && this.normalizedShortcutParts.length > 0;
+  }
+
+  protected get normalizedShortcutParts(): readonly string[] {
+    return normalizeShortcutParts(this.shortcutParts);
+  }
+
+  private get shortcutLabel(): string {
+    return this.normalizedShortcutParts.join('+');
   }
 
   private get visibleIconCount(): number {

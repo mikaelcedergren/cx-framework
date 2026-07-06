@@ -24,7 +24,6 @@ export class CxHierarchicalSelectComponent {
   private readonly queryState = signal('');
   private readonly openState = signal(false);
   private readonly disabledState = signal(false);
-  private readonly readOnlyState = signal(false);
 
   @Input() placeholder = 'Select option';
   @Input() searchable = false;
@@ -58,18 +57,6 @@ export class CxHierarchicalSelectComponent {
     return this.disabledState();
   }
 
-  @Input()
-  public set readOnly(value: boolean) {
-    this.readOnlyState.set(value === true);
-    if (value === true) {
-      this.openState.set(false);
-    }
-  }
-
-  public get readOnly(): boolean {
-    return this.readOnlyState();
-  }
-
   @Output() readonly valueChange = new EventEmitter<string | undefined>();
   @Output() readonly expandedIdsChange = new EventEmitter<readonly string[]>();
 
@@ -90,7 +77,7 @@ export class CxHierarchicalSelectComponent {
   }
 
   protected isLocked(): boolean {
-    return this.disabledState() || this.readOnlyState();
+    return this.disabledState();
   }
 
   protected toggleOpen(): void {

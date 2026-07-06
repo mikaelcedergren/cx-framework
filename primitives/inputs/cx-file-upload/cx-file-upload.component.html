@@ -3,27 +3,100 @@
   class="cx-file-upload__native-input"
   type="file"
   aria-label="File upload"
+  [accept]="accept"
+  [multiple]="multiple"
   [disabled]="disabled"
   (change)="onNativeInputChange($event)"
 />
 
-@if (!hasFile$()) {
-  <cx-button
-    class="cx-file-upload__button"
-    [text]="visibleButtonText$()"
-    [icon]="buttonIcon"
-    [disabled]="disabled"
-    (pressed)="openNativePicker()"
-  />
-} @else {
-  <div class="cx-file-upload__selected">
-    <div class="cx-file-upload__name">{{ fileName$() }}</div>
-    <cx-icon-button
-      icon="remove"
-      mood="default"
-      [disabled]="disabled"
-      [ariaLabel]="clearAriaLabel"
-      (pressed)="clearFile()"
-    />
+@if (variant === 'zone') {
+  <div
+    class="cx-file-upload__zone"
+    [class.cx-file-upload__zone--dragging]="dragging$()"
+    [class.cx-file-upload__zone--disabled]="disabled"
+    (click)="onZoneClick()"
+    (dragenter)="onDragEnter($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+  >
+    @if (icon) {
+      <cx-icon class="cx-file-upload__zone-icon" [name]="icon" size="32" />
+    }
+
+    <div class="cx-file-upload__zone-heading">{{ resolvedHeading }}</div>
+
+    @if (hasHint) {
+      <div class="cx-file-upload__zone-hint">{{ hint }}</div>
+    }
+
+    <span class="cx-file-upload__zone-action" (click)="$event.stopPropagation()">
+      <cx-button [text]="visibleButtonText$()" [disabled]="disabled" (pressed)="openNativePicker()" />
+    </span>
   </div>
+
+  @if (errorMessages$().length) {
+    <cx-validation-message class="cx-file-upload__error" [messages]="errorMessages$()" />
+  }
+
+  @if (hasFiles) {
+    <ng-container [ngTemplateOutlet]="fileList" />
+  }
+} @else {
+  @if (!hasFiles) {
+    <cx-button
+      class="cx-file-upload__button"
+      [text]="visibleButtonText$()"
+      [icon]="buttonIcon"
+      [disabled]="disabled"
+      (pressed)="openNativePicker()"
+    />
+  } @else if (!multiple) {
+    <div class="cx-file-upload__selected">
+      <div class="cx-file-upload__name">{{ firstFileName }}</div>
+      <cx-icon-button
+        icon="remove"
+        mood="default"
+        [disabled]="disabled"
+        [ariaLabel]="clearAriaLabel"
+        (pressed)="clearFile()"
+      />
+    </div>
+  } @else {
+    <cx-button
+      class="cx-file-upload__button"
+      [text]="visibleButtonText$()"
+      [icon]="buttonIcon"
+      [disabled]="disabled"
+      (pressed)="openNativePicker()"
+    />
+    <ng-container [ngTemplateOutlet]="fileList" />
+  }
+
+  @if (errorMessages$().length) {
+    <cx-validation-message class="cx-file-upload__error" [messages]="errorMessages$()" />
+  }
 }
+
+<ng-template #fileList>
+  <ul class="cx-file-upload__list" aria-live="polite">
+    @for (file of visibleFiles; track $index) {
+      <li class="cx-file-upload__row">
+        <cx-icon class="cx-file-upload__row-icon" name="document" size="20" />
+        <div class="cx-file-upload__row-name">{{ file.name }}</div>
+        @if (formatSize(file.size); as size) {
+          <div class="cx-file-upload__row-size">{{ size }}</div>
+        }
+        <cx-icon-button
+          icon="remove"
+          mood="default"
+          variant="transparent"
+          size="small"
+          [disabled]="disabled"
+          [ariaLabel]="removeAriaLabel(file)"
+          (pressed)="removeFile(file)"
+        />
+      </li>
+    }
+  </ul>
+</ng-template>

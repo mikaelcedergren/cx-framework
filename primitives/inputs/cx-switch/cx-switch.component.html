@@ -23,20 +23,16 @@
     <span class="cx-switch__track" aria-hidden="true">
       <span class="cx-switch__thumb"></span>
     </span>
-    <span class="cx-switch__content">
-      @if (text.trim()) {
+    @if (text.trim()) {
+      <span class="cx-switch__content">
         <span class="cx-switch__label">
           {{ text }}
           @if (showHint$()) {
             <span class="cx-switch__hint" [id]="hintId">{{ hint!.trim() }}</span>
           }
         </span>
-      } @else if (custom) {
-        <span class="cx-switch__label">
-          <ng-content />
-        </span>
-      }
-    </span>
+      </span>
+    }
   </label>
 
   @if (validationMessages$().length > 0) {
@@ -44,7 +40,6 @@
       class="cx-switch-field__error"
       [id]="messagesId"
       [messages]="validationMessages$()"
-      [showAll]="true"
     />
   }
 </div>

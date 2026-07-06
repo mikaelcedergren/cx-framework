@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import {
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  type CxFieldValidation,
+  normalizeCxValidation,
 } from '../shared/field.types';
-
-let cxRadioId = 0;
 
 @Component({
   selector: 'cx-radio',
@@ -15,18 +13,18 @@ let cxRadioId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxRadioComponent {
-  private readonly baseId = `cx-radio-${++cxRadioId}`;
+  private static nextId = 0;
+  private readonly baseId = `cx-radio-${++CxRadioComponent.nextId}`;
   private readonly selectedState = signal(false);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
 
-  @Input() text = 'High priority';
+  @Input() text = '';
   @Input() hint: string | undefined;
-  @Input() custom = false;
   @Input() disabled = false;
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -40,7 +38,7 @@ export class CxRadioComponent {
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly hasText$ = () => !!this.text.trim();

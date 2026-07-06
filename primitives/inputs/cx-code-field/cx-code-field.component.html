@@ -1,14 +1,23 @@
 <div
   class="cx-code-field"
   [class.cx-code-field--disabled]="disabled$()"
-  [class.cx-code-field--readonly]="readOnly$()"
   [class.cx-code-field--error]="hasError$()"
 >
+  @if (label.trim()) {
+    <div class="cx-code-field__header">
+      <div class="cx-code-field__label" [id]="labelId">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-code-field__optional">Optional</div>
+      }
+    </div>
+  }
+
   <div
     #cells
     class="cx-code-field__cells"
     role="group"
     [attr.aria-label]="resolvedAriaLabel"
+    [attr.aria-labelledby]="resolvedAriaLabelledBy"
   >
     @for (cell of cells$(); track $index) {
       <input
@@ -27,9 +36,7 @@
         [attr.aria-label]="cellAriaLabel($index)"
         [attr.aria-describedby]="resolvedAriaDescribedBy"
         [attr.aria-invalid]="hasError$() ? 'true' : null"
-        [attr.aria-readonly]="readOnly$() ? 'true' : null"
         [disabled]="disabled$()"
-        [readOnly]="readOnly$()"
         [value]="cell"
         [autofocus]="autoFocus && $index === 0"
         (input)="onCellInput($index, $event)"
@@ -42,9 +49,14 @@
     }
   </div>
 
-  @if (validationMessages$().length > 0) {
+  @if (showHint$() || validationMessages$().length > 0) {
     <div class="cx-code-field__messages" [id]="messagesId">
-      <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+      @if (showHint$()) {
+        <div class="cx-code-field__hint">{{ hint!.trim() }}</div>
+      }
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" />
+      }
     </div>
   }
 </div>

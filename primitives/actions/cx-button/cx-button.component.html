@@ -31,6 +31,9 @@
     @if (visibleText) {
       <span class="cx-button__label">{{ visibleText }}</span>
     }
+    @if (hasShortcut) {
+      <cx-shortcut-key class="cx-button__shortcut" [parts]="normalizedShortcutParts" aria-hidden="true" />
+    }
     @if (appendIcon; as iconName) {
       <cx-icon class="cx-button__icon" [name]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
     }

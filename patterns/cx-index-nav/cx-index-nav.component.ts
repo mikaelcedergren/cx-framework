@@ -77,8 +77,6 @@ export class CxIndexNavComponent {
   @Input() ariaLabel = 'Section navigation';
   /** Show the built-in filter field. */
   @Input({ transform: booleanAttribute }) filterable = true;
-  /** Placeholder for the filter field. */
-  @Input() filterPlaceholder = 'Filter';
   /** Message shown when the filter matches nothing. */
   @Input() emptyText = 'No matches';
   /** Show the skeleton loading state. */

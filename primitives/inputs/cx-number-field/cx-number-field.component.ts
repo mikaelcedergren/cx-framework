@@ -1,12 +1,11 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, computed, signal } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxFieldUpdateOn,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 @Component({
@@ -16,27 +15,24 @@ import {
   styleUrl: './cx-number-field.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxNumberFieldComponent implements OnDestroy {
+export class CxNumberFieldComponent {
   private static nextId = 0;
 
   private readonly valueState = signal<number | undefined>(undefined);
   private readonly draftState = signal('');
   private readonly focusedState = signal(false);
   private readonly disabledState = signal(false);
-  private readonly readOnlyState = signal(false);
   private readonly loadingState = signal(false);
   private readonly sizeState = signal<CxFieldSize>('default');
   private readonly minState = signal<number | undefined>(undefined);
   private readonly maxState = signal<number | undefined>(undefined);
   private readonly stepState = signal<number | undefined>(undefined);
   private readonly clearableState = signal(false);
-  private readonly updateOnState = signal<CxFieldUpdateOn>('blur');
+  private readonly steppersState = signal(false);
   private readonly prependTextState = signal<string | undefined>(undefined);
   private readonly appendTextState = signal<string | undefined>(undefined);
   private readonly hintState = signal<string | undefined>(undefined);
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
-  private debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
 
   protected readonly labelId = `cx-number-field-label-${CxNumberFieldComponent.nextId}`;
   protected readonly messagesId = `cx-number-field-messages-${CxNumberFieldComponent.nextId++}`;
@@ -46,8 +42,6 @@ export class CxNumberFieldComponent implements OnDestroy {
 
   @Input() label = 'Number';
   @Input() ariaLabel: string | undefined;
-  @Input() ariaDescribedBy: string | undefined;
-  @Input() placeholder = '';
   @Input() optional = false;
 
   @Input()
@@ -60,11 +54,6 @@ export class CxNumberFieldComponent implements OnDestroy {
   @Input()
   public set disabled(value: boolean) {
     this.disabledState.set(!!value);
-  }
-
-  @Input()
-  public set readOnly(value: boolean) {
-    this.readOnlyState.set(!!value);
   }
 
   @Input()
@@ -98,6 +87,11 @@ export class CxNumberFieldComponent implements OnDestroy {
   }
 
   @Input()
+  public set steppers(value: boolean) {
+    this.steppersState.set(!!value);
+  }
+
+  @Input()
   public set prependText(value: string | undefined) {
     this.prependTextState.set(value?.trim() || undefined);
   }
@@ -108,25 +102,13 @@ export class CxNumberFieldComponent implements OnDestroy {
   }
 
   @Input()
-  public set updateOn(value: CxFieldUpdateOn | undefined) {
-    this.updateOnState.set(value === 'input' || value === 'debounced' ? value : 'blur');
-  }
-
-  @Input() debounceMs = 300;
-
-  @Input()
   public set hint(value: string | undefined) {
     this.hintState.set(value);
   }
 
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Output() readonly valueChange = new EventEmitter<number | undefined>();
@@ -136,7 +118,6 @@ export class CxNumberFieldComponent implements OnDestroy {
   protected readonly value$ = this.valueState.asReadonly();
   protected readonly draft$ = this.draftState.asReadonly();
   protected readonly disabled$ = this.disabledState.asReadonly();
-  protected readonly readOnly$ = this.readOnlyState.asReadonly();
   protected readonly loading$ = this.loadingState.asReadonly();
   protected readonly size$ = this.sizeState.asReadonly();
   protected readonly min$ = this.minState.asReadonly();
@@ -145,7 +126,7 @@ export class CxNumberFieldComponent implements OnDestroy {
   protected readonly prependText$ = this.prependTextState.asReadonly();
   protected readonly appendText$ = this.appendTextState.asReadonly();
   protected readonly isLocked$ = computed(() => this.disabledState() || this.loadingState());
-  protected readonly isInteractive$ = computed(() => !this.disabledState() && !this.loadingState() && !this.readOnlyState());
+  protected readonly isInteractive$ = computed(() => !this.disabledState() && !this.loadingState());
   protected readonly hasClear$ = computed(
     () => this.clearableState() && this.valueState() !== undefined && this.isInteractive$(),
   );
@@ -153,12 +134,31 @@ export class CxNumberFieldComponent implements OnDestroy {
     if (this.disabledState()) {
       return [];
     }
-    return normalizeCxValidationMessages(this.validationMessagesState(), this.errorMessageState());
+    return normalizeCxValidation(this.validationState());
   });
   protected readonly hasError$ = computed(() => this.validationMessages$().some((message) => message.type === 'error'));
   protected readonly hint$ = computed(() => this.hintState()?.trim() || undefined);
   protected readonly showHint$ = computed(() => !!this.hint$() && this.validationMessages$().length === 0);
   protected readonly shellFocused$ = computed(() => this.focusedState() && !this.isLocked$());
+  protected readonly steppers$ = this.steppersState.asReadonly();
+  protected readonly stepAmount$ = computed(() => {
+    const step = this.stepState();
+    return step && step > 0 ? step : 1;
+  });
+  protected readonly canDecrement$ = computed(() => {
+    if (!this.isInteractive$()) {
+      return false;
+    }
+    const min = this.minState();
+    return min === undefined || this.currentForStep() > min;
+  });
+  protected readonly canIncrement$ = computed(() => {
+    if (!this.isInteractive$()) {
+      return false;
+    }
+    const max = this.maxState();
+    return max === undefined || this.currentForStep() < max;
+  });
 
   protected get resolvedAriaLabel(): string | undefined {
     const ariaLabel = this.ariaLabel?.trim();
@@ -180,10 +180,6 @@ export class CxNumberFieldComponent implements OnDestroy {
 
   protected get resolvedAriaDescribedBy(): string | undefined {
     const ids: string[] = [];
-    const external = this.ariaDescribedBy?.trim();
-    if (external) {
-      ids.push(external);
-    }
     if (this.showHint$() || this.validationMessages$().length > 0) {
       ids.push(this.messagesId);
     }
@@ -192,10 +188,6 @@ export class CxNumberFieldComponent implements OnDestroy {
 
   public focus(): void {
     this.fieldRef?.nativeElement.focus();
-  }
-
-  public ngOnDestroy(): void {
-    this.clearDebounce();
   }
 
   protected onInput(event: Event): void {
@@ -207,14 +199,7 @@ export class CxNumberFieldComponent implements OnDestroy {
       return;
     }
     this.draftState.set(target.value);
-    if (this.updateOnState() === 'input') {
-      this.clearDebounce();
-      this.commit(target.value);
-      return;
-    }
-    if (this.updateOnState() === 'debounced') {
-      this.scheduleDebouncedCommit(target.value);
-    }
+    this.commit(target.value);
   }
 
   protected onFocus(): void {
@@ -226,9 +211,6 @@ export class CxNumberFieldComponent implements OnDestroy {
   }
 
   protected onBlur(): void {
-    if (this.updateOnState() !== 'input') {
-      this.commit(this.draftState());
-    }
     this.focusedState.set(false);
     this.focusChange.emit(false);
   }
@@ -264,11 +246,45 @@ export class CxNumberFieldComponent implements OnDestroy {
     queueMicrotask(() => this.fieldRef?.nativeElement.focus());
   }
 
+  protected onStep(direction: 1 | -1): void {
+    if (!this.isInteractive$()) {
+      return;
+    }
+    const next = this.clampToBounds(this.currentForStep() + direction * this.stepAmount$());
+    if (next === this.valueState()) {
+      return;
+    }
+    this.valueState.set(next);
+    this.draftState.set(this.formatValue(next));
+    this.valueChange.emit(next);
+    queueMicrotask(() => this.fieldRef?.nativeElement.focus());
+  }
+
+  private currentForStep(): number {
+    const value = this.valueState();
+    if (value !== undefined) {
+      return value;
+    }
+    return this.minState() ?? 0;
+  }
+
+  private clampToBounds(value: number): number {
+    const min = this.minState();
+    const max = this.maxState();
+    let next = value;
+    if (min !== undefined) {
+      next = Math.max(min, next);
+    }
+    if (max !== undefined) {
+      next = Math.min(max, next);
+    }
+    return next;
+  }
+
   private commit(raw: string): void {
     if (!this.isInteractive$()) {
       return;
     }
-    this.clearDebounce();
 
     const trimmed = raw.trim();
     if (!trimmed) {
@@ -292,26 +308,6 @@ export class CxNumberFieldComponent implements OnDestroy {
     }
     this.valueState.set(value);
     this.valueChange.emit(value);
-  }
-
-  private scheduleDebouncedCommit(raw: string): void {
-    this.clearDebounce();
-    this.debounceTimer = setTimeout(() => {
-      this.debounceTimer = undefined;
-      this.commit(raw);
-    }, this.normalizedDebounceMs());
-  }
-
-  private clearDebounce(): void {
-    if (!this.debounceTimer) {
-      return;
-    }
-    clearTimeout(this.debounceTimer);
-    this.debounceTimer = undefined;
-  }
-
-  private normalizedDebounceMs(): number {
-    return Number.isFinite(this.debounceMs) ? Math.max(0, Math.floor(this.debounceMs)) : 300;
   }
 
   private normalizeOptionalNumber(value: number | null | undefined): number | undefined {

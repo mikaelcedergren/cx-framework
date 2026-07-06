@@ -3,7 +3,9 @@ import { marked } from 'marked';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
+  type CxFieldValidation,
   type CxValidationMessage,
+  normalizeCxValidation,
   normalizeCxValidationMessages,
 } from '../shared/field.types';
 
@@ -70,7 +72,6 @@ export class CxTextareaComponent {
   private readonly forcedFocusState = signal(false);
   private readonly markdownState = signal(false);
   private readonly disabledState = signal(false);
-  private readonly readOnlyState = signal(false);
   private readonly sizeState = signal<CxTextareaSize>('default');
   private readonly sizingState = signal<CxTextareaSizing>('resizable');
   private readonly minLinesState = signal(5);
@@ -80,15 +81,13 @@ export class CxTextareaComponent {
   private readonly annotationsState = signal<ReadonlyArray<CxTextareaAnnotation>>([]);
   private readonly scrollTopState = signal(0);
   private readonly hintState = signal<string | undefined>(undefined);
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
 
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLTextAreaElement>;
 
   @Input() label = 'Label';
   @Input() ariaLabel: string | undefined;
-  @Input() placeholder = '';
   @Input() optional = false;
   @Input() monospace = false;
   @Input() variant: CxTextareaVariant = 'default';
@@ -113,11 +112,6 @@ export class CxTextareaComponent {
   @Input()
   public set disabled(value: boolean) {
     this.disabledState.set(!!value);
-  }
-
-  @Input()
-  public set readOnly(value: boolean) {
-    this.readOnlyState.set(!!value);
   }
 
   @Input()
@@ -179,13 +173,8 @@ export class CxTextareaComponent {
   }
 
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -213,7 +202,6 @@ export class CxTextareaComponent {
 
   protected readonly value$ = this.valueState.asReadonly();
   protected readonly disabled$ = this.disabledState.asReadonly();
-  protected readonly readOnly$ = this.readOnlyState.asReadonly();
   protected readonly size$ = this.sizeState.asReadonly();
   protected readonly sizing$ = this.sizingState.asReadonly();
   protected readonly minLines$ = this.minLinesState.asReadonly();
@@ -301,20 +289,18 @@ export class CxTextareaComponent {
     if (this.disabledState()) {
       return [];
     }
-
-    const messages: CxValidationMessage[] = [...this.validationMessagesState()];
+    const messages: CxValidationMessage[] = [...normalizeCxValidation(this.validationState())];
     for (const annotation of this.visibleAnnotations$()) {
       const message = annotation.message?.trim();
       if (annotation.mood === 'danger' && message) {
         messages.push({ type: 'error', message: `Line ${annotation.line}: ${message}` });
       }
     }
-    return normalizeCxValidationMessages(messages, this.errorMessageState());
+    return normalizeCxValidationMessages(messages);
   });
   protected readonly hasError$ = computed(() => this.validationMessages$().some((message) => message.type === 'error'));
   protected readonly hint$ = computed(() => this.hintState()?.trim() || undefined);
   protected readonly showHint$ = computed(() => !!this.hint$() && this.validationMessages$().length === 0);
-  protected readonly errorMessage$ = this.errorMessageState.asReadonly();
   protected readonly gutterTransform$ = computed(() => `translateY(-${this.scrollTopState()}px)`);
   protected readonly markdown$ = this.markdownState.asReadonly();
   protected readonly showMarkdownPreview$ = computed(

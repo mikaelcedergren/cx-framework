@@ -631,6 +631,51 @@
       "path": "primitives/inputs/cx-file-upload/cx-file-upload.component.ts"
     },
     {
+      "name": "cx-rating",
+      "selectors": [
+        "cx-rating"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-rating/cx-rating.component.ts"
+    },
+    {
+      "name": "cx-reaction",
+      "selectors": [
+        "cx-reaction"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-reaction/cx-reaction.component.ts"
+    },
+    {
+      "name": "cx-text-shimmer",
+      "selectors": [
+        "cx-text-shimmer"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-text-shimmer/cx-text-shimmer.component.ts"
+    },
+    {
+      "name": "cx-item-card",
+      "selectors": [
+        "cx-item-card"
+      ],
+      "area": "pattern",
+      "category": "cx-item-card",
+      "path": "patterns/cx-item-card/cx-item-card.component.ts"
+    },
+    {
+      "name": "cx-kpi",
+      "selectors": [
+        "cx-kpi"
+      ],
+      "area": "pattern",
+      "category": "cx-kpi",
+      "path": "patterns/cx-kpi/cx-kpi.component.ts"
+    },
+    {
       "name": "cx-hierarchical-select",
       "selectors": [
         "cx-hierarchical-select"
@@ -647,6 +692,24 @@
       "area": "primitive",
       "category": "inputs",
       "path": "primitives/inputs/cx-text-field/cx-text-field.component.ts"
+    },
+    {
+      "name": "cx-email-field",
+      "selectors": [
+        "cx-email-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-email-field/cx-email-field.component.ts"
+    },
+    {
+      "name": "cx-phone-field",
+      "selectors": [
+        "cx-phone-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-phone-field/cx-phone-field.component.ts"
     },
     {
       "name": "cx-number-field",
@@ -676,13 +739,13 @@
       "path": "primitives/inputs/cx-search-field/cx-search-field.component.ts"
     },
     {
-      "name": "cx-select",
+      "name": "cx-dropdown",
       "selectors": [
-        "cx-select"
+        "cx-dropdown"
       ],
       "area": "primitive",
       "category": "inputs",
-      "path": "primitives/inputs/cx-select/cx-select.component.ts"
+      "path": "primitives/inputs/cx-dropdown/cx-dropdown.component.ts"
     },
     {
       "name": "cx-slider",

@@ -30,6 +30,14 @@ The live component reference is the product-facing documentation surface. When a
 
 This document is the agent-facing design-system reference. It should explain why the system works the way it does so future changes do not drift back into one-off local taste.
 
+## Cortex -> cx-framework -> projects loop
+
+Cortex is the authoring source for the shared product system: components, tokens, AI skills, design guidance, and reusable UI rules start here.
+
+`cx-framework` is the packaged delivery from Cortex. Other projects consume `@mikaelcedergren/cx-framework`; they do not import Cortex, point package dependencies at Cortex, copy Cortex source, or patch framework behavior from their own app code.
+
+When a project shows that the framework needs a stronger component, token, default, pattern, rule, or skill, improve this design system first. Package it into `cx-framework`, then let the consuming project update from the package so the same improvement benefits every project after it.
+
 Broader design judgment comes from:
 
 - `docs/PURPOSE.md` for the chain: purpose -> role -> information -> component -> token.
@@ -295,6 +303,13 @@ Current weights:
 - `--font-weight-medium`: 550
 - `--font-weight-bold`: 700
 
+Current line heights:
+
+- `--line-height-heading`: 1.2
+- `--line-height-body`: 1.3
+- `--line-height-body-lg`: 1.8
+- `--line-height-small`: 1.2
+
 Most component text should be `--font-size-body`, not `--font-size-body-sm`.
 
 `--font-size-body-sm` is for labels, helper text, metadata, compact table header text, captions, and secondary detail. It should not be the default font size for buttons, inputs, menu options, or main values.
@@ -388,6 +403,8 @@ A component owns its template, styles, padding, chrome, state, and rules. Pages 
 Do not fix component behavior from the outside with deep selectors, parent stylesheet patches, inline styles, duplicated token values, or specificity fights.
 
 Fix behavior at the deepest piece that owns it. If the clean fix belongs in a primitive, grow the primitive API first.
+
+During focused component work, keep the scope on that component. If a requested outcome for the current component would require changing another component's implementation, API, styling, or behavior, stop and ask how to proceed before touching the other component. It is fine to use another component's existing public API; it is not fine to quietly reshape that component as a side effect.
 
 Prefer normal document flow for component layout. Use absolute positioning and `z-index` only when the component genuinely needs layering, not for ordinary spacing, sizing, or click targets. A large hit area should come from the interactive element's natural box, such as a button or label, not from an invisible overlay.
 
@@ -562,6 +579,10 @@ Remove errors the moment they are no longer true. Never reset the form on error.
 
 Be forgiving with input formats. Accept reasonable date, phone, and typed formats; convert internally.
 
+Text fields, textareas, search fields, number fields, password fields, and editable text surfaces do not use placeholders. Keep the field empty with a clear label; put examples, constraints, and format help in helper text.
+
+Dropdowns and picker-style choice controls either have a selected value or show a placeholder shaped as `Select [thing]`, such as `Select severity` or `Select language`. Use `Select` only when no clearer object fits.
+
 ## Copy
 
 Use plain sentence case.
@@ -600,7 +621,7 @@ New public behavior should be visible with controls that reveal the prop type:
 - number fields for numeric values
 - sliders for bounded ranges
 - button groups for small option sets
-- selects for larger option sets
+- dropdowns for larger option sets
 
 The default state matters. It should show the component as it is meant to be used most often, not a maximal demo.
 
@@ -608,7 +629,7 @@ Default-state review wins over historical implementation. If the existing compon
 
 The reference should not include props just because they are technically possible. It should include the public API that belongs to the component.
 
-Shared workbench controls such as preview width, min size, and alignment belong to the workbench. Component-specific controls belong to the component section.
+Shared workbench controls such as preview width, preview height, and alignment belong to the workbench. Component-specific controls belong to the component section.
 
 The moodboard is also a reference surface. It should present real Cortex components and expose visual issues; it should not receive local styling patches that hide component problems. If something looks wrong on the moodboard, fix the owning component or token.
 

@@ -6,19 +6,16 @@
 >
   <cx-text-field
     [label]="label"
-    [placeholder]="placeholder"
+    [ariaLabel]="ariaLabel"
     [hint]="hint"
     [optional]="optional"
     [disabled]="disabled"
-    [readOnly]="readOnly"
     [loading]="loading"
     [clearable]="clearable"
     [size]="size"
     prependIcon="search"
-    [updateOn]="updateOn"
-    [debounceMs]="debounceMs"
     [value]="value$()"
-    [validationMessages]="validationMessages"
+    [validation]="validation"
     (valueChange)="onValueChange($event)"
   />
 </div>

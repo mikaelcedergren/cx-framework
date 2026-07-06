@@ -17,9 +17,9 @@ export class CxCheckboxComponent {
   protected readonly hintId = `cx-checkbox-${++CxCheckboxComponent.nextId}-hint`;
 
   @Input() text = '';
+  @Input() ariaLabel: string | undefined;
   @Input() hint: string | undefined;
   @Input() disabled = false;
-  @Input() custom = false;
 
   @Input()
   public set selected(value: boolean) {
@@ -45,6 +45,7 @@ export class CxCheckboxComponent {
   protected readonly visibleText$ = () => this.text.trim();
   protected readonly visibleHint$ = () => this.hint?.trim();
   protected readonly hasContent$ = () => this.visibleText$().length > 0;
+  protected readonly resolvedAriaLabel$ = () => this.visibleText$() ? null : this.ariaLabel?.trim() || null;
 
   protected onNativeChange(event: Event): void {
     if (this.disabled) {

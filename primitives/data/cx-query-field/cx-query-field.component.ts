@@ -4,9 +4,9 @@ import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../../inputs/shared/field.types';
 import { CxQueryElementComponent, type CxQueryElementData } from '../cx-query-element';
 
@@ -31,7 +31,7 @@ let cxQueryFieldId = 0;
 export class CxQueryFieldComponent {
   private readonly segmentsState = signal<readonly CxQueryFieldSegment[]>([]);
   private readonly focusedIndexState = signal<number | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
 
   protected readonly labelId = `cx-query-field-label-${++cxQueryFieldId}`;
   protected readonly messagesId = `cx-query-field-messages-${cxQueryFieldId}`;
@@ -41,11 +41,9 @@ export class CxQueryFieldComponent {
   @Input() optional = false;
   @Input() size: CxQueryFieldSize = 'default';
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() clearable = false;
   @Input() ariaLabel: string | undefined;
-  @Input() ariaDescribedBy: string | undefined;
 
   @Input()
   public set query(value: readonly CxQueryFieldSegment[] | null | undefined) {
@@ -56,8 +54,8 @@ export class CxQueryFieldComponent {
   }
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(normalizeCxValidationMessages(value));
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Output() readonly queryChange = new EventEmitter<readonly CxQueryFieldSegment[]>();
@@ -67,7 +65,7 @@ export class CxQueryFieldComponent {
     if (this.disabled) {
       return [];
     }
-    return [...this.validationMessagesState()];
+    return normalizeCxValidation(this.validationState());
   });
   protected readonly hasError$ = computed(() => this.validationMessages$().some(message => message.type === 'error'));
   protected readonly showHint$ = computed(() => !!this.hint?.trim() && this.validationMessages$().length === 0);
@@ -79,14 +77,13 @@ export class CxQueryFieldComponent {
 
   protected resolvedAriaDescribedBy(): string | null {
     const ids = [
-      this.ariaDescribedBy,
       this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined,
     ].filter((id): id is string => !!id);
     return ids.length > 0 ? ids.join(' ') : null;
   }
 
   protected isLocked(): boolean {
-    return this.disabled || this.readOnly || this.loading;
+    return this.disabled || this.loading;
   }
 
   protected segmentData(segment: CxQueryFieldSegment, index: number): CxQueryElementData {

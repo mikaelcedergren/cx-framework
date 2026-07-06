@@ -3,13 +3,8 @@
 }
 
 .cx-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   display: flex;
-  z-index: var(--z-index-toast);
-  width: 100vw;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
@@ -17,17 +12,35 @@
   background: var(--info);
   color: var(--on-ink);
   box-sizing: border-box;
-  box-shadow: var(--shadow-popover);
-  transform: translateY(calc(-100% - var(--space-sm)));
-  transition:
-    transform 320ms var(--ease-out);
 }
 
-.cx-banner--open {
+.cx-banner--dismissible {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-index-toast);
+  width: 100vw;
+  box-shadow: var(--shadow-popover);
+  transform: translateY(calc(-100% - var(--space-sm)));
+  transition: transform 320ms var(--ease-out);
+}
+
+.cx-banner--persistent {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-toast);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: none;
+  transform: none;
+  transition: none;
+}
+
+.cx-banner--dismissible.cx-banner--open {
   transform: translateY(0);
 }
 
-.cx-banner--closing {
+.cx-banner--dismissible.cx-banner--closing {
   transform: translateY(calc(-100% - var(--space-sm)));
 }
 
@@ -127,7 +140,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cx-banner {
+  .cx-banner--dismissible {
     transition: none;
   }
 }

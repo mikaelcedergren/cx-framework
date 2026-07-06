@@ -2,7 +2,8 @@
   class="cx-big-radio"
   [class.cx-big-radio--selected]="selected$()"
   [class.cx-big-radio--disabled]="disabled"
-  >
+  [class.cx-big-radio--has-icon]="!!icon"
+>
   <input
     class="cx-big-radio__input"
     type="radio"
@@ -22,20 +23,24 @@
     </span>
   </div>
   <div class="cx-big-radio__content">
-    @if (custom) {
-      <ng-content />
-    } @else {
+    @if (visibleHeading$()) {
       <div class="cx-big-radio__title-row">
-        @if (icon; as iconName) {
-          <cx-icon class="cx-big-radio__icon" [name]="iconName" [size]="16" />
-        }
-        @if (heading) {
-          <div class="cx-big-radio__label">{{ heading }}</div>
-        }
+        <div class="cx-big-radio__label">{{ visibleHeading$() }}</div>
       </div>
-      @if (text) {
-        <div class="cx-big-radio__description">{{ text }}</div>
-      }
     }
+    @if (visibleText$()) {
+      <div class="cx-big-radio__description">{{ visibleText$() }}</div>
+    }
+    <ng-content />
   </div>
+  @if (icon; as iconName) {
+    <cx-icon
+      class="cx-big-radio__icon"
+      [name]="iconName"
+      [mood]="iconMood"
+      size="24"
+      shape="square-subtle"
+      aria-hidden="true"
+    />
+  }
 </label>

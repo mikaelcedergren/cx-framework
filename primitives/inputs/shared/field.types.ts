@@ -10,11 +10,23 @@ export type CxValidationMessage = {
   text?: string | null;
 };
 
+export type CxFieldValidation = CxValidationMessage | string;
+
 export type CxRenderedValidationMessage = {
   id: string;
   type: CxValidationMessageType;
   message: string;
 };
+
+export function normalizeCxValidation(
+  validation: CxFieldValidation | null | undefined,
+): ReadonlyArray<CxRenderedValidationMessage> {
+  if (typeof validation === 'string') {
+    return normalizeCxValidationMessages([{ type: 'error', message: validation }]).slice(0, 1);
+  }
+
+  return normalizeCxValidationMessages(validation ? [validation] : []).slice(0, 1);
+}
 
 export function normalizeCxValidationMessages(
   messages: ReadonlyArray<CxValidationMessage> | null | undefined,

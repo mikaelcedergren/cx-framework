@@ -6,6 +6,7 @@ import {
   HostBinding,
   HostListener,
   Input,
+  OnDestroy,
   Output,
   inject,
   signal,
@@ -26,12 +27,13 @@ export type CxDetailPanelVariant = 'floating' | 'fixed' | 'bar';
   styleUrl: './cx-detail-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxDetailPanelComponent {
+export class CxDetailPanelComponent implements OnDestroy {
   private readonly host = inject(ElementRef<HTMLElement>);
+  private dismissTimer: number | undefined;
 
   @Input() ariaLabel = 'Detail panel';
   @Input() icon: CxIconName | undefined;
-  @Input() heading = 'Asset details';
+  @Input() heading = '';
   @Input() dismissible = true;
   @Input() variant: CxDetailPanelVariant = 'floating';
   @Input() hasScrollbar = true;
@@ -120,9 +122,17 @@ export class CxDetailPanelComponent {
     // before the panel animates away.
     (document.activeElement as HTMLElement | null)?.blur();
     this.closing$.set(true);
-    window.setTimeout(() => {
+    this.dismissTimer = window.setTimeout(() => {
+      this.dismissTimer = undefined;
       this.dismissed.emit();
     }, DETAIL_PANEL_DISMISS_DURATION_MS);
+  }
+
+  public ngOnDestroy(): void {
+    if (this.dismissTimer !== undefined) {
+      window.clearTimeout(this.dismissTimer);
+      this.dismissTimer = undefined;
+    }
   }
 
   protected onMenuSelect(id: string): void {

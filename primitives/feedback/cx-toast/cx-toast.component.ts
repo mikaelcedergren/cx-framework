@@ -3,19 +3,12 @@ import { type CxIconName } from '../../../icons/manifest';
 import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
+import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
+import { prefersReducedMotion } from '../reduced-motion';
 
 export type CxToastMood = 'default' | 'info' | 'success' | 'warning' | 'danger';
 
-export interface CxToastAction {
-  readonly text: string;
-  readonly mood?: CxButtonMood;
-  readonly icon?: CxIconName;
-  readonly appendIcon?: CxIconName;
-  readonly disabled?: boolean;
-  readonly loading?: boolean;
-  readonly ariaLabel?: string;
-  readonly transparent?: boolean;
-}
+export type CxToastAction = CxFeedbackAction;
 
 @Component({
   selector: 'cx-toast',
@@ -80,11 +73,11 @@ export class CxToastComponent implements OnDestroy {
   }
 
   protected get visibleAction(): CxToastAction | undefined {
-    return this.visibleActionFor(this.action);
+    return visibleCxFeedbackAction(this.action);
   }
 
   protected get visibleSecondaryAction(): CxToastAction | undefined {
-    return this.visibleActionFor(this.secondaryAction);
+    return visibleCxFeedbackAction(this.secondaryAction);
   }
 
   protected get hasControls(): boolean {
@@ -158,7 +151,7 @@ export class CxToastComponent implements OnDestroy {
       }
     } else {
       this.openState.set(false);
-      if (!this.renderedState() || this.prefersReducedMotion()) {
+      if (!this.renderedState() || prefersReducedMotion()) {
         this.renderedState.set(false);
       }
     }
@@ -193,13 +186,4 @@ export class CxToastComponent implements OnDestroy {
     this.hideTimer = undefined;
   }
 
-  private prefersReducedMotion(): boolean {
-    return typeof window !== 'undefined'
-      && 'matchMedia' in window
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
-
-  private visibleActionFor(action: CxToastAction | undefined): CxToastAction | undefined {
-    return action?.text.trim() ? action : undefined;
-  }
 }

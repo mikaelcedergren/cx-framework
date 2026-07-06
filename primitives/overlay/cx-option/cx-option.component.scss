@@ -45,6 +45,7 @@
 }
 
 .cx-option--with-checkbox {
+  gap: 0;
   padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-sm);
 }
 
@@ -92,15 +93,6 @@
 
 .cx-option__checkbox {
   flex: 0 0 auto;
-}
-
-.cx-option__checkbox-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 
 .cx-option__icon {

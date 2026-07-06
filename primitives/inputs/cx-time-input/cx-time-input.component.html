@@ -21,7 +21,6 @@
     [class.cx-time-input__field-shell--small]="size$() === 'small'"
     [class.cx-time-input__field-shell--large]="size$() === 'large'"
     [class.cx-time-input__field-shell--disabled]="disabled"
-    [class.cx-time-input__field-shell--readonly]="readOnly"
     [class.cx-time-input__field-shell--loading]="loading"
     [class.cx-time-input__field-shell--error]="hasError$()"
     [class.cx-time-input__field-shell--empty]="isEmpty$()"
@@ -30,7 +29,6 @@
     [attr.aria-labelledby]="resolvedGroupAriaLabelledBy"
     [attr.aria-describedby]="resolvedGroupAriaDescribedBy"
     [attr.aria-label]="resolvedGroupAriaLabel"
-    [attr.aria-readonly]="readOnly ? 'true' : null"
     [attr.aria-busy]="loading ? 'true' : null"
     (mousedown)="onShellMousedown($event)"
   >
@@ -44,12 +42,9 @@
           maxlength="2"
           autocomplete="off"
           spellcheck="false"
-          placeholder="--"
           [value]="hourText$()"
           [disabled]="isLocked$()"
-          [readOnly]="readOnly"
           [attr.aria-label]="hourAriaLabel"
-          [attr.aria-readonly]="readOnly ? 'true' : null"
           (focus)="onSegmentFocus('hour')"
           (keydown)="onSegmentKeydown('hour', $event)"
           (paste)="onSegmentPaste($event)"
@@ -65,12 +60,9 @@
           maxlength="2"
           autocomplete="off"
           spellcheck="false"
-          placeholder="--"
           [value]="minuteText$()"
           [disabled]="isLocked$()"
-          [readOnly]="readOnly"
           [attr.aria-label]="minuteAriaLabel"
-          [attr.aria-readonly]="readOnly ? 'true' : null"
           (focus)="onSegmentFocus('minute')"
           (keydown)="onSegmentKeydown('minute', $event)"
           (paste)="onSegmentPaste($event)"
@@ -82,7 +74,7 @@
           #meridiemButton
           type="button"
           class="cx-time-input__meridiem"
-          [disabled]="isLocked$() || readOnly"
+          [disabled]="isLocked$()"
           [attr.aria-label]="'Meridiem ' + meridiem$()"
           (click)="onMeridiemClick()"
           (keydown)="onMeridiemKeydown($event)"
@@ -106,7 +98,7 @@
       }
 
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       }
     </div>
   }

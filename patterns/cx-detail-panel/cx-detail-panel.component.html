@@ -31,7 +31,9 @@
         @if (icon; as iconName) {
           <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
         }
-        <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
+        @if (heading.trim()) {
+          <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
+        }
       </div>
 
       <div class="cx-detail-panel__header-actions">

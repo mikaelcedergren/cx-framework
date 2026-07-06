@@ -3,23 +3,25 @@
 @if (isInteractive$()) {
   <div #actionsRail class="cx-action-area__actions" role="group" aria-label="Actions">
     @for (action of visibleActions$(); track action.key) {
-      <button
-        type="button"
-        class="cx-action-area__action"
-        [class.cx-action-area__action--has-icon]="action.icon"
-        [disabled]="action.disabled"
-        [attr.aria-label]="actionAriaLabel(action)"
-        (pointerdown)="onActionPointerDown($event)"
-        (click)="onActionClick(action, $event)"
+      <cx-tooltip
+        class="cx-action-area__action-tooltip"
+        position="top"
+        [text]="actionTooltipText(action)"
+        [disabled]="!actionTooltipText(action)"
       >
-        @if (action.icon; as iconName) {
-          <cx-icon class="cx-action-area__action-icon" [name]="iconName" [size]="14" />
-        }
-        <span class="cx-action-area__action-label">{{ action.text }}</span>
-        @if (hasShortcut(action)) {
-          <cx-shortcut-key class="cx-action-area__action-shortcut" [parts]="action.shortcutParts" />
-        }
-      </button>
+        <cx-button
+          class="cx-action-area__action"
+          size="small"
+          [text]="actionText(action)"
+          [icon]="action.icon"
+          [shortcutParts]="actionShortcutParts(action)"
+          [ariaLabel]="actionAriaLabel(action)"
+          [disabled]="action.disabled === true"
+          (pointerdown)="onActionPointerDown($event)"
+          (click)="onActionClick($event)"
+          (pressed)="onActionPressed(action)"
+        />
+      </cx-tooltip>
     }
   </div>
 }

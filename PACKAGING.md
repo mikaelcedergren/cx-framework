@@ -4,6 +4,12 @@ This file is for maintainers of the source framework.
 
 The package is exported to the GitHub package repo `mikaelcedergren/cx-framework`, published for personal app installs as `@mikaelcedergren/cx-framework`.
 
+## Improvement loop
+
+Cortex is the source. `cx-framework` is the package. Every other project consumes `@mikaelcedergren/cx-framework` and must not reference Cortex directly.
+
+When a consuming project exposes a reusable framework gap, fix it in Cortex under `framework/`, package it here, have the owner push the package repo to GitHub `main`, then update the consuming app. A good package export should make the current app better and leave all future apps stronger.
+
 ## Source of truth
 
 Make framework changes in the source app first. New components, patterns, tokens, icons, AI docs, AI skills, support files, and scripts should live under `framework/`.

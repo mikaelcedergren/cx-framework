@@ -3,15 +3,17 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   Output,
   signal,
 } from '@angular/core';
 import { CxTextFieldComponent } from '../cx-text-field';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxFieldUpdateOn,
-  type CxValidationMessage,
 } from '../shared/field.types';
+
+const SEARCH_FIELD_DEBOUNCE_MS = 300;
 
 @Component({
   selector: 'cx-search-field',
@@ -21,24 +23,23 @@ import {
   host: { role: 'search' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxSearchFieldComponent {
+export class CxSearchFieldComponent implements OnDestroy {
   private readonly valueState = signal('');
+  private debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   @Input() label = 'Search';
-  @Input() placeholder = '';
+  @Input() ariaLabel: string | undefined;
   @Input() hint: string | undefined;
   @Input() optional = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
   @Input() clearable = false;
-  @Input() updateOn: CxFieldUpdateOn = 'blur';
-  @Input() debounceMs = 300;
   @Input() size: CxFieldSize = 'default';
-  @Input() validationMessages: ReadonlyArray<CxValidationMessage> | null | undefined;
+  @Input() validation: CxFieldValidation | null | undefined;
 
   @Input()
   public set value(value: string | undefined) {
+    this.clearDebounceTimer();
     this.valueState.set(value ?? '');
   }
 
@@ -48,11 +49,11 @@ export class CxSearchFieldComponent {
   protected readonly value$ = this.valueState.asReadonly();
 
   protected onValueChange(value: string): void {
-    if (this.disabled || this.readOnly || this.loading) {
+    if (this.disabled || this.loading) {
       return;
     }
     this.valueState.set(value);
-    this.valueChange.emit(value);
+    this.scheduleValueChange();
   }
 
   protected onEscape(event: Event): void {
@@ -61,11 +62,11 @@ export class CxSearchFieldComponent {
   }
 
   protected clearSearch(): void {
-    if (this.disabled || this.readOnly || this.loading) {
+    if (this.disabled || this.loading) {
       return;
     }
     this.valueState.set('');
-    this.valueChange.emit('');
+    this.scheduleValueChange();
   }
 
   protected onFocusIn(): void {
@@ -78,5 +79,27 @@ export class CxSearchFieldComponent {
       return;
     }
     this.focusChange.emit(false);
+  }
+
+  public ngOnDestroy(): void {
+    this.clearDebounceTimer();
+  }
+
+  private scheduleValueChange(): void {
+    this.clearDebounceTimer();
+    this.debounceTimer = setTimeout(() => {
+      this.debounceTimer = undefined;
+      if (this.disabled || this.loading) {
+        return;
+      }
+      this.valueChange.emit(this.valueState());
+    }, SEARCH_FIELD_DEBOUNCE_MS);
+  }
+
+  private clearDebounceTimer(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = undefined;
+    }
   }
 }

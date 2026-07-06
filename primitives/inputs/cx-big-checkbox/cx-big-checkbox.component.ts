@@ -1,46 +1,39 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
-
-export type CxBigCheckboxValue = 'selected' | 'deselected' | 'indeterminate';
-const BIG_CHECKBOX_VALUES: readonly CxBigCheckboxValue[] = ['selected', 'deselected', 'indeterminate'];
+import { type CxIconName } from '../../../icons/manifest';
+import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 
 @Component({
   selector: 'cx-big-checkbox',
+  imports: [CxIconComponent],
   templateUrl: './cx-big-checkbox.component.html',
   styleUrl: './cx-big-checkbox.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxBigCheckboxComponent {
-  private readonly valueState = signal<CxBigCheckboxValue>('deselected');
+  private readonly selectedState = signal(false);
 
   @Input() heading = '';
   @Input() text = '';
-  @Input() custom = false;
+  @Input() icon: CxIconName | undefined;
+  @Input() iconMood: CxIconMood = 'default';
   @Input() disabled = false;
 
   @Input()
   public set selected(selected: boolean) {
-    if (selected) {
-      this.valueState.set('selected');
-    } else if (this.valueState() === 'selected') {
-      this.valueState.set('deselected');
-    }
-  }
-
-  @Input()
-  public set value(value: CxBigCheckboxValue | undefined) {
-    this.valueState.set(BIG_CHECKBOX_VALUES.includes(value as CxBigCheckboxValue) ? value! : 'deselected');
+    this.selectedState.set(selected);
   }
 
   @Output() readonly selectedChange = new EventEmitter<boolean>();
-  @Output() readonly valueChange = new EventEmitter<CxBigCheckboxValue>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
 
-  protected selected$(): boolean {
-    return this.valueState() === 'selected';
+  protected readonly selected$ = this.selectedState.asReadonly();
+
+  protected visibleHeading$(): string {
+    return this.heading.trim();
   }
 
-  protected indeterminate$(): boolean {
-    return this.valueState() === 'indeterminate';
+  protected visibleText$(): string {
+    return this.text.trim();
   }
 
   protected onNativeChange(event: Event): void {
@@ -49,11 +42,9 @@ export class CxBigCheckboxComponent {
     }
 
     const target = event.target;
-    const checked = target instanceof HTMLInputElement ? target.checked : this.valueState() !== 'selected';
-    const nextValue: CxBigCheckboxValue = checked ? 'selected' : 'deselected';
-    this.valueState.set(nextValue);
-    this.selectedChange.emit(nextValue === 'selected');
-    this.valueChange.emit(nextValue);
+    const selected = target instanceof HTMLInputElement ? target.checked : !this.selectedState();
+    this.selectedState.set(selected);
+    this.selectedChange.emit(selected);
   }
 
   protected onFocus(focused: boolean): void {

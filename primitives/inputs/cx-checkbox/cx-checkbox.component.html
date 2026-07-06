@@ -12,6 +12,7 @@
       [checked]="selected$()"
       [indeterminate]="indeterminate$()"
       [disabled]="disabled"
+      [attr.aria-label]="resolvedAriaLabel$()"
       [attr.aria-describedby]="visibleHint$() ? hintId : null"
       (change)="onNativeChange($event)"
       (focus)="onFocus(true)"
@@ -29,8 +30,6 @@
 
     @if (visibleText$()) {
       <span class="cx-checkbox__label">{{ visibleText$() }}</span>
-    } @else if (custom) {
-      <span class="cx-checkbox__label"><ng-content /></span>
     }
   </label>
 

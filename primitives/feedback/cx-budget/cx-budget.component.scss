@@ -160,6 +160,31 @@
   flex: 0 1 auto;
 }
 
+.cx-budget--compact .cx-budget-label--current {
+  display: inline-flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: var(--space-xs);
+  color: var(--opacity-high);
+}
+
+.cx-budget--compact .cx-budget-label__value,
+.cx-budget--compact .cx-budget-label__context {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-budget--compact .cx-budget-label__value {
+  flex: 0 0 auto;
+  color: var(--ink);
+}
+
+.cx-budget--compact .cx-budget-label__context {
+  flex: 1 1 auto;
+}
+
 .cx-budget-label--maximum {
   flex: 1 1 auto;
   text-align: right;

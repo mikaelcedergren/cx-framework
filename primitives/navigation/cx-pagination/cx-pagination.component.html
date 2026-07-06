@@ -38,11 +38,11 @@
 
     <div class="cx-pagination__page-size">
       <span class="cx-pagination__page-size-label">Rows per page</span>
-      <cx-select
+      <cx-dropdown
         class="cx-pagination__page-size-select"
         label=""
         ariaLabel="Page size"
-        placeholder="25"
+        placeholder="Select page size"
         size="small"
         [availableValues]="pageSizeOptions$()"
         [value]="pageSizeValue$()"

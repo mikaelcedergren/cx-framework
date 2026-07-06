@@ -1,33 +1,54 @@
+@use '../shared/field-shell' as field;
+
 :host {
   display: inline-flex;
   min-width: 0;
 }
 
 .cx-color-picker {
-  position: relative;
   display: inline-flex;
   min-width: 0;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.cx-color-picker--disabled {
-  opacity: var(--opacity-disabled, 0.45);
-}
+@include field.field-header('cx-color-picker', 0);
 
 .cx-color-picker__trigger {
-  display: inline-grid;
+  box-sizing: border-box;
+  display: inline-flex;
   min-width: calc(var(--controller-size) * 4);
   min-height: var(--controller-size);
-  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-mid);
+  background: var(--opacity-darken);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  text-align: start;
+  text-align: left;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    outline-color var(--motion-fast) ease;
+}
+
+.cx-color-picker--small .cx-color-picker__trigger {
+  min-height: var(--controller-size-small);
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-color-picker--large .cx-color-picker__trigger {
+  min-height: calc(var(--controller-size) + var(--space-md));
+  font-size: var(--font-size-body-lg);
+}
+
+.cx-color-picker--swatch-only .cx-color-picker__trigger {
+  min-width: auto;
+  gap: var(--space-sm);
 }
 
 .cx-color-picker__trigger:hover:not(:disabled) {
@@ -39,107 +60,137 @@
   outline-offset: var(--outline-tab-offset);
 }
 
+.cx-color-picker__trigger--open {
+  border-color: var(--border-open);
+  background: var(--surface-low);
+}
+
+.cx-color-picker__trigger--error {
+  border-color: var(--danger);
+}
+
 .cx-color-picker__trigger:disabled {
   cursor: default;
 }
 
+.cx-color-picker--disabled,
+.cx-color-picker--loading {
+  opacity: var(--opacity-disabled, 0.55);
+}
+
 .cx-color-picker__value {
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
+  line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cx-color-picker__swatch {
+  --cx-color-picker-swatch-border-color: var(--opacity-mid);
+  --cx-color-picker-swatch-size: calc(var(--icon-size-md) - 2px);
+
   display: inline-flex;
-  width: var(--icon-size-sm);
-  height: var(--icon-size-sm);
+  width: var(--cx-color-picker-swatch-size);
+  height: var(--cx-color-picker-swatch-size);
   flex: 0 0 auto;
-  border: var(--line);
+  border: var(--border-width) solid var(--cx-color-picker-swatch-border-color);
   border-radius: var(--radius-sm);
+  background: var(--surface-mid);
+  box-sizing: border-box;
 }
 
 .cx-color-picker__swatch--empty {
   background:
     linear-gradient(
       135deg,
-      transparent calc(50% - var(--space-2xs) / 4),
-      var(--danger) 50%,
-      transparent calc(50% + var(--space-2xs) / 4)
+      transparent calc(50% - var(--border-width) / 2),
+      var(--cx-color-picker-swatch-border-color) calc(50% - var(--border-width) / 2),
+      var(--cx-color-picker-swatch-border-color) calc(50% + var(--border-width) / 2),
+      transparent calc(50% + var(--border-width) / 2)
     ),
     var(--surface-mid);
 }
 
 .cx-color-picker__chevron {
+  flex: 0 0 auto;
   color: var(--opacity-high);
+  transition: transform var(--motion-fast) ease;
 }
 
-.cx-color-picker__panel {
-  position: absolute;
-  z-index: var(--z-index-popover);
-  top: calc(100% + var(--space-xs));
-  left: 0;
-  display: grid;
-  min-width: 100%;
-  gap: var(--space-2xs);
+.cx-color-picker__trigger--open .cx-color-picker__chevron {
+  transform: rotate(180deg);
+}
+
+@include field.field-messages('cx-color-picker', 0);
+
+.cx-color-picker__options {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-xs);
-  border: var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-popover);
 }
 
 .cx-color-picker__option {
-  display: grid;
-  min-width: calc(var(--controller-size) * 4);
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size);
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-sm);
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) var(--space-xs);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  text-align: start;
+  text-align: left;
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
 }
 
-.cx-color-picker__option:hover,
+.cx-color-picker__option:hover {
+  background: var(--primary-opacity);
+}
+
+.cx-color-picker__option:focus-visible {
+  background: var(--primary-opacity);
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-color-picker__option:active:not(:disabled) {
+  background: var(--opacity-mid);
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+}
+
 .cx-color-picker__option--selected {
   background: var(--opacity-low);
 }
 
+.cx-color-picker__option-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: currentColor;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cx-color-picker__option--clear {
-  color: var(--opacity-high);
-}
-
-.cx-color-picker__swatch[data-color='primary'] {
-  background: var(--primary);
-}
-
-.cx-color-picker__swatch[data-color='accent'] {
-  background: var(--accent);
-}
-
-.cx-color-picker__swatch[data-color='success'] {
-  background: var(--success);
-}
-
-.cx-color-picker__swatch[data-color='warning'] {
-  background: var(--warning);
-}
-
-.cx-color-picker__swatch[data-color='danger'] {
-  background: var(--danger);
-}
-
-.cx-color-picker__swatch[data-color='info'] {
-  background: var(--info);
+  color: var(--ink);
 }
 
 .cx-color-picker__swatch[data-color='blue'] {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
-import { type CxFeedbackAction } from '../cx-feedback-action';
+import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
 
 export type CxAlertMood = 'default' | 'info' | 'warning' | 'success' | 'danger';
 export type CxAlertIcon = 'auto' | 'none' | CxIconName;
@@ -68,11 +68,11 @@ export class CxAlertComponent {
   }
 
   protected get visibleAction(): CxAlertAction | undefined {
-    return this.visibleActionFor(this.action);
+    return visibleCxFeedbackAction(this.action);
   }
 
   protected get visibleSecondaryAction(): CxAlertAction | undefined {
-    return this.visibleActionFor(this.secondaryAction);
+    return visibleCxFeedbackAction(this.secondaryAction);
   }
 
   protected hasText(): boolean {
@@ -81,10 +81,6 @@ export class CxAlertComponent {
 
   protected hasActions(): boolean {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
-  }
-
-  private visibleActionFor(action: CxAlertAction | undefined): CxAlertAction | undefined {
-    return action?.text.trim() ? action : undefined;
   }
 
   protected onActionSelect(action: CxAlertAction): void {

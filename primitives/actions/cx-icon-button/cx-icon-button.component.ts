@@ -25,6 +25,7 @@ export class CxIconButtonComponent implements OnDestroy {
   @Input() active = false;
   @Input() ariaPressed: boolean | undefined;
   @Input() hover = false;
+  @Input() rounded = false;
   @Input() disabled = false;
   @Input() badgeValue: string | undefined;
   /** Stretch to the full width of the host's container (e.g. a full-row add button). */
@@ -38,6 +39,7 @@ export class CxIconButtonComponent implements OnDestroy {
   @Output() readonly countdownChange = new EventEmitter<boolean>();
 
   private readonly delayedLoading = createDelayedLoadingState(0);
+  // 6000ms must match the 6s countdown ring animation in the component SCSS.
   private readonly countdownState = createCountdownState(6000, () => {
     this.countdownChange.emit(false);
   });

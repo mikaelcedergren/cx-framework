@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
-import { CxSelectComponent, type CxSelectOption } from '../cx-select';
+import { CxDropdownComponent, type CxDropdownOption } from '../cx-dropdown';
 import {
   CX_MONTH_OPTIONS,
   addCxMonths,
@@ -17,7 +17,7 @@ import {
 
 @Component({
   selector: 'cx-calendar',
-  imports: [CxIconButtonComponent, CxSelectComponent],
+  imports: [CxIconButtonComponent, CxDropdownComponent],
   templateUrl: './cx-calendar.component.html',
   styleUrl: './cx-calendar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,7 +44,7 @@ export class CxCalendarComponent {
 
   @Output() readonly valueChange = new EventEmitter<Date | undefined>();
 
-  protected readonly monthOptions: CxSelectOption[] = CX_MONTH_OPTIONS.map(option => ({
+  protected readonly monthOptions: CxDropdownOption[] = CX_MONTH_OPTIONS.map(option => ({
     id: String(option.value),
     label: option.label,
   }));
@@ -53,7 +53,7 @@ export class CxCalendarComponent {
   protected readonly viewYearValue$ = computed(() => `${this.viewYearState()}`);
   protected readonly viewMonthValue$ = computed(() => `${this.viewMonthState()}`);
   protected readonly selectedDate$ = computed(() => this.toDateParts(this.valueState()));
-  protected readonly yearOptions$ = computed<CxSelectOption[]>(() =>
+  protected readonly yearOptions$ = computed<CxDropdownOption[]>(() =>
     getCxYearOptions(this.viewYearState(), this.yearRange).map(year => ({
       id: String(year),
       label: String(year),

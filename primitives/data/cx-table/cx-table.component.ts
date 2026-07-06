@@ -33,7 +33,6 @@ import {
 import {
   CxTagComponent,
   type CxTagColor,
-  type CxTagVariant,
 } from '../../display/cx-tag';
 import {
   CxTrendTagComponent,
@@ -98,7 +97,6 @@ export type CxTableCell =
       kind: 'tag';
       label: string;
       color?: CxTagColor;
-      variant?: CxTagVariant;
       outline?: boolean;
     };
 

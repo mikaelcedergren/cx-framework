@@ -11,14 +11,12 @@
   <div
     class="cx-query-field__container"
     [class.cx-query-field__container--disabled]="disabled"
-    [class.cx-query-field__container--readonly]="readOnly"
     [class.cx-query-field__container--loading]="loading"
     [class.cx-query-field__container--error]="hasError$()"
     role="search"
     tabindex="0"
     [attr.aria-invalid]="hasError$() ? 'true' : null"
     [attr.aria-disabled]="disabled ? 'true' : null"
-    [attr.aria-readonly]="readOnly ? 'true' : null"
     [attr.aria-busy]="loading ? 'true' : null"
     [attr.aria-labelledby]="resolvedAriaLabelledBy()"
     [attr.aria-describedby]="resolvedAriaDescribedBy()"
@@ -63,7 +61,7 @@
         <div class="cx-query-field__hint">{{ hint!.trim() }}</div>
       }
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       }
     </div>
   }

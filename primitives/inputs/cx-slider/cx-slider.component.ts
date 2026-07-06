@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, computed, signal } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import {
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  type CxFieldValidation,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxSliderRangeValue = readonly [number, number];
@@ -29,7 +29,7 @@ export class CxSliderComponent implements OnDestroy {
   private readonly valueState = signal(40);
   private readonly rangeState = signal(false);
   private readonly rangeValueState = signal<CxSliderRangeValue>([25, 75]);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly showTooltipOnDragState = signal(false);
   private readonly valueFormatterState = signal<((value: number) => string) | undefined>(undefined);
   private readonly activeThumbState = signal<CxSliderThumb | null>(null);
@@ -45,8 +45,8 @@ export class CxSliderComponent implements OnDestroy {
   @Input() showValue = true;
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -139,7 +139,7 @@ export class CxSliderComponent implements OnDestroy {
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly showTooltipOnDrag$ = this.showTooltipOnDragState.asReadonly();

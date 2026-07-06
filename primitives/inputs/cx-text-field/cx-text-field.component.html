@@ -5,7 +5,7 @@
 >
   @if (label.trim()) {
     <div class="cx-text-field__header">
-      <div class="cx-text-field__label">{{ label }}</div>
+      <div class="cx-text-field__label" [id]="labelId">{{ label }}</div>
       @if (optional) {
         <div class="cx-text-field__optional">Optional</div>
       }
@@ -16,19 +16,13 @@
     class="cx-text-field__field-shell"
     [class.cx-text-field__field-shell--focused]="isFocused$()"
     [class.cx-text-field__field-shell--disabled]="disabled"
-    [class.cx-text-field__field-shell--readonly]="readOnly"
     [class.cx-text-field__field-shell--loading]="loading"
     [class.cx-text-field__field-shell--error]="hasError$()"
-    [class.cx-text-field__field-shell--inline-edit]="variant === 'inline-edit'"
+    [class.cx-text-field__field-shell--inline-edit]="inlineEdit"
     [attr.aria-busy]="loading ? 'true' : null"
   >
     @if (prependIcon; as iconName) {
-      <span
-        class="cx-text-field__prepend"
-        [class.cx-text-field__icon--clickable]="prependIconClickable && !disabled"
-        aria-hidden="true"
-        (click)="onIconPress('prepend', $event)"
-      >
+      <span class="cx-text-field__prepend" aria-hidden="true">
         <cx-icon [name]="iconName" [size]="16" />
       </span>
     }
@@ -37,17 +31,16 @@
     }
     <input
       #field
-      [type]="effectiveType"
+      type="text"
       class="cx-text-field__field"
       [attr.name]="resolvedName"
       [attr.autocomplete]="resolvedAutocomplete"
       [disabled]="disabled || loading"
-      [readOnly]="readOnly"
       [value]="value$()"
-      [placeholder]="placeholder"
       [attr.aria-label]="resolvedAriaLabel"
+      [attr.aria-labelledby]="resolvedAriaLabelledBy"
+      [attr.aria-describedby]="resolvedAriaDescribedBy"
       [attr.aria-invalid]="hasError$() ? 'true' : null"
-      [attr.aria-readonly]="readOnly ? 'true' : null"
       (input)="onInput($event)"
       (focus)="onFocus()"
       (blur)="onBlur()"
@@ -68,12 +61,7 @@
       </button>
     }
     @if (appendIcon; as iconName) {
-      <span
-        class="cx-text-field__append"
-        [class.cx-text-field__icon--clickable]="appendIconClickable && !disabled"
-        aria-hidden="true"
-        (click)="onIconPress('append', $event)"
-      >
+      <span class="cx-text-field__append" aria-hidden="true">
         <cx-icon [name]="iconName" [size]="16" />
       </span>
     }
@@ -81,13 +69,13 @@
   </div>
 
   @if (showHint$() || validationMessages$().length > 0) {
-    <div class="cx-text-field__messages">
+    <div class="cx-text-field__messages" [id]="messagesId">
       @if (showHint$()) {
         <div class="cx-text-field__hint">{{ hint!.trim() }}</div>
       }
 
       @if (validationMessages$().length > 0) {
-        <cx-validation-message [messages]="validationMessages$()" [showAll]="true" />
+        <cx-validation-message [messages]="validationMessages$()" />
       }
     </div>
   }

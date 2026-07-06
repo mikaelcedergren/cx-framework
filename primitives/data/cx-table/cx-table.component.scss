@@ -207,15 +207,6 @@
   line-height: 0;
 }
 
-.cx-table__selection-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
 .cx-table__cell-content {
   display: flex;
   width: 100%;

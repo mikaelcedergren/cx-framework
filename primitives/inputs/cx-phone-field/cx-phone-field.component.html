@@ -1,0 +1,82 @@
+<div
+  class="cx-phone-field"
+  [class.cx-phone-field--small]="size === 'small'"
+  [class.cx-phone-field--large]="size === 'large'"
+>
+  <div class="cx-phone-field__header">
+    <div class="cx-phone-field__label" [id]="labelId">Phone number</div>
+    @if (optional) {
+      <div class="cx-phone-field__optional">Optional</div>
+    }
+  </div>
+
+  <div
+    class="cx-phone-field__field-shell"
+    [class.cx-phone-field__field-shell--focused]="isFocused$()"
+    [class.cx-phone-field__field-shell--disabled]="disabled"
+    [class.cx-phone-field__field-shell--loading]="loading"
+    [class.cx-phone-field__field-shell--error]="hasError$()"
+    [attr.aria-busy]="loading ? 'true' : null"
+    (focusin)="onFocusIn()"
+    (focusout)="onFocusOut($event)"
+  >
+    <span class="cx-phone-field__country">
+      <select
+        class="cx-phone-field__country-select"
+        aria-label="Country code"
+        autocomplete="tel-country-code"
+        name="country-code"
+        [disabled]="disabled || loading"
+        [value]="countryCode$()"
+        (change)="onCountryCodeChange($event)"
+      >
+        @for (option of countryCodeOptions$(); track option.code) {
+          <option [value]="option.code">{{ option.label }}</option>
+        }
+      </select>
+      <cx-icon class="cx-phone-field__country-icon" name="chevron-down" [size]="12" />
+    </span>
+
+    <span class="cx-phone-field__divider" aria-hidden="true"></span>
+
+    <input
+      #field
+      type="tel"
+      inputmode="tel"
+      class="cx-phone-field__field"
+      name="phone"
+      autocomplete="tel-national"
+      [disabled]="disabled || loading"
+      [value]="value$()"
+      [attr.aria-labelledby]="labelId"
+      [attr.aria-describedby]="resolvedAriaDescribedBy"
+      [attr.aria-invalid]="hasError$() ? 'true' : null"
+      (input)="onInput($event)"
+      (keydown.escape)="onEscapeKey()"
+    />
+
+    @if (loading) {
+      <span class="cx-phone-field__loading" aria-hidden="true">
+        <cx-spinner size="16" mood="default" />
+      </span>
+    }
+
+    @if (hasClear$()) {
+      <button type="button" class="cx-phone-field__clear" aria-label="Clear" (click)="onClear($event)">
+        <cx-icon name="remove" [size]="14" />
+      </button>
+    }
+  </div>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-phone-field__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-phone-field__hint">{{ hint!.trim() }}</div>
+      }
+
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" />
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,18 @@
+<div class="cx-item-card">
+  @if (icon) {
+    <div class="cx-item-card__icon">
+      <cx-icon [name]="icon" size="20" />
+    </div>
+  }
+
+  <div class="cx-item-card__body">
+    <div class="cx-item-card__heading">{{ heading }}</div>
+    @if (hasDescription) {
+      <div class="cx-item-card__description">{{ description }}</div>
+    }
+  </div>
+
+  <div class="cx-item-card__action">
+    <ng-content />
+  </div>
+</div>

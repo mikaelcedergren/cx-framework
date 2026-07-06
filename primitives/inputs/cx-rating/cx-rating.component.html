@@ -1,0 +1,27 @@
+<div
+  class="cx-rating"
+  [attr.role]="interactive ? 'slider' : 'img'"
+  [attr.tabindex]="interactive ? 0 : null"
+  [attr.aria-label]="ariaLabel"
+  [attr.aria-valuemin]="interactive ? 0 : null"
+  [attr.aria-valuemax]="interactive ? max$() : null"
+  [attr.aria-valuenow]="interactive ? displayValue$() : null"
+  [attr.aria-valuetext]="valueText"
+  [attr.aria-readonly]="readonly ? 'true' : null"
+  [attr.aria-disabled]="disabled ? 'true' : null"
+  (keydown)="onKeydown($event)"
+  (mouseleave)="onLeave()"
+>
+  @for (star of stars$(); track star) {
+    <span
+      class="cx-rating__star"
+      (mouseenter)="onStarEnter(star)"
+      (click)="onStarClick(star)"
+    >
+      <cx-icon class="cx-rating__glyph cx-rating__glyph--empty" [name]="icon" [size]="iconSize" />
+      <span class="cx-rating__fill" [style.width.%]="fillPercent(star)">
+        <cx-icon class="cx-rating__glyph cx-rating__glyph--full" [name]="icon" [size]="iconSize" />
+      </span>
+    </span>
+  }
+</div>

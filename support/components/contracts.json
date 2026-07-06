@@ -28,6 +28,7 @@
         "actions",
         "info",
         "askAi",
+        "support",
         "editable",
         "ariaLabel",
         "disabled",
@@ -96,26 +97,25 @@
     {
       "name": "cx-big-checkbox",
       "inputs": [
-        "custom",
         "disabled",
         "heading",
+        "icon",
+        "iconMood",
         "selected",
-        "text",
-        "value"
+        "text"
       ],
       "outputs": [
         "focusChange",
-        "selectedChange",
-        "valueChange"
+        "selectedChange"
       ]
     },
     {
       "name": "cx-big-radio",
       "inputs": [
-        "custom",
         "disabled",
         "heading",
         "icon",
+        "iconMood",
         "selected",
         "text"
       ],
@@ -148,7 +148,7 @@
         "hint",
         "maximum",
         "maximumLabel",
-        "unit",
+        "unitLabel",
         "variant"
       ],
       "outputs": []
@@ -159,6 +159,7 @@
         "text",
         "icon",
         "appendIcon",
+        "shortcutParts",
         "ariaLabel",
         "type",
         "mood",
@@ -263,7 +264,7 @@
     {
       "name": "cx-checkbox",
       "inputs": [
-        "custom",
+        "ariaLabel",
         "disabled",
         "hint",
         "selected",
@@ -293,9 +294,11 @@
         "ariaLabel",
         "autoFocus",
         "disabled",
+        "hint",
+        "label",
         "mode",
-        "readOnly",
-        "validationMessages",
+        "optional",
+        "validation",
         "value"
       ],
       "outputs": [
@@ -307,16 +310,20 @@
     {
       "name": "cx-color-picker",
       "inputs": [
+        "ariaLabel",
         "clearable",
+        "color",
         "disabled",
-        "options",
-        "placeholder",
-        "readOnly",
-        "showValue",
-        "value"
+        "hint",
+        "label",
+        "loading",
+        "optional",
+        "size",
+        "validation",
+        "showValue"
       ],
       "outputs": [
-        "valueChange"
+        "colorChange"
       ]
     },
     {
@@ -340,16 +347,19 @@
       "inputs": [
         "allDay",
         "allDayEnabled",
+        "ariaLabel",
         "clearable",
         "disabled",
+        "hint",
+        "label",
         "loading",
         "max",
         "min",
+        "optional",
         "placeholder",
-        "readOnly",
         "size",
         "timeEnabled",
-        "validationMessages",
+        "validation",
         "value",
         "weekStart",
         "yearRange"
@@ -366,6 +376,7 @@
         "allDayEnabled",
         "allDayEnd",
         "allDayStart",
+        "ariaLabel",
         "clearable",
         "closeOnSelect",
         "disabled",
@@ -379,10 +390,9 @@
         "optional",
         "placeholder",
         "quickRanges",
-        "readOnly",
         "size",
         "timeEnabled",
-        "validationMessages",
+        "validation",
         "value",
         "weekStart"
       ],
@@ -490,20 +500,92 @@
     {
       "name": "cx-file-upload",
       "inputs": [
+        "accept",
         "buttonIcon",
         "buttonText",
         "disabled",
-        "file"
+        "file",
+        "files",
+        "heading",
+        "hint",
+        "icon",
+        "maxSize",
+        "multiple",
+        "variant"
       ],
       "outputs": [
         "fileUpload"
       ]
     },
     {
+      "name": "cx-rating",
+      "inputs": [
+        "ariaLabel",
+        "disabled",
+        "icon",
+        "max",
+        "readonly",
+        "size",
+        "value"
+      ],
+      "outputs": [
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-reaction",
+      "inputs": [
+        "ariaLabel",
+        "count",
+        "disabled",
+        "emoji",
+        "readonly",
+        "selected",
+        "size"
+      ],
+      "outputs": [
+        "selectedChange"
+      ]
+    },
+    {
+      "name": "cx-text-shimmer",
+      "inputs": [
+        "active",
+        "text"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-item-card",
+      "inputs": [
+        "description",
+        "heading",
+        "icon",
+        "variant"
+      ],
+      "outputs": []
+    },
+    {
+      "name": "cx-kpi",
+      "inputs": [
+        "footer",
+        "heading",
+        "icon",
+        "mood",
+        "progress",
+        "progressLabel",
+        "progressMax",
+        "trendFavor",
+        "trendValue",
+        "value"
+      ],
+      "outputs": []
+    },
+    {
       "name": "cx-filter-bar",
       "inputs": [
         "columnOptions",
-        "columnSearchPlaceholder",
+        "columnSearchAriaLabel",
         "displayMode",
         "filterOptions",
         "filterPlaceholder",
@@ -511,7 +593,7 @@
         "groupBy",
         "groupByOptions",
         "mode",
-        "queryPlaceholder",
+        "queryAriaLabel",
         "queryValue",
         "quickFilters",
         "savedViews",
@@ -541,21 +623,13 @@
     {
       "name": "cx-fullscreen-dialog",
       "inputs": [
-        "description",
-        "disabled",
-        "dismissible",
-        "heading",
-        "loading",
-        "open",
-        "primaryActionMood",
-        "primaryActionText",
-        "secondaryActionText"
+        "ariaLabel",
+        "closeButton",
+        "open"
       ],
       "outputs": [
         "dismiss",
-        "openChange",
-        "primaryAction",
-        "secondaryAction"
+        "openChange"
       ]
     },
     {
@@ -577,7 +651,6 @@
         "expandedIds",
         "items",
         "placeholder",
-        "readOnly",
         "searchable",
         "showIcons",
         "value"
@@ -611,6 +684,7 @@
         "icon",
         "loading",
         "mood",
+        "rounded",
         "size",
         "variant"
       ],
@@ -644,35 +718,64 @@
       "name": "cx-text-field",
       "inputs": [
         "appendIcon",
-        "appendIconClickable",
         "appendText",
         "ariaLabel",
         "autocomplete",
         "clearable",
-        "debounceMs",
         "disabled",
-        "errorMessage",
         "hint",
+        "inlineEdit",
         "label",
         "loading",
         "name",
         "optional",
-        "placeholder",
         "prependIcon",
-        "prependIconClickable",
         "prependText",
-        "readOnly",
         "size",
-        "type",
-        "updateOn",
-        "validationMessages",
-        "variant",
+        "validation",
         "value"
       ],
       "outputs": [
         "clear",
         "focusChange",
-        "iconClick",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-email-field",
+      "inputs": [
+        "clearable",
+        "disabled",
+        "hint",
+        "loading",
+        "optional",
+        "size",
+        "validation",
+        "value"
+      ],
+      "outputs": [
+        "clear",
+        "focusChange",
+        "valueChange"
+      ]
+    },
+    {
+      "name": "cx-phone-field",
+      "inputs": [
+        "clearable",
+        "countryCode",
+        "disabled",
+        "hint",
+        "loading",
+        "optional",
+        "size",
+        "validation",
+        "value"
+      ],
+      "outputs": [
+        "clear",
+        "countryCodeChange",
+        "focusChange",
         "valueChange"
       ]
     },
@@ -819,25 +922,20 @@
       "name": "cx-number-field",
       "inputs": [
         "appendText",
-        "ariaDescribedBy",
         "ariaLabel",
         "clearable",
         "disabled",
-        "errorMessage",
         "hint",
         "label",
         "loading",
         "max",
         "min",
         "optional",
-        "placeholder",
         "prependText",
-        "readOnly",
         "size",
         "step",
-        "debounceMs",
-        "updateOn",
-        "validationMessages",
+        "steppers",
+        "validation",
         "value"
       ],
       "outputs": [
@@ -858,6 +956,7 @@
         "prependIcon",
         "role",
         "selected",
+        "selectedHighlight",
         "shortcutParts",
         "showCheckbox",
         "size",
@@ -972,7 +1071,6 @@
     {
       "name": "cx-query-field",
       "inputs": [
-        "ariaDescribedBy",
         "ariaLabel",
         "clearable",
         "disabled",
@@ -981,9 +1079,8 @@
         "loading",
         "optional",
         "query",
-        "readOnly",
         "size",
-        "validationMessages"
+        "validation"
       ],
       "outputs": [
         "queryChange"
@@ -992,12 +1089,11 @@
     {
       "name": "cx-radio",
       "inputs": [
-        "custom",
         "disabled",
         "hint",
         "selected",
         "text",
-        "validationMessages"
+        "validation"
       ],
       "outputs": [
         "selectedChange"
@@ -1020,18 +1116,15 @@
     {
       "name": "cx-search-field",
       "inputs": [
+        "ariaLabel",
         "clearable",
-        "debounceMs",
         "disabled",
         "hint",
         "label",
         "loading",
         "optional",
-        "placeholder",
-        "readOnly",
         "size",
-        "updateOn",
-        "validationMessages",
+        "validation",
         "value"
       ],
       "outputs": [
@@ -1049,35 +1142,31 @@
       "outputs": []
     },
     {
-      "name": "cx-select",
+      "name": "cx-dropdown",
       "inputs": [
-        "ariaDescribedBy",
         "ariaLabel",
         "availableValues",
         "clearable",
+        "creatable",
+        "createText",
         "disabled",
-        "displayValue",
-        "discreet",
-        "emptyText",
-        "errorMessage",
-        "grow",
         "hint",
-        "icon",
-        "inline",
         "label",
         "loading",
-        "mode",
+        "multiple",
+        "noResultsText",
         "optional",
         "placeholder",
-        "readOnly",
+        "searchable",
         "size",
-        "validationMessages",
+        "transparent",
+        "validation",
         "value",
-        "values",
-        "variant"
+        "values"
       ],
       "outputs": [
         "clear",
+        "create",
         "focusChange",
         "valueChange",
         "valuesChange"
@@ -1131,7 +1220,7 @@
         "showTooltipOnDrag",
         "showValue",
         "step",
-        "validationMessages",
+        "validation",
         "value",
         "valueFormatter"
       ],
@@ -1208,13 +1297,12 @@
     {
       "name": "cx-switch",
       "inputs": [
-        "custom",
         "disabled",
         "hint",
         "selected",
         "size",
         "text",
-        "validationMessages"
+        "validation"
       ],
       "outputs": [
         "focusChange",
@@ -1271,7 +1359,7 @@
         "page",
         "pageSizes",
         "paginationMode",
-        "queryPlaceholder",
+        "queryAriaLabel",
         "queryValue",
         "quickFilters",
         "rightClickMenu",
@@ -1337,37 +1425,31 @@
       "name": "cx-tag",
       "inputs": [
         "color",
-        "disabled",
+        "dismissible",
         "icon",
-        "info",
-        "size",
-        "tags",
-        "text",
-        "variant"
+        "outline",
+        "text"
       ],
       "outputs": [
-        "remove"
+        "dismiss"
       ]
     },
     {
       "name": "cx-tag-input",
       "inputs": [
-        "ariaDescribedBy",
         "ariaLabel",
         "clearable",
         "disabled",
         "emptyText",
-        "errorMessage",
         "hint",
         "label",
         "loading",
         "optional",
         "placeholder",
-        "readOnly",
         "searchable",
         "size",
         "tags",
-        "validationMessages",
+        "validation",
         "values"
       ],
       "outputs": [
@@ -1384,7 +1466,6 @@
         "ariaLabel",
         "autoGrow",
         "disabled",
-        "errorMessage",
         "focusVariant",
         "focused",
         "hint",
@@ -1397,13 +1478,11 @@
         "minLines",
         "monospace",
         "optional",
-        "placeholder",
-        "readOnly",
         "resizable",
         "rows",
         "size",
         "sizing",
-        "validationMessages",
+        "validation",
         "variant",
         "value"
       ],
@@ -1416,11 +1495,9 @@
     {
       "name": "cx-time-input",
       "inputs": [
-        "ariaDescribedBy",
         "ariaLabel",
         "clearable",
         "disabled",
-        "errorMessage",
         "format",
         "hint",
         "hourAriaLabel",
@@ -1432,10 +1509,9 @@
         "minuteStep",
         "mode",
         "optional",
-        "readOnly",
         "size",
         "time",
-        "validationMessages",
+        "validation",
         "value"
       ],
       "outputs": [
@@ -1616,7 +1692,7 @@
       "name": "cx-workbench",
       "inputs": [
         "align",
-        "minSize",
+        "previewHeight",
         "previewWidth"
       ],
       "outputs": []

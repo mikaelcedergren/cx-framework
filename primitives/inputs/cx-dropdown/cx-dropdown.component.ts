@@ -16,65 +16,64 @@ import {
 import { CommonModule } from '@angular/common';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
+import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxTextFieldComponent } from '../cx-text-field';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { measureCxFloatingSurface } from '../../overlay/floating-surface';
-import { type CxIconName } from '../../../icons/manifest';
 import {
+  type CxFieldValidation,
   type CxFieldSize,
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
-export type CxSelectOption = {
+const CX_DROPDOWN_POPOVER_MIN_WIDTH = 120;
+
+export type CxDropdownOption = {
   id: string;
   label: string;
   description?: string;
-  icon?: CxIconName;
   disabled?: boolean;
 };
 
-export type CxSelectMode = 'single' | 'multiple' | 'combobox' | 'creatable';
-export type CxSelectSize = CxFieldSize;
-export type CxSelectVariant = 'default' | 'transparent' | 'inline-edit';
-
-const CX_SELECT_SEARCH_THRESHOLD = 32;
+export type CxDropdownSize = CxFieldSize;
 
 @Component({
-  selector: 'cx-select',
+  selector: 'cx-dropdown',
   imports: [
     CommonModule,
     CxValidationMessageComponent,
+    CxIconButtonComponent,
     CxIconComponent,
     CxTextFieldComponent,
     CxOptionComponent,
     CxPopoverComponent,
     CxSpinnerComponent,
   ],
-  templateUrl: './cx-select.component.html',
-  styleUrl: './cx-select.component.scss',
+  templateUrl: './cx-dropdown.component.html',
+  styleUrl: './cx-dropdown.component.scss',
   host: {
-    '[class.cx-select-host--small]': 'size === "small"',
-    '[class.cx-select-host--large]': 'size === "large"',
+    '[class.cx-dropdown-host--small]': 'size === "small"',
+    '[class.cx-dropdown-host--large]': 'size === "large"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxSelectComponent implements AfterViewInit, OnDestroy {
+export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private static nextId = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
   private fieldElement?: HTMLElement;
-  private readonly optionsState = signal<CxSelectOption[]>([]);
+  private readonly optionsState = signal<CxDropdownOption[]>([]);
   private readonly multipleState = signal(false);
-  private readonly modeState = signal<CxSelectMode>('single');
+  private readonly searchableState = signal(false);
+  private readonly creatableState = signal(false);
   private readonly selectedValueState = signal<string | undefined>(undefined);
   private readonly selectedValuesState = signal<string[]>([]);
-  private readonly displayValueState = signal<string | undefined>(undefined);
+  private readonly clearableState = signal(false);
   private readonly placeholderState = signal('');
-  private readonly emptyTextState = signal('No options');
-  private readonly errorMessageState = signal<string | undefined>(undefined);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly createTextState = signal('Create option');
+  private readonly noResultsTextState = signal('No matching options');
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly searchQueryState = signal('');
   private readonly openState = signal(false);
   private readonly overlayWidthState = signal<number | undefined>(undefined);
@@ -83,11 +82,14 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
   private readonly overlayTopState = signal<number | undefined>(undefined);
   private readonly overlayBottomState = signal<number | undefined>(undefined);
   private readonly activePlacementState = signal<'bottom' | 'top'>('bottom');
+  private requiredValueValidationQueued = false;
+  private reportedInvalidValue = false;
   private resizeObserver?: ResizeObserver;
   private searchFocusTimer?: number;
-  protected readonly labelId = `cx-select-label-${CxSelectComponent.nextId}`;
-  protected readonly messagesId = `cx-select-messages-${CxSelectComponent.nextId}`;
-  protected readonly popoverId = `cx-select-popover-${CxSelectComponent.nextId++}`;
+  private selectionMeasureFrame?: number;
+  protected readonly labelId = `cx-dropdown-label-${CxDropdownComponent.nextId}`;
+  protected readonly messagesId = `cx-dropdown-messages-${CxDropdownComponent.nextId}`;
+  protected readonly popoverId = `cx-dropdown-popover-${CxDropdownComponent.nextId++}`;
 
   @ViewChild('fieldButton', { read: ElementRef })
   private fieldButtonRef?: ElementRef<HTMLElement>;
@@ -95,6 +97,10 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
   private popoverRef?: CxPopoverComponent;
   @ViewChild('searchInput')
   private searchInputRef?: CxTextFieldComponent;
+  @ViewChild('valueText', { read: ElementRef })
+  private valueTextRef?: ElementRef<HTMLElement>;
+  @ViewChild('selectionMeasure', { read: ElementRef })
+  private selectionMeasureRef?: ElementRef<HTMLElement>;
 
   protected readonly selectedOption$ = computed(() =>
     this.optionsState().find((option) => option.id === this.selectedValueState()),
@@ -107,27 +113,38 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     }
     return this.optionsState().filter(option => selectedValues.includes(option.id));
   });
-  protected readonly displayValueText$ = computed(() => this.displayValueState()?.trim() || undefined);
-  protected readonly selectedRawValueText$ = computed(() => {
-    const value = this.selectedValueState()?.trim();
-    return this.modeState() === 'creatable' && value ? value : undefined;
+  protected readonly placeholderText$ = computed(() => {
+    const explicitPlaceholder = this.placeholderState().trim();
+    if (explicitPlaceholder) {
+      return explicitPlaceholder;
+    }
+    const subject = this.selectPlaceholderSubject();
+    return subject ? `Select ${subject}` : 'Select';
   });
-  protected readonly placeholderText$ = computed(() => this.placeholderState().trim());
-  protected readonly emptyText$ = computed(() => this.emptyTextState().trim() || 'No options');
+  protected readonly noResultsText$ = computed(() => this.noResultsTextState().trim() || 'No matching options');
+  protected readonly showSearchEmptyState$ = computed(() => this.searchQueryState().trim().length > 0);
+  protected readonly createText$ = computed(() => this.createTextState().trim() || 'Create option');
+  protected readonly selectedLabelsText$ = computed(() =>
+    this.selectedOptions$().map(option => option.label).join(', '),
+  );
+  protected readonly selectedCountText$ = computed(() => `${this.selectedOptions$().length} selected`);
+  protected readonly collapseSelectedText$ = signal(false);
+  protected readonly emptyDisplayText$ = computed(() => this.placeholderText$());
   protected readonly displayText$ = computed(() => {
     if (this.multipleState()) {
-      const selectedLabels = this.selectedOptions$().map(option => option.label);
-      if (selectedLabels.length > 0) {
-        return selectedLabels.join(', ');
+      const selectedOptions = this.selectedOptions$();
+      if (selectedOptions.length > 0) {
+        return this.collapseSelectedText$() ? this.selectedCountText$() : this.selectedLabelsText$();
       }
+      return this.emptyDisplayText$();
     }
-    return this.selectedOption$()?.label || this.selectedRawValueText$() || this.displayValueText$() || this.placeholderText$();
+    return this.selectedOption$()?.label || this.emptyDisplayText$();
   });
   protected readonly showPlaceholder$ = computed(() => {
     if (this.multipleState()) {
-      return this.selectedOptions$().length === 0 && !this.displayValueText$();
+      return this.selectedOptions$().length === 0;
     }
-    return !this.selectedOption$() && !this.displayValueText$();
+    return !this.selectedOption$();
   });
   protected readonly filteredOptions$ = computed(() => {
     if (!this.searchEnabled$()) {
@@ -146,58 +163,74 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     const trimmedLabel = this.label.trim();
     return trimmedLabel || '';
   });
-  protected readonly searchEnabled$ = computed(
-    () => this.modeState() === 'combobox' || this.modeState() === 'creatable' || this.optionsState().length > CX_SELECT_SEARCH_THRESHOLD,
-  );
+  protected readonly searchEnabled$ = computed(() => this.searchableState() || this.creatableState());
+  protected readonly createValue$ = computed(() => this.searchQueryState().trim());
 
   @Input() label = 'Severity';
   @Input() ariaLabel: string | undefined;
-  @Input() ariaDescribedBy: string | undefined;
-  @Input() variant: CxSelectVariant = 'default';
-  @Input() grow = false;
+  @Input() transparent = false;
+
+  @Input()
+  public set createText(value: string | undefined) {
+    this.createTextState.set(value ?? 'Create option');
+  }
   @Input()
   public set placeholder(value: string | undefined) {
     this.placeholderState.set(value ?? '');
+    this.scheduleRequiredValueValidation();
   }
   @Input()
-  public set emptyText(value: string | undefined) {
-    this.emptyTextState.set(value ?? 'No options');
+  public set noResultsText(value: string | undefined) {
+    this.noResultsTextState.set(value ?? 'No matching options');
   }
-  @Input() size: CxSelectSize = 'default';
+  @Input() size: CxDropdownSize = 'default';
   @Input() optional = false;
   @Input() disabled = false;
-  @Input() readOnly = false;
   @Input() loading = false;
-  @Input() clearable = false;
-  @Input() icon: CxIconName | undefined;
-  @Input() discreet = false;
-  @Input() inline = false;
+
   @Input()
-  public set mode(value: CxSelectMode | undefined) {
-    const nextMode = this.normalizeMode(value);
-    this.modeState.set(nextMode);
-    this.multipleState.set(nextMode === 'multiple');
+  public set clearable(value: boolean | undefined) {
+    this.clearableState.set(value === true);
+    this.scheduleRequiredValueValidation();
+    this.scheduleSelectionDisplayMeasurement();
+  }
+
+  @Input()
+  public set multiple(value: boolean | undefined) {
+    this.multipleState.set(value === true);
+    this.scheduleRequiredValueValidation();
+    this.scheduleSelectionDisplayMeasurement();
+  }
+
+  @Input()
+  public set searchable(value: boolean | undefined) {
+    this.searchableState.set(value === true);
+    if (!this.searchEnabled$()) {
+      this.searchQueryState.set('');
+    }
+  }
+
+  @Input()
+  public set creatable(value: boolean | undefined) {
+    this.creatableState.set(value === true);
     if (!this.searchEnabled$()) {
       this.searchQueryState.set('');
     }
   }
   @Input() hint: string | undefined;
   @Input()
-  public set errorMessage(value: string | undefined) {
-    this.errorMessageState.set(value);
-  }
-
-  @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
   @Input()
-  public set availableValues(value: CxSelectOption[]) {
+  public set availableValues(value: CxDropdownOption[]) {
     const nextOptions = value ?? [];
     this.optionsState.set(nextOptions);
     if (!this.searchEnabled$()) {
       this.searchQueryState.set('');
     }
+    this.scheduleRequiredValueValidation();
+    this.scheduleSelectionDisplayMeasurement();
   }
 
   protected options$ = this.optionsState.asReadonly();
@@ -205,40 +238,39 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
   @Input()
   public set value(value: string | undefined) {
     this.selectedValueState.set(value);
+    this.scheduleRequiredValueValidation();
+    this.scheduleSelectionDisplayMeasurement();
   }
 
   @Input()
   public set values(value: string[] | undefined) {
     this.selectedValuesState.set(this.normalizeSelectedValues(value));
-  }
-
-  @Input()
-  public set displayValue(value: string | undefined) {
-    this.displayValueState.set(value);
+    this.scheduleRequiredValueValidation();
+    this.scheduleSelectionDisplayMeasurement();
   }
 
   @Output() readonly valueChange = new EventEmitter<string | undefined>();
   @Output() readonly valuesChange = new EventEmitter<string[]>();
+  @Output() readonly create = new EventEmitter<string>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly clear = new EventEmitter<void>();
 
   protected readonly isOpen$ = this.openState.asReadonly();
-  protected readonly displayValue$ = this.displayValueState.asReadonly();
   protected readonly searchQuery$ = this.searchQueryState.asReadonly();
-  protected readonly mode$ = this.modeState.asReadonly();
   protected readonly multiple$ = this.multipleState.asReadonly();
+  protected readonly creatable$ = this.creatableState.asReadonly();
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState(), this.errorMessageState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly isLocked$ = () => this.disabled || this.loading;
-  protected readonly isInteractive$ = () => !this.disabled && !this.loading && !this.readOnly;
+  protected readonly isInteractive$ = () => !this.disabled && !this.loading;
   protected readonly hasClear$ = () =>
-    this.clearable &&
+    this.clearableState() &&
     this.isInteractive$() &&
-    (this.selectedOptions$().length > 0 || !!this.displayValueState() || !!this.selectedRawValueText$());
+    this.selectedOptions$().length > 0;
   protected readonly overlayWidth$ = this.overlayWidthState.asReadonly();
   protected readonly overlayMaxHeight$ = this.overlayMaxHeightState.asReadonly();
   protected readonly overlayLeft$ = this.overlayLeftState.asReadonly();
@@ -266,10 +298,6 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
 
   protected get resolvedFieldAriaDescribedBy(): string | undefined {
     const ids: string[] = [];
-    const external = this.ariaDescribedBy?.trim();
-    if (external) {
-      ids.push(external);
-    }
     if (this.showHint$() || this.validationMessages$().length > 0) {
       ids.push(this.messagesId);
     }
@@ -279,18 +307,24 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.fieldElement = this.fieldButtonRef?.nativeElement;
     this.syncPopoverMetrics();
+    this.scheduleRequiredValueValidation();
     const field = this.fieldElement;
     if (!field || typeof ResizeObserver === 'undefined') {
       return;
     }
     this.resizeObserver = new ResizeObserver(() => {
       this.syncPopoverMetrics();
+      this.scheduleSelectionDisplayMeasurement();
     });
     this.resizeObserver.observe(field);
+    this.scheduleSelectionDisplayMeasurement();
   }
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    if (typeof window !== 'undefined' && this.selectionMeasureFrame !== undefined) {
+      window.cancelAnimationFrame(this.selectionMeasureFrame);
+    }
     if (typeof window !== 'undefined' && this.searchFocusTimer) {
       window.clearTimeout(this.searchFocusTimer);
     }
@@ -312,7 +346,7 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  protected selectOption(option: CxSelectOption): void {
+  protected selectOption(option: CxDropdownOption): void {
     if (!this.isInteractive$() || option.disabled) {
       return;
     }
@@ -327,12 +361,16 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
         : [...currentValues, option.id];
       this.selectedValuesState.set(nextValues);
       this.valuesChange.emit(nextValues);
+      this.validateRequiredValueState();
+      this.scheduleSelectionDisplayMeasurement();
       return;
     }
     this.selectedValueState.set(option.id);
     this.valueChange.emit(option.id);
     this.searchQueryState.set('');
     this.openState.set(false);
+    this.validateRequiredValueState();
+    this.scheduleSelectionDisplayMeasurement();
   }
 
   protected isOptionSelected(optionId: string): boolean {
@@ -342,7 +380,7 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     return this.selectedOption$()?.id === optionId;
   }
 
-  protected isOptionDisabled(option: CxSelectOption): boolean {
+  protected isOptionDisabled(option: CxDropdownOption): boolean {
     return option.disabled === true;
   }
 
@@ -372,11 +410,6 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
 
   protected onSearchChange(value: string): void {
     this.searchQueryState.set(value);
-    if (this.modeState() === 'creatable') {
-      const nextValue = value.trim() ? value : undefined;
-      this.selectedValueState.set(nextValue);
-      this.valueChange.emit(nextValue);
-    }
     if (this.openState()) {
       queueMicrotask(() => {
         this.syncPopoverMetrics();
@@ -389,23 +422,35 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     this.openState.set(false);
   }
 
-  protected clearSelection(event: MouseEvent): void {
+  protected clearSelection(event?: Event): void {
     if (!this.hasClear$()) {
       return;
     }
-    event.preventDefault();
-    event.stopPropagation();
+    event?.preventDefault();
+    event?.stopPropagation();
     if (this.multipleState()) {
       this.selectedValuesState.set([]);
       this.valuesChange.emit([]);
     } else {
       this.selectedValueState.set(undefined);
-      this.displayValueState.set(undefined);
       this.valueChange.emit(undefined);
     }
     this.searchQueryState.set('');
     this.openState.set(false);
     this.clear.emit();
+    this.validateRequiredValueState();
+    this.scheduleSelectionDisplayMeasurement();
+  }
+
+  protected onCreateOption(event: MouseEvent): void {
+    if (!this.creatableState() || !this.isInteractive$()) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.create.emit(this.createValue$());
+    this.searchQueryState.set('');
+    this.openState.set(false);
   }
 
   protected onFocusChange(focused: boolean): void {
@@ -426,7 +471,7 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
       return;
     }
     // The popover surface is portaled to <body>, so options aren't descendants
-    // of the cx-select host. Treat clicks inside the surface as "inside" too —
+    // of the cx-dropdown host. Treat clicks inside the surface as "inside" too —
     // otherwise WebKit closes the popover on pointerdown, the option is gone
     // by pointerup, and no click ever reaches selectOption.
     const surface = this.popoverRef?.surfaceElement();
@@ -438,6 +483,7 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   protected onWindowResize(): void {
+    this.scheduleSelectionDisplayMeasurement();
     if (!this.openState()) {
       return;
     }
@@ -454,14 +500,16 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     }
 
     const rect = activeField.getBoundingClientRect();
-    const minWidth = Math.floor(Math.min(rect.width, window.innerWidth - 16));
+    const viewportMaxWidth = Math.max(window.innerWidth - 16, 0);
+    const minWidth = Math.floor(Math.min(Math.max(rect.width, CX_DROPDOWN_POPOVER_MIN_WIDTH), viewportMaxWidth));
     const popoverSurface = this.popoverRef?.surfaceElement();
     const measuredWidth = popoverSurface
-      ? Math.ceil(popoverSurface.getBoundingClientRect().width)
+      ? Math.ceil(Math.max(popoverSurface.getBoundingClientRect().width, popoverSurface.scrollWidth))
       : minWidth;
     const searchHeight = this.searchEnabled$() ? 60 : 0;
+    const createHeight = this.creatableState() ? 48 : 0;
     const estimatedHeight = Math.min(
-      searchHeight + Math.max(this.optionsState().length, 1) * 48,
+      searchHeight + createHeight + Math.max(this.optionsState().length, 1) * 48,
       360,
     );
     const surface = measureCxFloatingSurface({
@@ -486,8 +534,88 @@ export class CxSelectComponent implements AfterViewInit, OnDestroy {
     return [...new Set(value ?? [])];
   }
 
-  private normalizeMode(value: CxSelectMode | undefined): CxSelectMode {
-    return value === 'multiple' || value === 'combobox' || value === 'creatable' ? value : 'single';
+  private scheduleSelectionDisplayMeasurement(): void {
+    if (typeof window === 'undefined') {
+      queueMicrotask(() => {
+        this.updateSelectionDisplayMode();
+      });
+      return;
+    }
+    if (this.selectionMeasureFrame !== undefined) {
+      window.cancelAnimationFrame(this.selectionMeasureFrame);
+    }
+    this.selectionMeasureFrame = window.requestAnimationFrame(() => {
+      this.selectionMeasureFrame = undefined;
+      this.updateSelectionDisplayMode();
+    });
+  }
+
+  private updateSelectionDisplayMode(): void {
+    if (!this.multipleState() || this.selectedOptions$().length === 0) {
+      this.collapseSelectedText$.set(false);
+      return;
+    }
+    const valueElement = this.valueTextRef?.nativeElement;
+    const measureElement = this.selectionMeasureRef?.nativeElement;
+    if (!valueElement || !measureElement) {
+      this.collapseSelectedText$.set(false);
+      return;
+    }
+    const availableWidth = valueElement.clientWidth;
+    if (availableWidth <= 0) {
+      return;
+    }
+    this.collapseSelectedText$.set(Math.ceil(measureElement.scrollWidth) > Math.floor(availableWidth));
+  }
+
+  private scheduleRequiredValueValidation(): void {
+    if (this.requiredValueValidationQueued) {
+      return;
+    }
+    this.requiredValueValidationQueued = true;
+    queueMicrotask(() => {
+      this.requiredValueValidationQueued = false;
+      this.validateRequiredValueState();
+    });
+  }
+
+  private validateRequiredValueState(): void {
+    const hasInvalidValue = this.hasInvalidSelectedValue();
+    if (!hasInvalidValue) {
+      this.reportedInvalidValue = false;
+      return;
+    }
+    if (this.reportedInvalidValue) {
+      return;
+    }
+    this.reportedInvalidValue = true;
+    console.error(
+      `[cx-dropdown] Selected value is not available (${this.validationTargetLabel()}). Provide a value/values entry that exists in availableValues.`,
+    );
+  }
+
+  private hasInvalidSelectedValue(): boolean {
+    const optionIds = new Set(this.optionsState().map(option => option.id));
+    if (this.multipleState()) {
+      return this.selectedValuesState().some(value => !optionIds.has(value));
+    }
+    const value = this.selectedValueState();
+    return Boolean(value) && !optionIds.has(value!);
+  }
+
+  private validationTargetLabel(): string {
+    return this.labelText$() || this.ariaLabel?.trim() || 'unlabelled dropdown';
+  }
+
+  private selectPlaceholderSubject(): string {
+    const label = this.labelText$() || this.ariaLabel?.trim() || '';
+    if (!label) {
+      return '';
+    }
+    if (label === label.toUpperCase()) {
+      return label;
+    }
+    return label.charAt(0).toLowerCase() + label.slice(1);
   }
 
   private focusSearchInput(): void {

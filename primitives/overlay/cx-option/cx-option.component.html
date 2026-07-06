@@ -3,7 +3,7 @@
   class="cx-option"
   [class.cx-option--danger]="mood === 'danger'"
   [class.cx-option--hover]="hover"
-  [class.cx-option--selected]="selected"
+  [class.cx-option--selected]="selected && selectedHighlight"
   [class.cx-option--small]="size === 'small'"
   [class.cx-option--large]="size === 'large'"
   [class.cx-option--submenu-open]="submenu === 'open'"
@@ -18,9 +18,7 @@
   [attr.aria-selected]="ariaSelectedValue()"
 >
   @if (showCheckbox) {
-    <cx-checkbox class="cx-option__checkbox" [selected]="selected" [disabled]="disabled" [custom]="true">
-      <span class="cx-option__checkbox-label">{{ label }}</span>
-    </cx-checkbox>
+    <cx-checkbox class="cx-option__checkbox" [selected]="selected" [disabled]="disabled" [ariaLabel]="label" />
   }
 
   @if (prependIcon; as prependIconValue) {

@@ -10,7 +10,8 @@ import {
 import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
-import { type CxFeedbackAction } from '../cx-feedback-action';
+import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
+import { prefersReducedMotion } from '../reduced-motion';
 
 export type CxBannerMood = 'default' | 'warning' | 'success' | 'danger';
 export type CxBannerAction = CxFeedbackAction;
@@ -25,13 +26,22 @@ export type CxBannerAction = CxFeedbackAction;
 export class CxBannerComponent implements OnDestroy {
   private readonly renderedState = signal(false);
   private readonly openState = signal(false);
+  private readonly dismissibleState = signal(true);
 
   @Input() mood: CxBannerMood = 'default';
   @Input() heading = '';
   @Input() description = '';
   @Input() action: CxBannerAction | undefined;
   @Input() secondaryAction: CxBannerAction | undefined;
-  @Input() dismissible = true;
+
+  @Input()
+  public set dismissible(value: boolean) {
+    const dismissible = Boolean(value);
+    this.dismissibleState.set(dismissible);
+    if (!dismissible && this.renderedState()) {
+      this.openState.set(true);
+    }
+  }
 
   @Input()
   public set visible(value: boolean) {
@@ -44,6 +54,7 @@ export class CxBannerComponent implements OnDestroy {
 
   protected readonly isRendered$ = this.renderedState.asReadonly();
   protected readonly isOpen$ = this.openState.asReadonly();
+  protected readonly isDismissible$ = this.dismissibleState.asReadonly();
 
   protected get resolvedIcon(): CxIconName {
     switch (this.mood) {
@@ -84,11 +95,11 @@ export class CxBannerComponent implements OnDestroy {
   }
 
   protected get visibleAction(): CxBannerAction | undefined {
-    return this.visibleActionFor(this.action);
+    return visibleCxFeedbackAction(this.action);
   }
 
   protected get visibleSecondaryAction(): CxBannerAction | undefined {
-    return this.visibleActionFor(this.secondaryAction);
+    return visibleCxFeedbackAction(this.secondaryAction);
   }
 
   protected hasActions(): boolean {
@@ -123,6 +134,11 @@ export class CxBannerComponent implements OnDestroy {
   private setOpen(nextVisible: boolean): void {
     if (nextVisible) {
       this.renderedState.set(true);
+      if (!this.dismissibleState() || prefersReducedMotion()) {
+        this.openState.set(true);
+        return;
+      }
+
       this.openState.set(false);
       if (typeof window !== 'undefined') {
         window.requestAnimationFrame(() => {
@@ -135,18 +151,9 @@ export class CxBannerComponent implements OnDestroy {
     }
 
     this.openState.set(false);
-    if (!this.renderedState() || this.prefersReducedMotion()) {
+    if (!this.renderedState() || !this.dismissibleState() || prefersReducedMotion()) {
       this.renderedState.set(false);
     }
   }
 
-  private prefersReducedMotion(): boolean {
-    return typeof window !== 'undefined'
-      && 'matchMedia' in window
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
-
-  private visibleActionFor(action: CxBannerAction | undefined): CxBannerAction | undefined {
-    return action?.text.trim() ? action : undefined;
-  }
 }

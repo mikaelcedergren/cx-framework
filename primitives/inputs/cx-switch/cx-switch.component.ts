@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import {
-  type CxValidationMessage,
-  normalizeCxValidationMessages,
+  type CxFieldValidation,
+  normalizeCxValidation,
 } from '../shared/field.types';
 
 export type CxSwitchSize = 'default' | 'small';
@@ -17,19 +17,18 @@ export type CxSwitchSize = 'default' | 'small';
 export class CxSwitchComponent {
   private static nextId = 0;
   private readonly selectedState = signal(false);
-  private readonly validationMessagesState = signal<ReadonlyArray<CxValidationMessage>>([]);
+  private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   protected readonly hintId = `cx-switch-${++CxSwitchComponent.nextId}-hint`;
   protected readonly messagesId = `cx-switch-${CxSwitchComponent.nextId}-messages`;
 
-  @Input() text = 'Type something';
+  @Input() text = '';
   @Input() hint: string | undefined;
   @Input() size: CxSwitchSize = 'default';
   @Input() disabled = false;
-  @Input() custom = false;
 
   @Input()
-  public set validationMessages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
-    this.validationMessagesState.set(value ?? []);
+  public set validation(value: CxFieldValidation | null | undefined) {
+    this.validationState.set(value ?? undefined);
   }
 
   @Input()
@@ -44,7 +43,7 @@ export class CxSwitchComponent {
   protected readonly validationMessages$ = () =>
     this.disabled
       ? []
-      : normalizeCxValidationMessages(this.validationMessagesState());
+      : normalizeCxValidation(this.validationState());
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly describedByIds$ = computed(() => {

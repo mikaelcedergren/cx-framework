@@ -2,9 +2,9 @@
   class="cx-workbench"
   [class.cx-workbench--align-top]="align$() === 'top'"
   [class.cx-workbench--align-bottom]="align$() === 'bottom'"
-  [class.cx-workbench--min-small]="minSize$() === 'small'"
-  [class.cx-workbench--min-medium]="minSize$() === 'medium'"
-  [class.cx-workbench--min-large]="minSize$() === 'large'"
+  [class.cx-workbench--height-small]="previewHeight$() === 'small'"
+  [class.cx-workbench--height-medium]="previewHeight$() === 'medium'"
+  [class.cx-workbench--height-large]="previewHeight$() === 'large'"
   [class.cx-workbench--width-small]="previewWidth$() === 'small'"
   [class.cx-workbench--width-medium]="previewWidth$() === 'medium'"
   [class.cx-workbench--width-large]="previewWidth$() === 'large'"
@@ -19,18 +19,18 @@
 
     <div class="cx-workbench__meta">
       <div class="cx-workbench__meta-field">
-        <span class="cx-workbench__meta-label">minSize</span>
-        <cx-select
+        <span class="cx-workbench__meta-label">previewHeight</span>
+        <cx-dropdown
           label=""
-          ariaLabel="minSize"
-          [availableValues]="minSizeOptions"
-          [value]="minSize$()"
-          (valueChange)="onMinSizeChange($event)"
+          ariaLabel="previewHeight"
+          [availableValues]="previewHeightOptions"
+          [value]="previewHeight$()"
+          (valueChange)="onPreviewHeightChange($event)"
         />
       </div>
       <div class="cx-workbench__meta-field">
         <span class="cx-workbench__meta-label">previewWidth</span>
-        <cx-select
+        <cx-dropdown
           label=""
           ariaLabel="previewWidth"
           [availableValues]="previewWidthOptions"
@@ -40,7 +40,7 @@
       </div>
       <div class="cx-workbench__meta-field">
         <span class="cx-workbench__meta-label">align</span>
-        <cx-select
+        <cx-dropdown
           label=""
           ariaLabel="align"
           [availableValues]="alignOptions"

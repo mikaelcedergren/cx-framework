@@ -5,16 +5,27 @@
         <div class="cx-dynamic-fields__row" [attr.data-field-id]="field.id">
           <div class="cx-dynamic-fields__label">{{ field.label }}</div>
 
-          <cx-text-field
-            class="cx-dynamic-fields__input"
-            [label]="''"
-            [ariaLabel]="field.label"
-            [placeholder]="field.placeholder"
-            [type]="field.masked ? 'password' : 'text'"
-            [disabled]="disabled"
-            [value]="field.value"
-            (valueChange)="onFieldValueChange(field.id, $event)"
-          />
+          @if (field.masked) {
+            <cx-password-field
+              class="cx-dynamic-fields__input"
+              [label]="''"
+              [ariaLabel]="field.label"
+              [hint]="field.hint"
+              [disabled]="disabled"
+              [value]="field.value"
+              (valueChange)="onFieldValueChange(field.id, $event)"
+            />
+          } @else {
+            <cx-text-field
+              class="cx-dynamic-fields__input"
+              [label]="''"
+              [ariaLabel]="field.label"
+              [hint]="field.hint"
+              [disabled]="disabled"
+              [value]="field.value"
+              (valueChange)="onFieldValueChange(field.id, $event)"
+            />
+          }
 
           <cx-icon-button
             class="cx-dynamic-fields__remove"

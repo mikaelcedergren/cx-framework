@@ -27,11 +27,11 @@
             <cx-text-field
               [label]="''"
               [value]="content.value"
-              [placeholder]="content.placeholder ?? 'Type something'"
               [prependText]="content.prependText"
               [appendText]="content.appendText"
+              [hint]="content.hint"
               [disabled]="content.disabled ?? false"
-              [errorMessage]="content.errorMessage"
+              [validation]="content.validation"
               (valueChange)="onInputValueChange($event)"
             />
           </div>
@@ -42,11 +42,11 @@
             <cx-textarea
               [label]="''"
               [value]="content.value"
-              [placeholder]="content.placeholder ?? 'Type something'"
+              [hint]="content.hint"
               [rows]="content.rows ?? 5"
               [autoGrow]="content.autoGrow ?? false"
               [disabled]="content.disabled ?? false"
-              [errorMessage]="content.errorMessage"
+              [validation]="content.validation"
               (valueChange)="onInputValueChange($event)"
             />
           </div>
@@ -54,16 +54,16 @@
 
         @case ('select') {
           <div class="cx-labeled-row__field-shell">
-            <cx-select
+            <cx-dropdown
               [label]="''"
               [availableValues]="content.options"
               [value]="content.value"
               [values]="content.values"
-              [displayValue]="content.displayValue"
               [placeholder]="content.placeholder ?? 'Select'"
-              [mode]="content.multiple ? 'multiple' : content.searchable ? 'combobox' : 'single'"
+              [multiple]="content.multiple ?? false"
+              [searchable]="content.searchable ?? false"
               [disabled]="content.disabled ?? false"
-              [errorMessage]="content.errorMessage"
+              [validation]="content.validation"
               (valueChange)="onSelectValueChange($event)"
               (valuesChange)="onSelectValuesChange($event)"
             />
@@ -84,10 +84,10 @@
                 }
               </div>
 
-              @if (content.errorMessage) {
+              @if (content.validation) {
                 <cx-validation-message
                   class="cx-labeled-row__group-error"
-                  [messages]="[{ type: 'error', text: content.errorMessage }]"
+                  [messages]="validationMessages(content.validation)"
                 />
               }
             </div>
@@ -102,10 +102,10 @@
               [disabled]="content.disabled ?? false"
               (selectedChange)="onCheckboxCheckedChange($event)"
             />
-            @if (content.errorMessage) {
+            @if (content.validation) {
               <cx-validation-message
                 class="cx-labeled-row__group-error"
-                [messages]="[{ type: 'error', text: content.errorMessage }]"
+                [messages]="validationMessages(content.validation)"
               />
             }
           </div>
@@ -117,7 +117,7 @@
               [text]="content.label"
               [selected]="content.checked ?? false"
               [disabled]="content.disabled ?? false"
-              [validationMessages]="content.errorMessage ? [{ type: 'error', message: content.errorMessage }] : []"
+              [validation]="content.validation"
               (selectedChange)="onSwitchCheckedChange($event)"
             />
           </div>

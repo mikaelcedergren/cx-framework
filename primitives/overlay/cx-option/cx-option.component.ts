@@ -20,7 +20,7 @@ export class CxOptionComponent {
   @Input() label = 'Option';
   /**
    * ARIA role for the underlying control. Left undefined by default so shared
-   * consumers (cx-select, cx-table, cx-tag-input) keep the native button role.
+   * consumers (cx-dropdown, cx-table, cx-tag-input) keep the native button role.
    * cx-menu passes "menuitem".
    */
   @Input() role?: string;
@@ -31,6 +31,7 @@ export class CxOptionComponent {
   @Input() size: CxOptionSize = 'default';
   @Input() hover = false;
   @Input() selected = false;
+  @Input() selectedHighlight = true;
   @Input() showCheckbox = false;
   @Input() disabled = false;
   @Input() shortcutParts: readonly string[] | undefined;
