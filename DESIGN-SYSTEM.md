@@ -14,7 +14,7 @@ The design system is not decoration. It is how Cortex stays trustworthy.
 
 Read this document before changing tokens, primitives, patterns, component APIs, component reference controls, or page-level UI styling. It describes the thinking behind the system, not only the current files.
 
-## Source Of Truth
+## Source of truth
 
 The design system is authored in Cortex (the `framework` source) and published here as `@mikaelcedergren/cx-framework`.
 
@@ -45,7 +45,7 @@ Broader design judgment comes from:
 - The portable AI design docs in `ai/design/`, rebuilt from the human articles in `articles/human/`.
 - The portable AI skills in `ai/skills/`, used as general agent behavior contracts.
 
-## North Star
+## North star
 
 Cortex should make life calmer, more focused, and richer.
 
@@ -57,7 +57,7 @@ The UI should:
 - feel consistent enough that the user trusts the information before inspecting it
 - use warmth only where warmth helps, not where precision is needed
 
-## Product Chain
+## Product chain
 
 Nothing user-facing should skip the chain:
 
@@ -69,7 +69,7 @@ First decide why the thing exists. Then decide which role owns it. Then shape th
 
 If a screen starts from a layout idea, a favorite style, or a local workaround, it is already drifting.
 
-## Design Philosophy
+## Design philosophy
 
 Clarity wins.
 
@@ -87,7 +87,7 @@ Affordance must stay visible.
 
 Calm does not mean hidden. Interactive things need to look reachable. Current location, selected state, focus, and destructive actions should not be subtle guesses.
 
-## Color Architecture
+## Color architecture
 
 Cortex color is layered:
 
@@ -97,7 +97,7 @@ foundation palette -> semantic colors -> surfaces, ink, opacity, and components
 
 Tokens are semantic. They name a role, not a color.
 
-### Foundation Palette
+### Foundation palette
 
 The foundation palette contains raw named colors:
 
@@ -123,7 +123,7 @@ Use the palette directly only when the color itself is the user-facing meaning: 
 
 For everything else, use a semantic color.
 
-### Semantic Colors
+### Semantic colors
 
 Semantic colors are primarily used through component props such as `mood`.
 
@@ -176,7 +176,7 @@ Surfaces are solid colors that content sits on.
 
 Do not stack surfaces to fake depth. Surface levels mark page-relative position. Floating elements such as popovers, dropdowns, dialogs, and tooltips use border and shadow, not a higher surface.
 
-### Ink And Opacity
+### Ink and opacity
 
 Ink tokens are for content, hierarchy, and quiet structure.
 
@@ -198,7 +198,7 @@ Default text should not automatically be `ink`. Start with `opacity-high` for or
 
 `opacity-low` should almost disappear. Use it for soft fills, hover rows, and quiet structure; do not use it for readable text except placeholder ghost content where legibility is intentionally reduced.
 
-### Color Use
+### Color use
 
 Color impact depends on surface area. A small splash reads as detail; a large field reads as mood.
 
@@ -221,7 +221,7 @@ Current theme layers include:
 
 Components should be written against semantic tokens so theme changes do not require local rewrites. If a component only works because it picked a literal color, the component is not theme-ready.
 
-## Spacing And Size
+## Spacing and size
 
 Spacing and sizing follow a 4px factor.
 
@@ -255,7 +255,7 @@ Spacing follows relationship first, then visual weight. Heavier elements need mo
 
 Avoid large airy marketing-style gaps. Cortex is an operational product, so bigger pauses should clarify the page, not make it feel like a landing page.
 
-### Component Size Defaults
+### Component size defaults
 
 Default size is the product baseline.
 
@@ -318,7 +318,7 @@ Most component text should be `--font-size-body`, not `--font-size-body-sm`.
 
 Use `--line-height-body` for readable body text and `--line-height-small` for small/tiny text or tight control labels. Avoid raw line-height values unless the component is doing precise icon/SVG geometry.
 
-## Radius, Shadow, Motion, And Depth
+## Radius, shadow, motion, and depth
 
 One thing gets one box.
 
@@ -338,7 +338,7 @@ Use system icons for controls, navigation, state, and scanability. Do not draw o
 
 Icons should support meaning, not decorate the surface. When an icon-only control is not obvious, pair it with a tooltip or accessible label.
 
-### Icon Pipeline
+### Icon pipeline
 
 Cortex is the source of truth for icons. Source SVGs live in `icons/svg/`; they are authored here, validated against the icon contract, and compiled to `icons/manifest.ts` (the `cx-icon` lookup). Package output copies from Cortex, never the other way.
 
@@ -352,7 +352,7 @@ pnpm --filter @mikaelcedergren/cx-framework icons         # rebuild icons/manife
 
 The contract and full authoring workflow live in `icons/README.md`. The generated manifest is the Cortex lookup surface — do not hand-edit generated icon entries.
 
-## Components And Patterns
+## Components and patterns
 
 The design system has three framework layers:
 
@@ -394,7 +394,7 @@ Tooling may be exported for the component reference, but it is not product UI. D
 
 If a feature needs behavior that belongs in a shared primitive or pattern, extend the system there and consume it from the page. Do not build a private page-level version of an existing component.
 
-## Component Discipline
+## Component discipline
 
 Components are sealed.
 
@@ -416,7 +416,7 @@ Invalid prop combinations should fail clearly in the component's own surface ins
 
 Two elements that look similar must behave similarly. Visual consistency is a behavioral contract.
 
-## Component Design Principles
+## Component design principles
 
 Design the role before the props.
 
@@ -520,7 +520,7 @@ Loading should reduce uncertainty. Use a spinner for unknown duration, progress 
 
 Empty states need a short explanation and a useful next step. The empty-state pattern should carry multiple faces rather than spawning separate local empty components.
 
-## Layout And Navigation
+## Layout and navigation
 
 Components own padding. Containers own gaps. Pages own big spacing between sections.
 
@@ -547,7 +547,7 @@ Do not move navigation casually. Users remember positions before labels.
 
 Use breadcrumbs only when the product has real depth. Back goes where the user came from, not to a generic previous route guess.
 
-## Feedback And Messaging
+## Feedback and messaging
 
 Feedback should reduce uncertainty more than it reduces wait time.
 
@@ -562,7 +562,7 @@ Operational surfaces should be concise. Warmth belongs in onboarding, empty stat
 
 Errors are not the place for personality.
 
-## Forms And Validation
+## Forms and validation
 
 Validate on blur, not on every keystroke, unless the control has no meaningful blur moment.
 
@@ -608,7 +608,7 @@ Every interactive element must be keyboard reachable. Focus must be visible. Con
 
 If the user has to hunt for what is focused, selected, clickable, current, disabled, dangerous, or broken, the design system has failed.
 
-## Component Reference
+## Component reference
 
 The component reference is live documentation.
 
@@ -633,7 +633,7 @@ Shared workbench controls such as preview width, preview height, and alignment b
 
 The moodboard is also a reference surface. It should present real Cortex components and expose visual issues; it should not receive local styling patches that hide component problems. If something looks wrong on the moodboard, fix the owning component or token.
 
-## What Is Wrong
+## What is wrong
 
 These are design-system smells:
 
