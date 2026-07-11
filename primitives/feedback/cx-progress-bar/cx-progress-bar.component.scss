@@ -56,6 +56,7 @@
   height: var(--space-sm);
   overflow: hidden;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
 }
 
@@ -65,9 +66,10 @@
   width: calc(var(--cx-progress-ratio, 0) * 100%);
   min-width: 0;
   border-radius: inherit;
+  corner-shape: inherit;
   background: currentColor;
   transition:
-    width var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1),
+    width var(--motion-slow) var(--ease-out-strong),
     background-color var(--motion-fast) ease;
 }
 
@@ -81,7 +83,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: 1.4;
+  line-height: var(--line-height-body-relaxed);
 }
 
 @media (prefers-reduced-motion: reduce) {

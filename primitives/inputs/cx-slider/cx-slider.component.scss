@@ -1,7 +1,6 @@
 :host {
   display: block;
   width: 100%;
-  --cx-slider-track-size: var(--space-2xs);
   --cx-slider-thumb-size: calc(var(--space-md) - var(--space-2xs));
   --cx-slider-track-top: calc(var(--space-sm) + var(--space-2xs));
   --cx-slider-tooltip-track-top: calc(var(--space-xl) + var(--space-sm) - var(--space-2xs));
@@ -75,8 +74,8 @@
   padding: 0 var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-md);
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-raised);
+  background: var(--surface);
+  box-shadow: var(--shadow-low);
   color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
@@ -102,8 +101,9 @@
 .cx-slider__fill {
   position: absolute;
   top: var(--cx-slider-track-top);
-  height: var(--cx-slider-track-size);
+  height: var(--space-2xs);
   border-radius: var(--radius-pill);
+  corner-shape: round;
 }
 
 .cx-slider__control--with-tooltips .cx-slider__track,
@@ -164,8 +164,9 @@
 }
 
 .cx-slider__field::-webkit-slider-runnable-track {
-  height: var(--cx-slider-track-size);
+  height: var(--space-2xs);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: transparent;
 }
 
@@ -175,8 +176,9 @@
   margin-top: var(--cx-slider-thumb-offset);
   border: var(--line);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--primary);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
   pointer-events: auto;
   -webkit-appearance: none;
   appearance: none;
@@ -192,7 +194,7 @@
 .cx-slider__field:focus-visible::-webkit-slider-thumb {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
 }
 
 .cx-slider__field:not(:disabled):hover::-webkit-slider-thumb {
@@ -200,9 +202,10 @@
 }
 
 .cx-slider__field::-moz-range-track {
-  height: var(--cx-slider-track-size);
+  height: var(--space-2xs);
   border: 0;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: transparent;
 }
 
@@ -215,8 +218,9 @@
   height: var(--cx-slider-thumb-size);
   border: var(--line);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--primary);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
   pointer-events: auto;
   transition:
     transform var(--motion-fast) ease,
@@ -230,7 +234,7 @@
 .cx-slider__field:focus-visible::-moz-range-thumb {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
 }
 
 .cx-slider__field:not(:disabled):hover::-moz-range-thumb {

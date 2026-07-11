@@ -1,27 +1,21 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
-import { CxIconComponent } from '../../primitives/media/cx-icon';
-import { CxMetricComponent } from '../../primitives/display/cx-metric';
+import { CxIconComponent, type CxIconMood } from '../../primitives/media/cx-icon';
 import { CxTrendTagComponent, type CxTrendTagFavor } from '../../primitives/display/cx-trend-tag';
 import { CxProgressBarComponent, type CxProgressBarMood } from '../../primitives/feedback/cx-progress-bar';
 
-export type CxKpiMood = 'default' | 'success' | 'warning' | 'danger';
+export type CxKpiMood = CxIconMood;
 
 /**
  * A key-performance-indicator card: a headline metric with an optional trend,
  * status-tinted icon, progress, footer note, and a slot for a sparkline
- * (`[cxKpiChart]`). It composes cx-metric, cx-trend-tag, and cx-progress-bar.
+ * (`[cxKpiChart]`). It composes cx-trend-tag and cx-progress-bar.
  */
 @Component({
   selector: 'cx-kpi',
-  imports: [CxIconComponent, CxMetricComponent, CxTrendTagComponent, CxProgressBarComponent],
+  imports: [CxIconComponent, CxTrendTagComponent, CxProgressBarComponent],
   templateUrl: './cx-kpi.component.html',
   styleUrl: './cx-kpi.component.scss',
-  host: {
-    '[class.cx-kpi-host--success]': "mood === 'success'",
-    '[class.cx-kpi-host--warning]': "mood === 'warning'",
-    '[class.cx-kpi-host--danger]': "mood === 'danger'",
-  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxKpiComponent {
@@ -35,6 +29,10 @@ export class CxKpiComponent {
   @Input() progressMax = 100;
   @Input() progressLabel = 'Progress';
   @Input() footer: string | undefined;
+
+  protected get hasHeading(): boolean {
+    return Boolean(this.heading.trim());
+  }
 
   protected get hasTrend(): boolean {
     return Boolean(this.trendValue?.trim());
@@ -50,6 +48,8 @@ export class CxKpiComponent {
 
   protected get progressMood(): CxProgressBarMood {
     switch (this.mood) {
+      case 'accent':
+        return 'accent';
       case 'success':
         return 'success';
       case 'danger':

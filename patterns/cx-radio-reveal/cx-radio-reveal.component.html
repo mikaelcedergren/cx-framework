@@ -22,7 +22,7 @@
             <cx-text-field
               [label]="''"
               [ariaLabel]="getRevealAriaLabel(option)"
-              [hint]="option.revealHint ?? option.revealPlaceholder"
+              [hint]="option.revealHint"
               [disabled]="disabled"
               [value]="revealValueState()"
               (valueChange)="onRevealValueChange($event)"

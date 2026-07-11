@@ -12,6 +12,9 @@ export interface CxQueryElementData {
   valuesSuffix?: string;
   focused?: boolean;
   disabled?: boolean;
+  grouped?: boolean;
+  tabIndex?: number;
+  ariaLabel?: string;
 }
 
 const DEFAULT_QUERY_ELEMENT_DATA: CxQueryElementData = {
@@ -34,6 +37,9 @@ export class CxQueryElementComponent {
   protected valuesSuffix = '';
   protected focused = false;
   protected disabled = false;
+  protected grouped = false;
+  protected tabIndex = 0;
+  protected ariaLabel: string | undefined;
 
   @Input()
   public set data(value: CxQueryElementData | null | undefined) {
@@ -47,6 +53,9 @@ export class CxQueryElementComponent {
     this.valuesSuffix = data.valuesSuffix ?? '';
     this.focused = data.focused ?? false;
     this.disabled = data.disabled ?? false;
+    this.grouped = data.grouped ?? false;
+    this.tabIndex = data.tabIndex ?? 0;
+    this.ariaLabel = data.ariaLabel?.trim() || undefined;
   }
 
   @Output() readonly pressed = new EventEmitter<void>();
@@ -63,7 +72,8 @@ export class CxQueryElementComponent {
     return this.defaultLabelFor(this.kind);
   }
 
-  protected onPressed(): void {
+  protected onPressed(event: MouseEvent): void {
+    event.stopPropagation();
     if (this.disabled) {
       return;
     }

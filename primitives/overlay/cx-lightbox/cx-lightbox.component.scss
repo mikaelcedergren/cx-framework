@@ -36,22 +36,23 @@
   width: auto;
   max-width: min(100%, 1120px);
   max-height: calc(100vh - (var(--space-xl) * 2));
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-popover);
-  background: var(--surface-mid);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-mid);
+  background: var(--surface);
 }
 
 .cx-lightbox__caption {
   color: var(--on-ink);
   font-size: var(--font-size-body-sm);
-  line-height: 1.4;
+  line-height: var(--line-height-body-relaxed);
   text-align: center;
 }
 
 .cx-lightbox__close {
   position: fixed;
-  top: var(--space-lg);
-  right: var(--space-lg);
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: calc(var(--z-index-dialog) + 1);
   display: inline-flex;
   width: var(--controller-size);
   height: var(--controller-size);
@@ -59,21 +60,31 @@
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--on-ink) 12%, transparent);
+  border-radius: var(--radius-pill);
+  corner-shape: round;
+  background: transparent;
   color: var(--on-ink);
   cursor: pointer;
+  margin: 0;
   outline: none;
   transition:
     background-color var(--motion-fast) ease,
-    opacity var(--motion-fast) ease;
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .cx-lightbox__close:hover {
-  background: color-mix(in srgb, var(--on-ink) 20%, transparent);
+  background: var(--emphasis);
+  color: var(--ink);
 }
 
 .cx-lightbox__close:focus-visible {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
+}
+
+.cx-lightbox__close:active {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+  transform: scale(0.98);
 }

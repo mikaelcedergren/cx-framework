@@ -1,104 +1,91 @@
 # Copy and microcopy
 
-Copy should reduce uncertainty. It should tell the user what something is, what happened, what they can do, or what will happen next.
+This file owns portable user-facing language rules. Search by `RULE-ID:`, `SCOPE:`, `TYPE:`, `TOPIC:`, or keyword. Product truth, local terminology, and known behavior always outrank a portable wording default.
 
-Use concise, specific language. Avoid cleverness, apology, filler, blame, shame, and vague system language.
+## Truth, voice, and terminology
 
-## Voice by surface
+RULE-ID: copy.truth SCOPE: copy TYPE: must TOPIC: trust RULE: Preserve known product behavior and consequence in the words. DESCRIPTION: Never invent capability, guarantee, policy, terminology, recovery, or outcome to make copy sound complete.
 
-Operational surfaces should be concise and professional:
+RULE-ID: copy.unknown-behavior SCOPE: copy TYPE: must TOPIC: trust RULE: Treat unknown behavior as a product question. DESCRIPTION: Do not hide unresolved meaning behind generic or confident wording.
 
-- buttons
-- labels
-- field help
-- validation
-- alerts
-- status
-- navigation
-- table values
+RULE-ID: copy.terminology SCOPE: copy TYPE: must TOPIC: copy RULE: Use one established term for one concept. DESCRIPTION: Prefer the consuming product's domain language and do not switch synonyms unless they represent different things.
 
-Learning surfaces can be warmer:
+RULE-ID: copy.plain-language SCOPE: copy TYPE: should TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 
-- onboarding
-- first-time empty states
-- setup guidance
-- explanatory panels
-- product education
+RULE-ID: copy.sentence-case SCOPE: copy TYPE: should TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
 
-Warmth should feel plain, kind, and useful. It should not become cute, fluffy, jokey, or chatty.
+RULE-ID: copy.concise SCOPE: operational-copy TYPE: should TOPIC: voice RULE: Keep operational copy as short as accuracy allows. DESCRIPTION: Do not remove consequence, constraint, recovery, or the next useful action merely to save words.
 
-When unsure, use concise.
+RULE-ID: copy.warmth SCOPE: learning-copy TYPE: may TOPIC: voice RULE: Use restrained warmth on learning and first-use surfaces. DESCRIPTION: Onboarding, setup guidance, and first-use empty states may be kind and conversational without becoming cute, jokey, or vague.
 
-## General rules
+RULE-ID: copy.no-blame SCOPE: copy TYPE: must TOPIC: trust RULE: Describe the state or required action without blaming the user. DESCRIPTION: Confusion and invalid state are product conditions, not evidence of personal failure.
 
-RULE: Use plain, specific language. TYPE: must TOPIC: copy DESCRIPTION: The user should understand the sentence without decoding product, technical, or business jargon.
+RULE-ID: copy.opt-out-neutral SCOPE: opt-out-copy TYPE: must TOPIC: trust RULE: Keep refusal and opt-out wording neutral. DESCRIPTION: Never shame, guilt, threaten, or coerce someone into staying, consenting, subscribing, or enabling a feature.
 
-RULE: Use one name for one concept. TYPE: must TOPIC: terminology DESCRIPTION: Do not switch between synonyms such as workspace, project, and account unless they mean different things.
+RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: should TOPIC: voice RULE: Remove filler, apology, and performative politeness. DESCRIPTION: Words such as `just`, `simply`, `easily`, `please`, `oops`, and `sorry` rarely improve operational clarity.
 
-RULE: Prefer sentence case for interface copy. TYPE: should TOPIC: copy DESCRIPTION: Sentence case is easier to scan and feels calmer than title case in dense product UI.
+## Buttons and actions
 
-RULE: Keep operational copy short. TYPE: should TOPIC: copy DESCRIPTION: Labels, buttons, field help, statuses, and errors should work at a glance.
+RULE-ID: copy.buttons.action SCOPE: button-label TYPE: must TOPIC: copy RULE: Label a button with the action it performs. DESCRIPTION: Button text names the result of activation rather than the current state or a generic confirmation.
 
-RULE: Put the user's action or next step in the sentence. TYPE: must TOPIC: microcopy DESCRIPTION: Copy should help the user move, not merely describe that the system has a problem.
+RULE-ID: copy.buttons.object SCOPE: button-label TYPE: should TOPIC: copy RULE: Name the action's object when it removes ambiguity. DESCRIPTION: Prefer `Delete file`, `Send invitation`, or `Save changes`; concise conventional actions such as `Cancel`, `Back`, and `Continue` do not need invented objects.
 
-RULE: Avoid filler words. TYPE: should TOPIC: copy DESCRIPTION: Words such as simply, just, easily, please, oops, and sorry usually add tone without adding clarity.
+RULE-ID: copy.buttons.destructive SCOPE: button-label TYPE: must TOPIC: trust RULE: Name destructive action explicitly. DESCRIPTION: The final action must say what will be deleted, removed, discarded, or ended.
 
-RULE: Do not blame the user. TYPE: must TOPIC: trust DESCRIPTION: Frame problems as state, constraint, or next action rather than personal failure.
+RULE-ID: copy.buttons.pairs SCOPE: action-group TYPE: should TOPIC: copy RULE: Give paired actions distinct outcomes. DESCRIPTION: Use a safe exit plus the real action rather than ambiguous `No` and `Yes` labels.
 
-## Buttons
+RULE-ID: copy.buttons.loading SCOPE: button-label TYPE: should TOPIC: feedback RULE: Keep processing language tied to the original action. DESCRIPTION: The control may show truthful activity while preserving what the user asked it to do.
 
-RULE: Label a button with the action it performs. TYPE: must TOPIC: buttons DESCRIPTION: Button text should name what clicking does.
+## Labels, placeholders, and help
 
-RULE: Name the object of the action when possible. TYPE: must TOPIC: buttons DESCRIPTION: Use `Delete file`, `Send invitation`, or `Save changes` instead of vague labels like `OK`, `Submit`, or `Confirm`.
+RULE-ID: copy.labels.object SCOPE: form-label TYPE: must TOPIC: forms RULE: Make a field label name the value or choice. DESCRIPTION: The label must keep the empty control understandable without turning into an instruction sentence.
 
-RULE: Make destructive buttons explicit. TYPE: must TOPIC: buttons DESCRIPTION: A destructive confirmation button should name the destructive action, such as `Delete file`.
+RULE-ID: copy.typed-fields.no-placeholder SCOPE: typed-field TYPE: must TOPIC: forms RULE: Do not use placeholders in typed fields. DESCRIPTION: Text, email, phone, search, number, password, textarea, and editable text controls stay empty with persistent labels; examples and constraints belong in helper text.
 
-RULE: Do not use button copy to describe current state. TYPE: must TOPIC: buttons DESCRIPTION: State belongs in status text, selected state, toggle state, or supporting UI; a button names the action.
+RULE-ID: copy.pickers.placeholder SCOPE: picker TYPE: must TOPIC: forms RULE: Write an empty picker placeholder as `Select [thing]`. DESCRIPTION: Use the clearest object, such as `Select severity` or `Select language`; use bare `Select` only when no object fits.
 
-RULE: Keep paired actions visibly distinct. TYPE: should TOPIC: buttons DESCRIPTION: Use clear opposites such as `Cancel` and `Archive project`, not `No` and `Yes`.
+RULE-ID: copy.helper.behavior SCOPE: helper-text TYPE: should TOPIC: microcopy RULE: Add helper text only when it changes successful behavior. DESCRIPTION: Explain a non-obvious constraint, format, consequence, or example instead of repeating the label.
 
-## Labels and help text
-
-RULE: Labels name the thing the user is providing or choosing. TYPE: must TOPIC: forms DESCRIPTION: A label should make the field understandable even when the field is empty.
-
-RULE: Do not use placeholders in text fields, textareas, search fields, number fields, password fields, or editable text surfaces. TYPE: must TOPIC: forms DESCRIPTION: Typed fields stay visually empty with clear labels; examples, constraints, and format help belong in helper text.
-
-RULE: Write empty dropdown and picker placeholders as Select [thing], or Select when no specific thing fits. TYPE: must TOPIC: forms DESCRIPTION: Use copy like Select severity or Select language. Do not use vague prompts like Choose, Pick, or Optional.
-
-RULE: Use helper text only when it changes the user's behavior. TYPE: should TOPIC: microcopy DESCRIPTION: Do not add help text that repeats the label or explains the obvious.
-
-RULE: Put important constraints near the field before the user fails. TYPE: should TOPIC: validation DESCRIPTION: Format, range, length, and irreversible consequences should appear early enough to prevent avoidable errors.
+RULE-ID: copy.helper.prevent SCOPE: helper-text TYPE: should TOPIC: validation RULE: Put important known constraints before failure. DESCRIPTION: Range, format, length, and irreversible consequence should appear early enough to prevent avoidable errors.
 
 ## Validation and errors
 
-RULE: Error messages must name the problem and the fix. TYPE: must TOPIC: errors DESCRIPTION: The user should know what went wrong and what to do next.
+RULE-ID: copy.errors.problem-fix SCOPE: error-message TYPE: must TOPIC: errors RULE: State the problem and the available recovery. DESCRIPTION: The user should know what failed and what they can do next; omit a recovery only when none exists.
 
-RULE: Put field-specific errors under the relevant field. TYPE: must TOPIC: validation DESCRIPTION: The message should appear where the user's attention and next action belong.
+RULE-ID: copy.errors.specific SCOPE: error-message TYPE: must TOPIC: errors RULE: Name the real failed object or condition. DESCRIPTION: `Error`, `Invalid`, and `Something went wrong` are not sufficient on their own.
 
-RULE: Use form-level alerts for problems that are not tied to one field. TYPE: must TOPIC: validation DESCRIPTION: Request failures, permission issues, timeouts, conflicts, and service outages belong at form or page level.
+RULE-ID: copy.errors.field SCOPE: field-error TYPE: should TOPIC: validation RULE: Name the expected field value or correction. DESCRIPTION: Prefer `Enter a valid email address` to a bare judgment such as `Invalid email`.
 
-RULE: Preserve entered data after validation errors. TYPE: must TOPIC: trust DESCRIPTION: Users should not lose work because a field failed validation.
+RULE-ID: copy.errors.request SCOPE: request-error TYPE: must TOPIC: errors RULE: Describe request-level failure without pretending to know its cause. DESCRIPTION: Distinguish known timeout, permission, conflict, unavailable service, and unknown failure only when the product has that evidence.
 
-RULE: Avoid generic error labels. TYPE: must TOPIC: errors DESCRIPTION: `Error`, `Invalid`, `Something went wrong`, and similar copy are not enough on their own.
+RULE-ID: copy.errors.calm SCOPE: error-message TYPE: should TOPIC: voice RULE: Keep error copy calm and direct. DESCRIPTION: Errors are not the place for jokes, personality, alarmist prefixes, or apology.
 
-RULE: Keep validation copy calm and direct. TYPE: should TOPIC: errors DESCRIPTION: Use short sentences that describe the condition and action without apology or drama.
+RULE-ID: copy.errors.punctuation SCOPE: error-message TYPE: should TOPIC: copy RULE: End complete validation and alert sentences with a full stop. DESCRIPTION: Button labels, field labels, statuses, and picker placeholders are not sentences and do not inherit this rule.
 
-RULE: Use fallback copy only when no tailored message exists. TYPE: should TOPIC: microcopy DESCRIPTION: Fallbacks are a safety net, not a replacement for context-aware writing.
+RULE-ID: copy.errors.fallback SCOPE: error-message TYPE: should TOPIC: errors RULE: Use fallback wording only when tailored copy cannot be written from known behavior. DESCRIPTION: A fallback is a safety net, not permission to invent product policy.
 
-## Empty states
+## Empty, missing, and status copy
 
-RULE: Explain why the area is empty. TYPE: must TOPIC: empty-states DESCRIPTION: The user should know whether nothing exists, nothing matches, something is unavailable, or something is still loading.
+RULE-ID: copy.empty.cause SCOPE: empty-state TYPE: must TOPIC: empty-states RULE: Explain the actual kind of absence. DESCRIPTION: Distinguish first use, no data, no search results, unavailable content, filtering, and loading.
 
-RULE: Give a clear next step when one exists. TYPE: must TOPIC: empty-states DESCRIPTION: Empty states should help the user continue rather than simply announce absence.
+RULE-ID: copy.empty.next-step SCOPE: empty-state TYPE: must TOPIC: empty-states RULE: Give the next useful action when one exists. DESCRIPTION: The action may create, reset, broaden, retry, wait, or return depending on the real cause.
 
-RULE: Avoid bare empty-state copy such as `No results`. TYPE: should TOPIC: empty-states DESCRIPTION: A useful empty state explains what was not found and how to broaden, reset, create, or wait.
+RULE-ID: copy.empty.no-bare-results SCOPE: empty-state TYPE: should TOPIC: empty-states RULE: Avoid a bare `No results` message. DESCRIPTION: Name what was not found and how the user can broaden, reset, or correct the search when possible.
 
-RULE: Keep first-use empty states welcoming but practical. TYPE: should TOPIC: empty-states DESCRIPTION: A first empty screen should reduce hesitation and guide setup without becoming decorative.
+RULE-ID: copy.missing.none SCOPE: missing-value TYPE: should TOPIC: data-display RULE: Use `None` when a known field has no value. DESCRIPTION: The word communicates deliberate absence rather than loading or failure.
 
-## Status and feedback
+RULE-ID: copy.missing.pending SCOPE: missing-value TYPE: should TOPIC: data-display RULE: Use `Pending` only while the system is still gathering the value. DESCRIPTION: Do not use it for absent, failed, or inapplicable data.
 
-RULE: Confirm meaningful success. TYPE: should TOPIC: feedback DESCRIPTION: Use short confirmation copy when the user needs confidence that an action completed.
+RULE-ID: copy.missing.not-applicable SCOPE: missing-value TYPE: should TOPIC: data-display RULE: Use `N/A` only when the field does not apply. DESCRIPTION: Prefer a contextual word over an unexplained dash.
 
-RULE: Label long-running work. TYPE: must TOPIC: feedback DESCRIPTION: Loading, saving, syncing, importing, exporting, and deleting should say what is happening.
+RULE-ID: copy.status.success SCOPE: status-message TYPE: should TOPIC: feedback RULE: Confirm meaningful success in one short sentence. DESCRIPTION: Confirm what completed when the user needs confidence; do not celebrate routine noise.
 
-RULE: Make failure actionable. TYPE: must TOPIC: feedback DESCRIPTION: If recovery is possible, tell the user how to recover; if it is not, say what state the system is in.
+RULE-ID: copy.status.waiting SCOPE: status-message TYPE: should TOPIC: feedback RULE: Name long-running work when the wait is meaningful. DESCRIPTION: Use the real activity, such as saving, syncing, importing, or deleting, without promising duration.
+
+## Dates and time
+
+RULE-ID: copy.dates.human-display SCOPE: human-date TYPE: should TOPIC: data-display RULE: Use an unambiguous human-readable absolute date. DESCRIPTION: A spelled-out month such as `6 May 2026` avoids locale-dependent day/month inversion in display copy.
+
+RULE-ID: copy.dates.machine-format SCOPE: machine-date TYPE: may TOPIC: data-display RULE: Use ISO date formats for machine, storage, API, or explicitly technical contexts. DESCRIPTION: `YYYY-MM-DD` is unambiguous when the surface is intentionally technical; do not describe it as a localized human date.
+
+RULE-ID: copy.dates.relative SCOPE: relative-time TYPE: should TOPIC: data-display RULE: Use relative time only when recency is the user's question. DESCRIPTION: Logs, reports, audits, and detail views need an absolute date and time.

@@ -19,6 +19,7 @@ import {
 import { type CxIconName } from '../../../icons/manifest';
 import { CxTooltipComponent } from '../../overlay/cx-tooltip';
 import { CxButtonComponent } from '../cx-button';
+import { isHostVisible } from '../../shared/host-visibility';
 import { eventMatchesShortcut, isTypingTarget, normalizeShortcutParts } from '../shared/shortcuts';
 
 export interface CxActionAreaAction {
@@ -315,6 +316,7 @@ export class CxActionAreaComponent implements OnDestroy {
   protected onDocumentKeydown(event: KeyboardEvent): void {
     const hasDomFocus = this.hasDomFocus();
     if (
+      !isHostVisible(this.host.nativeElement) ||
       (CxActionAreaComponent.activeInstance !== this && !hasDomFocus) ||
       (!this.hasInteractionIntent$() && !hasDomFocus) ||
       !this.shortcutsEnabledState() ||

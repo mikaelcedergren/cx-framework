@@ -1,3 +1,5 @@
+@use 'breakpoints-scale' as bp;
+
 :root {
   --icon-size-sm: 16px;
   --icon-size-md: 20px;
@@ -7,6 +9,7 @@
   --controller-size: 32px;
   --controller-size-small: 24px;
   --controller-size-large: 48px;
+  --choice-control-size: 16px;
 
   /* Content measure — max width of a centred content column (cx-measure-*).
      xl is the page-container measure (cx-container). */
@@ -17,6 +20,12 @@
 
   /* Page gutter — horizontal air between content and the viewport edge. The centred variant
      pads a full-bleed section so its content lines up with a cx-container column. */
-  --gutter-page: var(--space-xl);
+  --gutter-page: var(--space-lg);
   --gutter-centered: max(var(--gutter-page), calc(((100vw - var(--measure-xl)) / 2) + var(--gutter-page)));
+}
+
+@media (max-width: #{bp.$mobile - 1px}) {
+  :root {
+    --gutter-page: var(--space-md);
+  }
 }

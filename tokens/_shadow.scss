@@ -1,9 +1,18 @@
 :root {
-    --shadow-raised: 0 2px 8px rgb(0 0 0 / 12%);
-    --shadow-notification: 0 6px 12px rgb(0 0 0 / 10%);
-    --shadow-popover: 0 8px 16px rgb(0 0 0 / 10%);
-    --shadow-dialog: 0 16px 32px rgb(0 0 0 / 10%);
-    --shadow-notification-primary: 0 11px 13px color-mix(in srgb, var(--primary) 14%, transparent);
-    --shadow-notification-success: 0 11px 13px color-mix(in srgb, var(--success) 14%, transparent);
-    --shadow-notification-danger: 0 11px 13px color-mix(in srgb, var(--danger) 14%, transparent);
+  --shadow-low:
+    0 1px 1px hsl(0deg 0% 0% / 0.055),
+    0 2px 2px hsl(0deg 0% 0% / 0.035),
+    0 4px 4px hsl(0deg 0% 0% / 0.020);
+  --shadow-mid:
+    0 1px 1px hsl(0deg 0% 0% / 0.060),
+    0 2px 2px hsl(0deg 0% 0% / 0.045),
+    0 4px 4px hsl(0deg 0% 0% / 0.035),
+    0 8px 8px hsl(0deg 0% 0% / 0.025),
+    0 16px 16px hsl(0deg 0% 0% / 0.018);
+  --shadow-high:
+    0 1px 1px hsl(0deg 0% 0% / 0.065),
+    0 3px 3px hsl(0deg 0% 0% / 0.050),
+    0 8px 8px hsl(0deg 0% 0% / 0.040),
+    0 16px 16px hsl(0deg 0% 0% / 0.030),
+    0 32px 32px hsl(0deg 0% 0% / 0.022);
 }

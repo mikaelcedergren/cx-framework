@@ -8,6 +8,7 @@ const repoRoot = join(__dirname, "..");
 const iconRoot = join(repoRoot, "icons");
 const sourceDir = join(iconRoot, "svg");
 const outputPath = join(iconRoot, "index.html");
+const radiusTokenSource = readFileSync(join(repoRoot, "tokens", "_radius.scss"), "utf8");
 const args = process.argv.slice(2);
 const validArgs = new Set(["--check", "--help", "-h"]);
 const unknownArgs = args.filter((arg) => !validArgs.has(arg));
@@ -67,6 +68,19 @@ const GEOMETRY_ATTRIBUTES = [
 ];
 const INHERITED_ATTRIBUTES = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"];
 const TARGET_STROKE_WIDTH = 1.5;
+
+function readRadiusToken(name) {
+  const match = radiusTokenSource.match(new RegExp(`--${name}:\\s*([^;]+);`));
+  if (!match) {
+    throw new Error(`Missing radius token: --${name}`);
+  }
+  return match[1].trim();
+}
+
+const cornerShape = readRadiusToken("corner-shape");
+const radiusSm = readRadiusToken("radius-sm");
+const radiusMd = readRadiusToken("radius-md");
+const radiusPill = readRadiusToken("radius-pill");
 
 function slugify(value) {
   return value
@@ -631,10 +645,17 @@ const html = `<!doctype html>
         --blue: #005f73;
         --ink: #11181c;
         --shadow: 0 1px 2px rgba(12, 24, 32, 0.08);
+        --corner-shape: ${cornerShape};
+        --radius-sm: ${radiusSm};
+        --radius-md: ${radiusMd};
+        --radius-pill: ${radiusPill};
       }
 
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
+        corner-shape: var(--corner-shape, round);
       }
 
       html {
@@ -701,7 +722,7 @@ const html = `<!doctype html>
         appearance: none;
         background: var(--panel);
         border: 1px solid var(--border-strong);
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         color: var(--text);
         font: inherit;
         height: 36px;
@@ -726,7 +747,8 @@ const html = `<!doctype html>
         appearance: none;
         background: var(--panel);
         border: 1px solid var(--border);
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
+        corner-shape: round;
         color: var(--text);
         cursor: pointer;
         display: inline-flex;
@@ -762,7 +784,7 @@ const html = `<!doctype html>
       .card {
         background: var(--panel);
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         box-shadow: var(--shadow);
         display: grid;
         gap: 10px;
@@ -813,7 +835,8 @@ const html = `<!doctype html>
         align-items: center;
         background: var(--red-soft);
         border: 1px solid rgba(180, 35, 24, 0.22);
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
+        corner-shape: round;
         color: var(--red);
         display: inline-flex;
         font-size: 11px;
@@ -825,7 +848,7 @@ const html = `<!doctype html>
       .source-link {
         align-items: center;
         border: 1px solid var(--border);
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         color: var(--muted);
         display: inline-flex;
         font-size: 12px;
@@ -881,7 +904,7 @@ const html = `<!doctype html>
         aspect-ratio: 1 / 1;
         background: #ffffff;
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         color: var(--ink);
         display: flex;
         justify-content: center;
@@ -970,7 +993,7 @@ const html = `<!doctype html>
         align-items: center;
         background: var(--panel);
         border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         color: var(--muted);
         display: flex;
         justify-content: center;

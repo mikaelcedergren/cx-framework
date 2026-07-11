@@ -17,7 +17,7 @@
   gap: var(--space-xs);
   padding: var(--space-sm);
   border-right: var(--line);
-  background: var(--surface-low);
+  background: var(--surface-alt);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -92,7 +92,7 @@
 .cx-side-nav__group-items--collapsible {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: grid-template-rows var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-side-nav__group-items--collapsible .cx-side-nav__group-items-inner {
@@ -103,7 +103,7 @@
   transform: translateY(-6px);
   transition:
     opacity var(--motion-base) ease,
-    transform var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-side-nav__group-items--expanded.cx-side-nav__group-items--collapsible {
@@ -133,7 +133,7 @@
   display: grid;
   width: 100%;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: grid-template-rows var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-side-nav__children-inner {
@@ -148,7 +148,7 @@
   transform: translateY(-6px);
   transition:
     opacity var(--motion-base) ease,
-    transform var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-side-nav__children--expanded {
@@ -246,6 +246,7 @@
   justify-content: center;
   padding: 0 var(--space-2xs);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);
   font-size: var(--font-size-body-xs);

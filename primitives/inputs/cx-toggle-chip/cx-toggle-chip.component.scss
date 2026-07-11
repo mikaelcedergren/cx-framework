@@ -11,6 +11,7 @@
   padding: 0 calc(var(--space-sm) + var(--space-xs));
   border: 0;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);
   cursor: pointer;
@@ -36,7 +37,7 @@
   gap: calc(var(--space-xs) + var(--space-2xs));
   padding-left: var(--space-sm);
   background: var(--emphasis);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
   color: var(--on-emphasis);
 }
 

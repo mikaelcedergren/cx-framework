@@ -5,10 +5,6 @@
 }
 
 .cx-tag {
-  --cx-tag-background: var(--opacity-low);
-  --cx-tag-border: transparent;
-  --cx-tag-foreground: var(--opacity-high);
-
   position: relative;
   display: inline-flex;
   width: max-content;
@@ -18,11 +14,11 @@
   align-items: center;
   gap: var(--space-xs);
   padding: 0 var(--space-xs);
-  border: 1px solid var(--cx-tag-border);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
-  background: var(--cx-tag-background);
+  background: var(--opacity-low);
   box-sizing: border-box;
-  color: var(--cx-tag-foreground);
+  color: var(--opacity-high);
   vertical-align: middle;
 }
 
@@ -50,22 +46,25 @@
 .cx-tag__dismiss {
   position: absolute;
   top: 50%;
-  right: 0;
+  right: var(--space-2xs);
   display: inline-flex;
   width: 18px;
   height: 18px;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--line);
+  border: var(--line);
   border-radius: var(--radius-pill);
-  background: var(--surface-mid);
+  corner-shape: round;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(var(--space-xs));
+  -webkit-backdrop-filter: blur(var(--space-xs));
   color: var(--ink);
   cursor: pointer;
   margin: 0;
   opacity: 0;
   pointer-events: none;
-  transform: translate(38%, -50%) scale(0.94);
+  transform: translateY(-50%) scale(0.94);
   transition:
     opacity var(--motion-fast) var(--ease-out-in),
     transform var(--motion-fast) var(--ease-out-in),
@@ -77,7 +76,7 @@
 .cx-tag--dismissible:focus-within .cx-tag__dismiss {
   opacity: 1;
   pointer-events: auto;
-  transform: translate(38%, -50%) scale(1);
+  transform: translateY(-50%) scale(1);
 }
 
 .cx-tag__dismiss:hover {
@@ -91,105 +90,105 @@
 }
 
 .cx-tag--blue {
-  --cx-tag-background: var(--blue-opacity);
-  --cx-tag-foreground: var(--blue);
+  background: var(--blue-opacity);
+  color: var(--blue);
 }
 
 .cx-tag--outline.cx-tag--blue {
-  --cx-tag-border: var(--blue);
+  border-color: var(--blue);
 }
 
 .cx-tag--cyan {
-  --cx-tag-background: var(--cyan-opacity);
-  --cx-tag-foreground: var(--cyan);
+  background: var(--cyan-opacity);
+  color: var(--cyan);
 }
 
 .cx-tag--outline.cx-tag--cyan {
-  --cx-tag-border: var(--cyan);
+  border-color: var(--cyan);
 }
 
 .cx-tag--lime {
-  --cx-tag-background: var(--lime-opacity);
-  --cx-tag-foreground: var(--lime);
+  background: var(--lime-opacity);
+  color: var(--lime);
 }
 
 .cx-tag--outline.cx-tag--lime {
-  --cx-tag-border: var(--lime);
+  border-color: var(--lime);
 }
 
 .cx-tag--green {
-  --cx-tag-background: var(--green-opacity);
-  --cx-tag-foreground: var(--green);
+  background: var(--green-opacity);
+  color: var(--green);
 }
 
 .cx-tag--outline.cx-tag--green {
-  --cx-tag-border: var(--green);
+  border-color: var(--green);
 }
 
 .cx-tag--yellow {
-  --cx-tag-background: var(--yellow-opacity);
-  --cx-tag-foreground: var(--yellow);
+  background: var(--yellow-opacity);
+  color: var(--yellow);
 }
 
 .cx-tag--outline.cx-tag--yellow {
-  --cx-tag-border: var(--yellow);
+  border-color: var(--yellow);
 }
 
 .cx-tag--orange {
-  --cx-tag-background: var(--orange-opacity);
-  --cx-tag-foreground: var(--orange);
+  background: var(--orange-opacity);
+  color: var(--orange);
 }
 
 .cx-tag--outline.cx-tag--orange {
-  --cx-tag-border: var(--orange);
+  border-color: var(--orange);
 }
 
 .cx-tag--tangerine {
-  --cx-tag-background: var(--tangerine-opacity);
-  --cx-tag-foreground: var(--tangerine);
+  background: var(--tangerine-opacity);
+  color: var(--tangerine);
 }
 
 .cx-tag--outline.cx-tag--tangerine {
-  --cx-tag-border: var(--tangerine);
+  border-color: var(--tangerine);
 }
 
 .cx-tag--red {
-  --cx-tag-background: var(--red-opacity);
-  --cx-tag-foreground: var(--red);
+  background: var(--red-opacity);
+  color: var(--red);
 }
 
 .cx-tag--outline.cx-tag--red {
-  --cx-tag-border: var(--red);
+  border-color: var(--red);
 }
 
 .cx-tag--pink {
-  --cx-tag-background: var(--pink-opacity);
-  --cx-tag-foreground: var(--pink);
+  background: var(--pink-opacity);
+  color: var(--pink);
 }
 
 .cx-tag--outline.cx-tag--pink {
-  --cx-tag-border: var(--pink);
+  border-color: var(--pink);
 }
 
 .cx-tag--purple {
-  --cx-tag-background: var(--purple-opacity);
-  --cx-tag-foreground: var(--purple);
+  background: var(--purple-opacity);
+  color: var(--purple);
 }
 
 .cx-tag--outline.cx-tag--purple {
-  --cx-tag-border: var(--purple);
+  border-color: var(--purple);
 }
 
 .cx-tag--violet {
-  --cx-tag-background: var(--violet-opacity);
-  --cx-tag-foreground: var(--violet);
+  background: var(--violet-opacity);
+  color: var(--violet);
 }
 
 .cx-tag--outline.cx-tag--violet {
-  --cx-tag-border: var(--violet);
+  border-color: var(--violet);
 }
 
 .cx-tag--outline {
-  --cx-tag-background: transparent;
-  --cx-tag-border: var(--opacity-mid);
+  border-color: var(--opacity-mid);
+  background: transparent;
 }

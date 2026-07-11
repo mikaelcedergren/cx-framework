@@ -9,7 +9,7 @@ The guiding rule: **components own the padding inside themselves; containers own
 | You want… | Use |
 | --- | --- |
 | things in a vertical column | `cx-stack` |
-| things in a horizontal row (wraps when tight) | `cx-inline` |
+| things in a horizontal row | `cx-inline` |
 | equal-width columns / a card grid | `cx-grid` |
 | two groups pushed to opposite ends (one fills, one hugs) | `cx-split` |
 | a little padding on your *own* wrapper element | `cx-p-*` utility classes |
@@ -45,13 +45,13 @@ Children stacked top to bottom with an even gap.
 <cx-stack gap="md">
   <cx-text-field label="Name" />
   <cx-text-field label="Email" />
-  <cx-button>Save</cx-button>
+  <cx-button text="Save" />
 </cx-stack>
 ```
 
 ### cx-inline — horizontal row
 
-Children side by side, wrapping to the next line when they run out of room.
+Children side by side. They stay on one line by default; set `wrap` to `true` when they should wrap as space tightens.
 
 | prop | type | default |
 | --- | --- | --- |
@@ -107,8 +107,8 @@ A start group that fills the space and an end group that hugs its content, pushe
 <cx-split>
   <h1 start>Vulnerabilities</h1>
   <cx-inline end gap="sm">
-    <cx-button>Filter</cx-button>
-    <cx-button>Export</cx-button>
+    <cx-button text="Filter" />
+    <cx-button text="Export" />
   </cx-inline>
 </cx-split>
 ```
@@ -121,7 +121,7 @@ One breakpoint: **mobile is below 720px**; desktop is 720px and up (the `--break
 - **Visibility** — `cx-hide-mobile` hides below 720, `cx-hide-desktop` hides at 720 and up. Put these on your own wrapper, not on a component.
 - **Page frame** — `.cx-page` tightens its padding and gap one step on mobile automatically.
 
-`align` and `justify` aren't responsive. When a row needs to become a column on mobile, restructure or use a grid with `columnsMobile="1"`, which covers most cases.
+`align` and `justify` aren't responsive. When a row needs to become a column on mobile, restructure or use a grid with `[columnsMobile]="1"`, which covers most cases.
 
 ## Utility classes
 
@@ -143,7 +143,7 @@ Utilities and primitives are for UI. For a stream of editorial content — an ar
 
 ## The page frame
 
-`.cx-page` is the outermost wrapper of a screen: a full-height column that owns the page's outer padding and the gap between its blocks.
+`.cx-page` is the outermost wrapper of a screen: a full-height column that owns the frame. `.cx-page__content` owns the page padding and the gap between content blocks.
 
 ```html
 <div class="cx-page">
@@ -162,7 +162,7 @@ Utilities and primitives are for UI. For a stream of editorial content — an ar
 | `cx-page__loading` | centred loading area |
 | `cx-page--bounded` | clip overflow to the viewport (for inner scroll regions) |
 
-Retune the frame per page with custom properties instead of overriding rules: `--cx-page-padding`, `--cx-page-gap`, and `--cx-page-measure` (set a max width to cap and centre content on wide screens; default `none`).
+The global `--gutter-page` token keeps page content and shared chrome aligned, while the frame exposes `--cx-page-gap` and `--cx-page-measure` for intentional page-level configuration. Authenticated product pages keep the default full-width measure and cap only an inner reading block. Use `--cx-page-measure` only for a surface whose page-level role is explicitly bounded, rather than as local polish.
 
 ## A composed screen
 
@@ -174,8 +174,8 @@ A header, a responsive metric grid, and a stack of cards — all spacing from th
     <cx-split>
       <h1 start>Portfolio</h1>
       <cx-inline end gap="sm">
-        <cx-button>Filter</cx-button>
-        <cx-button>Add holding</cx-button>
+        <cx-button text="Filter" />
+        <cx-button text="Add holding" />
       </cx-inline>
     </cx-split>
 

@@ -1,0 +1,115 @@
+<cx-button
+  #trigger
+  [text]="triggerText"
+  appendIcon="chevron-down"
+  [style.--cx-button-width]="triggerWidth ? triggerWidth + 'px' : null"
+  (click)="toggleOpen()"
+/>
+
+@if (isOpen$()) {
+  <cx-popover
+    #popover
+    [open]="true"
+    [showBackdrop]="true"
+    [heading]="heading"
+    [description]="description"
+    [width]="overlay.width$()"
+    [minWidth]="overlay.minWidth$()"
+    [maxWidth]="maxWidth"
+    [maxHeight]="overlay.maxHeight$()"
+    [left]="overlay.left$()"
+    [top]="overlay.top$()"
+    [bottom]="overlay.bottom$()"
+    [placement]="overlay.placement$()"
+    [surfaceVariant]="scenario === 'workspace-menu' ? 'grouped' : 'default'"
+    [role]="scenario === 'workspace-menu' ? 'menu' : undefined"
+    [ariaLabel]="scenario === 'workspace-menu' ? 'Workspace menu' : undefined"
+    (backdropPressed)="close()"
+  >
+    @if (scenario === 'workspace-menu') {
+      <div class="cx-popover-demo__groups">
+        <div class="cx-popover-demo__group">
+          <cx-option label="Daily digest" [clickable]="false" (pointerenter)="closeSubmenu()">
+            <cx-switch
+              control
+              ariaLabel="Daily digest"
+              size="small"
+              [selected]="digestEnabled$()"
+              (selectedChange)="digestEnabled$.set($event)"
+            />
+          </cx-option>
+        </div>
+
+        <div class="cx-popover-demo__group">
+          <cx-option
+            [role]="'menuitem'"
+            label="Theme"
+            [submenu]="submenuState('theme')"
+            (pointerenter)="openSubmenu('theme', $any($event.currentTarget))"
+            (focusin)="openSubmenu('theme', $any($event.currentTarget))"
+            (click)="openSubmenuFromClick('theme', $any($event.currentTarget), $event)"
+            (keydown)="openSubmenuFromKeyboard('theme', $any($event.currentTarget), $event)"
+          />
+        </div>
+
+        <div class="cx-popover-demo__group">
+          <cx-option [role]="'menuitem'" label="Open" prependIcon="open-new" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option [role]="'menuitem'" label="Members" prependIcon="users" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option [role]="'menuitem'" label="Invite people" prependIcon="plus" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option [role]="'menuitem'" label="Copy link" prependIcon="copy" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option [role]="'menuitem'" label="Settings" prependIcon="settings" (pointerenter)="closeSubmenu()" (click)="close()" />
+        </div>
+
+        <div class="cx-popover-demo__group">
+          <cx-option-group label="Internal" />
+          <cx-option [role]="'menuitem'" label="Archive" prependIcon="archive" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option [role]="'menuitem'" label="Delete" prependIcon="delete" mood="danger" (pointerenter)="closeSubmenu()" (click)="close()" />
+        </div>
+      </div>
+    } @else {
+      @if (text) {
+        <p class="cx-popover-demo__text">{{ text }}</p>
+      }
+
+      @for (option of options; track option.id) {
+        <cx-option
+          [label]="option.label"
+          [description]="option.description"
+          [prependIcon]="option.prependIcon"
+          [showCheckbox]="showCheckboxes"
+          [selected]="isSelected(option.id)"
+          (click)="onOptionClick(option)"
+        />
+      }
+    }
+  </cx-popover>
+}
+
+@if (activeSubmenu$(); as submenu) {
+  <cx-popover
+    [open]="true"
+    [showBackdrop]="false"
+    [surfaceId]="submenuSurfaceId(submenu.id)"
+    [role]="'menu'"
+    [ariaLabel]="submenuAriaLabel(submenu.id)"
+    [width]="submenuWidth"
+    [maxHeight]="submenu.maxHeight"
+    [left]="submenu.left"
+    [top]="submenu.top"
+    surfaceVariant="grouped"
+  >
+    <div class="cx-popover-demo__groups">
+      <div class="cx-popover-demo__group">
+        @for (item of submenuItems(submenu.id); track item.id) {
+          <cx-option
+            [role]="'menuitemradio'"
+            [label]="item.label"
+            [prependIcon]="item.prependIcon"
+            [selected]="isSubmenuItemSelected(submenu.id, item.id)"
+            (click)="selectSubmenuItem(submenu.id, item.id)"
+          />
+        }
+      </div>
+    </div>
+  </cx-popover>
+}

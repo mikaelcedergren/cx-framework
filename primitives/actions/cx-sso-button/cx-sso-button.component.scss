@@ -13,7 +13,7 @@
   overflow: hidden;
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-mid);
+  background: var(--surface);
   color: var(--ink);
   cursor: pointer;
   font: inherit;
@@ -117,6 +117,7 @@
   border: var(--line);
   border-block-start-color: transparent;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   animation: cx-sso-button-spin calc(var(--motion-slow) * 4) linear infinite;
   pointer-events: none;
 }

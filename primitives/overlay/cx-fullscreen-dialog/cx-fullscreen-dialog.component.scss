@@ -13,6 +13,7 @@
   background: var(--overlay-backdrop);
   backdrop-filter: blur(2px);
   box-sizing: border-box;
+  outline: none;
 }
 
 .cx-fullscreen-dialog {
@@ -23,18 +24,66 @@
   min-height: 0;
   grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-dialog);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  background: var(--surface);
+  box-shadow: var(--shadow-high);
   color: var(--ink);
-  animation: cx-fullscreen-dialog-enter calc(var(--motion-slow) * 2) cubic-bezier(0.22, 1, 0.36, 1);
+  animation: cx-fullscreen-dialog-enter calc(var(--motion-slow) * 2) var(--ease-out-strong) both;
+}
+
+.cx-fullscreen-dialog__overlay--closing .cx-fullscreen-dialog {
+  animation: cx-fullscreen-dialog-exit calc(var(--motion-slow) * 2) var(--ease-out) both;
 }
 
 .cx-fullscreen-dialog__close {
   position: absolute;
-  top: var(--space-md);
-  right: var(--space-md);
-  z-index: 1;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: calc(var(--z-index-dialog) + 1);
+  display: inline-flex;
+  width: var(--controller-size);
+  height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  corner-shape: round;
+  background: transparent;
+  color: var(--on-ink);
+  cursor: pointer;
+  margin: 0;
+  opacity: 0;
+  outline: none;
+  pointer-events: none;
+  transform: scale(0.72);
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity 80ms var(--ease-out),
+    transform var(--motion-fast) cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.cx-fullscreen-dialog__close--ready {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.cx-fullscreen-dialog__close:hover {
+  background: var(--emphasis);
+  color: var(--ink);
+}
+
+.cx-fullscreen-dialog__close:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-fullscreen-dialog__close:active {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+  transform: scale(0.98);
 }
 
 .cx-fullscreen-dialog__content {
@@ -53,8 +102,23 @@
   }
 }
 
+@keyframes cx-fullscreen-dialog-exit {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cx-fullscreen-dialog {
+  .cx-fullscreen-dialog,
+  .cx-fullscreen-dialog__overlay--closing .cx-fullscreen-dialog {
     animation: none;
+  }
+
+  .cx-fullscreen-dialog__close {
+    transition: none;
   }
 }

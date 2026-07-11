@@ -1,259 +1,82 @@
 # Design philosophy for AI
 
-This document is a portable design and UX philosophy for AI agents that need to make product, interface, copy, and component decisions.
+Use this document when a task requires judgment rather than a direct rule lookup. It explains the product instincts behind the portable rules without repeating them.
 
-Use this before the rule lists when judgment matters. The rules say what to do. This document explains how to think.
+## Mental fit before mechanical logic
 
-## Core belief
+People experience software through perception, expectation, hesitation, confidence, and trust. They do not experience its database, route tree, or internal ownership model.
 
-Design exists to make a system feel natural to humans.
+Preserve the user's mental model over the implementation model. A technically neat structure is still wrong when it makes the user stop and decode the product. If a flow feels mentally awkward, redesign the flow instead of explaining the machinery.
 
-A computer system can be logically correct and still feel wrong. People do not experience software as a database, a routing tree, or an implementation model. They experience it through perception, expectation, emotion, hesitation, confidence, and trust. The right design is the one that carries enough of the system's complexity that the user can move naturally.
+## Discipline protects attention
 
-If a path feels natural, it is usually the right path even when it is less mechanically logical. If a path is logically neat but makes the user stop, decode, or feel stupid, it is wrong for the interface.
+A design system deliberately settles recurring decisions: spacing, token roles, component shape, interaction behavior, state treatment, and language patterns. That discipline saves judgment for the few decisions that genuinely depend on context and perception.
 
-The user's mental model wins over internal structure.
+Use the system as the starting point, not as inspiration. A feature should compose existing tokens, components, and patterns. When a repeatable need is missing, strengthen the shared owner within the approved scope so later features inherit the improvement.
 
-## UX is applied human judgment
+## Components are sealed pieces
 
-UX is not guessing, decoration, or endless user testing. It is expert judgment grounded in psychology, perception, human behavior, context, and real-world use.
+A component owns its template, presentation, internal spacing, states, and behavior. Containers own placement, width, surrounding gap, and page composition.
 
-Testing sharpens the work, but it is not the work. A chef does not need a focus group to know that salt sharpens flavor or that acid cuts richness. A designer should know the same kind of fundamentals: people scan before they read, prefer familiar patterns, avoid uncertainty, fear losing work, miss what is hidden, and trust consistency.
+Do not reach into a component from a consumer with deep selectors, inline visual patches, specificity battles, or wrapper tricks. If the clean fix belongs to another owner outside the task's scope, surface that boundary instead of hiding the problem locally.
 
-Treat confusion as evidence. If someone with product context finds a flow confusing, a customer will be confused faster and with less patience.
-
-The product should never ask the user to prove they are smart enough to decode it.
-
-## Discipline is freeing
-
-A design system can look restrictive from the outside because it removes many choices: spacing, color roles, component shape, button hierarchy, field behavior, and copy patterns. That is the point.
-
-Those choices were going to be made anyway. If the system makes them, designers and developers keep their attention for the decisions that actually need craft.
-
-The system handles the seventy small decisions so the human can make the one or two perceptual calls that matter:
-
-- whether spacing feels too tight even when it is technically on scale
-- whether wording scans but still feels wrong
-- whether a flow is logical but emotionally awkward
-- whether visual weight pulls attention away from the real task
-
-Discipline is not the enemy of creativity. It protects creative attention from being spent on decisions that should already be settled.
-
-## Build with pieces
-
-A product is built from pieces: tokens, components, patterns, and flows.
-
-Screens are not drawn from scratch. They are composed from the system. A button is not one button; it is a component with states, sizes, moods, loading behavior, disabled behavior, and copy rules. A card is not one card; it is a shape for a particular kind of content. A form field is not local chrome; it is the same field behavior reused wherever a field appears.
-
-When a component needs a new ability, extend the component. Do not bend one screen around it.
-
-The loop is:
-
-1. Use what the system already has.
-2. If the system lacks the right answer, extend the system.
-3. Use the new system capability in the feature.
-4. Let the next feature inherit the improvement.
-
-Every feature should leave the system a little stronger.
-
-## Components are sealed
-
-A component owns its template, styling, states, and internal rules. Consumers should not reach inside it with inline styles, parent overrides, global patches, specificity fights, or wrapper hacks.
-
-If a component does not fit the real use case, reshape the component itself. Add a prop, variant, slot, state, or token that belongs to its public API.
-
-Components own internal padding and chrome. Containers own gaps, margin, width, and layout. A component should not push its neighbors around with margin, because the right outside spacing depends on where it is used.
-
-Sealed components compose into patterns. Patterns compose into products. If components leak, the whole system becomes a pile of exceptions that designers, developers, AI, and users can no longer trust.
+Opinionated components are useful. Their public API should express meaningful product variation, not every technically possible styling knob. Defaults should represent normal use, not a maximal demonstration.
 
 ## Tokens carry meaning
 
-Do not choose tokens by appearance. Choose them by role.
+Choose tokens by role, not appearance. `primary` describes the main forward action; `danger` describes destructive or risky intent; surfaces describe planes; opacity describes hierarchy. A theme decides how those roles look.
 
-Use `primary` because the action is primary, not because a particular blue or violet looks nice. Use `danger` because the action is destructive or risky, not because red is attractive. Use `surface-mid`, `surface-low`, and `surface-high` because they describe a surface's position, not because of their current color values.
+Raw hue is appropriate only when hue itself is data or a user choice, such as a chart series, swatch, or chosen tag color. Meaning still needs another perceptual channel.
 
-The token holds the meaning. The theme decides what that meaning looks like.
+## Calm requires visible affordance
 
-This is what lets a product pivot: dark mode, high contrast, a brand refresh, a white-label version, or a visual retune should happen through tokens, not by rewriting every screen.
+Low-noise UI is not hidden UI. Remove chrome that does not clarify structure, action, state, or priority, but keep interactive elements visibly reachable. Current location, selected state, keyboard focus, destructive intent, and recovery paths must never become guesses.
 
-Use raw palette colors only when the hue itself is user-facing meaning, such as chart series, user-chosen tag colors, swatches, or explicit severity systems.
+Dense information can remain dense. The goal is to reduce interface chrome around it. Use alignment, spacing, typography, and semantic weight before adding another box, border, fill, icon, or label.
 
-## Color is signal first
+## One unit gets one boundary
 
-Color carries information before text is read. Red suggests danger or stop. Yellow suggests caution. Green suggests safety or success. The interface should treat color as meaning, not decoration.
+Visual hierarchy weakens when every unit receives a border, tint, radius, shadow, and nested container. Start with the lightest signal that makes a unit legible. Floating elements may combine a surface with shadow because elevation is their meaning; grounded content usually should not.
 
-But color alone is never enough. Not everyone sees color the same way, and even users with full color perception may be tired, rushed, in glare, or scanning quickly. Pair color with labels, icons, shape, position, or weight.
+## Consistency is learned behavior
 
-Surface area changes impact. A small colored mark reads as detail. A large colored area changes the whole mood of the page. Use large color fields carefully.
+Every repeated interaction teaches the user what labels mean, where actions live, what color signals, and how a control behaves. Similar things must remain similar enough that this learning transfers.
 
-Opacity does much of the quiet hierarchy work:
+Consistency is not sameness without context. Preserve the same concept and behavior; allow the surrounding layout to adapt to the task.
 
-- high opacity for readable supporting text
-- mid opacity for borders and structure
-- low opacity for soft backgrounds and quiet states
-- ink for active, important, or selected content
+## Feedback protects trust
 
-## Surfaces are paper
+The user acts and the product responds. Visible, local feedback reduces more uncertainty than a silent speed improvement. Match the signal to what the system truly knows: activity for unknown progress, determinate progress for measured work, and clear words for failure or recovery.
 
-Think of the interface as paper.
+Never manufacture progress, certainty, capability, or outcome to make the interface feel better. Trust depends on truthful state.
 
-`surface-mid` is the default page. Most content lives there.
+## Safety follows consequence
 
-`surface-low` recedes. Use it for quieter, slightly sunken regions.
+Reversible actions can be easy. Destructive, costly, or irreversible actions need clearer consequence and more deliberate intent. Preserve entered work after failure, warn before losing unsaved changes, and provide undo when the product can support it.
 
-`surface-high` rises. Use it rarely for zones that need to feel more present, such as navigation or prominent panels.
-
-Do not stack surfaces to fake depth. Use opacity for hierarchy on the same surface, borders to define units, and shadow only for floating elements such as dialogs, popovers, dropdowns, and tooltips.
-
-Surface names describe perceived position, not literal lightness. The theme supplies the color.
-
-## Consistency protects trust
-
-Every interface teaches rules:
-
-- where actions live
-- what red means
-- how buttons behave
-- how menus group actions
-- what words mean
-- what shape implies interactivity
-
-Users learn these rules without noticing. When the product follows them, the user stays in flow. When it breaks them, the user pauses and starts decoding.
-
-Similar things should look and behave similarly. The same action should use the same label, position, component, color, and behavior across the product. If something is called "workspace" in one place, do not call it "project" elsewhere unless it is genuinely different.
-
-Consistency is not aesthetic tidiness. It is a trust mechanism and a maintenance mechanism. It helps users learn the product and helps teams change the product from one place.
-
-## Familiar patterns carry hidden meaning
-
-Users arrive with years of pattern knowledge. Do not break that vocabulary.
-
-- Checkboxes mean multi-select.
-- Radio buttons mean one option from a short list.
-- Dropdowns mean choosing from a longer set.
-- Underlined text means link.
-- Hover states imply interactivity.
-- Disabled-looking controls imply unavailable action.
-- Red destructive actions imply risk.
-
-Borrow existing patterns whenever they fit. Invent only when no familiar pattern can express the job.
-
-Breaking familiar meaning creates confusion even if the local design seems clever.
-
-## Show less so the right thing can be seen
-
-Showing more does not automatically give the user more value. More options, more metadata, more chrome, and more visible controls can make the important thing harder to find.
-
-Start with the lightest structure that still communicates the content. Add affordance only when perception requires it.
-
-Dense data does not require dense interface chrome. Let alignment, typography, opacity, and grouping do the work before adding borders, fills, tags, icons, and tooltips.
-
-Ask what can be removed without reducing understanding.
-
-## One unit gets one box
-
-When something must feel like its own unit, use one signal:
-
-- a border
-- a subtle background
-- a shadow
-- a spacing boundary
-- a clear typographic grouping
-
-Do not stack all of them. Nested boxes, tinted cards inside cards, borders plus fills plus shadows, and heavy radius all compete for hierarchy.
-
-Floating elements are the exception. Dialogs, popovers, dropdowns, and tooltips may use both border and shadow because the combined cue means "this is above the page."
-
-Default radius should stay small, around 4px. Large radius is a semantic signal for softness, pills, avatars, or chip-like elements.
-
-## Spacing creates rhythm
-
-Use a 4px base. It keeps edges crisp, alignment predictable, and spacing coherent.
-
-Useful defaults:
-
-- 8px for close relationships such as labels, metadata, short text, and small inline groups
-- 16px for separate groups, fields, sections, and elements with visual weight
-- larger spacing only for real page pauses or major shifts
-
-Typography is the exception. Type is fitted by perception, not forced onto the grid.
+The product should absorb accidental human behavior rather than punish it.
 
 ## Accessibility is perception
 
-Accessibility is not a separate checklist. It is the same design done for the full range of humans.
+Accessibility is the same design under real human variation: keyboard use, poor lighting, reduced vision, distraction, fatigue, motor constraints, color-vision differences, and motion sensitivity.
 
-Poor contrast, tiny text, flashing animation, color-only meaning, missing focus states, and mouse-only flows fail more than a small accessibility category. They fail tired users, rushed users, older users, distracted users, keyboard users, power users, colorblind users, and users in bad lighting.
+Encode meaning through more than one channel. Keep interaction keyboard reachable, focus perceivable, contrast durable, and motion purposeful. Design these qualities into the component contract rather than adding them as release polish.
 
-Encode meaning through more than one channel. Make interactive elements keyboard reachable. Use visible focus. Keep contrast strong enough for real-world screens.
+## Voice follows the surface
 
-Design for messy human perception from the start.
+Operational surfaces need concise, specific language. Learning surfaces may be warmer. Warmth means plain, kind, and useful; it does not mean cute, apologetic, or vague.
 
-## Feedback removes uncertainty
+Words must preserve product truth. When behavior, consequence, or terminology is unknown, resolve the product question before writing around it.
 
-The user acts. The product responds.
+## Finished-product judgment
 
-That is the most basic interface contract. A click with no visible response feels broken even when the system is working. Silence makes one second feel like ten.
+Before handoff, ask:
 
-Respond near the user's attention:
+- Does the structure match how the user thinks?
+- Is the primary task obvious without decoding?
+- Is every reachable state understandable and recoverable?
+- Is the system being used or strengthened at the owning layer?
+- Can anything be removed without reducing understanding?
+- Are the claims, progress, consequences, and words truthful?
 
-- button state for a clicked button
-- inline progress for local work
-- skeletons for loading content
-- a progress bar for measurable processes
-- a clear message for failure
-- a short confirmation for meaningful success
-
-Speed matters less than certainty. Users wait better when they know what is happening.
-
-## Trust is fragile
-
-Trust is invisible until broken.
-
-Protect it by making the product predictable, reversible where possible, and honest about consequences.
-
-Destructive or irreversible actions need friction. Reversible actions should be easy. The dangerous path should require more attention than the safe path.
-
-Warn before losing work. Preserve user input after errors. Let users inspect, adjust, undo, or understand automated choices. Never make leaving harder than joining, and never shame the user into staying.
-
-The user should never be surprised by their own product.
-
-## Voice depends on surface
-
-The product does not have one voice. It has the right voice for the job.
-
-Operational surfaces should be concise and professional:
-
-- labels
-- errors
-- buttons
-- status
-- table values
-- field help
-
-Learning surfaces can be warmer:
-
-- onboarding
-- first-time empty states
-- guidance panels
-- setup explanations
-
-Warm does not mean cute, fluffy, apologetic, or jokey. It means plain, kind, and useful.
-
-When unsure, use concise.
-
-## The AI should behave like a system-minded designer
-
-When generating or reviewing UI, AI should:
-
-- preserve the user's mental model over the implementation model
-- start with the existing system before inventing new UI
-- extend shared components instead of patching local screens
-- choose tokens by meaning
-- keep visible affordance clear but low-noise
-- use familiar interaction patterns conventionally
-- make feedback immediate and local
-- prevent accidental actions
-- write copy that tells the user what to do
-- treat narrative principles as binding taste, not optional inspiration
-
-If the output is technically correct but mentally awkward, it is not done.
+If the output is technically correct but mentally awkward, it is not finished.

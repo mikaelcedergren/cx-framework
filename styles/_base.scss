@@ -8,6 +8,7 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  corner-shape: var(--corner-shape, round);
 }
 
 html,
@@ -16,12 +17,12 @@ body {
 }
 
 html {
-  background: var(--surface-mid);
+  background: var(--surface);
 }
 
 body {
   margin: 0;
-  background: var(--surface-mid);
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--font-family-base);
   font-size: var(--font-size-body);
@@ -46,10 +47,9 @@ a:active {
   color: var(--link);
 }
 
-a:focus-visible,
-button:focus-visible {
+:focus-visible {
   outline: var(--outline-tab);
-  outline-offset: 2px;
+  outline-offset: var(--outline-tab-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {

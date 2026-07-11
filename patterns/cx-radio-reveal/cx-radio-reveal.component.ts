@@ -6,7 +6,6 @@ export type CxRadioRevealOption = {
   id: string;
   label: string;
   hint?: string;
-  revealPlaceholder?: string;
   revealHint?: string;
 };
 
@@ -14,7 +13,6 @@ type CxResolvedRadioRevealOption = {
   id: string;
   label: string;
   hint?: string;
-  revealPlaceholder?: string;
   revealHint?: string;
 };
 
@@ -46,7 +44,6 @@ export class CxRadioRevealComponent {
         id,
         label,
         hint: option.hint?.trim() || undefined,
-        revealPlaceholder: option.revealPlaceholder?.trim() || undefined,
         revealHint: option.revealHint?.trim() || undefined,
       });
     }
@@ -75,7 +72,7 @@ export class CxRadioRevealComponent {
     if (!selectedId) {
       return undefined;
     }
-    return this.optionsState().find(option => option.id === selectedId && (!!option.revealPlaceholder || !!option.revealHint));
+    return this.optionsState().find(option => option.id === selectedId && !!option.revealHint);
   });
   protected readonly hasLabel$ = computed(() => this.label.trim().length > 0);
 

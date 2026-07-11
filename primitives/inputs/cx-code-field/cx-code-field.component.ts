@@ -81,12 +81,14 @@ export class CxCodeFieldComponent implements OnDestroy {
 
   @Input()
   public set value(value: string | null | undefined) {
-    this.inputRunComplete = false;
     const nextValue = this.filterValue(value ?? '').slice(0, CODE_FIELD_LENGTH);
+    // A parent echoing our own emission back is not an external change; it
+    // must not reset interaction state like inputRunComplete mid-typing.
     if (this.lastEmittedValue === nextValue) {
       this.lastEmittedValue = undefined;
       return;
     }
+    this.inputRunComplete = false;
     this.setCellsFromExternalValue(nextValue);
   }
 

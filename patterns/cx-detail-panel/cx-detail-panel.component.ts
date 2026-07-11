@@ -15,6 +15,7 @@ import { type CxIconName } from '../../icons/manifest';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxMenuComponent, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { isHostVisible } from '../../primitives/shared/host-visibility';
 
 const DETAIL_PANEL_DISMISS_DURATION_MS = 240;
 
@@ -36,7 +37,7 @@ export class CxDetailPanelComponent implements OnDestroy {
   @Input() heading = '';
   @Input() dismissible = true;
   @Input() variant: CxDetailPanelVariant = 'floating';
-  @Input() hasScrollbar = true;
+  @Input() scrollable = true;
   @Input() menuItems: CxMenuItem[] = [];
   @Input() menuAriaLabel = 'Open detail panel menu';
   /** Render in-page (position: absolute, fills the nearest positioned ancestor)
@@ -91,7 +92,7 @@ export class CxDetailPanelComponent implements OnDestroy {
     if (!this.dismissible || this.closing$() || !(event instanceof KeyboardEvent)) {
       return;
     }
-    if (this.isDismissGuarded()) {
+    if (!isHostVisible(this.host.nativeElement) || this.isDismissGuarded()) {
       return;
     }
     event.preventDefault();
@@ -106,6 +107,7 @@ export class CxDetailPanelComponent implements OnDestroy {
     }
     const target = event.target as HTMLElement | null;
     if (!target) return;
+    if (!isHostVisible(this.host.nativeElement)) return;
     if (this.host.nativeElement.contains(target)) return;
     // Don't close when the click lands on an overlay surface (menu, popover,
     // date-picker) that visually belongs to the panel but renders elsewhere.

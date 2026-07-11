@@ -69,7 +69,7 @@
 .cx-budget-fill {
   height: 100%;
   border-radius: var(--radius-xs);
-  transition: width var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-budget-fill-connected {
@@ -118,7 +118,7 @@
     var(--danger-opacity) 2px,
     var(--danger-opacity) 4px
   );
-  transition: width var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-budget--detailed .cx-budget-overage {
@@ -187,6 +187,7 @@
 
 .cx-budget-label--maximum {
   flex: 1 1 auto;
+  font-weight: var(--font-weight-regular);
   text-align: right;
 }
 

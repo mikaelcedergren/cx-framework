@@ -40,9 +40,9 @@
 
 .cx-split-button--accent {
   --cx-split-button-background: var(--accent);
-  --cx-split-button-color: var(--surface-mid);
+  --cx-split-button-color: var(--surface);
   --cx-split-button-hover-background: var(--accent-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--surface-mid) 24%, transparent);
+  --cx-split-button-divider: color-mix(in srgb, var(--surface) 24%, transparent);
 }
 
 .cx-split-button--info {
@@ -120,6 +120,7 @@
 
 .cx-split-button--rounded {
   border-radius: var(--radius-pill);
+  corner-shape: round;
 }
 
 .cx-split-button--disabled {

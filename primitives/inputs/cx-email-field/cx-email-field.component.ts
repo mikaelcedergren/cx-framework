@@ -36,6 +36,8 @@ export class CxEmailFieldComponent {
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLInputElement>;
 
+  @Input() label = 'Email';
+  @Input() ariaLabel: string | undefined;
   @Input() optional = false;
   @Input() disabled = false;
   @Input() size: CxFieldSize = 'default';
@@ -70,6 +72,22 @@ export class CxEmailFieldComponent {
 
   protected get resolvedAriaDescribedBy(): string | undefined {
     return this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined;
+  }
+
+  protected get resolvedAriaLabel(): string | undefined {
+    const ariaLabel = this.ariaLabel?.trim();
+    if (ariaLabel) {
+      return ariaLabel;
+    }
+    const label = this.label.trim();
+    return label || undefined;
+  }
+
+  protected get resolvedAriaLabelledBy(): string | undefined {
+    if (this.ariaLabel?.trim()) {
+      return undefined;
+    }
+    return this.label.trim() ? this.labelId : undefined;
   }
 
   public focus(): void {

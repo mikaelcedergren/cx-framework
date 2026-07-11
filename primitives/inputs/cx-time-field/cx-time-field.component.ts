@@ -12,6 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
+import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
   type CxFieldSize,
@@ -25,13 +26,13 @@ import {
 type CxTimeSegment = 'hour' | 'minute';
 type CxTimeMeridiem = 'AM' | 'PM';
 
-export type CxTimeInputMode = 'default' | '12h';
-export type CxTimeInputFormat = '24';
-export type CxTimeInputSize = CxFieldSize;
+export type CxTimeFieldMode = 'default' | '12h';
+export type CxTimeFieldFormat = '24';
+export type CxTimeFieldSize = CxFieldSize;
 
-export interface CxTimeInputModel {
+export interface CxTimeFieldModel {
   value?: string;
-  mode?: CxTimeInputMode;
+  mode?: CxTimeFieldMode;
   minuteStep?: number;
   min?: string;
   max?: string;
@@ -45,7 +46,7 @@ interface CxParsedTimeValue {
 
 export function parseCxTimeValue(
   value: string | undefined | null,
-  preferredFormat: CxTimeInputFormat = '24',
+  preferredFormat: CxTimeFieldFormat = '24',
 ): CxParsedTimeValue | null {
   const normalizedValue = value?.trim() ?? '';
   if (!normalizedValue) {
@@ -81,24 +82,32 @@ export function parseCxTimeValue(
     return null;
   }
 
-  let hours24 = clamp(rawHour, 0, 23);
+  if (rawMinute < 0 || rawMinute > 59) {
+    return null;
+  }
+
+  let hours24 = rawHour;
   if (meridiem) {
-    const hour12 = clamp(rawHour, 1, 12);
-    hours24 = meridiem === 'AM' ? hour12 % 12 : (hour12 % 12) + 12;
+    if (rawHour < 1 || rawHour > 12) {
+      return null;
+    }
+    hours24 = meridiem === 'AM' ? rawHour % 12 : (rawHour % 12) + 12;
+  } else if (rawHour < 0 || rawHour > 23) {
+    return null;
   }
 
   void preferredFormat;
 
   return {
     hours24,
-    minutes: clamp(rawMinute, 0, 59),
+    minutes: rawMinute,
   };
 }
 
 export function formatCxTimeValue(
   hours24: number,
   minutes: number,
-  format: CxTimeInputFormat = '24',
+  format: CxTimeFieldFormat = '24',
 ): string {
   const normalizedHours24 = clamp(hours24, 0, 23);
   const normalizedMinutes = clamp(minutes, 0, 59);
@@ -108,17 +117,17 @@ export function formatCxTimeValue(
 }
 
 @Component({
-  selector: 'cx-time-input',
-  imports: [CxIconComponent, CxValidationMessageComponent],
-  templateUrl: './cx-time-input.component.html',
-  styleUrl: './cx-time-input.component.scss',
+  selector: 'cx-time-field',
+  imports: [CxIconComponent, CxSpinnerComponent, CxValidationMessageComponent],
+  templateUrl: './cx-time-field.component.html',
+  styleUrl: './cx-time-field.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxTimeInputComponent {
+export class CxTimeFieldComponent {
   private static nextId = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly modeState = signal<CxTimeInputMode>('default');
-  private readonly sizeState = signal<CxTimeInputSize>('default');
+  private readonly modeState = signal<CxTimeFieldMode>('default');
+  private readonly sizeState = signal<CxTimeFieldSize>('default');
   private readonly hours24State = signal(0);
   private readonly minutesState = signal(0);
   private readonly hourTextState = signal('');
@@ -129,8 +138,12 @@ export class CxTimeInputComponent {
   private readonly maxState = signal<string | undefined>(undefined);
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly focusedState = signal(false);
-  protected readonly labelId = `cx-time-input-label-${CxTimeInputComponent.nextId}`;
-  protected readonly messagesId = `cx-time-input-messages-${CxTimeInputComponent.nextId++}`;
+  private readonly committedValueState = signal<CxParsedTimeValue | null>(null);
+  private readonly dirtyDraftState = signal(false);
+  private lastEmittedValue: string | undefined;
+  private refocusPending = false;
+  protected readonly labelId = `cx-time-field-label-${CxTimeFieldComponent.nextId}`;
+  protected readonly messagesId = `cx-time-field-messages-${CxTimeFieldComponent.nextId++}`;
 
   @ViewChild('hourField', { read: ElementRef })
   private readonly hourFieldRef?: ElementRef<HTMLInputElement>;
@@ -150,37 +163,47 @@ export class CxTimeInputComponent {
   @Input() hint: string | undefined;
 
   @Input()
-  public set time(value: CxTimeInputModel | null | undefined) {
-    if (!value) {
+  public set mode(value: CxTimeFieldMode | undefined) {
+    const mode = value === '12h' ? '12h' : 'default';
+    if (mode === this.modeState()) {
       return;
     }
-
-    this.mode = value.mode;
-    this.minuteStep = value.minuteStep;
-    this.min = value.min;
-    this.max = value.max;
-    if (value.disabled !== undefined) {
-      this.disabled = value.disabled;
-    }
-    this.value = value.value;
-  }
-
-  @Input()
-  public set mode(value: CxTimeInputMode | undefined) {
-    const mode = value === '12h' ? '12h' : 'default';
     this.modeState.set(mode);
-    this.syncDraftFromCanonical();
+    if (this.committedValueState() && !this.dirtyDraftState()) {
+      this.syncDraftFromCanonical(true);
+    }
   }
 
   @Input()
-  public set size(value: CxTimeInputSize | undefined) {
+  public set size(value: CxTimeFieldSize | undefined) {
     this.sizeState.set(value === 'small' || value === 'large' ? value : 'default');
   }
 
   @Input()
   public set minuteStep(value: number | undefined) {
     const numeric = Number(value);
-    this.minuteStepState.set(Number.isFinite(numeric) ? Math.max(1, Math.floor(numeric)) : 1);
+    const nextStep = Number.isFinite(numeric) ? clamp(Math.floor(numeric), 1, 59) : 1;
+    if (nextStep === this.minuteStepState()) {
+      return;
+    }
+
+    this.minuteStepState.set(nextStep);
+    const committedValue = this.committedValueState();
+    if (!committedValue || this.dirtyDraftState()) {
+      return;
+    }
+
+    const nextMinutes = snapToMinuteStep(committedValue.minutes, nextStep);
+    if (nextMinutes === committedValue.minutes) {
+      return;
+    }
+
+    const nextValue = { ...committedValue, minutes: nextMinutes };
+    this.committedValueState.set(nextValue);
+    this.hours24State.set(nextValue.hours24);
+    this.minutesState.set(nextValue.minutes);
+    this.syncDraftFromCanonical(true);
+    queueMicrotask(() => this.emitCommittedValue());
   }
 
   @Input()
@@ -194,9 +217,8 @@ export class CxTimeInputComponent {
   }
 
   @Input()
-  public set format(value: CxTimeInputFormat | undefined) {
+  public set format(value: CxTimeFieldFormat | undefined) {
     void value;
-    this.mode = 'default';
   }
 
   @Input()
@@ -209,14 +231,16 @@ export class CxTimeInputComponent {
     const parsedValue = parseCxTimeValue(value);
     if (!parsedValue) {
       this.clearDraft();
+      this.lastEmittedValue = undefined;
       return;
     }
 
     this.setCanonicalValue(parsedValue);
+    this.lastEmittedValue = this.formattedCommittedValue();
   }
 
   @Output() readonly valueChange = new EventEmitter<string | undefined>();
-  @Output() readonly timeChange = new EventEmitter<CxTimeInputModel>();
+  @Output() readonly timeChange = new EventEmitter<CxTimeFieldModel>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly clear = new EventEmitter<void>();
 
@@ -244,15 +268,24 @@ export class CxTimeInputComponent {
     }
 
     const explicitValidation = normalizeCxValidation(this.validationState());
-    if (explicitValidation.length > 0) {
-      return explicitValidation;
+    const explicitError = explicitValidation.find(message => message.type === 'error');
+    if (explicitError) {
+      return [explicitError];
     }
 
     const messages: CxValidationMessage[] = [];
-    if (this.outOfRange$()) {
-      messages.push({ type: 'error', message: 'Time must be within the allowed range.' });
+    const invalidDraftMessage = this.invalidDraftMessage();
+    if (invalidDraftMessage) {
+      messages.push({ type: 'error', message: invalidDraftMessage });
     }
-    return normalizeCxValidationMessages(messages).slice(0, 1);
+    if (this.outOfRange$()) {
+      messages.push({ type: 'error', message: this.rangeValidationMessage() });
+    }
+    const builtInMessages = normalizeCxValidationMessages(messages).slice(0, 1);
+    if (builtInMessages.length > 0) {
+      return builtInMessages;
+    }
+    return explicitValidation;
   };
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
@@ -289,21 +322,27 @@ export class CxTimeInputComponent {
 
   @HostListener('focusin')
   protected onFocusIn(): void {
-    if (!this.isLocked$()) {
-      this.focusedState.set(true);
-      this.focusChange.emit(true);
+    if (this.isLocked$() || this.focusedState()) {
+      return;
     }
+    this.focusedState.set(true);
+    this.focusChange.emit(true);
   }
 
   @HostListener('focusout', ['$event'])
   protected onFocusOut(event: FocusEvent): void {
+    if (this.refocusPending) {
+      return;
+    }
     const nextTarget = event.relatedTarget;
     if (nextTarget instanceof Node && this.host.nativeElement.contains(nextTarget)) {
       return;
     }
 
-    this.commitSegment('hour');
-    this.commitSegment('minute');
+    this.commitDraftOnExit();
+    if (!this.focusedState()) {
+      return;
+    }
     this.focusedState.set(false);
     this.focusChange.emit(false);
   }
@@ -327,6 +366,45 @@ export class CxTimeInputComponent {
     this.selectSegmentText(segment);
   }
 
+  protected onSegmentPointerUp(segment: CxTimeSegment, event: PointerEvent): void {
+    if (this.isLocked$()) {
+      return;
+    }
+    event.preventDefault();
+    this.selectSegmentText(segment);
+  }
+
+  protected onSegmentInput(segment: CxTimeSegment, event: Event): void {
+    if (this.isLocked$()) {
+      return;
+    }
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    const digits = target.value.replace(/\D/g, '').slice(0, 2);
+    this.setSegmentText(segment, digits);
+    this.dirtyDraftState.set(true);
+    if (digits.length === 1 && shouldAutoPadSingleDigit(segment, digits, this.modeState())) {
+      this.setSegmentText(segment, normalizeSegmentDraft(
+        segment,
+        `0${digits}`,
+        this.modeState(),
+        this.minuteStepState(),
+      ));
+      this.commitSegment(segment);
+      this.focusNextSegment(segment);
+      return;
+    }
+    if (digits.length === 2) {
+      this.commitSegment(segment);
+      this.focusNextSegment(segment);
+      return;
+    }
+    this.positionSegmentCaret(segment, digits.length);
+  }
+
   protected onSegmentKeydown(segment: CxTimeSegment, event: KeyboardEvent): void {
     if (this.isLocked$()) {
       return;
@@ -334,6 +412,10 @@ export class CxTimeInputComponent {
 
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (event.metaKey || event.ctrlKey || event.altKey) {
       return;
     }
 
@@ -350,7 +432,10 @@ export class CxTimeInputComponent {
       case 'Backspace':
         event.preventDefault();
         this.handleBackspace(segment, target);
-        this.emitCurrentValue();
+        return;
+      case 'Delete':
+        event.preventDefault();
+        this.handleDelete(segment, target);
         return;
       case ':':
       case 'ArrowRight':
@@ -365,11 +450,11 @@ export class CxTimeInputComponent {
         return;
       case 'ArrowUp':
         event.preventDefault();
-        this.adjustSegment(segment, event.shiftKey ? this.bigStep(segment) : this.stepForSegment(segment));
+        this.adjustSegment(segment, 1, event.shiftKey);
         return;
       case 'ArrowDown':
         event.preventDefault();
-        this.adjustSegment(segment, event.shiftKey ? -this.bigStep(segment) : -this.stepForSegment(segment));
+        this.adjustSegment(segment, -1, event.shiftKey);
         return;
       case 'Enter':
         event.preventDefault();
@@ -390,15 +475,15 @@ export class CxTimeInputComponent {
       return;
     }
 
+    event.preventDefault();
     const pastedText = event.clipboardData?.getData('text') ?? '';
     const parsedValue = parseCxTimeValue(pastedText);
     if (!parsedValue) {
       return;
     }
 
-    event.preventDefault();
     this.setCanonicalValue(parsedValue);
-    this.emitCurrentValue();
+    this.emitCommittedValue();
   }
 
   protected onMeridiemClick(): void {
@@ -446,14 +531,24 @@ export class CxTimeInputComponent {
     event.preventDefault();
     event.stopPropagation();
     this.clearDraft();
-    this.valueChange.emit(undefined);
-    this.timeChange.emit(this.currentModel(undefined));
+    this.emitValue(undefined, true);
     this.clear.emit();
+    this.refocusPending = true;
+    queueMicrotask(() => {
+      this.focusSegment('hour');
+      this.refocusPending = false;
+    });
   }
 
   private setCanonicalValue(value: CxParsedTimeValue): void {
-    this.hours24State.set(value.hours24);
-    this.minutesState.set(snapToMinuteStep(value.minutes, this.minuteStepState()));
+    const normalizedValue = {
+      hours24: clamp(value.hours24, 0, 23),
+      minutes: snapToMinuteStep(value.minutes, this.minuteStepState()),
+    };
+    this.hours24State.set(normalizedValue.hours24);
+    this.minutesState.set(normalizedValue.minutes);
+    this.committedValueState.set(normalizedValue);
+    this.dirtyDraftState.set(false);
     this.syncDraftFromCanonical(true);
   }
 
@@ -463,26 +558,29 @@ export class CxTimeInputComponent {
     this.hourTextState.set('');
     this.minuteTextState.set('');
     this.meridiemState.set('AM');
+    this.committedValueState.set(null);
+    this.dirtyDraftState.set(false);
   }
 
   private handleDigit(segment: CxTimeSegment, digit: string, replace: boolean): boolean {
     const currentText = this.getSegmentText(segment);
     const candidate = replace || currentText.length >= 2 ? digit : `${currentText}${digit}`;
+    this.dirtyDraftState.set(true);
 
     if (candidate.length === 1) {
       if (shouldAutoPadSingleDigit(segment, digit, this.modeState())) {
-        const normalizedValue = normalizeSegmentCandidate(segment, `0${digit}`, this.modeState(), this.minuteStepState());
+        const normalizedValue = normalizeSegmentDraft(segment, `0${digit}`, this.modeState(), this.minuteStepState());
         this.setSegmentText(segment, normalizedValue);
         this.commitSegment(segment);
         return true;
       }
 
       this.setSegmentText(segment, candidate);
-      this.emitCurrentValue();
+      this.positionSegmentCaret(segment, 1);
       return false;
     }
 
-    const normalizedValue = normalizeSegmentCandidate(segment, candidate, this.modeState(), this.minuteStepState());
+    const normalizedValue = normalizeSegmentDraft(segment, candidate, this.modeState(), this.minuteStepState());
     this.setSegmentText(segment, normalizedValue);
     this.commitSegment(segment);
     return true;
@@ -495,29 +593,67 @@ export class CxTimeInputComponent {
       return;
     }
 
-    if (shouldReplaceSelection(input)) {
-      this.setSegmentText(segment, '');
+    const start = input.selectionStart ?? currentText.length;
+    const end = input.selectionEnd ?? start;
+    if (start === 0 && end === 0) {
       return;
     }
 
-    this.setSegmentText(segment, currentText.slice(0, -1));
+    const nextStart = start === end ? Math.max(0, start - 1) : start;
+    const nextText = start === end
+      ? `${currentText.slice(0, nextStart)}${currentText.slice(end)}`
+      : `${currentText.slice(0, start)}${currentText.slice(end)}`;
+    this.setSegmentText(segment, nextText);
+    this.dirtyDraftState.set(true);
+    this.positionSegmentCaret(segment, nextStart);
   }
 
-  private adjustSegment(segment: CxTimeSegment, delta: number): void {
-    if (this.isEmpty$()) {
+  private handleDelete(segment: CxTimeSegment, input: HTMLInputElement): void {
+    const currentText = this.getSegmentText(segment);
+    if (!currentText) {
+      return;
+    }
+
+    const start = input.selectionStart ?? 0;
+    const end = input.selectionEnd ?? start;
+    if (start === end && start >= currentText.length) {
+      return;
+    }
+
+    const nextEnd = start === end ? start + 1 : end;
+    this.setSegmentText(segment, `${currentText.slice(0, start)}${currentText.slice(nextEnd)}`);
+    this.dirtyDraftState.set(true);
+    this.positionSegmentCaret(segment, start);
+  }
+
+  private adjustSegment(segment: CxTimeSegment, direction: 1 | -1, large: boolean): void {
+    const currentValue = this.currentValue();
+    if (currentValue) {
+      this.setCanonicalValue(currentValue);
+    } else if (!this.committedValueState()) {
       this.setCanonicalValue({ hours24: 0, minutes: 0 });
     } else {
-      this.commitSegment(segment);
+      this.syncDraftFromCanonical(true);
     }
 
     if (segment === 'hour') {
+      const delta = direction * (large ? 5 : 1);
       this.hours24State.set(wrap(this.hours24State() + delta, 0, 23));
     } else {
-      this.minutesState.set(wrap(this.minutesState() + delta, 0, 59));
+      const stepCount = large ? this.largeMinuteStepCount() : 1;
+      this.minutesState.set(stepMinuteOnGrid(
+        this.minutesState(),
+        this.minuteStepState(),
+        direction,
+        stepCount,
+      ));
     }
 
-    this.syncDraftFromCanonical();
-    this.emitCurrentValue();
+    const nextValue = { hours24: this.hours24State(), minutes: this.minutesState() };
+    this.committedValueState.set(nextValue);
+    this.dirtyDraftState.set(false);
+    this.syncDraftFromCanonical(true);
+    this.emitCommittedValue();
     this.selectSegmentText(segment);
   }
 
@@ -525,20 +661,51 @@ export class CxTimeInputComponent {
     const text = this.getSegmentText(segment);
     if (!text.trim()) {
       this.setSegmentText(segment, '');
-      this.emitCurrentValue();
+      this.dirtyDraftState.set(true);
       return;
     }
 
-    const normalizedValue = normalizeSegmentCandidate(segment, text, this.modeState(), this.minuteStepState());
+    const normalizedValue = normalizeSegmentDraft(segment, text, this.modeState(), this.minuteStepState());
     this.setSegmentText(segment, normalizedValue);
+    this.dirtyDraftState.set(true);
+    this.commitCurrentDraft();
+  }
 
-    if (segment === 'hour') {
-      this.hours24State.set(this.toHours24(Number.parseInt(normalizedValue, 10)));
-    } else {
-      this.minutesState.set(Number.parseInt(normalizedValue, 10));
+  private commitDraftOnExit(): void {
+    const hourText = this.hourTextState();
+    const minuteText = this.minuteTextState();
+    if (!hourText && !minuteText) {
+      this.clearDraft();
+      this.emitValue(undefined);
+      return;
     }
 
-    this.emitCurrentValue();
+    const fallbackHour = this.is12h$() ? '12' : '00';
+    this.hourTextState.set(normalizeSegmentDraft(
+      'hour',
+      hourText || fallbackHour,
+      this.modeState(),
+      this.minuteStepState(),
+    ));
+    this.minuteTextState.set(normalizeSegmentDraft(
+      'minute',
+      minuteText || '00',
+      this.modeState(),
+      this.minuteStepState(),
+    ));
+    this.dirtyDraftState.set(true);
+    this.commitCurrentDraft();
+  }
+
+  private commitCurrentDraft(): boolean {
+    const value = this.currentValue();
+    if (!value) {
+      return false;
+    }
+
+    this.setCanonicalValue(value);
+    this.emitCommittedValue();
+    return true;
   }
 
   private syncDraftFromCanonical(force = false): void {
@@ -557,33 +724,50 @@ export class CxTimeInputComponent {
     this.minuteTextState.set(padTwoDigits(this.minutesState()));
   }
 
-  private emitCurrentValue(): void {
-    const value = this.outOfRange$() ? undefined : this.formattedCurrentValue();
+  private emitCommittedValue(): void {
+    const value = this.formattedCommittedValue();
+    if (!value) {
+      return;
+    }
+    this.emitValue(value);
+  }
+
+  private emitValue(value: string | undefined, force = false): void {
+    if (!force && value === this.lastEmittedValue) {
+      return;
+    }
+    this.lastEmittedValue = value;
     this.valueChange.emit(value);
     this.timeChange.emit(this.currentModel(value));
   }
 
-  private formattedCurrentValue(): string | undefined {
-    const parsed = this.currentValue();
-    return parsed ? formatCxTimeValue(parsed.hours24, parsed.minutes) : undefined;
+  private formattedCommittedValue(): string | undefined {
+    const value = this.committedValueState();
+    return value ? formatCxTimeValue(value.hours24, value.minutes) : undefined;
   }
 
   private currentValue(): CxParsedTimeValue | null {
-    if (!this.hourTextState().trim() || !this.minuteTextState().trim()) {
+    const hourText = this.hourTextState().trim();
+    const minuteText = this.minuteTextState().trim();
+    if (hourText.length !== 2 || minuteText.length !== 2) {
       return null;
     }
-    const hour = Number.parseInt(this.hourTextState(), 10);
-    const minute = Number.parseInt(this.minuteTextState(), 10);
+    const hour = Number.parseInt(hourText, 10);
+    const minute = Number.parseInt(minuteText, 10);
     if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+      return null;
+    }
+    const validHour = this.is12h$() ? hour >= 1 && hour <= 12 : hour >= 0 && hour <= 23;
+    if (!validHour || minute < 0 || minute > 59) {
       return null;
     }
     return {
       hours24: this.toHours24(hour),
-      minutes: clamp(minute, 0, 59),
+      minutes: minute,
     };
   }
 
-  private currentModel(value: string | undefined): CxTimeInputModel {
+  private currentModel(value: string | undefined): CxTimeFieldModel {
     return {
       value,
       mode: this.modeState(),
@@ -599,11 +783,10 @@ export class CxTimeInputComponent {
   }
 
   private toHours24(displayHour: number): number {
-    const hour = this.modeState() === '12h' ? clamp(displayHour, 1, 12) : clamp(displayHour, 0, 23);
     if (this.modeState() !== '12h') {
-      return hour;
+      return displayHour;
     }
-    return this.meridiemState() === 'AM' ? hour % 12 : (hour % 12) + 12;
+    return this.meridiemState() === 'AM' ? displayHour % 12 : (displayHour % 12) + 12;
   }
 
   private toggleMeridiem(): void {
@@ -611,12 +794,12 @@ export class CxTimeInputComponent {
   }
 
   private setMeridiem(value: CxTimeMeridiem): void {
-    this.meridiemState.set(value);
-    const parsed = this.currentValue();
-    if (parsed) {
-      this.hours24State.set(parsed.hours24);
+    if (value === this.meridiemState()) {
+      return;
     }
-    this.emitCurrentValue();
+    this.meridiemState.set(value);
+    this.dirtyDraftState.set(true);
+    this.commitCurrentDraft();
   }
 
   private getSegmentText(segment: CxTimeSegment): string {
@@ -639,7 +822,9 @@ export class CxTimeInputComponent {
     }
     if (this.is12h$()) {
       this.meridiemButtonRef?.nativeElement.focus();
+      return;
     }
+    this.selectSegmentText('minute');
   }
 
   private focusPreviousSegment(segment: CxTimeSegment): void {
@@ -665,12 +850,56 @@ export class CxTimeInputComponent {
     });
   }
 
-  private stepForSegment(segment: CxTimeSegment): number {
-    return segment === 'minute' ? this.minuteStepState() : 1;
+  private positionSegmentCaret(segment: CxTimeSegment, position: number): void {
+    const target = segment === 'hour' ? this.hourFieldRef?.nativeElement : this.minuteFieldRef?.nativeElement;
+    if (!target) {
+      return;
+    }
+    queueMicrotask(() => target.setSelectionRange(position, position));
   }
 
-  private bigStep(segment: CxTimeSegment): number {
-    return segment === 'minute' ? 15 : 5;
+  private largeMinuteStepCount(): number {
+    return Math.max(1, Math.round(15 / this.minuteStepState()));
+  }
+
+  private invalidDraftMessage(): string | undefined {
+    const hourText = this.hourTextState().trim();
+    if (hourText.length === 2) {
+      const hour = Number.parseInt(hourText, 10);
+      const validHour = Number.isFinite(hour)
+        && (this.is12h$() ? hour >= 1 && hour <= 12 : hour >= 0 && hour <= 23);
+      if (!validHour) {
+        return this.is12h$()
+          ? 'Enter an hour from 1 to 12.'
+          : 'Enter an hour from 00 to 23.';
+      }
+    }
+
+    const minuteText = this.minuteTextState().trim();
+    if (minuteText.length === 2) {
+      const minute = Number.parseInt(minuteText, 10);
+      if (!Number.isFinite(minute) || minute < 0 || minute > 59) {
+        return 'Enter minutes from 00 to 59.';
+      }
+    }
+    return undefined;
+  }
+
+  private rangeValidationMessage(): string {
+    const min = parseCxTimeValue(this.minState());
+    const max = parseCxTimeValue(this.maxState());
+    const minText = min ? formatCxTimeValue(min.hours24, min.minutes) : undefined;
+    const maxText = max ? formatCxTimeValue(max.hours24, max.minutes) : undefined;
+    if (minText && maxText) {
+      return `Enter a time from ${minText} to ${maxText}.`;
+    }
+    if (minText) {
+      return `Enter a time at or after ${minText}.`;
+    }
+    if (maxText) {
+      return `Enter a time at or before ${maxText}.`;
+    }
+    return 'Enter an allowed time.';
   }
 }
 
@@ -694,7 +923,7 @@ function shouldReplaceSelection(input: HTMLInputElement): boolean {
 function shouldAutoPadSingleDigit(
   segment: CxTimeSegment,
   digit: string,
-  mode: CxTimeInputMode,
+  mode: CxTimeFieldMode,
 ): boolean {
   const numericDigit = Number.parseInt(digit, 10);
   if (!Number.isFinite(numericDigit)) {
@@ -708,10 +937,10 @@ function shouldAutoPadSingleDigit(
   return mode === '12h' ? numericDigit > 1 : numericDigit > 2;
 }
 
-function normalizeSegmentCandidate(
+function normalizeSegmentDraft(
   segment: CxTimeSegment,
   value: string,
-  mode: CxTimeInputMode,
+  mode: CxTimeFieldMode,
   minuteStep: number,
 ): string {
   const digitsOnly = value.replace(/[^0-9]/g, '');
@@ -725,15 +954,66 @@ function normalizeSegmentCandidate(
   }
 
   if (segment === 'minute') {
+    if (parsedValue > 59) {
+      return padTwoDigits(parsedValue);
+    }
     return padTwoDigits(snapToMinuteStep(parsedValue, minuteStep));
   }
 
-  return padTwoDigits(mode === '12h' ? clamp(parsedValue, 1, 12) : clamp(parsedValue, 0, 23));
+  if (mode === '12h' && parsedValue === 0) {
+    return '12';
+  }
+  return padTwoDigits(parsedValue);
 }
 
 function snapToMinuteStep(value: number, minuteStep: number): number {
-  const step = Math.max(1, Math.floor(minuteStep));
-  return clamp(Math.round(clamp(value, 0, 59) / step) * step, 0, 59);
+  const normalizedValue = clamp(value, 0, 59);
+  return minuteGrid(minuteStep).reduce((closest, candidate) => {
+    const closestDistance = Math.abs(normalizedValue - closest);
+    const candidateDistance = Math.abs(normalizedValue - candidate);
+    return candidateDistance <= closestDistance ? candidate : closest;
+  });
+}
+
+function stepMinuteOnGrid(
+  current: number,
+  minuteStep: number,
+  direction: 1 | -1,
+  count: number,
+): number {
+  const grid = minuteGrid(minuteStep);
+  const exactIndex = grid.indexOf(current);
+  let index: number;
+  if (exactIndex >= 0) {
+    index = exactIndex;
+  } else if (direction > 0) {
+    const nextIndex = grid.findIndex(value => value > current);
+    index = nextIndex >= 0 ? nextIndex - 1 : grid.length - 1;
+  } else {
+    let previousIndex = -1;
+    for (let gridIndex = grid.length - 1; gridIndex >= 0; gridIndex -= 1) {
+      if ((grid[gridIndex] ?? 0) < current) {
+        previousIndex = gridIndex;
+        break;
+      }
+    }
+    index = previousIndex >= 0 ? previousIndex + 1 : 0;
+  }
+
+  const moves = Math.max(1, Math.floor(count));
+  for (let move = 0; move < moves; move += 1) {
+    index = wrap(index + direction, 0, grid.length - 1);
+  }
+  return grid[index] ?? 0;
+}
+
+function minuteGrid(minuteStep: number): number[] {
+  const step = clamp(Math.floor(minuteStep), 1, 59);
+  const values: number[] = [];
+  for (let minute = 0; minute <= 59; minute += step) {
+    values.push(minute);
+  }
+  return values;
 }
 
 function toDisplayHour(hours24: number): number {

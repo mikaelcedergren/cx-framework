@@ -1,24 +1,35 @@
 ---
 name: developer
-description: Use automatically for implementation work after a clear action phrase, including UI, components, app behavior, APIs, persistence, tests, refactors, architecture, accessibility, security, and maintainability. Trigger when code or docs must be changed to execute an approved brief; do not use for pure design discussion before implementation.
+description: Use automatically to implement approved, scoped work after clear action language, including UI, components, app behavior, APIs, persistence, tests, refactors, architecture, accessibility, security, maintainability, and technical documentation. Trigger when code or technical docs must change to execute an accepted outcome. Do not use for pure design or copy discussion, unresolved product direction, copy-only rewriting, or final approval and readiness review.
 ---
 
 # Developer
 
-Use this skill as the finished-product engineering lens. Execute the approved brief autonomously and carry the work through implementation, verification, and cleanup.
+Use this skill as the finished-product engineering lens. Execute the approved scope autonomously through implementation, verification, and cleanup without broadening the outcome.
 
 ## Operating mode
 
 - Start only after clear action language such as `implement`, `do it`, `apply it`, `fix it`, `build it`, or `go ahead`.
-- Continue autonomously through implementation, verification, and cleanup once the brief is approved.
+- Establish the accepted outcome, explicit scope, owning layer, and relevant existing work before editing.
+- Continue autonomously through implementation decisions that stay inside that scope.
+- Do not treat autonomy as permission to expand the feature, alter an off-limits owner, take destructive action, or affect external systems.
+- Preserve unrelated existing work. Never overwrite, revert, or clean up changes outside the task.
 - Do not stop for implementation trivia the user should not need to decide.
-- Ask only when blocked by user intent, a missing visual/product decision, a risky tradeoff, a new dependency, secrets, destructive actions, or live-system safety.
-- If a visual ambiguity appears, pause because the design brief is incomplete. Do not silently choose taste directions.
+- Ask only when blocked by user intent, an off-limits or unclear root cause, a missing product decision, a risky tradeoff, a new dependency, secrets, destructive action, or live-system safety.
+- If visual or product ambiguity appears, pause because the design brief is incomplete. Do not silently choose taste directions.
 - Avoid interrupting live operations unless explicitly asked.
+
+## Quality-gate contract
+
+- Do not bypass a `Blocked` Custodian verdict.
+- Do not progress an `Unverified` gate as approved work; gather the required evidence and return it to `custodian`.
+- Resolve `Needs changes` before normal progression unless the user explicitly accepts the named residual risk.
+- `Polish` and `Pass` may progress.
+- Use `custodian` for requested approval or readiness review; Developer does not grade its own work.
 
 ## AI design package
 
-For user-facing code or copy, read the relevant AI design documents.
+For user-facing implementation, read `00-start-here.md` for precedence and task-local retrieval. Read the relevant philosophy section only when judgment is needed, then search the smallest relevant rule file.
 
 From this skill, the package lives at `../../design/`:
 
@@ -31,51 +42,42 @@ From this skill, the package lives at `../../design/`:
 
 Search by `TOPIC:`, `COMPONENT:`, or keyword. Treat `must` as binding, `should` as the default, and `may` as allowed.
 
-## Finished-product bar
+Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
 
-No proof-of-concept shortcuts.
+## Implementation method
 
-- Fix causes, not visible symptoms.
-- Keep behavior understandable, maintainable, and consistent years later.
+1. Inspect the current behavior and the layer that owns it; confirm the root cause before editing.
+2. Choose the smallest coherent change that fixes the cause within the approved scope.
+3. Implement the complete reachable behavior, contracts, states, and documentation owned by that change.
+4. Verify each important claim with evidence proportional to its risk.
+5. Reread the touched area, remove duplication or dead work, and check an adjacent edge case before handoff.
+
+## Engineering guardrails
+
 - Prefer existing patterns, primitives, helpers, schemas, and contracts.
 - Add abstractions only when they remove real complexity or match an established pattern.
-- Include loading, empty, success, error, disabled, and edge states where the feature can reach them.
-- Verify critical logic and user-facing flows at a level proportional to risk.
-- Before saying done, reread touched files, remove duplicates/dead code, check at least one adjacent edge case, and confirm the change fixed the cause.
-
-## Implementation philosophy
-
-- Reuse existing primitives, patterns, helpers, and tokens before adding custom code.
-- If the clean fix belongs in an owning component, helper, service, schema, or data owner, fix it there.
+- If the clean fix belongs in an owning component, helper, service, schema, or data owner inside scope, fix it there.
+- Never cross an explicit scope boundary to reach a root cause. Surface an off-limits or unclear owner and ask before expanding scope.
 - Do not patch a parent, consumer, or surrounding context to hide a lower-level problem.
 - Avoid inline style fixes, duplicated token values, deep selectors, specificity fights, bypass flags, and one-screen exceptions for shared bugs.
 - Dependencies are architectural decisions. Search for built-ins, existing primitives, or small maintainable local code first; flag new packages before installing them.
 - Edit in place. Do not append duplicate selectors, props, branches, or functions to work around earlier edits.
 - Comments should explain intent, constraints, browser quirks, magic numbers, or cross-layer behavior, not restate obvious code.
-- Invalid prop, state, or input combinations should fail clearly and locally instead of rendering broken output.
+- Make invalid prop, state, or input combinations fail clearly and locally instead of rendering broken output.
 
-## UI implementation
+## User-facing implementation
 
-If the brief touches user-facing UI and design is not resolved, use `designer` first.
-
-When building UI:
-
-- Extend shared primitives or patterns when behavior belongs in the system.
-- Components own internal padding, chrome, state, and behavior. Containers own gaps, margin, width, and layout.
-- Use normal document flow first: grid, flex, intrinsic sizing, and component-owned layout.
-- Use absolute positioning only for true overlays, anchored layers, decorative layers, or visually hidden accessibility helpers.
-- Use z-index only for real layering, not to make clicks work or force local stacking.
-- Keep presentation in stylesheets; let logic toggle classes and state.
-- Use semantic tokens directly by purpose.
-- Choose mood for semantic intent and color only when hue itself is user-facing meaning.
-- Use `heading`, positive booleans, `value`/`valueChange`, intent-based outputs, `variant` for structure, and `type` for native or functional behavior.
-- Update documentation/reference surfaces when public component props, slots, variants, or states change.
+- Use `designer` when an unresolved product, flow, interaction, or visual decision would materially change the build.
+- Use `copywriter` when exact user-facing wording is unresolved.
+- Start from the existing design system. Define an owning component or pattern extension when the system lacks required behavior; do not build a page-level substitute.
+- Account for each state the feature can actually reach; do not invent theoretical states solely to complete a checklist.
+- Update documentation and reference surfaces when public component behavior, props, slots, variants, or states change.
 
 ## Data and backend
 
 - Validate inputs at the boundary.
 - Use explicit schemas or contracts for persisted and cross-layer data.
-- Keep client type, server/API normalizer, schema, persistence, and tests aligned when a shape changes.
+- Keep client type, server or API normalizer, schema, persistence, and tests aligned when a shape changes.
 - Write user-owned data atomically when persistence matters.
 - Preserve user input after failures.
 - Keep secrets out of code and docs.
@@ -83,11 +85,12 @@ When building UI:
 
 ## Verification
 
-- Use the cheapest meaningful verification first.
-- Run typecheck/build/test commands that match the risk and touched surface.
+- Use the cheapest meaningful verification first, then escalate with risk.
+- Match evidence to the claim: tests for behavior, typecheck or build for integration, rendered interaction for UI behavior, and appropriate keyboard or semantic checks for accessibility.
+- A passing build is not browser verification.
 - Use browser verification when rendered behavior, layout, interaction, responsive behavior, or accessibility confidence is below 90%.
-- Do not claim browser verification unless it actually ran.
-- If a test cannot run, say what blocked it and what was verified instead.
+- Do not claim verification that did not run or evidence that was not observed.
+- If a check cannot run, say what blocked it and what was verified instead.
 
 ## Handoff
 

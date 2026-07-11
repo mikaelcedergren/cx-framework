@@ -3,12 +3,14 @@
   [class.cx-email-field--small]="size === 'small'"
   [class.cx-email-field--large]="size === 'large'"
 >
-  <div class="cx-email-field__header">
-    <div class="cx-email-field__label" [id]="labelId">Email</div>
-    @if (optional) {
-      <div class="cx-email-field__optional">Optional</div>
-    }
-  </div>
+  @if (label.trim()) {
+    <div class="cx-email-field__header">
+      <div class="cx-email-field__label" [id]="labelId">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-email-field__optional">Optional</div>
+      }
+    </div>
+  }
 
   <div
     class="cx-email-field__field-shell"
@@ -29,7 +31,8 @@
       autocomplete="email"
       [disabled]="disabled || loading"
       [value]="value$()"
-      [attr.aria-labelledby]="labelId"
+      [attr.aria-label]="resolvedAriaLabel"
+      [attr.aria-labelledby]="resolvedAriaLabelledBy"
       [attr.aria-describedby]="resolvedAriaDescribedBy"
       [attr.aria-invalid]="hasError$() ? 'true' : null"
       (input)="onInput($event)"

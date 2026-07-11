@@ -1,29 +1,25 @@
 <div
-  class="cx-time-input"
-  [class.cx-time-input--small]="size$() === 'small'"
-  [class.cx-time-input--large]="size$() === 'large'"
+  class="cx-time-field"
+  [class.cx-time-field--small]="size$() === 'small'"
+  [class.cx-time-field--large]="size$() === 'large'"
 >
-  @if (label.trim() || optional) {
-    <div class="cx-time-input__header">
-      @if (label.trim()) {
-        <div class="cx-time-input__label" [id]="labelId">{{ label }}</div>
-      }
+  @if (label.trim()) {
+    <div class="cx-time-field__header">
+      <div class="cx-time-field__label" [id]="labelId">{{ label }}</div>
 
-      @if (optional && label.trim()) {
-        <div class="cx-time-input__optional">Optional</div>
+      @if (optional) {
+        <div class="cx-time-field__optional">Optional</div>
       }
     </div>
   }
 
   <div
-    class="cx-time-input__field-shell"
-    [class.cx-time-input__field-shell--focused]="shellFocused$()"
-    [class.cx-time-input__field-shell--small]="size$() === 'small'"
-    [class.cx-time-input__field-shell--large]="size$() === 'large'"
-    [class.cx-time-input__field-shell--disabled]="disabled"
-    [class.cx-time-input__field-shell--loading]="loading"
-    [class.cx-time-input__field-shell--error]="hasError$()"
-    [class.cx-time-input__field-shell--empty]="isEmpty$()"
+    class="cx-time-field__field-shell"
+    [class.cx-time-field__field-shell--focused]="shellFocused$()"
+    [class.cx-time-field__field-shell--disabled]="disabled"
+    [class.cx-time-field__field-shell--loading]="loading"
+    [class.cx-time-field__field-shell--error]="hasError$()"
+    [class.cx-time-field__field-shell--empty]="isEmpty$()"
     role="group"
     [attr.aria-invalid]="hasError$() ? 'true' : null"
     [attr.aria-labelledby]="resolvedGroupAriaLabelledBy"
@@ -32,11 +28,11 @@
     [attr.aria-busy]="loading ? 'true' : null"
     (mousedown)="onShellMousedown($event)"
   >
-    <div class="cx-time-input__segments">
-      <div class="cx-time-input__clock">
+    <div class="cx-time-field__segments">
+      <div class="cx-time-field__clock">
         <input
           #hourField
-          class="cx-time-input__segment-input"
+          class="cx-time-field__segment-input"
           type="text"
           inputmode="numeric"
           maxlength="2"
@@ -46,15 +42,17 @@
           [disabled]="isLocked$()"
           [attr.aria-label]="hourAriaLabel"
           (focus)="onSegmentFocus('hour')"
+          (pointerup)="onSegmentPointerUp('hour', $event)"
+          (input)="onSegmentInput('hour', $event)"
           (keydown)="onSegmentKeydown('hour', $event)"
           (paste)="onSegmentPaste($event)"
         />
 
-        <span class="cx-time-input__separator" aria-hidden="true">:</span>
+        <span class="cx-time-field__separator" aria-hidden="true">:</span>
 
         <input
           #minuteField
-          class="cx-time-input__segment-input"
+          class="cx-time-field__segment-input"
           type="text"
           inputmode="numeric"
           maxlength="2"
@@ -64,6 +62,8 @@
           [disabled]="isLocked$()"
           [attr.aria-label]="minuteAriaLabel"
           (focus)="onSegmentFocus('minute')"
+          (pointerup)="onSegmentPointerUp('minute', $event)"
+          (input)="onSegmentInput('minute', $event)"
           (keydown)="onSegmentKeydown('minute', $event)"
           (paste)="onSegmentPaste($event)"
         />
@@ -73,7 +73,7 @@
         <button
           #meridiemButton
           type="button"
-          class="cx-time-input__meridiem"
+          class="cx-time-field__meridiem"
           [disabled]="isLocked$()"
           [attr.aria-label]="'Meridiem ' + meridiem$()"
           (click)="onMeridiemClick()"
@@ -84,17 +84,23 @@
       }
     </div>
 
+    @if (loading) {
+      <span class="cx-time-field__loading" aria-hidden="true">
+        <cx-spinner size="16" mood="default" />
+      </span>
+    }
+
     @if (hasClear$()) {
-      <button type="button" class="cx-time-input__clear" aria-label="Clear" (click)="onClear($event)">
-        <cx-icon name="remove" [size]="16" />
+      <button type="button" class="cx-time-field__clear" aria-label="Clear" (click)="onClear($event)">
+        <cx-icon name="remove" [size]="14" />
       </button>
     }
   </div>
 
   @if (showHint$() || validationMessages$().length > 0) {
-    <div class="cx-time-input__messages" [id]="messagesId">
+    <div class="cx-time-field__messages" [id]="messagesId">
       @if (showHint$()) {
-        <div class="cx-time-input__hint">{{ hint!.trim() }}</div>
+        <div class="cx-time-field__hint">{{ hint!.trim() }}</div>
       }
 
       @if (validationMessages$().length > 0) {

@@ -24,11 +24,11 @@
   grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
   overflow: hidden;
   border: var(--line);
-  border-radius: calc(var(--radius-md) * 2);
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-dialog);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-high);
   color: var(--ink);
-  animation: cx-wizard-dialog-enter calc(var(--motion-slow) * 2) cubic-bezier(0.22, 1, 0.36, 1);
+  animation: cx-wizard-dialog-enter calc(var(--motion-slow) * 2) var(--ease-out-strong);
 }
 
 .cx-wizard-dialog--large {
@@ -111,6 +111,7 @@
   justify-content: center;
   flex: 0 0 auto;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);
   font-size: var(--font-size-body-xs);
@@ -133,7 +134,7 @@
 
 .cx-wizard-dialog__step--complete .cx-wizard-dialog__step-marker {
   background: var(--success);
-  color: var(--surface-mid);
+  color: var(--surface);
 }
 
 .cx-wizard-dialog__step--active .cx-wizard-dialog__step-label {
@@ -167,8 +168,8 @@
   gap: var(--space-lg);
   padding: var(--space-xl);
   border: var(--line);
-  border-radius: calc(var(--radius-md) * 1.5);
-  background: var(--surface-mid);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   box-sizing: border-box;
 }
 
@@ -232,7 +233,7 @@
   position: relative;
   min-width: 0;
   border-left: var(--line-discreet);
-  background: var(--surface-low);
+  background: var(--surface-alt);
   box-sizing: border-box;
 }
 
@@ -268,7 +269,7 @@
   margin: 0;
   color: var(--ink);
   font-size: var(--font-size-body);
-  line-height: 1.4;
+  line-height: var(--line-height-body-relaxed);
 }
 
 .cx-wizard-dialog__close {

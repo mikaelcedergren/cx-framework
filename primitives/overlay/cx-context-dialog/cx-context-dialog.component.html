@@ -7,7 +7,7 @@
   tabindex="-1"
 >
   <div class="cx-context-dialog__heading">{{ heading }}</div>
-  <p class="cx-context-dialog__message">{{ text }}</p>
+  <p class="cx-context-dialog__message">{{ description }}</p>
   <footer class="cx-context-dialog__actions">
     <cx-button [text]="cancelText" mood="default" (pressed)="onCancel()" />
     <cx-button [text]="confirmText" [mood]="mood" (pressed)="onConfirm()" />

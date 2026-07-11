@@ -15,15 +15,14 @@ import {
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { eventMatchesShortcut, isTypingTarget } from '../../actions/shared/shortcuts';
-import { CxMenuHeaderComponent } from '../cx-menu-header';
-import { CxMenuLabelComponent } from '../cx-menu-label';
 import { CxOptionComponent } from '../cx-option';
+import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
 import { measureCxFloatingSurface } from '../floating-surface';
 
 export type CxMenuPriority = 'default' | 'primary' | 'secondary';
-export type CxMenuGroupVariant = 'label' | 'header';
 export type CxMenuLayout = 'inline' | 'fill';
+export type CxMenuSelection = 'single' | 'multiple';
 
 export type CxMenuItem = {
   id: string;
@@ -35,6 +34,8 @@ export type CxMenuItem = {
   disabled?: boolean;
   selected?: boolean;
   trackSelection?: boolean;
+  /** How this item's submenu tracks selection. Only read when the item has children. */
+  selection?: CxMenuSelection;
   priority?: CxMenuPriority;
   danger?: boolean;
   shortcutParts?: readonly string[];
@@ -48,20 +49,32 @@ export type CxMenuGroup = {
   id?: string;
   label?: string;
   description?: string;
-  variant?: CxMenuGroupVariant;
+  /**
+   * Declares the group as a choice group: 'single' announces items as
+   * menuitemradio, 'multiple' as menuitemcheckbox, both with aria-checked.
+   * Items with trackSelection: false stay plain menuitem actions.
+   */
+  selection?: CxMenuSelection;
   items: readonly CxMenuItem[];
 };
+
+type CxMenuItemRole = 'menuitem' | 'menuitemradio' | 'menuitemcheckbox';
 
 type CxResolvedMenuItem = CxMenuItem & {
   prependIcon?: CxIconName;
   appendIcon?: CxIconName;
   dividerBeforeResolved: boolean;
   hasChildren: boolean;
+  role: CxMenuItemRole;
   items?: CxResolvedMenuItem[];
 };
 
 type CxResolvedMenuGroup = Omit<CxMenuGroup, 'id' | 'items'> & {
   id: string;
+  items: CxResolvedMenuItem[];
+};
+
+type CxResolvedMenuVisualGroup = Pick<CxResolvedMenuGroup, 'id' | 'label' | 'description'> & {
   items: CxResolvedMenuItem[];
 };
 
@@ -86,16 +99,41 @@ function estimateMenuSurfaceHeight(items: readonly CxMenuItem[]): number {
   return Math.min(Math.max(items.length, 1) * 48 + 8, 320);
 }
 
-function resolveMenuItems(items: readonly CxMenuItem[]): CxResolvedMenuItem[] {
+function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelection): CxResolvedMenuItem[] {
   const hasPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
-  return items.map((item, index) => ({
-    ...item,
-    prependIcon: hasPrependIcons ? item.prependIcon : undefined,
-    dividerBeforeResolved:
-      index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
-    hasChildren: childItemsFor(item).length > 0,
-    items: childItemsFor(item).length > 0 ? resolveMenuItems(childItemsFor(item)) : undefined,
-  }));
+  return items.map((item, index) => {
+    const hasChildren = childItemsFor(item).length > 0;
+    return {
+      ...item,
+      prependIcon: hasPrependIcons ? item.prependIcon : undefined,
+      dividerBeforeResolved:
+        index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
+      hasChildren,
+      role: resolveMenuItemRole(item, hasChildren, selection),
+      items: hasChildren ? resolveMenuItems(childItemsFor(item), item.selection) : undefined,
+    };
+  });
+}
+
+function resolveMenuItemRole(
+  item: CxMenuItem,
+  hasChildren: boolean,
+  selection: CxMenuSelection | undefined,
+): CxMenuItemRole {
+  // Submenu parents open a surface and trackSelection: false marks plain
+  // actions inside choice groups; neither carries selection state.
+  if (hasChildren || item.trackSelection === false) {
+    return 'menuitem';
+  }
+  if (selection === 'multiple') {
+    return 'menuitemcheckbox';
+  }
+  // A consumer that tracks selection per item (selected set explicitly, or
+  // trackSelection: true) gets single-choice semantics without a group flag.
+  if (selection === 'single' || item.selected !== undefined || item.trackSelection === true) {
+    return 'menuitemradio';
+  }
+  return 'menuitem';
 }
 
 function childItemsFor(item: CxMenuItem): readonly CxMenuItem[] {
@@ -106,8 +144,47 @@ function resolveMenuGroups(groups: readonly CxMenuGroup[]): CxResolvedMenuGroup[
   return groups.map((group, index) => ({
     ...group,
     id: group.id?.trim() || `group-${index}`,
-    items: resolveMenuItems(group.items),
+    items: resolveMenuItems(group.items, group.selection),
   }));
+}
+
+function splitMenuItemsIntoVisualGroups(
+  items: readonly CxResolvedMenuItem[],
+  idPrefix: string,
+  label?: string,
+  description?: string,
+): CxResolvedMenuVisualGroup[] {
+  const groups: CxResolvedMenuVisualGroup[] = [];
+  let index = 0;
+  let current: CxResolvedMenuVisualGroup = {
+    id: `${idPrefix}-visual-${index}`,
+    label,
+    description,
+    items: [],
+  };
+
+  for (const item of items) {
+    if (item.dividerBeforeResolved && current.items.length > 0) {
+      groups.push(current);
+      index += 1;
+      current = {
+        id: `${idPrefix}-visual-${index}`,
+        items: [],
+      };
+    }
+    current.items.push(item);
+  }
+
+  if (current.items.length > 0 || current.label || current.description) {
+    groups.push(current);
+  }
+  return groups;
+}
+
+function resolveMenuVisualGroups(groups: readonly CxResolvedMenuGroup[]): CxResolvedMenuVisualGroup[] {
+  return groups.flatMap(group =>
+    splitMenuItemsIntoVisualGroups(group.items, group.id, group.label, group.description),
+  );
 }
 
 function buildItemPath(parentPath: string, itemId: string): string {
@@ -144,7 +221,7 @@ function measureCxSubmenuSurface(input: {
 
 @Component({
   selector: 'cx-menu',
-  imports: [CxMenuHeaderComponent, CxMenuLabelComponent, CxOptionComponent, CxPopoverComponent],
+  imports: [CxOptionComponent, CxOptionGroupComponent, CxPopoverComponent],
   templateUrl: './cx-menu.component.html',
   styleUrl: './cx-menu.component.scss',
   host: {
@@ -268,6 +345,9 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   protected readonly visibleGroups$ = computed<CxResolvedMenuGroup[]>(() =>
     this.normalizedGroups$().filter(group => group.items.length > 0),
   );
+  protected readonly visualGroups$ = computed<CxResolvedMenuVisualGroup[]>(() =>
+    resolveMenuVisualGroups(this.visibleGroups$()),
+  );
 
   protected get resolvedMenuAriaLabel(): string {
     return this.headingState() || this.ariaLabel;
@@ -349,9 +429,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       this.openSubmenu(item, level, buildItemPath(parentPath, item.id), optionWrap);
       return;
     }
-    this.updateCurrentId(item.id);
-    this.itemSelect.emit(item.id);
-    this.closeSurface();
+    this.activateItem(item);
   }
 
   protected onResolvedItemPointerEnter(
@@ -369,13 +447,6 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.trimSubmenus(level);
-  }
-
-  protected onResolvedItemFocused(item: CxResolvedMenuItem): void {
-    if (item.disabled) {
-      return;
-    }
-    this.updateCurrentId(item.id);
   }
 
   protected onResolvedItemKeydown(
@@ -427,6 +498,36 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   protected itemPath(parentPath: string, itemId: string): string {
     return buildItemPath(parentPath, itemId);
+  }
+
+  protected visualGroupsForItems(items: readonly CxResolvedMenuItem[], idPrefix: string): CxResolvedMenuVisualGroup[] {
+    return splitMenuItemsIntoVisualGroups(items, idPrefix || 'submenu');
+  }
+
+  protected itemSelectedState(item: CxResolvedMenuItem): boolean {
+    if (item.role === 'menuitemcheckbox') {
+      // currentId is a single-choice tracker; toggles rely on the consumer's
+      // per-item selected state only.
+      return item.selected ?? false;
+    }
+    if (item.role === 'menuitemradio') {
+      return item.selected ?? this.currentIdState() === item.id;
+    }
+    return (item.selected ?? false) || this.currentIdState() === item.id;
+  }
+
+  private activateItem(item: CxResolvedMenuItem): void {
+    if (item.role === 'menuitemcheckbox') {
+      // A toggle is not the menu's current choice, and closing after each
+      // toggle would make multi-select menus unusable.
+      this.itemSelect.emit(item.id);
+      return;
+    }
+    if (item.trackSelection !== false) {
+      this.updateCurrentId(item.id);
+    }
+    this.itemSelect.emit(item.id);
+    this.closeSurface();
   }
 
   protected submenuSurfaceId(path: string): string {
@@ -482,9 +583,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       return;
     }
     event.preventDefault();
-    this.updateCurrentId(item.id);
-    this.itemSelect.emit(item.id);
-    this.closeSurface();
+    this.activateItem(item);
   }
 
   @HostListener('window:resize')

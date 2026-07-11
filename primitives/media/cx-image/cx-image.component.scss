@@ -6,6 +6,7 @@
   max-height: var(--cx-image-max-height, none);
   overflow: hidden;
   border-radius: var(--cx-image-border-radius, var(--radius-none));
+  corner-shape: var(--cx-image-corner-shape, var(--corner-shape, round));
 }
 
 .cx-image {
@@ -33,6 +34,7 @@
   box-sizing: border-box;
   border: var(--line-discreet);
   border-radius: inherit;
+  corner-shape: inherit;
   background: var(--opacity-low);
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);

@@ -5,7 +5,7 @@
   [attr.aria-label]="ariaLabel"
   [attr.aria-valuemin]="interactive ? 0 : null"
   [attr.aria-valuemax]="interactive ? max$() : null"
-  [attr.aria-valuenow]="interactive ? displayValue$() : null"
+  [attr.aria-valuenow]="interactive ? value$() : null"
   [attr.aria-valuetext]="valueText"
   [attr.aria-readonly]="readonly ? 'true' : null"
   [attr.aria-disabled]="disabled ? 'true' : null"

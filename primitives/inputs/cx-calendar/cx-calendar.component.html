@@ -1,4 +1,9 @@
-<div class="cx-calendar" [class.cx-calendar--disabled]="disabled">
+<div
+  class="cx-calendar"
+  [class.cx-calendar--disabled]="disabled"
+  [class.cx-calendar--embedded]="variant === 'embedded'"
+  [class.cx-calendar--range]="selectionMode === 'range'"
+>
   <div class="cx-calendar__header">
     <cx-icon-button icon="arrow-left" variant="transparent" size="small" ariaLabel="Previous month" [disabled]="disabled" (pressed)="onPreviousMonth()" />
     <div class="cx-calendar__controls">
@@ -8,26 +13,34 @@
     <cx-icon-button icon="arrow-right" variant="transparent" size="small" ariaLabel="Next month" [disabled]="disabled" (pressed)="onNextMonth()" />
   </div>
 
-  <div class="cx-calendar__weekdays">
-    @for (weekday of weekdayLabels$(); track weekday) {
-      <div class="cx-calendar__weekday">{{ weekday }}</div>
-    }
-  </div>
+  <div class="cx-calendar__content">
+    <div class="cx-calendar__weekdays">
+      @for (weekday of weekdayLabels$(); track weekday) {
+        <div class="cx-calendar__weekday">{{ weekday }}</div>
+      }
+    </div>
 
-  <div class="cx-calendar__grid">
-    @for (day of calendarDays$(); track day.key) {
-      <button
-        type="button"
-        class="cx-calendar__day"
-        [class.cx-calendar__day--outside]="!day.inCurrentMonth"
-        [class.cx-calendar__day--today]="day.isToday"
-        [class.cx-calendar__day--selected]="isSelectedDay(day)"
-        [disabled]="disabled || isOutsideRange(day)"
-        [attr.aria-label]="day.isoDate"
-        (click)="onDaySelect(day)"
-      >
-        {{ day.day }}
-      </button>
-    }
+    <div class="cx-calendar__grid" role="grid" (mouseleave)="onDayLeave()">
+      @for (day of calendarDays$(); track day.key) {
+        <button
+          type="button"
+          class="cx-calendar__day"
+          [class.cx-calendar__day--outside]="!day.inCurrentMonth"
+          [class.cx-calendar__day--today]="day.isToday"
+          [class.cx-calendar__day--selected]="isSelectedDay(day)"
+          [class.cx-calendar__day--range]="isInRange(day)"
+          [class.cx-calendar__day--range-start]="isRangeStartDay(day)"
+          [class.cx-calendar__day--range-end]="isRangeEndDay(day)"
+          [class.cx-calendar__day--range-preview-end]="isRangePreviewEnd(day)"
+          [disabled]="disabled || isOutsideRange(day)"
+          [attr.aria-label]="day.isoDate"
+          [attr.aria-pressed]="isAriaSelectedDay(day)"
+          (click)="onDaySelect(day)"
+          (mouseenter)="onDayHover(day)"
+        >
+          {{ day.day }}
+        </button>
+      }
+    </div>
   </div>
 </div>

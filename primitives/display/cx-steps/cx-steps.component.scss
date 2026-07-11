@@ -23,6 +23,7 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   color: inherit;
   font-size: var(--font-size-body-sm);
@@ -56,7 +57,7 @@
 
 .cx-step--completed .cx-step__number {
   background: var(--success);
-  color: var(--surface-mid);
+  color: var(--surface);
 }
 
 :host(.cx-steps--disabled) .cx-step {

@@ -11,14 +11,14 @@
   min-height: 0;
   flex-direction: column;
   border-right: var(--line);
-  background: var(--surface-low);
+  background: var(--surface-alt);
   box-sizing: border-box;
   overflow: hidden;
-  transition: width var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-index-nav--collapsed {
-  width: var(--cx-index-nav-collapsed-width, 48px);
+  width: var(--controller-size-large);
 }
 
 /* ---- Top bar: filter + collapse toggle ---- */
@@ -151,7 +151,7 @@ button.cx-index-nav__folder--toggle {
 .cx-index-nav__items--collapsible {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+  transition: grid-template-rows var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-index-nav__items--collapsible .cx-index-nav__items-inner {
@@ -162,7 +162,7 @@ button.cx-index-nav__folder--toggle {
   transform: translateY(-6px);
   transition:
     opacity var(--motion-base) ease,
-    transform var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1);
+    transform var(--motion-slow) var(--ease-out-strong);
 }
 
 .cx-index-nav__items--expanded.cx-index-nav__items--collapsible {
@@ -239,6 +239,7 @@ button.cx-index-nav__folder--toggle {
   bottom: 4px;
   width: 2px;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--primary);
 }
 
@@ -273,6 +274,7 @@ button.cx-index-nav__folder--toggle {
   justify-content: center;
   padding: 0 var(--space-2xs);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);
   font-size: var(--font-size-body-xs);

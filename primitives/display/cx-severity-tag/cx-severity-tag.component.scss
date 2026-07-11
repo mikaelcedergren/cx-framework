@@ -27,6 +27,7 @@
   height: 8px;
   flex: 0 0 auto;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--cx-severity-accent);
   opacity: var(--cx-severity-indicator-opacity);
 }

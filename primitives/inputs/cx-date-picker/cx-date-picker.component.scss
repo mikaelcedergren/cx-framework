@@ -24,7 +24,7 @@
   padding: 0 var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: var(--opacity-darken);
+  background: transparent;
   color: var(--ink);
   font: inherit;
   box-sizing: border-box;
@@ -34,11 +34,15 @@
     background-color var(--motion-base) ease;
 }
 
-.cx-date-picker__field:hover:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading) {
+.cx-date-picker__field:hover:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error),
+.cx-date-picker__field:focus:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error),
+.cx-date-picker__field--open:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error) {
   border-color: var(--opacity-high);
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
 }
 
-.cx-date-picker__field:focus-visible {
+:host-context([data-cx-keyboard-navigation]) .cx-date-picker__field:focus:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
@@ -56,7 +60,7 @@
 }
 
 .cx-date-picker__field--open {
-  border-color: var(--primary);
+  border-color: var(--border-open);
 }
 
 .cx-date-picker__field--disabled {
@@ -132,114 +136,19 @@
 .cx-date-picker__surface-inner {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  gap: var(--space-xs);
   box-sizing: border-box;
 }
 
-.cx-date-picker__calendar-header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--space-xs);
-  align-items: center;
-}
-
-.cx-date-picker__calendar-controls {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-}
-
-.cx-date-picker__select-shell {
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-.cx-date-picker__select-shell--month {
-  width: calc(var(--controller-size) * 4);
-}
-
-.cx-date-picker__select-shell--year {
-  width: calc(var(--controller-size) * 2.75);
-}
-
-.cx-date-picker__weekdays,
-.cx-date-picker__grid {
-  display: grid;
-  grid-template-columns: repeat(7, var(--controller-size));
-  justify-content: center;
-  gap: var(--space-xs);
-}
-
-.cx-date-picker__weekday {
-  display: flex;
-  height: var(--controller-size-small);
-  align-items: center;
-  justify-content: center;
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-small);
-}
-
-.cx-date-picker__day {
+.cx-date-picker__calendar {
   display: inline-flex;
-  width: var(--controller-size);
-  height: var(--controller-size);
-  align-items: center;
-  justify-content: center;
-  border: var(--line-discreet);
-  border-color: transparent;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
-  cursor: pointer;
-  transition:
-    background-color var(--motion-fast) ease,
-    color var(--motion-fast) ease,
-    border-color var(--motion-fast) ease;
 }
 
-.cx-date-picker__day:hover:not(:disabled) {
-  background: var(--opacity-mid);
-}
-
-.cx-date-picker__day:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
-
-.cx-date-picker__day:disabled {
-  cursor: default;
-  opacity: var(--opacity-disabled);
-}
-
-.cx-date-picker__day--outside {
-  color: var(--opacity-mid);
-}
-
-.cx-date-picker__day--today {
-  border-color: var(--opacity-mid);
-}
-
-.cx-date-picker__day--selected {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--on-ink);
-}
-
-.cx-date-picker__day--selected:hover:not(:disabled) {
-  background: var(--primary-alt);
-}
-
-.cx-date-picker__divider {
-  border-top: var(--line);
+.cx-date-picker__time-island {
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-sizing: border-box;
 }
 
 .cx-date-picker__time-row {

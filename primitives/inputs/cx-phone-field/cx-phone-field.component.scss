@@ -10,15 +10,12 @@
 }
 
 .cx-phone-field--small {
-  --cx-phone-field-min-height: var(--controller-size-small);
   --cx-phone-field-font-size: var(--font-size-body-sm);
   --cx-phone-field-country-width: 74px;
 }
 
 .cx-phone-field--large {
-  --cx-phone-field-min-height: calc(var(--controller-size) + var(--space-md));
   --cx-phone-field-font-size: var(--font-size-body-lg);
-  --cx-phone-field-border-radius: var(--radius-lg);
   --cx-phone-field-country-width: 94px;
 }
 
@@ -28,16 +25,25 @@
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  min-height: var(--cx-phone-field-min-height, var(--controller-size));
+  min-height: var(--controller-size);
   align-items: center;
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
-  border-radius: var(--cx-phone-field-border-radius, var(--radius-md));
-  background: var(--opacity-darken);
+  border-radius: var(--radius-md);
+  background: transparent;
 }
 
 @include field.field-shell-state('.cx-phone-field__field-shell', '.cx-phone-field__field');
+
+.cx-phone-field--small .cx-phone-field__field-shell {
+  min-height: var(--controller-size-small);
+}
+
+.cx-phone-field--large .cx-phone-field__field-shell {
+  min-height: var(--controller-size-large);
+  border-radius: var(--radius-xl);
+}
 
 .cx-phone-field__field-shell:has(.cx-phone-field__country-select:focus-visible) {
   outline: var(--outline-tab);
@@ -63,7 +69,7 @@
   cursor: pointer;
   font: inherit;
   font-size: var(--cx-phone-field-font-size, var(--font-size-body));
-  line-height: 1.1;
+  line-height: var(--line-height-control);
   outline: 0;
 }
 
@@ -98,7 +104,7 @@
   font-family: inherit;
   font-size: var(--cx-phone-field-font-size, var(--font-size-body));
   font-weight: var(--font-weight-regular);
-  line-height: 1.1;
+  line-height: var(--line-height-control);
 }
 
 .cx-phone-field__field:focus-visible {

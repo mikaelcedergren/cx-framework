@@ -1,25 +1,34 @@
-@if (isOpen$()) {
-  <div class="cx-fullscreen-dialog__overlay">
+@if (isRendered$()) {
+  <div
+    #dialogRoot
+    class="cx-fullscreen-dialog__overlay"
+    [class.cx-fullscreen-dialog__overlay--closing]="isClosing$()"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="resolvedAriaLabel()"
+    [attr.tabindex]="dialogTabIndex()"
+    (keydown)="onEscape($event)"
+  >
+    @if (closeButton) {
+      <button
+        type="button"
+        class="cx-fullscreen-dialog__close"
+        [class.cx-fullscreen-dialog__close--ready]="isCloseButtonReady$()"
+        aria-label="Close fullscreen dialog"
+        [attr.aria-hidden]="isCloseButtonReady$() ? null : 'true'"
+        [attr.tabindex]="isCloseButtonReady$() ? 0 : -1"
+        (click)="onDismiss()"
+      >
+        <cx-icon name="remove" size="16" />
+      </button>
+    }
+
     <section
       class="cx-fullscreen-dialog"
-      cdkTrapFocus
-      [cdkTrapFocusAutoCapture]="true"
-      role="dialog"
-      aria-modal="true"
-      [attr.aria-label]="resolvedAriaLabel()"
-      (keydown)="onEscape($event)"
+      (animationend)="onCanvasAnimationEnd($event)"
     >
-      @if (closeButton) {
-        <cx-icon-button
-          class="cx-fullscreen-dialog__close"
-          icon="remove"
-          ariaLabel="Close fullscreen dialog"
-          variant="transparent"
-          [rounded]="true"
-          (pressed)="onDismiss()"
-        />
-      }
-
       <div class="cx-fullscreen-dialog__content">
         <ng-content />
       </div>

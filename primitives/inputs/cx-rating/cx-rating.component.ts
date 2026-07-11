@@ -25,12 +25,36 @@ export class CxRatingComponent {
   private readonly valueState = signal(0);
   private readonly maxState = signal(5);
   private readonly hoverState = signal<number | null>(null);
+  private readonlyState = false;
+  private disabledState = false;
 
   @Input() icon: CxIconName = 'star-on';
   @Input() size: CxRatingSize = 'default';
-  @Input() readonly = false;
-  @Input() disabled = false;
   @Input() ariaLabel = 'Rating';
+
+  @Input()
+  public set readonly(value: boolean) {
+    this.readonlyState = !!value;
+    if (this.readonlyState) {
+      this.hoverState.set(null);
+    }
+  }
+
+  public get readonly(): boolean {
+    return this.readonlyState;
+  }
+
+  @Input()
+  public set disabled(value: boolean) {
+    this.disabledState = !!value;
+    if (this.disabledState) {
+      this.hoverState.set(null);
+    }
+  }
+
+  public get disabled(): boolean {
+    return this.disabledState;
+  }
 
   @Input()
   public set value(value: number | null | undefined) {
@@ -46,6 +70,7 @@ export class CxRatingComponent {
 
   @Output() readonly valueChange = new EventEmitter<number>();
 
+  protected readonly value$ = this.valueState.asReadonly();
   protected readonly max$ = this.maxState.asReadonly();
   protected readonly stars$ = computed(() => Array.from({ length: this.maxState() }, (_, index) => index + 1));
   protected readonly displayValue$ = computed(() => this.hoverState() ?? this.valueState());
@@ -81,9 +106,7 @@ export class CxRatingComponent {
     if (!this.interactive) {
       return;
     }
-    // Clicking the current single-star value clears it back to zero.
-    const next = this.valueState() === index ? index - 1 : index;
-    this.commit(next);
+    this.commit(index);
   }
 
   protected onKeydown(event: KeyboardEvent): void {

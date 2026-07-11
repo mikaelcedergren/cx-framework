@@ -34,7 +34,7 @@
     color: var(--opacity-high);
     font-size: var(--font-size-body-sm);
     font-weight: var(--font-weight-regular);
-    line-height: 1.4;
+    line-height: var(--line-height-body-relaxed);
   }
 }
 
@@ -42,8 +42,7 @@
   #{$selector} {
     transition:
       border-color var(--motion-fast) ease,
-      background-color var(--motion-fast) ease,
-      outline-color var(--motion-fast) ease;
+      background-color var(--motion-fast) ease;
   }
 
   #{$selector}:hover:not(#{$selector}--disabled):not(#{$selector}--error) {
@@ -56,7 +55,7 @@
   }
 
   @if $focus-target != null {
-    #{$selector}:has(#{$focus-target}:focus-visible) {
+    :host-context([data-cx-keyboard-navigation]) #{$selector}:has(#{$focus-target}:focus) {
       outline: var(--outline-tab);
       outline-offset: var(--outline-tab-offset);
     }

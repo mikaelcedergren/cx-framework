@@ -19,6 +19,7 @@ export type CxToastAction = CxFeedbackAction;
 })
 export class CxToastComponent implements OnDestroy {
   private hideTimer: number | undefined;
+  private openFrame: number | undefined;
   private dismissibleValue = false;
   private readonly openState = signal(false);
   private readonly renderedState = signal(false);
@@ -113,6 +114,7 @@ export class CxToastComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cancelOpenFrame();
     this.clearHideTimer();
   }
 
@@ -137,15 +139,19 @@ export class CxToastComponent implements OnDestroy {
   }
 
   private setOpen(nextOpen: boolean): void {
+    this.cancelOpenFrame();
     this.clearHideTimer();
 
     if (nextOpen) {
       this.renderedState.set(true);
       this.openState.set(false);
       if (typeof window !== 'undefined') {
-        window.requestAnimationFrame(() => {
+        this.openFrame = window.requestAnimationFrame(() => {
+          this.openFrame = undefined;
           this.openState.set(true);
+          this.syncHideTimer();
         });
+        return;
       } else {
         this.openState.set(true);
       }
@@ -176,6 +182,14 @@ export class CxToastComponent implements OnDestroy {
     this.hideTimer = window.setTimeout(() => {
       this.requestClose();
     }, 5000);
+  }
+
+  private cancelOpenFrame(): void {
+    if (this.openFrame === undefined || typeof window === 'undefined') {
+      return;
+    }
+    window.cancelAnimationFrame(this.openFrame);
+    this.openFrame = undefined;
   }
 
   private clearHideTimer(): void {

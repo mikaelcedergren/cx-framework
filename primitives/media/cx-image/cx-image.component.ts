@@ -33,6 +33,7 @@ type NormalizedCxImage = Required<CxImage>;
     '[style.--cx-image-max-height]': 'hostMaxHeight',
     '[style.--cx-image-object-fit]': 'hostObjectFit',
     '[style.--cx-image-border-radius]': 'hostBorderRadius',
+    '[style.--cx-image-corner-shape]': 'hostCornerShape',
     '[class.cx-image-host--clickable]': 'hostClickable',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,6 +92,10 @@ export class CxImageComponent {
     return this.styleVars$()['--cx-image-border-radius'];
   }
 
+  public get hostCornerShape(): string {
+    return this.styleVars$()['--cx-image-corner-shape'];
+  }
+
   public get hostClickable(): boolean {
     return this.imageState().clickBehavior !== 'default';
   }
@@ -137,6 +142,7 @@ function calculateImageStyleVars(image: NormalizedCxImage): Record<string, strin
     '--cx-image-max-height': image.maxHeight === 'auto' ? 'none' : resolveImageSizeValue(image.maxHeight),
     '--cx-image-object-fit': image.objectFit,
     '--cx-image-border-radius': resolveImageRadiusValue(image.borderRadius),
+    '--cx-image-corner-shape': image.borderRadius === 'round' ? 'round' : 'var(--corner-shape, round)',
   };
 }
 
@@ -158,9 +164,9 @@ function resolveImageRadiusValue(radius: CxImageRadius): string {
     case 'none':
       return 'var(--radius-none)';
     case '4':
-      return 'var(--radius-sm)';
+      return 'var(--radius-xs)';
     case '8':
-      return 'var(--radius-md)';
+      return 'var(--radius-sm)';
     case '16':
       return 'var(--radius-lg)';
     case 'round':

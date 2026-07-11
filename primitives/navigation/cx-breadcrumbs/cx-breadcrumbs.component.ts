@@ -15,7 +15,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { type CxMenuItem, CxMenuComponent } from '../../overlay/cx-menu';
+import { type CxMenuGroup, type CxMenuItem, CxMenuComponent } from '../../overlay/cx-menu';
 import { CxIconComponent } from '../../media/cx-icon';
 
 export interface CxBreadcrumbOption {
@@ -161,14 +161,21 @@ export class CxBreadcrumbsComponent implements AfterViewInit, OnDestroy {
     return (item.options?.length ?? 0) > 0;
   }
 
-  protected optionMenuItems(item: CxBreadcrumbItem): CxMenuItem[] {
+  protected optionMenuGroups(item: CxBreadcrumbItem): CxMenuGroup[] {
+    // Sibling switching is a single-choice group: exactly one option is the
+    // current page, so items announce as menuitemradio with aria-checked.
     const selectedOptionId = item.selectedOptionId ?? item.id;
-    return (item.options ?? []).map(option => ({
-      id: option.id,
-      label: option.label,
-      disabled: option.disabled,
-      selected: option.id === selectedOptionId,
-    }));
+    return [
+      {
+        selection: 'single',
+        items: (item.options ?? []).map(option => ({
+          id: option.id,
+          label: option.label,
+          disabled: option.disabled,
+          selected: option.id === selectedOptionId,
+        })),
+      },
+    ];
   }
 
   protected selectOption(item: CxBreadcrumbItem, optionId: string): void {

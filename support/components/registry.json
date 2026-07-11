@@ -163,15 +163,6 @@
       "path": "patterns/cx-table-view/cx-table-view.component.ts"
     },
     {
-      "name": "cx-topbar",
-      "selectors": [
-        "cx-topbar"
-      ],
-      "area": "pattern",
-      "category": "cx-topbar",
-      "path": "patterns/cx-topbar/cx-topbar.component.ts"
-    },
-    {
       "name": "cx-wizard-dialog",
       "selectors": [
         "cx-wizard-dialog"
@@ -676,15 +667,6 @@
       "path": "patterns/cx-kpi/cx-kpi.component.ts"
     },
     {
-      "name": "cx-hierarchical-select",
-      "selectors": [
-        "cx-hierarchical-select"
-      ],
-      "area": "primitive",
-      "category": "inputs",
-      "path": "primitives/inputs/cx-hierarchical-select/cx-hierarchical-select.component.ts"
-    },
-    {
       "name": "cx-text-field",
       "selectors": [
         "cx-text-field"
@@ -766,13 +748,13 @@
       "path": "primitives/inputs/cx-switch/cx-switch.component.ts"
     },
     {
-      "name": "cx-tag-input",
+      "name": "cx-tag-field",
       "selectors": [
-        "cx-tag-input"
+        "cx-tag-field"
       ],
       "area": "primitive",
       "category": "inputs",
-      "path": "primitives/inputs/cx-tag-input/cx-tag-input.component.ts"
+      "path": "primitives/inputs/cx-tag-field/cx-tag-field.component.ts"
     },
     {
       "name": "cx-textarea",
@@ -784,13 +766,13 @@
       "path": "primitives/inputs/cx-textarea/cx-textarea.component.ts"
     },
     {
-      "name": "cx-time-input",
+      "name": "cx-time-field",
       "selectors": [
-        "cx-time-input"
+        "cx-time-field"
       ],
       "area": "primitive",
       "category": "inputs",
-      "path": "primitives/inputs/cx-time-input/cx-time-input.component.ts"
+      "path": "primitives/inputs/cx-time-field/cx-time-field.component.ts"
     },
     {
       "name": "cx-toggle-chip",
@@ -971,6 +953,87 @@
       "area": "primitive",
       "category": "overlay",
       "path": "primitives/overlay/cx-tooltip/cx-tooltip.component.ts"
+    },
+    {
+      "name": "cx-index-nav",
+      "selectors": [
+        "cx-index-nav"
+      ],
+      "area": "pattern",
+      "category": "cx-index-nav",
+      "path": "patterns/cx-index-nav/cx-index-nav.component.ts"
+    },
+    {
+      "name": "cx-masthead",
+      "selectors": [
+        "cx-masthead"
+      ],
+      "area": "pattern",
+      "category": "cx-masthead",
+      "path": "patterns/cx-masthead/cx-masthead.component.ts"
+    },
+    {
+      "name": "cx-process",
+      "selectors": [
+        "cx-process"
+      ],
+      "area": "pattern",
+      "category": "cx-process",
+      "path": "patterns/cx-process/cx-process.component.ts"
+    },
+    {
+      "name": "cx-popover-demo",
+      "selectors": [
+        "cx-popover-demo"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-popover-demo/cx-popover-demo.component.ts"
+    },
+    {
+      "name": "cx-split-button",
+      "selectors": [
+        "cx-split-button"
+      ],
+      "area": "primitive",
+      "category": "actions",
+      "path": "primitives/actions/cx-split-button/cx-split-button.component.ts"
+    },
+    {
+      "name": "cx-markdown",
+      "selectors": [
+        "cx-markdown"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-markdown/cx-markdown.component.ts"
+    },
+    {
+      "name": "cx-process-pill",
+      "selectors": [
+        "cx-process-pill"
+      ],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-process-pill/cx-process-pill.component.ts"
+    },
+    {
+      "name": "cx-password-field",
+      "selectors": [
+        "cx-password-field"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-password-field/cx-password-field.component.ts"
+    },
+    {
+      "name": "cx-popover-backdrop",
+      "selectors": [
+        "cx-popover-backdrop"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-popover-backdrop/cx-popover-backdrop.component.ts"
     }
   ]
 }

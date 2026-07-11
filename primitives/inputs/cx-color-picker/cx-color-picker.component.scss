@@ -25,15 +25,14 @@
   padding: 0 var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: var(--opacity-darken);
+  background: transparent;
   color: var(--ink);
   cursor: pointer;
   font: inherit;
   text-align: left;
   transition:
     border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease,
-    outline-color var(--motion-fast) ease;
+    background-color var(--motion-fast) ease;
 }
 
 .cx-color-picker--small .cx-color-picker__trigger {
@@ -62,7 +61,7 @@
 
 .cx-color-picker__trigger--open {
   border-color: var(--border-open);
-  background: var(--surface-low);
+  background: var(--surface-alt);
 }
 
 .cx-color-picker__trigger--error {
@@ -85,22 +84,21 @@
   color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: 1.1;
+  line-height: var(--line-height-control);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cx-color-picker__swatch {
-  --cx-color-picker-swatch-border-color: var(--opacity-mid);
   --cx-color-picker-swatch-size: calc(var(--icon-size-md) - 2px);
 
   display: inline-flex;
   width: var(--cx-color-picker-swatch-size);
   height: var(--cx-color-picker-swatch-size);
   flex: 0 0 auto;
-  border: var(--border-width) solid var(--cx-color-picker-swatch-border-color);
+  border: var(--border-width) solid var(--opacity-mid);
   border-radius: var(--radius-sm);
-  background: var(--surface-mid);
+  background: var(--surface);
   box-sizing: border-box;
 }
 
@@ -109,11 +107,11 @@
     linear-gradient(
       135deg,
       transparent calc(50% - var(--border-width) / 2),
-      var(--cx-color-picker-swatch-border-color) calc(50% - var(--border-width) / 2),
-      var(--cx-color-picker-swatch-border-color) calc(50% + var(--border-width) / 2),
+      var(--opacity-mid) calc(50% - var(--border-width) / 2),
+      var(--opacity-mid) calc(50% + var(--border-width) / 2),
       transparent calc(50% + var(--border-width) / 2)
     ),
-    var(--surface-mid);
+    var(--surface);
 }
 
 .cx-color-picker__chevron {
@@ -184,7 +182,7 @@
   color: currentColor;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: 1.4;
+  line-height: var(--line-height-body-relaxed);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

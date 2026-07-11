@@ -6,10 +6,14 @@ import {
   type CxButtonMood,
 } from '../../actions/cx-button';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
+import { eventMatchesShortcut } from '../../actions/shared/shortcuts';
+import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { CxMenuComponent, type CxMenuItem } from '../cx-menu';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 let cxDialogId = 0;
+const CX_DIALOG_PRIMARY_SHORTCUT = ['Mod', 'Enter'] as const;
+const CX_DIALOG_SECONDARY_SHORTCUT = ['Esc'] as const;
 
 export type CxDialogVariant = 'confirm' | 'info';
 export type CxDialogMood = CxButtonMood;
@@ -17,7 +21,14 @@ export type CxDialogSize = 'small' | 'default' | 'large';
 
 @Component({
   selector: 'cx-dialog',
-  imports: [CommonModule, A11yModule, CxButtonComponent, CxIconButtonComponent, CxMenuComponent],
+  imports: [
+    CommonModule,
+    A11yModule,
+    CxButtonComponent,
+    CxIconButtonComponent,
+    CxMenuComponent,
+    CxShortcutKeyComponent,
+  ],
   templateUrl: './cx-dialog.component.html',
   styleUrl: './cx-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,21 +40,28 @@ export class CxDialogComponent implements OnDestroy {
   private overlayHandle?: CxOverlayStateHandle;
 
   protected readonly titleId = `cx-dialog-title-${++cxDialogId}`;
-  protected readonly textId = `cx-dialog-text-${cxDialogId}`;
+  protected readonly descriptionId = `cx-dialog-description-${cxDialogId}`;
   protected readonly isOpen$ = this.openState.asReadonly();
+  protected readonly primaryShortcutParts = CX_DIALOG_PRIMARY_SHORTCUT;
+  protected readonly secondaryShortcutParts = CX_DIALOG_SECONDARY_SHORTCUT;
+  protected readonly primaryShortcutAria = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform)
+    ? 'Meta+Enter'
+    : 'Control+Enter';
 
   @Input() variant: CxDialogVariant = 'info';
   @Input() size: CxDialogSize = 'default';
   @Input() dismissible = false;
+  @Input() dismissOnClickOutside = false;
   @Input() heading = '';
-  @Input() text = '';
-  @Input() primaryText = 'Close';
+  @Input() description = '';
+  @Input() primaryText = '';
   @Input() primaryDisabled = false;
   @Input() primaryLoading = false;
   @Input() mood: CxDialogMood = 'primary';
   @Input() secondaryText = '';
   @Input() closeOnPrimary = true;
   @Input() closeOnSecondary = true;
+  @Input() menu = false;
   @Input() menuItems: readonly CxMenuItem[] | undefined;
   @Input() menuAriaLabel: string | undefined;
 
@@ -91,12 +109,27 @@ export class CxDialogComponent implements OnDestroy {
     return trimmedLabel.length > 0 ? trimmedLabel : 'Cancel';
   }
 
-  protected hasText(): boolean {
-    return this.text.trim().length > 0;
+  protected showPrimaryShortcut(): boolean {
+    return !this.primaryDisabled && !this.primaryLoading;
+  }
+
+  protected dialogShortcutAria(): string | null {
+    const shortcuts: string[] = [];
+    if (this.variant === 'confirm' || this.canDismiss()) {
+      shortcuts.push('Escape');
+    }
+    if (this.showPrimaryShortcut()) {
+      shortcuts.push(this.primaryShortcutAria);
+    }
+    return shortcuts.length > 0 ? shortcuts.join(' ') : null;
+  }
+
+  protected hasDescription(): boolean {
+    return this.description.trim().length > 0;
   }
 
   protected hasMenuItems(): boolean {
-    return (this.menuItems?.length ?? 0) > 0;
+    return this.menu && (this.menuItems?.length ?? 0) > 0;
   }
 
   protected canDismiss(): boolean {
@@ -117,16 +150,20 @@ export class CxDialogComponent implements OnDestroy {
   }
 
   protected onBackdropClick(): void {
-    if (!this.canDismiss()) {
+    if (!this.dismissOnClickOutside) {
       return;
     }
-    this.onDismiss();
+    this.dismissFromUser();
   }
 
   protected onDismiss(): void {
     if (!this.canDismiss()) {
       return;
     }
+    this.dismissFromUser();
+  }
+
+  private dismissFromUser(): void {
     this.dismiss.emit();
     this.closeFromUser();
   }
@@ -156,26 +193,37 @@ export class CxDialogComponent implements OnDestroy {
     this.menuItemSelect.emit(itemId);
   }
 
-  protected onEscape(event: KeyboardEvent): void {
-    if (event.key !== 'Escape' || this.menuOpenState() || !this.canDismiss()) {
+  protected onDialogKeydown(event: KeyboardEvent): void {
+    if (event.isComposing || this.menuOpenState()) {
       return;
     }
-    event.preventDefault();
-    event.stopPropagation();
-    this.onDismiss();
-  }
 
-  protected onEnter(event: KeyboardEvent): void {
-    if (event.key !== 'Enter' || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) {
+    if (
+      event.key === 'Escape'
+      && !event.altKey
+      && !event.ctrlKey
+      && !event.metaKey
+      && !event.shiftKey
+    ) {
+      if (this.variant === 'confirm') {
+        event.preventDefault();
+        event.stopPropagation();
+        this.onSecondary();
+        return;
+      }
+      if (this.canDismiss()) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.onDismiss();
+      }
       return;
     }
-    const target = event.target;
-    if (this.isEnterOwnedByControl(target)) {
-      return;
+
+    if (eventMatchesShortcut(CX_DIALOG_PRIMARY_SHORTCUT, event)) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.onPrimary();
     }
-    event.preventDefault();
-    event.stopPropagation();
-    this.onPrimary();
   }
 
   private closeFromUser(): void {
@@ -200,23 +248,5 @@ export class CxDialogComponent implements OnDestroy {
   private releaseOverlay(): void {
     this.overlayState.release(this.overlayHandle);
     this.overlayHandle = undefined;
-  }
-
-  private isEnterOwnedByControl(target: EventTarget | null): boolean {
-    if (!(target instanceof HTMLElement)) {
-      return false;
-    }
-    return !!target.closest(
-      [
-        'button',
-        'a[href]',
-        'select',
-        'textarea',
-        '[role="button"]',
-        '[role="menuitem"]',
-        '[role="option"]',
-        '[contenteditable]:not([contenteditable="false"])',
-      ].join(', '),
-    );
   }
 }

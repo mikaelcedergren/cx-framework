@@ -51,6 +51,16 @@ export class SettingsPage {}
 
 Use framework components before building local UI. If a shared component is missing a repeatable behavior, extend the framework component instead of patching a page.
 
+Install the keyboard-focus provider once in the application config. It keeps the primary focus ring exclusive to Tab navigation, while pointer-focused controls retain their quieter active state:
+
+```ts
+import { provideCxKeyboardFocus } from '@mikaelcedergren/cx-framework';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideCxKeyboardFocus()],
+};
+```
+
 ## Styles and tokens
 
 Use package subpaths in global styles:
@@ -115,9 +125,7 @@ Do not draw one-off app icons when a framework icon exists. If a reusable icon i
 
 ## AI design docs
 
-The AI design package lives in `ai/design/`.
-
-Start with:
+The canonical AI design package lives in `ai/design/`. Read `00-start-here.md` for precedence and task-local retrieval, then search only the relevant rules:
 
 - `ai/design/00-start-here.md`
 - `ai/design/01-design-philosophy.md`
@@ -126,7 +134,7 @@ Start with:
 - `ai/design/04-copy-and-microcopy.md`
 - `ai/design/05-fallback-copy.md`
 
-Agents should search these docs before making user-facing design, copy, component, or implementation decisions.
+Agents should not load the whole package by default. Search by stable `RULE-ID:`, `SCOPE:`, `TOPIC:`, `COMPONENT:`, or keyword.
 
 ## AI skills
 
@@ -137,7 +145,9 @@ Portable skills live in `ai/skills/`:
 - `custodian`
 - `developer`
 
-Use these as the reusable role contracts. Keep product-specific agent instructions in the consuming app's own local instructions. If a recurring design lesson becomes durable, promote it into `ai/design/` instead of hiding it in one product.
+Use these as reusable role contracts. Keep product-specific instructions in the consuming app. A discovery bridge may point to the packaged source skill, but the complete `ai/` tree must remain available so each skill's relative `../../design/` references resolve.
+
+The package does not register skills in a consuming product automatically. Install or bridge only the roles that product intends to expose, and keep discovery frontmatter aligned with the source skill.
 
 ## Consumer rules
 
@@ -153,5 +163,6 @@ Use these as the reusable role contracts. Keep product-specific agent instructio
 
 - `DESIGN-SYSTEM.md` explains the design-system model, token rules, component discipline, and reference expectations.
 - `ai/README.md` explains how the AI design docs and skills relate.
+- `support/README.md` explains machine-readable component discovery.
 - `icons/README.md` explains the icon source and manifest workflow.
 - `PACKAGING.md` explains how this package is exported and maintained.

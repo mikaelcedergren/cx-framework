@@ -18,8 +18,8 @@
   min-height: calc(var(--controller-size) * 10);
   overflow: hidden;
   border: var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-mid);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
 }
 
 .cx-variant__tabs {
@@ -94,7 +94,7 @@
   justify-content: center;
   overflow: auto;
   padding: var(--space-xl);
-  background: var(--surface-mid);
+  background: var(--surface);
   box-sizing: border-box;
 }
 

@@ -9,7 +9,7 @@
     type="checkbox"
     [checked]="selected$()"
     [disabled]="disabled"
-    [attr.aria-label]="heading || text || null"
+    [attr.aria-label]="heading || description || null"
     (change)="onNativeChange($event)"
     (focus)="onFocus(true)"
     (blur)="onFocus(false)"
@@ -29,8 +29,8 @@
     @if (visibleHeading$()) {
       <div class="cx-big-checkbox__label">{{ visibleHeading$() }}</div>
     }
-    @if (visibleText$()) {
-      <div class="cx-big-checkbox__description">{{ visibleText$() }}</div>
+    @if (visibleDescription$()) {
+      <div class="cx-big-checkbox__description">{{ visibleDescription$() }}</div>
     }
     <ng-content />
   </div>

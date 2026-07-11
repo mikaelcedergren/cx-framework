@@ -1,44 +1,68 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  type OnChanges,
+  type SimpleChanges,
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxCheckboxComponent } from '../../inputs/cx-checkbox';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { CxIconComponent } from '../../media/cx-icon';
 
-export type CxOptionSize = 'small' | 'default' | 'large';
-export type CxOptionMood = 'default' | 'danger';
+export type CxOptionMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxOptionSubmenu = 'none' | 'open' | 'closed';
-type CxOptionIconSize = '12' | '16' | '24';
 
 @Component({
   selector: 'cx-option',
-  imports: [CxCheckboxComponent, CxIconComponent, CxShortcutKeyComponent],
+  imports: [NgTemplateOutlet, CxIconComponent, CxShortcutKeyComponent],
   templateUrl: './cx-option.component.html',
   styleUrl: './cx-option.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxOptionComponent {
+export class CxOptionComponent implements OnChanges {
   @Input() label = 'Option';
-  /**
-   * ARIA role for the underlying control. Left undefined by default so shared
-   * consumers (cx-dropdown, cx-table, cx-tag-input) keep the native button role.
-   * cx-menu passes "menuitem".
-   */
-  @Input() role?: string;
-  @Input() prependIcon?: CxIconName;
   @Input() description?: string;
+  @Input() prependIcon?: CxIconName;
   @Input() appendIcon?: CxIconName;
+  @Input() shortcutParts: readonly string[] | undefined;
+  @Input() submenu: CxOptionSubmenu = 'none';
   @Input() mood: CxOptionMood = 'default';
-  @Input() size: CxOptionSize = 'default';
-  @Input() hover = false;
+  @Input() active = false;
   @Input() selected = false;
   @Input() selectedHighlight = true;
   @Input() showCheckbox = false;
+  @Input() clickable = true;
   @Input() disabled = false;
-  @Input() shortcutParts: readonly string[] | undefined;
-  @Input() submenu: CxOptionSubmenu = 'none';
+  /**
+   * ARIA role for the underlying control. Left undefined by default so shared
+   * consumers (cx-dropdown, cx-table, cx-tag-field) keep the native button role.
+   * cx-menu passes "menuitem".
+   */
+  @Input() role?: string;
+  /** Position within a partially rendered set (1-based); virtualized listboxes pass this. */
+  @Input() ariaPosInSet?: number;
+  /** Total size of a partially rendered set; virtualized listboxes pass this. */
+  @Input() ariaSetSize?: number;
+
+  @ViewChild('control', { read: ElementRef })
+  private controlRef?: ElementRef<HTMLElement>;
+
+  private warnedInvalidCheckboxIcon = false;
+
+  ngOnChanges(_changes: SimpleChanges): void {
+    this.warnInvalidCombinations();
+  }
+
+  /** Move keyboard focus to the option's control. */
+  public focus(): void {
+    this.controlRef?.nativeElement.focus();
+  }
 
   protected hasAppendOnlyLayout(): boolean {
-    return !this.showCheckbox && !this.prependIcon && Boolean(this.appendIcon || this.submenu !== 'none');
+    return !this.showCheckbox && !this.showPrependIcon() && Boolean(this.appendIcon || this.submenu !== 'none');
   }
 
   protected hasShortcut(): boolean {
@@ -49,17 +73,35 @@ export class CxOptionComponent {
     return this.submenu === 'none' ? this.appendIcon : 'chevron-right';
   }
 
-  protected iconSize(): CxOptionIconSize {
-    if (this.size === 'small') {
-      return '12';
-    }
-    if (this.size === 'large') {
-      return '24';
-    }
-    return '16';
+  protected showPrependIcon(): CxIconName | undefined {
+    return this.showCheckbox ? undefined : this.prependIcon;
   }
 
   protected ariaSelectedValue(): string | null {
-    return this.selected || this.role === 'option' ? String(this.selected) : null;
+    // aria-selected is only valid on the option role; other consumers (plain
+    // buttons, menu items) express selection visually or via aria-checked.
+    return this.role === 'option' ? String(this.selected) : null;
+  }
+
+  protected ariaCheckedValue(): string | null {
+    return this.role === 'menuitemradio' || this.role === 'menuitemcheckbox'
+      ? String(this.selected)
+      : null;
+  }
+
+  protected stopControlEvent(event: Event): void {
+    event.stopPropagation();
+  }
+
+  private warnInvalidCombinations(): void {
+    if (this.showCheckbox && this.prependIcon) {
+      if (!this.warnedInvalidCheckboxIcon) {
+        console.warn('[cx-option] showCheckbox and prependIcon cannot be used together. The checkbox affordance replaces the prepend icon.');
+        this.warnedInvalidCheckboxIcon = true;
+      }
+      return;
+    }
+
+    this.warnedInvalidCheckboxIcon = false;
   }
 }

@@ -9,9 +9,11 @@
   [class.cx-query-element--values]="kind === 'values'"
   [class.cx-query-element--focused]="focused"
   [class.cx-query-element--disabled]="disabled"
+  [class.cx-query-element--grouped]="grouped"
   [disabled]="disabled"
-  [attr.aria-pressed]="focused ? 'true' : null"
-  (click)="onPressed()"
+  [attr.tabindex]="tabIndex"
+  [attr.aria-label]="ariaLabel ?? null"
+  (click)="onPressed($event)"
 >
   @if (isValues()) {
     @if (valuesPrefix) {

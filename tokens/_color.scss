@@ -4,13 +4,18 @@
     --primary-opacity: var(--blue-opacity);
     --primary-alt: var(--blue-alt);
 
+    /* Choice controls share one selected-state language independently of
+       primary actions, so themes can tune the two roles separately. */
+    --choice-control-selected: var(--primary);
+    --choice-control-selected-hover: var(--primary-alt);
+    --on-choice-control: var(--on-ink);
+
     --accent: var(--cyan);
     --accent-opacity: var(--cyan-opacity);
     --accent-alt: var(--cyan-alt);
 
-    --surface-low: #f9f9f9;
-    --surface-mid: #ffffff;
-    --surface-high: #959ca8;
+    --surface: #ffffff;
+    --surface-alt: #f8f8f8;
 
     --ink: #1f1f1f;
     --on-ink: #ffffff;
@@ -18,7 +23,7 @@
     --on-emphasis: #171717;
 
     --opacity-high: color-mix(in srgb, rgb(22 24 29 / 62%) 92%, color-mix(in srgb, var(--blue) 62%, transparent) 8%);
-    --opacity-mid: color-mix(in srgb, rgb(22 24 29 / 10%) 92%, color-mix(in srgb, var(--blue) 10%, transparent) 8%);
+    --opacity-mid: color-mix(in srgb, rgb(22 24 29 / 8%) 92%, color-mix(in srgb, var(--blue) 8%, transparent) 8%);
     --opacity-low: color-mix(in srgb, rgb(22 24 29 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
     --opacity-darken: rgb(22 24 29 / 1.5%);
     --opacity-disabled: 0.55;
@@ -53,9 +58,8 @@
     --accent-opacity: var(--cyan-opacity);
     --accent-alt: var(--cyan-alt);
 
-    --surface-low: #151523;
-    --surface-mid: #1a1a2b;
-    --surface-high: #1f1f33;
+    --surface: #1a1a2b;
+    --surface-alt: #171727;
 
     --ink: #f4f7fc;
     --on-ink: #ffffff;
@@ -98,9 +102,8 @@
     --accent-opacity: var(--cyan-opacity);
     --accent-alt: var(--cyan-alt);
 
-    --surface-low: #0a0a0a;
-    --surface-mid: #000000;
-    --surface-high: #222222;
+    --surface: #000000;
+    --surface-alt: #0a0a0a;
 
     --ink: #f4f7fc;
     --on-ink: #ffffff;
@@ -143,9 +146,8 @@
     --accent-opacity: var(--cyan-opacity);
     --accent-alt: var(--cyan-alt);
 
-    --surface-low: #ffffff;
-    --surface-mid: #ffffff;
-    --surface-high: #ececec;
+    --surface: #ffffff;
+    --surface-alt: #ffffff;
 
     --ink: #000000;
     --on-ink: #ffffff;

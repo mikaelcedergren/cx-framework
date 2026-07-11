@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-export type CxOptionGroupVariant = 'label' | 'header';
-
 @Component({
   selector: 'cx-option-group',
   templateUrl: './cx-option-group.component.html',
@@ -9,7 +7,6 @@ export type CxOptionGroupVariant = 'label' | 'header';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxOptionGroupComponent {
-  @Input() label = 'Type something';
+  @Input() label = 'Group';
   @Input() description: string | undefined;
-  @Input() variant: CxOptionGroupVariant = 'label';
 }

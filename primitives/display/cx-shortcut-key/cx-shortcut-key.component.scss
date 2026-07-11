@@ -16,9 +16,9 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-xs);
-  border: var(--cx-shortcut-key-border, var(--line));
+  border: var(--line);
   color: var(--cx-shortcut-key-color, var(--placeholder));
-  background: var(--cx-shortcut-key-background, var(--opacity-low));
+  background: var(--opacity-low);
   box-sizing: border-box;
 }
 

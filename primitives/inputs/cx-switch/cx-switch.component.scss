@@ -89,7 +89,7 @@
 }
 
 .cx-switch--selected .cx-switch__track {
-  background: var(--primary);
+  background: var(--choice-control-selected);
 }
 
 .cx-switch--error .cx-switch__track,
@@ -112,7 +112,7 @@
   width: var(--cx-switch-thumb-size);
   height: var(--cx-switch-thumb-size);
   border-radius: var(--radius-xs);
-  background: var(--on-ink);
+  background: var(--on-choice-control);
   transition:
     transform var(--motion-fast) var(--ease-out-in),
     background var(--motion-fast) var(--ease-out-in);

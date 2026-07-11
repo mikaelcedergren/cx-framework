@@ -1,5 +1,4 @@
 :host {
-  --cx-radio-size: calc(var(--controller-size-small) - var(--space-sm));
   display: inline-flex;
   width: auto;
 }
@@ -13,7 +12,7 @@
 
 .cx-radio {
   display: inline-grid;
-  grid-template-columns: var(--cx-radio-size);
+  grid-template-columns: var(--choice-control-size);
   box-sizing: border-box;
   align-items: flex-start;
   border: 0;
@@ -21,7 +20,7 @@
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  min-height: var(--cx-radio-size);
+  min-height: var(--choice-control-size);
   line-height: 1;
   margin: 0;
   outline: none;
@@ -30,7 +29,7 @@
 }
 
 .cx-radio:has(.cx-radio__content) {
-  grid-template-columns: var(--cx-radio-size) minmax(0, auto);
+  grid-template-columns: var(--choice-control-size) minmax(0, auto);
   column-gap: var(--space-sm);
 }
 
@@ -44,8 +43,8 @@
 .cx-radio__input {
   grid-column: 1;
   grid-row: 1;
-  width: var(--cx-radio-size);
-  height: var(--cx-radio-size);
+  width: var(--choice-control-size);
+  height: var(--choice-control-size);
   padding: 0;
   border: 0;
   margin: 0;
@@ -59,13 +58,14 @@
   grid-column: 1;
   grid-row: 1;
   box-sizing: border-box;
-  width: var(--cx-radio-size);
-  height: var(--cx-radio-size);
+  width: var(--choice-control-size);
+  height: var(--choice-control-size);
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border: var(--line);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   line-height: 0;
   pointer-events: none;
@@ -90,8 +90,8 @@
 }
 
 .cx-radio--selected .cx-radio__control {
-  border-color: var(--cx-radio-checked-border-color, var(--primary));
-  background: var(--cx-radio-checked-background, var(--primary));
+  border-color: var(--choice-control-selected);
+  background: var(--choice-control-selected);
 }
 
 .cx-radio--selected .cx-radio__dot {
@@ -114,7 +114,8 @@
   width: calc(var(--space-xs) + var(--space-2xs));
   height: calc(var(--space-xs) + var(--space-2xs));
   border-radius: var(--radius-pill);
-  background: var(--cx-radio-checked-dot-color, var(--on-ink));
+  corner-shape: round;
+  background: var(--on-choice-control);
   transform: scale(0);
   opacity: 0;
   transition:
@@ -148,6 +149,6 @@
 }
 
 .cx-radio-field__error {
-  width: calc(100% - var(--cx-radio-size) - var(--space-sm));
-  margin-left: calc(var(--cx-radio-size) + var(--space-sm));
+  width: calc(100% - var(--choice-control-size) - var(--space-sm));
+  margin-left: calc(var(--choice-control-size) + var(--space-sm));
 }

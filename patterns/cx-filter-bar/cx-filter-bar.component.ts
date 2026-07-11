@@ -32,7 +32,7 @@ import {
   CxMenuComponent,
   type CxMenuItem,
 } from '../../primitives/overlay/cx-menu';
-import { CxMenuLabelComponent } from '../../primitives/overlay/cx-menu-label';
+import { CxOptionGroupComponent } from '../../primitives/overlay/cx-option-group';
 import { CxExpansionPanelComponent } from '../../primitives/display/cx-expansion-panel';
 import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
 import { measureCxFloatingSurface } from '../../primitives/overlay/floating-surface';
@@ -69,7 +69,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CxTextFieldComponent,
     CxDropdownComponent,
     CxMenuComponent,
-    CxMenuLabelComponent,
+    CxOptionGroupComponent,
     CxPopoverComponent,
     CxExpansionPanelComponent,
     CxSwitchComponent,
@@ -309,15 +309,17 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   });
   protected readonly hasColumnControls$ = computed(() => this.columnOptionsState().length > 0);
   protected readonly resolvedSavedViews$ = computed<CxMenuItem[]>(() =>
-    this.savedViewsState().map(item => ({
-      ...item,
-      appendIcon:
-        item.trackSelection === false
-          ? undefined
-          : this.activeSavedViewIdState() === item.id
-            ? 'check'
-            : undefined,
-    })),
+    this.savedViewsState().map(item => {
+      // trackSelection: false marks plain actions (e.g. "Manage views"); only
+      // real views carry radio selection state.
+      const selectable = item.trackSelection !== false;
+      const active = selectable && this.activeSavedViewIdState() === item.id;
+      return {
+        ...item,
+        selected: selectable ? active : undefined,
+        appendIcon: active ? 'check' : undefined,
+      };
+    }),
   );
   protected readonly savedViewIcon$ = computed<CxIconName>(() =>
     this.activeSavedViewIdState() ? 'saved-view-on' : 'saved-view',

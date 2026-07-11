@@ -16,6 +16,14 @@ Make framework changes in the source app first. New components, patterns, tokens
 
 Public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting.
 
+Validate portable AI rules, component discovery metadata, and skill bridges before every dry run or apply:
+
+```sh
+pnpm framework:ai:check
+```
+
+The package scripts run this automatically. Do not package a stale component registry or malformed rule set.
+
 ## Dry run
 
 From the source repo root:
@@ -68,7 +76,7 @@ It should not include generated or local junk such as `node_modules/`, `out-tsc/
 
 ## After export
 
-The package command bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
+The package command validates the AI/framework documentation layer, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
 
 After the package repo is committed and pushed, consuming apps using:
 

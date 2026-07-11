@@ -3,12 +3,14 @@
   [class.cx-phone-field--small]="size === 'small'"
   [class.cx-phone-field--large]="size === 'large'"
 >
-  <div class="cx-phone-field__header">
-    <div class="cx-phone-field__label" [id]="labelId">Phone number</div>
-    @if (optional) {
-      <div class="cx-phone-field__optional">Optional</div>
-    }
-  </div>
+  @if (label.trim()) {
+    <div class="cx-phone-field__header">
+      <div class="cx-phone-field__label" [id]="labelId">{{ label }}</div>
+      @if (optional) {
+        <div class="cx-phone-field__optional">Optional</div>
+      }
+    </div>
+  }
 
   <div
     class="cx-phone-field__field-shell"
@@ -48,7 +50,8 @@
       autocomplete="tel-national"
       [disabled]="disabled || loading"
       [value]="value$()"
-      [attr.aria-labelledby]="labelId"
+      [attr.aria-label]="resolvedAriaLabel"
+      [attr.aria-labelledby]="resolvedAriaLabelledBy"
       [attr.aria-describedby]="resolvedAriaDescribedBy"
       [attr.aria-invalid]="hasError$() ? 'true' : null"
       (input)="onInput($event)"

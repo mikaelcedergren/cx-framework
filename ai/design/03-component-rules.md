@@ -1,132 +1,143 @@
 # Component rules
 
-COMPONENT: banners
+Every rule carries its component name so `rg 'COMPONENT: buttons'` returns the applicable rules directly. Exact user-facing wording belongs in `04-copy-and-microcopy.md`.
 
-RULE: Reserve banners for critical messages the user must act on or for very important communication. TYPE: must TOPIC: feedback DESCRIPTION: Banners are intrusive and cover navigation, so they are only justified for critical, must-act-on or very important messages.
-RULE: Position banners at the top of the viewport. TYPE: must TOPIC: layout DESCRIPTION: A banner is always placed at the top of the screen.
-RULE: Make non-dismissable banners push the page content down rather than overlay it. TYPE: must TOPIC: layout DESCRIPTION: Non-dismissable banners are meant to be intrusive and must not shut out functionality, so they push content down.
-RULE: Make dismissable banners overlay the content so the user must dismiss them to proceed. TYPE: must TOPIC: interaction DESCRIPTION: Dismissable banners overlay content so the user notices the information and dismisses it before continuing.
-COMPONENT: buttons
+## Banners
 
-RULE: Label a button with the action it performs, not the current state. TYPE: must TOPIC: microcopy DESCRIPTION: A button names what it does (play/pause), while state is shown elsewhere.
-RULE: Always name the object of the action in button copy, not just the verb. TYPE: must TOPIC: microcopy DESCRIPTION: Use 'Delete file' or 'Send invitation' instead of vague 'Confirm' or 'Submit'.
-RULE: Reserve the primary button style for the single action that moves the user forward. TYPE: should TOPIC: interaction DESCRIPTION: Most buttons sit at default or secondary level; primary marks the one forward action.
-RULE: Avoid more than one primary button in the same area. TYPE: should TOPIC: interaction DESCRIPTION: Two primaries compete for attention and force the user to read both.
-RULE: Add a confirmation step before destructive, irreversible actions. TYPE: must TOPIC: interaction DESCRIPTION: Delete, remove, or cancel-subscription need an 'are you sure' step, not one-click.
-RULE: Use a clear, named action button on confirmation dialogs instead of an ambiguous label. TYPE: must TOPIC: microcopy DESCRIPTION: Use 'Delete file' on the dialog rather than 'OK'.
-RULE: Keep buttons enabled and reveal what is missing on click rather than disabling them. TYPE: should TOPIC: feedback DESCRIPTION: A greyed-out button without explanation confuses; clicking gives guidance when needed.
-RULE: Give immediate feedback when a button triggers a long process. TYPE: must TOPIC: feedback DESCRIPTION: A button state change or spinner stops users from clicking again or losing confidence.
-RULE: Follow a consistent order for a row of buttons. TYPE: should TOPIC: consistency DESCRIPTION: Consistent ordering builds muscle memory and avoids a chaotic feel.
-RULE: Place the primary action on the right and cancel or secondary on the left in western contexts. TYPE: should TOPIC: layout DESCRIPTION: Matches western reading conventions and user muscle memory.
-COMPONENT: context-menus
+RULE-ID: banners.earned SCOPE: component COMPONENT: banners TYPE: should TOPIC: feedback RULE: Reserve banners for important time-sensitive information. DESCRIPTION: Use quieter inline or page-level treatment when the message does not need broad immediate attention.
 
-RULE: Show only actions the user can actually perform right now. TYPE: must TOPIC: state DESCRIPTION: Keep the menu honest about what is possible at the current moment.
-RULE: When an action has an opposite, show only the state not currently set. TYPE: must TOPIC: state DESCRIPTION: If something is enabled show Disable; if disabled show Enable.
-RULE: Do not show both opposing actions with one greyed out. TYPE: must TOPIC: state DESCRIPTION: Present the next state as a single clickable verb that switches it over.
-RULE: Hide an action when the user cannot influence why it is unavailable. TYPE: must TOPIC: state DESCRIPTION: No permission ever, action does not apply, or required relationship does not exist.
-RULE: Disable an action when it is normally available but temporarily blocked by something the user can fix. TYPE: must TOPIC: state DESCRIPTION: Missing permission now, data loading, or another process in progress lets the user imagine resolving it.
-RULE: Group related actions together. TYPE: must TOPIC: layout DESCRIPTION: Status changes, administrative actions, and reporting each belong with their own kind.
-RULE: Reserve separators for boundaries between groups and keep them rare. TYPE: must TOPIC: layout DESCRIPTION: Too many separators turn the menu into single-item groups, equivalent to none.
-RULE: Place destructive actions at the bottom of the menu in their own cluster. TYPE: must TOPIC: layout DESCRIPTION: Putting Delete, Remove, Discard last gives a moment to register irreversibility.
-RULE: Color destructive actions red. TYPE: must TOPIC: color DESCRIPTION: Red signals the consequence before the user clicks.
-COMPONENT: dialogs
+RULE-ID: banners.position SCOPE: component COMPONENT: banners TYPE: should TOPIC: layout RULE: Place a banner at the top of the affected surface. DESCRIPTION: Its position should make scope and urgency apparent without covering unrelated navigation.
 
-RULE: Reserve dialogs for moments needing the user's full attention, like editing, adding, or confirming. TYPE: should TOPIC: components DESCRIPTION: Dialogs interrupt, so use them only when the task genuinely demands focus.
-RULE: Use dialogs only for contained tasks the user can complete without losing background context. TYPE: should TOPIC: components DESCRIPTION: A dialog should let the user decide and return to the same page they were on.
-RULE: Write the dialog message as a statement tied to the action button, not as a question. TYPE: should TOPIC: copy DESCRIPTION: Use "Archive project" rather than "Are you sure you want to archive this project?"
-RULE: Make the primary action read as a continuation of the title, not an answer to it. TYPE: should TOPIC: copy DESCRIPTION: The title and primary button should form a coherent action statement.
-RULE: Use clear, opposing button labels like "Cancel" and "Archive." TYPE: should TOPIC: microcopy DESCRIPTION: Distinct labels make each outcome unambiguous.
-RULE: Avoid generic "Yes" and "No" button labels. TYPE: should TOPIC: microcopy DESCRIPTION: Generic affirmatives don't communicate the action's outcome.
-RULE: Rarely include a close icon in the top right of a dialog. TYPE: should TOPIC: components DESCRIPTION: Closing should happen through explicit confirm or cancel actions, not an ambiguous X.
-RULE: Provide closing through explicit confirm or cancel actions with defined outcomes. TYPE: should TOPIC: interaction DESCRIPTION: Two clear choices prevent uncertainty about whether changes were saved.
-RULE: Default to modal behavior so the user must act before returning to the page. TYPE: should TOPIC: interaction DESCRIPTION: The right call when the dialog represents a decision that needs to be made.
-RULE: Prevent dismissing a modal dialog by clicking outside it. TYPE: should TOPIC: interaction DESCRIPTION: The user has to act on the dialog before going back to the page.
-RULE: Keep enough margin from the browser edges so the dialog feels balanced and centered. TYPE: should TOPIC: layout DESCRIPTION: Margin signals it is a dialog and not a whole new page.
-RULE: Never let a dialog feel cramped against the viewport edge. TYPE: must TOPIC: layout DESCRIPTION: A dialog jammed against the edge feels rushed and can be confused with a new page.
-COMPONENT: empty-states
+RULE-ID: banners.no-obstruction SCOPE: component COMPONENT: banners TYPE: must TOPIC: accessibility RULE: Keep banner content from obstructing essential controls or page content. DESCRIPTION: Whether a banner is dismissible must not decide whether important functionality becomes unreachable.
 
-RULE: Treat loading, success, scheduled, danger, and no-data empty states as faces of one component, not separate components. TYPE: must TOPIC: components DESCRIPTION: A single empty-state component takes different faces per situation so copy, spacing, and icons stay aligned.
-RULE: When a search returns nothing, explain what wasn't found and give the user a way forward. TYPE: should TOPIC: feedback DESCRIPTION: Suggest broadening the query, removing a filter, or checking spelling instead of leaving the user stuck.
-RULE: Avoid a bare 'No results' message that leaves the user stuck. TYPE: should TOPIC: copy DESCRIPTION: The system knows the query, so it can suggest the next move rather than stating only that nothing was found.
-RULE: Make first-impression empty states welcoming and clear. TYPE: should TOPIC: copy DESCRIPTION: New-user empty states form fast first impressions, so turn 'what now?' into clear guidance instead of looking cold or broken.
-RULE: Use the empty state only when a whole zone of expected content is missing or unavailable. TYPE: must TOPIC: state DESCRIPTION: A single missing cell or row is an inline problem; the empty state takes over only when the whole area is the question.
-RULE: Give every empty state a short explanation and a clear next step. TYPE: must TOPIC: copy DESCRIPTION: Say why it's empty, then tell the user what they can do about it.
-COMPONENT: notifications
+RULE-ID: banners.dismissal SCOPE: component COMPONENT: banners TYPE: should TOPIC: interaction RULE: Let users dismiss transient banners and acknowledge persistent ones. DESCRIPTION: A genuinely unresolved critical state may remain visible, but it still needs a clear action or acknowledgement path.
 
-RULE: Send a notification only when it earns the interruption. TYPE: must TOPIC: system DESCRIPTION: Only notify when the user actually needs to act soon on something unpredictable, since attention is finite.
-RULE: Do not mark everything as urgent. TYPE: must TOPIC: feedback DESCRIPTION: If everything is urgent nothing feels urgent, causing alert fatigue that buries the one notification that matters.
-RULE: Differentiate notification types with distinct visual treatments. TYPE: must TOPIC: feedback DESCRIPTION: Information, warning, success, and error must not look identical so the user knows urgency before reading.
-RULE: Use information for things the user might want to know. TYPE: should TOPIC: feedback DESCRIPTION: Information type is for awareness, not action.
-RULE: Use warning for things the user should look at. TYPE: should TOPIC: feedback DESCRIPTION: Warning type flags something worth the user's attention.
-RULE: Use error for things that need action. TYPE: should TOPIC: errors DESCRIPTION: Error type signals the user must do something.
-RULE: Keep success notifications brief. TYPE: should TOPIC: feedback DESCRIPTION: Success is a short confirmation, not a lingering message.
-RULE: Make every notification dismissible. TYPE: must TOPIC: interaction DESCRIPTION: An undismissable notification offloads the product's problem onto the user; even system-wide messages need an acknowledge action.
-RULE: Do not repeat a notification the user has already seen and dismissed. TYPE: must TOPIC: feedback DESCRIPTION: A dismissal is the signal the user does not need it again; re-pinging is harassment.
-RULE: Make the required action reachable from the notification itself. TYPE: must TOPIC: interaction DESCRIPTION: Don't force the user to navigate to find the thing; faster resolution lowers the notification's cost.
-RULE: Time an auto-dismissing notification to stay long enough to read but short enough not to overstay. TYPE: should TOPIC: motion DESCRIPTION: A toast that vanishes in two seconds is unread; one lingering ten seconds overstays its welcome.
-COMPONENT: spinners-&-progress-bars
+## Buttons
 
-RULE: Use a spinner when progress cannot be measured. TYPE: should TOPIC: feedback DESCRIPTION: Spinners indicate ongoing activity without a known duration.
-RULE: Use a progress bar when the endpoint is known. TYPE: should TOPIC: feedback DESCRIPTION: Progress bars communicate how much work remains when the duration can be measured.
-RULE: Delay showing a spinner by around 300 milliseconds. TYPE: should TOPIC: motion DESCRIPTION: A short delay avoids flicker during very quick actions.
-RULE: Keep the spinner visible just long enough to make the end transition feel smooth. TYPE: should TOPIC: motion DESCRIPTION: A brief hold on completion smooths the visual transition.
-RULE: Place a spinner near where the user's attention already is. TYPE: must TOPIC: layout DESCRIPTION: Position spinners inside the pressed button, beside loading content, or at the head of the incoming section.
-RULE: Give a spinner a label when you can. TYPE: should TOPIC: copy DESCRIPTION: A label tells the user what is happening and makes the wait feel intentional; the longer the wait, the more important the label.
-RULE: Start a progress bar with a few percent already filled. TYPE: should TOPIC: motion DESCRIPTION: The endowed progress effect makes users more likely to finish when they feel they have already begun.
-RULE: Keep progress bars moving subtly rather than still. TYPE: should TOPIC: motion DESCRIPTION: Motion reads as alive and keeps users calm; stillness feels wrong.
-RULE: Shape progress motion as a small head start, most movement in the middle, and a quick finish. TYPE: should TOPIC: motion DESCRIPTION: This rhythm feels natural and makes the process seem faster than it is.
-RULE: Prefer skeleton screens over spinners when loading content rather than processes. TYPE: should TOPIC: feedback DESCRIPTION: Placeholder shapes showing eventual structure feel faster than a spinner on a blank page.
-COMPONENT: switches
+RULE-ID: buttons.primary SCOPE: component COMPONENT: buttons TYPE: should TOPIC: interaction RULE: Reserve primary treatment for the main forward action in one action region. DESCRIPTION: Separate regions may have separate local hierarchies; peer actions in one region must not compete as primary.
 
-RULE: Always give a switch a label to its right explaining exactly what it does. TYPE: must TOPIC: forms DESCRIPTION: Each switch needs a right-side label that states the precise action it controls.
-RULE: In a horizontal layout, use the left label for grouping and the right label to explain the switch. TYPE: should TOPIC: layout DESCRIPTION: The left label names the group while the right label clarifies the individual switch's purpose.
-COMPONENT: tables
+RULE-ID: buttons.destructive SCOPE: component COMPONENT: buttons TYPE: must TOPIC: interaction RULE: Give destructive actions treatment and friction proportional to consequence. DESCRIPTION: Irreversible or costly actions need stronger intent than reversible low-risk changes.
 
-RULE: Make tables non-interactive unless the action is behind friction. TYPE: must TOPIC: interaction DESCRIPTION: Avoid direct clickable actions in table rows to prevent unintentional actions.
-RULE: Place destructive or consequential row actions behind a sub-menu or deliberate gesture. TYPE: should TOPIC: interaction DESCRIPTION: Routing actions through a sub-menu makes them intentional and reduces misclicks.
-RULE: Give long lists a way to search or filter them. TYPE: should TOPIC: data-display DESCRIPTION: Searching or filtering helps users find what they need instead of scrolling hundreds of rows.
-RULE: Make columns sortable when the order matters. TYPE: should TOPIC: data-display DESCRIPTION: Let users sort by relevant fields like names, dates, or severities.
-RULE: Set the default sort order to whatever makes sense for the page. TYPE: should TOPIC: data-display DESCRIPTION: Use a sensible default like most recent or highest severity first, while letting the user override it.
-RULE: Show row status at a glance with a clear visual marker. TYPE: must TOPIC: state DESCRIPTION: States like active, archived, scheduled, or failed should be visible in the row, not buried in a detail view.
-RULE: Use pagination when the user needs to track position or work through the list systematically. TYPE: should TOPIC: navigation DESCRIPTION: Pagination suits tables where users return to a specific spot or process the list methodically.
-RULE: Use infinite scroll for casual browsing where the user stops once they find one thing. TYPE: may TOPIC: navigation DESCRIPTION: Infinite scroll fits exploratory browsing rather than systematic work.
-RULE: Make clickable elements look clickable. TYPE: must TOPIC: interaction DESCRIPTION: Use underline, color, or hover states so interactive elements are recognizable.
-RULE: Do not make non-interactive elements look clickable. TYPE: must TOPIC: interaction DESCRIPTION: Elements that look clickable but do nothing erode trust when users try them and nothing happens.
-COMPONENT: tabs
+RULE-ID: buttons.reachable-validation SCOPE: component COMPONENT: buttons TYPE: should TOPIC: feedback RULE: Keep a button reachable when pressing it is how the user receives recovery guidance. DESCRIPTION: Do not replace useful submit-time validation with an unexplained disabled state.
 
-RULE: Use tabs for navigating and browsing information, not for completing tasks. TYPE: should TOPIC: navigation DESCRIPTION: Tabs suit exploring or comparing content, not finishing a task.
-RULE: Avoid tabs when users are creating or editing content. TYPE: should TOPIC: forms DESCRIPTION: Important fields or errors can be hidden on another tab, breaking the sense of one continuous action.
-RULE: Use tabs to split large content into simple browseable categories that preserve context. TYPE: should TOPIC: data-display DESCRIPTION: Tabs help users move between informational sections quickly without losing their place.
-RULE: Only use tabs inside a form when each tab is a distinct, self-contained form that shares no validation with the others. TYPE: should TOPIC: forms DESCRIPTION: Editing in tabs is acceptable only when tabs do not share validation, avoiding hidden errors.
-COMPONENT: tooltips
+RULE-ID: buttons.loading SCOPE: component COMPONENT: buttons TYPE: must TOPIC: feedback RULE: Prevent duplicate activation while a button action is processing. DESCRIPTION: Show truthful local progress or activity without changing the action into a fabricated completion state.
 
-RULE: Keep tooltip content to brief clarification, not detailed information. TYPE: must TOPIC: copy DESCRIPTION: Tooltips give a short hint about an element, not detailed content.
-RULE: Show the tooltip after a short pause, not the instant the user hovers. TYPE: must TOPIC: interaction DESCRIPTION: A delay before appearing confirms the user actually wants the explanation.
-RULE: Use a hover delay of around one second before showing the tooltip. TYPE: should TOPIC: interaction DESCRIPTION: About a second is the typical pause that confirms intent.
-RULE: Do not put long descriptions, instructions, data, or documentation-like text in a tooltip. TYPE: must TOPIC: copy DESCRIPTION: Tooltips are for quick hints, not documentation-length content.
-RULE: Move information that needs more space than a quick hint into a detail panel, sidebar, or standard in-context text. TYPE: should TOPIC: layout DESCRIPTION: Content too large for a tooltip belongs in a larger surface.
-RULE: Position the tooltip close to the element it explains, not somewhere random on screen. TYPE: must TOPIC: layout DESCRIPTION: Keeping the tip near the element avoids forcing the eye to move away and back.
-RULE: Default the tooltip position to just above or below the element. TYPE: should TOPIC: layout DESCRIPTION: Above or below is the usual default placement.
-RULE: Offset the tooltip enough that the cursor does not cover the text. TYPE: should TOPIC: layout DESCRIPTION: Enough offset keeps the tip readable past the cursor.
-RULE: Limit tooltip copy to one or two sentences confirming what the element does. TYPE: should TOPIC: copy DESCRIPTION: A tooltip confirms an element's purpose in one or two sentences.
-COMPONENT: wizard-dialogs
+RULE-ID: buttons.order SCOPE: component COMPONENT: buttons TYPE: should TOPIC: consistency RULE: Keep repeated action groups in a consistent order. DESCRIPTION: Stable ordering supports scanning and motor memory while allowing locale-aware layout.
 
-RULE: Use a wizard only for creating something new. TYPE: must TOPIC: components DESCRIPTION: Editing, managing, or single configuration tasks are dialogs, not wizards.
-RULE: Collect only what is needed to complete the setup. TYPE: must TOPIC: complexity DESCRIPTION: A wizard gathers exactly the required inputs, nothing more.
-RULE: Leave no hidden actions after the final step. TYPE: must TOPIC: trust DESCRIPTION: Each step leads toward a clear, complete result with nothing concealed after Finish.
-RULE: Split long forms into a series of short, focused steps. TYPE: should TOPIC: complexity DESCRIPTION: People perceive several short forms as easier than one long form with identical total work.
-RULE: Show a progress indicator so users know where they are. TYPE: should TOPIC: navigation DESCRIPTION: Knowing position in the process reduces anxiety and helps users see how close they are to the end.
-RULE: Show only the steps relevant to the user's choices. TYPE: should TOPIC: state DESCRIPTION: The wizard is dynamic and adapts to the user's input.
-RULE: Never expose branching logic or decision trees. TYPE: must TOPIC: navigation DESCRIPTION: The user should always feel they follow one clear, uninterrupted path even as the system adapts.
-RULE: Make each step self-contained. TYPE: must TOPIC: layout DESCRIPTION: The user should not need to remember information from earlier steps to complete the current one.
-RULE: Condense the progress indicator when a wizard has more than seven steps. TYPE: should TOPIC: navigation DESCRIPTION: The condensed indicator fits the layout for wizards over seven steps.
-RULE: Keep step labels short and direct. TYPE: should TOPIC: microcopy DESCRIPTION: Labels are made for quick recognition rather than explanation.
-RULE: Open a dedicated dialog to create a missing required item without breaking flow. TYPE: should TOPIC: navigation DESCRIPTION: When a step needs an entity that does not exist yet, a dialog creates it, then closes and returns to the wizard with the new item available.
-RULE: Reuse the same form components in wizards and edit dialogs. TYPE: should TOPIC: consistency DESCRIPTION: Identical form components, interaction, and behavior appear in both wrappers.
-RULE: Show Cancel and Continue on the first step. TYPE: must TOPIC: navigation DESCRIPTION: The first step focuses on safe entry: exit or begin without risk.
-RULE: Show Back and Continue on middle steps. TYPE: must TOPIC: navigation DESCRIPTION: Users move freely between steps without losing data.
-RULE: Show Back and Finish on the last step. TYPE: must TOPIC: navigation DESCRIPTION: Finish applies the result and ends the process.
-RULE: Adapt the Finish label to the context. TYPE: should TOPIC: microcopy DESCRIPTION: Use contextual labels like 'Create schedule' or 'Start scan'.
-RULE: Group default values in a dedicated box inside the wizard. TYPE: should TOPIC: layout DESCRIPTION: A dedicated box signals defaults belong to their own configuration layer.
-RULE: Open a separate dialog to edit defaults. TYPE: should TOPIC: navigation DESCRIPTION: The deliberate distance communicates that the user probably does not need to touch these.
-RULE: Do not move something to defaults just because it is optional. TYPE: must TOPIC: complexity DESCRIPTION: Optional and default are not the same thing.
+## Context menus
+
+RULE-ID: context-menus.relevant SCOPE: component COMPONENT: context-menus TYPE: should TOPIC: state RULE: Show actions relevant to the current object and user. DESCRIPTION: Hide actions that never apply or cannot be influenced in the current context.
+
+RULE-ID: context-menus.temporary SCOPE: component COMPONENT: context-menus TYPE: should TOPIC: state RULE: Disable only temporarily blocked actions the user can understand or resolve. DESCRIPTION: Pair the unavailable state with an explanation when the reason is not obvious.
+
+RULE-ID: context-menus.opposites SCOPE: component COMPONENT: context-menus TYPE: must TOPIC: interaction RULE: Show the next available action for a two-state command. DESCRIPTION: Present Enable when disabled and Disable when enabled rather than showing both with one unavailable.
+
+RULE-ID: context-menus.groups SCOPE: component COMPONENT: context-menus TYPE: should TOPIC: layout RULE: Group related commands and keep separators rare. DESCRIPTION: A separator marks a real conceptual boundary, not every individual item.
+
+RULE-ID: context-menus.destructive-last SCOPE: component COMPONENT: context-menus TYPE: must TOPIC: interaction RULE: Put destructive commands last in a distinct group. DESCRIPTION: Position and danger treatment should make consequence visible before activation.
+
+## Dialogs
+
+RULE-ID: dialogs.contained-task SCOPE: component COMPONENT: dialogs TYPE: should TOPIC: components RULE: Use a dialog for a contained decision or task that benefits from keeping background context. DESCRIPTION: A large multi-destination workflow belongs on a page rather than inside an oversized interruption.
+
+RULE-ID: dialogs.explicit-outcomes SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: interaction RULE: Provide explicit completion and cancellation paths. DESCRIPTION: The user must understand whether closing applies, discards, or preserves their changes.
+
+RULE-ID: dialogs.dismissal-risk SCOPE: component COMPONENT: dialogs TYPE: should TOPIC: interaction RULE: Match outside-click and Escape dismissal to consequence. DESCRIPTION: Prevent accidental dismissal when work or a consequential decision could be lost; allow it for safe transient dialogs.
+
+RULE-ID: dialogs.focus SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: accessibility RULE: Move focus into an opened modal and return it to the invoking control on close. DESCRIPTION: Modal focus must remain within the active dialog while it is open.
+
+RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: layout RULE: Keep dialog content and actions reachable within the viewport. DESCRIPTION: Preserve edge space and provide an intentional inner scroll region when content is taller than the available area.
+
+## Empty states
+
+RULE-ID: empty-states.whole-region SCOPE: component COMPONENT: empty-states TYPE: must TOPIC: state RULE: Use an empty state only when an expected content region is empty or unavailable. DESCRIPTION: A missing cell or individual value needs an inline state, not a takeover of the whole region.
+
+RULE-ID: empty-states.faces SCOPE: component COMPONENT: empty-states TYPE: should TOPIC: components RULE: Model related empty-region states as faces of one shared component. DESCRIPTION: No data, no results, unavailable, scheduled, success, and failure can share structure while preserving distinct meaning.
+
+RULE-ID: empty-states.recovery SCOPE: component COMPONENT: empty-states TYPE: must TOPIC: feedback RULE: Pair an actionable empty state with the next useful path. DESCRIPTION: Creation, reset, broader search, retry, or waiting guidance should match the real cause of absence.
+
+## Notifications
+
+RULE-ID: notifications.earned SCOPE: component COMPONENT: notifications TYPE: should TOPIC: feedback RULE: Send a notification only when the interruption is worth its attention cost. DESCRIPTION: Prefer a quiet status surface for predictable or non-urgent information.
+
+RULE-ID: notifications.severity SCOPE: component COMPONENT: notifications TYPE: must TOPIC: state RULE: Match notification severity to consequence and required response. DESCRIPTION: Information, success, warning, and error must not be inflated into the same urgency.
+
+RULE-ID: notifications.dismissible SCOPE: component COMPONENT: notifications TYPE: should TOPIC: interaction RULE: Make transient notifications dismissible. DESCRIPTION: An unresolved persistent state may remain, but it needs a direct action, acknowledgement, or explanation of why it cannot disappear.
+
+RULE-ID: notifications.no-repeat SCOPE: component COMPONENT: notifications TYPE: must TOPIC: trust RULE: Do not repeat a dismissed notification unless the underlying state meaningfully changes. DESCRIPTION: A dismissal records that the current instance no longer deserves attention.
+
+RULE-ID: notifications.action SCOPE: component COMPONENT: notifications TYPE: should TOPIC: interaction RULE: Put the required recovery action in or next to the notification. DESCRIPTION: Do not force the user to search the product for the state that interrupted them.
+
+RULE-ID: notifications.timeout SCOPE: component COMPONENT: notifications TYPE: should TOPIC: accessibility RULE: Keep auto-dismissing notifications available long enough to perceive and pause. DESCRIPTION: Important information must not vanish before a slow reader or keyboard user can reach it.
+
+## Spinners and progress bars
+
+RULE-ID: progress.unknown SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: should TOPIC: feedback RULE: Use a spinner or activity state when completion cannot be measured. DESCRIPTION: Activity feedback communicates ongoing work without claiming a percentage.
+
+RULE-ID: progress.known SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: must TOPIC: feedback RULE: Use a determinate progress bar only for measured progress toward a known endpoint. DESCRIPTION: The displayed amount must reflect real completed work.
+
+RULE-ID: progress.no-fabrication SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: must TOPIC: trust RULE: Never invent a head start or movement in a determinate progress bar. DESCRIPTION: Perceived speed must not come from false system state; use an indeterminate activity treatment when measurement is unavailable.
+
+RULE-ID: progress.delay SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: should TOPIC: motion RULE: Delay a short-lived spinner enough to avoid flicker. DESCRIPTION: Fast actions may complete through direct state change without flashing an activity indicator.
+
+RULE-ID: progress.location SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: should TOPIC: layout RULE: Put progress near the action or content it explains. DESCRIPTION: The user's attention should not move elsewhere to learn whether local work started.
+
+RULE-ID: progress.skeleton SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: should TOPIC: feedback RULE: Prefer a stable skeleton when the shape of incoming content is known. DESCRIPTION: Skeletons should represent structure, not pretend that data already exists.
+
+## Switches
+
+RULE-ID: switches.label SCOPE: component COMPONENT: switches TYPE: must TOPIC: accessibility RULE: Give every switch a persistent label and one combined activation target. DESCRIPTION: The label explains the setting and should activate the same control.
+
+RULE-ID: switches.state SCOPE: component COMPONENT: switches TYPE: must TOPIC: state RULE: Expose the switch's current on or off state semantically and visually. DESCRIPTION: State must remain understandable without relying on color alone.
+
+RULE-ID: switches.effect SCOPE: component COMPONENT: switches TYPE: should TOPIC: feedback RULE: Make it clear whether a switch applies immediately or waits for a separate save. DESCRIPTION: Do not mix both behaviors without visible feedback.
+
+## Tables
+
+RULE-ID: tables.row-navigation SCOPE: component COMPONENT: tables TYPE: may TOPIC: interaction RULE: Let a row open details when the row has a clear navigation affordance. DESCRIPTION: A row is not automatically clickable merely because detail content exists.
+
+RULE-ID: tables.inner-controls SCOPE: component COMPONENT: tables TYPE: must TOPIC: interaction RULE: Keep controls inside a clickable row independent from row navigation. DESCRIPTION: Buttons, links, checkboxes, and menus perform their own action without also opening the row.
+
+RULE-ID: tables.consequential-actions SCOPE: component COMPONENT: tables TYPE: should TOPIC: interaction RULE: Put destructive or consequential row commands behind an explicit action control. DESCRIPTION: Do not turn a broad row target into a risky command.
+
+RULE-ID: tables.findability SCOPE: component COMPONENT: tables TYPE: should TOPIC: data-display RULE: Give long tables appropriate search, filtering, or query tools. DESCRIPTION: The control set should match how users locate and compare rows.
+
+RULE-ID: tables.sorting SCOPE: component COMPONENT: tables TYPE: should TOPIC: data-display RULE: Make meaningful columns sortable and choose a useful default order. DESCRIPTION: Preserve the user's chosen sort when the surrounding task continues.
+
+RULE-ID: tables.status SCOPE: component COMPONENT: tables TYPE: must TOPIC: state RULE: Make important row state visible at a glance. DESCRIPTION: Do not bury active, failed, scheduled, or archived state only in details.
+
+RULE-ID: tables.pagination SCOPE: component COMPONENT: tables TYPE: should TOPIC: navigation RULE: Use pagination when position and systematic progress matter. DESCRIPTION: Infinite loading is better suited to casual browsing where exact position is unimportant.
+
+## Tabs
+
+RULE-ID: tabs.information SCOPE: component COMPONENT: tabs TYPE: should TOPIC: navigation RULE: Use tabs to switch between peer information views. DESCRIPTION: They preserve context while changing category, perspective, or subsection.
+
+RULE-ID: tabs.task-flow SCOPE: component COMPONENT: tabs TYPE: should TOPIC: forms RULE: Avoid splitting one dependent form or task across tabs. DESCRIPTION: Hidden required fields and errors break the sense of one continuous action. EXCEPT: Tabs may contain independent self-contained forms with no shared validation.
+
+RULE-ID: tabs.state SCOPE: component COMPONENT: tabs TYPE: must TOPIC: accessibility RULE: Expose selected tab, tablist, and panel relationships semantically. DESCRIPTION: Keyboard behavior and focus movement must follow the established tab pattern.
+
+## Tooltips
+
+RULE-ID: tooltips.clarification SCOPE: component COMPONENT: tooltips TYPE: must TOPIC: feedback RULE: Use a tooltip only for brief optional clarification. DESCRIPTION: Core understanding, instructions, and required state must remain available without it.
+
+RULE-ID: tooltips.trigger SCOPE: component COMPONENT: tooltips TYPE: must TOPIC: accessibility RULE: Make tooltip content available from keyboard focus as well as pointer hover. DESCRIPTION: Hover-only information excludes keyboard and touch interaction.
+
+RULE-ID: tooltips.delay SCOPE: component COMPONENT: tooltips TYPE: should TOPIC: interaction RULE: Use a short intentional delay before showing hover-triggered tooltips. DESCRIPTION: Avoid flashing incidental content while the pointer simply crosses the page.
+
+RULE-ID: tooltips.placement SCOPE: component COMPONENT: tooltips TYPE: should TOPIC: layout RULE: Place the tooltip near its trigger without covering the trigger or required content. DESCRIPTION: Placement may adapt to viewport space rather than obey one fixed side.
+
+## Wizard dialogs
+
+RULE-ID: wizard-dialogs.fit SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: components RULE: Use a wizard for a genuinely sequential multi-step task. DESCRIPTION: Creation is common, but editing may also qualify when later steps depend on earlier decisions; a short independent form does not need a wizard.
+
+RULE-ID: wizard-dialogs.required-only SCOPE: component COMPONENT: wizard-dialogs TYPE: must TOPIC: complexity RULE: Ask only for information required for the current outcome. DESCRIPTION: Optional detail should not become a step merely to fill the sequence.
+
+RULE-ID: wizard-dialogs.relevant-steps SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: state RULE: Show only steps relevant to the user's choices. DESCRIPTION: Adapt internally without exposing a branching decision tree as navigation.
+
+RULE-ID: wizard-dialogs.progress SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: navigation RULE: Show current position and remaining shape. DESCRIPTION: Condense the indicator when every step label would no longer fit or help.
+
+RULE-ID: wizard-dialogs.back SCOPE: component COMPONENT: wizard-dialogs TYPE: must TOPIC: navigation RULE: Let users move back without losing entered information. DESCRIPTION: Revisiting an earlier choice must preserve compatible later input and clearly reset data that no longer applies.
+
+RULE-ID: wizard-dialogs.finish SCOPE: component COMPONENT: wizard-dialogs TYPE: must TOPIC: interaction RULE: Make the final step's outcome explicit before commitment. DESCRIPTION: No additional hidden action should occur after the user completes the visible sequence.
+
+RULE-ID: wizard-dialogs.missing-item SCOPE: component COMPONENT: wizard-dialogs TYPE: may TOPIC: navigation RULE: Create a missing required item in a contained nested flow. DESCRIPTION: Return to the same wizard step with the new item available and the prior wizard data intact.

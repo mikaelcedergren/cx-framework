@@ -9,6 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
+import { isHostVisible } from '../../shared/host-visibility';
 
 export type CxContextDialogMood = Extract<CxButtonMood, 'default' | 'warning' | 'danger'>;
 export type CxContextDialogAlign = 'bottomLeft' | 'topLeft';
@@ -24,7 +25,7 @@ export class CxContextDialogComponent {
   private readonly host = inject(ElementRef<HTMLElement>);
 
   @Input() heading = 'Confirm action';
-  @Input() text = 'Review this before continuing.';
+  @Input() description = 'Review this before continuing.';
   @Input() confirmText = 'Confirm';
   @Input() cancelText = 'Cancel';
   @Input() mood: CxContextDialogMood = 'default';
@@ -44,7 +45,7 @@ export class CxContextDialogComponent {
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
-    if (!this.dismissible) {
+    if (!this.dismissible || !isHostVisible(this.host.nativeElement)) {
       return;
     }
 

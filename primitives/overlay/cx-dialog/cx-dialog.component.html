@@ -12,51 +12,53 @@
       [attr.role]="dialogRole()"
       aria-modal="true"
       [attr.aria-labelledby]="titleId"
-      [attr.aria-describedby]="hasText() ? textId : null"
+      [attr.aria-describedby]="hasDescription() ? descriptionId : null"
+      [attr.aria-keyshortcuts]="dialogShortcutAria()"
       (click)="$event.stopPropagation()"
-      (keydown)="onEscape($event)"
-      (keydown)="onEnter($event)"
+      (keydown)="onDialogKeydown($event)"
     >
-      <header class="cx-dialog__header">
-        <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+      <div class="cx-dialog__content">
+        <header class="cx-dialog__header">
+          <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
 
-        @if (hasHeaderActions()) {
-          <div class="cx-dialog__header-actions">
-            @if (hasMenuItems()) {
-              <cx-menu
-                class="cx-dialog__menu"
-                [items]="menuItems ?? []"
-                [ariaLabel]="resolvedMenuAriaLabel()"
-                align="end"
-                (openChange)="onMenuOpenChange($event)"
-                (itemSelect)="onMenuItemSelect($event)"
-              >
-                <cx-icon-button
-                  trigger
-                  icon="menu-vertical"
-                  variant="transparent"
+          @if (hasHeaderActions()) {
+            <div class="cx-dialog__header-actions">
+              @if (hasMenuItems()) {
+                <cx-menu
+                  class="cx-dialog__menu"
+                  [items]="menuItems ?? []"
                   [ariaLabel]="resolvedMenuAriaLabel()"
+                  align="end"
+                  (openChange)="onMenuOpenChange($event)"
+                  (itemSelect)="onMenuItemSelect($event)"
+                >
+                  <cx-icon-button
+                    trigger
+                    icon="menu-vertical"
+                    variant="transparent"
+                    [ariaLabel]="resolvedMenuAriaLabel()"
+                  />
+                </cx-menu>
+              }
+
+              @if (canDismiss()) {
+                <cx-icon-button
+                  icon="remove"
+                  ariaLabel="Dismiss dialog"
+                  variant="transparent"
+                  (pressed)="onDismiss()"
                 />
-              </cx-menu>
-            }
+              }
+            </div>
+          }
+        </header>
 
-            @if (canDismiss()) {
-              <cx-icon-button
-                icon="remove"
-                ariaLabel="Dismiss dialog"
-                variant="transparent"
-                (pressed)="onDismiss()"
-              />
-            }
-          </div>
-        }
-      </header>
-
-      <div class="cx-dialog__body">
-        @if (hasText()) {
-          <p class="cx-dialog__text" [id]="textId">{{ text }}</p>
-        }
-        <ng-content select="[body]" />
+        <div class="cx-dialog__body">
+          @if (hasDescription()) {
+            <p class="cx-dialog__description" [id]="descriptionId">{{ description }}</p>
+          }
+          <ng-content select="[body]" />
+        </div>
       </div>
 
       <footer
@@ -64,21 +66,35 @@
         [class.cx-dialog__footer--single]="!resolvedSecondaryText()"
       >
         @if (resolvedSecondaryText(); as secondaryText) {
-          <cx-button
-            [text]="secondaryText"
-            mood="default"
-            (pressed)="onSecondary()"
-          />
+          <div class="cx-dialog__footer-action cx-dialog__footer-action--start">
+            <cx-button
+              [text]="secondaryText"
+              mood="default"
+              (pressed)="onSecondary()"
+            />
+
+            <div class="cx-dialog__footer-shortcut" aria-hidden="true">
+              <cx-shortcut-key [parts]="secondaryShortcutParts" />
+            </div>
+          </div>
         }
 
-        <cx-button
-          [text]="resolvedPrimaryText()"
-          [mood]="mood"
-          [disabled]="primaryDisabled"
-          [loading]="primaryLoading"
-          cdkFocusInitial
-          (pressed)="onPrimary()"
-        />
+        <div class="cx-dialog__footer-action cx-dialog__footer-action--end">
+          @if (showPrimaryShortcut()) {
+            <div class="cx-dialog__footer-shortcut cx-dialog__footer-shortcut--combo" aria-hidden="true">
+              <cx-shortcut-key [parts]="primaryShortcutParts" />
+            </div>
+          }
+
+          <cx-button
+            [text]="resolvedPrimaryText()"
+            [mood]="mood"
+            [disabled]="primaryDisabled"
+            [loading]="primaryLoading"
+            cdkFocusInitial
+            (pressed)="onPrimary()"
+          />
+        </div>
       </footer>
     </section>
   </div>

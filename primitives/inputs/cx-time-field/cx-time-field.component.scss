@@ -1,0 +1,211 @@
+@use '../shared/field-shell' as field;
+
+:host {
+  display: inline-flex;
+  min-width: 0;
+  width: max-content;
+  max-width: 100%;
+}
+
+.cx-time-field {
+  min-width: 0;
+  width: max-content;
+  max-width: 100%;
+}
+
+@include field.field-header('cx-time-field');
+
+.cx-time-field__header,
+.cx-time-field__messages,
+.cx-time-field__label {
+  min-width: 0;
+}
+
+.cx-time-field__optional {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.cx-time-field__label,
+.cx-time-field__hint {
+  overflow-wrap: anywhere;
+}
+
+.cx-time-field__field-shell {
+  box-sizing: border-box;
+  display: inline-flex;
+  width: max-content;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+
+@include field.field-shell-state('.cx-time-field__field-shell', '.cx-time-field__segment-input');
+
+.cx-time-field--small .cx-time-field__field-shell {
+  min-height: var(--controller-size-small);
+}
+
+.cx-time-field--large .cx-time-field__field-shell {
+  min-height: var(--controller-size-large);
+  border-radius: var(--radius-xl);
+}
+
+.cx-time-field__field-shell:hover:not(.cx-time-field__field-shell--disabled):not(.cx-time-field__field-shell--error),
+.cx-time-field__field-shell:focus-within:not(.cx-time-field__field-shell--disabled):not(.cx-time-field__field-shell--error) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
+}
+
+.cx-time-field__field-shell--disabled {
+  user-select: none;
+  pointer-events: none;
+}
+
+.cx-time-field__segments {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cx-time-field__clock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.cx-time-field__segment-input {
+  width: 2.4ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-control);
+  text-align: center;
+  caret-color: var(--primary);
+}
+
+.cx-time-field--small .cx-time-field__segment-input,
+.cx-time-field--small .cx-time-field__separator {
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-time-field--large .cx-time-field__segment-input,
+.cx-time-field--large .cx-time-field__separator {
+  font-size: var(--font-size-body-lg);
+}
+
+.cx-time-field__segment-input::placeholder {
+  color: var(--placeholder);
+}
+
+.cx-time-field__segment-input:focus-visible {
+  outline: 0;
+}
+
+.cx-time-field__segment-input:disabled {
+  cursor: default;
+}
+
+.cx-time-field__field-shell--loading .cx-time-field__segment-input,
+.cx-time-field__field-shell--loading .cx-time-field__meridiem {
+  cursor: progress;
+}
+
+.cx-time-field__separator {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-control);
+}
+
+.cx-time-field__field-shell--empty .cx-time-field__separator {
+  color: var(--placeholder);
+}
+
+.cx-time-field__meridiem {
+  display: inline-flex;
+  min-width: var(--controller-size);
+  height: var(--icon-size-md);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-control);
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-time-field__meridiem:hover:not(:disabled) {
+  background: var(--opacity-mid);
+}
+
+.cx-time-field__meridiem:focus-visible {
+  background: var(--opacity-mid);
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-time-field__meridiem:disabled {
+  cursor: default;
+}
+
+.cx-time-field--small .cx-time-field__meridiem {
+  height: var(--icon-size-sm);
+}
+
+.cx-time-field--large .cx-time-field__meridiem {
+  height: var(--icon-size-lg);
+  font-size: var(--font-size-body);
+}
+
+.cx-time-field__loading {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.cx-time-field__clear {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+}
+
+.cx-time-field__clear:hover {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+.cx-time-field__clear:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+@include field.field-messages('cx-time-field');

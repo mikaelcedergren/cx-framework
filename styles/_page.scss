@@ -6,9 +6,8 @@
 // vertical gap between its blocks. Pages compose their content inside
 // .cx-page__content and may add their own classes alongside these.
 //
-// Spacing is driven by custom properties so a page can retune the frame
-// without overriding the structural rules:
-//   --cx-page-padding  outer padding of the content column
+// The global --gutter-page token owns the content column's outer padding.
+// Page-level custom properties cover only intentional frame configuration:
 //   --cx-page-gap      vertical gap between blocks in the content column
 //   --cx-page-measure  optional max width for the content column (default
 //                      none); set it to cap and centre content on wide screens.
@@ -22,7 +21,6 @@
 //   .cx-page--bounded        clip overflow to the viewport (for inner scrolling)
 
 .cx-page {
-  --cx-page-padding: var(--space-lg);
   --cx-page-gap: var(--space-lg);
   --cx-page-measure: none;
 
@@ -46,7 +44,7 @@
   flex-direction: column;
   gap: var(--cx-page-gap);
   margin-inline: auto;
-  padding: var(--cx-page-padding);
+  padding: var(--gutter-page);
   box-sizing: border-box;
 }
 
@@ -58,7 +56,7 @@
 
 .cx-page__notice {
   flex-shrink: 0;
-  padding: var(--space-md) var(--cx-page-padding) 0;
+  padding: var(--space-md) var(--gutter-page) 0;
 }
 
 .cx-page__loading {
@@ -73,7 +71,6 @@
 // utilities so every responsive boundary in the system flips at the same width.
 @media (max-width: #{bp.$mobile - 1px}) {
   .cx-page {
-    --cx-page-padding: var(--space-md);
     --cx-page-gap: var(--space-md);
   }
 }

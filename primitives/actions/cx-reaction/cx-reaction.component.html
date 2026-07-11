@@ -22,7 +22,12 @@
 }
 
 <ng-template #body>
-  <span class="cx-reaction__emoji" aria-hidden="true">{{ emoji }}</span>
+  <cx-icon
+    class="cx-reaction__icon"
+    [name]="icon"
+    [size]="resolvedIconSize"
+    aria-hidden="true"
+  />
   @if (hasCount) {
     <span class="cx-reaction__count">{{ count }}</span>
   }

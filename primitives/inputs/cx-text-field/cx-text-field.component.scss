@@ -10,14 +10,11 @@
 }
 
 .cx-text-field--small {
-  --cx-text-field-min-height: var(--controller-size-small);
   --cx-text-field-font-size: var(--font-size-body-sm);
 }
 
 .cx-text-field--large {
-  --cx-text-field-min-height: calc(var(--controller-size) + var(--space-md));
   --cx-text-field-font-size: var(--font-size-body-lg);
-  --cx-text-field-border-radius: var(--radius-lg);
 }
 
 @include field.field-header('cx-text-field');
@@ -26,16 +23,35 @@
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  min-height: var(--cx-text-field-min-height, var(--controller-size));
+  min-height: var(--controller-size);
   align-items: center;
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
-  border-radius: var(--cx-text-field-border-radius, var(--radius-md));
-  background: var(--opacity-darken);
+  border-radius: var(--radius-md);
+  background: transparent;
 }
 
 @include field.field-shell-state('.cx-text-field__field-shell', '.cx-text-field__field');
+
+.cx-text-field--small .cx-text-field__field-shell {
+  min-height: var(--controller-size-small);
+}
+
+.cx-text-field--large .cx-text-field__field-shell {
+  min-height: var(--controller-size-large);
+  border-radius: var(--radius-xl);
+}
+
+.cx-text-field__field-shell:hover:not(.cx-text-field__field-shell--disabled):not(.cx-text-field__field-shell--error) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
+}
+
+.cx-text-field__field-shell:focus-within:not(.cx-text-field__field-shell--disabled):not(.cx-text-field__field-shell--error) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
+}
 
 .cx-text-field__prepend {
   display: inline-flex;
@@ -90,7 +106,7 @@
   color: var(--opacity-high);
   font-size: var(--cx-text-field-font-size, var(--font-size-body));
   font-weight: var(--font-weight-regular);
-  line-height: 1.1;
+  line-height: var(--line-height-control);
   white-space: nowrap;
 }
 
@@ -106,7 +122,7 @@
   font-family: inherit;
   font-size: var(--cx-text-field-font-size, var(--font-size-body));
   font-weight: var(--font-weight-regular);
-  line-height: 1.1;
+  line-height: var(--line-height-control);
 }
 
 .cx-text-field__field::placeholder {
@@ -122,8 +138,7 @@
   background: transparent;
   transition:
     border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease,
-    outline-color var(--motion-fast) ease;
+    background-color var(--motion-fast) ease;
 }
 
 .cx-text-field__field-shell--inline-edit:hover:not(.cx-text-field__field-shell--disabled),

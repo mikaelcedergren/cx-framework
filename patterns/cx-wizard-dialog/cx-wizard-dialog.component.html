@@ -55,7 +55,7 @@
           <div class="cx-wizard-dialog__content-shell">
             <section class="cx-wizard-dialog__content-card">
               <div class="cx-wizard-dialog__content-title">
-                <h2 [id]="titleId">{{ currentTitle$() }}</h2>
+                <h2 [id]="titleId">{{ currentHeading$() }}</h2>
                 <div class="cx-wizard-dialog__content-divider" aria-hidden="true"></div>
               </div>
 
@@ -66,7 +66,7 @@
                   <cx-empty-state
                     icon="document"
                     heading="Add a step template"
-                    text="Use ng-template with cxWizardDialogStep so each step has a real body."
+                    description="Use ng-template with cxWizardDialogStep so each step has a real body."
                   />
                 }
               </div>
@@ -125,12 +125,12 @@
             }
 
             <div class="cx-wizard-dialog__sidebar-copy">
-              <h3 class="cx-wizard-dialog__sidebar-heading">{{ currentInfoTitle$() }}</h3>
+              <h3 class="cx-wizard-dialog__sidebar-heading">{{ currentInfoHeading$() }}</h3>
 
               @if (currentStep$()?.infoCustom) {
                 <ng-content select="[cxWizardDialogInfo], [slot=info]" />
-              } @else if (currentInfoText$(); as infoText) {
-                <p class="cx-wizard-dialog__sidebar-description">{{ infoText }}</p>
+              } @else if (currentInfoDescription$(); as infoDescription) {
+                <p class="cx-wizard-dialog__sidebar-description">{{ infoDescription }}</p>
               }
             </div>
           </div>

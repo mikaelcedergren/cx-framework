@@ -49,7 +49,7 @@
   padding: 0 var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: var(--opacity-darken);
+  background: transparent;
   color: var(--ink);
   font: inherit;
   text-align: left;
@@ -72,18 +72,21 @@
   height: calc(var(--controller-size) + var(--space-md));
 }
 
-.cx-date-span-picker__field:hover:not(.cx-date-span-picker__field--disabled):not(.cx-date-span-picker__field--loading) {
+.cx-date-span-picker__field:hover:not(.cx-date-span-picker__field--disabled):not(.cx-date-span-picker__field--loading):not(.cx-date-span-picker__field--error),
+.cx-date-span-picker__field:focus:not(.cx-date-span-picker__field--disabled):not(.cx-date-span-picker__field--loading):not(.cx-date-span-picker__field--error),
+.cx-date-span-picker__field--open:not(.cx-date-span-picker__field--disabled):not(.cx-date-span-picker__field--loading):not(.cx-date-span-picker__field--error) {
   border-color: var(--opacity-mid);
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
 }
 
-.cx-date-span-picker__field:focus-visible {
+:host-context([data-cx-keyboard-navigation]) .cx-date-span-picker__field:focus:not(.cx-date-span-picker__field--disabled):not(.cx-date-span-picker__field--loading):not(.cx-date-span-picker__field--error) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
 
 .cx-date-span-picker__field--open {
-  border-color: var(--primary);
-  background: var(--surface-low);
+  border-color: var(--border-open);
 }
 
 .cx-date-span-picker__field--disabled {
@@ -174,8 +177,7 @@
 .cx-date-span-picker__surface-inner {
   display: flex;
   flex-flow: row wrap;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  gap: var(--space-xs);
   box-sizing: border-box;
 }
 
@@ -184,8 +186,9 @@
   min-width: calc(var(--controller-size) * 4 + var(--space-sm) + var(--space-xs));
   flex-direction: column;
   gap: var(--space-2xs);
-  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xs);
-  border-right: var(--line);
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
   box-sizing: border-box;
 }
 
@@ -213,7 +216,7 @@
 
 .cx-date-span-picker__quick-range--active,
 .cx-date-span-picker__quick-range--active:hover {
-  background: color-mix(in srgb, var(--primary) 22%, transparent);
+  background: color-mix(in srgb, var(--choice-control-selected) 22%, transparent);
   color: var(--ink);
   font-weight: var(--font-weight-bold);
 }
@@ -222,155 +225,26 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .cx-date-span-picker__calendars {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: calc(var(--space-sm) + var(--space-xs));
+  gap: var(--space-xs);
 }
 
 .cx-date-span-picker__calendar {
-  display: flex;
-  width: calc(var(--controller-size) * 8.75);
-  flex: 0 0 auto;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.cx-date-span-picker__calendar-header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.cx-date-span-picker__calendar-controls {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-}
-
-.cx-date-span-picker__select {
+  display: inline-flex;
   flex: 0 0 auto;
 }
 
-.cx-date-span-picker__select--month {
-  width: calc(var(--controller-size) * 4);
-}
-
-.cx-date-span-picker__select--year {
-  width: calc(var(--controller-size) * 2.75);
-}
-
-.cx-date-span-picker__weekdays,
-.cx-date-span-picker__grid {
-  display: grid;
-  grid-template-columns: repeat(7, var(--controller-size));
-  justify-content: center;
-}
-
-.cx-date-span-picker__weekday {
-  display: flex;
-  height: var(--controller-size-small);
-  align-items: center;
-  justify-content: center;
-  color: var(--opacity-high);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-small);
-}
-
-.cx-date-span-picker__day {
-  position: relative;
-  display: flex;
-  width: var(--controller-size);
-  height: var(--controller-size);
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: var(--line-discreet);
-  border-color: transparent;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background-color var(--motion-fast) ease,
-    color var(--motion-fast) ease,
-    border-color var(--motion-fast) ease;
-}
-
-.cx-date-span-picker__day:hover:not(:disabled) {
-  background: var(--opacity-mid);
-}
-
-.cx-date-span-picker__day:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: calc(var(--space-2xs) * -1);
-}
-
-.cx-date-span-picker__day:disabled {
-  cursor: default;
-  pointer-events: none;
-}
-
-.cx-date-span-picker__day--disabled {
-  color: var(--opacity-mid);
-  opacity: var(--opacity-disabled);
-}
-
-.cx-date-span-picker__day--outside {
-  color: var(--opacity-mid);
-}
-
-.cx-date-span-picker__day--today,
-.cx-date-span-picker__day--start,
-.cx-date-span-picker__day--end,
-.cx-date-span-picker__day--preview-end {
-  border-radius: var(--radius-sm);
-}
-
-.cx-date-span-picker__day--today {
-  border-color: var(--opacity-mid);
-}
-
-.cx-date-span-picker__day--range {
-  border-radius: 0;
-  background: color-mix(in srgb, var(--primary) 22%, transparent);
-  color: var(--ink);
-}
-
-.cx-date-span-picker__day--range:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--primary) 38%, transparent);
-}
-
-.cx-date-span-picker__day--start,
-.cx-date-span-picker__day--end {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--on-ink);
-}
-
-.cx-date-span-picker__day--start:hover:not(:disabled),
-.cx-date-span-picker__day--end:hover:not(:disabled) {
-  background: var(--primary-alt);
-}
-
-.cx-date-span-picker__day--preview-end {
-  border-color: var(--primary);
-}
-
-.cx-date-span-picker__time-divider {
-  height: var(--border-width);
-  background: var(--opacity-mid);
+.cx-date-span-picker__time-island {
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-sizing: border-box;
 }
 
 .cx-date-span-picker__time-row {

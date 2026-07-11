@@ -1,10 +1,19 @@
-<cx-button
-  [text]="text"
-  [icon]="displayIcon$()"
-  [size]="size"
-  [transparent]="!selected$()"
-  [mood]="selected$() ? 'primary' : 'default'"
-  [disabled]="disabled"
-  [ariaLabel]="ariaLabel || undefined"
-  (pressed)="toggle()"
-/>
+@if (hasVisibleContent) {
+  <button
+    type="button"
+    class="cx-toggle-button"
+    [class.cx-toggle-button--selected]="selected$()"
+    [class.cx-toggle-button--icon-only]="isIconOnly"
+    [disabled]="disabled"
+    [attr.aria-pressed]="selected$()"
+    [attr.aria-label]="resolvedAriaLabel"
+    (click)="toggle()"
+  >
+    @if (displayIcon; as iconName) {
+      <cx-icon class="cx-toggle-button__icon" [name]="iconName" [size]="size === 'small' ? '14' : '16'" aria-hidden="true" />
+    }
+    @if (visibleText) {
+      <span>{{ visibleText }}</span>
+    }
+  </button>
+}

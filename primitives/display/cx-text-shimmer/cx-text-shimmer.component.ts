@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 /**
  * A short text label with a light sweeping across it, used to signal active
  * generation or background work (streaming, "thinking", loading). It rests at a
- * readable strength and sweeps a brighter highlight across; both colors are
- * theme tokens, overridable via `--cx-text-shimmer-base` and
- * `--cx-text-shimmer-highlight`. Honours reduced-motion.
+ * readable strength and sweeps a brighter highlight across using the system
+ * color tokens. A static base paint always remains underneath the highlight,
+ * and reduced-motion removes the highlight entirely.
  */
 @Component({
   selector: 'cx-text-shimmer',
@@ -22,6 +22,6 @@ export class CxTextShimmerComponent {
   /** The label to shimmer. */
   @Input() text = '';
 
-  /** Whether the sweep animates. When false the text sits still at full strength. */
+  /** Whether the highlight sweeps. When false the readable base label remains still. */
   @Input() active = true;
 }

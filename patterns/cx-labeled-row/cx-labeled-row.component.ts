@@ -11,7 +11,7 @@ import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
 import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
-import { CxTextareaComponent } from '../../primitives/inputs/cx-textarea';
+import { CxTextareaComponent, type CxTextareaSizing } from '../../primitives/inputs/cx-textarea';
 import { type CxFieldValidation, normalizeCxValidation } from '../../primitives/inputs/shared/field.types';
 import {
   CxDynamicFieldsComponent,
@@ -44,8 +44,8 @@ export type CxLabeledRowContent =
       kind: 'textarea';
       value?: string;
       hint?: string;
-      rows?: number;
-      autoGrow?: boolean;
+      minLines?: number;
+      sizing?: CxTextareaSizing;
       disabled?: boolean;
       validation?: CxFieldValidation;
     }

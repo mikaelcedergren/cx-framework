@@ -132,7 +132,7 @@
 >
   <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties">
     <section class="cx-filter-bar__properties-section">
-      <cx-menu-label heading="Display" />
+      <cx-option-group label="Display" />
       <div class="cx-filter-bar__properties-section-body">
         <cx-button-group
           class="cx-filter-bar__display-toggle"
@@ -147,7 +147,7 @@
     @if (hasGroupByControls$()) {
       <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
       <section class="cx-filter-bar__properties-section">
-        <cx-menu-label heading="Group by" />
+        <cx-option-group label="Group by" />
         <div class="cx-filter-bar__properties-section-body">
           <cx-toggle-chip-group
             size="small"
@@ -163,7 +163,7 @@
     @if (hasSortControls$()) {
       <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
       <section class="cx-filter-bar__properties-section">
-        <cx-menu-label heading="Sort by" />
+        <cx-option-group label="Sort by" />
         <div class="cx-filter-bar__properties-section-body">
           <div class="cx-filter-bar__sort-row">
             <cx-dropdown
@@ -187,7 +187,7 @@
 
       @if (hasThenByControls$()) {
       <section class="cx-filter-bar__properties-section">
-        <cx-menu-label heading="Then by" />
+        <cx-option-group label="Then by" />
         <div class="cx-filter-bar__properties-section-body">
           <div class="cx-filter-bar__sort-row">
             <cx-dropdown
@@ -214,46 +214,47 @@
     @if (hasColumnControls$()) {
       <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
       <section class="cx-filter-bar__properties-section">
-      <cx-menu-label heading="Columns">
-        <button
-          type="button"
-          class="cx-filter-bar__properties-link"
-          (click)="resetColumns()"
-        >
-          Reset
-        </button>
-      </cx-menu-label>
-      <div class="cx-filter-bar__properties-section-body">
-        <cx-text-field
-          label=""
-          [ariaLabel]="columnSearchAriaLabel"
-          prependIcon="search"
-          [value]="columnSearchValue$()"
-          (valueChange)="onColumnSearchValueChange($event)"
-        />
+        <cx-option-group label="Columns">
+          <button
+            actions
+            type="button"
+            class="cx-filter-bar__properties-link"
+            (click)="resetColumns()"
+          >
+            Reset
+          </button>
+        </cx-option-group>
+        <div class="cx-filter-bar__properties-section-body">
+          <cx-text-field
+            label=""
+            [ariaLabel]="columnSearchAriaLabel"
+            prependIcon="search"
+            [value]="columnSearchValue$()"
+            (valueChange)="onColumnSearchValueChange($event)"
+          />
 
-        <div class="cx-filter-bar__column-options">
-          @for (column of filteredColumnOptions$(); track column.id) {
-            <div class="cx-filter-bar__column-row">
-              <cx-switch
-                class="cx-filter-bar__column-switch"
-                [text]="column.label"
-                [selected]="isColumnVisible(column.id)"
-                (selectedChange)="onColumnOptionSelect(column.id)"
-              />
-              <cx-toggle-button
-                [icon]="'pin'"
-                [iconSelected]="'pin-off'"
-                [selected]="isColumnPinned(column.id)"
-                [ariaLabel]="isColumnPinned(column.id) ? 'Unpin column' : 'Pin column'"
-                size="small"
-                [disabled]="!canPinColumn(column.id)"
-                (selectedChange)="togglePinnedColumn(column.id)"
-              />
-            </div>
-          }
+          <div class="cx-filter-bar__column-options">
+            @for (column of filteredColumnOptions$(); track column.id) {
+              <div class="cx-filter-bar__column-row">
+                <cx-switch
+                  class="cx-filter-bar__column-switch"
+                  [text]="column.label"
+                  [selected]="isColumnVisible(column.id)"
+                  (selectedChange)="onColumnOptionSelect(column.id)"
+                />
+                <cx-toggle-button
+                  [icon]="'pin'"
+                  [iconSelected]="'pin-off'"
+                  [selected]="isColumnPinned(column.id)"
+                  [ariaLabel]="isColumnPinned(column.id) ? 'Unpin column' : 'Pin column'"
+                  size="small"
+                  [disabled]="!canPinColumn(column.id)"
+                  (selectedChange)="togglePinnedColumn(column.id)"
+                />
+              </div>
+            }
+          </div>
         </div>
-      </div>
       </section>
     }
   </div>

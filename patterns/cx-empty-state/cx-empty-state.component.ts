@@ -4,7 +4,7 @@ import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/c
 import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 
-export type CxEmptyStateType = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
+export type CxEmptyStateState = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
 export type CxEmptyStateVisual = 'icon' | 'none';
 
 export interface CxEmptyStateAction {
@@ -18,34 +18,34 @@ export interface CxEmptyStateAction {
   readonly transparent?: boolean;
 }
 
-const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateType, 'default'>, {
+const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateState, 'default'>, {
   heading: string;
-  text: string;
+  description: string;
   icon: CxIconName;
 }> = {
   pending: {
     heading: 'Working on it',
-    text: "Hold tight while we get this ready. We'll let you know when it's done.",
+    description: "Hold tight while we get this ready. We'll let you know when it's done.",
     icon: 'spinner',
   },
   success: {
     heading: 'All done',
-    text: 'Everything went through. You can move on to the next step.',
+    description: 'Everything went through. You can move on to the next step.',
     icon: 'check',
   },
   scheduled: {
     heading: 'Scheduled',
-    text: 'This will run automatically at the scheduled time. You can cancel it if plans change.',
+    description: 'This will run automatically at the scheduled time. You can cancel it if plans change.',
     icon: 'schedule',
   },
   danger: {
     heading: 'Something went wrong',
-    text: 'Try again, or reach out to support if it keeps happening.',
+    description: 'Try again, or reach out to support if it keeps happening.',
     icon: 'error',
   },
 };
 
-const CX_EMPTY_STATE_TYPE_ACTIONS: Partial<Record<CxEmptyStateType, CxEmptyStateAction>> = {
+const CX_EMPTY_STATE_STATE_ACTIONS: Partial<Record<CxEmptyStateState, CxEmptyStateAction>> = {
   success: { text: 'Continue', transparent: true },
   danger: { text: 'Try again', transparent: true },
 };
@@ -57,9 +57,9 @@ const CX_EMPTY_STATE_TYPE_ACTIONS: Partial<Record<CxEmptyStateType, CxEmptyState
   styleUrl: './cx-empty-state.component.scss',
   host: {
     role: 'status',
-    '[class.cx-empty-state-host--success]': 'type === "success"',
-    '[class.cx-empty-state-host--scheduled]': 'type === "scheduled"',
-    '[class.cx-empty-state-host--danger]': 'type === "danger"',
+    '[class.cx-empty-state-host--success]': 'state === "success"',
+    '[class.cx-empty-state-host--scheduled]': 'state === "scheduled"',
+    '[class.cx-empty-state-host--danger]': 'state === "danger"',
     '[attr.title]': 'null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,10 +69,10 @@ export class CxEmptyStateComponent {
   private iconValue: CxIconName | undefined;
 
   @Input() heading = '';
-  @Input() text: string | undefined;
+  @Input() description: string | undefined;
   @Input() action: CxEmptyStateAction | undefined;
   @Input() secondaryAction: CxEmptyStateAction | undefined;
-  @Input() type: CxEmptyStateType = 'default';
+  @Input() state: CxEmptyStateState = 'default';
   @Input() visual: CxEmptyStateVisual = 'icon';
   @Input() customContent = false;
 
@@ -105,25 +105,25 @@ export class CxEmptyStateComponent {
     return preset?.heading ?? '';
   }
 
-  protected get resolvedText(): string {
-    const text = this.text?.trim();
-    if (text) {
-      return text;
+  protected get resolvedDescription(): string {
+    const description = this.description?.trim();
+    if (description) {
+      return description;
     }
     const preset = this.resolvedPreset;
-    return preset?.text ?? '';
+    return preset?.description ?? '';
   }
 
   protected get hasHeading(): boolean {
     return this.resolvedHeading.length > 0;
   }
 
-  protected get hasText(): boolean {
-    return this.resolvedText.length > 0;
+  protected get hasDescription(): boolean {
+    return this.resolvedDescription.length > 0;
   }
 
   protected get showSpinner(): boolean {
-    return this.visual === 'icon' && this.type === 'pending';
+    return this.visual === 'icon' && this.state === 'pending';
   }
 
   protected get showIcon(): boolean {
@@ -131,7 +131,7 @@ export class CxEmptyStateComponent {
   }
 
   protected get visibleAction(): CxEmptyStateAction | undefined {
-    return this.visibleActionFor(this.action) ?? this.visibleActionFor(CX_EMPTY_STATE_TYPE_ACTIONS[this.type]);
+    return this.visibleActionFor(this.action) ?? this.visibleActionFor(CX_EMPTY_STATE_STATE_ACTIONS[this.state]);
   }
 
   protected get visibleSecondaryAction(): CxEmptyStateAction | undefined {
@@ -143,10 +143,10 @@ export class CxEmptyStateComponent {
   }
 
   private get resolvedPreset(): typeof CX_EMPTY_STATE_PRESETS[keyof typeof CX_EMPTY_STATE_PRESETS] | undefined {
-    if (this.type === 'default') {
+    if (this.state === 'default') {
       return undefined;
     }
-    return CX_EMPTY_STATE_PRESETS[this.type];
+    return CX_EMPTY_STATE_PRESETS[this.state];
   }
 
   private visibleActionFor(action: CxEmptyStateAction | undefined): CxEmptyStateAction | undefined {

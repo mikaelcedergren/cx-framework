@@ -3,7 +3,7 @@
   [class.cx-detail-panel--closing]="closing$()"
   [class.cx-detail-panel--bar]="isBar"
   [class.cx-detail-panel--fixed]="isFixed"
-  [class.cx-detail-panel--scrollable]="hasScrollbar"
+  [class.cx-detail-panel--scrollable]="scrollable"
   [attr.aria-label]="ariaLabel"
 >
   @if (isBar) {
@@ -31,6 +31,8 @@
         @if (icon; as iconName) {
           <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
         }
+        <ng-content select="[detail-panel-heading]" />
+        <ng-content select=".cx-detail-panel-slot-heading" />
         @if (heading.trim()) {
           <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
         }
@@ -68,6 +70,7 @@
 
       @if (showFooterClose) {
         <cx-icon-button
+          class="cx-detail-panel__footer-close"
           icon="arrow-right"
           ariaLabel="Close details panel"
           mood="default"

@@ -17,7 +17,11 @@ import { CxValidationMessageComponent } from '../../feedback/cx-validation-messa
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
-import { measureCxFloatingSurface } from '../../overlay/floating-surface';
+import {
+  CxFloatingSurfaceController,
+  type CxFloatingSurfaceRequest,
+  type CxFloatingSurfaceViewport,
+} from '../../overlay/floating-surface-controller';
 import {
   type CxFieldSize,
   type CxFieldValidation,
@@ -71,8 +75,6 @@ const CX_COLOR_PICKER_COLOR_SET: ReadonlySet<string> = new Set<string>(CX_COLOR_
 export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
   private static nextId = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
-  private fieldElement?: HTMLElement;
-  private resizeObserver?: ResizeObserver;
   private readonly colorState = signal<CxColorPickerColor | undefined>(undefined);
   private readonly disabledState = signal(false);
   private readonly loadingState = signal(false);
@@ -80,12 +82,10 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
   private readonly showValueState = signal(true);
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly openState = signal(false);
-  private readonly overlayWidthState = signal<number | undefined>(undefined);
-  private readonly overlayMaxHeightState = signal<number | undefined>(undefined);
-  private readonly overlayLeftState = signal<number | undefined>(undefined);
-  private readonly overlayTopState = signal<number | undefined>(undefined);
-  private readonly overlayBottomState = signal<number | undefined>(undefined);
-  private readonly activePlacementState = signal<'bottom' | 'top'>('bottom');
+  protected readonly overlay = new CxFloatingSurfaceController(
+    (rect, viewport) => this.measureOverlay(rect, viewport),
+    () => this.popoverRef?.surfaceElement(),
+  );
   protected readonly labelId = `cx-color-picker-label-${CxColorPickerComponent.nextId}`;
   protected readonly messagesId = `cx-color-picker-messages-${CxColorPickerComponent.nextId}`;
   protected readonly popoverId = `cx-color-picker-popover-${CxColorPickerComponent.nextId++}`;
@@ -157,12 +157,6 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
   );
   protected readonly hasError$ = computed(() => this.validationMessages$().some(message => message.type === 'error'));
   protected readonly showHint$ = computed(() => !!this.hint?.trim() && this.validationMessages$().length === 0);
-  protected readonly overlayWidth$ = this.overlayWidthState.asReadonly();
-  protected readonly overlayMaxHeight$ = this.overlayMaxHeightState.asReadonly();
-  protected readonly overlayLeft$ = this.overlayLeftState.asReadonly();
-  protected readonly overlayTop$ = this.overlayTopState.asReadonly();
-  protected readonly overlayBottom$ = this.overlayBottomState.asReadonly();
-  protected readonly activePlacement$ = this.activePlacementState.asReadonly();
   protected readonly triggerAriaLabel$ = computed(() => {
     const ariaLabel = this.ariaLabel?.trim();
     if (ariaLabel) {
@@ -181,18 +175,12 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
   );
 
   ngAfterViewInit(): void {
-    this.fieldElement = this.triggerRef?.nativeElement;
-    this.syncPopoverMetrics();
-    const field = this.fieldElement;
-    if (!field || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    this.resizeObserver = new ResizeObserver(() => this.syncPopoverMetrics());
-    this.resizeObserver.observe(field);
+    this.overlay.sync(this.triggerRef?.nativeElement);
+    this.overlay.observeTrigger(this.triggerRef?.nativeElement);
   }
 
   ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
+    this.overlay.destroy();
   }
 
   protected toggleOpen(field?: HTMLElement): void {
@@ -204,9 +192,9 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.fieldElement = field ?? this.fieldElement;
+    this.overlay.setTrigger(field);
     this.openState.set(true);
-    queueMicrotask(() => this.syncPopoverMetrics(field));
+    queueMicrotask(() => this.overlay.sync(field));
   }
 
   protected onTriggerKeydown(event: KeyboardEvent, field?: HTMLElement): void {
@@ -239,6 +227,7 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
 
   protected closePopover(): void {
     this.openState.set(false);
+    this.overlay.resetMeasurement();
   }
 
   protected isOptionSelected(option: CxColorPickerOption): boolean {
@@ -268,7 +257,7 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   protected onWindowResize(): void {
     if (this.openState()) {
-      this.syncPopoverMetrics();
+      this.overlay.sync();
     }
   }
 
@@ -278,39 +267,16 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
     this.colorChange.emit(color);
   }
 
-  private syncPopoverMetrics(field?: HTMLElement): void {
-    if (field) {
-      this.fieldElement = field;
-    }
-    const activeField = this.fieldElement;
-    if (!activeField || typeof window === 'undefined') {
-      return;
-    }
-
-    const rect = activeField.getBoundingClientRect();
-    const minWidth = Math.floor(Math.min(rect.width, window.innerWidth - 16));
-    const popoverSurface = this.popoverRef?.surfaceElement();
-    const measuredWidth = popoverSurface
-      ? Math.ceil(popoverSurface.getBoundingClientRect().width)
-      : minWidth;
+  private measureOverlay(rect: DOMRect, viewport: CxFloatingSurfaceViewport): CxFloatingSurfaceRequest {
+    const minWidth = Math.floor(Math.min(rect.width, viewport.width - 16));
     const optionCount = Math.max(CX_COLOR_PICKER_PALETTE_OPTIONS.length + (this.clearableState() ? 1 : 0), 1);
     const estimatedHeight = Math.min(optionCount * 48, 360);
-    const surface = measureCxFloatingSurface({
-      triggerRect: rect,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      width: measuredWidth,
+    return {
+      width: minWidth,
       minWidth,
       estimatedHeight,
       align: 'start',
-    });
-
-    this.overlayWidthState.set(surface.width);
-    this.overlayMaxHeightState.set(surface.maxHeight);
-    this.overlayLeftState.set(surface.left);
-    this.overlayTopState.set(surface.top);
-    this.overlayBottomState.set(surface.bottom);
-    this.activePlacementState.set(surface.placement);
+    };
   }
 
   private isColor(color: unknown): color is CxColorPickerColor {

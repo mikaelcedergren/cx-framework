@@ -10,8 +10,7 @@
   [class.cx-icon-button--success]="mood === 'success'"
   [class.cx-icon-button--transparent]="variant === 'transparent'"
   [class.cx-icon-button--small]="size === 'small'"
-  [class.cx-icon-button--active]="active"
-  [class.cx-icon-button--hover]="hover"
+  [class.cx-icon-button--selected]="selected"
   [class.cx-icon-button--rounded]="rounded"
   [class.cx-icon-button--disabled]="disabled"
   [class.cx-icon-button--loading]="showSpinner$()"
@@ -21,7 +20,7 @@
   [class.cx-icon-button--with-badge-value]="hasBadgeCount()"
   [disabled]="disabled || loading$() || countdownActive$()"
   [attr.aria-label]="ariaLabel"
-  [attr.aria-pressed]="ariaPressed === undefined ? null : ariaPressed"
+  [attr.aria-pressed]="ariaPressed === undefined ? (selected ? true : null) : ariaPressed"
   [attr.aria-busy]="loading$() ? 'true' : null"
   (click)="onClick()"
 >

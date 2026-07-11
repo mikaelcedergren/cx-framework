@@ -1,42 +1,177 @@
-<div class="cx-query-field" [class.cx-query-field--small]="size === 'small'" [class.cx-query-field--large]="size === 'large'">
+<div
+  class="cx-query-field"
+  [class.cx-query-field--small]="size === 'small'"
+  [class.cx-query-field--large]="size === 'large'"
+>
   @if (label.trim()) {
     <div class="cx-query-field__header">
-      <div class="cx-query-field__label" [id]="labelId">{{ label }}</div>
+      <label class="cx-query-field__label" [id]="labelId" [for]="inputId">{{ label }}</label>
       @if (optional) {
         <div class="cx-query-field__optional">Optional</div>
       }
     </div>
   }
 
+  <ng-template #editorTemplate>
+    <span
+      class="cx-query-field__editor-slot"
+      [class.cx-query-field__editor-slot--caret]="isStructuredCaretVisible()"
+    >
+      <input
+        #editorInput
+        class="cx-query-field__editor"
+        [class.cx-query-field__editor--date]="isDateValueStage()"
+        [id]="inputId"
+        type="text"
+        [value]="editorText$()"
+        [style.width.ch]="isStructuredCaretVisible() ? null : editorWidth()"
+        [disabled]="isLocked()"
+        [attr.inputmode]="editorInputMode()"
+        [attr.aria-label]="resolvedAriaLabel()"
+        [attr.aria-labelledby]="resolvedAriaLabelledBy()"
+        [attr.aria-describedby]="resolvedAriaDescribedBy()"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        [attr.aria-required]="optional ? null : 'true'"
+        [attr.aria-disabled]="disabled ? 'true' : null"
+        [attr.aria-busy]="loading || currentSuggestionsLoading() ? 'true' : null"
+        [attr.aria-expanded]="isOpen$()"
+        [attr.aria-controls]="isOpen$() ? listboxId : null"
+        [attr.aria-activedescendant]="activeDescendant()"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        role="combobox"
+        autocomplete="off"
+        spellcheck="false"
+        data-shortcut-ignore="ArrowDown,ArrowUp,ArrowLeft,ArrowRight,Enter,Escape,Backspace,Delete"
+        (focus)="onEditorFocus()"
+        (input)="onEditorInput($event)"
+        (keydown)="onEditorKeydown($event)"
+      />
+    </span>
+  </ng-template>
+
   <div
+    #fieldContainer
     class="cx-query-field__container"
     [class.cx-query-field__container--disabled]="disabled"
     [class.cx-query-field__container--loading]="loading"
     [class.cx-query-field__container--error]="hasError$()"
-    role="search"
-    tabindex="0"
-    [attr.aria-invalid]="hasError$() ? 'true' : null"
-    [attr.aria-disabled]="disabled ? 'true' : null"
-    [attr.aria-busy]="loading ? 'true' : null"
-    [attr.aria-labelledby]="resolvedAriaLabelledBy()"
-    [attr.aria-describedby]="resolvedAriaDescribedBy()"
-    [attr.aria-label]="ariaLabel ?? null"
-    data-shortcut-ignore="ArrowRight,ArrowLeft"
+    [class.cx-query-field__container--single-line]="!growVertically"
     (click)="onContainerClick()"
-    (keydown)="onKeydown($event)"
+    (focusin)="onContainerFocusIn($event)"
+    (keydown)="onContainerKeydown($event)"
   >
-    <cx-icon class="cx-query-field__search-icon" name="query" [size]="16" />
+    <span class="cx-query-field__prepend" aria-hidden="true">
+      <cx-icon name="query" [size]="16" />
+    </span>
 
-    <div class="cx-query-field__segments">
-      @if (hasSegments$()) {
-        @for (segment of segments$(); track segment.id; let index = $index) {
-          <cx-query-element
-            [data]="segmentData(segment, index)"
-            (pressed)="onSegmentPressed(index)"
-          />
-        }
-      } @else {
-        <span class="cx-query-field__placeholder" aria-hidden="true">&nbsp;</span>
+    <div
+      #segments
+      class="cx-query-field__segments"
+      [class.cx-query-field__segments--overflow-before]="hasHiddenQueryBefore$()"
+      [class.cx-query-field__segments--overflow-after]="hasHiddenQueryAfter$()"
+      (scroll)="onSegmentsScroll()"
+    >
+      @for (condition of conditions$(); track condition.id; let index = $index) {
+        <div class="cx-query-field__condition" [attr.data-query-condition-id]="condition.id">
+          @if (index > 0) {
+            @if (isEditingPart(condition.id, 'join')) {
+              <ng-container [ngTemplateOutlet]="editorTemplate" />
+            }
+            @if (!isEditingPart(condition.id, 'join') || showStructuredNavigationTarget(condition.id, 'join')) {
+              <button
+                type="button"
+                class="cx-query-field__join"
+                [disabled]="isLocked()"
+                [attr.tabindex]="showStructuredNavigationTarget(condition.id, 'join') ? -1 : null"
+                [attr.aria-label]="'Change ' + conditionJoinLabel(condition) + ' between filters'"
+                (click)="$event.stopPropagation(); openConditionPartFromPointer(condition, 'join')"
+              >
+                {{ conditionJoinLabel(condition) }}
+              </button>
+            }
+          }
+
+          <div
+            class="cx-query-field__clause"
+            [class.cx-query-field__clause--editing]="isEditingPart(condition.id, 'field') || isEditingPart(condition.id, 'operator') || isEditingPart(condition.id, 'value')"
+            [class.cx-query-field__clause--invalid]="isConditionInvalid(condition.id)"
+          >
+            @if (isEditingPart(condition.id, 'field')) {
+              <ng-container [ngTemplateOutlet]="editorTemplate" />
+            }
+            @if (!isEditingPart(condition.id, 'field') || showStructuredNavigationTarget(condition.id, 'field')) {
+              <cx-query-element
+                [data]="fieldElementData(condition)"
+                (pressed)="openConditionPartFromPointer(condition, 'field')"
+              />
+
+              @if (isEditingPart(condition.id, 'operator')) {
+                <ng-container [ngTemplateOutlet]="editorTemplate" />
+              }
+              @if (!isEditingPart(condition.id, 'operator') || showStructuredNavigationTarget(condition.id, 'operator')) {
+                <cx-query-element
+                  [data]="operatorElementData(condition)"
+                  (pressed)="openConditionPartFromPointer(condition, 'operator')"
+                />
+
+                @if (conditionNeedsValue(condition)) {
+                  @if (isEditingPart(condition.id, 'value')) {
+                    @if (!showStructuredNavigationTarget(condition.id, 'value') && draftValueSummary()) {
+                      <span class="cx-query-field__draft-values">{{ draftValueSummary() }}</span>
+                    }
+                    <ng-container [ngTemplateOutlet]="editorTemplate" />
+                  }
+                  @if (!isEditingPart(condition.id, 'value') || showStructuredNavigationTarget(condition.id, 'value')) {
+                    <cx-query-element
+                      [data]="valueElementData(condition)"
+                      (pressed)="openConditionPartFromPointer(condition, 'value')"
+                    />
+                  }
+                }
+              }
+            }
+          </div>
+        </div>
+      }
+
+      @if (!draft$()) {
+        <ng-container [ngTemplateOutlet]="editorTemplate" />
+      } @else if (isDraftNew()) {
+        <div class="cx-query-field__condition">
+          @if (draft$()?.stage === 'join') {
+            <ng-container [ngTemplateOutlet]="editorTemplate" />
+          } @else {
+            @if (conditions$().length > 0) {
+              <button
+                type="button"
+                class="cx-query-field__join"
+                [disabled]="isLocked()"
+                [attr.aria-label]="'Change pending ' + draftJoinLabel() + ' connector'"
+                (click)="$event.stopPropagation(); openDraftPart('join')"
+              >
+                {{ draftJoinLabel() }}
+              </button>
+            }
+
+            @if (draft$()?.stage === 'field') {
+              <ng-container [ngTemplateOutlet]="editorTemplate" />
+            } @else {
+              <div class="cx-query-field__clause cx-query-field__clause--editing">
+                <cx-query-element [data]="draftFieldElementData()" (pressed)="openDraftPart('field')" />
+                @if (draft$()?.stage === 'operator') {
+                  <ng-container [ngTemplateOutlet]="editorTemplate" />
+                } @else {
+                  <cx-query-element [data]="draftOperatorElementData()" (pressed)="openDraftPart('operator')" />
+                  @if (draftValueSummary()) {
+                    <span class="cx-query-field__draft-values">{{ draftValueSummary() }}</span>
+                  }
+                  <ng-container [ngTemplateOutlet]="editorTemplate" />
+                }
+              </div>
+            }
+          }
+        </div>
       }
     </div>
 
@@ -44,16 +179,24 @@
       <cx-spinner class="cx-query-field__spinner" size="16" mood="default" />
     }
 
-    @if (hasSegments$() && clearable && !isLocked()) {
-      <cx-icon-button
+    @if (hasConditions$() && clearable && !isLocked()) {
+      <span
         class="cx-query-field__clear"
-        icon="remove"
-        ariaLabel="Clear query" variant="transparent"
-        size="small"
-        (click)="onClear($event)"
-      />
+        (pointerdown)="$event.stopPropagation()"
+        (click)="$event.stopPropagation()"
+      >
+        <cx-icon-button
+          icon="remove"
+          ariaLabel="Clear query"
+          variant="transparent"
+          size="small"
+          (pressed)="onClear()"
+        />
+      </span>
     }
   </div>
+
+  <span class="cx-query-field__sr-only" [id]="statusId" aria-live="polite">{{ editorStatusText() }}</span>
 
   @if (showHint$() || validationMessages$().length > 0) {
     <div class="cx-query-field__messages" [id]="messagesId">
@@ -66,3 +209,126 @@
     </div>
   }
 </div>
+
+@if (isOpen$() && !isLocked()) {
+  <cx-popover
+    #popover
+    [open]="true"
+    [showBackdrop]="false"
+    [surfaceId]="popoverId"
+    [minWidth]="overlay.minWidth$()"
+    [width]="overlay.width$()"
+    [maxWidth]="popoverMaxWidth"
+    [maxHeight]="overlay.maxHeight$()"
+    [left]="overlay.left$()"
+    [top]="overlay.top$()"
+    [bottom]="overlay.bottom$()"
+    [placement]="overlay.placement$()"
+    (backdropPressed)="cancelEditor()"
+  >
+    <div class="cx-query-field__surface">
+      <cx-option-group [label]="stageHeading()" />
+
+      @if (currentSuggestionsLoading()) {
+        <div class="cx-query-field__state" role="status" aria-live="polite">
+          <cx-spinner size="16" mood="default" />
+          <div class="cx-query-field__state-copy">
+            <div class="cx-query-field__state-heading">Loading values</div>
+            <div class="cx-query-field__state-text">Available values will appear here.</div>
+          </div>
+        </div>
+      } @else if (currentSuggestionsError(); as error) {
+        <div class="cx-query-field__state cx-query-field__state--error" role="status" aria-live="polite">
+          <div class="cx-query-field__state-copy">
+            <div class="cx-query-field__state-heading">Values couldn’t load</div>
+            <div class="cx-query-field__state-text">{{ error }}</div>
+          </div>
+        </div>
+      } @else if (suggestions$().length === 0) {
+        <div class="cx-query-field__state" role="status" aria-live="polite">
+          <div class="cx-query-field__state-copy">
+            <div class="cx-query-field__state-heading">{{ emptyHeading() }}</div>
+            @if (emptyDescription(); as description) {
+              <div class="cx-query-field__state-text">{{ description }}</div>
+            }
+          </div>
+        </div>
+      }
+
+      <div
+        class="cx-query-field__options"
+        [id]="listboxId"
+        role="listbox"
+        [attr.aria-label]="listboxLabel()"
+        [attr.aria-multiselectable]="isMultipleValueStage() ? 'true' : null"
+        [attr.aria-busy]="currentSuggestionsLoading() ? 'true' : null"
+        data-cx-popover-scroll-container
+      >
+        @if (!currentSuggestionsLoading() && !currentSuggestionsError()) {
+          @for (suggestion of suggestions$(); track suggestion.key; let index = $index) {
+            <div
+              class="cx-query-field__option"
+              [class.cx-query-field__option--active]="isSuggestionActive(index)"
+              [id]="suggestionDomId(index)"
+              role="option"
+              [attr.aria-label]="suggestion.disabled ? suggestion.label : null"
+              [attr.aria-selected]="suggestionAriaSelected(suggestion)"
+              [attr.aria-disabled]="suggestion.disabled ? 'true' : null"
+              (pointerenter)="setActiveSuggestion(index)"
+              (pointerdown)="onSuggestionPointerDown($event)"
+              (click)="selectSuggestion(index)"
+            >
+              <cx-option
+                [clickable]="false"
+                [label]="suggestion.label"
+                [description]="suggestion.description"
+                [selected]="suggestion.selected ?? false"
+                [selectedHighlight]="!showSuggestionCheckbox(suggestion)"
+                [showCheckbox]="showSuggestionCheckbox(suggestion)"
+                [disabled]="suggestion.disabled ?? false"
+              />
+            </div>
+          }
+        }
+      </div>
+
+      @if (currentSuggestionsError()) {
+        <button
+          #footerAction
+          type="button"
+          class="cx-query-field__footer-action"
+          (pointerdown)="onSuggestionPointerDown($event)"
+          (keydown)="onFooterActionKeydown($event)"
+          (click)="retryValues()"
+        >
+          Try again
+        </button>
+      } @else if (isQueryFinishable()) {
+        <button
+          #footerAction
+          type="button"
+          class="cx-query-field__footer-action"
+          aria-label="Done editing query"
+          [attr.aria-keyshortcuts]="finishShortcutAria"
+          (pointerdown)="onSuggestionPointerDown($event)"
+          (keydown)="onFooterActionKeydown($event)"
+          (click)="finishQuery()"
+        >
+          <span>Done</span>
+          <cx-shortcut-key [parts]="finishShortcutParts" />
+        </button>
+      } @else if (canRemoveCurrentCondition()) {
+        <button
+          #footerAction
+          type="button"
+          class="cx-query-field__footer-action cx-query-field__footer-action--remove"
+          (pointerdown)="onSuggestionPointerDown($event)"
+          (keydown)="onFooterActionKeydown($event)"
+          (click)="removeCurrentCondition()"
+        >
+          Remove filter
+        </button>
+      }
+    </div>
+  </cx-popover>
+}

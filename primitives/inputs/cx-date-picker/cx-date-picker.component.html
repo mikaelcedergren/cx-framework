@@ -62,104 +62,52 @@
       [open]="true"
       [showBackdrop]="true"
       [surfaceId]="surfaceId"
-      [width]="overlayWidth$()"
-      [maxHeight]="overlayMaxHeight$()"
-      [left]="overlayLeft$()"
-      [top]="overlayTop$()"
-      [bottom]="overlayBottom$()"
+      [width]="overlay.width$()"
+      [maxHeight]="overlay.maxHeight$()"
+      [left]="overlay.left$()"
+      [top]="overlay.top$()"
+      [bottom]="overlay.bottom$()"
       [role]="'dialog'"
       [ariaLabel]="'Choose date'"
+      surfaceVariant="grouped"
       (backdropPressed)="toggleOpen()"
     >
       <div class="cx-date-picker__surface-inner">
-        <div class="cx-date-picker__calendar-header">
-          <cx-icon-button
-            icon="chevron-left" variant="transparent"
-            size="small"
-            ariaLabel="Previous month"
-            [disabled]="disabled"
-            (pressed)="onPreviousMonth()"
-          />
-
-          <div class="cx-date-picker__calendar-controls">
-            <cx-dropdown
-              class="cx-date-picker__select-shell cx-date-picker__select-shell--month"
-              label=""
-              ariaLabel="Month"
-              placeholder="Select month"
-              [availableValues]="monthOptions"
-              [value]="viewMonthValue$()"
-              [disabled]="disabled"
-              (valueChange)="onMonthChange($event)"
-            />
-
-            <cx-dropdown
-              class="cx-date-picker__select-shell cx-date-picker__select-shell--year"
-              label=""
-              ariaLabel="Year"
-              placeholder="Select year"
-              [availableValues]="yearOptions$()"
-              [value]="viewYearValue$()"
-              [disabled]="disabled"
-              (valueChange)="onYearChange($event)"
-            />
-          </div>
-
-          <cx-icon-button
-            icon="chevron-right" variant="transparent"
-            size="small"
-            ariaLabel="Next month"
-            [disabled]="disabled"
-            (pressed)="onNextMonth()"
-          />
-        </div>
-
-        <div class="cx-date-picker__weekdays">
-          @for (weekday of weekdayLabels$(); track weekday) {
-            <div class="cx-date-picker__weekday">{{ weekday }}</div>
-          }
-        </div>
-
-        <div class="cx-date-picker__grid" role="grid">
-          @for (day of calendarDays$(); track day.key) {
-            <button
-              type="button"
-              class="cx-date-picker__day"
-              [class.cx-date-picker__day--outside]="!day.inCurrentMonth"
-              [class.cx-date-picker__day--today]="day.isToday"
-              [class.cx-date-picker__day--selected]="isSelectedDay(day)"
-              [disabled]="disabled || isOutsideRange(day)"
-              [attr.aria-label]="day.isoDate"
-              [attr.aria-pressed]="isSelectedDay(day)"
-              (click)="onDaySelect(day)"
-            >
-              {{ day.day }}
-            </button>
-          }
-        </div>
+        <cx-calendar
+          class="cx-date-picker__calendar"
+          variant="embedded"
+          [value]="calendarValue$()"
+          [min]="calendarMin$()"
+          [max]="calendarMax$()"
+          [weekStart]="weekStart"
+          [yearRange]="yearRange"
+          [disabled]="isLocked$()"
+          (valueChange)="onCalendarValueChange($event)"
+        />
 
         @if (timeEnabled) {
-          <div class="cx-date-picker__divider"></div>
-          <div class="cx-date-picker__time-row">
-            <cx-time-input
-              class="cx-date-picker__time"
-              label=""
-              ariaLabel="Time"
-              [format]="timeFormat"
-              [value]="selectedTimeValue$()"
-              [disabled]="isLocked$() || !selectedDate$() || effectiveAllDay$()"
-              [loading]="loading"
-              (valueChange)="onTimeValueChange($event)"
-            />
-
-            @if (allDayEnabled) {
-              <cx-checkbox
-                text="All day"
-                [selected]="effectiveAllDay$()"
-                [disabled]="disabled"
-                (selectedChange)="onAllDayChange($event)"
+          <div class="cx-date-picker__time-island">
+            <div class="cx-date-picker__time-row">
+              <cx-time-field
+                class="cx-date-picker__time"
+                label=""
+                ariaLabel="Time"
+                [format]="timeFormat"
+                [value]="selectedTimeValue$()"
+                [disabled]="isLocked$() || !selectedDate$() || effectiveAllDay$()"
+                [loading]="loading"
+                (valueChange)="onTimeValueChange($event)"
               />
-            }
+
+              @if (allDayEnabled) {
+                <cx-checkbox
+                  text="All day"
+                  [selected]="effectiveAllDay$()"
+                  [disabled]="disabled"
+                  (selectedChange)="onAllDayChange($event)"
+                />
+              }
+            </div>
           </div>
         }
       </div>

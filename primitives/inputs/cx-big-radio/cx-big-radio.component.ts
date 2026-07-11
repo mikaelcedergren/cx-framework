@@ -13,7 +13,7 @@ export class CxBigRadioComponent {
   private readonly selectedState = signal(false);
 
   @Input() heading = '';
-  @Input() text = '';
+  @Input() description = '';
   @Input() icon: CxIconName | undefined;
   @Input() iconMood: CxIconMood = 'default';
   @Input() disabled = false;
@@ -32,8 +32,8 @@ export class CxBigRadioComponent {
     return this.heading.trim();
   }
 
-  protected visibleText$(): string {
-    return this.text.trim();
+  protected visibleDescription$(): string {
+    return this.description.trim();
   }
 
   protected activate(): void {

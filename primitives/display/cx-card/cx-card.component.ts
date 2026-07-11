@@ -5,6 +5,7 @@ import { CxIconComponent } from '../../media/cx-icon';
 import { CxMenuComponent, type CxMenuItem } from '../../overlay/cx-menu';
 
 export type CxCardMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
+export type CxCardPadding = 'none' | 'default' | 'large';
 
 @Component({
   selector: 'cx-card',
@@ -13,7 +14,10 @@ export type CxCardMood = 'default' | 'primary' | 'accent' | 'info' | 'success' |
   styleUrl: './cx-card.component.scss',
   host: {
     '[class.cx-card-host--background]': 'background',
-    '[class.cx-card-host--unpadded]': '!padded',
+    '[class.cx-card-host--border]': 'border',
+    '[class.cx-card-host--shadow]': 'shadow',
+    '[class.cx-card-host--padding-none]': 'padding === "none"',
+    '[class.cx-card-host--padding-large]': 'padding === "large"',
     '[class.cx-card-host--interactive]': 'interactive',
     '[class.cx-card-host--mood-primary]': 'mood === "primary"',
     '[class.cx-card-host--mood-accent]': 'mood === "accent"',
@@ -28,8 +32,10 @@ export class CxCardComponent {
   @Input() heading: string | undefined;
   @Input() icon: CxIconName | undefined;
   @Input() mood: CxCardMood = 'default';
+  @Input() padding: CxCardPadding = 'default';
   @Input({ transform: booleanAttribute }) background = false;
-  @Input({ transform: booleanAttribute }) padded = true;
+  @Input({ transform: booleanAttribute }) border = false;
+  @Input({ transform: booleanAttribute }) shadow = false;
   @Input({ transform: booleanAttribute }) interactive = false;
   @Input() menuItems: readonly CxMenuItem[] | undefined;
 

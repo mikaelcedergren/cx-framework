@@ -6,6 +6,11 @@
   gap: var(--space-sm);
 }
 
+:host(.cx-log-step--first),
+:host(.cx-log-step--middle) {
+  padding-bottom: calc(var(--space-sm) + var(--space-xs));
+}
+
 .cx-log-step__indicator {
   position: relative;
   width: 24px;
@@ -22,12 +27,12 @@
 
 :host(.cx-log-step--first) .cx-log-step__line {
   top: 12px;
-  bottom: 0;
+  bottom: calc(0px - var(--space-sm) - var(--space-xs));
 }
 
 :host(.cx-log-step--middle) .cx-log-step__line {
   top: 0;
-  bottom: 0;
+  bottom: calc(0px - var(--space-sm) - var(--space-xs));
 }
 
 :host(.cx-log-step--last) .cx-log-step__line {
@@ -45,7 +50,7 @@
   left: 0;
   width: 24px;
   height: 24px;
-  background: var(--surface-mid);
+  background: var(--surface);
 }
 
 .cx-log-step__circle {
@@ -59,7 +64,8 @@
   justify-content: center;
   border: 2px solid var(--opacity-mid);
   border-radius: var(--radius-pill);
-  background: var(--surface-mid);
+  corner-shape: round;
+  background: var(--surface);
   color: var(--ink);
 }
 

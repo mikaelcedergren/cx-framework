@@ -8,25 +8,21 @@
 .cx-textarea {
   --cx-textarea-font-size: var(--font-size-body);
   --cx-textarea-line-height: var(--line-height-body);
-  --cx-textarea-editor-padding: var(--space-sm);
 
   width: 100%;
 }
 
 .cx-textarea--small {
   --cx-textarea-font-size: var(--font-size-body-sm);
-  --cx-textarea-editor-padding: var(--space-xs) var(--space-sm);
 }
 
 .cx-textarea--large {
   --cx-textarea-font-size: var(--font-size-title-3);
-  --cx-textarea-editor-padding: var(--space-md);
 }
 
 .cx-textarea--document {
   --cx-textarea-font-size: 18px;
   --cx-textarea-line-height: 1.75;
-  --cx-textarea-editor-padding: var(--space-md);
 }
 
 @include field.field-header('cx-textarea');
@@ -35,39 +31,37 @@
   width: 100%;
   border: var(--line);
   border-radius: var(--radius-md);
-  background: var(--opacity-darken);
+  background: transparent;
   box-sizing: border-box;
   overflow: hidden;
   transition:
     border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease,
-    outline-color var(--motion-fast) ease;
+    background-color var(--motion-fast) ease;
 }
 
-.cx-textarea__shell:hover:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error) {
+.cx-textarea__shell:hover:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error):not(.cx-textarea__shell--inline-edit) {
   border-color: var(--opacity-high);
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
 }
 
 // --- Focus appearance ------------------------------------------------------
-// Default focusVariant: framework's existing behavior — invisible mouse focus,
-// keyboard focus shows a 2px blue outline drawn inside the border.
-.cx-textarea__shell--focused {
-  outline: var(--outline-focus);
-  outline-offset: var(--outline-focus-offset);
+// Default focusVariant: mouse focus keeps the subtle hover outline, while
+// keyboard focus uses the stronger tab outline.
+.cx-textarea__shell:focus-within:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error):not(.cx-textarea__shell--inline-edit) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
 }
 
-.cx-textarea__shell:has(.cx-textarea__field:focus-visible) {
+:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell:has(.cx-textarea__field:focus) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
 
-// Ring focusVariant: border-color flips to primary and a 1px primary outline
-// sits right outside the border. Outline doesn't take layout space, so the
-// shell stays exactly the same size on focus. Reads as a 2px primary ring.
-.cx-textarea__shell--focus-ring.cx-textarea__shell--focused,
-.cx-textarea__shell--focus-ring:has(.cx-textarea__field:focus-visible) {
+// Ring focusVariant strengthens the keyboard state without changing pointer focus.
+:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--focus-ring:has(.cx-textarea__field:focus) {
   border-color: var(--primary);
-  outline: 1px solid var(--primary);
+  outline: var(--outline-tab);
   outline-offset: 0;
 }
 
@@ -90,8 +84,7 @@
   background: transparent;
   transition:
     border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease,
-    outline-color var(--motion-fast) ease;
+    background-color var(--motion-fast) ease;
 }
 
 .cx-textarea__shell--inline-edit:hover:not(.cx-textarea__shell--disabled) {
@@ -100,11 +93,15 @@
   outline: 0;
 }
 
-.cx-textarea__shell--inline-edit.cx-textarea__shell--focused,
-.cx-textarea__shell--inline-edit:has(.cx-textarea__field:focus-visible) {
+.cx-textarea__shell--inline-edit.cx-textarea__shell--focused {
   border-color: var(--primary);
   background: transparent;
   outline: 0;
+}
+
+:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--inline-edit:has(.cx-textarea__field:focus) {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
 }
 
 .cx-textarea__shell--inline-edit.cx-textarea__shell--error {
@@ -115,7 +112,16 @@
   display: grid;
   grid-template-columns: 0px minmax(0, 1fr);
   align-items: start;
-  padding: var(--cx-textarea-editor-padding);
+  padding: var(--space-sm);
+}
+
+.cx-textarea--small .cx-textarea__editor {
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.cx-textarea--large .cx-textarea__editor,
+.cx-textarea--document .cx-textarea__editor {
+  padding: var(--space-md);
 }
 
 .cx-textarea__editor--with-gutter {

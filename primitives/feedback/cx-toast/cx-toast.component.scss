@@ -3,8 +3,6 @@
 }
 
 .cx-toast {
-  --cx-toast-timer-color: var(--primary);
-
   position: fixed;
   left: 50%;
   bottom: var(--space-md);
@@ -20,10 +18,11 @@
   padding: var(--space-sm);
   border: var(--line);
   border-radius: var(--radius-pill);
-  background: var(--surface-mid);
-  box-shadow: var(--shadow-notification);
+  corner-shape: round;
+  background: var(--surface);
+  box-shadow: var(--shadow-mid);
   color: var(--ink);
-  line-height: 1.4;
+  line-height: var(--line-height-body-relaxed);
   transform: translate(-50%, calc(100% + var(--space-xl)));
   transition: transform var(--motion-slow) var(--ease-out);
   backdrop-filter: blur(var(--space-sm));
@@ -42,25 +41,21 @@
 }
 
 .cx-toast--success {
-  --cx-toast-timer-color: var(--success);
   border-color: var(--success-opacity);
   background: var(--success-opacity);
 }
 
 .cx-toast--info {
-  --cx-toast-timer-color: var(--info);
   border-color: var(--info-opacity);
   background: var(--info-opacity);
 }
 
 .cx-toast--warning {
-  --cx-toast-timer-color: var(--warning);
   border-color: var(--warning-opacity);
   background: var(--warning-opacity);
 }
 
 .cx-toast--danger {
-  --cx-toast-timer-color: var(--danger);
   border-color: var(--danger-opacity);
   background: var(--danger-opacity);
 }
@@ -105,9 +100,25 @@
   bottom: 0;
   left: 0;
   height: var(--space-2xs);
-  background: var(--cx-toast-timer-color);
+  background: var(--primary);
   transform-origin: left center;
   animation: cx-toast-timer 5s linear forwards;
+}
+
+.cx-toast--success .cx-toast__timer {
+  background: var(--success);
+}
+
+.cx-toast--info .cx-toast__timer {
+  background: var(--info);
+}
+
+.cx-toast--warning .cx-toast__timer {
+  background: var(--warning);
+}
+
+.cx-toast--danger .cx-toast__timer {
+  background: var(--danger);
 }
 
 @keyframes cx-toast-timer {

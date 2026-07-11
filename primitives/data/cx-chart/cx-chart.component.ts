@@ -91,7 +91,7 @@ const CX_CHART_COLOR_FALLBACKS: Record<string, string> = {
   '--ink': '#1f1f1f',
   '--opacity-high': 'rgb(22 24 29 / 62%)',
   '--opacity-mid': 'rgb(22 24 29 / 10%)',
-  '--surface-mid': '#ffffff',
+  '--surface': '#ffffff',
   '--line': 'rgb(22 24 29 / 10%)',
 };
 
@@ -379,7 +379,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
         textColor: this.token('--opacity-high'),
         subtleTextColor: this.token('--opacity-high'),
         axisColor: this.token('--opacity-mid'),
-        tooltipBackgroundColor: this.token('--surface-mid'),
+        tooltipBackgroundColor: this.token('--surface'),
         tooltipTextColor: this.token('--ink'),
         tooltipSubtleTextColor: this.token('--opacity-high'),
         tooltipBorder: true,

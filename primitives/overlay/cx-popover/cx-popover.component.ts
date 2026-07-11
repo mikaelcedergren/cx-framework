@@ -16,8 +16,7 @@ import {
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverBackdropComponent } from '../cx-popover-backdrop/cx-popover-backdrop.component';
 
-export type CxPopoverMood = 'default' | 'danger';
-export type CxPopoverSurfaceVariant = 'default' | 'raised';
+export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 
 @Component({
   selector: 'cx-popover',
@@ -90,10 +89,14 @@ export class CxPopoverComponent {
   @Input() left: number | undefined;
   @Input() top: number | undefined;
   @Input() bottom: number | undefined;
+  /** Exact surface width for fixed layouts (calendars, fixed menus). Otherwise the content decides. */
   @Input() width: number | undefined;
+  /** Width floor — anchored surfaces pass the trigger width so the popover never reads narrower than it. */
+  @Input() minWidth: number | undefined;
+  /** Raises or lowers the compact content cap. Always viewport-clamped. */
+  @Input() maxWidth: number | undefined;
   @Input() maxHeight: number | undefined;
   @Input() placement: 'top' | 'bottom' | undefined;
-  @Input() mood: CxPopoverMood = 'default';
   @Input() surfaceVariant: CxPopoverSurfaceVariant = 'default';
 
   @Output() readonly backdropPressed = new EventEmitter<void>();
@@ -114,6 +117,17 @@ export class CxPopoverComponent {
       return `min(${Math.max(Math.floor(this.maxHeight), 0)}px, calc(100dvh - (var(--space-md) * 2)))`;
     }
     return 'calc(100dvh - (var(--space-md) * 2))';
+  }
+
+  protected get resolvedMaxWidth(): string | null {
+    if (typeof this.maxWidth === 'number' && Number.isFinite(this.maxWidth)) {
+      return `min(${Math.max(Math.floor(this.maxWidth), 0)}px, calc(100vw - (var(--space-md) * 2)))`;
+    }
+    if (typeof this.width === 'number' && Number.isFinite(this.width)) {
+      // Explicit width wins over the compact content cap; only the viewport clamps it.
+      return 'calc(100vw - (var(--space-md) * 2))';
+    }
+    return null;
   }
 
   protected get normalizedTitle(): string | undefined {

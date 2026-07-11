@@ -4,7 +4,6 @@
 }
 
 .cx-badge {
-  --cx-badge-bg: var(--primary);
   --cx-badge-cutout-size: 3px;
 
   position: relative;
@@ -16,14 +15,6 @@
   background: transparent;
   color: var(--on-ink);
   box-sizing: border-box;
-}
-
-.cx-badge--default {
-  --cx-badge-bg: var(--primary);
-}
-
-.cx-badge--danger {
-  --cx-badge-bg: var(--danger);
 }
 
 .cx-badge__content {
@@ -63,11 +54,16 @@
   justify-content: center;
   transform: translate(25%, -25%);
   pointer-events: none;
-  background: var(--cx-badge-bg);
+  background: var(--primary);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   color: var(--on-ink);
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.cx-badge--danger .cx-badge__indicator {
+  background: var(--danger);
 }
 
 .cx-badge--inline {
@@ -84,6 +80,7 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-pill);
+  corner-shape: round;
 }
 
 .cx-badge--with-count {
@@ -103,8 +100,9 @@
   height: 14px;
   min-width: 14px;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   padding: 0 var(--space-2xs);
-  color: var(--surface-mid);
+  color: var(--surface);
 }
 
 .cx-badge__value {

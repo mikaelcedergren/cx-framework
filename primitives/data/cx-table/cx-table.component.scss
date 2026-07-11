@@ -7,7 +7,6 @@
   --cx-table-z-sticky-header: 1;
   --cx-table-z-pinned-cell: 2;
   --cx-table-z-pinned-header: 3;
-  --cx-table-z-drag-preview: var(--z-index-popover);
 
   display: block;
   width: 100%;
@@ -48,14 +47,14 @@
   position: sticky;
   top: 0;
   z-index: var(--cx-table-z-sticky-header);
-  background: var(--surface-mid);
+  background: var(--surface);
 }
 
 .cx-table__head-cell--pinned,
 .cx-table__cell--pinned {
   position: sticky;
   z-index: var(--cx-table-z-pinned-cell);
-  background: var(--surface-mid);
+  background: var(--surface);
 }
 
 .cx-table__head-cell--pinned {
@@ -82,6 +81,7 @@
   bottom: var(--space-xs);
   width: 2px;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--primary);
   content: '';
 }
@@ -373,6 +373,7 @@
   width: 3px;
   height: calc(100% - (var(--space-xs) * 2));
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: transparent;
   content: '';
   transform: translate(-50%, -50%);
@@ -423,7 +424,7 @@
 
 .cx-table__drag-preview {
   position: fixed;
-  z-index: var(--cx-table-z-drag-preview);
+  z-index: var(--z-index-popover);
   display: inline-flex;
   max-width: 220px;
   min-height: 32px;
@@ -432,8 +433,8 @@
   padding: var(--space-xs);
   border: var(--line);
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface-mid) 94%, transparent);
-  box-shadow: var(--shadow-popover);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--shadow-mid);
   backdrop-filter: blur(2px);
   color: var(--ink);
   pointer-events: none;
@@ -459,6 +460,7 @@
   width: min(100%, 220px);
   height: 12px;
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: linear-gradient(
     90deg,
     var(--opacity-low),
@@ -485,7 +487,7 @@
   align-items: center;
   justify-content: center;
   border: var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   color: var(--opacity-high);
   font-size: var(--font-size-body);
 }

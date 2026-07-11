@@ -4,41 +4,37 @@
 
 .cx-big-radio {
   display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
+  grid-template-columns: var(--choice-control-size) minmax(0, 1fr);
   width: 100%;
   box-sizing: border-box;
   align-items: start;
   column-gap: var(--space-md);
   padding: var(--space-md);
-  border: var(--line);
-  border-radius: var(--radius-lg);
-  background: transparent;
+  border: none;
+  border-radius: var(--radius-xl);
+  background-color: var(--opacity-low);
   color: var(--opacity-high);
   cursor: pointer;
   outline: none;
   transition:
-    border-color var(--motion-base) var(--ease-out),
     background-color var(--motion-base) var(--ease-out),
     box-shadow var(--motion-fast) ease,
     color var(--motion-fast) ease;
 }
 
-.cx-big-radio:hover:not(.cx-big-radio--selected):not(.cx-big-radio--disabled) {
-  background: var(--primary-opacity);
-}
-
 .cx-big-radio--selected {
-  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: var(--shadow-low);
   color: var(--ink);
 }
 
 .cx-big-radio--selected:hover:not(.cx-big-radio--disabled) {
-  border-color: var(--primary);
-  background: var(--primary-opacity);
+  background: var(--surface);
+  box-shadow: var(--shadow-low);
 }
 
 .cx-big-radio--has-icon {
-  grid-template-columns: 16px minmax(0, 1fr) auto;
+  grid-template-columns: var(--choice-control-size) minmax(0, 1fr) auto;
 }
 
 .cx-big-radio--disabled {
@@ -53,8 +49,8 @@
   grid-row: 1;
   align-self: start;
   justify-self: center;
-  width: calc(var(--controller-size-small) - var(--space-sm));
-  height: calc(var(--controller-size-small) - var(--space-sm));
+  width: var(--choice-control-size);
+  height: var(--choice-control-size);
   padding: 0;
   border: 0;
   margin: 0;
@@ -65,13 +61,11 @@
 }
 
 .cx-big-radio:has(.cx-big-radio__input:focus-visible) {
-  border-color: var(--primary);
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
 
 .cx-big-radio__indicator {
-  --cx-big-radio-control-size: calc(var(--controller-size-small) - var(--space-sm));
   grid-column: 1;
   grid-row: 1;
   display: inline-flex;
@@ -83,12 +77,13 @@
 
 .cx-big-radio__control {
   display: inline-flex;
-  width: var(--cx-big-radio-control-size);
-  height: var(--cx-big-radio-control-size);
+  width: var(--choice-control-size);
+  height: var(--choice-control-size);
   align-items: center;
   justify-content: center;
   border: var(--line);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: var(--opacity-low);
   transition:
     border-color var(--motion-base) var(--ease-out),
@@ -101,15 +96,16 @@
 }
 
 .cx-big-radio__control--selected {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--choice-control-selected);
+  background: var(--choice-control-selected);
 }
 
 .cx-big-radio__dot {
   width: calc(var(--space-xs) + var(--space-2xs));
   height: calc(var(--space-xs) + var(--space-2xs));
   border-radius: var(--radius-pill);
-  background: var(--on-ink);
+  corner-shape: round;
+  background: var(--on-choice-control);
 }
 
 .cx-big-radio__content {

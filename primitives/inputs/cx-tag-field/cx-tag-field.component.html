@@ -1,0 +1,240 @@
+<div
+  class="cx-tag-field"
+  [class.cx-tag-field--small]="size === 'small'"
+  [class.cx-tag-field--large]="size === 'large'"
+>
+  @if (label.trim()) {
+    <div class="cx-tag-field__header">
+      <label class="cx-tag-field__label" [id]="labelId" [for]="inputId">{{ label.trim() }}</label>
+      @if (optional) {
+        <div class="cx-tag-field__optional">Optional</div>
+      }
+    </div>
+  }
+
+  <div
+    #fieldShell
+    class="cx-tag-field__field-shell"
+    [class.cx-tag-field__field-shell--open]="isOpen$()"
+    [class.cx-tag-field__field-shell--disabled]="disabled"
+    [class.cx-tag-field__field-shell--loading]="loading"
+    [class.cx-tag-field__field-shell--error]="hasError$()"
+    (click)="onFieldClick($event)"
+  >
+    <div class="cx-tag-field__tokens">
+      @for (tag of selectedTags$(); track tag.id; let index = $index) {
+        <span class="cx-tag-field__token" [attr.data-selected-tag-id]="tag.id">
+          <cx-tag
+            [text]="formatOptionLabel(tag)"
+            [color]="toTagColor(tag.color)"
+          />
+          <button
+            #selectedTagRemove
+            type="button"
+            class="cx-tag-field__token-remove"
+            tabindex="-1"
+            [disabled]="isLocked$()"
+            [attr.aria-label]="'Remove ' + formatOptionLabel(tag)"
+            (focus)="onSelectedTagFocus(tag)"
+            (keydown)="onSelectedTagKeydown($event, tag, index)"
+            (click)="removeTagFromPointer($event, tag)"
+          >
+            <cx-icon name="remove" [size]="12" />
+          </button>
+        </span>
+      }
+
+      <input
+        #tagField
+        class="cx-tag-field__input"
+        [id]="inputId"
+        type="text"
+        role="combobox"
+        autocomplete="off"
+        spellcheck="false"
+        [value]="query$()"
+        [placeholder]="inputPlaceholder$()"
+        [disabled]="isLocked$()"
+        [attr.aria-label]="resolvedFieldAriaLabel"
+        [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+        [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+        [attr.aria-expanded]="isOpen$()"
+        [attr.aria-controls]="isOpen$() ? listboxId : null"
+        [attr.aria-activedescendant]="isOpen$() ? activeDescendant$() : null"
+        [attr.aria-keyshortcuts]="showCreate$() ? createShortcutAria : null"
+        [attr.aria-invalid]="hasError$() ? 'true' : null"
+        [attr.aria-required]="optional ? null : 'true'"
+        [attr.aria-disabled]="disabled ? 'true' : null"
+        [attr.aria-busy]="loading ? 'true' : null"
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        data-shortcut-ignore="ArrowDown,ArrowUp,ArrowLeft,Enter,Escape,Backspace,Delete"
+        (focus)="onInputFocus()"
+        (input)="onInput($event)"
+        (keydown)="onInputKeydown($event)"
+      />
+    </div>
+
+    <span class="cx-tag-field__actions">
+      @if (hasClear$()) {
+        <span
+          class="cx-tag-field__clear"
+          (pointerdown)="$event.preventDefault(); $event.stopPropagation()"
+          (click)="$event.stopPropagation()"
+        >
+          <cx-icon-button
+            icon="remove"
+            ariaLabel="Clear tags"
+            variant="transparent"
+            size="small"
+            (pressed)="clearSelected()"
+          />
+        </span>
+      }
+      @if (loading) {
+        <span class="cx-tag-field__loading" aria-hidden="true">
+          <cx-spinner size="16" mood="default" />
+        </span>
+      }
+      <cx-icon
+        class="cx-tag-field__chevron"
+        name="chevron-down"
+        [size]="size === 'small' ? 12 : 16"
+        aria-hidden="true"
+      />
+    </span>
+  </div>
+
+  <span class="cx-tag-field__sr-only" [id]="statusId" aria-live="polite">{{ status$() }}</span>
+
+  @if (showHint$() || validationMessages$().length > 0) {
+    <div class="cx-tag-field__messages" [id]="messagesId">
+      @if (showHint$()) {
+        <div class="cx-tag-field__hint">{{ hint!.trim() }}</div>
+      }
+      @if (validationMessages$().length > 0) {
+        <cx-validation-message [messages]="validationMessages$()" />
+      }
+    </div>
+  }
+
+  @if (isOpen$() && !isLocked$()) {
+    <cx-popover
+      #popover
+      [open]="true"
+      [showBackdrop]="false"
+      [surfaceId]="popoverId"
+      [width]="overlay.width$()"
+      [minWidth]="overlay.minWidth$()"
+      [maxWidth]="popoverMaxWidth"
+      [maxHeight]="overlay.maxHeight$()"
+      [left]="overlay.left$()"
+      [top]="overlay.top$()"
+      [bottom]="overlay.bottom$()"
+      [placement]="overlay.placement$()"
+      (backdropPressed)="closePopover()"
+    >
+      <div
+        class="cx-tag-field__surface"
+        [id]="listboxId"
+        role="listbox"
+        [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+        [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+        [attr.aria-label]="resolvedFieldAriaLabel"
+        aria-multiselectable="true"
+      >
+        <div class="cx-tag-field__options" data-cx-popover-scroll-container>
+          @if (filteredTags$().length > 0) {
+            @for (tag of filteredTags$(); track tag.id; let index = $index) {
+              <div
+                class="cx-tag-field__option"
+                [class.cx-tag-field__option--active]="isTagActive(tag.id)"
+                [id]="optionDomId(index)"
+                role="option"
+                [attr.aria-selected]="isTagSelected(tag.id)"
+                (pointerenter)="setActiveTag(tag.id)"
+                (pointerdown)="onOptionPointerDown($event)"
+                (click)="toggleTag(tag)"
+              >
+                <cx-option
+                  [clickable]="false"
+                  [label]="formatOptionLabel(tag)"
+                  [active]="isTagActive(tag.id)"
+                  [selected]="isTagSelected(tag.id)"
+                  [selectedHighlight]="false"
+                  [showCheckbox]="true"
+                />
+              </div>
+            }
+          } @else {
+            <div class="cx-tag-field__empty" role="status">
+              {{ emptyText$() }}
+            </div>
+          }
+        </div>
+
+        @if (showCreate$()) {
+          <div
+            class="cx-tag-field__create"
+            [class.cx-tag-field__create--active]="isCreateActive()"
+            [id]="createOptionId"
+            role="option"
+            aria-selected="false"
+            [attr.aria-label]="createActionLabel$()"
+            [attr.aria-keyshortcuts]="createShortcutAria"
+            (pointerenter)="setCreateActive()"
+            (pointerdown)="onOptionPointerDown($event)"
+            (click)="openCreateDialog()"
+          >
+            <cx-option
+              [clickable]="false"
+              [label]="createActionLabel$()"
+              [active]="isCreateActive()"
+              [selected]="false"
+              prependIcon="plus"
+              [shortcutParts]="createShortcutParts"
+            />
+          </div>
+        }
+      </div>
+    </cx-popover>
+  }
+
+  <cx-dialog
+    variant="confirm"
+    [open]="createDialogOpen$()"
+    [dismissible]="true"
+    [heading]="createDialogHeading"
+    [description]="createDialogDescription"
+    [primaryText]="createDialogPrimaryLabel"
+    [secondaryText]="createDialogSecondaryLabel"
+    [closeOnPrimary]="false"
+    (openChange)="onCreateDialogOpenChange($event)"
+    (primary)="confirmCreateTag()"
+  >
+    <div body class="cx-tag-field__dialog-body">
+      <div class="cx-tag-field__dialog-name-row">
+        <cx-text-field
+          #draftNameInput
+          label="Name"
+          [value]="draftName$()"
+          [validation]="draftNameError$()"
+          (valueChange)="onDraftNameChange($event)"
+        />
+        <div class="cx-tag-field__dialog-color-slot">
+          <cx-color-picker
+            class="cx-tag-field__dialog-color-picker"
+            [color]="draftColor$()"
+            (colorChange)="onDraftColorChange($event)"
+          />
+        </div>
+      </div>
+      <cx-text-field
+        label="Key"
+        [optional]="true"
+        [value]="draftKey$()"
+        (valueChange)="onDraftKeyChange($event)"
+      />
+    </div>
+  </cx-dialog>
+</div>

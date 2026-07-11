@@ -9,7 +9,7 @@
         <cx-menu
           class="cx-breadcrumbs__menu"
           [ariaLabel]="'Switch ' + item.label"
-          [items]="optionMenuItems(item)"
+          [menu]="optionMenuGroups(item)"
           [currentId]="item.selectedOptionId ?? item.id"
           align="start"
           [width]="220"

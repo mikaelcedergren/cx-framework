@@ -13,6 +13,7 @@
       role="switch"
       [checked]="selected$()"
       [disabled]="disabled"
+      [attr.aria-label]="ariaLabel || null"
       [attr.aria-invalid]="hasError$() ? 'true' : null"
       [attr.aria-describedby]="describedByIds$() ?? null"
       (change)="onNativeChange($event)"

@@ -1,0 +1,278 @@
+@use '../shared/field-shell' as field;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cx-tag-field {
+  width: 100%;
+}
+
+@include field.field-header('cx-tag-field');
+
+.cx-tag-field__field-shell {
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size);
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: text;
+}
+
+@include field.field-shell-state('.cx-tag-field__field-shell', '.cx-tag-field__input');
+
+.cx-tag-field__field-shell:hover:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error),
+.cx-tag-field__field-shell:focus-within:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
+}
+
+.cx-tag-field__field-shell--disabled {
+  cursor: default;
+}
+
+.cx-tag-field__tokens {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  gap: var(--space-xs);
+}
+
+.cx-tag-field__token {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 1 auto;
+}
+
+.cx-tag-field__token-remove {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2xs);
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: var(--line);
+  border-radius: var(--radius-pill);
+  corner-shape: round;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.94);
+  transition:
+    opacity var(--motion-fast) var(--ease-out-in),
+    transform var(--motion-fast) var(--ease-out-in),
+    background-color var(--motion-fast) var(--ease-out-in),
+    border-color var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-tag-field__token:hover .cx-tag-field__token-remove,
+.cx-tag-field__token:focus-within .cx-tag-field__token-remove {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+.cx-tag-field__token-remove:hover {
+  border-color: var(--opacity-mid);
+  background: var(--opacity-low);
+}
+
+.cx-tag-field__token-remove:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-tag-field__token-remove:disabled {
+  cursor: default;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cx-tag-field__token-remove {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.cx-tag-field__input {
+  width: auto;
+  min-width: min(10ch, 100%);
+  min-height: var(--icon-size-md);
+  flex: 1 1 10ch;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-control);
+}
+
+.cx-tag-field--small .cx-tag-field__field-shell {
+  min-height: var(--controller-size-small);
+  padding-block: var(--space-2xs);
+}
+
+.cx-tag-field--small .cx-tag-field__input {
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-tag-field--large .cx-tag-field__field-shell {
+  min-height: var(--controller-size-large);
+  padding-block: var(--space-sm);
+  border-radius: var(--radius-xl);
+}
+
+.cx-tag-field--large .cx-tag-field__input {
+  font-size: var(--font-size-body-lg);
+}
+
+.cx-tag-field__input::placeholder {
+  color: var(--placeholder);
+}
+
+.cx-tag-field__input:disabled {
+  cursor: default;
+}
+
+.cx-tag-field__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  align-self: center;
+  gap: var(--space-xs);
+}
+
+.cx-tag-field__clear,
+.cx-tag-field__loading,
+.cx-tag-field__chevron {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.cx-tag-field__loading,
+.cx-tag-field__chevron {
+  color: var(--opacity-high);
+}
+
+.cx-tag-field__chevron {
+  pointer-events: none;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.cx-tag-field__field-shell--open .cx-tag-field__chevron {
+  transform: rotate(180deg);
+}
+
+.cx-tag-field__surface {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  max-height: inherit;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.cx-tag-field__options {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cx-tag-field__option,
+.cx-tag-field__create {
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-tag-field__option:hover,
+.cx-tag-field__option--active,
+.cx-tag-field__create:hover,
+.cx-tag-field__create--active {
+  background: var(--primary-opacity);
+}
+
+.cx-tag-field__create {
+  flex: 0 0 auto;
+  padding-top: var(--space-xs);
+  border-top: var(--line);
+}
+
+.cx-tag-field__empty {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  box-sizing: border-box;
+  padding: var(--space-md);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+}
+
+@include field.field-messages('cx-tag-field');
+
+.cx-tag-field__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cx-tag-field__dialog-body {
+  display: flex;
+  min-width: min(320px, 100%);
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cx-tag-field__dialog-name-row {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-md);
+}
+
+.cx-tag-field__dialog-color-slot {
+  display: flex;
+  flex-direction: column;
+}
+
+.cx-tag-field__dialog-color-picker {
+  width: fit-content;
+}
+
+@media (max-width: 480px) {
+  .cx-tag-field__dialog-body {
+    min-width: 0;
+  }
+
+  .cx-tag-field__dialog-name-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -13,7 +13,7 @@ export class CxBigCheckboxComponent {
   private readonly selectedState = signal(false);
 
   @Input() heading = '';
-  @Input() text = '';
+  @Input() description = '';
   @Input() icon: CxIconName | undefined;
   @Input() iconMood: CxIconMood = 'default';
   @Input() disabled = false;
@@ -32,8 +32,8 @@ export class CxBigCheckboxComponent {
     return this.heading.trim();
   }
 
-  protected visibleText$(): string {
-    return this.text.trim();
+  protected visibleDescription$(): string {
+    return this.description.trim();
   }
 
   protected onNativeChange(event: Event): void {

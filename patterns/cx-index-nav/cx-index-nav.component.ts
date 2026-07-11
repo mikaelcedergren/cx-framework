@@ -57,9 +57,9 @@ let nextBodyId = 0;
  * collapsible folders, and a single active item, and the whole panel can
  * compress to a thin rail to give the content full width.
  *
- * It owns its own width via `--cx-index-nav-width` / `--cx-index-nav-collapsed-width`,
- * so hosting it in an `auto`-width grid track or a `flex: 0 0 auto` column lets
- * the column animate as the panel collapses.
+ * It owns its expanded width via `--cx-index-nav-width`; its collapsed width
+ * follows the shared large control size. Hosting it in an `auto`-width grid
+ * track or a `flex: 0 0 auto` column lets the column animate as it collapses.
  */
 @Component({
   selector: 'cx-index-nav',

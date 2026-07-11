@@ -2,32 +2,14 @@
   position: relative;
   display: inline-block;
   width: max-content;
-}
-
-:host::before {
-  position: absolute;
-  inset: 0;
-  border: var(--line);
-  border-radius: var(--radius-sm);
-  content: '';
-  pointer-events: none;
+  border-radius: var(--radius-md);
+  background: var(--opacity-low);
 }
 
 :host(.cx-button-group-disabled) {
   cursor: default;
   opacity: 0.3;
   pointer-events: none;
-}
-
-:host(.cx-button-group-host--compact),
-:host:has(.cx-button-group-button-small) {
-  border-radius: var(--radius-pill, 999px);
-  background: var(--opacity-low);
-}
-
-:host(.cx-button-group-host--compact)::before,
-:host:has(.cx-button-group-button-small)::before {
-  border: none;
 }
 
 .cx-button-group-row {
@@ -47,9 +29,9 @@
   left: 0;
   width: var(--cx-button-group-indicator-width);
   height: var(--cx-button-group-indicator-height);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-md);
   background: var(--emphasis);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
   pointer-events: none;
   transform: translate(var(--cx-button-group-indicator-x), var(--cx-button-group-indicator-y));
   transition:
@@ -68,11 +50,12 @@
   margin: 0;
   padding: 0 var(--space-md);
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: transparent;
   color: var(--opacity-high);
   cursor: pointer;
   font: inherit;
+  font-weight: var(--font-weight-regular);
   line-height: 1;
   outline: none;
   transition:
@@ -97,25 +80,30 @@
   height: calc(var(--controller-size-small) - var(--space-xs));
   padding: 0 var(--space-sm);
   border-radius: var(--radius-pill, 999px);
+  corner-shape: round;
   font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-small);
+}
+
+:host:has(.cx-button-group-button-small) {
+  border-radius: var(--radius-pill, 999px);
+  corner-shape: round;
+}
+
+.cx-button-group-row-has-indicator:has(.cx-button-group-button-small) .cx-button-group-indicator {
+  border-radius: var(--radius-pill, 999px);
+  corner-shape: round;
 }
 
 .cx-button-group-button-selected {
   color: var(--on-emphasis);
   background: var(--emphasis);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-low);
 }
 
 .cx-button-group-row-has-indicator .cx-button-group-button-selected {
   background: transparent;
   box-shadow: none;
-}
-
-.cx-button-group-row-has-indicator:has(.cx-button-group-button-small) .cx-button-group-indicator,
-:host(.cx-button-group-host--compact) .cx-button-group-indicator {
-  border-radius: calc(var(--space-sm) - var(--space-2xs));
 }
 
 .cx-button-group-button-selected:hover {

@@ -42,7 +42,7 @@
 :host(.cx-icon--size-12.cx-icon--shaped) {
   --cx-icon-glyph-size: 8px;
   --cx-icon-outline-width: 2px;
-  --cx-icon-square-radius: 2px;
+  --cx-icon-square-radius: 4px;
 }
 
 :host(.cx-icon--size-14.cx-icon--shaped),
@@ -52,7 +52,7 @@
 
 :host(.cx-icon--size-14.cx-icon--shaped) {
   --cx-icon-outline-width: 2px;
-  --cx-icon-square-radius: 2px;
+  --cx-icon-square-radius: 4px;
 }
 
 :host(.cx-icon--size-20.cx-icon--shaped) {
@@ -66,13 +66,13 @@
 :host(.cx-icon--size-32.cx-icon--shaped) {
   --cx-icon-glyph-size: 20px;
   --cx-icon-outline-width: 6px;
-  --cx-icon-square-radius: 6px;
+  --cx-icon-square-radius: 8px;
 }
 
 :host(.cx-icon--size-64.cx-icon--shaped) {
   --cx-icon-glyph-size: 40px;
   --cx-icon-outline-width: 8px;
-  --cx-icon-square-radius: 8px;
+  --cx-icon-square-radius: 12px;
 }
 
 :host(.cx-icon--square) {
@@ -81,6 +81,7 @@
 
 :host(.cx-icon--circle) {
   border-radius: var(--radius-pill);
+  corner-shape: round;
 }
 
 :host(.cx-icon--subtle) {
@@ -88,7 +89,7 @@
 }
 
 :host(.cx-icon--solid) {
-  background: var(--surface-mid);
+  background: var(--surface);
 }
 
 :host(.cx-icon--outline) {

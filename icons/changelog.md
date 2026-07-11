@@ -1,6 +1,10 @@
 # Icons changelog
 
-Record changes to the icon source set in `svg/`.
+This is a historical change record, not the source of current icon availability.
+The SVG source set and generated manifest define what exists now.
+
+Record additions, removals, renames, and meaning changes to the icon source set
+in `svg/`.
 
 Use this shape for new entries:
 

@@ -9,23 +9,35 @@
     data-cx-popover-surface
     [class.cx-popover--top]="placement === 'top'"
     [class.cx-popover--bottom]="placement === 'bottom'"
-    [class.cx-popover--danger]="mood === 'danger'"
     [class.cx-popover--raised]="surfaceVariant === 'raised'"
+    [class.cx-popover--grouped]="surfaceVariant === 'grouped'"
     [attr.id]="surfaceId || null"
     [attr.role]="role || null"
     [attr.aria-label]="ariaLabel || null"
     [style.width.px]="width"
+    [style.min-width.px]="minWidth"
+    [style.max-width]="resolvedMaxWidth"
     [style.max-height]="resolvedMaxHeight"
     [style.left.px]="left"
     [style.top.px]="top"
     [style.bottom.px]="bottom"
   >
-    @if (normalizedTitle || normalizedTitleDescription) {
-      <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
-    }
-
     <div class="cx-popover__body" data-cx-popover-scroll-container>
-      <ng-content />
+      @if (surfaceVariant === 'grouped') {
+        @if (normalizedTitle || normalizedTitleDescription) {
+          <div class="cx-popover__island">
+            <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
+          </div>
+        }
+      }
+
+      <div class="cx-popover__content" [class.cx-popover__island]="surfaceVariant !== 'grouped'">
+        @if (surfaceVariant !== 'grouped' && (normalizedTitle || normalizedTitleDescription)) {
+          <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
+        }
+
+        <ng-content />
+      </div>
     </div>
   </div>
 }

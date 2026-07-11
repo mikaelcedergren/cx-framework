@@ -17,7 +17,6 @@ export class CxExpansionPanelComponent {
 
   @Input() heading = 'Severity';
   @Input() variant: CxExpansionPanelVariant = 'default';
-  @Input() active = false;
 
   @Input()
   public set expanded(value: boolean | undefined) {

@@ -22,10 +22,12 @@
   line-height: 1;
   margin: 0;
   outline: none;
+  transform-origin: center;
   transition:
     background-color var(--motion-fast) ease,
     color var(--motion-fast) ease,
-    opacity var(--motion-fast) ease;
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
   white-space: nowrap;
 }
 
@@ -61,7 +63,7 @@
 
 .cx-button--accent {
   background: var(--accent);
-  color: var(--surface-mid);
+  color: var(--surface);
 }
 
 .cx-button:is(:hover, .cx-button--hover).cx-button--accent:not(.cx-button--disabled):not(.cx-button--loading) {
@@ -176,6 +178,7 @@
 
 .cx-button--rounded {
   border-radius: var(--radius-pill);
+  corner-shape: round;
 }
 
 .cx-button--disabled {
@@ -191,6 +194,7 @@
 .cx-button:active:not(.cx-button--disabled):not(.cx-button--loading) {
   outline: var(--outline-active);
   outline-offset: var(--outline-active-offset);
+  transform: scale(0.98);
 }
 
 .cx-button__content {

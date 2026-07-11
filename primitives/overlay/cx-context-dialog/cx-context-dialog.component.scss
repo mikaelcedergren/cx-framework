@@ -5,8 +5,6 @@
 
 .cx-context-dialog {
   --cx-context-dialog-arrow-size: calc(var(--space-md) - var(--space-xs));
-  --cx-context-dialog-anchor-x: 50%;
-
   position: relative;
   display: flex;
   width: min(calc(var(--controller-size) * 10), calc(100vw - var(--space-xl)));
@@ -14,9 +12,9 @@
   box-sizing: border-box;
   border: var(--line);
   border-radius: var(--radius-md);
-  background: var(--surface-mid);
+  background: var(--surface);
   color: var(--ink);
-  box-shadow: var(--shadow-popover);
+  box-shadow: var(--shadow-mid);
   outline: none;
 }
 
@@ -24,11 +22,11 @@
   content: '';
   position: absolute;
   z-index: var(--z-index-detail);
-  left: var(--cx-context-dialog-anchor-x);
+  left: 50%;
   width: var(--cx-context-dialog-arrow-size);
   height: var(--cx-context-dialog-arrow-size);
   border: var(--line);
-  background: var(--surface-mid);
+  background: var(--surface);
   transform: translateX(-50%) rotate(45deg);
 }
 

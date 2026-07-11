@@ -30,9 +30,9 @@ export type CxWizardDialogStepStatus = 'default' | 'success';
 export interface CxWizardDialogStep {
   id: string;
   name: string;
-  title: string;
-  infoTitle: string;
-  infoText: string;
+  heading: string;
+  infoHeading: string;
+  infoDescription: string;
   icon?: CxIconName;
   infoCustom?: boolean;
   visible?: boolean;
@@ -109,20 +109,20 @@ export class CxWizardDialogComponent implements OnDestroy {
   protected readonly dismissible$ = computed(() => this.wizard$().dismissible !== false);
   protected readonly primaryLabel$ = computed(() => {
     if (this.isLastStep$()) {
-      const override = this.buttonNextText.trim();
+      const override = this.confirmLabel.trim();
       return override || 'Confirm';
     }
     return 'Continue';
   });
   protected readonly secondaryLabel$ = computed(() => (this.isFirstStep$() ? 'Cancel' : 'Back'));
-  protected readonly currentTitle$ = computed(() => this.currentStep$()?.title.trim() || this.currentStep$()?.name || 'Step');
-  protected readonly currentInfoTitle$ = computed(
-    () => this.currentStep$()?.infoTitle.trim() || this.currentStep$()?.name || 'Step guidance',
+  protected readonly currentHeading$ = computed(() => this.currentStep$()?.heading.trim() || this.currentStep$()?.name || 'Step');
+  protected readonly currentInfoHeading$ = computed(
+    () => this.currentStep$()?.infoHeading.trim() || this.currentStep$()?.name || 'Step guidance',
   );
-  protected readonly currentInfoText$ = computed(() => this.currentStep$()?.infoText.trim() || undefined);
+  protected readonly currentInfoDescription$ = computed(() => this.currentStep$()?.infoDescription.trim() || undefined);
 
   @Input() loading = false;
-  @Input() buttonNextText = '';
+  @Input() confirmLabel = '';
 
   @Input()
   public set wizard(value: CxWizardDialogData | null | undefined) {
@@ -295,9 +295,9 @@ export class CxWizardDialogComponent implements OnDestroy {
             ...step,
             id: step.id.trim(),
             name: step.name?.trim() || 'Step',
-            title: step.title?.trim() || step.name?.trim() || 'Step',
-            infoTitle: step.infoTitle?.trim() || step.name?.trim() || 'Step guidance',
-            infoText: step.infoText?.trim() || '',
+            heading: step.heading?.trim() || step.name?.trim() || 'Step',
+            infoHeading: step.infoHeading?.trim() || step.name?.trim() || 'Step guidance',
+            infoDescription: step.infoDescription?.trim() || '',
             status: step.status === 'success' ? 'success' as const : 'default' as const,
           }))
       : [];

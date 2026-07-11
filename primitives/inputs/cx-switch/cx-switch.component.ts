@@ -22,6 +22,7 @@ export class CxSwitchComponent {
   protected readonly messagesId = `cx-switch-${CxSwitchComponent.nextId}-messages`;
 
   @Input() text = '';
+  @Input() ariaLabel?: string;
   @Input() hint: string | undefined;
   @Input() size: CxSwitchSize = 'default';
   @Input() disabled = false;

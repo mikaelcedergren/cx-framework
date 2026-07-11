@@ -2,204 +2,144 @@
 
 ## Purpose
 
-This file is a safety net for shipping forms and error states without bespoke copy ready. When a designer or product owner has written specific copy for the situation, use that. When time allows, write tailored copy that fits the exact product context. When no better copy exists, use the closest message or pattern here so the product does not ship something vague, clever, or accidentally rude. The bar is good enough: clear, respectful, actionable, and safe enough to ship.
+Use this catalog only when known product behavior cannot support more specific wording. A fallback must never invent policy, capability, validation limits, supported formats, permission models, or recovery.
 
-## Message patterns
+Before using a pattern:
 
-Use these when there is no exact message in the catalog. Keep the same grammar as the closest pattern.
+1. Confirm what the product actually knows.
+2. Decide whether the message belongs to one field or the whole request.
+3. Replace every bracketed value with a known product value.
+4. If a required value is unknown, resolve the product question instead of guessing.
+5. Prefer the consuming product's established terminology.
 
-| Situation | Shape | Example |
-| --- | --- | --- |
-| Empty text field or missing typed value | `Enter a [thing].` | `Enter a URL.` |
-| Invalid typed format | `Enter a valid [thing].` | `Enter a valid email.` |
-| Format with a required shape | `Enter a [thing] in [format] format.` | `Enter an IP address in IPv4 format.` |
-| Format with a useful example | `Enter a valid [thing], like [example].` | `Enter a valid IP address, like 192.168.0.1.` |
-| Numeric or bounded range | `Enter a [thing] between [min] and [max].` | `Enter a port between 1024 and 65535.` |
-| Picker or choice input | `Select a [thing].` | `Select a date.` |
-| Empty dropdown or picker placeholder | `Select [thing]` | `Select severity` |
-| Multi-choice input | `Select at least one [thing].` | `Select at least one option.` |
-| Specific cleanup action | `Remove [what to remove].` | `Remove spaces or invalid characters.` |
-| Required value or protocol | `Use [correct value] only.` | `Use an https:// URL only.` |
-| Constraint violation | `[Field] can't be [state]. [Action].` | `Date can't be in the future. Select today or a past date.` |
-| Length, strength, or size issue | `[Field] is too [adjective]. [Action].` | `File is too large. Choose a smaller file.` |
-| Positive requirement | `[Field] must be [requirement]. [Action].` | `Name must be unique. Use a different name.` |
-| Duplicate | `[Thing] already exists. [Action].` | `Tag already exists. Use a different tag.` |
-| Unsupported feature or value | `[Thing] isn't supported. Use [supported thing].` | `IPv6 isn't supported. Use IPv4.` |
-| Problem plus fix | `[Problem]. [Action].` | `Invalid pattern. Update the regex to use a valid format.` |
-| Server or request issue | `The [thing] can't be [state] right now. [Action].` | `The service can't be reached right now. Try again later.` |
+## Safe message patterns
 
-## Choosing the right fallback
+| Known situation | Pattern |
+| --- | --- |
+| Required typed value | `Enter [thing].` |
+| Invalid known format | `Enter [thing] in [known format] format.` |
+| Useful known example | `Enter [thing], like [known example].` |
+| Known numeric range | `Enter [thing] between [known minimum] and [known maximum].` |
+| Required choice | `Select [thing].` |
+| Required multi-choice | `Select at least one [thing].` |
+| Known disallowed content | `Remove [known disallowed content].` |
+| Known requirement | `[Field] must [known requirement]. [Known recovery].` |
+| Known duplicate | `[Thing] already exists. [Known recovery].` |
+| Known unsupported value | `[Thing] isn't supported. Use [known supported option].` |
+| Known size or length limit | `[Thing] is too [large/long/short]. [Known recovery].` |
+| Known temporary failure | `[Thing] can't be [completed/reached] right now. [Known recovery].` |
 
-First decide where the message belongs, then how specific you can be. Use field-level inline validation when one field is empty, malformed, duplicated, or blocked; the message sits beneath that field. Empty-field messages should give the user a chance to act without sounding like they already failed, while messages for input that does not work should name the problem and guide toward the correct shape.
+Do not leave bracketed text in shipped copy.
 
-Use form-level alerts when the failure is not tied to one field — a failed request, an unavailable service, a denied permission, a timeout, or a conflict; the message appears in an alert at the top of the form.
+## Inline validation
 
-When the failure is a constraint violation (future/past date, duplicate, unsupported value, length or size limit), reach for the matching message pattern and keep its grammar, stating both the problem and the fix.
+Use beneath the field when the failure belongs to one value.
 
-Use generic last-resort copy only when nothing more specific applies: `This is required. Complete this field.` for a required field that cannot be named cleanly, and `Enter a valid value.` for an invalid value with no better label.
+### Generic required and invalid values
 
-## Inline validation catalog
-
-These messages appear directly beneath form fields. If the product uses a more specific field label, adapt the message to that label.
+| Situation | Fallback |
+| --- | --- |
+| Required named value | `Enter [field name].` |
+| Required unnamed value | `Complete this field.` |
+| Required choice | `Select [option type].` |
+| Required multi-choice | `Select at least one [option type].` |
+| Invalid value with no known detail | `Enter a valid [field name].` |
 
 ### URL
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Empty / required | `Enter a URL.` |
-| Invalid format | `Enter a valid URL with http:// or https:// and a domain name.` |
-| Wrong protocol | `Use an https:// URL only.` |
-| Invalid characters | `Remove spaces or invalid characters.` |
-| Exceeds length | `URL is too long. Shorten it.` |
+| Required | `Enter a URL.` |
+| Invalid | `Enter a valid URL.` |
+| Known required protocol | `Use a URL that starts with [supported protocol].` |
 | Unreachable | `The URL can't be reached. Check the address or try again.` |
-| Wrong protocol type | `Protocol isn't supported. Use http:// or https://.` |
-| Server-side validation failure | `The URL can't be validated right now. Try again.` |
-| Contains credentials | `The URL can't include credentials. Remove them.` |
+| Validation unavailable | `The URL can't be validated right now. Try again.` |
+
+Do not claim that one protocol, credential shape, hostname, or URL length is unsupported unless the product enforces that rule.
 
 ### Email
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Invalid format | `Enter a valid email.` |
-| Domain blocked | `Email domain isn't allowed. Use a different email.` |
-| Already taken | `Email is already in use. Use a different email.` |
+| Required | `Enter an email address.` |
+| Invalid | `Enter a valid email address.` |
+| Known duplicate | `Email address is already in use. Use a different email address.` |
+| Known domain restriction | `Email domain isn't allowed. Use an allowed email address.` |
 
 ### Password
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Empty / required | `Enter a password.` |
-| Complexity requirements | `Password must be 8 to 32 characters and include uppercase, lowercase, a number, and a symbol.` |
-| Invalid characters | `Remove spaces or unsupported characters (like emojis or non-English letters).` |
-| Too weak | `Password is too easy to guess. Use 8 to 32 characters with uppercase, lowercase, a number, and a symbol.` |
+| Required | `Enter a password.` |
+| Known requirement | `Password must [known requirement].` |
 | Confirmation mismatch | `Passwords don't match. Enter the same password in both fields.` |
-| Same as previous | `Password can't match your previous password. Use a new password.` |
-| Contains username | `Password can't contain your username. Remove it.` |
+| Known reuse restriction | `Password can't match [known previous-password rule]. Use a different password.` |
 
-### IP address
+Never invent length, complexity, character-set, language, symbol, or password-history policy. State only the requirements enforced by the product.
 
-| Scenario | Error message |
+### Network address or identifier
+
+| Known situation | Fallback |
 | --- | --- |
-| Empty / required | `Enter an IP address.` |
-| Duplicate | `Enter a unique IP address.` |
-| Out of range | `Enter an IP address inside the allowed range.` |
-| Wrong format | `Enter an IP address in IPv4 format.` |
-| Generic invalid | `Enter a valid IP address, like 192.168.0.1.` |
-| Blocked | `This IP address isn't allowed. Enter a different IP address.` |
-| Already exists | `This IP address is already in the list. Enter a different IP address.` |
-| IPv6 attempted | `IPv6 isn't supported. Use IPv4.` |
+| Required | `Enter [identifier name].` |
+| Invalid format | `Enter [identifier name] in [known format] format.` |
+| Known duplicate | `[Identifier name] already exists. Enter a different value.` |
+| Known unsupported version | `[Version] isn't supported. Use [supported version].` |
+| Known blocked value | `This [identifier name] isn't allowed. Enter a different value.` |
 
-### Name and text fields
+Do not assume IPv4, IPv6, port, protocol, range, or address policy without product evidence.
 
-| Scenario | Error message |
+### Name and text
+
+| Known situation | Fallback |
 | --- | --- |
-| Empty / required | `Enter a name.` |
-| Too long | `Name is too long. Shorten it.` |
-| Not unique | `Name must be unique. Use a different name.` |
-| Invalid characters | `Name contains unsupported characters. Remove them.` |
+| Required name | `Enter a name.` |
+| Known maximum length | `Name is too long. Use [known maximum] characters or fewer.` |
+| Known uniqueness requirement | `Name must be unique. Use a different name.` |
+| Known character restriction | `Name contains unsupported characters. Remove [known unsupported characters].` |
 
-### Number
+### Number or range
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Invalid format | `Enter a valid number.` |
-| Out of range | `Enter a number inside the allowed range.` |
-| Too low | `Enter a higher number.` |
-| Too high | `Enter a lower number.` |
-| Decimals not allowed | `Number can't include decimals. Use a whole number.` |
-
-### Port range
-
-| Scenario | Error message |
-| --- | --- |
-| Invalid port | `Enter a valid port number.` |
-| Out of range | `Enter a port inside the allowed range.` |
-| Specific range hint | `Enter a port between 1024 and 65535.` |
-| Bad format | `Port range format isn't valid. Use a range like 80-443.` |
-
-### Regex
-
-| Scenario | Error message |
-| --- | --- |
-| Invalid pattern | `Invalid pattern. Update the regex to use a valid format.` |
+| Invalid number | `Enter a valid number.` |
+| Known range | `Enter a number between [known minimum] and [known maximum].` |
+| Known minimum | `Enter a number of at least [known minimum].` |
+| Known maximum | `Enter a number no greater than [known maximum].` |
+| Whole number required | `Enter a whole number.` |
 
 ### Date
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Empty / required | `Select a date.` |
-| Future not allowed | `Date can't be in the future. Select today or a past date.` |
-| Past not allowed | `Date can't be in the past. Select today or a future date.` |
-| Out of range | `Date must be within the allowed range. Select an allowed date.` |
+| Required | `Select a date.` |
+| Future disallowed | `Date can't be in the future. Select today or an earlier date.` |
+| Past disallowed | `Date can't be in the past. Select today or a later date.` |
+| Known range | `Select a date between [known start] and [known end].` |
 | End before start | `End date must be after the start date. Select a later end date.` |
-
-### Tag input
-
-| Scenario | Error message |
-| --- | --- |
-| Duplicate | `Tag already exists. Use a different tag.` |
-| Invalid format | `Tag format isn't valid. Remove unsupported characters.` |
-| Limit reached | `Too many tags. Remove a tag before adding another.` |
-
-### Textarea
-
-| Scenario | Error message |
-| --- | --- |
-| Empty / required | `Enter text.` |
-| Too long | `Text is too long. Shorten it.` |
-| Invalid characters | `Text contains unsupported characters. Remove them.` |
-| Bad formatting | `Text contains invalid formatting. Remove unsupported formatting.` |
 
 ### File upload
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Wrong type | `File type isn't supported. Choose a supported file type.` |
-| Too large | `File is too large. Choose a smaller file.` |
-| General failure | `Upload failed. Try again.` |
-| Corrupt file | `File is corrupted or unreadable. Choose another file.` |
+| Known unsupported type | `File type isn't supported. Choose [known supported type].` |
+| Known size limit | `File is too large. Choose a file smaller than [known limit].` |
+| Unreadable file | `File can't be read. Choose another file.` |
+| Upload failure | `Upload failed. Try again.` |
 
-### Dropdown
+## Form- and request-level alerts
 
-Placeholder text for an empty dropdown is `Select [thing]`, such as `Select language`. Use `Select` only when no clearer object fits. This is display copy, not a validation error.
+Use at form or page level when the issue does not belong to one field.
 
-| Scenario | Error message |
+| Known situation | Fallback |
 | --- | --- |
-| Single-choice dropdown, no selection | `Select an option.` |
-| Multi-choice dropdown, no selection | `Select at least one option.` |
+| Unknown request failure | `The request failed. Try again.` |
+| Known unavailable service | `The service can't be reached right now. Try again later.` |
+| Known timeout | `The request took too long. Try again.` |
+| Known permission failure | `You don't have permission to [known action].` |
+| Known policy restriction | `This action isn't allowed by [known policy name].` |
+| Known conflict | `This conflicts with another change. Refresh and try again.` |
+| Server-side field validation | `Review the highlighted fields and try again.` |
+| Known rate limit | `Too many requests. Try again [known retry time].` |
 
-### Radio buttons
-
-| Scenario | Error message |
-| --- | --- |
-| No selection | `Select an option.` |
-
-### Checkboxes
-
-| Scenario | Error message |
-| --- | --- |
-| No selection | `Select at least one option.` |
-
-### Generic fallbacks
-
-Use these only when nothing more specific applies.
-
-| Scenario | Error message |
-| --- | --- |
-| Required field | `This is required. Complete this field.` |
-| Invalid value | `Enter a valid value.` |
-
-## Form-level alerts
-
-These messages appear in an alert at the top of a form when the issue is not tied to one field.
-
-| Scenario | Alert message |
-| --- | --- |
-| General server error | `The request failed. Try again.` |
-| Service unavailable | `The service can't be reached right now. Try again later.` |
-| Timeout | `The request took too long. Try again.` |
-| Permission denied | `You don't have permission to perform this action. Ask an admin for access.` |
-| Organization policy block | `This action isn't allowed by your organization's settings. Ask an admin to change it.` |
-| Conflict | `This action conflicts with another change. Refresh and try again.` |
-| Server-side validation | `Review the highlighted fields and try again.` |
-| Rate limiting | `Too many requests. Try again later.` |
+Do not tell the user to contact an administrator, owner, support team, or organization unless that recovery path exists in the consuming product.

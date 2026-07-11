@@ -9,33 +9,28 @@
   width: 100%;
 }
 
-.cx-email-field--small {
-  --cx-email-field-min-height: var(--controller-size-small);
-  --cx-email-field-font-size: var(--font-size-body-sm);
-}
-
-.cx-email-field--large {
-  --cx-email-field-min-height: calc(var(--controller-size) + var(--space-md));
-  --cx-email-field-font-size: var(--font-size-body-lg);
-  --cx-email-field-border-radius: var(--radius-lg);
-}
-
 @include field.field-header('cx-email-field');
 
 .cx-email-field__field-shell {
   box-sizing: border-box;
   display: flex;
   width: 100%;
-  min-height: var(--cx-email-field-min-height, var(--controller-size));
+  min-height: var(--controller-size);
   align-items: center;
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
-  border-radius: var(--cx-email-field-border-radius, var(--radius-md));
-  background: var(--opacity-darken);
+  border-radius: var(--radius-md);
+  background: transparent;
 }
 
 @include field.field-shell-state('.cx-email-field__field-shell', '.cx-email-field__field');
+
+.cx-email-field__field-shell:hover:not(.cx-email-field__field-shell--disabled):not(.cx-email-field__field-shell--error),
+.cx-email-field__field-shell:focus-within:not(.cx-email-field__field-shell--disabled):not(.cx-email-field__field-shell--error) {
+  outline: var(--outline-field-interaction);
+  outline-offset: 0;
+}
 
 .cx-email-field__field {
   flex: 1 1 auto;
@@ -47,9 +42,26 @@
   background: transparent;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-email-field-font-size, var(--font-size-body));
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: 1.1;
+  line-height: var(--line-height-control);
+}
+
+.cx-email-field--small .cx-email-field__field-shell {
+  min-height: var(--controller-size-small);
+}
+
+.cx-email-field--small .cx-email-field__field {
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-email-field--large .cx-email-field__field-shell {
+  min-height: var(--controller-size-large);
+  border-radius: var(--radius-xl);
+}
+
+.cx-email-field--large .cx-email-field__field {
+  font-size: var(--font-size-body-lg);
 }
 
 .cx-email-field__field:focus-visible {

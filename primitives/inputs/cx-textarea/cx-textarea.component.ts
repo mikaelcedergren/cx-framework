@@ -69,7 +69,6 @@ type CxTextareaRenderedLine = {
 export class CxTextareaComponent {
   private readonly valueState = signal('');
   private readonly focusedState = signal(false);
-  private readonly forcedFocusState = signal(false);
   private readonly markdownState = signal(false);
   private readonly disabledState = signal(false);
   private readonly sizeState = signal<CxTextareaSize>('default');
@@ -94,15 +93,6 @@ export class CxTextareaComponent {
   @Input() focusVariant: CxTextareaFocusVariant = 'default';
   @Input() layout: CxTextareaLayout = 'default';
   @Input() presentation: CxTextareaPresentation = 'default';
-
-  @Input()
-  public set autoGrow(value: boolean) {
-    if (value) {
-      this.sizingState.set('auto');
-    } else if (this.sizingState() === 'auto') {
-      this.sizingState.set('resizable');
-    }
-  }
 
   @Input()
   public set markdown(value: boolean) {
@@ -130,11 +120,6 @@ export class CxTextareaComponent {
   }
 
   @Input()
-  public set rows(value: number | undefined) {
-    this.minLines = value;
-  }
-
-  @Input()
   public set maxLines(value: number | null | undefined) {
     this.maxLinesState.set(this.normalizeOptionalCount(value));
   }
@@ -142,19 +127,6 @@ export class CxTextareaComponent {
   @Input()
   public set maxLength(value: number | null | undefined) {
     this.maxLengthState.set(this.normalizeOptionalCount(value));
-  }
-
-  @Input()
-  public set resizable(value: boolean) {
-    if (value) {
-      if (this.sizingState() !== 'auto') {
-        this.sizingState.set('resizable');
-      }
-      return;
-    }
-    if (this.sizingState() === 'resizable') {
-      this.sizingState.set('fixed');
-    }
   }
 
   @Input()
@@ -182,11 +154,6 @@ export class CxTextareaComponent {
     this.valueState.set(this.normalizeValueForLimits(value ?? ''));
   }
 
-  @Input()
-  public set focused(value: boolean) {
-    this.forcedFocusState.set(value);
-  }
-
   @Output() readonly valueChange = new EventEmitter<string>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly blurred = new EventEmitter<void>();
@@ -210,7 +177,7 @@ export class CxTextareaComponent {
     return maxLines === undefined ? undefined : Math.max(this.minLinesState(), maxLines);
   });
   protected readonly maxLength$ = this.maxLengthState.asReadonly();
-  protected readonly isFocused$ = computed(() => this.forcedFocusState() || this.focusedState());
+  protected readonly isFocused$ = computed(() => this.focusedState());
   protected readonly normalizedAnnotations$ = computed<ReadonlyArray<CxTextareaNormalizedAnnotation>>(() => {
     const normalized: CxTextareaNormalizedAnnotation[] = [];
 

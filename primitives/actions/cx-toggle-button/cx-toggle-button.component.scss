@@ -1,3 +1,87 @@
 :host {
   display: inline-flex;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cx-toggle-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-md);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--opacity-low);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  margin: 0;
+  outline: none;
+  transform-origin: center;
+  transition:
+    background-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  white-space: nowrap;
+}
+
+.cx-toggle-button:hover:not(:disabled) {
+  background: var(--opacity-mid);
+}
+
+.cx-toggle-button--selected,
+.cx-toggle-button--selected:hover:not(:disabled) {
+  background: var(--emphasis);
+  color: var(--on-emphasis);
+  box-shadow: var(--shadow-low);
+}
+
+.cx-toggle-button:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-toggle-button:active:not(:disabled) {
+  outline: var(--outline-active);
+  outline-offset: var(--outline-active-offset);
+  transform: scale(0.98);
+}
+
+.cx-toggle-button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.cx-toggle-button--icon-only {
+  min-width: var(--controller-size);
+  padding: 0;
+}
+
+.cx-toggle-button span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host(.cx-toggle-button-host--small) .cx-toggle-button {
+  min-height: var(--controller-size-small);
+  padding: 0 var(--space-sm);
+  font-size: var(--font-size-body-sm);
+}
+
+:host(.cx-toggle-button-host--small) .cx-toggle-button--icon-only {
+  min-width: var(--controller-size-small);
+  padding: 0;
 }

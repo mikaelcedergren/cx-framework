@@ -5,10 +5,15 @@
   --border-hover: var(--opacity-mid);
   --border-open: var(--opacity-mid);
   --border-active: var(--opacity-mid);
-  --outline-tab: 2px solid var(--blue);
+  --outline-tab: none;
   --outline-tab-offset: -2px;
   --outline-focus: none;
   --outline-focus-offset: -2px;
   --outline-active: none;
   --outline-active-offset: -2px;
+  --outline-field-interaction: 2px solid var(--opacity-low);
+}
+
+:root[data-cx-keyboard-navigation] {
+  --outline-tab: 2px solid var(--primary);
 }

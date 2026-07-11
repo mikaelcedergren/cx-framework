@@ -1,29 +1,75 @@
-<button
-  type="button"
-  class="cx-option"
-  [class.cx-option--danger]="mood === 'danger'"
-  [class.cx-option--hover]="hover"
-  [class.cx-option--selected]="selected && selectedHighlight"
-  [class.cx-option--small]="size === 'small'"
-  [class.cx-option--large]="size === 'large'"
-  [class.cx-option--submenu-open]="submenu === 'open'"
-  [class.cx-option--with-checkbox]="showCheckbox"
-  [class.cx-option--without-icons]="!showCheckbox && !prependIcon && !appendIconName()"
-  [class.cx-option--append-only]="hasAppendOnlyLayout()"
-  [class.cx-option--with-append]="!!appendIconName() || hasShortcut() || !!description"
-  [class.cx-option--disabled]="disabled"
-  [disabled]="disabled"
-  [attr.role]="role || null"
-  [attr.aria-disabled]="disabled ? 'true' : null"
-  [attr.aria-selected]="ariaSelectedValue()"
->
+@if (clickable) {
+  <button
+    #control
+    type="button"
+    class="cx-option"
+    [class.cx-option--primary]="mood === 'primary'"
+    [class.cx-option--accent]="mood === 'accent'"
+    [class.cx-option--info]="mood === 'info'"
+    [class.cx-option--success]="mood === 'success'"
+    [class.cx-option--warning]="mood === 'warning'"
+    [class.cx-option--danger]="mood === 'danger'"
+    [class.cx-option--selected]="selected && selectedHighlight"
+    [class.cx-option--active]="active"
+    [class.cx-option--submenu-open]="submenu === 'open'"
+    [class.cx-option--with-checkbox]="showCheckbox"
+    [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
+    [class.cx-option--append-only]="hasAppendOnlyLayout()"
+    [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
+    [class.cx-option--disabled]="disabled"
+    [disabled]="disabled"
+    [attr.role]="role || null"
+    [attr.aria-disabled]="disabled ? 'true' : null"
+    [attr.aria-selected]="ariaSelectedValue()"
+    [attr.aria-checked]="ariaCheckedValue()"
+    [attr.aria-posinset]="ariaPosInSet ?? null"
+    [attr.aria-setsize]="ariaSetSize ?? null"
+  >
+    <ng-container [ngTemplateOutlet]="optionContent" />
+  </button>
+} @else {
+  <div
+    #control
+    class="cx-option cx-option--static"
+    [class.cx-option--primary]="mood === 'primary'"
+    [class.cx-option--accent]="mood === 'accent'"
+    [class.cx-option--info]="mood === 'info'"
+    [class.cx-option--success]="mood === 'success'"
+    [class.cx-option--warning]="mood === 'warning'"
+    [class.cx-option--danger]="mood === 'danger'"
+    [class.cx-option--selected]="selected && selectedHighlight"
+    [class.cx-option--submenu-open]="submenu === 'open'"
+    [class.cx-option--with-checkbox]="showCheckbox"
+    [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
+    [class.cx-option--append-only]="hasAppendOnlyLayout()"
+    [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
+    [class.cx-option--disabled]="disabled"
+    [attr.role]="role || null"
+    [attr.inert]="disabled ? '' : null"
+    [attr.aria-disabled]="disabled ? 'true' : null"
+    [attr.aria-selected]="ariaSelectedValue()"
+    [attr.aria-checked]="ariaCheckedValue()"
+    [attr.aria-posinset]="ariaPosInSet ?? null"
+    [attr.aria-setsize]="ariaSetSize ?? null"
+  >
+    <ng-container [ngTemplateOutlet]="optionContent" />
+  </div>
+}
+
+<ng-template #optionContent>
   @if (showCheckbox) {
-    <cx-checkbox class="cx-option__checkbox" [selected]="selected" [disabled]="disabled" [ariaLabel]="label" />
+    <span
+      class="cx-option__checkbox"
+      [class.cx-option__checkbox--selected]="selected"
+      aria-hidden="true"
+    >
+      <span class="cx-option__checkbox-check"></span>
+    </span>
   }
 
-  @if (prependIcon; as prependIconValue) {
+  @if (showPrependIcon(); as prependIconValue) {
     <span class="cx-option__icon cx-option__icon--prepend" aria-hidden="true">
-      <cx-icon [name]="prependIconValue" [size]="iconSize()" />
+      <cx-icon [name]="prependIconValue" size="16" />
     </span>
   }
 
@@ -31,19 +77,34 @@
     <span class="cx-option__label">{{ label }}</span>
   </span>
 
-  @if (description) {
-    <span class="cx-option__description">{{ description }}</span>
-  }
+  <span class="cx-option__trailing">
+    @if (description) {
+      <span class="cx-option__description">{{ description }}</span>
+    }
 
-  @if (hasShortcut()) {
-    <span class="cx-option__shortcut" aria-hidden="true">
-      <cx-shortcut-key [parts]="shortcutParts ?? []" />
+    <span class="cx-option__append-slot">
+      <ng-content select="[append]" />
     </span>
-  }
 
-  @if (appendIconName(); as appendIconValue) {
-    <span class="cx-option__icon cx-option__icon--append" aria-hidden="true">
-      <cx-icon [name]="appendIconValue" [size]="iconSize()" />
+    @if (hasShortcut()) {
+      <span class="cx-option__shortcut" aria-hidden="true">
+        <cx-shortcut-key [parts]="shortcutParts ?? []" />
+      </span>
+    }
+
+    @if (appendIconName(); as appendIconValue) {
+      <span class="cx-option__icon cx-option__icon--append" aria-hidden="true">
+        <cx-icon [name]="appendIconValue" size="16" />
+      </span>
+    }
+
+    <span
+      class="cx-option__control-slot"
+      (click)="stopControlEvent($event)"
+      (keydown)="stopControlEvent($event)"
+      (pointerdown)="stopControlEvent($event)"
+    >
+      <ng-content select="[control]" />
     </span>
-  }
-</button>
+  </span>
+</ng-template>

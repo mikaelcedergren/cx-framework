@@ -13,37 +13,32 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
+import { CxCalendarComponent, type CxCalendarRange } from '../cx-calendar';
 import { CxCheckboxComponent } from '../cx-checkbox';
-import { CxDropdownComponent, type CxDropdownOption } from '../cx-dropdown';
 import {
-  CxTimeInputComponent,
-  type CxTimeInputFormat,
+  CxTimeFieldComponent,
+  type CxTimeFieldFormat,
   formatCxTimeValue,
   parseCxTimeValue,
-} from '../cx-time-input';
+} from '../cx-time-field';
 import {
-  CX_MONTH_OPTIONS,
   addCxMonths,
-  buildCxCalendarDays,
   compareCxDays,
   formatCxDateDisplay,
   formatCxDateSpanDisplay,
   formatCxDateValue,
   getCxTodayParts,
-  getCxWeekdayLabels,
-  getCxYearOptions,
-  isCxDayBetween,
-  isSameCxDay,
   parseCxDateValue,
-  type CxCalendarDay,
   type CxCalendarWeekStart,
   type CxLocalDateParts,
 } from '../shared/cx-date.utils';
-import { measureCxFloatingSurface } from '../../overlay/floating-surface';
+import {
+  CxFloatingSurfaceController,
+  type CxFloatingSurfaceRequest,
+} from '../../overlay/floating-surface-controller';
 import {
   type CxFieldValidation,
   type CxFieldSize,
@@ -70,12 +65,11 @@ export type CxDateSpanPickerWeekStart = CxCalendarWeekStart;
 @Component({
   selector: 'cx-date-span-picker',
   imports: [
+    CxCalendarComponent,
     CxCheckboxComponent,
-    CxIconButtonComponent,
     CxIconComponent,
     CxPopoverComponent,
-    CxDropdownComponent,
-    CxTimeInputComponent,
+    CxTimeFieldComponent,
     CxValidationMessageComponent,
   ],
   templateUrl: './cx-date-span-picker.component.html',
@@ -90,25 +84,26 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   private readonly quickRangesState = signal<CxDateSpanQuickRange[]>([]);
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly openState = signal(false);
-  private readonly overlayWidthState = signal<number | undefined>(undefined);
-  private readonly overlayMaxHeightState = signal<number | undefined>(undefined);
-  private readonly overlayLeftState = signal<number | undefined>(undefined);
-  private readonly overlayTopState = signal<number | undefined>(undefined);
-  private readonly overlayBottomState = signal<number | undefined>(undefined);
+  private readonly popoverMaxWidthState = signal<number | undefined>(undefined);
+  protected readonly overlay = new CxFloatingSurfaceController(
+    rect => this.measureOverlay(rect),
+    () => this.popoverRef?.surfaceElement(),
+  );
+  protected readonly popoverMaxWidth$ = this.popoverMaxWidthState.asReadonly();
   private readonly leftViewYearState = signal(getCxTodayParts().year);
   private readonly leftViewMonthState = signal(getCxTodayParts().month);
   private readonly rightViewYearState = signal(addCxMonths(getCxTodayParts().year, getCxTodayParts().month, 1).year);
   private readonly rightViewMonthState = signal(addCxMonths(getCxTodayParts().year, getCxTodayParts().month, 1).month);
-  private readonly hoverDayState = signal<Pick<CxLocalDateParts, 'year' | 'month' | 'day'> | undefined>(undefined);
-  private triggerElement?: HTMLElement;
-  private resizeObserver?: ResizeObserver;
+  private readonly calendarPreviewEndState = signal<Date | undefined>(undefined);
   protected readonly labelId = `cx-date-span-picker-label-${CxDateSpanPickerComponent.nextId}`;
   protected readonly messagesId = `cx-date-span-picker-messages-${CxDateSpanPickerComponent.nextId}`;
   protected readonly surfaceId = `cx-date-span-picker-surface-${CxDateSpanPickerComponent.nextId++}`;
-  protected readonly timeFormat: CxTimeInputFormat = '24';
+  protected readonly timeFormat: CxTimeFieldFormat = '24';
 
   @ViewChild('fieldButton', { read: ElementRef })
   private readonly fieldButtonRef?: ElementRef<HTMLElement>;
+  @ViewChild('popover')
+  private popoverRef?: CxPopoverComponent;
 
   @Input() label = 'Date span';
   @Input() ariaLabel: string | undefined;
@@ -151,46 +146,31 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   @Output() readonly allDayStartChange = new EventEmitter<boolean>();
   @Output() readonly allDayEndChange = new EventEmitter<boolean>();
 
-  protected readonly monthOptions: CxDropdownOption[] = CX_MONTH_OPTIONS.map(option => ({
-    id: String(option.value),
-    label: option.label,
-  }));
   protected readonly isOpen$ = this.openState.asReadonly();
-  protected readonly overlayWidth$ = this.overlayWidthState.asReadonly();
-  protected readonly overlayMaxHeight$ = this.overlayMaxHeightState.asReadonly();
-  protected readonly overlayLeft$ = this.overlayLeftState.asReadonly();
-  protected readonly overlayTop$ = this.overlayTopState.asReadonly();
-  protected readonly overlayBottom$ = this.overlayBottomState.asReadonly();
   protected readonly quickRanges$ = this.quickRangesState.asReadonly();
-  protected readonly leftViewYearValue$ = computed(() => `${this.leftViewYearState()}`);
-  protected readonly leftViewMonthValue$ = computed(() => `${this.leftViewMonthState()}`);
-  protected readonly rightViewYearValue$ = computed(() => `${this.rightViewYearState()}`);
-  protected readonly rightViewMonthValue$ = computed(() => `${this.rightViewMonthState()}`);
   protected readonly startDate$ = computed(() => parseCxDateValue(this.startValueState()));
   protected readonly endDate$ = computed(() => parseCxDateValue(this.endValueState()));
+  protected readonly calendarRange$ = computed<CxCalendarRange>(() => ({
+    start: this.toOptionalLocalDate(this.startDate$()),
+    end: this.toOptionalLocalDate(this.endDate$()),
+  }));
+  protected readonly calendarPreviewEnd$ = this.calendarPreviewEndState.asReadonly();
+  protected readonly leftViewDate$ = computed(
+    () => new Date(this.leftViewYearState(), this.leftViewMonthState() - 1, 1, 0, 0, 0, 0),
+  );
+  protected readonly rightViewDate$ = computed(
+    () => new Date(this.rightViewYearState(), this.rightViewMonthState() - 1, 1, 0, 0, 0, 0),
+  );
+  protected readonly calendarDateDisabled = (date: Date): boolean =>
+    !this.isDaySelectable({
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    });
   protected readonly displayText$ = computed(
     () => formatCxDateSpanDisplay(this.startValueState(), this.endValueState()) ?? (this.placeholder.trim() || 'Select date range'),
   );
   protected readonly showPlaceholder$ = computed(() => !this.startDate$() && !this.endDate$());
-  protected readonly weekdayLabels$ = computed(() => getCxWeekdayLabels(this.weekStart));
-  protected readonly leftCalendarDays$ = computed(() =>
-    buildCxCalendarDays(this.leftViewYearState(), this.leftViewMonthState(), this.weekStart),
-  );
-  protected readonly rightCalendarDays$ = computed(() =>
-    buildCxCalendarDays(this.rightViewYearState(), this.rightViewMonthState(), this.weekStart),
-  );
-  protected readonly leftYearOptions$ = computed<CxDropdownOption[]>(() =>
-    getCxYearOptions(this.leftViewYearState(), 12).map(year => ({
-      id: String(year),
-      label: String(year),
-    })),
-  );
-  protected readonly rightYearOptions$ = computed<CxDropdownOption[]>(() =>
-    getCxYearOptions(this.rightViewYearState(), 12).map(year => ({
-      id: String(year),
-      label: String(year),
-    })),
-  );
   protected readonly startTimeValue$ = computed(() => {
     const startDate = this.startDate$();
     return startDate ? formatCxTimeValue(startDate.hours, startDate.minutes, this.timeFormat) : '00:00';
@@ -257,22 +237,16 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    this.triggerElement = this.fieldButtonRef?.nativeElement;
-    this.syncOverlayMetrics();
-    const trigger = this.triggerElement;
-    if (!trigger || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    this.resizeObserver = new ResizeObserver(() => {
+    this.overlay.sync(this.fieldButtonRef?.nativeElement);
+    this.overlay.observeTrigger(this.fieldButtonRef?.nativeElement, () => {
       if (this.openState()) {
-        this.syncOverlayMetrics();
+        this.overlay.sync();
       }
     });
-    this.resizeObserver.observe(trigger);
   }
 
   public ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
+    this.overlay.destroy();
   }
 
   protected toggleOpen(field?: HTMLElement): void {
@@ -286,10 +260,11 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.triggerElement = field ?? this.triggerElement;
+    this.overlay.resetMeasurement();
+    this.overlay.setTrigger(field);
     this.syncViewToSelection();
     queueMicrotask(() => {
-      this.syncOverlayMetrics();
+      this.overlay.sync();
     });
   }
 
@@ -307,88 +282,36 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  protected onLeftPreviousMonth(): void {
-    const next = addCxMonths(this.leftViewYearState(), this.leftViewMonthState(), -1);
-    this.leftViewYearState.set(next.year);
-    this.leftViewMonthState.set(next.month);
-  }
-
-  protected onLeftNextMonth(): void {
-    const next = addCxMonths(this.leftViewYearState(), this.leftViewMonthState(), 1);
-    this.leftViewYearState.set(next.year);
-    this.leftViewMonthState.set(next.month);
-  }
-
-  protected onRightPreviousMonth(): void {
-    const next = addCxMonths(this.rightViewYearState(), this.rightViewMonthState(), -1);
-    this.rightViewYearState.set(next.year);
-    this.rightViewMonthState.set(next.month);
-  }
-
-  protected onRightNextMonth(): void {
-    const next = addCxMonths(this.rightViewYearState(), this.rightViewMonthState(), 1);
-    this.rightViewYearState.set(next.year);
-    this.rightViewMonthState.set(next.month);
-  }
-
-  protected onLeftMonthChange(value: string | undefined): void {
-    const nextMonth = this.parseMonth(value);
-    if (nextMonth === undefined) {
-      return;
-    }
-    this.leftViewMonthState.set(nextMonth);
-  }
-
-  protected onLeftYearChange(value: string | undefined): void {
-    const nextYear = this.parseYear(value);
-    if (nextYear === undefined) {
-      return;
-    }
-    this.leftViewYearState.set(nextYear);
-  }
-
-  protected onRightMonthChange(value: string | undefined): void {
-    const nextMonth = this.parseMonth(value);
-    if (nextMonth === undefined) {
-      return;
-    }
-    this.rightViewMonthState.set(nextMonth);
-  }
-
-  protected onRightYearChange(value: string | undefined): void {
-    const nextYear = this.parseYear(value);
-    if (nextYear === undefined) {
-      return;
-    }
-    this.rightViewYearState.set(nextYear);
-  }
-
-  protected onDaySelect(day: CxCalendarDay): void {
-    if (!this.isInteractive$() || !this.isDaySelectable(day)) {
+  protected onCalendarRangeChange(range: CxCalendarRange): void {
+    if (!this.isInteractive$()) {
       return;
     }
 
     const currentStart = this.startDate$();
     const currentEnd = this.endDate$();
+    const rangeStart = this.toDateParts(range.start);
+    const rangeEnd = this.toDateParts(range.end);
+    const nextStart = rangeStart ? this.buildBoundaryParts(rangeStart, 'start', currentStart) : undefined;
+    const nextEnd = rangeEnd ? this.buildBoundaryParts(rangeEnd, 'end', currentEnd ?? currentStart) : undefined;
+    this.commitRange(nextStart, nextEnd);
 
-    if (!currentStart || currentEnd) {
-      const nextStart = this.buildBoundaryParts(day, 'start', currentStart);
-      this.commitRange(nextStart, undefined);
-      return;
-    }
-
-    if (compareCxDays(day, currentStart) < 0) {
-      const nextStart = this.buildBoundaryParts(day, 'start', currentStart);
-      const nextEnd = this.buildBoundaryParts(currentStart, 'end', currentEnd ?? currentStart);
-      this.commitRange(nextStart, nextEnd);
-    } else {
-      const nextEnd = this.buildBoundaryParts(day, 'end', currentEnd ?? currentStart);
-      this.commitRange(currentStart, nextEnd);
-    }
-
-    if (this.closeOnSelect && !this.timeEnabled) {
+    if (nextEnd && this.closeOnSelect && !this.timeEnabled) {
       this.openState.set(false);
     }
+  }
+
+  protected onCalendarRangePreviewEndChange(value: Date | undefined): void {
+    this.calendarPreviewEndState.set(value ? new Date(value.getTime()) : undefined);
+  }
+
+  protected onLeftViewDateChange(value: Date): void {
+    this.leftViewYearState.set(value.getFullYear());
+    this.leftViewMonthState.set(value.getMonth() + 1);
+  }
+
+  protected onRightViewDateChange(value: Date): void {
+    this.rightViewYearState.set(value.getFullYear());
+    this.rightViewMonthState.set(value.getMonth() + 1);
   }
 
   protected onQuickRangeSelect(range: CxDateSpanQuickRange): void {
@@ -485,45 +408,6 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     this.commitRange(this.startDate$() ?? undefined, { ...endDate, hours: 23, minutes: 59 });
   }
 
-  protected onDayHover(day: CxCalendarDay): void {
-    this.hoverDayState.set({ year: day.year, month: day.month, day: day.day });
-  }
-
-  protected onDayLeave(): void {
-    this.hoverDayState.set(undefined);
-  }
-
-  protected isStartDay(day: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): boolean {
-    return isSameCxDay(this.startDate$(), day);
-  }
-
-  protected isEndDay(day: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): boolean {
-    return isSameCxDay(this.endDate$(), day);
-  }
-
-  protected isPreviewEnd(day: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): boolean {
-    const start = this.startDate$();
-    const end = this.endDate$();
-    const hover = this.hoverDayState();
-    return !!start && !end && !!hover && isSameCxDay(day, hover) && !isSameCxDay(day, start);
-  }
-
-  protected isInRange(day: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): boolean {
-    if (this.isStartDay(day) || this.isEndDay(day)) {
-      return false;
-    }
-    const start = this.startDate$();
-    const end = this.endDate$();
-    if (end) {
-      return isCxDayBetween(day, start, end);
-    }
-    const hover = this.hoverDayState();
-    if (!start || !hover || isSameCxDay(day, hover)) {
-      return false;
-    }
-    return compareCxDays(hover, start) < 0 ? isCxDayBetween(day, hover, start) : isCxDayBetween(day, start, hover);
-  }
-
   protected isDaySelectable(day: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): boolean {
     const today = getCxTodayParts();
     if (typeof this.min === 'number' && compareCxDays(day, this.addDaysToParts(today, Math.trunc(this.min))) < 0) {
@@ -580,21 +464,8 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   protected onWindowResize(): void {
     if (this.openState()) {
-      this.syncOverlayMetrics();
+      this.overlay.sync();
     }
-  }
-
-  private parseMonth(value: string | undefined): number | undefined {
-    const nextMonth = Number.parseInt(value ?? '', 10);
-    if (!Number.isFinite(nextMonth) || nextMonth < 1 || nextMonth > 12) {
-      return undefined;
-    }
-    return nextMonth;
-  }
-
-  private parseYear(value: string | undefined): number | undefined {
-    const nextYear = Number.parseInt(value ?? '', 10);
-    return Number.isFinite(nextYear) ? nextYear : undefined;
   }
 
   private buildBoundaryParts(
@@ -619,6 +490,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     };
     this.startValueState.set(nextValue.start);
     this.endValueState.set(nextValue.end);
+    this.calendarPreviewEndState.set(undefined);
     this.valueChange.emit(nextValue);
     this.syncViewToSelection();
   }
@@ -648,12 +520,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     this.rightViewMonthState.set(nextRight.month);
   }
 
-  private syncOverlayMetrics(): void {
-    const trigger = this.triggerElement;
-    if (!trigger || typeof window === 'undefined') {
-      return;
-    }
-
+  private measureOverlay(_rect: DOMRect): CxFloatingSurfaceRequest {
     const controllerSize = this.readLengthToken('--controller-size', 32);
     const spaceXs = this.readLengthToken('--space-xs', 4);
     const spaceSm = this.readLengthToken('--space-sm', 8);
@@ -662,23 +529,15 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     const calendarGap = spaceSm + spaceXs;
     const surfacePadding = spaceSm * 2;
     const quickRangeWidth = this.quickRangesState().length > 0 ? controllerSize * 4 + spaceSm + spaceXs + spaceSm : 0;
-    const rect = trigger.getBoundingClientRect();
-    const surface = measureCxFloatingSurface({
-      triggerRect: rect,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      width: calendarWidth * 2 + calendarGap + surfacePadding + spaceSm + quickRangeWidth,
+    const estimatedWidth = calendarWidth * 2 + calendarGap + surfacePadding + spaceSm + quickRangeWidth;
+    this.popoverMaxWidthState.set(estimatedWidth);
+    return {
+      width: estimatedWidth,
       estimatedHeight: this.timeEnabled ? controllerSize * 13 : controllerSize * 10.5,
       align: 'start',
       viewportPadding: spaceMd,
       gap: spaceSm,
-    });
-
-    this.overlayWidthState.set(surface.width);
-    this.overlayMaxHeightState.set(surface.maxHeight);
-    this.overlayLeftState.set(surface.left);
-    this.overlayTopState.set(surface.top);
-    this.overlayBottomState.set(surface.bottom);
+    };
   }
 
   private readLengthToken(name: string, fallback: number): number {
@@ -709,5 +568,22 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
 
   private toLocalDate(parts: Pick<CxLocalDateParts, 'year' | 'month' | 'day'>): Date {
     return new Date(parts.year, parts.month - 1, parts.day, 12, 0, 0, 0);
+  }
+
+  private toOptionalLocalDate(parts: Pick<CxLocalDateParts, 'year' | 'month' | 'day'> | null | undefined): Date | undefined {
+    return parts ? this.toLocalDate(parts) : undefined;
+  }
+
+  private toDateParts(value: Date | undefined): CxLocalDateParts | undefined {
+    if (!value || Number.isNaN(value.getTime())) {
+      return undefined;
+    }
+    return {
+      year: value.getFullYear(),
+      month: value.getMonth() + 1,
+      day: value.getDate(),
+      hours: 0,
+      minutes: 0,
+    };
   }
 }

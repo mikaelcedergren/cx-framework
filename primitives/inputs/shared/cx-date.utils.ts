@@ -1,4 +1,4 @@
-import { formatCxTimeValue, type CxTimeInputFormat } from '../cx-time-input';
+import { formatCxTimeValue, type CxTimeFieldFormat } from '../cx-time-field';
 
 export interface CxLocalDateParts {
   year: number;
@@ -107,7 +107,7 @@ export function formatCxDateValue(parts: CxLocalDateParts, includeTime = false):
 export function formatCxDateDisplay(
   value: string | undefined | null,
   includeTime = false,
-  timeFormat: CxTimeInputFormat = '24',
+  timeFormat: CxTimeFieldFormat = '24',
 ): string | undefined {
   const parsedValue = parseCxDateValue(value);
   if (!parsedValue) {
@@ -128,7 +128,7 @@ export function formatCxDateSpanDisplay(
   startValue: string | undefined | null,
   endValue: string | undefined | null,
   includeTime = false,
-  timeFormat: CxTimeInputFormat = '24',
+  timeFormat: CxTimeFieldFormat = '24',
 ): string | undefined {
   const startDate = parseCxDateValue(startValue);
   const endDate = parseCxDateValue(endValue);

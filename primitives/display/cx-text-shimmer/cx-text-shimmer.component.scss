@@ -1,47 +1,67 @@
 :host {
-  --cx-text-shimmer-base: var(--opacity-high);
-  --cx-text-shimmer-highlight: var(--ink);
-
   display: inline-block;
+  max-width: 100%;
+  min-width: 0;
   font-size: inherit;
   font-weight: inherit;
   line-height: var(--line-height-body);
 }
 
 .cx-text-shimmer__text {
-  color: var(--cx-text-shimmer-base);
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
 }
 
-:host(.cx-text-shimmer--active) .cx-text-shimmer__text {
-  background-image: linear-gradient(
-    100deg,
-    var(--cx-text-shimmer-base) 0%,
-    var(--cx-text-shimmer-base) 40%,
-    var(--cx-text-shimmer-highlight) 50%,
-    var(--cx-text-shimmer-base) 60%,
-    var(--cx-text-shimmer-base) 100%
-  );
-  background-repeat: no-repeat;
-  background-size: 220% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: cx-text-shimmer-sweep 1.8s linear infinite;
+.cx-text-shimmer__paint {
+  display: inline-block;
+  max-width: 100%;
+  min-width: 0;
+  color: var(--opacity-high);
+  overflow-wrap: anywhere;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  :host(.cx-text-shimmer--active) .cx-text-shimmer__paint {
+    background-image:
+      linear-gradient(
+        100deg,
+        transparent 42%,
+        var(--ink) 50%,
+        transparent 58%
+      ),
+      linear-gradient(var(--opacity-high), var(--opacity-high));
+    background-position:
+      120% 0,
+      0 0;
+    background-repeat: no-repeat, no-repeat;
+    background-size:
+      200% 100%,
+      100% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: cx-text-shimmer-sweep 1.8s linear infinite;
+  }
 }
 
 @keyframes cx-text-shimmer-sweep {
   from {
-    background-position: 120% 0;
+    background-position:
+      120% 0,
+      0 0;
   }
   to {
-    background-position: -120% 0;
+    background-position:
+      -20% 0,
+      0 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host(.cx-text-shimmer--active) .cx-text-shimmer__text {
-    animation: none;
+  :host(.cx-text-shimmer--active) .cx-text-shimmer__paint {
     background: none;
-    color: var(--cx-text-shimmer-base);
+    color: var(--opacity-high);
+    animation: none;
   }
 }

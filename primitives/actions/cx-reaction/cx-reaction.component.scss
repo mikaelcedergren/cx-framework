@@ -10,6 +10,7 @@
   padding: 0 var(--space-sm);
   border: var(--border-width) solid var(--opacity-mid);
   border-radius: var(--radius-pill);
+  corner-shape: round;
   background: transparent;
   color: var(--ink);
   font-family: inherit;
@@ -22,9 +23,8 @@
     transform var(--motion-fast) ease;
 }
 
-.cx-reaction__emoji {
-  font-size: var(--font-size-body-lg);
-  line-height: 1;
+.cx-reaction__icon {
+  flex: 0 0 auto;
 }
 
 .cx-reaction__count {
@@ -77,17 +77,9 @@ button.cx-reaction:disabled {
   font-size: var(--font-size-body-sm);
 }
 
-:host(.cx-reaction-host--small) .cx-reaction__emoji {
-  font-size: var(--font-size-body);
-}
-
 /* Large */
 :host(.cx-reaction-host--large) .cx-reaction {
   height: calc(var(--controller-size) + var(--space-sm));
   padding: 0 var(--space-md);
   font-size: var(--font-size-body-lg);
-}
-
-:host(.cx-reaction-host--large) .cx-reaction__emoji {
-  font-size: var(--font-size-title-3);
 }

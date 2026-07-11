@@ -54,12 +54,12 @@
   inset: 0;
   display: inline-flex;
   overflow: hidden;
-  color: var(--ink);
+  color: var(--yellow);
   pointer-events: none;
 }
 
 .cx-rating__glyph--full {
-  color: var(--ink);
+  color: var(--yellow);
 }
 
 :host(.cx-rating--disabled) {

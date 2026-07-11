@@ -6,10 +6,21 @@ The skills define how an agent should behave. The design documents define the du
 
 ## Skill set
 
-- `designer` shapes product experience, interaction, IA, states, hierarchy, and visual direction before implementation.
-- `copywriter` writes and reviews product copy, UI labels, validation, alerts, empty states, and guidance.
-- `custodian` reviews work as a design-quality gate and blocks weak UX, missing states, accessibility gaps, and framework misuse.
-- `developer` implements approved work with product-quality engineering, using the framework correctly when user-facing UI is involved.
+- `designer` shapes or redesigns product experience, resolves ambiguity, and produces a concrete brief.
+- `copywriter` writes or revises product copy while preserving product truth and settled terminology.
+- `custodian` reviews existing work as an evidence-led quality gate and separates defects from unverified areas.
+- `developer` implements an accepted scope without broadening it and verifies claims proportionally to risk.
+
+Route by the user's current verb and the artifact's stage:
+
+- exploration, product direction, UX ambiguity, or a design brief → `designer`
+- requested replacement wording → `copywriter`
+- review, audit, approval, or readiness verdict → `custodian`
+- explicit implementation of a settled outcome → `developer`
+
+Do not run the entire lifecycle automatically for a task that starts at a later settled stage. Switch roles only when unresolved product direction, wording, evidence, or implementation genuinely requires it. Implementation still starts only after explicit action language.
+
+`Blocked` and `Unverified` do not progress to implementation. `Needs changes` progresses only after resolution or explicit user acceptance of the named residual risk; `Polish` and `Pass` may proceed. Rule strength and verdict severity are separate: a violated `must` is binding but becomes `Blocked` only when its user impact makes the next gate unsafe, misleading, inaccessible, or wasteful.
 
 ## Boundaries
 

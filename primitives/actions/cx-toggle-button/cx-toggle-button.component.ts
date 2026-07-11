@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxButtonComponent } from '../cx-button';
+import { CxIconComponent } from '../../media/cx-icon';
 
 export type CxToggleButtonSize = 'default' | 'small';
 
 @Component({
   selector: 'cx-toggle-button',
-  imports: [CxButtonComponent],
+  imports: [CxIconComponent],
   templateUrl: './cx-toggle-button.component.html',
   styleUrl: './cx-toggle-button.component.scss',
+  host: {
+    '[class.cx-toggle-button-host--small]': "size === 'small'",
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxToggleButtonComponent {
@@ -29,9 +32,37 @@ export class CxToggleButtonComponent {
   @Output() readonly selectedChange = new EventEmitter<boolean>();
 
   protected readonly selected$ = this.selectedState.asReadonly();
-  protected readonly displayIcon$ = computed(() =>
-    this.selectedState() && this.iconSelected ? this.iconSelected : this.icon,
-  );
+
+  protected get displayIcon(): CxIconName | undefined {
+    return this.selectedState() && this.iconSelected ? this.iconSelected : this.icon;
+  }
+
+  protected get visibleText(): string {
+    return this.text.trim();
+  }
+
+  protected get hasVisibleContent(): boolean {
+    return Boolean(this.visibleText || this.icon);
+  }
+
+  protected get isIconOnly(): boolean {
+    return !this.visibleText && Boolean(this.icon);
+  }
+
+  protected get resolvedAriaLabel(): string | null {
+    const label = this.ariaLabel?.trim();
+    if (label) {
+      return label;
+    }
+    if (this.visibleText || !this.icon) {
+      return null;
+    }
+    return this.icon
+      ?.split('-')
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ') ?? 'Toggle';
+  }
 
   protected toggle(): void {
     if (this.disabled) {

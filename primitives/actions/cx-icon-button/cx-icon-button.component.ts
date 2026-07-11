@@ -22,9 +22,8 @@ export class CxIconButtonComponent implements OnDestroy {
   @Input() mood: CxButtonMood = 'default';
   @Input() variant: CxIconButtonVariant = 'default';
   @Input() size: CxButtonSize = 'default';
-  @Input() active = false;
+  @Input() selected = false;
   @Input() ariaPressed: boolean | undefined;
-  @Input() hover = false;
   @Input() rounded = false;
   @Input() disabled = false;
   @Input() badgeValue: string | undefined;

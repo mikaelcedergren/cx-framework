@@ -27,7 +27,6 @@
         maxlength="1"
         autocorrect="off"
         spellcheck="false"
-        [class.cx-code-field__cell--filled]="cell !== ''"
         [class.cx-code-field__cell--active]="focused$() && $index === activeIndex$()"
         [attr.autocomplete]="$index === 0 ? 'one-time-code' : 'off'"
         [attr.inputmode]="inputMode$()"
