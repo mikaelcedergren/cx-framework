@@ -6,7 +6,7 @@ The package is exported to the GitHub package repo `mikaelcedergren/cx-framework
 
 ## Improvement loop
 
-Cortex is the source. `cx-framework` is the package. Every other project consumes `@mikaelcedergren/cx-framework` and must not reference Cortex directly.
+Cortex is the source. `cx-framework` is the package. Every product using the shared UI consumes `@mikaelcedergren/cx-framework`; content and operations repos stay independent, and no downstream repo references Cortex implementation directly.
 
 When a consuming project exposes a reusable framework gap, fix it in Cortex under `framework/`, package it here, have the owner push the package repo to GitHub `main`, then update the consuming app. A good package export should make the current app better and leave all future apps stronger.
 
@@ -20,6 +20,8 @@ because a consumer still uses the old contract.
 Make framework changes in the source app first. New components, patterns, tokens, icons, AI docs, AI skills, support files, and scripts should live under `framework/`.
 
 Public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting.
+
+Angular code has one package entrypoint: `@mikaelcedergren/cx-framework`. Component, pattern, and tooling source folders are packaged for reference and build input but are not importable subpaths. Asset and maintainer subpaths are explicitly limited to `ai`, `fonts`, `icons`, `scripts`, `styles`, `support`, and `tokens`.
 
 Validate portable AI rules, component discovery metadata, and skill bridges before every dry run or apply:
 
@@ -81,7 +83,7 @@ It should not include generated or local junk such as `node_modules/`, `out-tsc/
 
 ## After export
 
-The package command validates the AI/framework documentation layer, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
+The package command validates the AI/framework documentation layer, checks package-path relocation and the explicit export allowlist, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, verifies root TypeScript and Sass consumption while rejecting private code subpaths, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
 
 After the package repo is committed and pushed, consuming apps using:
 

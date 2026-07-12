@@ -44,6 +44,7 @@
   </button>
 
   <cx-menu
+    [presentation]="{ kind: 'trigger' }"
     class="cx-split-button__menu"
     [items]="items$()"
     [open]="open$()"
@@ -54,13 +55,10 @@
     (itemSelect)="onItemSelect($event)"
   >
     <button
-      trigger
+      cxMenuTrigger
       type="button"
       class="cx-split-button__trigger"
-      [disabled]="isDisabled"
       [attr.aria-label]="resolvedMenuAriaLabel"
-      [attr.aria-expanded]="open$()"
-      aria-haspopup="menu"
     >
       <cx-icon class="cx-split-button__chevron" name="chevron-down" [size]="iconSize" />
     </button>

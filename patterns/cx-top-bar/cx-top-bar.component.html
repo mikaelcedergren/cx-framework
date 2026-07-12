@@ -23,6 +23,7 @@
 
       @if (hasMenuItems()) {
         <cx-menu
+          [presentation]="{ kind: 'trigger' }"
           class="cx-top-bar__menu"
           [items]="menuItems ?? []"
           [ariaLabel]="resolvedMenuAriaLabel()"
@@ -30,7 +31,7 @@
           (itemSelect)="onMenuItemSelect($event)"
         >
           <cx-icon-button
-            trigger
+            cxMenuTrigger
             icon="menu-vertical"
             variant="transparent"
             [ariaLabel]="resolvedMenuAriaLabel()"

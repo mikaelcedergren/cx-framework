@@ -16,9 +16,9 @@
         />
       }
       @if (menuItems.length > 0) {
-        <cx-menu align="end" [ariaLabel]="menuAriaLabel" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
+        <cx-menu [presentation]="{ kind: 'trigger' }" align="end" [ariaLabel]="menuAriaLabel" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
           <cx-icon-button
-            trigger
+            cxMenuTrigger
             icon="menu-vertical"
             [ariaLabel]="menuAriaLabel" variant="transparent"
           />
@@ -41,9 +41,9 @@
         <ng-content select="[detail-panel-header-actions]" />
 
         @if (menuItems.length > 0) {
-          <cx-menu [items]="menuItems" (itemSelect)="onMenuSelect($event)">
+          <cx-menu [presentation]="{ kind: 'trigger' }" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
             <cx-icon-button
-              trigger
+              cxMenuTrigger
               icon="menu-vertical"
               [ariaLabel]="menuAriaLabel" variant="transparent"
             />

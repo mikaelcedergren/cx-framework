@@ -8,6 +8,9 @@
   [class.cx-table--zebra]="zebra"
   [class.cx-table--loading]="loading"
 >
+  <span class="cx-table__visually-hidden" aria-live="polite" aria-atomic="true">
+    {{ columnReorderAnnouncement$() }}
+  </span>
   @if (loading || rows$().length > 0) {
     <table #tableElement class="cx-table__table">
       <colgroup>
@@ -62,7 +65,10 @@
                     #headerTrigger
                     type="button"
                     class="cx-table__head-trigger"
-                    [attr.aria-label]="'Open ' + column.label + ' column menu'"
+                    [attr.aria-label]="'Open ' + column.label + ' column actions'"
+                    aria-haspopup="dialog"
+                    [attr.aria-expanded]="isColumnHeaderMenuOpen(column)"
+                    [attr.aria-controls]="columnHeaderDialogId"
                     (click)="onColumnHeaderTriggerClick($event, column, headerTrigger)"
                   >
                     <span class="cx-table__head-label">{{ column.label }}</span>
@@ -77,15 +83,18 @@
                 }
                 @if (columnsReorderable) {
                   <button
+                    #columnGrip
                     type="button"
                     class="cx-table__column-grip"
                     [class.cx-table__column-grip--active]="draggingColumnId$() === column.id"
                     [attr.aria-label]="'Reorder ' + column.label + ' column'"
+                    [attr.data-column-grip-id]="column.id"
                     (pointerdown)="onColumnGripPointerDown($event, column)"
                     (pointermove)="onColumnGripPointerMove($event)"
                     (pointerup)="onColumnGripPointerUp($event)"
-                    (pointercancel)="onColumnGripPointerUp($event)"
-                    (mousedown)="onColumnGripMouseDown($event, column)"
+                    (pointercancel)="onColumnGripPointerCancel($event)"
+                    (lostpointercapture)="onColumnGripLostPointerCapture($event)"
+                    (keydown)="onColumnGripKeydown($event, column, columnGrip)"
                     (click)="$event.stopPropagation()"
                   >
                     <cx-icon name="grip-vertical" [size]="16" />
@@ -98,12 +107,18 @@
                   [class.cx-table__column-resizer--active]="resizingColumnId$() === column.id"
                   [attr.aria-label]="'Resize ' + column.label + ' column'"
                   aria-orientation="vertical"
+                  [attr.aria-valuemin]="columnMinWidth"
+                  [attr.aria-valuemax]="columnMaxWidth"
+                  [attr.aria-valuenow]="columnWidthValue(column)"
+                  [attr.aria-valuetext]="columnWidthValue(column) + ' pixels'"
+                  tabindex="0"
                   role="separator"
                   (pointerdown)="onColumnResizePointerDown($event, column)"
                   (pointermove)="onColumnResizePointerMove($event)"
                   (pointerup)="onColumnResizePointerUp($event)"
-                  (pointercancel)="onColumnResizePointerUp($event)"
-                  (mousedown)="onColumnResizeMouseDown($event, column)"
+                  (pointercancel)="onColumnResizePointerCancel($event)"
+                  (lostpointercapture)="onColumnResizeLostPointerCapture($event)"
+                  (keydown)="onColumnResizeKeydown($event, column)"
                   (dblclick)="onColumnResizeDoubleClick($event, column)"
                 ></div>
               }
@@ -153,15 +168,18 @@
             [class.cx-table__row--active]="activeRowId$() === row.id"
             [class.cx-table__row--folder]="rowKind(row) === 'folder'"
             [class.cx-table__row--item]="rowKind(row) === 'item'"
-            [attr.tabindex]="rowIsKeyboardReachable() ? '0' : null"
+            [attr.tabindex]="rowIsKeyboardReachable(row) ? '0' : null"
             [attr.aria-label]="rowLabel(row)"
             (click)="onRowClick($event, row, $any($event.currentTarget))"
-            (mouseup)="onRowMouseUp($event, row, $any($event.currentTarget))"
             (keydown)="onRowKeydown($event, row, $any($event.currentTarget))"
             (contextmenu)="onRowContextMenu($event, row, $any($event.currentTarget))"
           >
             @if (hasRowSelection$()) {
-              <td class="cx-table__cell cx-table__cell--selection" (click)="$event.stopPropagation()">
+              <td
+                class="cx-table__cell cx-table__cell--selection"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()"
+              >
                 <cx-checkbox
                   [selected]="isRowSelected(row.id)"
                   [ariaLabel]="selectionLabel(row)"
@@ -195,6 +213,7 @@
                             [score]="cell.score"
                             [kev]="cell.kev ?? false"
                             [display]="cell.display ?? 'severity'"
+                            [favor]="cell.favor ?? 'low'"
                           />
                         }
                         @case ('trend-tag') {
@@ -233,20 +252,26 @@
             }
 
             @if (hasRowMenus$() && showRowActions) {
-              <td class="cx-table__cell cx-table__cell--menu" (click)="$event.stopPropagation()">
+              <td
+                class="cx-table__cell cx-table__cell--menu"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()"
+              >
                 @if (row.menuItems?.length) {
                   <cx-menu
+                    [presentation]="{ kind: 'trigger' }"
                     [items]="row.menuItems"
+                    [open]="openRowMenuId$() === row.id"
                     (openChange)="onRowMenuOpenChange(row.id, $event)"
                     (itemSelect)="onRowMenuItemSelect(row.id, $event)"
                   >
-                    <span data-row-menu-trigger trigger>
-                      <cx-icon-button
-                        class="cx-table__row-menu-trigger"
-                        icon="menu-vertical"
-                        ariaLabel="Row actions" variant="transparent"
-                      />
-                    </span>
+                    <cx-icon-button
+                      data-row-menu-trigger
+                      cxMenuTrigger
+                      class="cx-table__row-menu-trigger"
+                      icon="menu-vertical"
+                      ariaLabel="Row actions" variant="transparent"
+                    />
                   </cx-menu>
                 }
               </td>
@@ -260,6 +285,7 @@
     @if (columnHeaderMenuColumn(); as column) {
       @if (columnHeaderMenuPosition$(); as columnHeaderMenuPosition) {
         <cx-popover
+          #columnHeaderPopover
           [open]="true"
           [showBackdrop]="true"
           [left]="columnHeaderMenuPosition.left"
@@ -268,7 +294,8 @@
           [width]="280"
           [maxHeight]="columnHeaderMenuPosition.maxHeight"
           [placement]="columnHeaderMenuPosition.placement"
-          [role]="'menu'"
+          [surfaceId]="columnHeaderDialogId"
+          [role]="'dialog'"
           [ariaLabel]="columnHeaderMenuAriaLabel(column)"
           (backdropPressed)="closeColumnHeaderMenu()"
         >
@@ -295,13 +322,11 @@
               <div class="cx-table__header-menu-actions">
                 @if (isColumnSortable(column)) {
                   <cx-option
-                    [role]="'menuitem'"
                     label="Sort ascending"
                     prependIcon="arrow-up"
                     (click)="onColumnHeaderAction(column, 'sort-asc')"
                   />
                   <cx-option
-                    [role]="'menuitem'"
                     label="Sort descending"
                     prependIcon="arrow-down"
                     (click)="onColumnHeaderAction(column, 'sort-desc')"
@@ -315,7 +340,6 @@
                 @if (isColumnPinnable(column)) {
                   @if (isColumnPinned(column)) {
                     <cx-option
-                      [role]="'menuitem'"
                       label="Unpin"
                       prependIcon="pin-off"
                       [disabled]="!canPinColumn(column)"
@@ -323,7 +347,6 @@
                     />
                   } @else {
                     <cx-option
-                      [role]="'menuitem'"
                       label="Pin"
                       prependIcon="pin"
                       [disabled]="!canPinColumn(column)"
@@ -334,7 +357,6 @@
 
                 @if (isColumnHideable(column)) {
                   <cx-option
-                    [role]="'menuitem'"
                     label="Hide"
                     prependIcon="unwatch"
                     [disabled]="!canHideColumn(column)"
@@ -348,40 +370,15 @@
       }
     }
 
-    @if (contextMenuOpen$()) {
-      @if (contextMenuPosition$(); as contextMenuPosition) {
-        <cx-popover
-          [open]="true"
-          [showBackdrop]="true"
-          [left]="contextMenuPosition.left"
-          [top]="contextMenuPosition.top"
-          [width]="240"
-          [maxHeight]="320"
-          [role]="'menu'"
-          [ariaLabel]="'Row actions'"
-          (backdropPressed)="closeContextMenu()"
-        >
-          @for (item of contextMenuItems$(); track item.id) {
-            @if (showContextMenuDividerBefore($index)) {
-              <div class="cx-table__context-menu-divider" aria-hidden="true"></div>
-            }
-            <button
-              type="button"
-              class="cx-table__context-menu-option"
-              [attr.data-context-menu-item-id]="item.id"
-              (click)="onContextMenuItemSelect(item.id)"
-            >
-              <cx-option
-                [label]="item.label"
-                [prependIcon]="item.prependIcon"
-                [description]="item.description"
-                [appendIcon]="item.appendIcon"
-                [mood]="item.danger ? 'danger' : 'default'"
-              />
-            </button>
-          }
-        </cx-popover>
-      }
+    @if (contextMenu$(); as contextMenu) {
+      <cx-menu
+        [presentation]="{ kind: 'context', left: contextMenu.point.left, top: contextMenu.point.top }"
+        [open]="true"
+        [items]="contextMenuItems$()"
+        ariaLabel="Row actions"
+        (openChange)="onContextMenuOpenChange($event)"
+        (itemSelect)="onContextMenuItemSelect($event)"
+      />
     }
 
     @if (dragPreview$(); as dragPreview) {

@@ -919,6 +919,15 @@
       "path": "primitives/overlay/cx-menu/cx-menu.component.ts"
     },
     {
+      "name": "cxMenuTrigger",
+      "selectors": [
+        "[cxMenuTrigger]"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-menu/cx-menu-trigger.directive.ts"
+    },
+    {
       "name": "cx-option",
       "selectors": [
         "cx-option"

@@ -45,6 +45,7 @@
 
   @if (overflowItems$().length > 0) {
     <cx-menu
+      [presentation]="{ kind: 'trigger' }"
       #overflowMenu
       class="cx-tabs__overflow"
       [items]="overflowMenuItems$()"
@@ -56,7 +57,7 @@
       (openChange)="overflowOpen$.set($event)"
     >
       <cx-icon-button
-        trigger
+        cxMenuTrigger
         icon="chevrons-right"
         variant="transparent"
         [selected]="overflowOpen$() || selectedIsOverflow$()"

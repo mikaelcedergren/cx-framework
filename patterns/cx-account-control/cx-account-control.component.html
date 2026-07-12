@@ -1,4 +1,5 @@
 <cx-menu
+  [presentation]="{ kind: 'trigger' }"
   [items]="resolvedMenuItems$()"
   [open]="open$()"
   [disabled]="disabled"
@@ -9,14 +10,11 @@
   (itemSelect)="onItemSelect($event)"
 >
   <button
-    trigger
+    cxMenuTrigger
     class="cx-account-control"
     [class.cx-account-control--open]="open$()"
-    [disabled]="disabled"
     type="button"
     [attr.aria-label]="'Account actions for ' + username"
-    [attr.aria-expanded]="open$()"
-    aria-haspopup="menu"
   >
     <span class="cx-account-control__identity">
       <cx-avatar

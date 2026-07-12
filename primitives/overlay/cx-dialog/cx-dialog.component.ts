@@ -8,7 +8,7 @@ import {
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { eventMatchesShortcut } from '../../actions/shared/shortcuts';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
-import { CxMenuComponent, type CxMenuItem } from '../cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../cx-menu';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 let cxDialogId = 0;
@@ -27,6 +27,7 @@ export type CxDialogSize = 'small' | 'default' | 'large';
     CxButtonComponent,
     CxIconButtonComponent,
     CxMenuComponent,
+    CxMenuTriggerDirective,
     CxShortcutKeyComponent,
   ],
   templateUrl: './cx-dialog.component.html',
@@ -61,7 +62,6 @@ export class CxDialogComponent implements OnDestroy {
   @Input() secondaryText = '';
   @Input() closeOnPrimary = true;
   @Input() closeOnSecondary = true;
-  @Input() menu = false;
   @Input() menuItems: readonly CxMenuItem[] | undefined;
   @Input() menuAriaLabel: string | undefined;
 
@@ -124,7 +124,7 @@ export class CxDialogComponent implements OnDestroy {
   }
 
   protected hasMenuItems(): boolean {
-    return this.menu && (this.menuItems?.length ?? 0) > 0;
+    return (this.menuItems?.length ?? 0) > 0;
   }
 
   protected canDismiss(): boolean {

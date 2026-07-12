@@ -106,6 +106,7 @@
           [disabled]="disabled$()"
           [attr.maxlength]="maxLength$() ?? null"
           [attr.aria-label]="resolvedAriaLabel"
+          [attr.aria-describedby]="resolvedAriaDescribedBy"
           [attr.aria-invalid]="hasError$() ? 'true' : null"
           (beforeinput)="onBeforeInput($event)"
           (input)="onInput($event)"
@@ -118,7 +119,7 @@
   </div>
 
   @if (showHint$() || validationMessages$().length > 0) {
-    <div class="cx-textarea__messages">
+    <div class="cx-textarea__messages" [id]="messagesId">
       @if (showHint$()) {
         <div class="cx-textarea__hint">{{ hint$() }}</div>
       }

@@ -38,7 +38,7 @@
   }
 }
 
-@mixin field-shell-state($selector, $focus-target: null, $readonly-background: transparent, $loading-cursor: progress) {
+@mixin field-shell-state($selector, $focus-target: null, $loading-cursor: progress) {
   #{$selector} {
     transition:
       border-color var(--motion-fast) ease,
@@ -69,11 +69,6 @@
   #{$selector}--disabled {
     opacity: 0.55;
     cursor: default;
-  }
-
-  #{$selector}--readonly,
-  #{$selector}--read-only {
-    background: $readonly-background;
   }
 
   #{$selector}--loading {

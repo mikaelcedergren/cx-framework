@@ -2,14 +2,14 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
-import { CxMenuComponent, type CxMenuItem } from '../../overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
 
 export type CxCardMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxCardPadding = 'none' | 'default' | 'large';
 
 @Component({
   selector: 'cx-card',
-  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent],
+  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent, CxMenuTriggerDirective],
   templateUrl: './cx-card.component.html',
   styleUrl: './cx-card.component.scss',
   host: {

@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Out
 import { type CxIconName } from '../../../icons/manifest';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
-import { CxMenuComponent, type CxMenuItem } from '../../overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
 import { type CxButtonMood, type CxButtonSize, type CxButtonType } from '../cx-button';
 import { createDelayedLoadingState } from '../shared/delayed-loading-state';
 
 @Component({
   selector: 'cx-split-button',
-  imports: [CxIconComponent, CxMenuComponent, CxSpinnerComponent],
+  imports: [CxIconComponent, CxMenuComponent, CxMenuTriggerDirective, CxSpinnerComponent],
   templateUrl: './cx-split-button.component.html',
   styleUrl: './cx-split-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

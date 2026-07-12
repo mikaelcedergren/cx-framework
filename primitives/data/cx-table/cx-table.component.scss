@@ -158,25 +158,6 @@
   transition: opacity var(--motion-fast) ease;
 }
 
-.cx-table__context-menu-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--opacity-mid);
-}
-
-.cx-table__context-menu-option {
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-}
-
-.cx-table__context-menu-option cx-option {
-  width: 100%;
-}
-
 .cx-table__row:hover .cx-table__row-menu-trigger,
 .cx-table__row:focus-within .cx-table__row-menu-trigger {
   opacity: 1;
@@ -358,9 +339,9 @@
 .cx-table__column-resizer {
   position: absolute;
   top: 0;
-  right: -2px;
+  right: -6px;
   z-index: 1;
-  width: 5px;
+  width: 12px;
   height: 100%;
   cursor: col-resize;
   pointer-events: auto;
@@ -381,8 +362,14 @@
 }
 
 .cx-table__column-resizer:hover::after,
+.cx-table__column-resizer:focus-visible::after,
 .cx-table__column-resizer--active::after {
   background: var(--info);
+}
+
+.cx-table__column-resizer:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
 }
 
 .cx-table__column-grip {
@@ -490,6 +477,19 @@
   border-radius: var(--radius-xl);
   color: var(--opacity-high);
   font-size: var(--font-size-body);
+}
+
+.cx-table__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 @keyframes cx-table-skeleton {

@@ -48,13 +48,14 @@
   <div class="cx-filter-bar__right">
     @if (savedViews$().length > 0) {
       <cx-menu
+        [presentation]="{ kind: 'trigger' }"
         heading="Saved views"
         [items]="resolvedSavedViews$()"
         (openChange)="onSavedViewsOpenChange($event)"
         (itemSelect)="onSavedViewSelect($event)"
       >
         <cx-icon-button
-          trigger
+          cxMenuTrigger
           [icon]="savedViewIcon$()"
           ariaLabel="Saved views" variant="transparent"
         />
@@ -70,12 +71,13 @@
     </div>
 
     <cx-menu
+      [presentation]="{ kind: 'trigger' }"
       [items]="overflowItems$()"
       (openChange)="onOverflowOpenChange($event)"
       (itemSelect)="onOverflowItemSelect($event)"
     >
       <cx-icon-button
-        trigger
+        cxMenuTrigger
         icon="menu-vertical"
         ariaLabel="Table actions" variant="transparent"
       />

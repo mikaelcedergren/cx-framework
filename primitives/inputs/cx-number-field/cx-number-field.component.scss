@@ -25,7 +25,7 @@
   color: var(--ink);
 }
 
-@include field.field-shell-state('.cx-number-field__field-shell', '.cx-number-field__field', var(--opacity-low), default);
+@include field.field-shell-state('.cx-number-field__field-shell', '.cx-number-field__field', $loading-cursor: default);
 
 .cx-number-field--small .cx-number-field__field-shell {
   min-height: var(--controller-size-small);

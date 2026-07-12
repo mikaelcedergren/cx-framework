@@ -6,10 +6,10 @@
   [class.cx-progress-bar--danger]="mood === 'danger'"
   [class.cx-progress-bar--indeterminate]="indeterminate"
 >
-  @if (label.trim() || (showValue && resolvedValueLabel())) {
+  @if (visibleLabel() || (showValue && resolvedValueLabel())) {
     <div class="cx-progress-bar__header">
-      @if (label.trim()) {
-        <div class="cx-progress-bar__label">{{ label }}</div>
+      @if (visibleLabel(); as labelText) {
+        <div class="cx-progress-bar__label" [id]="labelId">{{ labelText }}</div>
       }
       @if (showValue && resolvedValueLabel(); as valueLabelText) {
         <div class="cx-progress-bar__value">{{ valueLabelText }}</div>
@@ -25,11 +25,14 @@
     [attr.aria-valuemax]="max$()"
     [attr.aria-valuenow]="indeterminate ? null : normalizedValue$()"
     [attr.aria-valuetext]="resolvedValueLabel() ?? null"
+    [attr.aria-labelledby]="visibleLabel() ? labelId : null"
+    [attr.aria-label]="visibleLabel() ? null : resolvedAriaLabel()"
+    [attr.aria-describedby]="visibleHint() ? hintId : null"
   >
     <span class="cx-progress-bar__fill" aria-hidden="true"></span>
   </div>
 
-  @if (hint?.trim()) {
-    <div class="cx-progress-bar__hint">{{ hint!.trim() }}</div>
+  @if (visibleHint(); as hintText) {
+    <div class="cx-progress-bar__hint" [id]="hintId">{{ hintText }}</div>
   }
 </div>

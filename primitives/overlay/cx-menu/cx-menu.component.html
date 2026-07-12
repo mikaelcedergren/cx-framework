@@ -1,16 +1,11 @@
 <div class="cx-menu" [class.cx-menu--fill]="layout$() === 'fill'">
-  <span
-    #triggerWrap
-    class="cx-menu__trigger"
-    [class.cx-menu__trigger--disabled]="disabled"
-    [class.cx-menu__trigger--empty]="!hasTrigger$()"
-    (click)="onTriggerClick($event, triggerWrap)"
-    (keydown)="onTriggerKeydown($event, triggerWrap)"
-  >
-    <ng-content select="[trigger]" />
-  </span>
+  @if (presentation$().kind === 'trigger') {
+    <span class="cx-menu__trigger">
+      <ng-content select="[cxMenuTrigger]" />
+    </span>
+  }
 
-  @if (hasTrigger$()) {
+  @if (presentation$().kind !== 'inline') {
     <cx-popover
       #rootPopover
       [open]="isOpen$()"
@@ -24,7 +19,7 @@
       [top]="surfaceTop$()"
       [bottom]="surfaceBottom$()"
       surfaceVariant="grouped"
-      (backdropPressed)="setOpen(false)"
+      (backdropPressed)="setOpen(false, true)"
     >
       <div class="cx-menu__groups">
         @if (heading$()) {

@@ -5,7 +5,6 @@ import {
   DestroyRef,
   ElementRef,
   EventEmitter,
-  HostListener,
   Input,
   Output,
   ViewChild,
@@ -15,6 +14,7 @@ import {
 } from '@angular/core';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverBackdropComponent } from '../cx-popover-backdrop/cx-popover-backdrop.component';
+import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 
@@ -27,7 +27,9 @@ export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 })
 export class CxPopoverComponent {
   private readonly document = inject(DOCUMENT);
+  private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
+  private overlayHandle?: CxOverlayStateHandle;
   private portaledSurface: HTMLElement | null = null;
   private portaledBackdrop: HTMLElement | null = null;
 
@@ -63,7 +65,10 @@ export class CxPopoverComponent {
       this.portaledSurface = surface;
     });
 
-    destroyRef.onDestroy(() => this.releasePortaledNodes());
+    destroyRef.onDestroy(() => {
+      this.releasePortaledNodes();
+      this.releaseOverlayOwnership();
+    });
   }
 
   private releasePortaledNodes(): void {
@@ -75,7 +80,16 @@ export class CxPopoverComponent {
 
   @Input()
   public set open(value: boolean) {
-    this.openState.set(!!value);
+    const nextOpen = !!value;
+    if (this.openState() === nextOpen) {
+      return;
+    }
+    this.openState.set(nextOpen);
+    if (nextOpen) {
+      this.captureOverlayOwnership();
+    } else {
+      this.releaseOverlayOwnership();
+    }
   }
   public get open(): boolean {
     return this.openState();
@@ -105,13 +119,6 @@ export class CxPopoverComponent {
     return this.surfaceRef?.nativeElement;
   }
 
-  @HostListener('document:keydown.escape')
-  protected onEscapeKey(): void {
-    if (this.openState()) {
-      this.backdropPressed.emit();
-    }
-  }
-
   protected get resolvedMaxHeight(): string {
     if (typeof this.maxHeight === 'number' && Number.isFinite(this.maxHeight)) {
       return `min(${Math.max(Math.floor(this.maxHeight), 0)}px, calc(100dvh - (var(--space-md) * 2)))`;
@@ -138,5 +145,22 @@ export class CxPopoverComponent {
   protected get normalizedTitleDescription(): string | undefined {
     const next = this.description?.trim();
     return next ? next : undefined;
+  }
+
+  private captureOverlayOwnership(): void {
+    if (this.overlayHandle) {
+      return;
+    }
+    this.overlayHandle = this.overlayState.capture({
+      kind: 'transient',
+      restoreFocus: false,
+      isActive: () => this.openState() && this.backdropPressed.observed,
+      onEscape: () => this.backdropPressed.emit(),
+    });
+  }
+
+  private releaseOverlayOwnership(): void {
+    this.overlayState.release(this.overlayHandle);
+    this.overlayHandle = undefined;
   }
 }

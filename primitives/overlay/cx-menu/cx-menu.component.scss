@@ -28,14 +28,6 @@
   width: 100%;
 }
 
-.cx-menu__trigger--empty {
-  display: none;
-}
-
-.cx-menu__trigger--disabled {
-  pointer-events: none;
-}
-
 .cx-menu__inline-surface {
   display: flex;
   min-width: max-content;

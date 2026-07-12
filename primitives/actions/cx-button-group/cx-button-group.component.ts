@@ -82,7 +82,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
     this.disabledState.set(!!value);
   }
 
-  @Output() readonly valueChange = new EventEmitter<string | undefined>();
+  @Output() readonly valueChange = new EventEmitter<string>();
 
   @HostBinding('class.cx-button-group-disabled')
   protected get disabledHostClass(): boolean {
@@ -152,52 +152,68 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End', ' ', 'Enter'].includes(event.key)) {
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       return;
     }
 
     event.preventDefault();
 
     const buttons = this.buttons$();
-    if (event.key === ' ' || event.key === 'Enter') {
-      const button = buttons[index];
-      if (button) {
-        this.valueState.set(button.id);
-        this.valueChange.emit(button.id);
-        this.scheduleIndicatorRefresh();
-      }
+    const enabledIndexes = buttons
+      .map((button, buttonIndex) => button.disabled ? -1 : buttonIndex)
+      .filter(buttonIndex => buttonIndex >= 0);
+    if (enabledIndexes.length === 0) {
       return;
     }
 
-    const maxIndex = buttons.length - 1;
-    if (maxIndex < 0) {
-      return;
-    }
-
-    let nextIndex = index;
+    let nextIndex: number;
     if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      nextIndex = index >= maxIndex ? 0 : index + 1;
+      nextIndex = this.nextEnabledIndex(enabledIndexes, index, 1);
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      nextIndex = index <= 0 ? maxIndex : index - 1;
+      nextIndex = this.nextEnabledIndex(enabledIndexes, index, -1);
     } else if (event.key === 'Home') {
-      nextIndex = 0;
+      nextIndex = enabledIndexes[0]!;
     } else if (event.key === 'End') {
-      nextIndex = maxIndex;
+      nextIndex = enabledIndexes[enabledIndexes.length - 1]!;
+    } else {
+      return;
     }
 
     const nextButton = buttons[nextIndex];
-    if (!nextButton || nextButton.disabled) {
+    if (!nextButton) {
       return;
     }
 
-    this.valueState.set(nextButton.id);
-    this.valueChange.emit(nextButton.id);
     this.buttonRefs?.get(nextIndex)?.nativeElement.focus();
-    this.scheduleIndicatorRefresh();
+    if (!nextButton.selected) {
+      this.valueState.set(nextButton.id);
+      this.valueChange.emit(nextButton.id);
+      this.scheduleIndicatorRefresh();
+    }
   }
 
-  protected tabIndexFor(button: CxButtonGroupButton, index: number): string {
-    return button.selected || (this.valueState() === undefined && index === 0) ? '0' : '-1';
+  protected tabIndexFor(index: number): string {
+    if (this.disabledState()) {
+      return '-1';
+    }
+
+    const buttons = this.buttons$();
+    const selectedEnabledIndex = buttons.findIndex(button => button.selected && !button.disabled);
+    const tabStopIndex = selectedEnabledIndex >= 0
+      ? selectedEnabledIndex
+      : buttons.findIndex(button => !button.disabled);
+    return index === tabStopIndex ? '0' : '-1';
+  }
+
+  private nextEnabledIndex(enabledIndexes: readonly number[], currentIndex: number, direction: 1 | -1): number {
+    const currentEnabledPosition = enabledIndexes.indexOf(currentIndex);
+    if (currentEnabledPosition < 0) {
+      return direction === 1 ? enabledIndexes[0]! : enabledIndexes[enabledIndexes.length - 1]!;
+    }
+
+    return enabledIndexes[
+      (currentEnabledPosition + direction + enabledIndexes.length) % enabledIndexes.length
+    ]!;
   }
 
   private observeIndicatorTargets(): void {

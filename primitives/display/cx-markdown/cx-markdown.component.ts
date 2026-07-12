@@ -22,6 +22,7 @@ export interface CxMarkdownLinkClick {
  * (serif headings, reading measure). Use for long-form bodies.
  */
 export type CxMarkdownVariant = 'default' | 'article';
+export type CxMarkdownAlign = 'center' | 'start';
 
 @Component({
   selector: 'cx-markdown',
@@ -41,6 +42,7 @@ export class CxMarkdownComponent {
   }
 
   @Input() variant: CxMarkdownVariant = 'default';
+  @Input() align: CxMarkdownAlign = 'center';
 
   protected readonly renderedMarkdown$ = computed(() => {
     const raw = this.markdownState().trim();

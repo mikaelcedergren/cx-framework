@@ -7,6 +7,7 @@
     >
       @if (hasOptions(item)) {
         <cx-menu
+          [presentation]="{ kind: 'trigger' }"
           class="cx-breadcrumbs__menu"
           [ariaLabel]="'Switch ' + item.label"
           [groups]="optionMenuGroups(item)"
@@ -16,7 +17,7 @@
           (itemSelect)="selectOption(item, $event)"
         >
           <button
-            trigger
+            cxMenuTrigger
             type="button"
             class="cx-breadcrumbs__control cx-breadcrumbs__control--menu"
             [class.cx-breadcrumbs__current]="isCurrent(item.id)"
@@ -82,6 +83,7 @@
 
       <li class="cx-breadcrumbs__item cx-breadcrumbs__item--ellipsis">
         <cx-menu
+          [presentation]="{ kind: 'trigger' }"
           class="cx-breadcrumbs__menu"
           ariaLabel="Hidden breadcrumb levels"
           [items]="hiddenMenuItems$()"
@@ -90,7 +92,7 @@
           (itemSelect)="selectItem($event)"
         >
           <button
-            trigger
+            cxMenuTrigger
             type="button"
             class="cx-breadcrumbs__control cx-breadcrumbs__control--ellipsis"
             aria-label="Show hidden breadcrumb levels"

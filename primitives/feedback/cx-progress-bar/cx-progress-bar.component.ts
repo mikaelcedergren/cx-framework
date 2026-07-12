@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@an
 
 export type CxProgressBarMood = 'default' | 'accent' | 'success' | 'danger';
 
+let cxProgressBarId = 0;
+
 @Component({
   selector: 'cx-progress-bar',
   templateUrl: './cx-progress-bar.component.html',
@@ -11,8 +13,12 @@ export type CxProgressBarMood = 'default' | 'accent' | 'success' | 'danger';
 export class CxProgressBarComponent {
   private readonly valueState = signal(64);
   private readonly maxState = signal(100);
+  private readonly instanceId = ++cxProgressBarId;
+  protected readonly labelId = `cx-progress-bar-label-${this.instanceId}`;
+  protected readonly hintId = `cx-progress-bar-hint-${this.instanceId}`;
 
   @Input() label = 'Progress';
+  @Input() ariaLabel: string | undefined;
   @Input() hint: string | undefined;
   @Input() mood: CxProgressBarMood = 'default';
   @Input() showValue = true;
@@ -55,5 +61,17 @@ export class CxProgressBarComponent {
       return undefined;
     }
     return `${this.progressPercent()}%`;
+  }
+
+  protected visibleLabel(): string {
+    return this.label?.trim() ?? '';
+  }
+
+  protected visibleHint(): string {
+    return this.hint?.trim() ?? '';
+  }
+
+  protected resolvedAriaLabel(): string {
+    return this.ariaLabel?.trim() || 'Progress';
   }
 }

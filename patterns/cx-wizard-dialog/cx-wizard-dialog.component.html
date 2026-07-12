@@ -25,7 +25,7 @@
         <div class="cx-wizard-dialog__main">
           <header class="cx-wizard-dialog__steps-header">
             <ol class="cx-wizard-dialog__steps" aria-label="Steps">
-              @for (step of visibleSteps$(); track step.id; let index = $index) {
+              @for (step of steps$(); track step.id; let index = $index) {
                 <li
                   class="cx-wizard-dialog__step"
                   [class.cx-wizard-dialog__step--active]="isActiveStep(index)"
@@ -40,7 +40,7 @@
                     }
                   </span>
                   <span class="cx-wizard-dialog__step-label">{{ step.name }}</span>
-                  @if (index < visibleSteps$().length - 1) {
+                  @if (index < steps$().length - 1) {
                     <span
                       class="cx-wizard-dialog__step-separator"
                       [class.cx-wizard-dialog__step-separator--complete]="isConnectorComplete(index)"

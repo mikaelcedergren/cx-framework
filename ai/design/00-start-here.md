@@ -28,10 +28,10 @@ Start with the task, not the documents:
 Useful searches:
 
 ```sh
-rg 'TOPIC: (accessibility|interaction|layout)' framework/ai/design/02-ux-rules.md
-rg 'COMPONENT: buttons' framework/ai/design/03-component-rules.md
-rg 'TOPIC: (validation|errors)' framework/ai/design/04-copy-and-microcopy.md
-rg 'RULE-ID: copy\.buttons' framework/ai/design
+rg 'TOPIC: (accessibility|interaction|layout)' ai/design/02-ux-rules.md
+rg 'COMPONENT: buttons' ai/design/03-component-rules.md
+rg 'TOPIC: (validation|errors)' ai/design/04-copy-and-microcopy.md
+rg 'RULE-ID: copy\.buttons' ai/design
 ```
 
 ## Rule grammar

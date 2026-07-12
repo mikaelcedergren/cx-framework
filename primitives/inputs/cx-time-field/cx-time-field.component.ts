@@ -29,15 +29,6 @@ type CxTimeMeridiem = 'AM' | 'PM';
 export type CxTimeFieldMode = 'default' | '12h';
 export type CxTimeFieldSize = CxFieldSize;
 
-export interface CxTimeFieldModel {
-  value?: string;
-  mode?: CxTimeFieldMode;
-  minuteStep?: number;
-  min?: string;
-  max?: string;
-  disabled?: boolean;
-}
-
 interface CxParsedTimeValue {
   hours24: number;
   minutes: number;
@@ -228,7 +219,6 @@ export class CxTimeFieldComponent {
   }
 
   @Output() readonly valueChange = new EventEmitter<string | undefined>();
-  @Output() readonly timeChange = new EventEmitter<CxTimeFieldModel>();
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly clear = new EventEmitter<void>();
 
@@ -726,7 +716,6 @@ export class CxTimeFieldComponent {
     }
     this.lastEmittedValue = value;
     this.valueChange.emit(value);
-    this.timeChange.emit(this.currentModel(value));
   }
 
   private formattedCommittedValue(): string | undefined {
@@ -752,17 +741,6 @@ export class CxTimeFieldComponent {
     return {
       hours24: this.toHours24(hour),
       minutes: minute,
-    };
-  }
-
-  private currentModel(value: string | undefined): CxTimeFieldModel {
-    return {
-      value,
-      mode: this.modeState(),
-      minuteStep: this.minuteStepState(),
-      min: this.minState(),
-      max: this.maxState(),
-      disabled: this.disabled,
     };
   }
 

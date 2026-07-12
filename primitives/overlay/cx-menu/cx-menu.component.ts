@@ -1,28 +1,36 @@
 import {
-  AfterViewInit,
+  AfterContentInit,
   ChangeDetectionStrategy,
   Component,
+  ContentChildren,
   ElementRef,
   EventEmitter,
   HostListener,
   Input,
   OnDestroy,
   Output,
+  QueryList,
   ViewChild,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { type Subscription } from 'rxjs';
 import { type CxIconName } from '../../../icons/manifest';
 import { eventMatchesShortcut, isTypingTarget } from '../../actions/shared/shortcuts';
 import { CxOptionComponent } from '../cx-option';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
 import { measureCxFloatingSurface } from '../floating-surface';
+import { CxMenuTriggerDirective } from './cx-menu-trigger.directive';
 
-export type CxMenuPriority = 'default' | 'primary' | 'secondary';
 export type CxMenuLayout = 'inline' | 'fill';
 export type CxMenuSelection = 'single' | 'multiple';
+export type CxMenuItemType = 'action' | 'choice';
+export type CxMenuPresentation =
+  | { kind: 'trigger' }
+  | { kind: 'inline' }
+  | { kind: 'context'; left: number; top: number };
 
 export type CxMenuItem = {
   id: string;
@@ -32,10 +40,9 @@ export type CxMenuItem = {
   description?: string;
   disabled?: boolean;
   selected?: boolean;
-  trackSelection?: boolean;
+  type?: CxMenuItemType;
   /** How this item's submenu tracks selection. Only read when the item has children. */
   selection?: CxMenuSelection;
-  priority?: CxMenuPriority;
   danger?: boolean;
   shortcutParts?: readonly string[];
   dividerBefore?: boolean;
@@ -50,7 +57,7 @@ export type CxMenuGroup = {
   /**
    * Declares the group as a choice group: 'single' announces items as
    * menuitemradio, 'multiple' as menuitemcheckbox, both with aria-checked.
-   * Items with trackSelection: false stay plain menuitem actions.
+   * Items with type: 'action' stay plain commands inside a choice group.
    */
   selection?: CxMenuSelection;
   items: readonly CxMenuItem[];
@@ -101,13 +108,21 @@ function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelect
   const hasPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
   return items.map((item, index) => {
     const hasChildren = childItemsFor(item).length > 0;
+    const itemType: CxMenuItemType = hasChildren ? 'action' : item.type ?? (selection ? 'choice' : 'action');
+    if (hasChildren && (item.type === 'choice' || item.selected !== undefined)) {
+      throw new Error(`[cx-menu] Submenu item "${item.id}" cannot declare choice state.`);
+    }
+    if (!hasChildren && itemType === 'action' && item.selected !== undefined) {
+      throw new Error(`[cx-menu] Action item "${item.id}" cannot declare selected state.`);
+    }
     return {
       ...item,
+      type: itemType,
       prependIcon: hasPrependIcons ? item.prependIcon : undefined,
       dividerBeforeResolved:
         index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
       hasChildren,
-      role: resolveMenuItemRole(item, hasChildren, selection),
+      role: resolveMenuItemRole({ ...item, type: itemType }, hasChildren, selection),
       items: hasChildren ? resolveMenuItems(childItemsFor(item), item.selection) : undefined,
     };
   });
@@ -118,20 +133,13 @@ function resolveMenuItemRole(
   hasChildren: boolean,
   selection: CxMenuSelection | undefined,
 ): CxMenuItemRole {
-  // Submenu parents open a surface and trackSelection: false marks plain
-  // actions inside choice groups; neither carries selection state.
-  if (hasChildren || item.trackSelection === false) {
+  if (hasChildren || item.type === 'action' || (!item.type && !selection)) {
     return 'menuitem';
   }
   if (selection === 'multiple') {
     return 'menuitemcheckbox';
   }
-  // A consumer that tracks selection per item (selected set explicitly, or
-  // trackSelection: true) gets single-choice semantics without a group flag.
-  if (selection === 'single' || item.selected !== undefined || item.trackSelection === true) {
-    return 'menuitemradio';
-  }
-  return 'menuitem';
+  return 'menuitemradio';
 }
 
 function childItemsFor(item: CxMenuItem): readonly CxMenuItem[] {
@@ -227,7 +235,7 @@ function measureCxSubmenuSurface(input: {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxMenuComponent implements AfterViewInit, OnDestroy {
+export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private static instanceCounter = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly instanceId = ++CxMenuComponent.instanceCounter;
@@ -236,10 +244,10 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   private readonly itemsState = signal<CxMenuItem[]>([]);
   private readonly groupsState = signal<CxMenuGroup[]>([]);
   private readonly headingState = signal('');
-  private readonly currentIdState = signal('none');
+  private readonly currentIdState = signal<string | undefined>(undefined);
   private readonly shortcutsEnabledState = signal(false);
   private readonly openState = signal(false);
-  private readonly hasTriggerState = signal(true);
+  private readonly presentationState = signal<CxMenuPresentation>({ kind: 'inline' });
   private readonly submenuSurfacesState = signal<CxMenuSubmenuSurface[]>([]);
   private readonly alignState = signal<'start' | 'end'>('end');
   private readonly layoutState = signal<CxMenuLayout>('inline');
@@ -249,15 +257,60 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   private readonly surfaceLeftState = signal<number | undefined>(undefined);
   private readonly surfaceMaxHeightState = signal<number | undefined>(undefined);
   private triggerElement?: HTMLElement;
+  private triggerButton?: HTMLButtonElement;
+  private triggerOriginalState?: {
+    disabled: boolean;
+    type: string | null;
+    ariaHaspopup: string | null;
+    ariaExpanded: string | null;
+    ariaControls: string | null;
+    buttonDisabledClass: boolean;
+    iconButtonDisabledClass: boolean;
+  };
   private resizeObserver?: ResizeObserver;
+  private destroyed = false;
+  private readonly triggerClickListener = (event: MouseEvent) => this.onTriggerClick(event);
+  private readonly triggerKeydownListener = (event: KeyboardEvent) => this.onTriggerKeydown(event);
 
-  @ViewChild('triggerWrap', { read: ElementRef })
-  private triggerRef?: ElementRef<HTMLElement>;
+  @ContentChildren(CxMenuTriggerDirective, { descendants: true })
+  private triggerDirectives?: QueryList<CxMenuTriggerDirective>;
+  private triggerChangesSubscription?: Subscription;
 
   @ViewChild('rootPopover')
   private rootPopoverRef?: CxPopoverComponent;
 
-  @Input() disabled = false;
+  private disabledValue = false;
+
+  @Input()
+  public set disabled(value: boolean) {
+    this.disabledValue = Boolean(value);
+    if (this.disabledValue && this.openState()) {
+      this.setOpen(false, true);
+    }
+    this.syncTriggerState();
+  }
+  public get disabled(): boolean {
+    return this.disabledValue;
+  }
+
+  @Input({ required: true })
+  public set presentation(value: CxMenuPresentation) {
+    const nextPresentation = this.normalizePresentation(value);
+    if (this.presentationsMatch(this.presentationState(), nextPresentation)) {
+      return;
+    }
+    this.presentationState.set(nextPresentation);
+    if (nextPresentation.kind === 'inline' && this.openState()) {
+      this.setOpen(false, false);
+    }
+    queueMicrotask(() => this.connectTrigger());
+    if (nextPresentation.kind === 'context' && this.openState()) {
+      queueMicrotask(() => {
+        this.syncSurfaceMetrics();
+        this.focusFirstEnabledOption();
+      });
+    }
+  }
   @Input() ariaLabel = 'Menu';
 
   @Input()
@@ -277,7 +330,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   public set currentId(value: string | undefined) {
-    this.currentIdState.set(value?.trim() || 'none');
+    this.currentIdState.set(value?.trim() || undefined);
   }
 
   @Input()
@@ -287,10 +340,15 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   public set open(value: boolean) {
-    this.openState.set(value);
-    if (value) {
+    const nextOpen = Boolean(value) && !this.disabled && this.presentationState().kind !== 'inline';
+    this.openState.set(nextOpen);
+    this.syncTriggerState();
+    if (nextOpen) {
       queueMicrotask(() => {
         this.syncSurfaceMetrics();
+        if (this.presentationState().kind === 'context') {
+          this.focusFirstEnabledOption();
+        }
       });
       return;
     }
@@ -316,8 +374,8 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   @Output() readonly itemSelect = new EventEmitter<string>();
   @Output() readonly currentIdChange = new EventEmitter<string>();
 
-  protected readonly hasTrigger$ = this.hasTriggerState.asReadonly();
   protected readonly isOpen$ = this.openState.asReadonly();
+  protected readonly presentation$ = this.presentationState.asReadonly();
   protected readonly layout$ = this.layoutState.asReadonly();
   protected readonly heading$ = this.headingState.asReadonly();
   protected readonly currentId$ = this.currentIdState.asReadonly();
@@ -346,55 +404,42 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     return this.headingState() || this.ariaLabel;
   }
 
-  ngAfterViewInit(): void {
-    this.triggerElement = this.triggerRef?.nativeElement;
-    const trigger = this.triggerElement;
-    this.hasTriggerState.set(this.hasTriggerContent(trigger));
-    if (!this.hasTriggerState()) {
-      return;
-    }
-    if (!trigger || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    if (this.openState()) {
-      queueMicrotask(() => {
-        this.syncSurfaceMetrics(trigger);
-      });
-    }
-    this.resizeObserver = new ResizeObserver(() => {
-      if (this.openState()) {
-        this.syncSurfaceMetrics();
-      }
+  ngAfterContentInit(): void {
+    this.triggerChangesSubscription = this.triggerDirectives?.changes.subscribe(() => {
+      queueMicrotask(() => this.connectTrigger());
     });
-    this.resizeObserver.observe(trigger);
+    queueMicrotask(() => this.connectTrigger());
   }
 
   ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
+    this.destroyed = true;
+    this.triggerChangesSubscription?.unsubscribe();
+    this.disconnectTrigger();
   }
 
-  protected onTriggerClick(event: MouseEvent, trigger?: HTMLElement): void {
+  private onTriggerClick(event: MouseEvent): void {
     event.preventDefault();
+    event.stopImmediatePropagation();
     if (this.disabled) {
       return;
     }
     // A click synthesised from keyboard activation (Enter/Space on the trigger
     // button) reports detail === 0; only then do we pull focus into the menu so
     // pointer-driven opens leave focus on the trigger.
-    this.toggleOpen(trigger, event.detail === 0);
+    this.toggleOpen(event.detail === 0);
   }
 
-  protected onTriggerKeydown(event: KeyboardEvent, trigger?: HTMLElement): void {
+  private onTriggerKeydown(event: KeyboardEvent): void {
     if (this.disabled) {
       return;
     }
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
       return;
     }
-    // Enter/Space activation is handled natively through the trigger's click.
     event.preventDefault();
+    event.stopImmediatePropagation();
     if (!this.openState()) {
-      this.syncSurfaceMetrics(trigger);
+      this.syncSurfaceMetrics();
       this.setOpen(true);
     }
     const toLast = event.key === 'ArrowUp';
@@ -468,7 +513,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
         event.preventDefault();
         const itemPath = buildItemPath(parentPath, item.id);
         this.openSubmenu(item, level, itemPath, optionWrap);
-        const firstChildId = item.items?.[0]?.id;
+        const firstChildId = item.items?.find(child => !child.disabled)?.id;
         if (firstChildId) {
           const childPath = buildItemPath(itemPath, firstChildId);
           this.focusWhenReady(() => this.optionButtonByPath(childPath));
@@ -506,7 +551,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     if (item.role === 'menuitemradio') {
       return item.selected ?? this.currentIdState() === item.id;
     }
-    return (item.selected ?? false) || this.currentIdState() === item.id;
+    return false;
   }
 
   private activateItem(item: CxResolvedMenuItem): void {
@@ -516,7 +561,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       this.itemSelect.emit(item.id);
       return;
     }
-    if (item.trackSelection !== false) {
+    if (item.role === 'menuitemradio') {
       this.updateCurrentId(item.id);
     }
     this.itemSelect.emit(item.id);
@@ -560,10 +605,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     }
     const active = typeof document !== 'undefined' ? document.activeElement : null;
     const focusWasInside = active instanceof Node && this.targetIsInsideMenuSurface(active);
-    this.closeSurface();
-    if (focusWasInside && this.hasTriggerState()) {
-      this.focusTrigger();
-    }
+    this.closeSurface(focusWasInside);
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -587,42 +629,58 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     this.syncSurfaceMetrics();
   }
 
-  private toggleOpen(trigger?: HTMLElement, focusFirstOption = false): void {
+  private toggleOpen(focusFirstOption = false): void {
     const nextOpen = !this.openState();
     if (nextOpen) {
-      this.syncSurfaceMetrics(trigger);
+      this.syncSurfaceMetrics();
     }
-    this.setOpen(nextOpen);
+    this.setOpen(nextOpen, !nextOpen);
     if (nextOpen && focusFirstOption) {
       this.focusWhenReady(() => this.optionButtonsInSurface(this.rootSurfaceElement())[0] ?? null);
     }
   }
 
-  protected setOpen(nextOpen: boolean): void {
-    this.openState.set(nextOpen);
-    if (!nextOpen) {
+  protected setOpen(nextOpen: boolean, restoreFocus = !nextOpen): void {
+    const resolvedOpen = nextOpen && !this.disabled && this.presentationState().kind !== 'inline';
+    if (this.openState() === resolvedOpen) {
+      return;
+    }
+    this.openState.set(resolvedOpen);
+    if (!resolvedOpen) {
       this.submenuSurfacesState.set([]);
     }
-    this.openChange.emit(nextOpen);
+    this.syncTriggerState();
+    this.openChange.emit(resolvedOpen);
+    if (!resolvedOpen && restoreFocus && this.presentationState().kind === 'trigger') {
+      queueMicrotask(() => this.focusTrigger());
+    }
   }
 
-  private syncSurfaceMetrics(trigger?: HTMLElement): void {
-    if (trigger) {
-      this.triggerElement = trigger;
-    }
-    const activeTrigger = this.triggerElement;
-    if (!activeTrigger || typeof window === 'undefined') {
+  private syncSurfaceMetrics(): void {
+    if (typeof window === 'undefined') {
       return;
     }
 
-    const rect = activeTrigger.getBoundingClientRect();
+    const presentation = this.presentationState();
+    const rect = presentation.kind === 'context'
+      ? {
+          left: presentation.left,
+          right: presentation.left,
+          top: presentation.top,
+          bottom: presentation.top,
+        }
+      : this.triggerElement?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
     const surface = measureCxFloatingSurface({
       triggerRect: rect,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       width: this.widthState(),
       estimatedHeight: estimateMenuSurfaceHeight(this.rootItems()),
-      align: this.alignState(),
+      align: presentation.kind === 'context' ? 'start' : this.alignState(),
+      gap: presentation.kind === 'context' ? 0 : undefined,
     });
 
     this.surfaceLeftState.set(surface.left);
@@ -682,16 +740,16 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     this.currentIdChange.emit(itemId);
   }
 
-  private closeSurface(): void {
-    if (this.hasTriggerState()) {
-      this.setOpen(false);
+  private closeSurface(restoreFocus = true): void {
+    if (this.presentationState().kind !== 'inline') {
+      this.setOpen(false, restoreFocus);
       return;
     }
     this.submenuSurfacesState.set([]);
   }
 
   private isSurfaceActive(): boolean {
-    return this.openState() || !this.hasTriggerState();
+    return this.presentationState().kind === 'inline' || this.openState();
   }
 
   private syncSubmenuSurfaceMetrics(): void {
@@ -748,7 +806,7 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
     if (typeof document === 'undefined') {
       return null;
     }
-    if (!this.hasTriggerState()) {
+    if (this.presentationState().kind === 'inline') {
       return this.host.nativeElement.querySelector('[data-cx-popover-surface]');
     }
     return this.rootPopoverRef?.surfaceElement() ?? document.getElementById(this.rootSurfaceId);
@@ -814,8 +872,135 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   }
 
   private focusTrigger(): void {
-    const focusable = this.triggerElement?.querySelector<HTMLElement>('button, [tabindex]');
-    focusable?.focus();
+    if (this.triggerButton && !this.triggerButton.disabled && this.triggerButton.isConnected) {
+      this.triggerButton.focus();
+    }
+  }
+
+  private focusFirstEnabledOption(): void {
+    this.focusWhenReady(() => this.optionButtonsInSurface(this.rootSurfaceElement())[0] ?? null);
+  }
+
+  private connectTrigger(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.disconnectTrigger();
+
+    const presentation = this.presentationState();
+    const triggerDirectives = this.triggerDirectives?.toArray() ?? [];
+    if (presentation.kind !== 'trigger') {
+      if (triggerDirectives.length > 0) {
+        throw new Error(`[cx-menu] ${presentation.kind} presentation cannot contain cxMenuTrigger.`);
+      }
+      return;
+    }
+    if (triggerDirectives.length !== 1) {
+      throw new Error(
+        `[cx-menu] Trigger presentation requires exactly one cxMenuTrigger; found ${triggerDirectives.length}.`,
+      );
+    }
+
+    const button = triggerDirectives[0].nativeButton();
+    this.triggerButton = button;
+    this.triggerElement = button;
+    this.triggerOriginalState = {
+      disabled: button.disabled,
+      type: button.getAttribute('type'),
+      ariaHaspopup: button.getAttribute('aria-haspopup'),
+      ariaExpanded: button.getAttribute('aria-expanded'),
+      ariaControls: button.getAttribute('aria-controls'),
+      buttonDisabledClass: button.classList.contains('cx-button--disabled'),
+      iconButtonDisabledClass: button.classList.contains('cx-icon-button--disabled'),
+    };
+
+    button.addEventListener('click', this.triggerClickListener, true);
+    button.addEventListener('keydown', this.triggerKeydownListener, true);
+    this.syncTriggerState();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.openState()) {
+          this.syncSurfaceMetrics();
+        }
+      });
+      this.resizeObserver.observe(button);
+    }
+    if (this.openState()) {
+      this.syncSurfaceMetrics();
+    }
+  }
+
+  private disconnectTrigger(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+
+    const button = this.triggerButton;
+    const original = this.triggerOriginalState;
+    if (button && original) {
+      button.removeEventListener('click', this.triggerClickListener, true);
+      button.removeEventListener('keydown', this.triggerKeydownListener, true);
+      button.disabled = original.disabled;
+      this.restoreAttribute(button, 'type', original.type);
+      this.restoreAttribute(button, 'aria-haspopup', original.ariaHaspopup);
+      this.restoreAttribute(button, 'aria-expanded', original.ariaExpanded);
+      this.restoreAttribute(button, 'aria-controls', original.ariaControls);
+      button.classList.toggle('cx-button--disabled', original.buttonDisabledClass);
+      button.classList.toggle('cx-icon-button--disabled', original.iconButtonDisabledClass);
+    }
+
+    this.triggerButton = undefined;
+    this.triggerElement = undefined;
+    this.triggerOriginalState = undefined;
+  }
+
+  private syncTriggerState(): void {
+    const button = this.triggerButton;
+    const original = this.triggerOriginalState;
+    if (!button || !original) {
+      return;
+    }
+
+    const disabled = original.disabled || this.disabled;
+    button.type = 'button';
+    button.disabled = disabled;
+    button.setAttribute('aria-haspopup', 'menu');
+    button.setAttribute('aria-expanded', String(this.openState()));
+    button.setAttribute('aria-controls', this.rootSurfaceId);
+    if (button.classList.contains('cx-button')) {
+      button.classList.toggle('cx-button--disabled', disabled);
+    }
+    if (button.classList.contains('cx-icon-button')) {
+      button.classList.toggle('cx-icon-button--disabled', disabled);
+    }
+  }
+
+  private restoreAttribute(element: HTMLElement, name: string, value: string | null): void {
+    if (value === null) {
+      element.removeAttribute(name);
+      return;
+    }
+    element.setAttribute(name, value);
+  }
+
+  private normalizePresentation(value: CxMenuPresentation): CxMenuPresentation {
+    if (value?.kind === 'trigger' || value?.kind === 'inline') {
+      return value;
+    }
+    if (value?.kind === 'context' && Number.isFinite(value.left) && Number.isFinite(value.top)) {
+      return { kind: 'context', left: value.left, top: value.top };
+    }
+    throw new Error('[cx-menu] presentation must be trigger, inline, or a finite context point.');
+  }
+
+  private presentationsMatch(current: CxMenuPresentation, next: CxMenuPresentation): boolean {
+    if (current.kind !== next.kind) {
+      return false;
+    }
+    if (current.kind !== 'context' || next.kind !== 'context') {
+      return true;
+    }
+    return current.left === next.left && current.top === next.top;
   }
 
   private rootItems(): readonly CxMenuItem[] {
@@ -824,15 +1009,6 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
       return this.itemsState();
     }
     return groups.flatMap(group => group.items);
-  }
-
-  private hasTriggerContent(trigger?: HTMLElement): boolean {
-    if (!trigger) {
-      return false;
-    }
-    return Array.from(trigger.childNodes).some(
-      node => node.nodeType === 1 || (node.textContent?.trim().length ?? 0) > 0,
-    );
   }
 
   private findShortcutItem(items: readonly CxResolvedMenuItem[], event: KeyboardEvent): CxResolvedMenuItem | undefined {

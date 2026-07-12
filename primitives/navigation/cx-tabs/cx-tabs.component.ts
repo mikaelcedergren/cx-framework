@@ -17,7 +17,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
-import { CxMenuComponent, type CxMenuItem } from '../../overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
 
 export interface CxTabItem {
   id: string;
@@ -32,7 +32,7 @@ function coerceBoolean(value: boolean | string | undefined): boolean {
 
 @Component({
   selector: 'cx-tabs',
-  imports: [CxIconButtonComponent, CxMenuComponent],
+  imports: [CxIconButtonComponent, CxMenuComponent, CxMenuTriggerDirective],
   templateUrl: './cx-tabs.component.html',
   styleUrl: './cx-tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -116,6 +116,7 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
     this.overflowItems$().map(item => ({
       id: item.id,
       label: this.menuLabelFor(item),
+      type: 'choice',
       disabled: item.disabled,
       selected: item.id === this.selectedIdState(),
     })),

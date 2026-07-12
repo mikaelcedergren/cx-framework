@@ -139,7 +139,7 @@ There are deliberately **no margin or gap utilities** — gap belongs to the lay
 
 ## Article
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its headings, paragraphs, lists, quotes, and code get a reading-optimised treatment with no per-element classes. It styles plain semantic HTML, so the source doesn't matter; the whole block scales from one custom property, `--cx-article-base`.
+Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its headings, paragraphs, lists, quotes, and code get a reading-optimised treatment with no per-element classes. It styles plain semantic HTML, so the source doesn't matter; the whole block scales from one custom property, `--cx-article-base`. Articles centre within an open reading canvas by default. Add `.cx-article--start` when the article is embedded beside navigation or another fixed column and must share that content column's start edge. The `cx-markdown` equivalent is `variant="article" align="start"`.
 
 ## The page frame
 

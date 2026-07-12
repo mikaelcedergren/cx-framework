@@ -11,40 +11,32 @@
     @if (hasActions()) {
       <div class="cx-alert__actions">
         @if (visibleAction; as action) {
-          <button
-            type="button"
-            class="cx-alert__action cx-alert__action--primary"
-            [disabled]="action.disabled || action.loading"
-            [attr.aria-label]="action.ariaLabel"
-            [attr.aria-busy]="action.loading ? 'true' : null"
-            (click)="onActionSelect(action)"
-          >
-            @if (action.icon; as iconName) {
-              <cx-icon class="cx-alert__action-icon" [name]="iconName" [size]="16" />
-            }
-            <span>{{ action.text }}</span>
-            @if (action.appendIcon; as iconName) {
-              <cx-icon class="cx-alert__action-icon" [name]="iconName" [size]="16" />
-            }
-          </button>
+          <cx-button
+            class="cx-alert__action"
+            [text]="action.text"
+            [mood]="action.mood ?? 'default'"
+            [transparent]="action.transparent ?? true"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onActionSelect(action)"
+          />
         }
         @if (visibleSecondaryAction; as action) {
-          <button
-            type="button"
-            class="cx-alert__action cx-alert__action--secondary"
-            [disabled]="action.disabled || action.loading"
-            [attr.aria-label]="action.ariaLabel"
-            [attr.aria-busy]="action.loading ? 'true' : null"
-            (click)="onSecondaryActionSelect(action)"
-          >
-            @if (action.icon; as iconName) {
-              <cx-icon class="cx-alert__action-icon" [name]="iconName" [size]="16" />
-            }
-            <span>{{ action.text }}</span>
-            @if (action.appendIcon; as iconName) {
-              <cx-icon class="cx-alert__action-icon" [name]="iconName" [size]="16" />
-            }
-          </button>
+          <cx-button
+            class="cx-alert__action"
+            [text]="action.text"
+            [mood]="action.mood ?? 'default'"
+            [transparent]="action.transparent ?? true"
+            [icon]="action.icon"
+            [appendIcon]="action.appendIcon"
+            [disabled]="action.disabled ?? false"
+            [loading]="action.loading ?? false"
+            [ariaLabel]="action.ariaLabel"
+            (pressed)="onSecondaryActionSelect(action)"
+          />
         }
       </div>
     }

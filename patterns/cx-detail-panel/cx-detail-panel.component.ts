@@ -14,23 +14,28 @@ import {
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
-import { CxMenuComponent, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
 
 const DETAIL_PANEL_DISMISS_DURATION_MS = 240;
 
 export type CxDetailPanelVariant = 'floating' | 'fixed' | 'bar';
+export type CxDetailPanelPlacement = 'container' | 'viewport';
 
 @Component({
   selector: 'cx-detail-panel',
-  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent],
+  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent, CxMenuTriggerDirective],
   templateUrl: './cx-detail-panel.component.html',
   styleUrl: './cx-detail-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxDetailPanelComponent implements OnDestroy {
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly overlayState = inject(CxOverlayStateService);
+  private overlayHandle?: CxOverlayStateHandle;
   private dismissTimer: number | undefined;
+  private placementValue: CxDetailPanelPlacement = 'container';
 
   @Input() ariaLabel = 'Detail panel';
   @Input() icon: CxIconName | undefined;
@@ -40,33 +45,56 @@ export class CxDetailPanelComponent implements OnDestroy {
   @Input() scrollable = true;
   @Input() menuItems: CxMenuItem[] = [];
   @Input() menuAriaLabel = 'Open detail panel menu';
-  /** Render in-page (position: absolute, fills the nearest positioned ancestor)
-   * instead of a viewport-fixed drawer. The host page must be positioned. */
-  @Input() inline = false;
-  /** Optional width / min-width overrides (any CSS length) for inline panels. */
+  /** Optional width / min-width overrides (any CSS length) for the panel host. */
   @Input() width: string | null = null;
   @Input() minWidth: string | null = null;
-  /** Also dismiss on a click outside the panel (ignoring popover surfaces). */
+  /** Also dismiss on a click outside the panel after any owned overlay closes. */
   @Input() dismissOnClickOutside = false;
-  /** When set, escape / outside-click are suppressed while this selector
-   * matches something in the DOM (e.g. an open date-picker overlay). */
-  @Input() dismissGuardSelector: string | null = null;
 
   @Output() readonly dismissed = new EventEmitter<void>();
   @Output() readonly menuSelect = new EventEmitter<string>();
 
   protected readonly closing$ = signal(false);
 
-  @HostBinding('class.cx-detail-panel-host--inline') get inlineClass(): boolean {
-    return this.inline;
+  constructor() {
+    this.overlayHandle = this.overlayState.capture({
+      kind: 'transient',
+      restoreFocus: true,
+      isActive: () => isHostVisible(this.host.nativeElement),
+      onEscape: () => {
+        if (this.dismissible && !this.closing$()) {
+          this.dismiss();
+        }
+      },
+    });
+  }
+
+  @Input()
+  public set placement(value: CxDetailPanelPlacement) {
+    if (value !== 'container' && value !== 'viewport') {
+      throw new Error(`[cx-detail-panel] placement must be "container" or "viewport"; received "${value}".`);
+    }
+    this.placementValue = value;
+  }
+
+  public get placement(): CxDetailPanelPlacement {
+    return this.placementValue;
+  }
+
+  @HostBinding('class.cx-detail-panel-host--container') get containerPlacementClass(): boolean {
+    return this.placement === 'container';
+  }
+
+  @HostBinding('class.cx-detail-panel-host--viewport') get viewportPlacementClass(): boolean {
+    return this.placement === 'viewport';
   }
 
   @HostBinding('class.cx-detail-panel-host--bar') get barClass(): boolean {
     return this.variant === 'bar';
   }
 
-  // Exposed as custom properties (not direct width/min-width) so the inline
-  // variant's responsive rules can override them without inline-style !important.
+  // Exposed as custom properties so the responsive placement rules can replace
+  // them cleanly without competing with inline width declarations.
   @HostBinding('style.--cx-detail-panel-width') get widthVar(): string | null {
     return this.width;
   }
@@ -87,19 +115,6 @@ export class CxDetailPanelComponent implements OnDestroy {
     return this.dismissible;
   }
 
-  @HostListener('document:keydown.escape', ['$event'])
-  protected onEscape(event: Event): void {
-    if (!this.dismissible || this.closing$() || !(event instanceof KeyboardEvent)) {
-      return;
-    }
-    if (!isHostVisible(this.host.nativeElement) || this.isDismissGuarded()) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    this.dismiss();
-  }
-
   @HostListener('document:mousedown', ['$event'])
   protected onDocumentMousedown(event: MouseEvent): void {
     if (!this.dismissOnClickOutside || !this.dismissible || this.closing$()) {
@@ -108,11 +123,8 @@ export class CxDetailPanelComponent implements OnDestroy {
     const target = event.target as HTMLElement | null;
     if (!target) return;
     if (!isHostVisible(this.host.nativeElement)) return;
+    if (!this.overlayState.isTopmost(this.overlayHandle)) return;
     if (this.host.nativeElement.contains(target)) return;
-    // Don't close when the click lands on an overlay surface (menu, popover,
-    // date-picker) that visually belongs to the panel but renders elsewhere.
-    if (target.closest('[data-cx-popover-surface], .cx-popover-backdrop__surface')) return;
-    if (this.isDismissGuarded()) return;
     this.dismiss();
   }
 
@@ -135,13 +147,12 @@ export class CxDetailPanelComponent implements OnDestroy {
       window.clearTimeout(this.dismissTimer);
       this.dismissTimer = undefined;
     }
+    this.overlayState.release(this.overlayHandle);
+    this.overlayHandle = undefined;
   }
 
   protected onMenuSelect(id: string): void {
     this.menuSelect.emit(id);
   }
 
-  private isDismissGuarded(): boolean {
-    return !!this.dismissGuardSelector && !!document.querySelector(this.dismissGuardSelector);
-  }
 }

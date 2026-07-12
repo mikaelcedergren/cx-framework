@@ -4,7 +4,9 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
   computed,
   signal,
@@ -30,11 +32,8 @@ export type CxFileUploadValue = {
 export type CxFileUpload = {
   buttonText: string;
   buttonIcon: CxIconName | undefined;
-  file: CxFileUploadValue | undefined;
   files: readonly CxFileUploadValue[];
   disabled: boolean;
-  hasFile: boolean;
-  fileName: string;
 };
 
 const WRONG_TYPE_MESSAGE: CxValidationMessage = {
@@ -66,7 +65,7 @@ const SINGLE_FILE_MESSAGE: CxValidationMessage = {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxFileUploadComponent {
+export class CxFileUploadComponent implements OnChanges {
   private readonly filesState = signal<readonly CxFileUploadValue[]>([]);
   private readonly noticeState = signal<CxValidationMessage | undefined>(undefined);
   private readonly draggingState = signal(false);
@@ -85,18 +84,20 @@ export class CxFileUploadComponent {
   @Input() maxSize: number | undefined;
   @Input() multiple = false;
   @Input() disabled = false;
-
-  @Input()
-  public set file(value: CxFileUploadValue | File | null | undefined) {
-    this.filesState.set(value ? [this.normalizeFile(value)] : []);
-  }
-
-  @Input()
-  public set files(value: ReadonlyArray<CxFileUploadValue | File> | null | undefined) {
-    this.filesState.set((value ?? []).map(item => this.normalizeFile(item)));
-  }
+  @Input() files: ReadonlyArray<CxFileUploadValue | File> | null | undefined = [];
 
   @Output() readonly fileUpload = new EventEmitter<CxFileUpload>();
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['files']) {
+      this.filesState.set(this.limitFiles((this.files ?? []).map(item => this.normalizeFile(item))));
+      return;
+    }
+
+    if (changes['multiple'] && !this.multiple) {
+      this.filesState.update(files => this.limitFiles(files));
+    }
+  }
 
   protected readonly files$ = this.filesState.asReadonly();
   protected readonly dragging$ = this.draggingState.asReadonly();
@@ -107,10 +108,9 @@ export class CxFileUploadComponent {
     return notice ? [notice] : [];
   });
 
-  /** Files shown and reported. A single-file control never surfaces more than the first. */
+  /** Files shown and reported. A single-file control owns an array of zero or one item. */
   protected get visibleFiles(): readonly CxFileUploadValue[] {
-    const files = this.files$();
-    return this.multiple ? files : files.slice(0, 1);
+    return this.files$();
   }
 
   protected get hasFiles(): boolean {
@@ -279,7 +279,7 @@ export class CxFileUploadComponent {
       if (this.multiple) {
         this.filesState.set(this.mergeFiles(this.files$(), accepted));
       } else {
-        this.filesState.set([accepted[0]]);
+        this.filesState.set(this.limitFiles(accepted));
       }
     }
 
@@ -310,6 +310,10 @@ export class CxFileUploadComponent {
       }
     }
     return merged;
+  }
+
+  private limitFiles(files: readonly CxFileUploadValue[]): readonly CxFileUploadValue[] {
+    return this.multiple ? files : files.slice(0, 1);
   }
 
   private matchesAccept(file: CxFileUploadValue): boolean {
@@ -372,16 +376,12 @@ export class CxFileUploadComponent {
   }
 
   private snapshot(): CxFileUpload {
-    const files = this.visibleFiles;
-    const first = files[0];
+    const files = [...this.visibleFiles];
     return {
       buttonText: this.visibleButtonText$(),
       buttonIcon: this.buttonIcon,
-      file: first,
       files,
       disabled: this.disabled,
-      hasFile: files.length > 0,
-      fileName: first?.name ?? '',
     };
   }
 }

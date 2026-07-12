@@ -1,10 +1,10 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
-import { CxMenuComponent, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
 
 @Component({
   selector: 'cx-top-bar',
-  imports: [CxIconButtonComponent, CxMenuComponent],
+  imports: [CxIconButtonComponent, CxMenuComponent, CxMenuTriggerDirective],
   templateUrl: './cx-top-bar.component.html',
   styleUrl: './cx-top-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

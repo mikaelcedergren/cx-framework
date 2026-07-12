@@ -1,31 +1,38 @@
-@for (step of visibleSteps(); track index; let index = $index) {
-  <div
-    class="cx-step"
-    [class.cx-step--selected]="index === visibleIndex()"
-    [class.cx-step--completed]="index < visibleIndex()"
-    [class.cx-step--danger]="isDanger(step)"
-    [attr.aria-current]="index === visibleIndex() ? 'step' : null"
-  >
-    <div class="cx-step__number">
-      @if (isDanger(step)) {
-        <cx-icon name="warning" [size]="14" />
-      } @else if (index < visibleIndex()) {
-        <cx-icon name="check" [size]="14" />
-      } @else {
-        {{ index + 1 }}
-      }
-    </div>
-    @if (showLabel(index)) {
-      <div class="cx-step__name">
+<ol class="cx-steps__list" aria-label="Steps">
+  @for (step of steps; track index; let index = $index) {
+    <li
+      class="cx-step"
+      [class.cx-step--selected]="isCurrent(index)"
+      [class.cx-step--completed]="isCompleted(index)"
+      [class.cx-step--danger]="isDanger(step)"
+      [attr.aria-current]="isCurrent(index) ? 'step' : null"
+    >
+      <span class="cx-step__number" aria-hidden="true">
+        @if (isDanger(step)) {
+          <cx-icon name="warning" [size]="14" />
+        } @else if (isCompleted(index)) {
+          <cx-icon name="check" [size]="14" />
+        } @else {
+          {{ index + 1 }}
+        }
+      </span>
+
+      <span class="cx-step__name" [class.cx-step__name--visually-hidden]="!labelIsVisible(index)">
         <span>{{ step.name }}</span>
         @if (badgeText(step); as badge) {
           <span class="cx-step__badge">{{ badge }}</span>
         }
-      </div>
-    }
-  </div>
+      </span>
 
-  @if (index < lastVisibleIndex()) {
-    <div class="cx-step__divider" [class.cx-step__divider--completed]="index < visibleIndex()"></div>
+      <span class="cx-step__status">{{ stepStatus(step, index) }}</span>
+
+      @if (index < steps.length - 1) {
+        <span
+          class="cx-step__divider"
+          [class.cx-step__divider--completed]="isCompleted(index)"
+          aria-hidden="true"
+        ></span>
+      }
+    </li>
   }
-}
+</ol>

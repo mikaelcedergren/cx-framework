@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { CxButtonComponent } from '../../actions/cx-button';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
 import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
@@ -7,7 +8,7 @@ export type CxAlertMood = 'default' | 'info' | 'warning' | 'success' | 'danger';
 export type CxAlertIcon = 'auto' | 'none' | CxIconName;
 @Component({
   selector: 'cx-alert',
-  imports: [CxIconComponent],
+  imports: [CxButtonComponent, CxIconComponent],
   templateUrl: './cx-alert.component.html',
   styleUrl: './cx-alert.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

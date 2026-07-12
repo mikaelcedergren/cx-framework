@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import { CxAlertComponent } from '../cx-alert';
+import { CxAlertComponent, type CxAlertMood } from '../cx-alert';
 import { CxIconComponent } from '../../media/cx-icon';
 import {
   type CxRenderedValidationMessage,
@@ -10,6 +10,15 @@ import {
 } from '../../inputs/shared/field.types';
 
 export type CxValidationMessageDisplay = 'inline' | 'global';
+
+const VALIDATION_ALERT_MOOD = {
+  status: 'default',
+  info: 'info',
+  success: 'success',
+  warning: 'warning',
+  error: 'danger',
+} as const satisfies Readonly<Record<CxValidationMessageType, CxAlertMood>>;
+
 @Component({
   selector: 'cx-validation-message',
   host: {
@@ -68,5 +77,9 @@ export class CxValidationMessageComponent {
 
   protected roleFor(type: CxValidationMessageType): 'alert' | 'status' {
     return type === 'error' || type === 'warning' ? 'alert' : 'status';
+  }
+
+  protected alertMoodFor(type: CxValidationMessageType): CxAlertMood {
+    return VALIDATION_ALERT_MOOD[type];
   }
 }

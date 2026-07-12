@@ -67,6 +67,8 @@ type CxTextareaRenderedLine = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxTextareaComponent {
+  private static nextId = 0;
+
   private readonly valueState = signal('');
   private readonly focusedState = signal(false);
   private readonly markdownState = signal(false);
@@ -158,6 +160,8 @@ export class CxTextareaComponent {
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly blurred = new EventEmitter<void>();
 
+  protected readonly messagesId = `cx-textarea-messages-${CxTextareaComponent.nextId++}`;
+
   protected get resolvedAriaLabel(): string | undefined {
     const ariaLabel = this.ariaLabel?.trim();
     if (ariaLabel) {
@@ -165,6 +169,10 @@ export class CxTextareaComponent {
     }
     const label = this.label.trim();
     return label || undefined;
+  }
+
+  protected get resolvedAriaDescribedBy(): string | undefined {
+    return this.showHint$() || this.validationMessages$().length > 0 ? this.messagesId : undefined;
   }
 
   protected readonly value$ = this.valueState.asReadonly();

@@ -35,7 +35,6 @@ export interface CxWizardDialogStep {
   infoDescription: string;
   icon?: CxIconName;
   infoCustom?: boolean;
-  visible?: boolean;
   status?: CxWizardDialogStepStatus;
 }
 
@@ -83,16 +82,8 @@ export class CxWizardDialogComponent implements OnDestroy {
   protected readonly isOpen$ = this.openState.asReadonly();
   protected readonly wizard$ = this.wizardState.asReadonly();
   protected readonly steps$ = computed(() => this.wizard$().steps);
-  protected readonly visibleSteps$ = computed(() => this.steps$().filter(step => step.visible !== false));
   protected readonly currentStepIndex$ = computed(() => this.clampIndex(this.wizard$().index ?? 0));
   protected readonly currentStep$ = computed<CxWizardDialogStep | undefined>(() => this.steps$()[this.currentStepIndex$()]);
-  protected readonly currentVisibleStepIndex$ = computed(() => {
-    const currentStep = this.currentStep$();
-    if (!currentStep) {
-      return -1;
-    }
-    return this.visibleSteps$().indexOf(currentStep);
-  });
   protected readonly activeTemplate$ = computed(() => {
     const activeStepId = this.currentStep$()?.id;
     if (!activeStepId) {
@@ -102,8 +93,12 @@ export class CxWizardDialogComponent implements OnDestroy {
   });
   protected readonly loadingActionId$ = computed(() => this.wizard$().loadingActionId);
   protected readonly isLoading$ = computed(() => this.loading || !!this.loadingActionId$());
-  protected readonly isFirstStep$ = computed(() => this.previousIndex() < 0);
-  protected readonly isLastStep$ = computed(() => this.nextIndex() >= this.steps$().length);
+  protected readonly isFirstStep$ = computed(() =>
+    this.steps$().length === 0 || this.currentStepIndex$() === 0,
+  );
+  protected readonly isLastStep$ = computed(() =>
+    this.steps$().length === 0 || this.currentStepIndex$() === this.steps$().length - 1,
+  );
   protected readonly showFeedback$ = computed(() => this.wizard$().feedbackVisible === true);
   protected readonly isLarge$ = computed(() => this.wizard$().size === 'large');
   protected readonly dismissible$ = computed(() => this.wizard$().dismissible !== false);
@@ -143,15 +138,15 @@ export class CxWizardDialogComponent implements OnDestroy {
   }
 
   protected isActiveStep(index: number): boolean {
-    return index === this.currentVisibleStepIndex$();
+    return index === this.currentStepIndex$();
   }
 
   protected isCompletedStep(step: CxWizardDialogStep, index: number): boolean {
-    return step.status === 'success' || (this.currentVisibleStepIndex$() > -1 && index < this.currentVisibleStepIndex$());
+    return step.status === 'success' || index < this.currentStepIndex$();
   }
 
   protected isConnectorComplete(index: number): boolean {
-    return this.currentVisibleStepIndex$() > index;
+    return this.currentStepIndex$() > index;
   }
 
   protected onBackdropClick(event: MouseEvent): void {
@@ -255,32 +250,13 @@ export class CxWizardDialogComponent implements OnDestroy {
     this.overlayHandle = undefined;
   }
 
-  private previousIndex(): number {
-    const steps = this.steps$();
-    for (let index = this.currentStepIndex$() - 1; index >= 0; index -= 1) {
-      if (steps[index]?.visible !== false) {
-        return index;
-      }
-    }
-    return -1;
-  }
-
-  private nextIndex(): number {
-    const steps = this.steps$();
-    for (let index = this.currentStepIndex$() + 1; index < steps.length; index += 1) {
-      if (steps[index]?.visible !== false) {
-        return index;
-      }
-    }
-    return steps.length;
-  }
-
   private clampIndex(index: number): number {
     const maxIndex = this.steps$().length - 1;
     if (maxIndex < 0) {
       return 0;
     }
-    return Math.max(0, Math.min(Math.trunc(index), maxIndex));
+    const normalizedIndex = Number.isFinite(index) ? Math.trunc(index) : 0;
+    return Math.max(0, Math.min(normalizedIndex, maxIndex));
   }
 
   private normalizeWizard(value: CxWizardDialogData | null | undefined): CxWizardDialogData {
@@ -292,12 +268,13 @@ export class CxWizardDialogComponent implements OnDestroy {
       ? value.steps
           .filter((step): step is CxWizardDialogStep => !!step && typeof step.id === 'string' && step.id.trim().length > 0)
           .map(step => ({
-            ...step,
             id: step.id.trim(),
             name: step.name?.trim() || 'Step',
             heading: step.heading?.trim() || step.name?.trim() || 'Step',
             infoHeading: step.infoHeading?.trim() || step.name?.trim() || 'Step guidance',
             infoDescription: step.infoDescription?.trim() || '',
+            icon: step.icon,
+            infoCustom: step.infoCustom === true,
             status: step.status === 'success' ? 'success' as const : 'default' as const,
           }))
       : [];

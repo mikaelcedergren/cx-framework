@@ -36,6 +36,14 @@ RULE-ID: context-menus.groups SCOPE: component COMPONENT: context-menus TYPE: sh
 
 RULE-ID: context-menus.destructive-last SCOPE: component COMPONENT: context-menus TYPE: must TOPIC: interaction RULE: Put destructive commands last in a distinct group. DESCRIPTION: Position and danger treatment should make consequence visible before activation.
 
+RULE-ID: context-menus.invocation SCOPE: component COMPONENT: context-menus TYPE: must TOPIC: interaction RULE: Open a context menu without activating its object. DESCRIPTION: Right-click, Menu, and Shift+F10 reveal the same actions without triggering row navigation, selection, or another object command.
+
+## Menus
+
+RULE-ID: menus.declared-meaning SCOPE: component COMPONENT: menus TYPE: must TOPIC: state RULE: Declare whether every menu item is an action or a choice. DESCRIPTION: Actions never acquire selected state; single and multiple choices expose their chosen state with the matching menu semantics.
+
+RULE-ID: menus.real-trigger SCOPE: component COMPONENT: menus TYPE: must TOPIC: accessibility RULE: Put trigger behavior and menu state on the real button. DESCRIPTION: The actual focusable control owns disabled state, popup relationships, activation, and focus restoration rather than a generic wrapper.
+
 ## Dialogs
 
 RULE-ID: dialogs.contained-task SCOPE: component COMPONENT: dialogs TYPE: should TOPIC: components RULE: Use a dialog for a contained decision or task that benefits from keeping background context. DESCRIPTION: A large multi-destination workflow belongs on a page rather than inside an oversized interruption.
@@ -47,6 +55,12 @@ RULE-ID: dialogs.dismissal-risk SCOPE: component COMPONENT: dialogs TYPE: should
 RULE-ID: dialogs.focus SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: accessibility RULE: Move focus into an opened modal and return it to the invoking control on close. DESCRIPTION: Modal focus must remain within the active dialog while it is open.
 
 RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: layout RULE: Keep dialog content and actions reachable within the viewport. DESCRIPTION: Preserve edge space and provide an intentional inner scroll region when content is taller than the available area.
+
+## Detail panels
+
+RULE-ID: detail-panels.placement SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Declare whether the panel belongs to a positioned content container or the viewport. DESCRIPTION: The detail-panel component owns its overlay position, edge, height, responsive full-screen treatment, and stacking role; consumers provide width and surrounding composition without recreating drawer positioning.
+
+RULE-ID: detail-panels.overlay-ownership SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Let the topmost child overlay handle dismissal before the detail panel. DESCRIPTION: Menus, pickers, popovers, and dialogs opened from the panel own Escape and outside interaction until they close; consumers never inspect child selectors to guard the panel.
 
 ## Empty states
 
@@ -68,7 +82,9 @@ RULE-ID: notifications.no-repeat SCOPE: component COMPONENT: notifications TYPE:
 
 RULE-ID: notifications.action SCOPE: component COMPONENT: notifications TYPE: should TOPIC: interaction RULE: Put the required recovery action in or next to the notification. DESCRIPTION: Do not force the user to search the product for the state that interrupted them.
 
-RULE-ID: notifications.timeout SCOPE: component COMPONENT: notifications TYPE: should TOPIC: accessibility RULE: Keep auto-dismissing notifications available long enough to perceive and pause. DESCRIPTION: Important information must not vanish before a slow reader or keyboard user can reach it.
+RULE-ID: notifications.actionable-persistent SCOPE: component COMPONENT: notifications TYPE: must TOPIC: accessibility RULE: Keep actionable notifications visible until the user dismisses them. DESCRIPTION: An action must never disappear on a timer while the user is reading or reaching it.
+
+RULE-ID: notifications.timeout SCOPE: component COMPONENT: notifications TYPE: should TOPIC: accessibility RULE: Keep auto-dismissing notifications available long enough to perceive and pause. DESCRIPTION: Pause the exact remaining lifetime while pointer or focus is inside; important information must not vanish before a slow reader or keyboard user can reach it.
 
 ## Spinners and progress bars
 
@@ -84,6 +100,18 @@ RULE-ID: progress.location SCOPE: component COMPONENT: spinners-and-progress-bar
 
 RULE-ID: progress.skeleton SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: should TOPIC: feedback RULE: Prefer a stable skeleton when the shape of incoming content is known. DESCRIPTION: Skeletons should represent structure, not pretend that data already exists.
 
+RULE-ID: progress.named SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: must TOPIC: accessibility RULE: Give every progress indicator an accessible purpose. DESCRIPTION: A visible label names the indicator; an intentionally label-less indicator needs an explicit accessible name and any visible hint must be associated.
+
+RULE-ID: progress.passive SCOPE: component COMPONENT: spinners-and-progress-bars TYPE: must TOPIC: state RULE: Do not present passive progress as a disabled control. DESCRIPTION: Progress communicates state and has no interaction to disable.
+
+## Steps
+
+RULE-ID: steps.exact-sequence SCOPE: component COMPONENT: steps TYPE: must TOPIC: navigation RULE: Present and index one exact step sequence. DESCRIPTION: The owner derives conditional branches before rendering; the indicator does not hide steps or reinterpret the index against another array.
+
+RULE-ID: steps.accessible-labels SCOPE: component COMPONENT: steps TYPE: must TOPIC: accessibility RULE: Keep every step name and status available when labels are visually suppressed. DESCRIPTION: Compact presentation may hide words from view but never removes current, completed, upcoming, or needs-attention meaning from the accessibility tree.
+
+RULE-ID: steps.passive SCOPE: component COMPONENT: steps TYPE: must TOPIC: state RULE: Do not disable a passive step indicator. DESCRIPTION: A non-interactive progress sequence describes state; it is not an unavailable control.
+
 ## Switches
 
 RULE-ID: switches.label SCOPE: component COMPONENT: switches TYPE: must TOPIC: accessibility RULE: Give every switch a persistent label and one combined activation target. DESCRIPTION: The label explains the setting and should activate the same control.
@@ -96,7 +124,7 @@ RULE-ID: switches.effect SCOPE: component COMPONENT: switches TYPE: should TOPIC
 
 RULE-ID: tables.row-navigation SCOPE: component COMPONENT: tables TYPE: may TOPIC: interaction RULE: Let a row open details when the row has a clear navigation affordance. DESCRIPTION: A row is not automatically clickable merely because detail content exists.
 
-RULE-ID: tables.inner-controls SCOPE: component COMPONENT: tables TYPE: must TOPIC: interaction RULE: Keep controls inside a clickable row independent from row navigation. DESCRIPTION: Buttons, links, checkboxes, and menus perform their own action without also opening the row.
+RULE-ID: tables.inner-controls SCOPE: component COMPONENT: tables TYPE: must TOPIC: interaction RULE: Keep controls inside a clickable row independent from row navigation. DESCRIPTION: Buttons, links, form fields, editable content, checkboxes, and menus perform their own action without also opening or highlighting the row.
 
 RULE-ID: tables.consequential-actions SCOPE: component COMPONENT: tables TYPE: should TOPIC: interaction RULE: Put destructive or consequential row commands behind an explicit action control. DESCRIPTION: Do not turn a broad row target into a risky command.
 
@@ -107,6 +135,8 @@ RULE-ID: tables.sorting SCOPE: component COMPONENT: tables TYPE: should TOPIC: d
 RULE-ID: tables.status SCOPE: component COMPONENT: tables TYPE: must TOPIC: state RULE: Make important row state visible at a glance. DESCRIPTION: Do not bury active, failed, scheduled, or archived state only in details.
 
 RULE-ID: tables.pagination SCOPE: component COMPONENT: tables TYPE: should TOPIC: navigation RULE: Use pagination when position and systematic progress matter. DESCRIPTION: Infinite loading is better suited to casual browsing where exact position is unimportant.
+
+RULE-ID: tables.column-input-parity SCOPE: component COMPONENT: tables TYPE: must TOPIC: accessibility RULE: Make column reorder and resize available from pointer and keyboard. DESCRIPTION: Both input paths obey the same bounds, pinned partitions, cancellation, focus, and truthful commit behavior.
 
 ## Tabs
 
@@ -132,7 +162,7 @@ RULE-ID: wizard-dialogs.fit SCOPE: component COMPONENT: wizard-dialogs TYPE: sho
 
 RULE-ID: wizard-dialogs.required-only SCOPE: component COMPONENT: wizard-dialogs TYPE: must TOPIC: complexity RULE: Ask only for information required for the current outcome. DESCRIPTION: Optional detail should not become a step merely to fill the sequence.
 
-RULE-ID: wizard-dialogs.relevant-steps SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: state RULE: Show only steps relevant to the user's choices. DESCRIPTION: Adapt internally without exposing a branching decision tree as navigation.
+RULE-ID: wizard-dialogs.relevant-steps SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: state RULE: Show only steps relevant to the user's choices. DESCRIPTION: The owner derives the exact presented sequence and explicitly remaps the current step when a branch changes; the dialog never searches hidden steps for a replacement.
 
 RULE-ID: wizard-dialogs.progress SCOPE: component COMPONENT: wizard-dialogs TYPE: should TOPIC: navigation RULE: Show current position and remaining shape. DESCRIPTION: Condense the indicator when every step label would no longer fit or help.
 

@@ -12,7 +12,7 @@ Portable product judgment and UX rules live in `ai/design/`. This document owns 
 
 ## Critical contracts
 
-1. **Cortex is the source.** Author framework work under ``; package it outward as `@mikaelcedergren/cx-framework`. Cortex never consumes or patches its packaged output.
+1. **Cortex is the source.** Author framework work in Cortex; this repository publishes it as `@mikaelcedergren/cx-framework`. Cortex never consumes or patches its packaged output.
 2. **Use the existing system first.** Inspect the registry, public component, sibling API, token, and pattern before adding local UI.
 3. **Fix the owning layer.** Shared behavior belongs in the shared component or pattern. A consumer must not hide an owning defect with deep selectors, inline visual fixes, duplicated token values, specificity battles, or wrapper hacks.
 4. **Keep component work focused.** Using another component's public API is allowed. Changing a different component's implementation, API, styling, or behavior requires explicit scope.
@@ -93,7 +93,7 @@ Install `provideCxKeyboardFocus()` once in a consuming application's configurati
 
 ## Source map and discovery
 
-The framework lives in ``:
+The packaged framework lives at this repository root:
 
 - `tokens/`: semantic color, spacing, type, radius, border, shadow, motion, size, breakpoint, and stacking tokens
 - `styles/`: global framework styles and utilities
@@ -110,8 +110,8 @@ The framework lives in ``:
 Before inventing a component or pattern, search the registry and source:
 
 ```sh
-rg '"name": "cx-' framework/support/components/registry.json
-rg "selector: 'cx-" framework/primitives framework/patterns
+rg '"name": "cx-' support/components/registry.json
+rg "selector: 'cx-" primitives patterns
 ```
 
 Cortex package tooling validates the registry against source before export. It must never advertise a removed selector or omit an existing public component/directive.
@@ -313,9 +313,9 @@ Canonical SVG sources live in `icons/svg/`; `icons/manifest.ts` and `icons/index
 After changing source SVGs:
 
 ```sh
-pnpm --filter @mikaelcedergren/cx-framework icons:check
-pnpm --filter @mikaelcedergren/cx-framework icons:index
-pnpm --filter @mikaelcedergren/cx-framework icons
+pnpm icons:check
+pnpm icons:index
+pnpm icons
 ```
 
 The full icon contract lives in `icons/README.md`.

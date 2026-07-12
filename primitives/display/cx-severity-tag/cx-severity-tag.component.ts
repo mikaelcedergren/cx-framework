@@ -4,11 +4,36 @@ export type CxSeverityLevel = 'critical' | 'high' | 'medium' | 'low' | 'recommen
 export type CxSeverityTagVariant = 'bars' | 'dot';
 export type CxSeverityTagDisplay = 'severity' | 'grade' | 'recommended';
 export type CxSeverityTagFavor = 'low' | 'high';
-type CxSeverityGrade = 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
+export type CxSeverityGrade = 'a' | 'b' | 'c' | 'd' | 'e' | 'f';
 
 const SCORE_MAX = 10;
 const GRADE_STEPS: readonly CxSeverityGrade[] = ['a', 'b', 'c', 'd', 'e', 'f'];
 const SEVERITY_STEPS: readonly Exclude<CxSeverityLevel, 'recommended'>[] = ['low', 'medium', 'high', 'critical'];
+
+function cxSeverityRiskRatio(score: number, favor: CxSeverityTagFavor): number {
+  const normalizedScore = Number.isFinite(score) ? Math.max(0, Math.min(SCORE_MAX, score)) : 0;
+  const ratio = normalizedScore / SCORE_MAX;
+  return favor === 'low' ? ratio : 1 - ratio;
+}
+
+export function cxSeverityLevelForScore(
+  score: number,
+  favor: CxSeverityTagFavor = 'low',
+): Exclude<CxSeverityLevel, 'recommended'> {
+  const risk = cxSeverityRiskRatio(score, favor);
+  if (risk >= 0.9) return 'critical';
+  if (risk >= 0.7) return 'high';
+  if (risk >= 0.4) return 'medium';
+  return 'low';
+}
+
+export function cxSeverityGradeForScore(
+  score: number,
+  favor: CxSeverityTagFavor = 'low',
+): CxSeverityGrade {
+  const index = Math.min(Math.floor(cxSeverityRiskRatio(score, favor) * GRADE_STEPS.length), GRADE_STEPS.length - 1);
+  return GRADE_STEPS[index];
+}
 
 @Component({
   selector: 'cx-severity-tag',
@@ -134,11 +159,7 @@ export class CxSeverityTagComponent {
     if (score === undefined && this.severityOverride && this.severityOverride !== 'recommended') {
       return this.severityOverride;
     }
-    const risk = this.riskRatio(score ?? 0);
-    if (risk >= 0.9) return 'critical';
-    if (risk >= 0.7) return 'high';
-    if (risk >= 0.4) return 'medium';
-    return 'low';
+    return cxSeverityLevelForScore(score ?? 0, this.favor);
   }
 
   private gradeLabel(): CxSeverityGrade {
@@ -146,13 +167,7 @@ export class CxSeverityTagComponent {
     if (score === undefined) {
       return 'f';
     }
-    const index = Math.min(Math.floor(this.riskRatio(score) * GRADE_STEPS.length), GRADE_STEPS.length - 1);
-    return GRADE_STEPS[index];
-  }
-
-  private riskRatio(score: number): number {
-    const ratio = score / SCORE_MAX;
-    return this.favor === 'low' ? ratio : 1 - ratio;
+    return cxSeverityGradeForScore(score, this.favor);
   }
 
   private normalizedScore(): number | undefined {

@@ -20,7 +20,7 @@
       [class.cx-button-group-button-disabled]="button.disabled"
       [disabled]="disabled$() || button.disabled"
       [attr.aria-pressed]="button.selected"
-      [attr.tabindex]="tabIndexFor(button, buttonIndex)"
+      [attr.tabindex]="tabIndexFor(buttonIndex)"
       (click)="select($event, button)"
       (keydown)="onKeydown($event, buttonIndex)"
     >

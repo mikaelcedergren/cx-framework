@@ -2,12 +2,31 @@
 
 :host {
   display: block;
-  width: var(--cx-detail-panel-width, min(450px, 100%));
-  max-width: 100%;
-  height: 100%;
-  min-height: 420px;
   color: var(--ink);
   pointer-events: auto;
+}
+
+:host(.cx-detail-panel-host--container),
+:host(.cx-detail-panel-host--viewport) {
+  z-index: var(--z-index-detail);
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: var(--cx-detail-panel-width, min(450px, 100%));
+  height: 100%;
+  min-height: 0;
+}
+
+:host(.cx-detail-panel-host--container) {
+  position: absolute;
+  min-width: min(var(--cx-detail-panel-min-width, 0px), 100%);
+  max-width: 100%;
+}
+
+:host(.cx-detail-panel-host--viewport) {
+  position: fixed;
+  min-width: min(var(--cx-detail-panel-min-width, 0px), 100vw);
+  max-width: 100vw;
+  height: 100dvh;
 }
 
 .cx-detail-panel {
@@ -18,7 +37,7 @@
   width: 100%;
   height: 100%;
   min-width: min(450px, 100%);
-  min-height: 420px;
+  min-height: 0;
   max-width: 100%;
   flex-direction: column;
   overflow: hidden;
@@ -43,23 +62,9 @@
   animation: cx-detail-panel-exit var(--motion-slow) var(--ease-in) both;
 }
 
-:host(.cx-detail-panel-host--inline) {
-  position: absolute;
-  z-index: var(--z-index-detail);
-  inset-block: 0;
-  inset-inline-end: 0;
-  width: var(--cx-detail-panel-width, min(450px, 100%));
-  min-width: var(--cx-detail-panel-min-width, 0);
-  height: 100%;
-  min-height: 0;
-}
-
-:host(.cx-detail-panel-host--inline) .cx-detail-panel {
-  min-height: 0;
-}
-
 @media (max-width: #{bp.$mobile - 1px}) {
-  :host(.cx-detail-panel-host--inline) {
+  :host(.cx-detail-panel-host--container),
+  :host(.cx-detail-panel-host--viewport) {
     position: fixed;
     inset: 0;
     width: 100%;

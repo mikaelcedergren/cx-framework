@@ -126,7 +126,8 @@
         @case ('file-upload') {
           <div class="cx-labeled-row__field-shell">
             <cx-file-upload
-              [file]="content.file"
+              [multiple]="content.multiple ?? false"
+              [files]="content.files ?? []"
               [buttonText]="content.buttonText ?? 'Upload file'"
               [buttonIcon]="content.buttonIcon ?? 'upload'"
               [disabled]="content.disabled ?? false"

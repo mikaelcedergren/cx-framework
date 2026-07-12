@@ -92,7 +92,9 @@
   }
 
   .cx-progress-bar--indeterminate .cx-progress-bar__fill {
-    animation-duration: 2.4s;
+    left: 32%;
+    animation: none;
+    transform: none;
   }
 }
 

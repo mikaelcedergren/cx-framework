@@ -1,5 +1,6 @@
 <div
   [class.cx-markdown]="variant !== 'article'"
   [class.cx-article]="variant === 'article'"
+  [class.cx-article--start]="variant === 'article' && align === 'start'"
   [innerHTML]="renderedMarkdown$()"
 ></div>

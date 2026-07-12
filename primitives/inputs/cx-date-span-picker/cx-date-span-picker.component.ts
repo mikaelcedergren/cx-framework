@@ -451,13 +451,6 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     this.openState.set(false);
   }
 
-  @HostListener('document:keydown.escape')
-  protected onEscapeKey(): void {
-    if (this.openState()) {
-      this.openState.set(false);
-    }
-  }
-
   @HostListener('window:resize')
   protected onWindowResize(): void {
     if (this.openState()) {

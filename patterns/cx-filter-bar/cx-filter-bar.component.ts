@@ -30,6 +30,7 @@ import {
 } from '../../primitives/inputs/cx-dropdown';
 import {
   CxMenuComponent,
+  CxMenuTriggerDirective,
   type CxMenuItem,
 } from '../../primitives/overlay/cx-menu';
 import { CxOptionGroupComponent } from '../../primitives/overlay/cx-option-group';
@@ -68,6 +69,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CxTextFieldComponent,
     CxDropdownComponent,
     CxMenuComponent,
+    CxMenuTriggerDirective,
     CxOptionGroupComponent,
     CxPopoverComponent,
     CxExpansionPanelComponent,
@@ -309,12 +311,12 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly hasColumnControls$ = computed(() => this.columnOptionsState().length > 0);
   protected readonly resolvedSavedViews$ = computed<CxMenuItem[]>(() =>
     this.savedViewsState().map(item => {
-      // trackSelection: false marks plain actions (e.g. "Manage views"); only
-      // real views carry radio selection state.
-      const selectable = item.trackSelection !== false;
+      const type = item.type ?? 'choice';
+      const selectable = type === 'choice';
       const active = selectable && this.activeSavedViewIdState() === item.id;
       return {
         ...item,
+        type,
         selected: selectable ? active : undefined,
         appendIcon: active ? 'check' : undefined,
       };
@@ -387,7 +389,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   protected onSavedViewSelect(itemId: string): void {
     const item = this.savedViewsState().find(candidate => candidate.id === itemId);
-    const nextActiveId = item?.trackSelection === false ? undefined : itemId;
+    const nextActiveId = item?.type === 'action' ? undefined : itemId;
     this.activeSavedViewIdState.set(nextActiveId);
     this.activeSavedViewIdChange.emit(nextActiveId);
     this.savedViewSelect.emit(itemId);

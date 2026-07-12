@@ -8,9 +8,9 @@ Low-level reusable `cx-*` components live here. Do not infer the available API f
 Useful searches:
 
 ```sh
-jq -r '.components[] | select(.area == "primitive") | [.name, .category, .path] | @tsv' framework/support/components/registry.json
-rg '"name": "cx-text-field"' framework/support/components/registry.json
-rg '"cx-text-field"' framework/support/components/guidance.json
+jq -r '.components[] | select(.area == "primitive") | [.name, .category, .path] | @tsv' support/components/registry.json
+rg '"name": "cx-text-field"' support/components/registry.json
+rg '"cx-text-field"' support/components/guidance.json
 ```
 
 Areas:

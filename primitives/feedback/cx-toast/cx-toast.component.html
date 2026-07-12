@@ -10,8 +10,14 @@
     [class.cx-toast--danger]="mood === 'danger'"
     [class.cx-toast--multiline]="isMultiline"
     [class.cx-toast--timed]="effectiveTimed"
+    [style.--cx-toast-timer-progress]="timerProgress$()"
+    [style.--cx-toast-timer-duration]="timerTransition$() + 'ms'"
     role="status"
     [attr.aria-live]="mood === 'danger' ? 'assertive' : 'polite'"
+    (pointerenter)="onPointerEnter()"
+    (pointerleave)="onPointerLeave()"
+    (focusin)="onFocusIn()"
+    (focusout)="onFocusOut($event)"
     (transitionend)="onTransitionEnd($event)"
   >
     @if (moodIcon; as iconName) {

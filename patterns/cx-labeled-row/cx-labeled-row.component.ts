@@ -7,6 +7,7 @@ import {
   CxFileUploadComponent,
   type CxFileUploadValue,
 } from '../../primitives/inputs/cx-file-upload';
+import { type CxIconName } from '../../icons/manifest';
 import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
 import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
@@ -83,9 +84,10 @@ export type CxLabeledRowContent =
     }
   | {
       kind: 'file-upload';
-      file?: CxFileUploadValue;
+      files?: ReadonlyArray<CxFileUploadValue | File>;
+      multiple?: boolean;
       buttonText?: string;
-      buttonIcon?: CxFileUpload['buttonIcon'];
+      buttonIcon?: CxIconName;
       disabled?: boolean;
     }
   | {
