@@ -67,12 +67,12 @@ Use package subpaths in global styles:
 
 ```scss
 @use '@mikaelcedergren/cx-framework/tokens';
-@use '@mikaelcedergren/cx-styles/fonts';
-@use '@mikaelcedergren/cx-styles/base';
-@use '@mikaelcedergren/cx-styles/page';
-@use '@mikaelcedergren/cx-styles/article';
-@use '@mikaelcedergren/cx-styles/markdown';
-@use '@mikaelcedergren/cx-styles/utilities';
+@use '@mikaelcedergren/cx-framework/styles/fonts';
+@use '@mikaelcedergren/cx-framework/styles/base';
+@use '@mikaelcedergren/cx-framework/styles/page';
+@use '@mikaelcedergren/cx-framework/styles/article';
+@use '@mikaelcedergren/cx-framework/styles/markdown';
+@use '@mikaelcedergren/cx-framework/styles/utilities';
 ```
 
 Or add the package folder to Sass include paths:

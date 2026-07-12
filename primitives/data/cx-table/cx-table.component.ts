@@ -25,6 +25,7 @@ import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import {
   CxSeverityTagComponent,
   type CxSeverityLevel,
+  type CxSeverityTagDisplay,
 } from '../../display/cx-severity-tag';
 import {
   CxStatusTagComponent,
@@ -36,7 +37,8 @@ import {
 } from '../../display/cx-tag';
 import {
   CxTrendTagComponent,
-  type CxTrendTagTrend,
+  type CxTrendTagFavor,
+  type CxTrendTagUnit,
 } from '../../display/cx-trend-tag';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxCheckboxComponent } from '../../inputs/cx-checkbox';
@@ -86,12 +88,13 @@ export type CxTableCell =
       severity: CxSeverityLevel;
       score?: string;
       kev?: boolean;
-      grade?: boolean;
+      display?: CxSeverityTagDisplay;
     }
   | {
       kind: 'trend-tag';
-      trend: CxTrendTagTrend;
-      value: string;
+      amount: number;
+      favor?: CxTrendTagFavor;
+      unit?: CxTrendTagUnit;
     }
   | {
       kind: 'tag';

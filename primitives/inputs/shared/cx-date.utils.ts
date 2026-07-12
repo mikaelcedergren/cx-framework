@@ -1,4 +1,4 @@
-import { formatCxTimeValue, type CxTimeFieldFormat } from '../cx-time-field';
+import { formatCxTimeValue } from '../cx-time-field';
 
 export interface CxLocalDateParts {
   year: number;
@@ -107,7 +107,6 @@ export function formatCxDateValue(parts: CxLocalDateParts, includeTime = false):
 export function formatCxDateDisplay(
   value: string | undefined | null,
   includeTime = false,
-  timeFormat: CxTimeFieldFormat = '24',
 ): string | undefined {
   const parsedValue = parseCxDateValue(value);
   if (!parsedValue) {
@@ -121,14 +120,13 @@ export function formatCxDateDisplay(
     return dateText;
   }
 
-  return `${dateText} ${formatCxTimeValue(parsedValue.hours, parsedValue.minutes, timeFormat)}`;
+  return `${dateText} ${formatCxTimeValue(parsedValue.hours, parsedValue.minutes)}`;
 }
 
 export function formatCxDateSpanDisplay(
   startValue: string | undefined | null,
   endValue: string | undefined | null,
   includeTime = false,
-  timeFormat: CxTimeFieldFormat = '24',
 ): string | undefined {
   const startDate = parseCxDateValue(startValue);
   const endDate = parseCxDateValue(endValue);
@@ -138,8 +136,8 @@ export function formatCxDateSpanDisplay(
   }
 
   if (includeTime) {
-    const startText = formatCxDateDisplay(startValue, includeTime, timeFormat);
-    const endText = formatCxDateDisplay(endValue, includeTime, timeFormat);
+    const startText = formatCxDateDisplay(startValue, includeTime);
+    const endText = formatCxDateDisplay(endValue, includeTime);
     if (startText && endText) {
       return `${startText} – ${endText}`;
     }

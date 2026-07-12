@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent, type CxIconMood } from '../../primitives/media/cx-icon';
-import { CxTrendTagComponent, type CxTrendTagFavor } from '../../primitives/display/cx-trend-tag';
+import {
+  CxTrendTagComponent,
+  type CxTrendTagFavor,
+  type CxTrendTagUnit,
+} from '../../primitives/display/cx-trend-tag';
 import { CxProgressBarComponent, type CxProgressBarMood } from '../../primitives/feedback/cx-progress-bar';
 
 export type CxKpiMood = CxIconMood;
@@ -23,8 +27,9 @@ export class CxKpiComponent {
   @Input() value = '0';
   @Input() icon: CxIconName | undefined;
   @Input() mood: CxKpiMood = 'default';
-  @Input() trendValue: string | undefined;
+  @Input() trendAmount: number | undefined;
   @Input() trendFavor: CxTrendTagFavor = 'up';
+  @Input() trendUnit: CxTrendTagUnit = 'percent';
   @Input() progress: number | undefined;
   @Input() progressMax = 100;
   @Input() progressLabel = 'Progress';
@@ -35,7 +40,7 @@ export class CxKpiComponent {
   }
 
   protected get hasTrend(): boolean {
-    return Boolean(this.trendValue?.trim());
+    return typeof this.trendAmount === 'number' && Number.isFinite(this.trendAmount);
   }
 
   protected get hasProgress(): boolean {

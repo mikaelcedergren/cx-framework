@@ -3,21 +3,29 @@
     class="cx-step"
     [class.cx-step--selected]="index === visibleIndex()"
     [class.cx-step--completed]="index < visibleIndex()"
+    [class.cx-step--danger]="isDanger(step)"
     [attr.aria-current]="index === visibleIndex() ? 'step' : null"
   >
     <div class="cx-step__number">
-      @if (index < visibleIndex()) {
+      @if (isDanger(step)) {
+        <cx-icon name="warning" [size]="14" />
+      } @else if (index < visibleIndex()) {
         <cx-icon name="check" [size]="14" />
       } @else {
         {{ index + 1 }}
       }
     </div>
-    @if (!compact || index === visibleIndex()) {
-      <div class="cx-step__name">{{ step.name }}</div>
+    @if (showLabel(index)) {
+      <div class="cx-step__name">
+        <span>{{ step.name }}</span>
+        @if (badgeText(step); as badge) {
+          <span class="cx-step__badge">{{ badge }}</span>
+        }
+      </div>
     }
   </div>
 
   @if (index < lastVisibleIndex()) {
-    <div class="cx-step__divider"></div>
+    <div class="cx-step__divider" [class.cx-step__divider--completed]="index < visibleIndex()"></div>
   }
 }

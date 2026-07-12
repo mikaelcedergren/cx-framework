@@ -27,7 +27,6 @@ type CxTimeSegment = 'hour' | 'minute';
 type CxTimeMeridiem = 'AM' | 'PM';
 
 export type CxTimeFieldMode = 'default' | '12h';
-export type CxTimeFieldFormat = '24';
 export type CxTimeFieldSize = CxFieldSize;
 
 export interface CxTimeFieldModel {
@@ -46,7 +45,6 @@ interface CxParsedTimeValue {
 
 export function parseCxTimeValue(
   value: string | undefined | null,
-  preferredFormat: CxTimeFieldFormat = '24',
 ): CxParsedTimeValue | null {
   const normalizedValue = value?.trim() ?? '';
   if (!normalizedValue) {
@@ -96,8 +94,6 @@ export function parseCxTimeValue(
     return null;
   }
 
-  void preferredFormat;
-
   return {
     hours24,
     minutes: rawMinute,
@@ -107,12 +103,9 @@ export function parseCxTimeValue(
 export function formatCxTimeValue(
   hours24: number,
   minutes: number,
-  format: CxTimeFieldFormat = '24',
 ): string {
   const normalizedHours24 = clamp(hours24, 0, 23);
   const normalizedMinutes = clamp(minutes, 0, 59);
-  void format;
-
   return `${padTwoDigits(normalizedHours24)}:${padTwoDigits(normalizedMinutes)}`;
 }
 
@@ -214,11 +207,6 @@ export class CxTimeFieldComponent {
   @Input()
   public set max(value: string | undefined) {
     this.maxState.set(value?.trim() || undefined);
-  }
-
-  @Input()
-  public set format(value: CxTimeFieldFormat | undefined) {
-    void value;
   }
 
   @Input()

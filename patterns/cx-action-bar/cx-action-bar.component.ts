@@ -5,7 +5,6 @@ import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/c
 export interface CxActionBarItem {
   id: string;
   name?: string;
-  label?: string;
   icon?: CxIconName;
   priority?: 'primary';
   mood?: CxButtonMood;
@@ -55,11 +54,11 @@ export class CxActionBarComponent {
   }
 
   protected actionText(item: CxActionBarItem): string {
-    return item.priority === 'primary' ? item.name ?? item.label ?? '' : '';
+    return item.priority === 'primary' ? item.name ?? '' : '';
   }
 
   protected actionAriaLabel(item: CxActionBarItem): string {
-    return item.name ?? item.label ?? item.id;
+    return item.name ?? item.id;
   }
 
   protected actionTransparent(item: CxActionBarItem): boolean {

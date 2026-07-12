@@ -92,7 +92,6 @@
                 class="cx-date-picker__time"
                 label=""
                 ariaLabel="Time"
-                [format]="timeFormat"
                 [value]="selectedTimeValue$()"
                 [disabled]="isLocked$() || !selectedDate$() || effectiveAllDay$()"
                 [loading]="loading"

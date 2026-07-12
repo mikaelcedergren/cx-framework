@@ -14,8 +14,6 @@ import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-a
 import { prefersReducedMotion } from '../reduced-motion';
 
 export type CxBannerMood = 'default' | 'warning' | 'success' | 'danger';
-export type CxBannerAction = CxFeedbackAction;
-
 @Component({
   selector: 'cx-banner',
   imports: [CxButtonComponent, CxIconComponent],
@@ -31,8 +29,8 @@ export class CxBannerComponent implements OnDestroy {
   @Input() mood: CxBannerMood = 'default';
   @Input() heading = '';
   @Input() description = '';
-  @Input() action: CxBannerAction | undefined;
-  @Input() secondaryAction: CxBannerAction | undefined;
+  @Input() action: CxFeedbackAction | undefined;
+  @Input() secondaryAction: CxFeedbackAction | undefined;
 
   @Input()
   public set dismissible(value: boolean) {
@@ -48,8 +46,8 @@ export class CxBannerComponent implements OnDestroy {
     this.setOpen(Boolean(value));
   }
 
-  @Output() readonly actionSelect = new EventEmitter<CxBannerAction>();
-  @Output() readonly secondaryActionSelect = new EventEmitter<CxBannerAction>();
+  @Output() readonly actionSelect = new EventEmitter<CxFeedbackAction>();
+  @Output() readonly secondaryActionSelect = new EventEmitter<CxFeedbackAction>();
   @Output() readonly visibleChange = new EventEmitter<boolean>();
 
   protected readonly isRendered$ = this.renderedState.asReadonly();
@@ -77,7 +75,7 @@ export class CxBannerComponent implements OnDestroy {
     return 'status';
   }
 
-  protected actionButtonMood(action: CxBannerAction): CxButtonMood {
+  protected actionButtonMood(action: CxFeedbackAction): CxButtonMood {
     if (action.mood !== undefined) {
       return action.mood;
     }
@@ -94,11 +92,11 @@ export class CxBannerComponent implements OnDestroy {
     }
   }
 
-  protected get visibleAction(): CxBannerAction | undefined {
+  protected get visibleAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.action);
   }
 
-  protected get visibleSecondaryAction(): CxBannerAction | undefined {
+  protected get visibleSecondaryAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.secondaryAction);
   }
 
@@ -111,11 +109,11 @@ export class CxBannerComponent implements OnDestroy {
     this.openState.set(false);
   }
 
-  protected onActionSelect(action: CxBannerAction): void {
+  protected onActionSelect(action: CxFeedbackAction): void {
     this.actionSelect.emit(action);
   }
 
-  protected onSecondaryActionSelect(action: CxBannerAction): void {
+  protected onSecondaryActionSelect(action: CxFeedbackAction): void {
     this.secondaryActionSelect.emit(action);
   }
 

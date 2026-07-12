@@ -20,6 +20,9 @@ Portable product judgment and UX rules live in `ai/design/`. This document owns 
 6. **Workbenches are literal API inspectors.** They must tell the truth about the public component contract; the complete rules are below.
 7. **Hidden components are inert.** A visually hidden instance must not react to document-level interaction.
 8. **Keyboard focus is distinct from pointer focus.** The primary outline appears for keyboard navigation and leaves when pointer input resumes.
+9. **Consumers migrate forward.** Cortex defines the component, token, and behavior contract;
+   `cx-framework` packages it; consumers adopt it. Never add compatibility shims, legacy aliases,
+   deprecated props, or restored behavior to preserve stale consumer usage.
 
 ## Workbench contract
 

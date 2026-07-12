@@ -7,7 +7,6 @@ export type CxValidationMessageType = 'status' | 'info' | 'success' | 'warning' 
 export type CxValidationMessage = {
   type?: CxValidationMessageType;
   message?: string | null;
-  text?: string | null;
 };
 
 export type CxFieldValidation = CxValidationMessage | string;
@@ -46,7 +45,7 @@ export function normalizeCxValidationMessages(
   }
 
   for (const item of messages ?? []) {
-    const message = (item.message ?? item.text ?? '').trim();
+    const message = (item.message ?? '').trim();
     if (!message) {
       continue;
     }

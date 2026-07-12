@@ -35,10 +35,23 @@
 }
 
 .cx-step__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
   width: max-content;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
+}
+
+.cx-step__badge {
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-pill);
+  background: var(--opacity-low);
+  color: var(--ink);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+  white-space: nowrap;
 }
 
 .cx-step--selected {
@@ -60,6 +73,16 @@
   color: var(--surface);
 }
 
+.cx-step--danger {
+  color: var(--danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.cx-step--danger .cx-step__number {
+  background: var(--danger);
+  color: var(--on-ink);
+}
+
 :host(.cx-steps--disabled) .cx-step {
   opacity: 0.45;
 }
@@ -71,6 +94,10 @@
   background: var(--opacity-mid);
 }
 
+.cx-step__divider--completed {
+  background: var(--success);
+}
+
 :host(.cx-steps--compact) {
   gap: var(--space-sm);
 }
@@ -78,4 +105,12 @@
 :host(.cx-steps--compact) .cx-step__divider {
   width: var(--icon-size-sm);
   min-width: var(--icon-size-sm);
+}
+
+:host(.cx-steps--compact) .cx-step__number {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  min-width: var(--icon-size-sm);
+  min-height: var(--icon-size-sm);
+  font-size: var(--font-size-body-xs);
 }

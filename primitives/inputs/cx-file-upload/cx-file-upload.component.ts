@@ -39,15 +39,15 @@ export type CxFileUpload = {
 
 const WRONG_TYPE_MESSAGE: CxValidationMessage = {
   type: 'error',
-  text: "File type isn't supported. Choose a supported file type.",
+  message: "File type isn't supported. Choose a supported file type.",
 };
 const TOO_LARGE_MESSAGE: CxValidationMessage = {
   type: 'error',
-  text: 'File is too large. Choose a smaller file.',
+  message: 'File is too large. Choose a smaller file.',
 };
 const SINGLE_FILE_MESSAGE: CxValidationMessage = {
   type: 'warning',
-  text: 'Only one file can be added. Keeping the first.',
+  message: 'Only one file can be added. Keeping the first.',
 };
 
 @Component({

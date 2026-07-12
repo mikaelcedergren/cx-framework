@@ -60,7 +60,7 @@
       }
       @if (loading) {
         <span class="cx-dropdown__loading" aria-hidden="true">
-          <cx-spinner size="16" mood="default" />
+          <cx-spinner size="small" mood="default" />
         </span>
       }
       <cx-icon class="cx-dropdown__chevron" name="chevron-down" [size]="size === 'small' ? 12 : 16" />
@@ -130,7 +130,7 @@
           @if (loading) {
             <div class="cx-dropdown__empty cx-dropdown__empty--state" role="status" aria-live="polite">
               <span class="cx-dropdown__empty-spinner" aria-hidden="true">
-                <cx-spinner size="16" mood="default" />
+                <cx-spinner size="small" mood="default" />
               </span>
               <div class="cx-dropdown__empty-heading">{{ loadingText$() }}</div>
               <div class="cx-dropdown__empty-text">{{ loadingDescriptionText$() }}</div>
@@ -170,7 +170,7 @@
             </div>
             @if (loadingMore$()) {
               <div class="cx-dropdown__loading-more" role="status" aria-live="polite">
-                <cx-spinner size="16" mood="default" />
+                <cx-spinner size="small" mood="default" />
                 <span>{{ loadingMoreText$() }}</span>
               </div>
             }

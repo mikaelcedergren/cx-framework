@@ -21,7 +21,6 @@ import { CxIconComponent } from '../../media/cx-icon';
 export interface CxButtonGroupOption {
   id: string;
   label?: string;
-  name?: string;
   icon?: CxIconName;
   disabled?: boolean;
 }
@@ -115,7 +114,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   protected readonly buttons$ = computed<CxButtonGroupButton[]>(() =>
     this.availableValuesState().map(option => ({
       id: option.id,
-      name: option.label ?? option.name ?? option.id,
+      name: option.label ?? option.id,
       icon: option.icon,
       disabled: !!option.disabled,
       selected: option.id === this.valueState(),

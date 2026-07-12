@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, comput
 export type CxSsoProvider = 'google' | 'apple' | 'microsoft' | 'sso';
 export type CxSsoAction = 'sign-in' | 'sign-up' | 'continue';
 export type CxSsoSize = 'small' | 'default' | 'large';
-type CxSsoInputSize = CxSsoSize | 'sm' | 'md' | 'lg';
 
 const PROVIDER_NAME: Record<CxSsoProvider, string> = {
   google: 'Google',
@@ -33,18 +32,15 @@ export class CxSsoButtonComponent {
   @Input() disabled = false;
 
   @Input()
-  public set size(value: CxSsoInputSize | undefined) {
+  public set size(value: CxSsoSize | undefined) {
     switch (value) {
       case 'small':
-      case 'sm':
         this.sizeState.set('small');
         return;
       case 'large':
-      case 'lg':
         this.sizeState.set('large');
         return;
       case 'default':
-      case 'md':
       default:
         this.sizeState.set('default');
         return;

@@ -8,8 +8,6 @@ import { prefersReducedMotion } from '../reduced-motion';
 
 export type CxToastMood = 'default' | 'info' | 'success' | 'warning' | 'danger';
 
-export type CxToastAction = CxFeedbackAction;
-
 @Component({
   selector: 'cx-toast',
   imports: [CxButtonComponent, CxIconComponent, CxIconButtonComponent],
@@ -27,8 +25,8 @@ export class CxToastComponent implements OnDestroy {
   @Input() heading = 'Notification';
   @Input() description: string | undefined;
   @Input() mood: CxToastMood = 'default';
-  @Input() action: CxToastAction | undefined;
-  @Input() secondaryAction: CxToastAction | undefined;
+  @Input() action: CxFeedbackAction | undefined;
+  @Input() secondaryAction: CxFeedbackAction | undefined;
 
   @Input()
   public set open(value: boolean) {
@@ -46,8 +44,8 @@ export class CxToastComponent implements OnDestroy {
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
-  @Output('action') readonly actionEmitter = new EventEmitter<CxToastAction>();
-  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxToastAction>();
+  @Output('action') readonly actionEmitter = new EventEmitter<CxFeedbackAction>();
+  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxFeedbackAction>();
   @Output() readonly dismissed = new EventEmitter<void>();
 
   protected readonly isRendered$ = this.renderedState.asReadonly();
@@ -73,11 +71,11 @@ export class CxToastComponent implements OnDestroy {
     return this.hasHeading || this.isMultiline;
   }
 
-  protected get visibleAction(): CxToastAction | undefined {
+  protected get visibleAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.action);
   }
 
-  protected get visibleSecondaryAction(): CxToastAction | undefined {
+  protected get visibleSecondaryAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.secondaryAction);
   }
 
@@ -123,11 +121,11 @@ export class CxToastComponent implements OnDestroy {
     this.requestClose();
   }
 
-  protected onActionPressed(action: CxToastAction): void {
+  protected onActionPressed(action: CxFeedbackAction): void {
     this.actionEmitter.emit(action);
   }
 
-  protected onSecondaryActionPressed(action: CxToastAction): void {
+  protected onSecondaryActionPressed(action: CxFeedbackAction): void {
     this.secondaryActionEmitter.emit(action);
   }
 

@@ -15,7 +15,12 @@
     <div class="cx-kpi__value">{{ value }}</div>
 
     @if (hasTrend) {
-      <cx-trend-tag class="cx-kpi__trend" [value]="trendValue" [favor]="trendFavor" />
+      <cx-trend-tag
+        class="cx-kpi__trend"
+        [amount]="trendAmount!"
+        [favor]="trendFavor"
+        [unit]="trendUnit"
+      />
     }
   </div>
 

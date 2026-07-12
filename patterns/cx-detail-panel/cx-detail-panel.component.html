@@ -32,7 +32,6 @@
           <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
         }
         <ng-content select="[detail-panel-heading]" />
-        <ng-content select=".cx-detail-panel-slot-heading" />
         @if (heading.trim()) {
           <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
         }
@@ -40,7 +39,6 @@
 
       <div class="cx-detail-panel__header-actions">
         <ng-content select="[detail-panel-header-actions]" />
-        <ng-content select=".cx-detail-panel-slot-header-actions" />
 
         @if (menuItems.length > 0) {
           <cx-menu [items]="menuItems" (itemSelect)="onMenuSelect($event)">
@@ -65,7 +63,6 @@
     <footer class="cx-detail-panel__footer">
       <div class="cx-detail-panel__footer-slot">
         <ng-content select="[detail-panel-footer]" />
-        <ng-content select=".cx-detail-panel-slot-footer" />
       </div>
 
       @if (showFooterClose) {

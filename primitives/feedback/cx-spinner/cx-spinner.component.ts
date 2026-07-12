@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
 
 export type CxSpinnerSize = 'small' | 'default' | 'large' | 'xlarge' | 'auto';
-type CxSpinnerInputSize = CxSpinnerSize | '16' | '24' | '32' | '64';
 export type CxSpinnerMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 
 interface CxSpinnerSegment {
@@ -71,25 +70,21 @@ export class CxSpinnerComponent {
   }
 
   @Input()
-  public set size(value: CxSpinnerInputSize | undefined) {
+  public set size(value: CxSpinnerSize | undefined) {
     switch (value) {
       case 'small':
-      case '16':
         this.size$.set('small');
         return;
       case 'large':
-      case '32':
         this.size$.set('large');
         return;
       case 'xlarge':
-      case '64':
         this.size$.set('xlarge');
         return;
       case 'auto':
         this.size$.set('auto');
         return;
       case 'default':
-      case '24':
       default:
         this.size$.set('default');
         return;

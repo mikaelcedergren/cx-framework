@@ -40,12 +40,6 @@ export class CxMarkdownComponent {
     this.markdownState.set(value ?? '');
   }
 
-  @Input()
-  public set text(value: string | undefined) {
-    this.markdownState.set(value ?? '');
-  }
-
-  @Input() assetBasePath: string | undefined;
   @Input() variant: CxMarkdownVariant = 'default';
 
   protected readonly renderedMarkdown$ = computed(() => {

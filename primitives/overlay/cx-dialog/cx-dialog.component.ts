@@ -66,11 +66,6 @@ export class CxDialogComponent implements OnDestroy {
   @Input() menuAriaLabel: string | undefined;
 
   @Input()
-  public set loading(value: boolean) {
-    this.primaryLoading = value;
-  }
-
-  @Input()
   public set open(value: boolean) {
     this.syncOpen(Boolean(value));
   }

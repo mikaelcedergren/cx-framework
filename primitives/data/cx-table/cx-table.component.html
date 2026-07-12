@@ -194,11 +194,15 @@
                             [severity]="cell.severity"
                             [score]="cell.score"
                             [kev]="cell.kev ?? false"
-                            [grade]="cell.grade ?? false"
+                            [display]="cell.display ?? 'severity'"
                           />
                         }
                         @case ('trend-tag') {
-                          <cx-trend-tag [trend]="cell.trend" [value]="cell.value" />
+                          <cx-trend-tag
+                            [amount]="cell.amount"
+                            [favor]="cell.favor ?? 'up'"
+                            [unit]="cell.unit ?? 'percent'"
+                          />
                         }
                         @case ('tag') {
                           <cx-tag

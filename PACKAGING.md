@@ -10,6 +10,11 @@ Cortex is the source. `cx-framework` is the package. Every other project consume
 
 When a consuming project exposes a reusable framework gap, fix it in Cortex under `framework/`, package it here, have the owner push the package repo to GitHub `main`, then update the consuming app. A good package export should make the current app better and leave all future apps stronger.
 
+Cortex defines the contract and `cx-framework` delivers it. If that contract changes, every
+consumer must migrate to the new selector, prop, token, default, or behavior. Never add a
+compatibility shim, legacy alias, deprecated prop, fallback, or restored behavior to Cortex merely
+because a consumer still uses the old contract.
+
 ## Source of truth
 
 Make framework changes in the source app first. New components, patterns, tokens, icons, AI docs, AI skills, support files, and scripts should live under `framework/`.

@@ -20,7 +20,6 @@ import { CxCalendarComponent, type CxCalendarRange } from '../cx-calendar';
 import { CxCheckboxComponent } from '../cx-checkbox';
 import {
   CxTimeFieldComponent,
-  type CxTimeFieldFormat,
   formatCxTimeValue,
   parseCxTimeValue,
 } from '../cx-time-field';
@@ -98,8 +97,6 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   protected readonly labelId = `cx-date-span-picker-label-${CxDateSpanPickerComponent.nextId}`;
   protected readonly messagesId = `cx-date-span-picker-messages-${CxDateSpanPickerComponent.nextId}`;
   protected readonly surfaceId = `cx-date-span-picker-surface-${CxDateSpanPickerComponent.nextId++}`;
-  protected readonly timeFormat: CxTimeFieldFormat = '24';
-
   @ViewChild('fieldButton', { read: ElementRef })
   private readonly fieldButtonRef?: ElementRef<HTMLElement>;
   @ViewChild('popover')
@@ -173,11 +170,11 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   protected readonly showPlaceholder$ = computed(() => !this.startDate$() && !this.endDate$());
   protected readonly startTimeValue$ = computed(() => {
     const startDate = this.startDate$();
-    return startDate ? formatCxTimeValue(startDate.hours, startDate.minutes, this.timeFormat) : '00:00';
+    return startDate ? formatCxTimeValue(startDate.hours, startDate.minutes) : '00:00';
   });
   protected readonly endTimeValue$ = computed(() => {
     const endDate = this.endDate$();
-    return endDate ? formatCxTimeValue(endDate.hours, endDate.minutes, this.timeFormat) : '23:59';
+    return endDate ? formatCxTimeValue(endDate.hours, endDate.minutes) : '23:59';
   });
   protected readonly effectiveAllDayStart$ = computed(
     () => this.timeEnabled && this.allDayEnabled && this.allDayStart,
@@ -200,8 +197,8 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   protected readonly isLocked$ = () => this.disabled || this.loading;
   protected readonly isInteractive$ = () => !this.disabled && !this.loading;
   protected readonly summaryText$ = computed(() => {
-    const startText = formatCxDateDisplay(this.startValueState(), this.timeEnabled, this.timeFormat);
-    const endText = formatCxDateDisplay(this.endValueState(), this.timeEnabled, this.timeFormat);
+    const startText = formatCxDateDisplay(this.startValueState(), this.timeEnabled);
+    const endText = formatCxDateDisplay(this.endValueState(), this.timeEnabled);
     if (startText && endText) {
       return `From ${startText} to ${endText}`;
     }
@@ -348,7 +345,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     if (!startDate) {
       return;
     }
-    const parsedTime = parseCxTimeValue(value, this.timeFormat);
+    const parsedTime = parseCxTimeValue(value);
     if (!parsedTime) {
       return;
     }
@@ -370,7 +367,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     if (!endDate) {
       return;
     }
-    const parsedTime = parseCxTimeValue(value, this.timeFormat);
+    const parsedTime = parseCxTimeValue(value);
     if (!parsedTime) {
       return;
     }

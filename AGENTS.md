@@ -15,5 +15,5 @@ If a consuming project needs a framework upgrade, make the source fix in Cortex,
 Rules that still apply:
 
 - Do not run write-side git here as part of agent work. After Cortex packages a new version, the owner reviews and pushes it to GitHub `main`; only then do consuming apps reinstall.
-- Keep framework changes additive so existing consumers do not shift visually.
+- Cortex and this current package have authority over consumers. When the contract changes, migrate every consumer forward; never add compatibility shims, legacy aliases, deprecated props, or restored behavior for stale downstream code.
 - `README.md`, `DESIGN-SYSTEM.md`, and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, …) are copied from Cortex source.

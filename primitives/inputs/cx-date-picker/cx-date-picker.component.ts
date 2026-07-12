@@ -20,7 +20,6 @@ import { CxCalendarComponent } from '../cx-calendar';
 import { CxCheckboxComponent } from '../cx-checkbox';
 import {
   CxTimeFieldComponent,
-  type CxTimeFieldFormat,
   formatCxTimeValue,
   parseCxTimeValue,
 } from '../cx-time-field';
@@ -70,8 +69,6 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   protected readonly labelId = `cx-date-picker-label-${CxDatePickerComponent.nextId}`;
   protected readonly messagesId = `cx-date-picker-messages-${CxDatePickerComponent.nextId}`;
   protected readonly surfaceId = `cx-date-picker-surface-${CxDatePickerComponent.nextId++}`;
-  protected readonly timeFormat: CxTimeFieldFormat = '24';
-
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLElement>;
 
@@ -117,7 +114,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   protected readonly effectiveAllDay$ = computed(() => this.timeEnabled && this.allDayEnabled && this.allDay);
   protected readonly displayText$ = computed(
     () =>
-      formatCxDateDisplay(this.valueState(), this.timeEnabled && !this.effectiveAllDay$(), this.timeFormat) ??
+      formatCxDateDisplay(this.valueState(), this.timeEnabled && !this.effectiveAllDay$()) ??
       (this.placeholder.trim() || 'Select date'),
   );
   protected readonly showPlaceholder$ = computed(() => !this.selectedDate$());
@@ -126,7 +123,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     if (!selectedDate) {
       return '00:00';
     }
-    return formatCxTimeValue(selectedDate.hours, selectedDate.minutes, this.timeFormat);
+    return formatCxTimeValue(selectedDate.hours, selectedDate.minutes);
   });
   protected readonly hasClear$ = computed(
     () => this.clearable && !!this.selectedDate$() && !this.disabled && !this.loading,
@@ -277,7 +274,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     if (!selectedDate) {
       return;
     }
-    const parsedTime = parseCxTimeValue(value, this.timeFormat);
+    const parsedTime = parseCxTimeValue(value);
     if (!parsedTime) {
       return;
     }

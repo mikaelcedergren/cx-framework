@@ -176,7 +176,7 @@
     </div>
 
     @if (loading) {
-      <cx-spinner class="cx-query-field__spinner" size="16" mood="default" />
+      <cx-spinner class="cx-query-field__spinner" size="small" mood="default" />
     }
 
     @if (hasConditions$() && clearable && !isLocked()) {
@@ -231,7 +231,7 @@
 
       @if (currentSuggestionsLoading()) {
         <div class="cx-query-field__state" role="status" aria-live="polite">
-          <cx-spinner size="16" mood="default" />
+          <cx-spinner size="small" mood="default" />
           <div class="cx-query-field__state-copy">
             <div class="cx-query-field__state-heading">Loading values</div>
             <div class="cx-query-field__state-text">Available values will appear here.</div>

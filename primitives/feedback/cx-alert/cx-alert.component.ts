@@ -5,8 +5,6 @@ import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-a
 
 export type CxAlertMood = 'default' | 'info' | 'warning' | 'success' | 'danger';
 export type CxAlertIcon = 'auto' | 'none' | CxIconName;
-export type CxAlertAction = CxFeedbackAction;
-
 @Component({
   selector: 'cx-alert',
   imports: [CxIconComponent],
@@ -18,13 +16,13 @@ export class CxAlertComponent {
   @Input() mood: CxAlertMood = 'default';
   @Input() text = '';
   @Input() icon: CxAlertIcon = 'auto';
-  @Input() action: CxAlertAction | undefined;
-  @Input() secondaryAction: CxAlertAction | undefined;
+  @Input() action: CxFeedbackAction | undefined;
+  @Input() secondaryAction: CxFeedbackAction | undefined;
   @Input() dismissible = false;
 
   @Output() readonly dismiss = new EventEmitter<void>();
-  @Output() readonly actionSelect = new EventEmitter<CxAlertAction>();
-  @Output() readonly secondaryActionSelect = new EventEmitter<CxAlertAction>();
+  @Output() readonly actionSelect = new EventEmitter<CxFeedbackAction>();
+  @Output() readonly secondaryActionSelect = new EventEmitter<CxFeedbackAction>();
 
   @HostBinding('class')
   protected get hostClass(): string {
@@ -67,11 +65,11 @@ export class CxAlertComponent {
     }
   }
 
-  protected get visibleAction(): CxAlertAction | undefined {
+  protected get visibleAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.action);
   }
 
-  protected get visibleSecondaryAction(): CxAlertAction | undefined {
+  protected get visibleSecondaryAction(): CxFeedbackAction | undefined {
     return visibleCxFeedbackAction(this.secondaryAction);
   }
 
@@ -83,11 +81,11 @@ export class CxAlertComponent {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
   }
 
-  protected onActionSelect(action: CxAlertAction): void {
+  protected onActionSelect(action: CxFeedbackAction): void {
     this.actionSelect.emit(action);
   }
 
-  protected onSecondaryActionSelect(action: CxAlertAction): void {
+  protected onSecondaryActionSelect(action: CxFeedbackAction): void {
     this.secondaryActionSelect.emit(action);
   }
 

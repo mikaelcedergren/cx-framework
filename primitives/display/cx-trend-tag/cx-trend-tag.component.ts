@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CxIconComponent } from '../../media/cx-icon';
 
-export type CxTrendTagTrend = 'up' | 'flat' | 'down';
 export type CxTrendTagFavor = 'up' | 'down';
 export type CxTrendTagUnit = 'percent' | 'none';
+type CxTrendTagDirection = 'up' | 'flat' | 'down';
 
 @Component({
   selector: 'cx-trend-tag',
@@ -16,7 +16,6 @@ export class CxTrendTagComponent {
   private amountValue = 3;
   private favorValue: CxTrendTagFavor = 'up';
   private unitValue: CxTrendTagUnit = 'percent';
-  private valueOverride: string | undefined;
 
   @Input()
   public set favor(value: CxTrendTagFavor | undefined) {
@@ -31,26 +30,6 @@ export class CxTrendTagComponent {
   @Input()
   public set amount(value: number) {
     this.amountValue = Number.isFinite(value) ? value : 0;
-    this.valueOverride = undefined;
-  }
-
-  @Input()
-  public set trend(value: CxTrendTagTrend) {
-    if (value === 'flat') {
-      this.amountValue = 0;
-      return;
-    }
-    this.favor = value;
-  }
-
-  @Input()
-  public set value(value: string | undefined) {
-    this.valueOverride = value;
-    const parsed = Number((value ?? '').replace(/[+,%\s]/g, ''));
-    if (Number.isFinite(parsed)) {
-      this.amountValue = parsed;
-    }
-    this.unit = value?.includes('%') ? 'percent' : 'none';
   }
 
   protected iconName() {
@@ -64,7 +43,7 @@ export class CxTrendTagComponent {
     return 'trend-up' as const;
   }
 
-  protected trendClass(): CxTrendTagTrend {
+  protected trendClass(): CxTrendTagDirection {
     const favoredAmount = this.favorValue === 'up' ? this.roundedAmount() : -this.roundedAmount();
     if (favoredAmount > 0) return 'up';
     if (favoredAmount < 0) return 'down';
@@ -72,10 +51,6 @@ export class CxTrendTagComponent {
   }
 
   protected displayValue(): string {
-    const override = this.valueOverride?.trim();
-    if (override) {
-      return override;
-    }
     const value = this.formatAmount(this.roundedAmount());
     return this.unitValue === 'percent' ? `${value}%` : value;
   }

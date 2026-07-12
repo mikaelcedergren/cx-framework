@@ -30,7 +30,6 @@ export type CxMenuItem = {
   prependIcon?: CxIconName;
   appendIcon?: CxIconName;
   description?: string;
-  hint?: string;
   disabled?: boolean;
   selected?: boolean;
   trackSelection?: boolean;
@@ -42,7 +41,6 @@ export type CxMenuItem = {
   dividerBefore?: boolean;
   dividerAfter?: boolean;
   items?: readonly CxMenuItem[];
-  children?: readonly CxMenuItem[];
 };
 
 export type CxMenuGroup = {
@@ -137,7 +135,7 @@ function resolveMenuItemRole(
 }
 
 function childItemsFor(item: CxMenuItem): readonly CxMenuItem[] {
-  return item.items ?? item.children ?? [];
+  return item.items ?? [];
 }
 
 function resolveMenuGroups(groups: readonly CxMenuGroup[]): CxResolvedMenuGroup[] {
@@ -270,11 +268,6 @@ export class CxMenuComponent implements AfterViewInit, OnDestroy {
   @Input()
   public set items(value: readonly CxMenuItem[] | undefined) {
     this.itemsState.set([...(value ?? [])]);
-  }
-
-  @Input()
-  public set menu(value: readonly CxMenuGroup[] | undefined) {
-    this.groupsState.set([...(value ?? [])]);
   }
 
   @Input()

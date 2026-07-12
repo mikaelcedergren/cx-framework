@@ -37,8 +37,7 @@ import { CxExpansionPanelComponent } from '../../primitives/display/cx-expansion
 import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
 import { measureCxFloatingSurface } from '../../primitives/overlay/floating-surface';
 
-export type CxFilterBarMode = 'filters' | 'query' | 'jql';
-type CxFilterBarResolvedMode = 'filters' | 'query';
+export type CxFilterBarMode = 'filters' | 'query';
 export type CxFilterBarDisplayMode = 'compact' | 'comfortable';
 export type CxFilterBarSortDirection = 'asc' | 'desc';
 
@@ -82,7 +81,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
 })
 export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly modeState = signal<CxFilterBarResolvedMode>('filters');
+  private readonly modeState = signal<CxFilterBarMode>('filters');
   private readonly quickFiltersState = signal<CxButtonGroupOption[]>([]);
   private readonly selectedQuickFilterIdState = signal<string | undefined>(undefined);
   private readonly filterOptionsState = signal<CxDropdownOption[]>([]);
@@ -138,7 +137,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   public set mode(value: CxFilterBarMode | undefined) {
-    this.modeState.set(value === 'query' || value === 'jql' ? 'query' : 'filters');
+    this.modeState.set(value === 'query' ? 'query' : 'filters');
   }
 
   @Input()
@@ -297,7 +296,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly groupByChipOptions$ = computed(() =>
     this.groupByOptionsState().map(option => ({
       id: option.id,
-      label: option.label ?? option.name ?? option.id,
+      label: option.label ?? option.id,
       disabled: option.disabled,
     })),
   );
@@ -626,7 +625,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private applyMode(mode: CxFilterBarResolvedMode): void {
+  private applyMode(mode: CxFilterBarMode): void {
     this.modeState.set(mode);
     this.modeChange.emit(mode);
     this.filterPopoverOpenState.set(false);

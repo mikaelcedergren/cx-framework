@@ -4,7 +4,13 @@ import { CxIconComponent } from '../../media/cx-icon';
 export interface CxStep {
   name: string;
   visible?: boolean;
+  badge?: string | number;
+  mood?: CxStepMood;
 }
+
+export type CxStepMood = 'default' | 'danger';
+export type CxStepsDensity = 'default' | 'compact';
+export type CxStepsLabelMode = 'all' | 'current' | 'none';
 
 @Component({
   selector: 'cx-steps',
@@ -12,7 +18,7 @@ export interface CxStep {
   templateUrl: './cx-steps.component.html',
   styleUrl: './cx-steps.component.scss',
   host: {
-    '[class.cx-steps--compact]': 'compact',
+    '[class.cx-steps--compact]': 'density === "compact"',
     '[class.cx-steps--disabled]': 'disabled',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,7 +26,8 @@ export interface CxStep {
 export class CxStepsComponent {
   @Input() steps: readonly CxStep[] = [];
   @Input() index = 0;
-  @Input() compact = false;
+  @Input() density: CxStepsDensity = 'default';
+  @Input() labelMode: CxStepsLabelMode = 'all';
   @Input() disabled = false;
 
   protected visibleSteps(): readonly CxStep[] {
@@ -38,5 +45,20 @@ export class CxStepsComponent {
 
   protected lastVisibleIndex(): number {
     return this.visibleSteps().length - 1;
+  }
+
+  protected showLabel(index: number): boolean {
+    return this.labelMode === 'all' || (this.labelMode === 'current' && index === this.visibleIndex());
+  }
+
+  protected isDanger(step: CxStep): boolean {
+    return step.mood === 'danger';
+  }
+
+  protected badgeText(step: CxStep): string {
+    if (typeof step.badge === 'number') {
+      return Number.isFinite(step.badge) ? String(step.badge) : '';
+    }
+    return step.badge?.trim() ?? '';
   }
 }

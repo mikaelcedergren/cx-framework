@@ -45,17 +45,6 @@ export class CxSeverityTagComponent {
     this.scoreValue = Number.isFinite(parsed) ? parsed : undefined;
   }
 
-  @Input()
-  public set grade(value: boolean) {
-    if (value) {
-      this.display = 'grade';
-      return;
-    }
-    if (this.display === 'grade') {
-      this.display = 'severity';
-    }
-  }
-
   protected label(): string {
     if (this.display === 'recommended' || this.severityOverride === 'recommended') {
       return 'Recommended';

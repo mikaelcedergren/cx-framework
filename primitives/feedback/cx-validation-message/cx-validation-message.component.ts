@@ -10,8 +10,6 @@ import {
 } from '../../inputs/shared/field.types';
 
 export type CxValidationMessageDisplay = 'inline' | 'global';
-export type CxValidationMessageInput = CxValidationMessage;
-
 @Component({
   selector: 'cx-validation-message',
   host: {
@@ -27,8 +25,8 @@ export type CxValidationMessageInput = CxValidationMessage;
 export class CxValidationMessageComponent {
   private readonly displayState = signal<CxValidationMessageDisplay>('inline');
   private readonly showAllState = signal(false);
-  private readonly messagesState = signal<ReadonlyArray<CxValidationMessageInput>>([
-    { type: 'error', text: 'This field is required.' },
+  private readonly messagesState = signal<ReadonlyArray<CxValidationMessage>>([
+    { type: 'error', message: 'This field is required.' },
   ]);
 
   @Input()
@@ -42,7 +40,7 @@ export class CxValidationMessageComponent {
   }
 
   @Input()
-  public set messages(value: ReadonlyArray<CxValidationMessageInput> | null | undefined) {
+  public set messages(value: ReadonlyArray<CxValidationMessage> | null | undefined) {
     this.messagesState.set(value ?? []);
   }
 

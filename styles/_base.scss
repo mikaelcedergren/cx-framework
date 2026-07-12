@@ -1,7 +1,7 @@
 // Base layer — the minimal global reset every cx-framework app shares: box
 // model, page canvas, body type, links, focus ring, and reduced-motion. It is
 // token-driven, so it follows the active theme. Opt in once per app with
-// `@use '@mikaelcedergren/cx-styles/base'` instead of hand-rolling
+// `@use '@mikaelcedergren/cx-framework/styles/base'` instead of hand-rolling
 // resets. Font *files* are loaded by the app; this only sets the family token.
 
 *,
