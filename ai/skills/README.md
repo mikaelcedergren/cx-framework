@@ -10,6 +10,7 @@ The skills define how an agent should behave. The design documents define the du
 - `copywriter` writes or revises product copy while preserving product truth and settled terminology.
 - `custodian` reviews existing work as an evidence-led quality gate and separates defects from unverified areas.
 - `developer` implements an accepted scope without broadening it and verifies claims proportionally to risk.
+- `cleaner` autonomously inspects, simplifies, cleans, and verifies a repository or multi-repository workspace.
 
 Route by the user's current verb and the artifact's stage:
 
@@ -17,6 +18,7 @@ Route by the user's current verb and the artifact's stage:
 - requested replacement wording → `copywriter`
 - review, audit, approval, or readiness verdict → `custodian`
 - explicit implementation of a settled outcome → `developer`
+- repository or workspace cleanup, optimization, maintenance, or structural sanity check → `cleaner`
 
 Do not run the entire lifecycle automatically for a task that starts at a later settled stage. Switch roles only when unresolved product direction, wording, evidence, or implementation genuinely requires it. Implementation still starts only after explicit action language.
 

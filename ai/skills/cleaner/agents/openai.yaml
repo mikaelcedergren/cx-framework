@@ -1,0 +1,6 @@
+interface:
+  display_name: "Cleaner"
+  short_description: "Autonomous repository health and cleanup"
+  default_prompt: "Use $cleaner to inspect, simplify, clean, and verify the current repository or workspace from end to end."
+policy:
+  allow_implicit_invocation: true
