@@ -12,6 +12,10 @@ RULE-ID: banners.no-obstruction SCOPE: component COMPONENT: banners TYPE: must T
 
 RULE-ID: banners.dismissal SCOPE: component COMPONENT: banners TYPE: should TOPIC: interaction RULE: Let users dismiss transient banners and acknowledge persistent ones. DESCRIPTION: A genuinely unresolved critical state may remain visible, but it still needs a clear action or acknowledgement path.
 
+## Utility bars
+
+RULE-ID: utility-bars.internal-only SCOPE: component COMPONENT: utility-bars TYPE: must TOPIC: components RULE: Use utility bars only for explicit internal prototype, administration, or operator tooling. DESCRIPTION: They must never appear in public-facing interfaces or be visible to ordinary users.
+
 ## Buttons
 
 RULE-ID: buttons.primary SCOPE: component COMPONENT: buttons TYPE: should TOPIC: interaction RULE: Reserve primary treatment for the main forward action in one action region. DESCRIPTION: Separate regions may have separate local hierarchies; peer actions in one region must not compete as primary.

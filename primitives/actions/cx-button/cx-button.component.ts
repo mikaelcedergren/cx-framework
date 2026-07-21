@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
@@ -12,7 +13,7 @@ export type CxButtonType = 'button' | 'submit' | 'reset';
 
 @Component({
   selector: 'cx-button',
-  imports: [CxSpinnerComponent, CxIconComponent, CxShortcutKeyComponent],
+  imports: [NgTemplateOutlet, CxSpinnerComponent, CxIconComponent, CxShortcutKeyComponent],
   templateUrl: './cx-button.component.html',
   styleUrl: './cx-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,7 @@ export class CxButtonComponent implements OnDestroy {
   @Input() icon: CxIconName | undefined;
   @Input() appendIcon: CxIconName | undefined;
   @Input() shortcutParts: readonly string[] | undefined;
+  @Input() href: string | undefined;
   @Input() type: CxButtonType = 'button';
   @Input() size: CxButtonSize = 'default';
   @Input() ariaLabel: string | undefined;
@@ -66,6 +68,14 @@ export class CxButtonComponent implements OnDestroy {
 
   protected get nativeType(): CxButtonType {
     return this.type === 'submit' || this.type === 'reset' ? this.type : 'button';
+  }
+
+  protected get resolvedHref(): string | undefined {
+    return this.href?.trim() || undefined;
+  }
+
+  protected get isUnavailable(): boolean {
+    return this.disabled || this.loading$();
   }
 
   protected get isDefault(): boolean {
@@ -128,8 +138,10 @@ export class CxButtonComponent implements OnDestroy {
     this.delayedLoading.destroy();
   }
 
-  protected onClick(): void {
-    if (this.disabled || this.loading$()) {
+  protected onActivate(event?: MouseEvent): void {
+    if (this.isUnavailable) {
+      event?.preventDefault();
+      event?.stopPropagation();
       return;
     }
     this.pressed.emit();

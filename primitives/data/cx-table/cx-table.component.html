@@ -205,7 +205,7 @@
                     <div class="cx-table__measure-target">
                       @switch (cell.kind) {
                         @case ('status-tag') {
-                          <cx-status-tag [mood]="cell.mood" [text]="cell.text" />
+                          <cx-status-tag [mood]="cell.mood" [text]="cell.text" [icon]="cell.icon" />
                         }
                         @case ('severity-tag') {
                           <cx-severity-tag

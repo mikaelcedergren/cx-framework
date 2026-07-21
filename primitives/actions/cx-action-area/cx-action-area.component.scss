@@ -31,9 +31,10 @@
   justify-content: flex-end;
   gap: var(--space-xs);
   padding: var(--space-xs);
-  border: var(--line);
+  border: var(--line-discreet);
   border-radius: var(--radius-md);
   background: var(--surface);
+  box-shadow: var(--shadow-low);
   opacity: 0;
   pointer-events: none;
   transform: translateY(calc(var(--space-xs) * -1));

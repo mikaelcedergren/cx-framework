@@ -1,22 +1,44 @@
-<div
-  class="cx-utility-bar"
-  [class.cx-utility-bar--end]="alignment$() === 'end'"
-  [class.cx-utility-bar--space-between]="alignment$() === 'space-between'"
-  [class.cx-utility-bar--wrap]="wrap"
-  [attr.aria-label]="label$() ?? null"
-  role="toolbar"
->
-  @for (item of items$(); track item.id) {
-    <cx-button
-      [text]="item.text ?? ''"
-      [ariaLabel]="item.ariaLabel"
-      [icon]="item.icon"
-      [appendIcon]="item.appendIcon"
-      [transparent]="item.transparent ?? false"
-      [mood]="item.mood ?? 'default'"
-      [size]="size"
-      [disabled]="disabled || item.disabled === true"
-      (pressed)="onItemPressed(item)"
-    />
-  }
-</div>
+@if (visible) {
+  <section
+    class="cx-utility-bar"
+    [attr.aria-labelledby]="resolvedHeading() ? headingId : null"
+    [attr.aria-label]="resolvedHeading() ? null : 'Internal utility bar'"
+  >
+    <div class="cx-utility-bar__main">
+      @if (resolvedHeading(); as title) {
+        <div class="cx-utility-bar__heading" [id]="headingId">{{ title }}</div>
+      }
+
+      <div class="cx-utility-bar__content">
+        <ng-content />
+      </div>
+    </div>
+
+    <div class="cx-utility-bar__actions">
+      <ng-content select="[actions]" />
+    </div>
+
+    @if (themeMode; as mode) {
+      <div class="cx-utility-bar__theme">
+        <cx-menu
+          [presentation]="themeMenuPresentation"
+          [items]="themeMenuItems"
+          [currentId]="mode"
+          heading="Theme"
+          ariaLabel="Theme"
+          align="end"
+          [width]="200"
+          (currentIdChange)="onThemeModeChange($event)"
+        >
+          <cx-icon-button
+            cxMenuTrigger
+            [icon]="themeIcon(mode)"
+            [ariaLabel]="themeTriggerLabel(mode)"
+            variant="transparent"
+            size="small"
+          />
+        </cx-menu>
+      </div>
+    }
+  </section>
+}

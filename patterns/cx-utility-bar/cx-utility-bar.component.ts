@@ -1,66 +1,82 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { type CxIconName } from '../../icons/manifest';
 import {
-  CxButtonComponent,
-  type CxButtonMood,
-  type CxButtonSize,
-} from '../../primitives/actions/cx-button';
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  booleanAttribute,
+} from '@angular/core';
+import { type CxIconName } from '../../icons/manifest';
+import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
+import {
+  CxMenuComponent,
+  CxMenuTriggerDirective,
+  type CxMenuItem,
+  type CxMenuPresentation,
+} from '../../primitives/overlay/cx-menu';
 
-export type CxUtilityBarAlignment = 'start' | 'end' | 'space-between';
+export type CxUtilityBarThemeMode = 'light' | 'dark' | 'night' | 'high-contrast';
 
-export interface CxUtilityBarItem {
-  readonly id: string;
-  readonly text?: string;
-  readonly ariaLabel?: string;
-  readonly icon?: CxIconName;
-  readonly appendIcon?: CxIconName;
-  readonly mood?: CxButtonMood;
-  readonly disabled?: boolean;
-  readonly transparent?: boolean;
+const THEME_MENU_ITEMS: readonly CxMenuItem[] = [
+  { id: 'light', label: 'Light', prependIcon: 'light-mode', type: 'choice' },
+  { id: 'dark', label: 'Dark', prependIcon: 'dark-mode', type: 'choice' },
+  { id: 'night', label: 'Night', prependIcon: 'night-mode', type: 'choice' },
+  { id: 'high-contrast', label: 'High contrast', prependIcon: 'high-contrast-mode', type: 'choice' },
+];
+
+const THEME_LABELS: Record<CxUtilityBarThemeMode, string> = {
+  light: 'Light',
+  dark: 'Dark',
+  night: 'Night',
+  'high-contrast': 'High contrast',
+};
+
+const THEME_ICONS: Record<CxUtilityBarThemeMode, CxIconName> = {
+  light: 'light-mode',
+  dark: 'dark-mode',
+  night: 'night-mode',
+  'high-contrast': 'high-contrast-mode',
+};
+
+function isThemeMode(value: string): value is CxUtilityBarThemeMode {
+  return value === 'light' || value === 'dark' || value === 'night' || value === 'high-contrast';
 }
 
 @Component({
   selector: 'cx-utility-bar',
-  imports: [CxButtonComponent],
+  imports: [CxIconButtonComponent, CxMenuComponent, CxMenuTriggerDirective],
   templateUrl: './cx-utility-bar.component.html',
   styleUrl: './cx-utility-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxUtilityBarComponent {
-  private readonly itemsState = signal<readonly CxUtilityBarItem[]>([]);
-  private readonly labelState = signal<string | undefined>(undefined);
-  private readonly alignmentState = signal<CxUtilityBarAlignment>('start');
+  private static instanceCounter = 0;
 
-  @Input()
-  public set items(value: readonly CxUtilityBarItem[] | null | undefined) {
-    this.itemsState.set(value ?? []);
+  protected readonly headingId = `cx-utility-bar-heading-${++CxUtilityBarComponent.instanceCounter}`;
+  protected readonly themeMenuItems = THEME_MENU_ITEMS;
+  protected readonly themeMenuPresentation: CxMenuPresentation = { kind: 'trigger' };
+
+  @Input() heading = '';
+  @Input({ transform: booleanAttribute }) visible = false;
+  @Input() themeMode: CxUtilityBarThemeMode | undefined;
+
+  @Output() readonly themeModeChange = new EventEmitter<CxUtilityBarThemeMode>();
+
+  protected resolvedHeading(): string {
+    return this.heading.trim();
   }
 
-  @Input()
-  public set label(value: string | undefined) {
-    const trimmed = value?.trim();
-    this.labelState.set(trimmed?.length ? trimmed : undefined);
+  protected themeIcon(mode: CxUtilityBarThemeMode): CxIconName {
+    return THEME_ICONS[mode];
   }
 
-  @Input()
-  public set alignment(value: CxUtilityBarAlignment | undefined) {
-    this.alignmentState.set(value ?? 'start');
+  protected themeTriggerLabel(mode: CxUtilityBarThemeMode): string {
+    return `Choose theme. Current theme: ${THEME_LABELS[mode]}.`;
   }
 
-  @Input() size: CxButtonSize = 'default';
-  @Input() wrap = false;
-  @Input() disabled = false;
-
-  @Output() readonly action = new EventEmitter<string>();
-
-  protected readonly items$ = this.itemsState.asReadonly();
-  protected readonly label$ = this.labelState.asReadonly();
-  protected readonly alignment$ = this.alignmentState.asReadonly();
-
-  protected onItemPressed(item: CxUtilityBarItem): void {
-    if (this.disabled || item.disabled) {
-      return;
+  protected onThemeModeChange(value: string): void {
+    if (isThemeMode(value)) {
+      this.themeModeChange.emit(value);
     }
-    this.action.emit(item.id);
   }
 }

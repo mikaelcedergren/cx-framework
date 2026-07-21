@@ -25,6 +25,8 @@ export class CxBannerComponent implements OnDestroy {
   private readonly renderedState = signal(false);
   private readonly openState = signal(false);
   private readonly dismissibleState = signal(true);
+  private requestedOpen = false;
+  private openFrame: number | undefined;
 
   @Input() mood: CxBannerMood = 'default';
   @Input() heading = '';
@@ -36,8 +38,13 @@ export class CxBannerComponent implements OnDestroy {
   public set dismissible(value: boolean) {
     const dismissible = Boolean(value);
     this.dismissibleState.set(dismissible);
-    if (!dismissible && this.renderedState()) {
-      this.openState.set(true);
+    if (!dismissible) {
+      this.cancelOpenFrame();
+      if (this.requestedOpen && this.renderedState()) {
+        this.openState.set(true);
+      } else if (!this.requestedOpen) {
+        this.renderedState.set(false);
+      }
     }
   }
 
@@ -105,6 +112,7 @@ export class CxBannerComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cancelOpenFrame();
     this.renderedState.set(false);
     this.openState.set(false);
   }
@@ -123,13 +131,21 @@ export class CxBannerComponent implements OnDestroy {
   }
 
   protected onTransitionEnd(event: TransitionEvent): void {
-    if (event.target !== event.currentTarget || event.propertyName !== 'transform' || this.openState()) {
+    if (event.target !== event.currentTarget || event.propertyName !== 'transform' || this.requestedOpen) {
       return;
     }
     this.renderedState.set(false);
   }
 
   private setOpen(nextVisible: boolean): void {
+    if (nextVisible === this.requestedOpen) {
+      return;
+    }
+
+    const wasWaitingToOpen = this.openFrame !== undefined;
+    this.requestedOpen = nextVisible;
+    this.cancelOpenFrame();
+
     if (nextVisible) {
       this.renderedState.set(true);
       if (!this.dismissibleState() || prefersReducedMotion()) {
@@ -139,7 +155,11 @@ export class CxBannerComponent implements OnDestroy {
 
       this.openState.set(false);
       if (typeof window !== 'undefined') {
-        window.requestAnimationFrame(() => {
+        this.openFrame = window.requestAnimationFrame(() => {
+          this.openFrame = undefined;
+          if (!this.requestedOpen) {
+            return;
+          }
           this.openState.set(true);
         });
       } else {
@@ -149,9 +169,17 @@ export class CxBannerComponent implements OnDestroy {
     }
 
     this.openState.set(false);
-    if (!this.renderedState() || !this.dismissibleState() || prefersReducedMotion()) {
+    if (wasWaitingToOpen || !this.renderedState() || !this.dismissibleState() || prefersReducedMotion()) {
       this.renderedState.set(false);
     }
   }
 
+  private cancelOpenFrame(): void {
+    if (this.openFrame === undefined || typeof window === 'undefined') {
+      return;
+    }
+
+    window.cancelAnimationFrame(this.openFrame);
+    this.openFrame = undefined;
+  }
 }

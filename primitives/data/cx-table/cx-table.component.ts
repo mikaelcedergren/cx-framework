@@ -101,6 +101,7 @@ export type CxTableCell =
       kind: 'status-tag';
       mood: CxStatusTagMood;
       text: string;
+      icon?: CxIconName;
     }
   | CxTableSeverityCell
   | {

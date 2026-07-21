@@ -22,7 +22,7 @@
   }
 }
 
-@mixin field-messages($root, $margin-top: var(--space-sm)) {
+@mixin field-messages($root, $margin-top: var(--space-xs)) {
   .#{$root}__messages {
     display: flex;
     flex-direction: column;

@@ -1,7 +1,7 @@
 @if (display$() === 'global') {
   <div class="cx-validation-message__list cx-validation-message__list--global">
     @for (item of messages$(); track item.id) {
-      <cx-alert [mood]="alertMoodFor(item.type)" [text]="item.message" />
+      <cx-alert [mood]="alertMoodFor(item.type)" [heading]="item.message" />
     }
   </div>
 } @else {

@@ -1,55 +1,39 @@
-@if (hasText()) {
-  @if (resolvedIcon; as iconName) {
-    <div class="cx-alert__icon" aria-hidden="true">
-      <cx-icon [name]="iconName" />
+@if (hasHeading()) {
+  <div class="cx-alert__surface">
+    <div class="cx-alert__visual" aria-hidden="true">
+      @if (loading) {
+        <cx-spinner [mood]="mood" aria-hidden="true" />
+      } @else {
+        <cx-icon [name]="resolvedIcon" [size]="20" />
+      }
     </div>
-  }
 
-  <div class="cx-alert__text">
-    {{ text }}
+    <div class="cx-alert__content">
+      <div class="cx-alert__heading">{{ resolvedHeading }}</div>
+      <div class="cx-alert__description"><ng-content /></div>
+    </div>
 
-    @if (hasActions()) {
-      <div class="cx-alert__actions">
-        @if (visibleAction; as action) {
-          <cx-button
-            class="cx-alert__action"
-            [text]="action.text"
-            [mood]="action.mood ?? 'default'"
-            [transparent]="action.transparent ?? true"
-            [icon]="action.icon"
-            [appendIcon]="action.appendIcon"
-            [disabled]="action.disabled ?? false"
-            [loading]="action.loading ?? false"
-            [ariaLabel]="action.ariaLabel"
-            (pressed)="onActionSelect(action)"
-          />
-        }
-        @if (visibleSecondaryAction; as action) {
-          <cx-button
-            class="cx-alert__action"
-            [text]="action.text"
-            [mood]="action.mood ?? 'default'"
-            [transparent]="action.transparent ?? true"
-            [icon]="action.icon"
-            [appendIcon]="action.appendIcon"
-            [disabled]="action.disabled ?? false"
-            [loading]="action.loading ?? false"
-            [ariaLabel]="action.ariaLabel"
-            (pressed)="onSecondaryActionSelect(action)"
-          />
-        }
-      </div>
+    @if (visibleAction; as action) {
+      <cx-button
+        class="cx-alert__action"
+        [text]="action.text.trim()"
+        [href]="actionHref(action)"
+        [mood]="actionMood"
+        size="small"
+        [rounded]="true"
+        (pressed)="onActionSelect(action)"
+      />
+    }
+
+    @if (dismissible) {
+      <cx-icon-button
+        class="cx-alert__dismiss"
+        icon="remove"
+        [ariaLabel]="dismissAriaLabel"
+        size="small"
+        [rounded]="true"
+        (pressed)="onDismiss()"
+      />
     }
   </div>
-
-  @if (dismissible) {
-    <button
-      type="button"
-      class="cx-alert__dismiss"
-      aria-label="Dismiss alert"
-      (click)="onDismiss()"
-    >
-      <cx-icon name="remove" [size]="16" aria-hidden="true" />
-    </button>
-  }
 }

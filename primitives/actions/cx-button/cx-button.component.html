@@ -1,25 +1,58 @@
-<button
-  [type]="nativeType"
-  class="cx-button"
-  [class.cx-button--default]="isDefault"
-  [class.cx-button--primary]="isPrimary"
-  [class.cx-button--accent]="isAccent"
-  [class.cx-button--info]="isInfo"
-  [class.cx-button--success]="isSuccess"
-  [class.cx-button--warning]="isWarning"
-  [class.cx-button--danger]="isDanger"
-  [class.cx-button--transparent]="isTransparent"
-  [class.cx-button--icon]="isIconOnly"
-  [class.cx-button--small]="size === 'small'"
-  [class.cx-button--large]="size === 'large'"
-  [class.cx-button--disabled]="disabled"
-  [class.cx-button--loading]="showSpinner$()"
-  [class.cx-button--rounded]="rounded"
-  [disabled]="disabled || loading$()"
-  [attr.aria-label]="resolvedAriaLabel"
-  [attr.aria-busy]="loading$() ? 'true' : null"
-  (click)="onClick()"
->
+@if (resolvedHref; as href) {
+  <a
+    class="cx-button"
+    role="link"
+    [class.cx-button--default]="isDefault"
+    [class.cx-button--primary]="isPrimary"
+    [class.cx-button--accent]="isAccent"
+    [class.cx-button--info]="isInfo"
+    [class.cx-button--success]="isSuccess"
+    [class.cx-button--warning]="isWarning"
+    [class.cx-button--danger]="isDanger"
+    [class.cx-button--transparent]="isTransparent"
+    [class.cx-button--icon]="isIconOnly"
+    [class.cx-button--small]="size === 'small'"
+    [class.cx-button--large]="size === 'large'"
+    [class.cx-button--disabled]="disabled"
+    [class.cx-button--loading]="showSpinner$()"
+    [class.cx-button--rounded]="rounded"
+    [attr.href]="isUnavailable ? null : href"
+    [attr.aria-label]="resolvedAriaLabel"
+    [attr.aria-disabled]="isUnavailable ? 'true' : null"
+    [attr.aria-busy]="loading$() ? 'true' : null"
+    [attr.tabindex]="isUnavailable ? '-1' : null"
+    (click)="onActivate($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <button
+    [type]="nativeType"
+    class="cx-button"
+    [class.cx-button--default]="isDefault"
+    [class.cx-button--primary]="isPrimary"
+    [class.cx-button--accent]="isAccent"
+    [class.cx-button--info]="isInfo"
+    [class.cx-button--success]="isSuccess"
+    [class.cx-button--warning]="isWarning"
+    [class.cx-button--danger]="isDanger"
+    [class.cx-button--transparent]="isTransparent"
+    [class.cx-button--icon]="isIconOnly"
+    [class.cx-button--small]="size === 'small'"
+    [class.cx-button--large]="size === 'large'"
+    [class.cx-button--disabled]="disabled"
+    [class.cx-button--loading]="showSpinner$()"
+    [class.cx-button--rounded]="rounded"
+    [disabled]="isUnavailable"
+    [attr.aria-label]="resolvedAriaLabel"
+    [attr.aria-busy]="loading$() ? 'true' : null"
+    (click)="onActivate()"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </button>
+}
+
+<ng-template #content>
   <span
     class="cx-button__content"
     [class.cx-button__content--hidden]="showSpinner$()"
@@ -44,4 +77,4 @@
       <cx-spinner mood="default" size="auto" />
     </span>
   }
-</button>
+</ng-template>

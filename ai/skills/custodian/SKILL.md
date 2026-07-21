@@ -11,6 +11,8 @@ Use this skill as the design-quality guardian. Evaluate existing work; do not cr
 
 - Establish the user's goal, the artifact's maturity, and the next gate before judging it.
 - Review only behavior that is relevant, reachable, and supported by the available evidence.
+- Preserve the product's established structure and conventions unless the assigned design explicitly changes them; do not turn refinement into an unrelated redesign.
+- Treat responsive behavior as out of scope unless the user or current gate explicitly includes it.
 - Treat unmentioned or unobservable behavior as unverified, not defective.
 - Say what is wrong, unclear, inconsistent, risky, unsupported, inaccessible, or incomplete for the current gate.
 - Explain findings through visible user impact, design-system rules, UX rules, accessibility expectations, or copy quality.
@@ -42,6 +44,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 3. Search only the rules relevant to the reachable behavior in scope.
 4. Find root issues and consolidate related symptoms.
 5. Choose the verdict against the next gate, not an imagined final release.
+6. For an implementation or release-candidate gate, complete the mandatory final rendered-UI review below.
 
 Calibrate the review to the artifact:
 
@@ -59,6 +62,25 @@ Classify each possible issue internally:
 
 Only observed issues and well-supported inferences become findings. A not-verified area may appear as one short coverage note when it materially limits approval; it does not become a defect or blocker by itself.
 
+## Mandatory final rendered-UI review
+
+For every rendered implementation or release-candidate gate, inspect the actual UI at the intended desktop viewport. Use rendered screenshots as required visual evidence; code, DOM, component, and token inspection may support the review but cannot replace them. If screenshots do not cover every important page and applicable state, assign `Unverified` for this gate. Keep responsive review out of scope unless explicitly requested.
+
+1. Capture a before screenshot of every important page at one documented desktop viewport. Populate tables, lists, panels, and dashboards with enough realistic example data to expose density, repetition, truncation, hierarchy, and scrolling.
+2. Inspect every important interaction state at the same viewport, including applicable detail panels, popovers, menus, expanded rows, dialogs, loading, empty, and error states.
+3. After corrections, capture matching after screenshots and compare them directly with the before set at the same viewport.
+4. Re-run all eight lenses on the after set:
+   - **Necessity:** Reject information, labels, containers, explanations, and controls that do not improve understanding or action. Detect repeated information expressed in slightly different forms.
+   - **Hierarchy:** Make the most important information and actions visually dominant. Reduce competing emphasis and unnecessary heading levels.
+   - **Grouping:** Group by meaning and task. Reject nested boxes unless each boundary communicates a genuinely different level or state.
+   - **Affordance:** Make interactive elements look interactive and read-only information look non-editable. Communicate action priority without turning every action into a button.
+   - **Semantic cues:** Use icons, typography, status treatment, and restrained color only when they improve recognition or scanning. Reject decoration without meaning.
+   - **Spacing:** Check rhythm, alignment, density, and consistency across siblings. Dense interfaces may remain dense only when deliberately composed.
+   - **Edge crowding:** Require a deliberate inner safe area on every side of a bounded surface. Align text, badges, metadata, controls, and progress information to that inset. Allow dividers, images, tables, or progress bars to reach an edge only when intentionally full-bleed; reject accidental contact, near-contact, clipping, and inconsistent sibling insets.
+   - **Data sufficiency:** Reject sparse happy-path evidence that cannot reveal real density, repetition, truncation, hierarchy, or scrolling behavior.
+
+Do not pass or declare the final UI complete while any visible issue from these lenses remains unresolved. Prefer fewer containers and repeated labels, stronger alignment, calmer hierarchy, and clearer actions. Require the consuming product's shared components, tokens, and patterns, including cx-framework where it is the product contract. If the shared system cannot express the required result, record a framework gap instead of approving a local substitute.
+
 ## Review checklist
 
 Use this checklist internally. Apply only relevant, reachable items; do not turn it into the output.
@@ -67,9 +89,9 @@ Use this checklist internally. Apply only relevant, reachable items; do not turn
 - Mental model: structure, naming, grouping, and hierarchy match how users think about the work.
 - Design system: tokens, components, patterns, naming, states, and behavior are consistent.
 - UX patterns: navigation, forms, dialogs, tables, filters, empty states, destructive actions, and recovery paths behave as expected.
-- Reachable states: loading, empty, error, disabled, hover, focus, active, success, validation, long content, narrow viewports, permission, and unavailable states that the work can actually enter.
-- Information hierarchy: primary action, scan order, density, grouping, labels, and cognitive load.
-- Interaction design: affordance, feedback, timing, reversibility, keyboard behavior, touch targets, and accidental-action protection.
+- Reachable states: relevant state, content-length, permission, and unavailable behavior are covered; include responsive states only when they are in scope.
+- Visual review: rendered implementations and release candidates pass all eight lenses in the mandatory review above.
+- Interaction design: feedback, timing, reversibility, keyboard behavior, touch targets, and accidental-action protection are sound.
 - Accessibility: contrast, focus visibility, semantic structure, keyboard reachability, color-independent meaning, readable copy, and screen-reader expectations.
 - Microcopy: labels name things, buttons name actions, errors say what is wrong and how to recover, terminology stays consistent.
 - Implementation shape: no one-off UI, parent overrides, inline style patches, duplicated token values, specificity fights, or local workarounds when the system should own the behavior.
@@ -81,6 +103,8 @@ Use this checklist internally. Apply only relevant, reachable items; do not turn
 - `Needs changes`: evidence shows an important issue that should be resolved before normal progression; only explicit user acceptance of the named residual risk may override it.
 - `Polish`: minor issues remain, but progression is reasonable.
 - `Pass`: no meaningful issues were found within the reviewed scope; unverified areas have not implicitly passed.
+
+In the final rendered-UI review, `Polish` is not completion: any visible issue identified by the eight lenses keeps the refinement cycle open.
 
 Block when evidence shows the work:
 

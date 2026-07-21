@@ -156,14 +156,12 @@
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
-}
-
-.cx-detail-panel--bar .cx-detail-panel__content-container {
-  overflow: hidden;
-}
-
-.cx-detail-panel--bar .cx-detail-panel__content {
   flex-direction: column;
+}
+
+.cx-detail-panel--content-inset .cx-detail-panel__content {
+  box-sizing: border-box;
+  padding: var(--space-lg);
 }
 
 .cx-detail-panel__footer {

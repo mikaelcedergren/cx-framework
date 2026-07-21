@@ -1,25 +1,100 @@
+@use 'tokens/breakpoints' as bp;
+
 :host {
-  display: flex;
-  min-width: 0;
+  display: contents;
 }
 
 .cx-utility-bar {
+  --link: var(--ink);
+  --cx-icon-button-transparent-color: var(--ink);
+  --cx-icon-button-transparent-hover-background: color-mix(in srgb, var(--ink) 10%, transparent);
+
   display: flex;
   width: 100%;
   min-width: 0;
+  min-height: var(--controller-size);
   align-items: center;
-  justify-content: flex-start;
   gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background-color: var(--yellow);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent var(--space-sm),
+    color-mix(in srgb, var(--on-ink) 4%, transparent) var(--space-sm),
+    color-mix(in srgb, var(--on-ink) 4%, transparent) var(--space-md)
+  );
+  color: var(--ink);
+  box-sizing: border-box;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
 }
 
-.cx-utility-bar--end {
-  justify-content: flex-end;
+.cx-utility-bar__main,
+.cx-utility-bar__content,
+.cx-utility-bar__actions,
+.cx-utility-bar__theme {
+  display: flex;
+  min-width: 0;
+  align-items: center;
 }
 
-.cx-utility-bar--space-between {
-  justify-content: space-between;
+.cx-utility-bar__main {
+  flex: 1 1 auto;
+  gap: var(--space-md);
 }
 
-.cx-utility-bar--wrap {
+.cx-utility-bar__heading {
+  min-width: 0;
+  flex: 0 1 auto;
+  color: currentColor;
+  font-weight: var(--font-weight-bold);
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.cx-utility-bar__content {
+  flex: 1 1 auto;
   flex-wrap: wrap;
+  gap: var(--space-md);
+  overflow-wrap: anywhere;
+}
+
+.cx-utility-bar__actions {
+  flex: 0 0 auto;
+  gap: var(--space-xs);
+  margin-inline-start: auto;
+}
+
+.cx-utility-bar__theme {
+  flex: 0 0 auto;
+}
+
+.cx-utility-bar__content:empty,
+.cx-utility-bar__actions:empty {
+  display: none;
+}
+
+@media (max-width: #{bp.$mobile - 1px}) {
+  .cx-utility-bar {
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
+  }
+
+  .cx-utility-bar__main {
+    order: 1;
+  }
+
+  .cx-utility-bar__theme {
+    order: 2;
+    margin-inline-start: auto;
+  }
+
+  .cx-utility-bar__actions {
+    width: 100%;
+    flex: 1 1 100%;
+    order: 3;
+    justify-content: flex-end;
+    margin-inline-start: 0;
+  }
 }

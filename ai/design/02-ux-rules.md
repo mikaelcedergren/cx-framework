@@ -8,6 +8,8 @@ RULE-ID: system.mental-model SCOPE: global TYPE: must TOPIC: system RULE: Organi
 
 RULE-ID: system.use-existing SCOPE: design-system TYPE: should TOPIC: system RULE: Start with the existing tokens, components, patterns, and documented behavior. DESCRIPTION: Familiar system pieces reduce drift and transfer learned behavior across the product.
 
+RULE-ID: system.default-first SCOPE: design-system TYPE: must TOPIC: system RULE: Begin with the framework defaults and the minimum configuration needed. DESCRIPTION: Change a default only when it fails to express a clear requirement in the current context; when several choices work, keep the default. The existence of another option or example is not a reason to use it.
+
 RULE-ID: system.shared-owner SCOPE: design-system TYPE: must TOPIC: components RULE: Put repeatable behavior in the shared owner. DESCRIPTION: Extend the owning component or pattern instead of creating a private page-level substitute.
 
 RULE-ID: system.sealed-components SCOPE: design-system TYPE: must TOPIC: components RULE: Keep component internals sealed from consumers. DESCRIPTION: Consumers control placement and composition, not internal templates, styles, padding, or state logic.

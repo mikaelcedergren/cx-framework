@@ -22,6 +22,7 @@ const DETAIL_PANEL_DISMISS_DURATION_MS = 240;
 
 export type CxDetailPanelVariant = 'floating' | 'fixed' | 'bar';
 export type CxDetailPanelPlacement = 'container' | 'viewport';
+export type CxDetailPanelContentLayout = 'full-bleed' | 'inset';
 
 @Component({
   selector: 'cx-detail-panel',
@@ -42,6 +43,7 @@ export class CxDetailPanelComponent implements OnDestroy {
   @Input() heading = '';
   @Input() dismissible = true;
   @Input() variant: CxDetailPanelVariant = 'floating';
+  @Input() contentLayout: CxDetailPanelContentLayout = 'full-bleed';
   @Input() scrollable = true;
   @Input() menuItems: CxMenuItem[] = [];
   @Input() menuAriaLabel = 'Open detail panel menu';

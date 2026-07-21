@@ -1,37 +1,38 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
-import { CxButtonComponent } from '../../actions/cx-button';
 import { type CxIconName } from '../../../icons/manifest';
+import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
+import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
-import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
+import { CxSpinnerComponent } from '../cx-spinner';
 
 export type CxAlertMood = 'default' | 'info' | 'warning' | 'success' | 'danger';
-export type CxAlertIcon = 'auto' | 'none' | CxIconName;
+
+export interface CxAlertAction {
+  readonly text: string;
+  readonly href?: string;
+}
+
 @Component({
   selector: 'cx-alert',
-  imports: [CxButtonComponent, CxIconComponent],
+  imports: [CxButtonComponent, CxIconButtonComponent, CxIconComponent, CxSpinnerComponent],
   templateUrl: './cx-alert.component.html',
   styleUrl: './cx-alert.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxAlertComponent {
+  @Input() heading = '';
   @Input() mood: CxAlertMood = 'default';
-  @Input() text = '';
-  @Input() icon: CxAlertIcon = 'auto';
-  @Input() action: CxFeedbackAction | undefined;
-  @Input() secondaryAction: CxFeedbackAction | undefined;
+  @Input() loading = false;
+  @Input() action: CxAlertAction | undefined;
   @Input() dismissible = false;
 
+  @Output() readonly actionSelect = new EventEmitter<CxAlertAction>();
   @Output() readonly dismiss = new EventEmitter<void>();
-  @Output() readonly actionSelect = new EventEmitter<CxFeedbackAction>();
-  @Output() readonly secondaryActionSelect = new EventEmitter<CxFeedbackAction>();
 
   @HostBinding('class')
   protected get hostClass(): string {
     const classes = ['cx-alert', `cx-alert--${this.mood}`];
-    if (this.resolvedIcon) classes.push('cx-alert--with-icon');
-    if (this.dismissible) classes.push('cx-alert--dismissible');
-    if (this.hasActions()) classes.push('cx-alert--with-actions');
-    if (!this.hasText()) classes.push('cx-alert--hidden');
+    if (!this.hasHeading()) classes.push('cx-alert--hidden');
     return classes.join(' ');
   }
 
@@ -40,54 +41,54 @@ export class CxAlertComponent {
     return this.mood === 'danger' || this.mood === 'warning' ? 'alert' : 'status';
   }
 
-  protected get resolvedIcon(): CxIconName | null {
-    if (this.icon === 'none') {
-      return null;
-    }
-    if (this.icon !== 'auto') {
-      return this.icon;
-    }
-    return this.defaultIconForMood();
+  @HostBinding('attr.aria-busy')
+  protected get hostBusy(): 'true' | null {
+    return this.loading ? 'true' : null;
   }
 
-  private defaultIconForMood(): CxIconName | null {
+  protected get resolvedHeading(): string {
+    return this.heading.trim();
+  }
+
+  protected hasHeading(): boolean {
+    return this.resolvedHeading.length > 0;
+  }
+
+  protected get resolvedIcon(): CxIconName {
     switch (this.mood) {
-      case 'danger':
-        return 'error';
-      case 'warning':
-        return 'warning';
       case 'success':
         return 'check';
+      case 'warning':
+        return 'warning';
+      case 'danger':
+        return 'error';
       case 'info':
-        return 'info';
       case 'default':
       default:
-        return null;
+        return 'info';
     }
   }
 
-  protected get visibleAction(): CxFeedbackAction | undefined {
-    return visibleCxFeedbackAction(this.action);
+  protected get visibleAction(): CxAlertAction | undefined {
+    return this.action?.text.trim() ? this.action : undefined;
   }
 
-  protected get visibleSecondaryAction(): CxFeedbackAction | undefined {
-    return visibleCxFeedbackAction(this.secondaryAction);
+  protected get actionMood(): CxButtonMood {
+    return this.mood;
   }
 
-  protected hasText(): boolean {
-    return this.text.trim().length > 0;
+  protected actionHref(action: CxAlertAction): string | undefined {
+    return action.href?.trim() || undefined;
   }
 
-  protected hasActions(): boolean {
-    return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
+  protected get dismissAriaLabel(): string {
+    return `Dismiss ${this.resolvedHeading}`;
   }
 
-  protected onActionSelect(action: CxFeedbackAction): void {
-    this.actionSelect.emit(action);
-  }
-
-  protected onSecondaryActionSelect(action: CxFeedbackAction): void {
-    this.secondaryActionSelect.emit(action);
+  protected onActionSelect(action: CxAlertAction): void {
+    if (!this.actionHref(action)) {
+      this.actionSelect.emit(action);
+    }
   }
 
   protected onDismiss(): void {
