@@ -8,7 +8,7 @@ The package is exported to the GitHub package repo `mikaelcedergren/cx-framework
 
 Cortex is the source. `cx-framework` is the package. Every product using the shared UI consumes `@mikaelcedergren/cx-framework`; content and operations repos stay independent, and no downstream repo references Cortex implementation directly.
 
-When a consuming project exposes a reusable framework gap, fix it in Cortex under `framework/`, package it here, have the owner push the package repo to GitHub `main`, then update the consuming app. A good package export should make the current app better and leave all future apps stronger.
+When a consuming project exposes a reusable framework gap, fix it in Cortex under `framework/`, package it here, obtain the user's explicit push authorisation under the shared Git policy, push the package repo to GitHub `main`, then update the consuming app. A good package export should make the current app better and leave all future apps stronger.
 
 Cortex defines the contract and `cx-framework` delivers it. If that contract changes, every
 consumer must migrate to the new selector, prop, token, default, or behavior. Never add a
