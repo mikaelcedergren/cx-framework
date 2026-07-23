@@ -5,7 +5,7 @@
   max-width: var(--cx-image-max-width, none);
   max-height: var(--cx-image-max-height, none);
   overflow: hidden;
-  border-radius: var(--cx-image-border-radius, var(--radius-none));
+  border-radius: var(--cx-image-border-radius, var(--radius-lg));
   corner-shape: var(--cx-image-corner-shape, var(--corner-shape, round));
 }
 

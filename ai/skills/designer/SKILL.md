@@ -40,8 +40,9 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 1. Define the user goal, primary task, mental model, and constraints.
 2. Inspect the existing product system before proposing new structure or components.
 3. Resolve information architecture, flow, behavior, hierarchy, and affordance.
-4. Define reachable states, accessibility expectations, and copy needs.
-5. Remove unnecessary complexity and record any decision still blocking the next gate.
+4. Declare the hierarchy: primary task or focal information, primary action when one exists, secondary actions, supporting information, and what remains hidden until relevant.
+5. Define reachable states, accessibility expectations, and copy needs.
+6. Remove unnecessary complexity and record any decision still blocking the next gate.
 
 ## Product bar
 
@@ -50,9 +51,9 @@ Design for a finished product, never a proof of concept.
 - Remove unnecessary complexity before adding polish.
 - Preserve the user's mental model over implementation structure.
 - Make hierarchy clear enough to scan without decoding.
-- Use the minimum affordance that still makes interaction, hierarchy, and state obvious.
+- Apply `RULE-ID: surfaces.light-first` when choosing control, surface, signifier, and disclosure weight.
 - Use familiar patterns unless a better product reason exists.
-- Define every reachable state: default, hover, focus, active, disabled, loading, empty, success, warning, and error.
+- Apply `RULE-ID: system.reachable-states`; define every relevant reachable and edge-case state without inventing impossible states.
 - Treat accessibility as perception: keyboard reachability, visible focus, contrast, and more than color alone for meaning.
 - If a technically correct UI feels mentally awkward, redesign it.
 
@@ -62,11 +63,9 @@ Design for a finished product, never a proof of concept.
 - Critique every element for necessity before adding or keeping it.
 - Remove anything whose purpose is already implied by surrounding context.
 - Avoid noise unless it conveys structure, priority, state, or action.
-- When unsure, choose the cleaner, quieter route that preserves affordance.
 - Use spacing as communication, not only layout.
 - Favor fewer elements, stronger grouping, disciplined density, and clear scan order.
-- Start visually light and add weight only when perception needs it.
-- Avoid nested cards, decorative containers, heavy borders, and repeated emphasis unless each signal has a role.
+- Apply `RULE-ID: surfaces.one-boundary` before introducing a card, box, bordered container, or additional surface.
 - Review rhythm, alignment, affordance, typography hierarchy, redundancy, edge states, and copy fit before handoff.
 
 ## System thinking
@@ -89,6 +88,7 @@ Before the build gate, make the brief concrete:
 - accessibility expectations
 - copy needs or settled wording
 - visual risks and unresolved product decisions
+- rationale for major design decisions, tied to the user goal, risk addressed, and accepted tradeoff; omit settled system defaults
 
 Use `copywriter` when exact wording still needs to be settled. Then use `custodian` to validate the brief against its build gate.
 

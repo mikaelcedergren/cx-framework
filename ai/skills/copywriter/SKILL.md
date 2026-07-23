@@ -41,6 +41,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 ## Copy standard
 
+- Apply `RULE-ID: copy.reader-language` before drafting user-facing text.
 - Prefer the plainest accurate word.
 - Use one term for one concept and match the product's existing domain language.
 - Make the copy as short as possible without removing meaning, consequence, constraint, or the next useful action.

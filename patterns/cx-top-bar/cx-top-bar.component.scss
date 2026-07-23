@@ -21,7 +21,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-lg);
-  padding: var(--gutter-page) var(--gutter-page) var(--space-md);
+  padding: var(--space-md);
   box-sizing: border-box;
 }
 
@@ -92,7 +92,6 @@
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-md);
-    padding: var(--gutter-page);
   }
 
   .cx-top-bar__actions {

@@ -34,75 +34,19 @@
   background: transparent;
   box-sizing: border-box;
   overflow: hidden;
-  transition:
-    border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease;
 }
 
-.cx-textarea__shell:hover:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error):not(.cx-textarea__shell--inline-edit) {
-  border-color: var(--opacity-high);
-  outline: var(--outline-field-interaction);
-  outline-offset: 0;
-}
-
-// --- Focus appearance ------------------------------------------------------
-// Default focusVariant: mouse focus keeps the subtle hover outline, while
-// keyboard focus uses the stronger tab outline.
-.cx-textarea__shell:focus-within:not(.cx-textarea__shell--disabled):not(.cx-textarea__shell--error):not(.cx-textarea__shell--inline-edit) {
-  outline: var(--outline-field-interaction);
-  outline-offset: 0;
-}
-
-:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell:has(.cx-textarea__field:focus) {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
+@include field.field-shell-state('.cx-textarea__shell', '.cx-textarea__field');
+@include field.field-shell-interaction('.cx-textarea__shell');
 
 // Ring focusVariant strengthens the keyboard state without changing pointer focus.
-:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--focus-ring:has(.cx-textarea__field:focus) {
+:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--focus-ring:not(.cx-textarea__shell--error):has(.cx-textarea__field:focus) {
   border-color: var(--primary);
   outline: var(--outline-tab);
   outline-offset: 0;
 }
 
-.cx-textarea__shell--error,
-.cx-textarea__shell--error:hover:not(.cx-textarea__shell--disabled) {
-  border-color: var(--danger);
-}
-
-.cx-textarea__shell--disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.cx-textarea__shell--inline-edit {
-  border-color: transparent;
-  background: transparent;
-  transition:
-    border-color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease;
-}
-
-.cx-textarea__shell--inline-edit:hover:not(.cx-textarea__shell--disabled) {
-  border-color: var(--opacity-mid);
-  background: transparent;
-  outline: 0;
-}
-
-.cx-textarea__shell--inline-edit.cx-textarea__shell--focused {
-  border-color: var(--primary);
-  background: transparent;
-  outline: 0;
-}
-
-:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--inline-edit:has(.cx-textarea__field:focus) {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
-
-.cx-textarea__shell--inline-edit.cx-textarea__shell--error {
-  border-color: var(--danger);
-}
+@include field.field-shell-inline-edit('.cx-textarea__shell', '.cx-textarea__field');
 
 .cx-textarea__editor {
   display: grid;

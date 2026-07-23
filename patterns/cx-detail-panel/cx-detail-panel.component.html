@@ -1,80 +1,84 @@
 <aside
+  #panelSurface
   class="cx-detail-panel"
   [class.cx-detail-panel--closing]="closing$()"
-  [class.cx-detail-panel--bar]="isBar"
   [class.cx-detail-panel--fixed]="isFixed"
-  [class.cx-detail-panel--scrollable]="scrollable"
-  [class.cx-detail-panel--content-inset]="contentLayout === 'inset'"
-  [attr.aria-label]="ariaLabel"
+  [attr.aria-labelledby]="normalizedHeading ? headingId : null"
+  [attr.aria-label]="normalizedHeading ? null : 'Detail panel'"
+  [attr.aria-hidden]="closing$() ? 'true' : null"
+  [attr.inert]="closing$() ? '' : null"
+  (animationend)="onDismissAnimationEnd($event)"
 >
-  @if (isBar) {
-    <div class="cx-detail-panel__bar">
-      @if (dismissible) {
-        <cx-icon-button
-          icon="arrow-right"
-          ariaLabel="Close details panel" variant="transparent"
-          (pressed)="dismiss()"
-        />
+  <header class="cx-detail-panel__header">
+    <div class="cx-detail-panel__heading-group">
+      @if (icon; as iconName) {
+        <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
       }
-      @if (menuItems.length > 0) {
-        <cx-menu [presentation]="{ kind: 'trigger' }" align="end" [ariaLabel]="menuAriaLabel" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
+      @if (normalizedHeading) {
+        <h2 class="cx-detail-panel__heading" [id]="headingId">{{ normalizedHeading }}</h2>
+      }
+    </div>
+
+    <div class="cx-detail-panel__header-actions">
+      <ng-content select="[detail-panel-context]" />
+
+      @if (hasMenuItems) {
+        <cx-menu
+          [presentation]="{ kind: 'trigger' }"
+          [items]="menuItems ?? []"
+          [ariaLabel]="resolvedMenuAriaLabel"
+          align="end"
+          (itemSelect)="onMenuItemSelect($event)"
+        >
           <cx-icon-button
             cxMenuTrigger
             icon="menu-vertical"
-            [ariaLabel]="menuAriaLabel" variant="transparent"
+            [ariaLabel]="resolvedMenuAriaLabel"
+            variant="transparent"
           />
         </cx-menu>
       }
     </div>
-  } @else {
-    <div class="cx-detail-panel__header">
-      <div class="cx-detail-panel__heading-group">
-        @if (icon; as iconName) {
-          <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
-        }
-        <ng-content select="[detail-panel-heading]" />
-        @if (heading.trim()) {
-          <h3 class="cx-detail-panel__heading">{{ heading }}</h3>
-        }
-      </div>
+  </header>
 
-      <div class="cx-detail-panel__header-actions">
-        <ng-content select="[detail-panel-header-actions]" />
-
-        @if (menuItems.length > 0) {
-          <cx-menu [presentation]="{ kind: 'trigger' }" [items]="menuItems" (itemSelect)="onMenuSelect($event)">
-            <cx-icon-button
-              cxMenuTrigger
-              icon="menu-vertical"
-              [ariaLabel]="menuAriaLabel" variant="transparent"
-            />
-          </cx-menu>
-        }
-      </div>
-    </div>
+  @if (hasTabs) {
+    <cx-tabs
+      class="cx-detail-panel__tabs"
+      [items]="tabs"
+      [selectedId]="selectedTabId"
+      [ariaLabel]="resolvedTabsAriaLabel"
+      [controlsId]="tabPanelId"
+      [transparent]="true"
+      [divided]="false"
+      (selectedIdChange)="onTabSelect($event)"
+    />
   }
 
-  <div class="cx-detail-panel__content-container">
+  <div
+    #contentViewport
+    class="cx-detail-panel__content-viewport"
+    [attr.id]="hasTabs ? tabPanelId : null"
+    [attr.role]="hasTabs ? 'tabpanel' : null"
+    [attr.aria-labelledby]="hasTabs ? selectedTabButtonId : null"
+    [attr.aria-label]="hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null"
+    [attr.tabindex]="hasTabs ? '0' : null"
+  >
     <div class="cx-detail-panel__content">
       <ng-content />
     </div>
   </div>
 
-  @if (!isBar) {
-    <footer class="cx-detail-panel__footer">
-      <div class="cx-detail-panel__footer-slot">
-        <ng-content select="[detail-panel-footer]" />
-      </div>
+  <footer class="cx-detail-panel__footer">
+    <div class="cx-detail-panel__footer-slot">
+      <ng-content select="[detail-panel-footer]" />
+    </div>
 
-      @if (showFooterClose) {
-        <cx-icon-button
-          class="cx-detail-panel__footer-close"
-          icon="arrow-right"
-          ariaLabel="Close details panel"
-          mood="default"
-          (pressed)="dismiss()"
-        />
-      }
-    </footer>
-  }
+    <cx-icon-button
+      class="cx-detail-panel__footer-close"
+      icon="arrow-right"
+      [ariaLabel]="resolvedCloseAriaLabel"
+      mood="default"
+      (pressed)="dismiss()"
+    />
+  </footer>
 </aside>

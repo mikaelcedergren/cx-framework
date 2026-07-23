@@ -43,13 +43,13 @@
 }
 
 .cx-icon-button--default {
-  --cx-icon-button-background: var(--opacity-low);
+  --cx-icon-button-background: var(--cx-icon-button-default-background, var(--opacity-low));
 
-  color: var(--ink);
+  color: var(--cx-icon-button-default-color, var(--ink));
 }
 
 .cx-icon-button:hover.cx-icon-button--default:not(.cx-icon-button--disabled) {
-  --cx-icon-button-background: var(--opacity-mid);
+  --cx-icon-button-background: var(--cx-icon-button-default-hover-background, var(--opacity-mid));
 }
 
 .cx-icon-button--transparent {

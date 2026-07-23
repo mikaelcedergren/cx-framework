@@ -73,6 +73,15 @@
       "path": "patterns/cx-detail-panel/cx-detail-panel.component.ts"
     },
     {
+      "name": "cx-detail-panel-section",
+      "selectors": [
+        "cx-detail-panel-section"
+      ],
+      "area": "pattern",
+      "category": "cx-detail-panel",
+      "path": "patterns/cx-detail-panel/cx-detail-panel-section.component.ts"
+    },
+    {
       "name": "cx-dynamic-fields",
       "selectors": [
         "cx-dynamic-fields"

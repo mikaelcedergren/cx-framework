@@ -72,12 +72,12 @@ For every rendered implementation or release-candidate gate, inspect the actual 
 4. Re-run all eight lenses on the after set:
    - **Necessity:** Reject information, labels, containers, explanations, and controls that do not improve understanding or action. Detect repeated information expressed in slightly different forms.
    - **Hierarchy:** Make the most important information and actions visually dominant. Reduce competing emphasis and unnecessary heading levels.
-   - **Grouping:** Group by meaning and task. Reject nested boxes unless each boundary communicates a genuinely different level or state.
-   - **Affordance:** Make interactive elements look interactive and read-only information look non-editable. Communicate action priority without turning every action into a button.
+   - **Grouping:** Group by meaning and task. Apply `RULE-ID: surfaces.one-boundary` when reviewing container composition.
+   - **Affordance:** Apply `RULE-ID: surfaces.light-first`; keep interactive elements discoverable and read-only information non-editable without turning every action into a button.
    - **Semantic cues:** Use icons, typography, status treatment, and restrained color only when they improve recognition or scanning. Reject decoration without meaning.
    - **Spacing:** Check rhythm, alignment, density, and consistency across siblings. Dense interfaces may remain dense only when deliberately composed.
-   - **Edge crowding:** Require a deliberate inner safe area on every side of a bounded surface. Align text, badges, metadata, controls, and progress information to that inset. Allow dividers, images, tables, or progress bars to reach an edge only when intentionally full-bleed; reject accidental contact, near-contact, clipping, and inconsistent sibling insets.
-   - **Data sufficiency:** Reject sparse happy-path evidence that cannot reveal real density, repetition, truncation, hierarchy, or scrolling behavior.
+   - **Edge crowding:** Require a deliberate inner safe area on every side of a bounded surface. Align text, badges, metadata, controls, and progress information to that inset. Allow dividers, images, tables, or progress bars to reach an edge only when intentionally full-bleed; reject accidental edge contact, accidental clipping, near-contact, and inconsistent sibling insets.
+   - **Data sufficiency:** Reject sparse happy-path evidence that cannot reveal real density, repetition, truncation, hierarchy, or scrolling behavior. Apply `RULE-ID: content.truncation` when deciding whether revealed truncation is a finding.
 
 Do not pass or declare the final UI complete while any visible issue from these lenses remains unresolved. Prefer fewer containers and repeated labels, stronger alignment, calmer hierarchy, and clearer actions. Require the consuming product's shared components, tokens, and patterns, including cx-framework where it is the product contract. If the shared system cannot express the required result, record a framework gap instead of approving a local substitute.
 

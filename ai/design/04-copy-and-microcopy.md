@@ -12,6 +12,8 @@ RULE-ID: copy.terminology SCOPE: copy TYPE: must TOPIC: copy RULE: Use one estab
 
 RULE-ID: copy.plain-language SCOPE: copy TYPE: should TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 
+RULE-ID: copy.reader-language SCOPE: copy TYPE: should TOPIC: copy RULE: Write for the reader instead of mirroring the underlying data model. DESCRIPTION: Convert field names, enum values, status tokens, and key-value structures into natural language. EXCEPT: Preserve structured representation when the surface intentionally presents data in that form.
+
 RULE-ID: copy.sentence-case SCOPE: copy TYPE: should TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
 
 RULE-ID: copy.concise SCOPE: operational-copy TYPE: should TOPIC: voice RULE: Keep operational copy as short as accuracy allows. DESCRIPTION: Do not remove consequence, constraint, recovery, or the next useful action merely to save words.

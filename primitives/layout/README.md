@@ -63,9 +63,9 @@ Children side by side. They stay on one line by default; set `wrap` to `true` wh
 
 ```html
 <cx-inline gap="sm" [wrap]="true">
-  <cx-tag text="open" />
-  <cx-tag text="kev" />
-  <cx-tag text="internet-facing" />
+  <cx-tag text="Open" />
+  <cx-tag text="KEV" />
+  <cx-tag text="Internet-facing" />
 </cx-inline>
 ```
 
@@ -139,7 +139,15 @@ There are deliberately **no margin or gap utilities** — gap belongs to the lay
 
 ## Article
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its headings, paragraphs, lists, quotes, and code get a reading-optimised treatment with no per-element classes. It styles plain semantic HTML, so the source doesn't matter; the whole block scales from one custom property, `--cx-article-base`. Articles centre within an open reading canvas by default. Add `.cx-article--start` when the article is embedded beside navigation or another fixed column and must share that content column's start edge. The `cx-markdown` equivalent is `variant="article" align="start"`.
+Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The whole block scales from one custom property, `--cx-article-base`.
+
+Native article elements need no classes. Three explicit roles cover meaning HTML does not provide on its own:
+
+- `.cx-article__ingress` — the opening summary or lead paragraph
+- `.cx-article__discreet` — supporting text in the secondary foreground colour
+- `.cx-article__keyword` — a dotted-underlined term; pair it with `cx-tooltip` or an equivalent accessible explanation
+
+Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored article sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. Articles centre within an open reading canvas by default. Add `.cx-article--start` when the article is embedded beside navigation or another fixed column and must share that content column's start edge. The `cx-markdown` equivalent is `variant="article" align="start"`.
 
 ## The page frame
 

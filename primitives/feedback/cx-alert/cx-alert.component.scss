@@ -6,19 +6,19 @@
 }
 
 :host(.cx-alert--info) {
-  --cx-alert-accent: var(--info-alt);
+  --cx-alert-accent: var(--info);
 }
 
 :host(.cx-alert--success) {
-  --cx-alert-accent: var(--success-alt);
+  --cx-alert-accent: var(--success);
 }
 
 :host(.cx-alert--warning) {
-  --cx-alert-accent: var(--warning-alt);
+  --cx-alert-accent: var(--warning);
 }
 
 :host(.cx-alert--danger) {
-  --cx-alert-accent: var(--danger-alt);
+  --cx-alert-accent: var(--danger);
 }
 
 :host(.cx-alert--hidden) {

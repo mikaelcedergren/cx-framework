@@ -1,29 +1,59 @@
-@if (isOpen$() && hasImage()) {
-  <div
-    class="cx-lightbox"
-    role="dialog"
-    aria-modal="true"
-    cdkTrapFocus
-    [cdkTrapFocusAutoCapture]="true"
-    [attr.aria-label]="ariaLabel"
-    (click)="onBackdropClick()"
-  >
-    <button
-      type="button"
-      class="cx-lightbox__close"
-      [attr.aria-label]="closeAriaLabel"
-      (click)="onCloseClick($event)"
+@if (isOpen$()) {
+  @if (currentImage$(); as image) {
+    <div
+      class="cx-lightbox"
+      [class.cx-lightbox--gallery]="hasNavigation$()"
+      role="dialog"
+      aria-modal="true"
+      cdkTrapFocus
+      [cdkTrapFocusAutoCapture]="true"
+      [attr.aria-label]="ariaLabel"
+      [attr.aria-keyshortcuts]="hasNavigation$() ? 'Escape ArrowLeft ArrowRight' : 'Escape'"
+      (click)="onBackdropClick($event)"
     >
-      <cx-icon name="remove" [size]="16" aria-hidden="true" />
-    </button>
+      @if (hasNavigation$()) {
+        <cx-icon-button
+          class="cx-lightbox__control cx-lightbox__navigation cx-lightbox__previous"
+          icon="chevron-left"
+          [rounded]="true"
+          [ariaLabel]="previousAriaLabel"
+          [disabled]="!canGoPrevious$()"
+          (pressed)="showPreviousImage()"
+        />
+      }
 
-    <div class="cx-lightbox__surface" (click)="onSurfaceClick($event)">
-      <div class="cx-lightbox__content">
-        <img class="cx-lightbox__image" [src]="src" [alt]="alt" />
-        @if (caption?.trim()) {
-          <div class="cx-lightbox__caption">{{ caption!.trim() }}</div>
+      <figure class="cx-lightbox__surface" tabindex="-1" cdkFocusInitial>
+        <img class="cx-lightbox__image" [src]="image.src" [alt]="image.alt" />
+        @if (image.caption || hasNavigation$()) {
+          <figcaption class="cx-lightbox__meta">
+            @if (image.caption) {
+              <span class="cx-lightbox__caption">{{ image.caption }}</span>
+            }
+            @if (hasNavigation$()) {
+              <span
+                class="cx-lightbox__position"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                [attr.aria-label]="positionLabel$()"
+              >
+                {{ positionText$() }}
+              </span>
+            }
+          </figcaption>
         }
-      </div>
+      </figure>
+
+      @if (hasNavigation$()) {
+        <cx-icon-button
+          class="cx-lightbox__control cx-lightbox__navigation cx-lightbox__next"
+          icon="chevron-right"
+          [rounded]="true"
+          [ariaLabel]="nextAriaLabel"
+          [disabled]="!canGoNext$()"
+          (pressed)="showNextImage()"
+        />
+      }
     </div>
-  </div>
+  }
 }

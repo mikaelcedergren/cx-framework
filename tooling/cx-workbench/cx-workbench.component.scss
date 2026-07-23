@@ -113,6 +113,17 @@ cx-workbench.cx-workbench--overflow-visible .cx-workbench {
   box-sizing: border-box;
 }
 
+.cx-workbench__controls-content > [cxWorkbenchNote] {
+  margin: 0;
+  padding-bottom: var(--space-md);
+  border-bottom: var(--line-discreet);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body-relaxed);
+  overflow-wrap: anywhere;
+}
+
 .cx-workbench__controls-content > [cxWorkbenchControls] {
   display: flex;
   width: 100%;

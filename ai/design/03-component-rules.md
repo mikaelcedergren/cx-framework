@@ -62,9 +62,27 @@ RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: must TOPIC: 
 
 ## Detail panels
 
-RULE-ID: detail-panels.placement SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Declare whether the panel belongs to a positioned content container or the viewport. DESCRIPTION: The detail-panel component owns its overlay position, edge, height, responsive full-screen treatment, and stacking role; consumers provide width and surrounding composition without recreating drawer positioning.
+RULE-ID: detail-panels.placement SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Own the available application frame beneath any explicit persistent utility bar. DESCRIPTION: Mount the panel in the top-level application frame so source tables, cards, split panes, and other content regions never determine its bounds; the component owns its edge treatment, responsive full-frame behavior, and stacking role.
+
+RULE-ID: detail-panels.variants SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Let floating cover the canvas and fixed reflow it. DESCRIPTION: On desktop, floating overlays the application frame without changing its geometry and uses a 4px top, trailing-edge, and bottom inset with low elevation; fixed stays flush to the frame while the owning shell reserves the panel’s rendered inline size so the application body reflows beside it. Below the mobile breakpoint, both variants cover the complete frame and the shell reserves no space.
 
 RULE-ID: detail-panels.overlay-ownership SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Let the topmost child overlay handle dismissal before the detail panel. DESCRIPTION: Menus, pickers, popovers, and dialogs opened from the panel own Escape and outside interaction until they close; consumers never inspect child selectors to guard the panel.
+
+RULE-ID: detail-panels.entity-continuity SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: consistency RULE: Treat the detail panel as a deeper view of the invoking entity. DESCRIPTION: Preserve the entity’s identity, state, and already-visible facts before adding detail so opening the panel expands the same mental object instead of presenting a separate or reinterpreted one.
+
+RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Keep the header order identity, contextual state or metadata, then the rightmost entity menu. DESCRIPTION: Project state or metadata through detail-panel-context; ordinary entity actions belong in the overflow menu rather than a parallel inline action region.
+
+RULE-ID: detail-panels.entity-actions SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Drive every entity action menu from one collection and selection handler. DESCRIPTION: The table-row kebab, right-click menu, other source menu, and detail-panel kebab must match exactly in action set, order, availability, disabled state, and danger treatment; opening details is source activation rather than an action-menu command, and consumers never copy actions into a panel-only model or handler.
+
+RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: Status, metadata, navigation, passive copy, and ordinary entity actions belong in the header, content, or shared entity menu. EXCEPT: A pinned panel-wide task may add persistent completion controls only when they must remain reachable while the task body scrolls.
+
+RULE-ID: detail-panels.frame SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Use a quiet grey frame behind the panel’s separate white surfaces. DESCRIPTION: The header, bordered content sections, and footer read as distinct surfaces while the frame creates one coherent vertical structure.
+
+RULE-ID: detail-panels.tabs SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: navigation RULE: Render supplied peer-section tabs bare on the grey frame immediately beneath the header. DESCRIPTION: Tabs stay transparent, undivided, pinned, and free of surrounding padding or rounded island chrome above the panel-owned scrolling body; consumers never recreate a second tab bar.
+
+RULE-ID: detail-panels.sections SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Compose the scrolling body from explicit cx-detail-panel-section children. DESCRIPTION: Each section owns a white surface, discreet border, fixed 16px internal padding, and an 8px gap between direct children; consumers group related content into sections instead of projecting unsectioned content or choosing body padding.
+
+RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Keep the body independently scrollable and always provide close-button and Escape dismissal. DESCRIPTION: The panel body scrolls vertically only; content that genuinely requires horizontal movement owns a bounded local scroller. Outside-click dismissal remains optional because safety depends on whether closing can lose context or work.
 
 ## Empty states
 
@@ -112,7 +130,9 @@ RULE-ID: progress.passive SCOPE: component COMPONENT: spinners-and-progress-bars
 
 RULE-ID: steps.exact-sequence SCOPE: component COMPONENT: steps TYPE: must TOPIC: navigation RULE: Present and index one exact step sequence. DESCRIPTION: The owner derives conditional branches before rendering; the indicator does not hide steps or reinterpret the index against another array.
 
-RULE-ID: steps.accessible-labels SCOPE: component COMPONENT: steps TYPE: must TOPIC: accessibility RULE: Keep every step name and status available when labels are visually suppressed. DESCRIPTION: Compact presentation may hide words from view but never removes current, completed, upcoming, or needs-attention meaning from the accessibility tree.
+RULE-ID: steps.accessible-labels SCOPE: component COMPONENT: steps TYPE: must TOPIC: accessibility RULE: Keep every step name and status available when labels are visually suppressed. DESCRIPTION: Compact presentation may hide words from view but never removes current, completed, upcoming, pending, or needs-attention meaning from the accessibility tree.
+
+RULE-ID: steps.pending SCOPE: component COMPONENT: steps TYPE: must TOPIC: state RULE: Treat pending as an explicit waiting status independent of mood and indexed position. DESCRIPTION: Pending overrides index-derived completion without moving the current index; add danger when attention is needed, and keep the cause and recovery action outside the passive indicator.
 
 RULE-ID: steps.passive SCOPE: component COMPONENT: steps TYPE: must TOPIC: state RULE: Do not disable a passive step indicator. DESCRIPTION: A non-interactive progress sequence describes state; it is not an unavailable control.
 
@@ -149,6 +169,8 @@ RULE-ID: tabs.information SCOPE: component COMPONENT: tabs TYPE: should TOPIC: n
 RULE-ID: tabs.task-flow SCOPE: component COMPONENT: tabs TYPE: should TOPIC: forms RULE: Avoid splitting one dependent form or task across tabs. DESCRIPTION: Hidden required fields and errors break the sense of one continuous action. EXCEPT: Tabs may contain independent self-contained forms with no shared validation.
 
 RULE-ID: tabs.state SCOPE: component COMPONENT: tabs TYPE: must TOPIC: accessibility RULE: Expose selected tab, tablist, and panel relationships semantically. DESCRIPTION: Keyboard behavior and focus movement must follow the established tab pattern.
+
+RULE-ID: tabs.divider SCOPE: component COMPONENT: tabs TYPE: should TOPIC: affordance RULE: Keep the neutral divider beneath tabs by default. DESCRIPTION: Disable the divider when the surrounding surface already establishes the boundary; the selected-tab indicator remains visible in either state.
 
 ## Tooltips
 

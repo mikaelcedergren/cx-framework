@@ -108,11 +108,11 @@ RULE-ID: layout.stability SCOPE: dynamic-layout TYPE: should TOPIC: layout RULE:
 
 RULE-ID: density.data-not-chrome SCOPE: data-display TYPE: should TOPIC: density RULE: Separate information density from interface density. DESCRIPTION: Dense data can remain readable without giving every value a box, icon, tag, or tooltip.
 
-RULE-ID: surfaces.one-boundary SCOPE: visual-group TYPE: should TOPIC: surfaces RULE: Give one unit one primary boundary signal. DESCRIPTION: Prefer spacing, one border, one quiet fill, or one typographic group instead of stacking several boxes.
+RULE-ID: surfaces.one-boundary SCOPE: visual-group TYPE: should TOPIC: surfaces RULE: Keep each visual group to one primary boundary; do not put a card, box, or bordered container inside another. DESCRIPTION: Flatten the composition with spacing, typography, dividers, or one shared surface instead of stacking borders, fills, shadows, and containers. EXCEPT: Nest a surface only when the user or product contract explicitly requires a distinct semantic plane.
 
 RULE-ID: surfaces.floating-depth SCOPE: floating-surface TYPE: should TOPIC: surfaces RULE: Reserve shadow for floating elements and real elevation. DESCRIPTION: Grounded regions should rely on surfaces, spacing, opacity, and restrained borders.
 
-RULE-ID: surfaces.light-first SCOPE: global TYPE: should TOPIC: surfaces RULE: Start with the lightest structure that keeps hierarchy and affordance clear. DESCRIPTION: Every extra border, fill, shadow, container, and weight must communicate something useful.
+RULE-ID: surfaces.light-first SCOPE: global TYPE: must TOPIC: affordance RULE: Start with the quietest complete interface; every visible addition must earn its place through clear user value. DESCRIPTION: Add a label, icon, badge, divider, container, border, fill, shadow, helper, or persistent control only when it materially improves understanding, task completion, discoverability, state perception, error prevention, or accessibility. If its value is uncertain, omit it until a demonstrated or explicitly requested need exists; never compromise necessary hierarchy, actions, state, consequences, form labels, accessible names, visible focus, readable contrast, or meaning beyond color.
 
 ## Tokens and color
 
@@ -179,6 +179,8 @@ RULE-ID: navigation.position-stability SCOPE: navigation TYPE: should TOPIC: nav
 RULE-ID: navigation.breadcrumb-depth SCOPE: navigation TYPE: should TOPIC: navigation RULE: Use breadcrumbs only for genuine hierarchical depth. DESCRIPTION: Do not add them to flat products or as a substitute for a correct Back action.
 
 RULE-ID: data.user-importance SCOPE: data-display TYPE: must TOPIC: data-display RULE: Order information by user importance rather than storage order. DESCRIPTION: Lead with identity, current state, or the signal that changes what the user should do now.
+
+RULE-ID: content.truncation SCOPE: content-display TYPE: should TOPIC: hierarchy RULE: Allow intentional truncation for secondary or supporting text. DESCRIPTION: Treat truncation as a defect only when it hides task-primary information, an action, state, consequence, required recovery, or otherwise harms task success or accessibility.
 
 RULE-ID: data.consistent-order SCOPE: data-display TYPE: should TOPIC: data-display RULE: Keep comparable views in the same information order. DESCRIPTION: Stable ordering improves scanning, comparison, and learned behavior.
 

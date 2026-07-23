@@ -4,7 +4,7 @@ import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 
 export type CxImageSize = 'auto' | '80' | '160' | '320';
 export type CxImageFit = 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-export type CxImageRadius = 'none' | '4' | '8' | '16' | 'round';
+export type CxImageRadius = 'small' | 'default' | 'large' | 'round';
 export type CxImageClickBehavior = 'default' | 'click' | 'fullScreen';
 
 export interface CxImage {
@@ -129,7 +129,7 @@ function normalizeCxImage(image: CxImage | undefined): NormalizedCxImage {
     maxWidth: image?.maxWidth ?? 'auto',
     maxHeight: image?.maxHeight ?? 'auto',
     objectFit: image?.objectFit ?? 'cover',
-    borderRadius: image?.borderRadius ?? 'none',
+    borderRadius: image?.borderRadius ?? 'default',
     clickBehavior: image?.clickBehavior ?? 'default',
   };
 }
@@ -161,14 +161,12 @@ function resolveImageSizeValue(size: CxImageSize): string {
 
 function resolveImageRadiusValue(radius: CxImageRadius): string {
   switch (radius) {
-    case 'none':
-      return 'var(--radius-none)';
-    case '4':
-      return 'var(--radius-xs)';
-    case '8':
+    case 'small':
       return 'var(--radius-sm)';
-    case '16':
+    case 'default':
       return 'var(--radius-lg)';
+    case 'large':
+      return 'var(--radius-media-lg)';
     case 'round':
       return 'var(--radius-pill)';
   }

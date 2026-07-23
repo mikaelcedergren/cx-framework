@@ -13,9 +13,13 @@
   align-items: stretch;
   gap: 0;
   padding: 0;
-  border-bottom: var(--line);
+  border-bottom: var(--border-width) solid transparent;
   background: var(--opacity-low);
   box-sizing: border-box;
+}
+
+.cx-tabs--divided {
+  border-bottom-color: var(--opacity-mid);
 }
 
 .cx-tabs--transparent {
@@ -57,9 +61,7 @@
   line-height: 1;
   margin: 0;
   outline: none;
-  transition:
-    color var(--motion-fast) ease,
-    background-color var(--motion-fast) ease;
+  transition: color var(--motion-fast) ease;
   white-space: nowrap;
 }
 
@@ -70,7 +72,6 @@
 
 .cx-tabs__tab:is(:hover, :focus-visible):not(.cx-tabs__tab--disabled) {
   color: var(--ink);
-  background: var(--opacity-darken);
 }
 
 .cx-tabs__tab:focus-visible {

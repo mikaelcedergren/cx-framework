@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  ViewEncapsulation,
+  signal,
+} from '@angular/core';
 import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 
 export type CxWorkbenchAlign = 'top' | 'center' | 'bottom';
@@ -38,6 +45,10 @@ export class CxWorkbenchComponent {
     { id: 'large', label: 'large' },
     { id: 'full', label: 'full' },
   ];
+
+  @Input({ transform: booleanAttribute }) showPreviewHeightControl = true;
+  @Input({ transform: booleanAttribute }) showPreviewWidthControl = true;
+  @Input({ transform: booleanAttribute }) showAlignControl = true;
 
   @Input()
   public set align(value: CxWorkbenchAlign | undefined) {

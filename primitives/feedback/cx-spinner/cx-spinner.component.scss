@@ -58,12 +58,14 @@
 }
 
 .cx-spinner__track {
-  opacity: 0.18;
+  color: var(--opacity-mid);
 }
 
 .cx-spinner__arc {
   transform-origin: center;
-  animation: cx-spinner-spin 1.05s linear infinite;
+  animation:
+    cx-spinner-spin 1.8s linear infinite,
+    cx-spinner-arc-pulse 1.4s ease-in-out infinite;
 }
 
 .cx-spinner__segment {
@@ -85,9 +87,26 @@
   }
 }
 
+@keyframes cx-spinner-arc-pulse {
+  0% {
+    stroke-dasharray: 8 100;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 68 100;
+    stroke-dashoffset: -18;
+  }
+
+  100% {
+    stroke-dasharray: 8 100;
+    stroke-dashoffset: -108;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cx-spinner__arc {
-    animation-duration: 2.4s;
+    animation: none;
   }
 
   .cx-spinner__segment {

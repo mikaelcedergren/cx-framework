@@ -54,6 +54,7 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
   private readonly hasOverflowState = signal(false);
   private readonly overflowIdsState = signal<string[]>([]);
   private readonly transparentState = signal(false);
+  private readonly dividedState = signal(true);
   private readonly equalWidthState = signal(false);
   protected readonly overflowOpen$ = signal(false);
   protected readonly indicatorVisible$ = signal(false);
@@ -67,6 +68,8 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
   private pointerScrollLeft: number | undefined;
 
   @Input() ariaLabel = 'Tabs';
+  /** DOM id of the tab panel controlled by this tablist. */
+  @Input() controlsId: string | undefined;
 
   @Input()
   public set items(value: readonly CxTabItem[] | undefined) {
@@ -93,6 +96,11 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
+  public set divided(value: boolean | string | undefined) {
+    this.dividedState.set(value === undefined ? true : coerceBoolean(value));
+  }
+
+  @Input()
   public set equalWidth(value: boolean | string | undefined) {
     this.equalWidthState.set(coerceBoolean(value));
     this.scheduleLayoutRefresh();
@@ -103,6 +111,7 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
   protected readonly selectedId$ = this.selectedIdState.asReadonly();
   protected readonly items$ = this.itemsState.asReadonly();
   protected readonly transparent$ = this.transparentState.asReadonly();
+  protected readonly divided$ = this.dividedState.asReadonly();
   protected readonly equalWidth$ = this.equalWidthState.asReadonly();
   protected readonly hasOverflow$ = this.hasOverflowState.asReadonly();
   protected readonly overflowItems$ = computed<CxTabItem[]>(() => {
@@ -233,6 +242,10 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
 
   protected menuLabelFor(item: CxTabItem): string {
     return this.hasCount(item) ? `${item.label} (${item.count})` : item.label;
+  }
+
+  protected tabIdFor(index: number): string | null {
+    return this.controlsId ? `${this.controlsId}-tab-${index}` : null;
   }
 
   private normalizeItems(value: readonly CxTabItem[] | undefined): CxTabItem[] {

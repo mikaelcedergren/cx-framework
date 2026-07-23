@@ -2,6 +2,7 @@
   #rootRef
   class="cx-tabs"
   [class.cx-tabs--transparent]="transparent$()"
+  [class.cx-tabs--divided]="divided$()"
   [class.cx-tabs--equal-width]="equalWidth$()"
 >
   <div
@@ -20,7 +21,9 @@
         [class.cx-tabs__tab--active]="selectedId$() === item.id"
         [class.cx-tabs__tab--disabled]="item.disabled"
         [disabled]="item.disabled"
+        [attr.id]="tabIdFor(index)"
         [attr.aria-selected]="selectedId$() === item.id ? 'true' : 'false'"
+        [attr.aria-controls]="controlsId || null"
         [attr.tabindex]="tabIndexFor(item, index)"
         (pointerdown)="onTabPointerDown($event)"
         (click)="select(item.id, false)"

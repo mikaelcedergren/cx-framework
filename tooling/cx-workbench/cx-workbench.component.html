@@ -17,42 +17,51 @@
       </div>
     </div>
 
-    <div class="cx-workbench__meta">
-      <div class="cx-workbench__meta-field">
-        <span class="cx-workbench__meta-label">previewHeight</span>
-        <cx-dropdown
-          label=""
-          ariaLabel="previewHeight"
-          [availableValues]="previewHeightOptions"
-          [value]="previewHeight$()"
-          (valueChange)="onPreviewHeightChange($event)"
-        />
+    @if (showPreviewHeightControl || showPreviewWidthControl || showAlignControl) {
+      <div class="cx-workbench__meta">
+        @if (showPreviewHeightControl) {
+          <div class="cx-workbench__meta-field">
+            <span class="cx-workbench__meta-label">previewHeight</span>
+            <cx-dropdown
+              label=""
+              ariaLabel="previewHeight"
+              [availableValues]="previewHeightOptions"
+              [value]="previewHeight$()"
+              (valueChange)="onPreviewHeightChange($event)"
+            />
+          </div>
+        }
+        @if (showPreviewWidthControl) {
+          <div class="cx-workbench__meta-field">
+            <span class="cx-workbench__meta-label">previewWidth</span>
+            <cx-dropdown
+              label=""
+              ariaLabel="previewWidth"
+              [availableValues]="previewWidthOptions"
+              [value]="previewWidth$()"
+              (valueChange)="onPreviewWidthChange($event)"
+            />
+          </div>
+        }
+        @if (showAlignControl) {
+          <div class="cx-workbench__meta-field">
+            <span class="cx-workbench__meta-label">align</span>
+            <cx-dropdown
+              label=""
+              ariaLabel="align"
+              [availableValues]="alignOptions"
+              [value]="align$()"
+              (valueChange)="onAlignChange($event)"
+            />
+          </div>
+        }
       </div>
-      <div class="cx-workbench__meta-field">
-        <span class="cx-workbench__meta-label">previewWidth</span>
-        <cx-dropdown
-          label=""
-          ariaLabel="previewWidth"
-          [availableValues]="previewWidthOptions"
-          [value]="previewWidth$()"
-          (valueChange)="onPreviewWidthChange($event)"
-        />
-      </div>
-      <div class="cx-workbench__meta-field">
-        <span class="cx-workbench__meta-label">align</span>
-        <cx-dropdown
-          label=""
-          ariaLabel="align"
-          [availableValues]="alignOptions"
-          [value]="align$()"
-          (valueChange)="onAlignChange($event)"
-        />
-      </div>
-    </div>
+    }
   </div>
 
   <aside class="cx-workbench__controls">
     <div class="cx-workbench__controls-content">
+      <ng-content select="[cxWorkbenchNote]" />
       <ng-content select="[cxWorkbenchControls]" />
     </div>
   </aside>

@@ -27,7 +27,7 @@
     --opacity-low: color-mix(in srgb, rgb(22 24 29 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
     --opacity-darken: rgb(22 24 29 / 1.5%);
     --opacity-disabled: 0.55;
-    --overlay-backdrop: rgb(0 0 0 / 50%);
+    --overlay-backdrop: rgb(0 0 0 / 80%);
 
     --success: var(--green);
     --success-opacity: var(--green-opacity);
@@ -71,7 +71,7 @@
     --opacity-low: color-mix(in srgb, rgb(255 255 255 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
     --opacity-darken: rgb(0 0 0 / 5%);
     --opacity-disabled: 0.55;
-    --overlay-backdrop: rgb(0 0 0 / 64%);
+    --overlay-backdrop: rgb(0 0 0 / 80%);
 
     --success: var(--green);
     --success-opacity: var(--green-opacity);
@@ -115,7 +115,7 @@
     --opacity-low: color-mix(in srgb, rgb(244 247 252 / 4%) 92%, color-mix(in srgb, var(--blue) 4%, transparent) 8%);
     --opacity-darken: rgb(0 0 0 / 5%);
     --opacity-disabled: 0.55;
-    --overlay-backdrop: rgb(5 7 12 / 64%);
+    --overlay-backdrop: rgb(5 7 12 / 80%);
 
     --success: var(--green);
     --success-opacity: var(--green-opacity);
@@ -159,7 +159,7 @@
     --opacity-low: color-mix(in srgb, rgb(0 0 0 / 8%) 96%, color-mix(in srgb, var(--blue) 8%, transparent) 4%);
     --opacity-darken: rgb(0 0 0 / 3%);
     --opacity-disabled: 0.55;
-    --overlay-backdrop: rgb(0 0 0 / 72%);
+    --overlay-backdrop: rgb(0 0 0 / 80%);
 
     --success: var(--green);
     --success-opacity: var(--green-opacity);

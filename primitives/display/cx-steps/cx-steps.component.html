@@ -3,14 +3,17 @@
     <li
       class="cx-step"
       [class.cx-step--selected]="isCurrent(index)"
-      [class.cx-step--completed]="isCompleted(index)"
+      [class.cx-step--completed]="isCompleted(step, index)"
+      [class.cx-step--pending]="isPending(step)"
       [class.cx-step--danger]="isDanger(step)"
       [attr.aria-current]="isCurrent(index) ? 'step' : null"
     >
       <span class="cx-step__number" aria-hidden="true">
-        @if (isDanger(step)) {
+        @if (isPending(step)) {
+          <cx-icon name="pending" [size]="14" />
+        } @else if (isDanger(step)) {
           <cx-icon name="warning" [size]="14" />
-        } @else if (isCompleted(index)) {
+        } @else if (isCompleted(step, index)) {
           <cx-icon name="check" [size]="14" />
         } @else {
           {{ index + 1 }}
@@ -27,11 +30,7 @@
       <span class="cx-step__status">{{ stepStatus(step, index) }}</span>
 
       @if (index < steps.length - 1) {
-        <span
-          class="cx-step__divider"
-          [class.cx-step__divider--completed]="isCompleted(index)"
-          aria-hidden="true"
-        ></span>
+        <span class="cx-step__divider" aria-hidden="true"></span>
       }
     </li>
   }

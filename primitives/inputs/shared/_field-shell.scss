@@ -75,3 +75,30 @@
     cursor: $loading-cursor;
   }
 }
+
+@mixin field-shell-interaction($selector) {
+  #{$selector}:hover:not(#{$selector}--disabled):not(#{$selector}--error),
+  #{$selector}:focus-within:not(#{$selector}--disabled):not(#{$selector}--error) {
+    outline: var(--outline-field-interaction);
+    outline-offset: 0;
+  }
+}
+
+@mixin field-shell-inline-edit($selector, $focus-target) {
+  #{$selector}--inline-edit {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  #{$selector}--inline-edit:hover:not(#{$selector}--disabled):not(#{$selector}--error),
+  #{$selector}--inline-edit#{$selector}--focused:not(#{$selector}--disabled):not(#{$selector}--error),
+  #{$selector}--inline-edit:has(#{$focus-target}:focus-visible):not(#{$selector}--disabled):not(#{$selector}--error) {
+    border-color: var(--opacity-mid);
+    background: var(--opacity-darken);
+  }
+
+  #{$selector}--inline-edit#{$selector}--error,
+  #{$selector}--inline-edit#{$selector}--error:hover:not(#{$selector}--disabled) {
+    border-color: var(--danger);
+  }
+}

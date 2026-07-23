@@ -34,9 +34,11 @@ The user evaluates components through the workbench, not through source code. A 
 - Label every control with the exact public name or prop path, such as `mood`, `dismissible`, or `action.text`.
 - Do not expose implementation helpers, scenario presets, visual hacks, or workbench-only toggles as component props.
 - Put outputs and event demonstrations outside the prop-control list.
+- Project contextual workbench information through `[cxWorkbenchNote]`; the shell places it above the prop controls with a divider, keeping explanatory text out of the preview.
 - Keep component controls in one vertical stack; never place them side by side.
 - Make every control fill the full control-column width.
 - Keep preview width, preview height, alignment, and other shell controls in the shared workbench shell rather than the component's prop section.
+- Omit an individual shell control through its positive `show*Control` input when changing it cannot reveal meaningful component behavior; leave every applicable control visible.
 
 ### Control mapping
 
@@ -196,7 +198,7 @@ Components use the semantic role, never the mapped palette name.
 - `--opacity-low`: quiet fills and near-background hierarchy; not readable body text
 - `--opacity-darken`: subtle pressed or shaded effects
 - `--opacity-disabled`: disabled visibility
-- `--overlay-backdrop`: overlay backdrop
+- `--overlay-backdrop`: dimming backdrop for modal and navigation overlays
 
 Do not stack surfaces to fake depth. Floating surfaces use clear surface contrast and shadow; grounded regions use spacing, opacity, and restrained borders.
 
@@ -221,8 +223,8 @@ Default control size is `default`; `small` is for genuinely compact or secondary
 Type scale:
 
 - `--font-size-title-1`: 24px
-- `--font-size-title-2`: 18px
-- `--font-size-title-3`: 16px
+- `--font-size-title-2`: 20px
+- `--font-size-title-3`: 18px
 - `--font-size-body-lg`: 16px
 - `--font-size-body`: 14px
 - `--font-size-body-sm`: 12px
@@ -239,6 +241,7 @@ Radius scale:
 - `--radius-sm`: 8px
 - `--radius-md`: 12px
 - `--radius-lg`: 16px
+- `--radius-media-lg`: 24px for large media corners
 - `--radius-xl`: 32px
 - `--radius-2xl`: 64px
 - `--radius-pill`: 999px
@@ -285,7 +288,8 @@ Authenticated pages use the shared page rhythm:
 - bounded board/editor: `cx-page--bounded` with `cx-page__fill`
 - desktop padding: `--space-lg`
 - narrow padding: `--space-md`
-- page and top-bar alignment: global `--gutter-page`
+- page padding: global `--gutter-page`
+- top-bar inner padding: `--space-md`
 
 Pages take the full canvas width by default. Cap a specific readable text block, not the page shell. Do not add custom padding to individual page roots.
 
@@ -339,7 +343,8 @@ Use source inspection for predictable token-only changes. Use rendered browser v
 - consumer reaching into component internals
 - local token aliases that add no boundary
 - inline visual fixes or raw token values
-- nested cards and stacked boundary signals
+- violations of portable `RULE-ID: surfaces.one-boundary` in `ai/design/02-ux-rules.md`
+- violations of portable `RULE-ID: surfaces.light-first` in `ai/design/02-ux-rules.md`
 - multiple primary actions in one action region
 - color-only meaning
 - hidden focus or false hover affordance
