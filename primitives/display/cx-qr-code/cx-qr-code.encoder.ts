@@ -541,7 +541,14 @@ function toSvg(modules: Matrix, pixelSize: number): string {
     }
   });
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" role="presentation" focusable="false" shape-rendering="crispEdges"><path fill="currentColor" d="${segments.join('')}"/></svg>`;
+  // QR contrast belongs to the scannable artifact, not the surrounding theme.
+  // Include both colors in the SVG so its quiet zone stays light everywhere.
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" role="presentation" focusable="false" shape-rendering="crispEdges">`,
+    `<rect width="${viewBoxSize}" height="${viewBoxSize}" fill="#ffffff"/>`,
+    `<path fill="#000000" d="${segments.join('')}"/>`,
+    '</svg>',
+  ].join('');
 }
 
 class BitBuffer {

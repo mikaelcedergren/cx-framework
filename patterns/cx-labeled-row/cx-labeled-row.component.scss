@@ -1,6 +1,7 @@
 :host {
   display: block;
   width: 100%;
+  container-type: inline-size;
 }
 
 .cx-labeled-row {
@@ -69,6 +70,8 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body-relaxed);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .cx-labeled-row__radio-group {
@@ -88,4 +91,11 @@
 
 .cx-labeled-row__group-error {
   width: 100%;
+}
+
+@container (max-width: 480px) {
+  .cx-labeled-row:not(.cx-labeled-row--no-label) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-2xs);
+  }
 }

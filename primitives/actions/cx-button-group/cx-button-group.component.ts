@@ -59,6 +59,9 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
   private animationFrameId: number | undefined;
 
+  /** Accessible name for the single-choice group. */
+  @Input() ariaLabel: string | undefined = 'Options';
+
   @Input()
   public set availableValues(value: CxButtonGroupOption[] | undefined) {
     this.availableValuesState.set(value ?? []);

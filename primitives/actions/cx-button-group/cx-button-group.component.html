@@ -3,6 +3,7 @@
   class="cx-button-group-row"
   [class.cx-button-group-row-has-indicator]="indicatorVisible$()"
   role="group"
+  [attr.aria-label]="ariaLabel?.trim() || 'Options'"
 >
   @if (indicatorVisible$()) {
     <span class="cx-button-group-indicator" aria-hidden="true"></span>
