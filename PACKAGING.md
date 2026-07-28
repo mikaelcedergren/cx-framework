@@ -91,10 +91,18 @@ After the package repo is committed and pushed, consuming apps using:
 {
   "dependencies": {
     "@mikaelcedergren/cx-framework": "github:mikaelcedergren/cx-framework#main"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@mikaelcedergren/cx-framework"
+    ]
   }
 }
 ```
 
-must refresh their install or lockfile so the GitHub dependency points at the new commit.
+must refresh their install or lockfile so the GitHub dependency points at the new commit. Because
+the GitHub source dependency builds `dist/lib` during `prepare`, every pnpm consumer must retain the
+package in `pnpm.onlyBuiltDependencies`; a previously prepared pnpm store entry is not proof that a
+clean install is reproducible.
 
 If a consuming app exposes something wrong, fix the source framework and re-export rather than patching the app locally.

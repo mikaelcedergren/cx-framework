@@ -25,11 +25,19 @@ Install the package from GitHub:
 {
   "dependencies": {
     "@mikaelcedergren/cx-framework": "github:mikaelcedergren/cx-framework#main"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@mikaelcedergren/cx-framework"
+    ]
   }
 }
 ```
 
-The package expects Angular, Angular CDK, and RxJS peer dependencies from the consuming app. Keep the consuming app on the same Angular major as the package.
+The GitHub source package builds its `dist/lib` entrypoint during `prepare`, so pnpm consumers must
+explicitly allow that package build. A prepared store entry can otherwise mask a broken clean
+install. The package also expects Angular, Angular CDK, and RxJS peer dependencies from the
+consuming app. Keep the consuming app on the same Angular major as the package.
 
 ## Angular components
 
