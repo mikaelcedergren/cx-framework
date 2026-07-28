@@ -297,7 +297,6 @@ export class CxTableComponent implements OnDestroy {
     | undefined;
 
   @ViewChild('tableElement') private readonly tableElement?: ElementRef<HTMLTableElement>;
-  @ViewChild('columnSearchInput') private readonly columnSearchInput?: CxTextFieldComponent;
   @ViewChild('columnHeaderPopover') private readonly columnHeaderPopover?: CxPopoverComponent;
   @Input() density: CxTableDensity = 'compact';
   @Input() rowActivation: CxTableRowActivation = 'none';
@@ -840,7 +839,7 @@ export class CxTableComponent implements OnDestroy {
     this.columnHeaderMenuColumnIdState.set(column.id);
     this.columnHeaderMenuTrigger = triggerElement;
     this.syncColumnHeaderMenuPosition(column, triggerElement);
-    queueMicrotask(() => this.focusColumnHeaderMenu(column));
+    this.scheduleColumnHeaderMenuFocus(column);
   }
 
   protected closeColumnHeaderMenu(restoreFocus = true): void {
@@ -874,15 +873,22 @@ export class CxTableComponent implements OnDestroy {
     return index < 0 ? undefined : triggers[index + 1] ?? triggers[index - 1];
   }
 
-  private focusColumnHeaderMenu(column: CxTableColumn): void {
+  private focusColumnHeaderMenuWhenReady(column: CxTableColumn, attempt = 0): void {
     if (this.columnHeaderMenuColumnIdState() !== column.id) {
       return;
     }
-    if (this.isColumnSearchable(column) && this.columnSearchInput) {
-      this.columnSearchInput.focus();
+    const surface = this.columnHeaderPopover?.surfaceElement();
+    const searchInput = this.isColumnSearchable(column)
+      ? surface?.querySelector<HTMLInputElement>('.cx-table__header-menu-search input:not(:disabled)')
+      : undefined;
+    if (searchInput) {
+      searchInput.focus();
       return;
     }
-    const surface = this.columnHeaderPopover?.surfaceElement();
+    if (this.isColumnSearchable(column)) {
+      this.retryColumnHeaderMenuFocus(column, attempt);
+      return;
+    }
     const firstAction = surface
       ?.querySelector<HTMLButtonElement>('.cx-table__header-menu-actions button:not(:disabled)');
     if (firstAction) {
@@ -892,7 +898,24 @@ export class CxTableComponent implements OnDestroy {
     if (surface) {
       surface.tabIndex = -1;
       surface.focus();
+      return;
     }
+    this.retryColumnHeaderMenuFocus(column, attempt);
+  }
+
+  private scheduleColumnHeaderMenuFocus(column: CxTableColumn): void {
+    if (typeof requestAnimationFrame === 'undefined') {
+      queueMicrotask(() => this.focusColumnHeaderMenuWhenReady(column));
+      return;
+    }
+    requestAnimationFrame(() => this.focusColumnHeaderMenuWhenReady(column));
+  }
+
+  private retryColumnHeaderMenuFocus(column: CxTableColumn, attempt: number): void {
+    if (attempt >= 12 || typeof requestAnimationFrame === 'undefined') {
+      return;
+    }
+    requestAnimationFrame(() => this.focusColumnHeaderMenuWhenReady(column, attempt + 1));
   }
 
   private syncColumnHeaderMenuPosition(column: CxTableColumn, triggerElement: HTMLElement): void {

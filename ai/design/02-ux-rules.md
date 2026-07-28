@@ -84,6 +84,8 @@ RULE-ID: interaction.hover SCOPE: interactive TYPE: must TOPIC: interaction RULE
 
 RULE-ID: interaction.primary-region SCOPE: action-region TYPE: should TOPIC: interaction RULE: Use at most one primary forward action in one action region. DESCRIPTION: A page may contain distinct regions with their own local action hierarchy; unrelated actions must not compete as peers.
 
+RULE-ID: interaction.secondary-utilities-overflow SCOPE: secondary-action TYPE: must TOPIC: hierarchy RULE: Put occasional utility actions such as copy or export inside the overflow menu instead of presenting them as persistent buttons beside it. DESCRIPTION: Keep visible action space for the current primary task; expose a secondary utility directly only when the product explicitly identifies it as a frequent primary task.
+
 RULE-ID: interaction.automation-control SCOPE: automated-action TYPE: should TOPIC: trust RULE: Let users inspect, adjust, or reverse meaningful automated choices. DESCRIPTION: Automation should reduce work without making consequential decisions mysterious.
 
 ## Layout, density, and surfaces
@@ -99,6 +101,8 @@ RULE-ID: layout.component-spacing SCOPE: design-system TYPE: must TOPIC: layout 
 RULE-ID: layout.spacing-rhythm SCOPE: layout TYPE: should TOPIC: density RULE: Follow the product's tokenized spacing rhythm. DESCRIPTION: Use close spacing for related text-like content and more space for visually heavier groups. EXCEPT: Typography follows its own fitted scale.
 
 RULE-ID: layout.default-gaps SCOPE: layout TYPE: should TOPIC: density RULE: Start with 8px for close relationships and 16px for separate or weighty groups. DESCRIPTION: Larger pauses should correspond to a real mental or page-level shift.
+
+RULE-ID: layout.trailing-control-cluster SCOPE: secondary-controls TYPE: must TOPIC: layout RULE: Group secondary and contextual controls in one compact cluster aligned to the trailing edge. DESCRIPTION: Keep peer selectors, utilities, and overflow actions together with deliberate gaps; never distribute them across the full row or create empty space merely to fill available width. EXCEPT: Separate a leading control only when the product explicitly gives it a distinct navigation, scope-setting, or primary-task role.
 
 RULE-ID: layout.no-page-horizontal-scroll SCOPE: page-layout TYPE: must TOPIC: layout RULE: Keep ordinary page content within the viewport. DESCRIPTION: Reflow or stack content rather than forcing page-level horizontal reading. EXCEPT: A bounded component may scroll horizontally when its role clearly requires it, such as a wide data table or carousel.
 

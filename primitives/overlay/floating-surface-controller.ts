@@ -182,9 +182,13 @@ export class CxFloatingSurfaceController {
     this.resizeObserver.observe(activeTrigger);
   }
 
-  destroy(): void {
+  stopObservingTrigger(): void {
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
+  }
+
+  destroy(): void {
+    this.stopObservingTrigger();
     this.cancelMeasurePass();
   }
 }

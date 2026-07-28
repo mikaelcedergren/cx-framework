@@ -16,6 +16,10 @@ RULE-ID: banners.dismissal SCOPE: component COMPONENT: banners TYPE: should TOPI
 
 RULE-ID: utility-bars.internal-only SCOPE: component COMPONENT: utility-bars TYPE: must TOPIC: components RULE: Use utility bars only for explicit internal prototype, administration, or operator tooling. DESCRIPTION: They must never appear in public-facing interfaces or be visible to ordinary users.
 
+## Action areas
+
+RULE-ID: action-areas.explicit-only SCOPE: component COMPONENT: action-areas TYPE: must TOPIC: components RULE: Use an action area only when the product scope explicitly requires one. DESCRIPTION: Never introduce cx-action-area as a default wrapper, automatic enhancement, or substitute for ordinary inline actions, entity menus, section content, or navigation; when action-area use is not explicitly requested, omit it.
+
 ## Buttons
 
 RULE-ID: buttons.primary SCOPE: component COMPONENT: buttons TYPE: should TOPIC: interaction RULE: Reserve primary treatment for the main forward action in one action region. DESCRIPTION: Separate regions may have separate local hierarchies; peer actions in one region must not compete as primary.
@@ -70,11 +74,15 @@ RULE-ID: detail-panels.overlay-ownership SCOPE: component COMPONENT: detail-pane
 
 RULE-ID: detail-panels.entity-continuity SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: consistency RULE: Treat the detail panel as a deeper view of the invoking entity. DESCRIPTION: Preserve the entity’s identity, state, and already-visible facts before adding detail so opening the panel expands the same mental object instead of presenting a separate or reinterpreted one.
 
-RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Keep the header order identity, contextual state or metadata, then the rightmost entity menu. DESCRIPTION: Project state or metadata through detail-panel-context; ordinary entity actions belong in the overflow menu rather than a parallel inline action region.
+RULE-ID: detail-panels.information-depth SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: hierarchy RULE: Make the body a meaningful breakdown of the entity rather than a restyled summary. DESCRIPTION: After preserving source-visible facts for continuity, add the relevant context, evidence, timing, relationships, and history needed to understand the entity and its main state; omit unavailable information rather than inventing it, and never let an action area substitute for detail.
+
+RULE-ID: detail-panels.labeled-rows SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Present compact label-value facts as horizontal labeled rows by default. DESCRIPTION: Keep labels in one stable leading column with values beside them so the body scans as relationships rather than stacked fragments, and keep the orientation consistent across comparable detail surfaces. EXCEPT: Use a vertical label-value layout only when the product explicitly requires it or a documented narrow-layout constraint makes the horizontal row unreadable.
+
+RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Keep the header order identity, main status, then the rightmost entity menu. DESCRIPTION: When the entity has a main status, project exactly one cx-status-tag through detail-panel-status at the right of the header immediately before the menu; never substitute severity, classification, or secondary metadata, never repeat the main status in the body, tabs, or footer, and leave the slot empty rather than inventing a status for an entity without one.
 
 RULE-ID: detail-panels.entity-actions SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Drive every entity action menu from one collection and selection handler. DESCRIPTION: The table-row kebab, right-click menu, other source menu, and detail-panel kebab must match exactly in action set, order, availability, disabled state, and danger treatment; opening details is source activation rather than an action-menu command, and consumers never copy actions into a panel-only model or handler.
 
-RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: Status, metadata, navigation, passive copy, and ordinary entity actions belong in the header, content, or shared entity menu. EXCEPT: A pinned panel-wide task may add persistent completion controls only when they must remain reachable while the task body scrolls.
+RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: The main status belongs only in the header; supporting metadata, navigation, and passive copy belong in content, while ordinary entity actions belong in the shared entity menu. EXCEPT: A pinned panel-wide task may add persistent completion controls only when they must remain reachable while the task body scrolls.
 
 RULE-ID: detail-panels.frame SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Use a quiet grey frame behind the panel’s separate white surfaces. DESCRIPTION: The header, bordered content sections, and footer read as distinct surfaces while the frame creates one coherent vertical structure.
 

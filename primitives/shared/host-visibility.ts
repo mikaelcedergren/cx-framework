@@ -6,9 +6,9 @@
  * Components whose surface renders entirely inside their host must gate
  * document-level listeners (escape, outside-click, global shortcuts) on this:
  * a CSS-hidden instance (hidden tab, hidden workbench, collapsed step) is not
- * part of the UI and must not react to page-wide events. Components that
- * portal their surface to `<body>` should keep gating on their own open state
- * instead — their surface can be visible while the host is hidden.
+ * part of the UI and must not react to page-wide events. A component that
+ * portals an open surface to `<body>` must additionally observe its owning
+ * host and close if that host becomes hidden.
  */
 export function isHostVisible(host: Element | null | undefined): boolean {
   if (!host || !host.isConnected) {
@@ -20,4 +20,66 @@ export function isHostVisible(host: Element | null | undefined): boolean {
   // Fallback: a display:none subtree produces no client rects. Unlike
   // offsetParent, this also works for position: fixed hosts.
   return host.getClientRects().length > 0;
+}
+
+/**
+ * Watches only while a component owns a portaled surface. Resize covers
+ * display/layout changes; ancestor attribute observation also catches
+ * visibility changes that preserve the host's box.
+ */
+export class CxHostVisibilityObserver {
+  private observing = false;
+  private wasConnected = false;
+  private resizeObserver?: ResizeObserver;
+  private mutationObserver?: MutationObserver;
+
+  constructor(
+    private readonly host: Element,
+    private readonly onChange: (visible: boolean) => void,
+  ) {}
+
+  start(): void {
+    if (this.observing) {
+      this.check();
+      return;
+    }
+    this.observing = true;
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.check());
+      this.resizeObserver.observe(this.host);
+    }
+    if (typeof MutationObserver !== 'undefined') {
+      this.mutationObserver = new MutationObserver(() => this.check());
+      let ancestor: Element | null = this.host;
+      while (ancestor) {
+        this.mutationObserver.observe(ancestor, {
+          attributes: true,
+          attributeFilter: ['class', 'hidden', 'style'],
+        });
+        ancestor = ancestor.parentElement;
+      }
+    }
+
+    this.check();
+  }
+
+  stop(): void {
+    this.observing = false;
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+    this.mutationObserver?.disconnect();
+    this.mutationObserver = undefined;
+  }
+
+  check(): boolean {
+    if (this.host.isConnected) {
+      this.wasConnected = true;
+    }
+    const visible = this.host.isConnected ? isHostVisible(this.host) : !this.wasConnected;
+    if (this.observing) {
+      this.onChange(visible);
+    }
+    return visible;
+  }
 }

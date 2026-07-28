@@ -60,6 +60,7 @@ const CX_POPOVER_DEMO_SUBMENU_ITEMS: Record<CxPopoverDemoSubmenuId, readonly CxP
     { id: 'dark', label: 'Dark', prependIcon: 'dark-mode' },
     { id: 'night', label: 'Night', prependIcon: 'night-mode' },
     { id: 'high-contrast', label: 'High contrast', prependIcon: 'high-contrast-mode' },
+    { id: 'wireframe', label: 'Wireframe', prependIcon: 'browser-window' },
   ],
 };
 

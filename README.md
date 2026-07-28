@@ -61,6 +61,37 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
+Install navigation recovery at the application root when routes are lazy-loaded:
+
+```ts
+import {
+  CxNavigationRecoveryComponent,
+  cxNavigationRecoveryHandler,
+  provideCxNavigationRecovery,
+} from '@mikaelcedergren/cx-framework';
+
+@Component({
+  imports: [CxNavigationRecoveryComponent],
+  template: `<cx-navigation-recovery />`,
+})
+export class AppComponent {}
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideCxNavigationRecovery({
+      diagnosticsEndpoint: '/api/navigation-diagnostics',
+      copy: { staleBuildHeading: 'The product has been updated' },
+    }),
+    provideRouter(
+      routes,
+      withNavigationErrorHandler(cxNavigationRecoveryHandler),
+    ),
+  ],
+};
+```
+
+The release server owns the matching build identity contract: a `cx-build-id` meta tag in the loaded document and a no-store `/cx-build.json` response with the same `buildId`. Recovery never reloads automatically. A failed module retry opens a fresh document only after the user chooses Retry, and a confirmed stale build offers Reload. Diagnostics are optional and contain only a bounded route plus category, timestamp, and valid build identities.
+
 ## Styles and tokens
 
 Use package subpaths in global styles:

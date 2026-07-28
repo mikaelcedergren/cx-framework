@@ -33,6 +33,7 @@ export class CxBannerComponent implements OnDestroy {
   @Input() description = '';
   @Input() action: CxFeedbackAction | undefined;
   @Input() secondaryAction: CxFeedbackAction | undefined;
+  @Input() dismissAriaLabel = 'Dismiss banner';
 
   @Input()
   public set dismissible(value: boolean) {

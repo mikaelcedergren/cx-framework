@@ -21,6 +21,7 @@ import { eventMatchesShortcut, isTypingTarget } from '../../actions/shared/short
 import { CxOptionComponent } from '../cx-option';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
+import { CxHostVisibilityObserver, isHostVisible } from '../../shared/host-visibility';
 import { measureCxFloatingSurface } from '../floating-surface';
 import { CxMenuTriggerDirective } from './cx-menu-trigger.directive';
 
@@ -108,7 +109,7 @@ function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelect
   const hasPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
   return items.map((item, index) => {
     const hasChildren = childItemsFor(item).length > 0;
-    const itemType: CxMenuItemType = hasChildren ? 'action' : item.type ?? (selection ? 'choice' : 'action');
+    const itemType: CxMenuItemType = hasChildren ? 'action' : (item.type ?? (selection ? 'choice' : 'action'));
     if (hasChildren && (item.type === 'choice' || item.selected !== undefined)) {
       throw new Error(`[cx-menu] Submenu item "${item.id}" cannot declare choice state.`);
     }
@@ -119,8 +120,7 @@ function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelect
       ...item,
       type: itemType,
       prependIcon: hasPrependIcons ? item.prependIcon : undefined,
-      dividerBeforeResolved:
-        index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
+      dividerBeforeResolved: index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
       hasChildren,
       role: resolveMenuItemRole({ ...item, type: itemType }, hasChildren, selection),
       items: hasChildren ? resolveMenuItems(childItemsFor(item), item.selection) : undefined,
@@ -188,9 +188,7 @@ function splitMenuItemsIntoVisualGroups(
 }
 
 function resolveMenuVisualGroups(groups: readonly CxResolvedMenuGroup[]): CxResolvedMenuVisualGroup[] {
-  return groups.flatMap(group =>
-    splitMenuItemsIntoVisualGroups(group.items, group.id, group.label, group.description),
-  );
+  return groups.flatMap(group => splitMenuItemsIntoVisualGroups(group.items, group.id, group.label, group.description));
 }
 
 function buildItemPath(parentPath: string, itemId: string): string {
@@ -216,7 +214,9 @@ function measureCxSubmenuSurface(input: {
   const leftBase = openToRight ? input.triggerRect.right + gap : input.triggerRect.left - width - gap;
   const left = Math.floor(clamp(leftBase, viewportPadding, input.viewportWidth - width - viewportPadding));
   const maxTop = Math.max(
-    input.viewportHeight - Math.min(input.estimatedHeight, input.viewportHeight - viewportPadding * 2) - viewportPadding,
+    input.viewportHeight -
+      Math.min(input.estimatedHeight, input.viewportHeight - viewportPadding * 2) -
+      viewportPadding,
     viewportPadding,
   );
   const top = Math.floor(clamp(input.triggerRect.top, viewportPadding, maxTop));
@@ -238,6 +238,9 @@ function measureCxSubmenuSurface(input: {
 export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private static instanceCounter = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly hostVisibility = new CxHostVisibilityObserver(this.host.nativeElement, visible =>
+    this.onHostVisibilityChange(visible),
+  );
   private readonly instanceId = ++CxMenuComponent.instanceCounter;
   protected readonly scopeId = `cx-menu-${this.instanceId}`;
   protected readonly rootSurfaceId = `${this.scopeId}-surface`;
@@ -247,7 +250,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private readonly currentIdState = signal<string | undefined>(undefined);
   private readonly shortcutsEnabledState = signal(false);
   private readonly openState = signal(false);
-  private readonly presentationState = signal<CxMenuPresentation>({ kind: 'inline' });
+  private readonly presentationState = signal<CxMenuPresentation>({
+    kind: 'inline',
+  });
   private readonly submenuSurfacesState = signal<CxMenuSubmenuSurface[]>([]);
   private readonly alignState = signal<'start' | 'end'>('end');
   private readonly layoutState = signal<CxMenuLayout>('inline');
@@ -264,6 +269,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     ariaHaspopup: string | null;
     ariaExpanded: string | null;
     ariaControls: string | null;
+    ariaDisabled: string | null;
     buttonDisabledClass: boolean;
     iconButtonDisabledClass: boolean;
   };
@@ -343,6 +349,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     const nextOpen = Boolean(value) && !this.disabled && this.presentationState().kind !== 'inline';
     this.openState.set(nextOpen);
     this.syncTriggerState();
+    this.syncTriggerResizeObserver();
     if (nextOpen) {
       queueMicrotask(() => {
         this.syncSurfaceMetrics();
@@ -352,7 +359,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       });
       return;
     }
-    this.submenuSurfacesState.set([]);
+    this.setSubmenuSurfaces([]);
   }
 
   @Input()
@@ -413,6 +420,8 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyed = true;
+    this.openState.set(false);
+    this.submenuSurfacesState.set([]);
     this.triggerChangesSubscription?.unsubscribe();
     this.disconnectTrigger();
   }
@@ -613,7 +622,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     if (!this.shortcutsEnabledState() || !this.isSurfaceActive() || isTypingTarget(event.target)) {
       return;
     }
-    const item = this.findShortcutItem(this.normalizedGroups$().flatMap(group => group.items), event);
+    const item = this.findShortcutItem(
+      this.normalizedGroups$().flatMap(group => group.items),
+      event,
+    );
     if (!item || item.disabled || item.hasChildren) {
       return;
     }
@@ -647,9 +659,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
     this.openState.set(resolvedOpen);
     if (!resolvedOpen) {
-      this.submenuSurfacesState.set([]);
+      this.setSubmenuSurfaces([]);
     }
     this.syncTriggerState();
+    this.syncTriggerResizeObserver();
     this.openChange.emit(resolvedOpen);
     if (!resolvedOpen && restoreFocus && this.presentationState().kind === 'trigger') {
       queueMicrotask(() => this.focusTrigger());
@@ -662,14 +675,15 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
 
     const presentation = this.presentationState();
-    const rect = presentation.kind === 'context'
-      ? {
-          left: presentation.left,
-          right: presentation.left,
-          top: presentation.top,
-          bottom: presentation.top,
-        }
-      : this.triggerElement?.getBoundingClientRect();
+    const rect =
+      presentation.kind === 'context'
+        ? {
+            left: presentation.left,
+            right: presentation.left,
+            top: presentation.top,
+            bottom: presentation.top,
+          }
+        : this.triggerElement?.getBoundingClientRect();
     if (!rect) {
       return;
     }
@@ -690,12 +704,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     this.syncSubmenuSurfaceMetrics();
   }
 
-  private openSubmenu(
-    item: CxResolvedMenuItem,
-    level: number,
-    itemPath: string,
-    anchorElement: HTMLElement,
-  ): void {
+  private openSubmenu(item: CxResolvedMenuItem, level: number, itemPath: string, anchorElement: HTMLElement): void {
     if (!item.items?.length || typeof window === 'undefined') {
       this.trimSubmenus(level);
       return;
@@ -720,16 +729,14 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       maxHeight: surface.maxHeight,
     };
 
-    this.submenuSurfacesState.set([
+    this.setSubmenuSurfaces([
       ...this.submenuSurfacesState().filter(existingSurface => existingSurface.level < nextSurface.level),
       nextSurface,
     ]);
   }
 
   private trimSubmenus(level: number): void {
-    this.submenuSurfacesState.set(
-      this.submenuSurfacesState().filter(existingSurface => existingSurface.level <= level),
-    );
+    this.setSubmenuSurfaces(this.submenuSurfacesState().filter(existingSurface => existingSurface.level <= level));
   }
 
   private updateCurrentId(itemId: string): void {
@@ -745,11 +752,52 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       this.setOpen(false, restoreFocus);
       return;
     }
-    this.submenuSurfacesState.set([]);
+    this.setSubmenuSurfaces([]);
+  }
+
+  private setSubmenuSurfaces(surfaces: CxMenuSubmenuSurface[]): void {
+    const trackingChanged = this.submenuSurfacesState().length > 0 !== surfaces.length > 0;
+    this.submenuSurfacesState.set(surfaces);
+    if (trackingChanged) {
+      this.syncTriggerResizeObserver();
+    }
+  }
+
+  private onHostVisibilityChange(visible: boolean): void {
+    if (this.destroyed) {
+      return;
+    }
+    if (visible) {
+      this.syncSurfaceMetrics();
+      return;
+    }
+    if (this.presentationState().kind === 'inline') {
+      if (this.submenuSurfacesState().length > 0) {
+        this.setSubmenuSurfaces([]);
+      }
+      return;
+    }
+    if (this.openState()) {
+      this.setOpen(false, false);
+    }
   }
 
   private isSurfaceActive(): boolean {
-    return this.presentationState().kind === 'inline' || this.openState();
+    if (this.presentationState().kind === 'inline') {
+      const visible = isHostVisible(this.host.nativeElement);
+      if (!visible && this.submenuSurfacesState().length > 0) {
+        this.setSubmenuSurfaces([]);
+      }
+      return visible;
+    }
+    if (!this.openState()) {
+      return false;
+    }
+    if (!isHostVisible(this.host.nativeElement)) {
+      this.setOpen(false, false);
+      return false;
+    }
+    return true;
   }
 
   private syncSubmenuSurfaceMetrics(): void {
@@ -778,7 +826,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
         maxHeight: nextMetrics.maxHeight,
       });
     }
-    this.submenuSurfacesState.set(refreshedSurfaces);
+    this.setSubmenuSurfaces(refreshedSurfaces);
   }
 
   private moveOptionFocus(key: string, optionWrap: HTMLElement): void {
@@ -832,9 +880,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     if (!surface) {
       return [];
     }
-    return Array.from(
-      surface.querySelectorAll<HTMLElement>('.cx-menu__option-wrap .cx-option'),
-    ).filter(button => !button.hasAttribute('disabled'));
+    return Array.from(surface.querySelectorAll<HTMLElement>('.cx-menu__option-wrap .cx-option')).filter(
+      button => !button.hasAttribute('disabled'),
+    );
   }
 
   private optionButtonByPath(path: string): HTMLElement | null {
@@ -843,11 +891,11 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
   private optionWrapByPath(path: string): HTMLElement | null {
     for (const surface of this.menuSurfaceElements()) {
-      const option = Array.from(surface.querySelectorAll<HTMLElement>('[data-menu-item-path]'))
-        .find(element =>
-          element.getAttribute('data-cx-menu-scope') === this.scopeId
-          && element.getAttribute('data-menu-item-path') === path,
-        );
+      const option = Array.from(surface.querySelectorAll<HTMLElement>('[data-menu-item-path]')).find(
+        element =>
+          element.getAttribute('data-cx-menu-scope') === this.scopeId &&
+          element.getAttribute('data-menu-item-path') === path,
+      );
       if (option) {
         return option;
       }
@@ -856,6 +904,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   }
 
   private focusWhenReady(resolve: () => HTMLElement | null, attempt = 0): void {
+    if (this.destroyed) {
+      return;
+    }
     if (typeof requestAnimationFrame === 'undefined') {
       resolve()?.focus();
       return;
@@ -893,6 +944,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       if (triggerDirectives.length > 0) {
         throw new Error(`[cx-menu] ${presentation.kind} presentation cannot contain cxMenuTrigger.`);
       }
+      this.syncTriggerResizeObserver();
       return;
     }
     if (triggerDirectives.length !== 1) {
@@ -910,6 +962,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       ariaHaspopup: button.getAttribute('aria-haspopup'),
       ariaExpanded: button.getAttribute('aria-expanded'),
       ariaControls: button.getAttribute('aria-controls'),
+      ariaDisabled: button.getAttribute('aria-disabled'),
       buttonDisabledClass: button.classList.contains('cx-button--disabled'),
       iconButtonDisabledClass: button.classList.contains('cx-icon-button--disabled'),
     };
@@ -917,23 +970,40 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     button.addEventListener('click', this.triggerClickListener, true);
     button.addEventListener('keydown', this.triggerKeydownListener, true);
     this.syncTriggerState();
+    this.syncTriggerResizeObserver();
+    if (this.openState()) {
+      this.syncSurfaceMetrics();
+    }
+  }
 
-    if (typeof ResizeObserver !== 'undefined') {
+  private syncTriggerResizeObserver(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+    this.hostVisibility.stop();
+
+    if (!this.openState() && this.submenuSurfacesState().length === 0) {
+      return;
+    }
+
+    this.hostVisibility.start();
+    if (!this.openState() && this.submenuSurfacesState().length === 0) {
+      this.hostVisibility.stop();
+      return;
+    }
+    if (this.triggerButton && typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => {
-        if (this.openState()) {
+        if (this.hostVisibility.check()) {
           this.syncSurfaceMetrics();
         }
       });
-      this.resizeObserver.observe(button);
-    }
-    if (this.openState()) {
-      this.syncSurfaceMetrics();
+      this.resizeObserver.observe(this.triggerButton);
     }
   }
 
   private disconnectTrigger(): void {
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
+    this.hostVisibility.stop();
 
     const button = this.triggerButton;
     const original = this.triggerOriginalState;
@@ -945,6 +1015,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       this.restoreAttribute(button, 'aria-haspopup', original.ariaHaspopup);
       this.restoreAttribute(button, 'aria-expanded', original.ariaExpanded);
       this.restoreAttribute(button, 'aria-controls', original.ariaControls);
+      this.restoreAttribute(button, 'aria-disabled', original.ariaDisabled);
       button.classList.toggle('cx-button--disabled', original.buttonDisabledClass);
       button.classList.toggle('cx-icon-button--disabled', original.iconButtonDisabledClass);
     }
@@ -967,6 +1038,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     button.setAttribute('aria-haspopup', 'menu');
     button.setAttribute('aria-expanded', String(this.openState()));
     button.setAttribute('aria-controls', this.rootSurfaceId);
+    this.restoreAttribute(button, 'aria-disabled', disabled ? 'true' : original.ariaDisabled);
     if (button.classList.contains('cx-button')) {
       button.classList.toggle('cx-button--disabled', disabled);
     }
@@ -1023,5 +1095,4 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
     return undefined;
   }
-
 }

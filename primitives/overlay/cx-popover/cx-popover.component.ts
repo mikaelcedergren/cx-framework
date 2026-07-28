@@ -54,15 +54,9 @@ export class CxPopoverComponent {
       // (popover 1110 > backdrop 1100) regardless of DOM order, but WebKit
       // hit-tests the later-painted sibling and swallows clicks on options.
       const backdrop = this.backdropRef?.nativeElement ?? null;
-      if (backdrop && backdrop.parentNode !== body) {
-        body.appendChild(backdrop);
-      }
-      this.portaledBackdrop = backdrop;
+      this.portaledBackdrop = this.syncPortaledNode(this.portaledBackdrop, backdrop, body);
       const surface = this.surfaceRef?.nativeElement ?? null;
-      if (surface && surface.parentNode !== body) {
-        body.appendChild(surface);
-      }
-      this.portaledSurface = surface;
+      this.portaledSurface = this.syncPortaledNode(this.portaledSurface, surface, body);
     });
 
     destroyRef.onDestroy(() => {
@@ -78,9 +72,29 @@ export class CxPopoverComponent {
     this.portaledBackdrop = null;
   }
 
+  private syncPortaledNode(
+    currentNode: HTMLElement | null,
+    nextNode: HTMLElement | null,
+    body: HTMLElement,
+  ): HTMLElement | null {
+    if (currentNode && currentNode !== nextNode) {
+      currentNode.remove();
+    }
+    if (nextNode && nextNode.parentNode !== body) {
+      body.appendChild(nextNode);
+    }
+    return nextNode;
+  }
+
   @Input()
   public set open(value: boolean) {
     const nextOpen = !!value;
+    if (!nextOpen) {
+      // Remove the click-catching body nodes synchronously. Angular will
+      // destroy the view on the following render, but interaction must be
+      // restored the moment the owner closes the popover.
+      this.releasePortaledNodes();
+    }
     if (this.openState() === nextOpen) {
       return;
     }

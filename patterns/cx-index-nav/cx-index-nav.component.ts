@@ -7,6 +7,7 @@ import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxSearchFieldComponent } from '../../primitives/inputs/cx-search-field';
 
 export type CxIndexNavBadgeTone = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
+export type CxIndexNavVariant = 'default' | 'transparent';
 
 export type CxIndexNavItem = {
   id: string;
@@ -83,6 +84,8 @@ export class CxIndexNavComponent {
   @Input({ transform: booleanAttribute }) loading = false;
   /** Allow the whole panel to compress to a rail. */
   @Input({ transform: booleanAttribute }) collapsible = true;
+  /** Panel surface treatment. Transparent keeps the divider but removes the alternate background. */
+  @Input() variant: CxIndexNavVariant = 'default';
 
   /** Whole-panel collapsed state. Controllable; mirrors `collapsedChange`. */
   @Input({ transform: booleanAttribute })

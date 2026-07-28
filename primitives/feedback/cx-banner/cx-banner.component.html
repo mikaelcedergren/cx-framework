@@ -62,7 +62,7 @@
           <button
             type="button"
             class="cx-banner__dismiss"
-            aria-label="Dismiss banner"
+            [attr.aria-label]="dismissAriaLabel"
             (click)="onDismissPress()"
           >
             <cx-icon name="remove" [size]="14" aria-hidden="true" />

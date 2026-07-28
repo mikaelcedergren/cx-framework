@@ -749,6 +749,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (this.isLocked()) {
       return;
     }
+    this.cancelScheduledTabClose();
     const draft: CxQueryFieldDraft = {
       targetId: condition.id,
       stage,
@@ -787,6 +788,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     ) {
       return;
     }
+    this.cancelScheduledTabClose();
     this.draftState.set({ ...draft, stage });
     this.structuredCaretState.set(false);
     this.editorTextState.set('');
@@ -1119,6 +1121,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (this.isLocked()) {
       return;
     }
+    this.cancelScheduledTabClose();
     this.draftState.set({
       stage: this.conditionsState().length > 0 ? 'join' : 'field',
     });
@@ -1424,10 +1427,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   private closeEditor(focus: boolean): void {
-    if (typeof window !== 'undefined' && this.tabCloseTimer !== undefined) {
-      window.clearTimeout(this.tabCloseTimer);
-      this.tabCloseTimer = undefined;
-    }
+    this.cancelScheduledTabClose();
     this.openState.set(false);
     this.draftState.set(undefined);
     this.structuredCaretState.set(false);
@@ -1492,6 +1492,14 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       this.tabCloseTimer = undefined;
       this.closeEditor(false);
     }, 0);
+  }
+
+  private cancelScheduledTabClose(): void {
+    if (typeof window === 'undefined' || this.tabCloseTimer === undefined) {
+      return;
+    }
+    window.clearTimeout(this.tabCloseTimer);
+    this.tabCloseTimer = undefined;
   }
 
   private handleBackspaceNavigation(): void {

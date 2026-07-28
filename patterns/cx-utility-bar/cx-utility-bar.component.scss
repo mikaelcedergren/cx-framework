@@ -5,9 +5,9 @@
 }
 
 .cx-utility-bar {
-  --link: var(--ink);
-  --cx-icon-button-transparent-color: var(--ink);
-  --cx-icon-button-transparent-hover-background: color-mix(in srgb, var(--ink) 10%, transparent);
+  --link: var(--on-utility-bar);
+  --cx-icon-button-transparent-color: var(--on-utility-bar);
+  --cx-icon-button-transparent-hover-background: color-mix(in srgb, var(--on-utility-bar) 10%, transparent);
 
   display: flex;
   width: 100%;
@@ -16,7 +16,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
-  background-color: var(--yellow);
+  background-color: var(--utility-bar-surface);
   background-image: repeating-linear-gradient(
     -45deg,
     transparent 0,
@@ -24,7 +24,7 @@
     color-mix(in srgb, var(--on-ink) 4%, transparent) var(--space-sm),
     color-mix(in srgb, var(--on-ink) 4%, transparent) var(--space-md)
   );
-  color: var(--ink);
+  color: var(--on-utility-bar);
   box-sizing: border-box;
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-small);

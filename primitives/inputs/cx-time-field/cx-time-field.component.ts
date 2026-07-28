@@ -4,9 +4,11 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Injector,
   Input,
   Output,
   ViewChild,
+  afterNextRender,
   computed,
   inject,
   signal,
@@ -110,6 +112,7 @@ export function formatCxTimeValue(
 export class CxTimeFieldComponent {
   private static nextId = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly injector = inject(Injector);
   private readonly modeState = signal<CxTimeFieldMode>('default');
   private readonly sizeState = signal<CxTimeFieldSize>('default');
   private readonly hours24State = signal(0);
@@ -512,10 +515,10 @@ export class CxTimeFieldComponent {
     this.emitValue(undefined, true);
     this.clear.emit();
     this.refocusPending = true;
-    queueMicrotask(() => {
+    afterNextRender(() => {
       this.focusSegment('hour');
       this.refocusPending = false;
-    });
+    }, { injector: this.injector });
   }
 
   private setCanonicalValue(value: CxParsedTimeValue): void {

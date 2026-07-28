@@ -4,7 +4,6 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostListener,
   Input,
   OnDestroy,
   Output,
@@ -29,11 +28,8 @@ import {
   type CxFloatingSurfaceRequest,
   type CxFloatingSurfaceViewport,
 } from '../../overlay/floating-surface-controller';
-import {
-  type CxFieldValidation,
-  type CxFieldSize,
-  normalizeCxValidation,
-} from '../shared/field.types';
+import { type CxFieldValidation, type CxFieldSize, normalizeCxValidation } from '../shared/field.types';
+import { CxHostVisibilityObserver } from '../../shared/host-visibility';
 
 const CX_DROPDOWN_POPOVER_MIN_WIDTH = 200;
 const CX_DROPDOWN_POPOVER_MAX_WIDTH = 360;
@@ -120,6 +116,11 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private static nextId = 0;
   private readonly instanceId = CxDropdownComponent.nextId++;
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly hostVisibility = new CxHostVisibilityObserver(this.host.nativeElement, visible => {
+    if (!visible && this.openState()) {
+      this.closePopover();
+    }
+  });
   private readonly optionsState = signal<CxDropdownOption[]>([]);
   private readonly selectionState = signal<CxDropdownSelection>('single');
   private readonly filterModeState = signal<CxDropdownFilterMode>('client');
@@ -159,6 +160,9 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private selectionMeasureFrame?: number;
   private optionMeasureFrame?: number;
   private loadMoreRequested = false;
+  private openTracking = false;
+  private selectionResizeObserver?: ResizeObserver;
+  private selectionResizeElement?: HTMLElement;
   protected readonly labelId = `cx-dropdown-label-${this.instanceId}`;
   protected readonly messagesId = `cx-dropdown-messages-${this.instanceId}`;
   protected readonly popoverId = `cx-dropdown-popover-${this.instanceId}`;
@@ -190,7 +194,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
       return undefined;
     }
     return (
-      this.optionsState().find((option) => option.id === selectedValue) ??
+      this.optionsState().find(option => option.id === selectedValue) ??
       this.knownSelectedOptionsState().get(selectedValue)
     );
   });
@@ -221,7 +225,9 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   protected readonly showSearchEmptyState$ = computed(() => this.searchQueryState().trim().length > 0);
   protected readonly createLabel$ = computed(() => this.translation('createLabel'));
   protected readonly selectedLabelsText$ = computed(() =>
-    this.selectedOptions$().map(option => option.label).join(', '),
+    this.selectedOptions$()
+      .map(option => option.label)
+      .join(', '),
   );
   protected readonly selectedCountText$ = computed(() => this.formatSelectedCount(this.selectedOptions$().length));
   protected readonly collapseSelectedText$ = signal(false);
@@ -250,17 +256,16 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     if (!query) {
       return this.optionsState();
     }
-    return this.optionsState().filter((option) => {
-      const haystack = [
-        option.label,
-        option.description,
-        ...(Array.isArray(option.keywords) ? option.keywords : []),
-      ].filter(Boolean).join(' ').toLowerCase();
+    return this.optionsState().filter(option => {
+      const haystack = [option.label, option.description, ...(Array.isArray(option.keywords) ? option.keywords : [])]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
       return haystack.includes(query);
     });
   });
-  protected readonly virtualizedOptions$ = computed(() =>
-    this.filteredOptions$().length > CX_DROPDOWN_VIRTUALIZATION_THRESHOLD,
+  protected readonly virtualizedOptions$ = computed(
+    () => this.filteredOptions$().length > CX_DROPDOWN_VIRTUALIZATION_THRESHOLD,
   );
   protected readonly renderedOptions$ = computed<CxDropdownRenderedOption[]>(() => {
     const options = this.filteredOptions$();
@@ -426,23 +431,16 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   protected readonly loadingMore$ = this.loadingMoreState.asReadonly();
   protected readonly activeOptionId$ = this.activeOptionIdState.asReadonly();
   protected readonly activeCreate$ = this.activeCreateState.asReadonly();
-  protected readonly validationMessages$ = () =>
-    this.disabled
-      ? []
-      : normalizeCxValidation(this.validationState());
+  protected readonly validationMessages$ = () => (this.disabled ? [] : normalizeCxValidation(this.validationState()));
   protected readonly hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
   protected readonly showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
   protected readonly isLocked$ = () => this.disabled;
   protected readonly isInteractive$ = () => !this.disabled;
   protected readonly canCommitSelection$ = () => !this.disabled && !this.loading;
   protected readonly hasClear$ = () =>
-    this.clearableState() &&
-    this.canCommitSelection$() &&
-    this.selectedOptions$().length > 0;
+    this.clearableState() && this.canCommitSelection$() && this.selectedOptions$().length > 0;
   protected readonly formValues$ = computed(() =>
-    this.isMultiple$()
-      ? this.selectedValuesState()
-      : [this.selectedValueState() ?? ''],
+    this.isMultiple$() ? this.selectedValuesState() : [this.selectedValueState() ?? ''],
   );
   protected readonly isRequired$ = () => !this.optional;
   protected readonly optionalText$ = computed(() => this.translation('optional'));
@@ -486,23 +484,22 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.overlay.sync(this.fieldButtonRef?.nativeElement);
-    this.scheduleRequiredValueValidation();
-    if (typeof document !== 'undefined') {
-      document.addEventListener('scroll', this.onCapturedDocumentScroll, true);
-    }
-    this.overlay.observeTrigger(this.fieldButtonRef?.nativeElement, () => {
+    this.overlay.setTrigger(this.fieldButtonRef?.nativeElement);
+    if (this.openState()) {
+      this.stopOpenTracking();
+      this.startOpenTracking();
       this.overlay.sync();
-      this.scheduleSelectionDisplayMeasurement();
-    });
+    }
+    this.scheduleRequiredValueValidation();
     this.scheduleSelectionDisplayMeasurement();
   }
 
   ngOnDestroy(): void {
+    this.stopOpenTracking();
+    this.selectionResizeObserver?.disconnect();
+    this.selectionResizeObserver = undefined;
+    this.selectionResizeElement = undefined;
     this.overlay.destroy();
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('scroll', this.onCapturedDocumentScroll, true);
-    }
     if (typeof window !== 'undefined' && this.selectionMeasureFrame !== undefined) {
       window.cancelAnimationFrame(this.selectionMeasureFrame);
     }
@@ -813,8 +810,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     this.focusChange.emit(false);
   }
 
-  @HostListener('document:pointerdown', ['$event'])
-  protected onDocumentPointerDown(event: PointerEvent): void {
+  private onDocumentPointerDown(event: PointerEvent): void {
     if (!this.openState()) {
       return;
     }
@@ -837,12 +833,11 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     this.closePopover();
   }
 
-  @HostListener('window:resize')
-  protected onWindowResize(): void {
-    this.scheduleSelectionDisplayMeasurement();
-    if (!this.openState()) {
+  private onWindowResize(): void {
+    if (!this.hostVisibility.check()) {
       return;
     }
+    this.scheduleSelectionDisplayMeasurement();
     this.overlay.sync();
     this.updateOptionsViewport();
     this.maybeEmitLoadMore();
@@ -863,6 +858,9 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     if (!this.openState()) {
       return;
     }
+    if (!this.hostVisibility.check()) {
+      return;
+    }
     const target = event.target;
     const surface = this.popoverRef?.surfaceElement();
     if (target instanceof Node && surface?.contains(target)) {
@@ -878,6 +876,11 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.openState.set(open);
+    if (open) {
+      this.startOpenTracking();
+    } else {
+      this.stopOpenTracking();
+    }
     this.openChange.emit(open);
     if (!open) {
       this.resetOptionScroll();
@@ -1099,8 +1102,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private optionHostAtIndex(index: number): HTMLElement | undefined {
     return this.optionRefs
       ?.toArray()
-      .find(optionRef => Number(optionRef.nativeElement.dataset['cxDropdownOptionIndex']) === index)
-      ?.nativeElement;
+      .find(optionRef => Number(optionRef.nativeElement.dataset['cxDropdownOptionIndex']) === index)?.nativeElement;
   }
 
   private optionComponentAtIndex(index: number): CxOptionComponent | undefined {
@@ -1125,7 +1127,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
 
   private enabledOptionIndexes(): number[] {
     return this.filteredOptions$()
-      .map((option, index) => this.isOptionDisabled(option) ? -1 : index)
+      .map((option, index) => (this.isOptionDisabled(option) ? -1 : index))
       .filter(index => index >= 0);
   }
 
@@ -1236,7 +1238,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     const normalizedQuery = query.toLocaleLowerCase();
     const options = this.filteredOptions$();
     const currentIndex = this.currentFocusedOptionIndex();
-    const startIndex = currentIndex >= 0 ? currentIndex : this.selectedOptionIndex() ?? -1;
+    const startIndex = currentIndex >= 0 ? currentIndex : (this.selectedOptionIndex() ?? -1);
 
     for (let offset = 1; offset <= options.length; offset += 1) {
       const optionIndex = (startIndex + offset + options.length) % options.length;
@@ -1297,7 +1299,11 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     const loadingMoreHeight = this.loadingMoreState() ? optionHeight : 0;
     const stateHeight = this.loading || this.filteredOptions$().length === 0 ? 156 : 0;
     const estimatedContentHeight = Math.min(
-      searchHeight + createHeight + loadingMoreHeight + Math.max(this.filteredOptions$().length, 1) * optionHeight + stateHeight,
+      searchHeight +
+        createHeight +
+        loadingMoreHeight +
+        Math.max(this.filteredOptions$().length, 1) * optionHeight +
+        stateHeight,
       CX_DROPDOWN_POPOVER_MAX_HEIGHT,
     );
     const estimatedHeight = estimatedContentHeight + CX_DROPDOWN_POPOVER_FRAME_HEIGHT;
@@ -1323,9 +1329,10 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     if (typeof translation === 'function') {
       return translation(count);
     }
-    const pattern = typeof translation === 'string' && translation.trim()
-      ? translation.trim()
-      : CX_DROPDOWN_DEFAULT_TRANSLATIONS.selectedCount;
+    const pattern =
+      typeof translation === 'string' && translation.trim()
+        ? translation.trim()
+        : CX_DROPDOWN_DEFAULT_TRANSLATIONS.selectedCount;
     return pattern.replace(/\{count\}/g, `${count}`);
   }
 
@@ -1345,9 +1352,83 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     }
     this.selectionMeasureFrame = window.requestAnimationFrame(() => {
       this.selectionMeasureFrame = undefined;
+      this.syncSelectionResizeObserver();
       this.updateSelectionDisplayMode();
     });
   }
+
+  private syncSelectionResizeObserver(): void {
+    const valueElement = this.valueTextRef?.nativeElement;
+    if (
+      !valueElement ||
+      !this.isMultiple$() ||
+      this.selectedOptions$().length === 0 ||
+      typeof ResizeObserver === 'undefined'
+    ) {
+      this.selectionResizeObserver?.disconnect();
+      this.selectionResizeObserver = undefined;
+      this.selectionResizeElement = undefined;
+      return;
+    }
+    if (this.selectionResizeObserver && this.selectionResizeElement === valueElement) {
+      return;
+    }
+
+    this.selectionResizeObserver?.disconnect();
+    this.selectionResizeObserver = new ResizeObserver(() => this.scheduleSelectionDisplayMeasurement());
+    this.selectionResizeElement = valueElement;
+    this.selectionResizeObserver.observe(valueElement);
+  }
+
+  private startOpenTracking(): void {
+    if (this.openTracking) {
+      return;
+    }
+    this.openTracking = true;
+    this.hostVisibility.start();
+    if (!this.openTracking) {
+      return;
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('pointerdown', this.onOpenDocumentPointerDown, true);
+      document.addEventListener('scroll', this.onCapturedDocumentScroll, true);
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', this.onOpenWindowResize);
+    }
+    this.overlay.observeTrigger(this.overlay.trigger ?? this.fieldButtonRef?.nativeElement, () => {
+      if (!this.hostVisibility.check()) {
+        return;
+      }
+      this.overlay.sync();
+      this.updateOptionsViewport();
+      this.maybeEmitLoadMore();
+    });
+  }
+
+  private stopOpenTracking(): void {
+    this.hostVisibility.stop();
+    if (!this.openTracking) {
+      return;
+    }
+    this.openTracking = false;
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('pointerdown', this.onOpenDocumentPointerDown, true);
+      document.removeEventListener('scroll', this.onCapturedDocumentScroll, true);
+    }
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.onOpenWindowResize);
+    }
+    this.overlay.stopObservingTrigger();
+  }
+
+  private readonly onOpenDocumentPointerDown = (event: PointerEvent): void => {
+    this.onDocumentPointerDown(event);
+  };
+
+  private readonly onOpenWindowResize = (): void => {
+    this.onWindowResize();
+  };
 
   private updateSelectionDisplayMode(): void {
     if (!this.isMultiple$() || this.selectedOptions$().length === 0) {
@@ -1415,8 +1496,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     const known = this.knownSelectedOptionsState();
     const next = new Map<string, CxDropdownOption>();
     for (const selectedId of selectedIds) {
-      const option =
-        this.optionsState().find(candidate => candidate.id === selectedId) ?? known.get(selectedId);
+      const option = this.optionsState().find(candidate => candidate.id === selectedId) ?? known.get(selectedId);
       if (option) {
         next.set(selectedId, option);
       }

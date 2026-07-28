@@ -14,6 +14,7 @@ export * from './patterns/cx-item-card';
 export * from './patterns/cx-kpi';
 export * from './patterns/cx-labeled-row';
 export * from './patterns/cx-masthead';
+export * from './patterns/cx-navigation-recovery';
 export * from './patterns/cx-null-controller';
 export * from './patterns/cx-process';
 export * from './patterns/cx-utility-bar';

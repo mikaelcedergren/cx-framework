@@ -194,6 +194,8 @@ Components use the semantic role, never the mapped palette name.
 - `--ink`: prominent, selected, active, or actionable content
 - `--on-ink`: content on an ink-colored fill
 - `--on-emphasis`: content on emphasis
+- `--utility-bar-surface`: internal utility-bar plane
+- `--on-utility-bar`: content on the utility-bar plane
 - `--opacity-mid`: borders, separators, and medium structure
 - `--opacity-low`: quiet fills and near-background hierarchy; not readable body text
 - `--opacity-darken`: subtle pressed or shaded effects

@@ -149,11 +149,13 @@
   transition:
     opacity calc(var(--motion-base) + var(--motion-fast)) ease,
     transform calc(var(--motion-base) + var(--motion-fast)) ease;
+  transition-delay: 0s;
 }
 
 .cx-dialog__footer:hover .cx-dialog__footer-shortcut {
   opacity: 1;
   transform: translateY(0);
+  transition-delay: 1s;
 }
 
 @keyframes cx-dialog-enter {
@@ -174,7 +176,9 @@
   }
 
   .cx-dialog__footer-shortcut {
-    transition: none;
+    transition:
+      opacity 0s linear,
+      transform 0s linear;
   }
 }
 

@@ -20,7 +20,7 @@
     </div>
 
     <div class="cx-detail-panel__header-actions">
-      <ng-content select="[detail-panel-context]" />
+      <ng-content select="cx-status-tag[detail-panel-status]" />
 
       @if (hasMenuItems) {
         <cx-menu

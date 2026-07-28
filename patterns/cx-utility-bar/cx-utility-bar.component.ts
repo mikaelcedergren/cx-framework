@@ -15,13 +15,14 @@ import {
   type CxMenuPresentation,
 } from '../../primitives/overlay/cx-menu';
 
-export type CxUtilityBarThemeMode = 'light' | 'dark' | 'night' | 'high-contrast';
+export type CxUtilityBarThemeMode = 'light' | 'dark' | 'night' | 'high-contrast' | 'wireframe';
 
 const THEME_MENU_ITEMS: readonly CxMenuItem[] = [
   { id: 'light', label: 'Light', prependIcon: 'light-mode', type: 'choice' },
   { id: 'dark', label: 'Dark', prependIcon: 'dark-mode', type: 'choice' },
   { id: 'night', label: 'Night', prependIcon: 'night-mode', type: 'choice' },
   { id: 'high-contrast', label: 'High contrast', prependIcon: 'high-contrast-mode', type: 'choice' },
+  { id: 'wireframe', label: 'Wireframe', prependIcon: 'browser-window', type: 'choice' },
 ];
 
 const THEME_LABELS: Record<CxUtilityBarThemeMode, string> = {
@@ -29,6 +30,7 @@ const THEME_LABELS: Record<CxUtilityBarThemeMode, string> = {
   dark: 'Dark',
   night: 'Night',
   'high-contrast': 'High contrast',
+  wireframe: 'Wireframe',
 };
 
 const THEME_ICONS: Record<CxUtilityBarThemeMode, CxIconName> = {
@@ -36,10 +38,15 @@ const THEME_ICONS: Record<CxUtilityBarThemeMode, CxIconName> = {
   dark: 'dark-mode',
   night: 'night-mode',
   'high-contrast': 'high-contrast-mode',
+  wireframe: 'browser-window',
 };
 
 function isThemeMode(value: string): value is CxUtilityBarThemeMode {
-  return value === 'light' || value === 'dark' || value === 'night' || value === 'high-contrast';
+  return value === 'light'
+    || value === 'dark'
+    || value === 'night'
+    || value === 'high-contrast'
+    || value === 'wireframe';
 }
 
 @Component({

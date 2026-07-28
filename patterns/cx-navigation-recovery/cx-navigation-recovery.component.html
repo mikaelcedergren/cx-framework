@@ -1,0 +1,15 @@
+@if (recovery.state(); as state) {
+  <cx-banner
+    [mood]="state.mood"
+    [heading]="state.heading"
+    [description]="state.description"
+    [action]="state.primaryAction"
+    [secondaryAction]="state.secondaryAction"
+    [dismissAriaLabel]="state.dismissAriaLabel"
+    [dismissible]="true"
+    [visible]="true"
+    (actionSelect)="recovery.performPrimaryAction()"
+    (secondaryActionSelect)="recovery.performSecondaryAction()"
+    (visibleChange)="recovery.dismiss()"
+  />
+}

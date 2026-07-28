@@ -118,6 +118,15 @@
       "path": "patterns/cx-labeled-row/cx-labeled-row.component.ts"
     },
     {
+      "name": "cx-navigation-recovery",
+      "selectors": [
+        "cx-navigation-recovery"
+      ],
+      "area": "pattern",
+      "category": "cx-navigation-recovery",
+      "path": "patterns/cx-navigation-recovery/cx-navigation-recovery.component.ts"
+    },
+    {
       "name": "cx-null-controller",
       "selectors": [
         "cx-null-controller"
@@ -188,6 +197,15 @@
       "area": "pattern",
       "category": "cx-wizard-dialog",
       "path": "patterns/cx-wizard-dialog/cx-wizard-dialog-step.directive.ts"
+    },
+    {
+      "name": "cxActiveWorkbench",
+      "selectors": [
+        "[cxActiveWorkbench]"
+      ],
+      "area": "tooling",
+      "category": "reference",
+      "path": "tooling/cx-workbench/cx-active-workbench.directive.ts"
     },
     {
       "name": "cx-workbench",

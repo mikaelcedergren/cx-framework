@@ -21,6 +21,10 @@
   width: var(--controller-size-large);
 }
 
+.cx-index-nav--transparent {
+  background: transparent;
+}
+
 /* ---- Top bar: filter + collapse toggle ---- */
 
 .cx-index-nav__top {

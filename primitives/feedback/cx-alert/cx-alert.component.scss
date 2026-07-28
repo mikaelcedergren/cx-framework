@@ -1,7 +1,6 @@
 :host {
   display: block;
   width: 100%;
-  container-type: inline-size;
   --cx-alert-accent: var(--ink);
 }
 
@@ -27,7 +26,7 @@
 
 .cx-alert__surface {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
   width: 100%;
   min-width: 0;
   align-items: start;
@@ -88,30 +87,14 @@
 
 .cx-alert__action {
   display: inline-flex;
-  grid-column: 3;
-  grid-row: 1;
-  justify-self: end;
+  grid-column: 2 / -1;
+  grid-row: 2;
+  justify-self: start;
 }
 
 .cx-alert__dismiss {
   display: inline-flex;
-  grid-column: 4;
+  grid-column: 3;
   grid-row: 1;
   justify-self: end;
-}
-
-@container (max-width: 440px) {
-  .cx-alert__surface {
-    grid-template-columns: 24px minmax(0, 1fr) auto;
-  }
-
-  .cx-alert__dismiss {
-    grid-column: 3;
-  }
-
-  .cx-alert__action {
-    grid-column: 2 / -1;
-    grid-row: 2;
-    justify-self: start;
-  }
 }
