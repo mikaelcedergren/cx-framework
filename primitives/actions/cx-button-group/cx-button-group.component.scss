@@ -12,6 +12,20 @@
   pointer-events: none;
 }
 
+:host(.cx-button-group-fill) {
+  display: block;
+  width: auto;
+}
+
+:host(.cx-button-group-fill) .cx-button-group-row {
+  display: flex;
+}
+
+:host(.cx-button-group-fill) .cx-button-group-button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
 .cx-button-group-row {
   position: relative;
   display: inline-flex;
@@ -79,20 +93,17 @@
 .cx-button-group-button-small {
   height: calc(var(--controller-size-small) - var(--space-xs));
   padding: 0 var(--space-sm);
-  border-radius: var(--radius-pill, 999px);
-  corner-shape: round;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-small);
 }
 
 :host:has(.cx-button-group-button-small) {
-  border-radius: var(--radius-pill, 999px);
-  corner-shape: round;
+  border-radius: var(--radius-sm);
 }
 
 .cx-button-group-row-has-indicator:has(.cx-button-group-button-small) .cx-button-group-indicator {
-  border-radius: var(--radius-pill, 999px);
-  corner-shape: round;
+  border-radius: var(--radius-sm);
 }
 
 .cx-button-group-button-selected {

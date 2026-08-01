@@ -101,6 +101,11 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   private readonly fieldButtonRef?: ElementRef<HTMLElement>;
   @ViewChild('popover')
   private popoverRef?: CxPopoverComponent;
+  @ViewChild('leftCalendar')
+  private leftCalendarRef?: CxCalendarComponent;
+  @ViewChild('rightCalendar')
+  private rightCalendarRef?: CxCalendarComponent;
+  private dialogFocusFrame: number | undefined;
 
   @Input() label = 'Date span';
   @Input() ariaLabel: string | undefined;
@@ -243,6 +248,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.cancelDialogFocus();
     this.overlay.destroy();
   }
 
@@ -251,17 +257,32 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const nextOpen = !this.openState();
-    this.openState.set(nextOpen);
-    if (!nextOpen) {
+    if (this.openState()) {
+      this.closePopover();
       return;
     }
 
+    this.openState.set(true);
     this.overlay.resetMeasurement();
     this.overlay.setTrigger(field);
     this.syncViewToSelection();
     queueMicrotask(() => {
       this.overlay.sync();
+    });
+    this.scheduleDialogFocus();
+  }
+
+  protected closePopover(): void {
+    if (!this.openState()) {
+      return;
+    }
+    this.cancelDialogFocus();
+    this.openState.set(false);
+    queueMicrotask(() => {
+      const field = this.fieldButtonRef?.nativeElement;
+      if (field?.isConnected && !this.isLocked$()) {
+        field.focus({ preventScroll: true });
+      }
     });
   }
 
@@ -275,7 +296,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (event.key === 'Escape') {
-      this.openState.set(false);
+      this.closePopover();
     }
   }
 
@@ -293,7 +314,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     this.commitRange(nextStart, nextEnd);
 
     if (nextEnd && this.closeOnSelect && !this.timeEnabled) {
-      this.openState.set(false);
+      this.closePopover();
     }
   }
 
@@ -322,7 +343,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     }
     this.commitRange(start, end);
     if (this.closeOnSelect && !this.timeEnabled) {
-      this.openState.set(false);
+      this.closePopover();
     }
   }
 
@@ -435,7 +456,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     }
     const target = event.target;
     if (!(target instanceof Node)) {
-      this.openState.set(false);
+      this.closePopover();
       return;
     }
     if (this.host.nativeElement.contains(target)) {
@@ -448,7 +469,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     if (target instanceof Element && target.closest('[data-cx-popover-surface]')) {
       return;
     }
-    this.openState.set(false);
+    this.closePopover();
   }
 
   @HostListener('window:resize')
@@ -508,6 +529,43 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     this.leftViewMonthState.set(source.month);
     this.rightViewYearState.set(nextRight.year);
     this.rightViewMonthState.set(nextRight.month);
+  }
+
+  private scheduleDialogFocus(attempt = 0): void {
+    const focusDialog = (): void => {
+      this.dialogFocusFrame = undefined;
+      if (!this.openState()) {
+        return;
+      }
+      if (this.leftCalendarRef?.focusActiveDay() || this.rightCalendarRef?.focusActiveDay()) {
+        return;
+      }
+
+      const fallback = this.popoverRef?.surfaceElement()?.querySelector<HTMLElement>(
+        'button:not(:disabled):not([tabindex="-1"]), input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+      );
+      if (fallback) {
+        fallback.focus({ preventScroll: true });
+        return;
+      }
+      if (attempt < 3) {
+        this.scheduleDialogFocus(attempt + 1);
+      }
+    };
+
+    if (typeof window === 'undefined') {
+      queueMicrotask(focusDialog);
+      return;
+    }
+    this.cancelDialogFocus();
+    this.dialogFocusFrame = window.requestAnimationFrame(focusDialog);
+  }
+
+  private cancelDialogFocus(): void {
+    if (typeof window !== 'undefined' && this.dialogFocusFrame !== undefined) {
+      window.cancelAnimationFrame(this.dialogFocusFrame);
+    }
+    this.dialogFocusFrame = undefined;
   }
 
   private measureOverlay(_rect: DOMRect): CxFloatingSurfaceRequest {

@@ -1,5 +1,6 @@
 export * from './icons/manifest';
 export * from './primitives/shared/keyboard-focus';
+export * from './theme';
 
 export * from './patterns/cx-account-control';
 export * from './patterns/cx-action-bar';
@@ -40,6 +41,7 @@ export * from './primitives/actions/cx-toggle-button';
 export * from './primitives/actions/cx-reaction';
 
 export * from './primitives/data/cx-chart';
+export * from './primitives/data/cx-column-filter-editor';
 export * from './primitives/data/cx-list-view';
 export * from './primitives/data/cx-query-element';
 export * from './primitives/data/cx-query-field';
@@ -100,7 +102,7 @@ export * from './primitives/inputs/cx-dropdown';
 export * from './primitives/inputs/cx-slider';
 export * from './primitives/inputs/cx-switch';
 export * from './primitives/inputs/cx-tag-field';
-export * from './primitives/inputs/cx-textarea';
+export * from './primitives/inputs/cx-text-area';
 export * from './primitives/inputs/cx-time-field';
 export * from './primitives/inputs/cx-toggle-chip';
 export * from './primitives/inputs/cx-toggle-chip-group';

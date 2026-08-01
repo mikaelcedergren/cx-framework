@@ -17,15 +17,14 @@
   overflow: hidden;
   padding: var(--space-sm);
   border: var(--line);
-  border-radius: var(--radius-pill);
-  corner-shape: round;
+  border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-mid);
   color: var(--ink);
   line-height: var(--line-height-body-relaxed);
   transform: translate(-50%, calc(100% + var(--space-xl)));
   transition: transform var(--motion-slow) var(--ease-out);
-  backdrop-filter: blur(var(--space-sm));
+  backdrop-filter: blur(calc(var(--frost-softness) * 4));
 }
 
 .cx-toast--open {

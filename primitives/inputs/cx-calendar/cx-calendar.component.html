@@ -20,7 +20,7 @@
       }
     </div>
 
-    <div class="cx-calendar__grid" role="grid" (mouseleave)="onDayLeave()">
+    <div class="cx-calendar__grid" role="grid" [attr.aria-label]="gridAriaLabel$()" (mouseleave)="onDayLeave()">
       @for (day of calendarDays$(); track day.key) {
         <button
           type="button"
@@ -33,9 +33,14 @@
           [class.cx-calendar__day--range-end]="isRangeEndDay(day)"
           [class.cx-calendar__day--range-preview-end]="isRangePreviewEnd(day)"
           [disabled]="disabled || isOutsideRange(day)"
-          [attr.aria-label]="day.isoDate"
+          [attr.tabindex]="day.key === tabbableDayKey$() ? 0 : -1"
+          [attr.data-cx-calendar-day]="day.key"
+          [attr.aria-label]="dayAriaLabel(day)"
           [attr.aria-pressed]="isAriaSelectedDay(day)"
+          [attr.aria-current]="day.isToday ? 'date' : null"
           (click)="onDaySelect(day)"
+          (focus)="onDayFocus(day)"
+          (keydown)="onDayKeydown($event, day)"
           (mouseenter)="onDayHover(day)"
         >
           {{ day.day }}

@@ -11,7 +11,7 @@
   min-height: 0;
   padding: var(--space-xl) var(--space-xl) 0;
   background: var(--overlay-backdrop);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(var(--frost-softness));
   box-sizing: border-box;
   outline: none;
 }
@@ -24,6 +24,7 @@
   min-height: 0;
   grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
+  border: var(--floating-surface-border);
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   background: var(--surface);
   box-shadow: var(--shadow-high);

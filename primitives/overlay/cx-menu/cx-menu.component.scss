@@ -38,7 +38,7 @@
   border-radius: var(--radius-xl);
   background: var(--surface-alt);
   box-shadow: var(--shadow-mid);
-  padding: var(--space-xs);
+  padding: var(--surface-separation);
 }
 
 .cx-menu__option-wrap,
@@ -52,7 +52,7 @@
   min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--surface-separation);
 }
 
 .cx-menu__group {

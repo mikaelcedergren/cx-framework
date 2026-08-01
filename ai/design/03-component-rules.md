@@ -164,6 +164,8 @@ RULE-ID: tables.findability SCOPE: component COMPONENT: tables TYPE: should TOPI
 
 RULE-ID: tables.sorting SCOPE: component COMPONENT: tables TYPE: should TOPIC: data-display RULE: Make meaningful columns sortable and choose a useful default order. DESCRIPTION: Preserve the user's chosen sort when the surrounding task continues.
 
+RULE-ID: tables.column-order SCOPE: component COMPONENT: tables TYPE: must TOPIC: layout RULE: Order columns by decision value: state first, entity second, supporting info next, time last. DESCRIPTION: When rows carry a wrong-or-right signal such as status or severity, that column leads the row; the entity it judges comes immediately after; remaining attributes follow; timestamps such as created or last seen close the row. The reading order always answers what is wrong or right, which entity it concerns, what else matters, and when it happened.
+
 RULE-ID: tables.status SCOPE: component COMPONENT: tables TYPE: must TOPIC: state RULE: Make important row state visible at a glance. DESCRIPTION: Do not bury active, failed, scheduled, or archived state only in details.
 
 RULE-ID: tables.pagination SCOPE: component COMPONENT: tables TYPE: should TOPIC: navigation RULE: Use pagination when position and systematic progress matter. DESCRIPTION: Infinite loading is better suited to casual browsing where exact position is unimportant.

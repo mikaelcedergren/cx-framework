@@ -200,41 +200,43 @@
     </cx-popover>
   }
 
-  <cx-dialog
-    variant="confirm"
-    [open]="createDialogOpen$()"
-    [dismissible]="true"
-    [heading]="createDialogHeading"
-    [description]="createDialogDescription"
-    [primaryText]="createDialogPrimaryLabel"
-    [secondaryText]="createDialogSecondaryLabel"
-    [closeOnPrimary]="false"
-    (openChange)="onCreateDialogOpenChange($event)"
-    (primary)="confirmCreateTag()"
-  >
-    <div body class="cx-tag-field__dialog-body">
-      <div class="cx-tag-field__dialog-name-row">
-        <cx-text-field
-          #draftNameInput
-          label="Name"
-          [value]="draftName$()"
-          [validation]="draftNameError$()"
-          (valueChange)="onDraftNameChange($event)"
-        />
-        <div class="cx-tag-field__dialog-color-slot">
-          <cx-color-picker
-            class="cx-tag-field__dialog-color-picker"
-            [color]="draftColor$()"
-            (colorChange)="onDraftColorChange($event)"
+  @if (creatable$()) {
+    <cx-dialog
+      variant="confirm"
+      [open]="createDialogOpen$()"
+      [dismissible]="true"
+      [heading]="createDialogHeading"
+      [description]="createDialogDescription"
+      [primaryText]="createDialogPrimaryLabel"
+      [secondaryText]="createDialogSecondaryLabel"
+      [closeOnPrimary]="false"
+      (openChange)="onCreateDialogOpenChange($event)"
+      (primary)="confirmCreateTag()"
+    >
+      <div body class="cx-tag-field__dialog-body">
+        <div class="cx-tag-field__dialog-name-row">
+          <cx-text-field
+            #draftNameInput
+            label="Name"
+            [value]="draftName$()"
+            [validation]="draftNameError$()"
+            (valueChange)="onDraftNameChange($event)"
           />
+          <div class="cx-tag-field__dialog-color-slot">
+            <cx-color-picker
+              class="cx-tag-field__dialog-color-picker"
+              [color]="draftColor$()"
+              (colorChange)="onDraftColorChange($event)"
+            />
+          </div>
         </div>
+        <cx-text-field
+          label="Key"
+          [optional]="true"
+          [value]="draftKey$()"
+          (valueChange)="onDraftKeyChange($event)"
+        />
       </div>
-      <cx-text-field
-        label="Key"
-        [optional]="true"
-        [value]="draftKey$()"
-        (valueChange)="onDraftKeyChange($event)"
-      />
-    </div>
-  </cx-dialog>
+    </cx-dialog>
+  }
 </div>

@@ -1,36 +1,27 @@
 <div class="cx-filter-bar">
   <div class="cx-filter-bar__left">
     @if (mode$() === 'filters') {
-      <div class="cx-filter-bar__filter-trigger" #filterTriggerAnchor>
-        <cx-icon-button
-          icon="filters"
-          ariaLabel="Open filters"
-          mood="default"
-          size="small"
-          (pressed)="toggleFilterPopover()"
-        />
-      </div>
+      @if (filters$().length > 0) {
+        <div class="cx-filter-bar__filter-trigger" #filterTriggerAnchor>
+          <cx-icon-button
+            icon="filters"
+            [ariaLabel]="filterButtonAriaLabel$()"
+            mood="default"
+            [selected]="activeFilterCount$() > 0"
+            [badgeValue]="activeFilterCount$() > 0 ? activeFilterCount$().toString() : undefined"
+            (pressed)="toggleFilterPopover()"
+          />
+        </div>
+      }
 
       @if (quickFilters$().length > 0) {
+        <!-- Quick filters stay small on purpose: they are a compact scope strip, not primary controls. -->
         <cx-button-group
           size="small"
           [availableValues]="quickFilters$()"
           [value]="selectedQuickFilterId$()"
           (valueChange)="onQuickFilterSelect($event)"
         />
-      }
-
-      @if (filterOptions$().length > 0) {
-        <div class="cx-filter-bar__select">
-          <cx-dropdown
-            label=""
-            size="small"
-            [placeholder]="resolvedFilterPlaceholder$()"
-            [availableValues]="filterOptions$()"
-            [value]="selectedFilterValue$()"
-            (valueChange)="onFilterValueChange($event)"
-          />
-        </div>
       }
     } @else {
       <div class="cx-filter-bar__query">
@@ -97,23 +88,71 @@
   [width]="filterPopoverWidth$()"
   [maxHeight]="filterPopoverMaxHeight$()"
   [placement]="filterPopoverPlacement$()"
+  [role]="'dialog'"
+  ariaLabel="Filters"
   (backdropPressed)="closeFloatingPopovers()"
 >
   <div class="cx-filter-bar__popover-content">
-    <cx-button-group
-      size="small"
-      [availableValues]="presetOptions"
-      [value]="presetSelection$()"
-      (valueChange)="onPresetSelect($event)"
+    <cx-text-field
+      #filterSearchControl
+      class="cx-filter-bar__filter-search"
+      label=""
+      [ariaLabel]="filterSearchAriaLabel"
+      placeholder="Search columns"
+      prependIcon="search"
+      [clearable]="true"
+      [value]="filterSearchValue$()"
+      (valueChange)="onFilterSearchValueChange($event)"
     />
 
-    <div class="cx-filter-bar__sections">
-      @for (section of filterSections$(); track section.id) {
+    @if (activeFilterCount$() > 0) {
+      <div class="cx-filter-bar__filter-actions">
+        <span>{{ activeFilterCount$() }} active</span>
+        <button type="button" class="cx-filter-bar__filter-clear" (click)="clearAllFilters()">
+          Clear all
+        </button>
+      </div>
+    }
+
+    <div class="cx-filter-bar__filters">
+      @for (filter of filteredFilters$(); track filter.id) {
         <cx-expansion-panel
-          [heading]="section.label"
+          class="cx-filter-bar__filter-panel"
+          variant="flat"
+          [heading]="filter.label"
+          [expanded]="isFilterExpanded(filter.id)"
+          (expandedChange)="onFilterExpandedChange(filter.id, $event)"
         >
-          <p class="cx-filter-bar__section-copy">{{ sectionBody(section) }}</p>
+          @if (isFilterActive(filter)) {
+            <button
+              actions
+              type="button"
+              class="cx-filter-bar__filter-clear cx-filter-bar__filter-clear--column"
+              [attr.aria-label]="'Clear ' + filter.label + ' filter'"
+              (click)="clearFilter(filter)"
+            >
+              Clear
+            </button>
+          }
+
+          @if (isFilterExpanded(filter.id)) {
+            <cx-column-filter-editor
+              class="cx-filter-bar__filter-editor"
+              [label]="''"
+              [ariaLabel]="filter.label + ' filter'"
+              [showClearAction]="false"
+              [definition]="filter.filter"
+              [value]="filterValue(filter.id)"
+              (valueChange)="onColumnFilterValueChange(filter, $event)"
+              (queryChange)="onFilterQueryChange(filter.id, $event)"
+              (loadMore)="onFilterLoadMore(filter.id)"
+            />
+          }
         </cx-expansion-panel>
+      } @empty {
+        <div class="cx-filter-bar__filter-empty" role="status">
+          No matching columns
+        </div>
       }
     </div>
   </div>
@@ -129,16 +168,19 @@
   [width]="propertiesPopoverWidth$()"
   [maxHeight]="propertiesPopoverMaxHeight$()"
   [placement]="propertiesPopoverPlacement$()"
-  surfaceVariant="raised"
+  [role]="'dialog'"
+  ariaLabel="Table properties"
+  surfaceVariant="grouped"
   (backdropPressed)="closeFloatingPopovers()"
 >
   <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties">
-    <section class="cx-filter-bar__properties-section">
+    <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
       <cx-option-group label="Display" />
       <div class="cx-filter-bar__properties-section-body">
         <cx-button-group
           class="cx-filter-bar__display-toggle"
-          size="small"
+          ariaLabel="Display"
+          [fill]="true"
           [availableValues]="displayOptions"
           [value]="displayMode$()"
           (valueChange)="onDisplayModeSelect($event)"
@@ -147,23 +189,22 @@
     </section>
 
     @if (hasGroupByControls$()) {
-      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
-      <section class="cx-filter-bar__properties-section">
+      <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
         <cx-option-group label="Group by" />
         <div class="cx-filter-bar__properties-section-body">
-          <cx-toggle-chip-group
-            size="small"
-            [availableValues]="groupByChipOptions$()"
-            selection="single"
-            [selectedValues]="groupByValues$()"
-            (selectedValuesChange)="onGroupByValuesSelect($event)"
+          <cx-dropdown
+            label=""
+            ariaLabel="Group by"
+            [availableValues]="groupByDropdownOptions$()"
+            [value]="groupBy$()"
+            (valueChange)="onGroupBySelect($event)"
           />
         </div>
       </section>
     }
 
     @if (hasSortControls$()) {
-      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
+      <div class="cx-filter-bar__properties-island">
       <section class="cx-filter-bar__properties-section">
         <cx-option-group label="Sort by" />
         <div class="cx-filter-bar__properties-section-body">
@@ -171,18 +212,20 @@
             <cx-dropdown
               class="cx-filter-bar__sort-select"
               label=""
+              ariaLabel="Sort by"
               placeholder="Select column"
               [availableValues]="sortOptions$()"
               [value]="sortBy$()"
               (valueChange)="onSortByValueChange($event)"
             />
-            <cx-icon-button
-              [icon]="directionIcon(sortDirection$())"
-              ariaLabel="Toggle primary sort direction" variant="transparent"
-              size="small"
-              [disabled]="!hasActivePrimarySort()"
-              (pressed)="toggleSortDirection()"
-            />
+            <cx-tooltip [text]="directionTooltip(sortDirection$())" position="top">
+              <cx-icon-button
+                [icon]="directionIcon(sortDirection$())"
+                ariaLabel="Toggle primary sort direction" variant="transparent"
+                [disabled]="!hasActivePrimarySort()"
+                (pressed)="toggleSortDirection()"
+              />
+            </cx-tooltip>
           </div>
         </div>
       </section>
@@ -195,27 +238,29 @@
             <cx-dropdown
               class="cx-filter-bar__sort-select"
               label=""
+              ariaLabel="Then by"
               placeholder="Select column"
               [availableValues]="sortOptions$()"
               [value]="thenBy$()"
               (valueChange)="onThenByValueChange($event)"
             />
-            <cx-icon-button
-              [icon]="directionIcon(thenByDirection$())"
-              ariaLabel="Toggle secondary sort direction" variant="transparent"
-              size="small"
-              [disabled]="!hasActiveSecondarySort()"
-              (pressed)="toggleThenByDirection()"
-            />
+            <cx-tooltip [text]="directionTooltip(thenByDirection$())" position="top">
+              <cx-icon-button
+                [icon]="directionIcon(thenByDirection$())"
+                ariaLabel="Toggle secondary sort direction" variant="transparent"
+                [disabled]="!hasActiveSecondarySort()"
+                (pressed)="toggleThenByDirection()"
+              />
+            </cx-tooltip>
           </div>
         </div>
       </section>
       }
+      </div>
     }
 
     @if (hasColumnControls$()) {
-      <div class="cx-filter-bar__properties-divider" aria-hidden="true"></div>
-      <section class="cx-filter-bar__properties-section">
+      <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
         <cx-option-group label="Columns">
           <button
             actions
@@ -244,6 +289,7 @@
                   [selected]="isColumnVisible(column.id)"
                   (selectedChange)="onColumnOptionSelect(column.id)"
                 />
+                <!-- Repeated row action in a dense list: one of the few legitimate size="small" cases. -->
                 <cx-toggle-button
                   [icon]="'pin'"
                   [iconSelected]="'pin-off'"

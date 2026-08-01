@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxDropdownComponent, type CxDropdownOption } from '../cx-dropdown';
 import {
@@ -6,6 +17,7 @@ import {
   addCxMonths,
   buildCxCalendarDays,
   compareCxDays,
+  getCxDaysInMonth,
   getCxWeekdayLabels,
   getCxTodayParts,
   getCxYearOptions,
@@ -24,6 +36,17 @@ export interface CxCalendarRange {
   end?: Date;
 }
 
+const calendarDayLabelFormatter = new Intl.DateTimeFormat('en-SE', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const calendarGridLabelFormatter = new Intl.DateTimeFormat('en-SE', {
+  month: 'long',
+  year: 'numeric',
+});
+
 @Component({
   selector: 'cx-calendar',
   imports: [CxIconButtonComponent, CxDropdownComponent],
@@ -32,12 +55,23 @@ export interface CxCalendarRange {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxCalendarComponent {
+  private readonly host = inject(ElementRef<HTMLElement>);
   private readonly valueState = signal<Date | undefined>(undefined);
   private readonly rangeState = signal<CxCalendarRange>({});
   private readonly rangePreviewEndState = signal<Date | undefined>(undefined);
   private readonly viewYearState = signal(getCxTodayParts().year);
   private readonly viewMonthState = signal(getCxTodayParts().month);
+  private readonly focusedDayKeyState = signal<string | undefined>(undefined);
   private hasControlledView = false;
+  private focusFrame: number | undefined;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      if (typeof window !== 'undefined' && this.focusFrame !== undefined) {
+        window.cancelAnimationFrame(this.focusFrame);
+      }
+    });
+  }
 
   @Input() variant: CxCalendarVariant = 'default';
   @Input() selectionMode: CxCalendarSelectionMode = 'single';
@@ -106,6 +140,31 @@ export class CxCalendarComponent {
   protected readonly calendarDays$ = computed(() =>
     buildCxCalendarDays(this.viewYearState(), this.viewMonthState(), this.weekStart),
   );
+  protected readonly gridAriaLabel$ = computed(() =>
+    calendarGridLabelFormatter.format(
+      new Date(this.viewYearState(), this.viewMonthState() - 1, 1, 12, 0, 0, 0),
+    ),
+  );
+  protected readonly tabbableDayKey$ = computed(() => this.resolveTabbableDay()?.key);
+
+  /**
+   * Moves focus to the calendar's current roving day.
+   * Returns false when the calendar is disabled or every rendered day is unavailable.
+   */
+  public focusActiveDay(): boolean {
+    if (this.disabled) {
+      return false;
+    }
+    const day = this.resolveTabbableDay();
+    if (!day) {
+      return false;
+    }
+    this.focusedDayKeyState.set(day.key);
+    if (!this.focusDayButton(day.key)) {
+      this.scheduleDayFocus(day.key);
+    }
+    return true;
+  }
 
   protected onPreviousMonth(): void {
     const next = addCxMonths(this.viewYearState(), this.viewMonthState(), -1);
@@ -135,6 +194,7 @@ export class CxCalendarComponent {
     if (this.disabled || this.isOutsideRange(day)) {
       return;
     }
+    this.focusedDayKeyState.set(day.key);
     const nextValue = new Date(day.year, day.month - 1, day.day, 0, 0, 0, 0);
 
     if (this.selectionMode === 'range') {
@@ -217,6 +277,82 @@ export class CxCalendarComponent {
     this.clearRangePreview();
   }
 
+  protected onDayFocus(day: CxCalendarDay): void {
+    if (!this.disabled && !this.isOutsideRange(day)) {
+      this.focusedDayKeyState.set(day.key);
+    }
+  }
+
+  protected onDayKeydown(event: KeyboardEvent, day: CxCalendarDay): void {
+    if (this.disabled || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      const days = this.calendarDays$();
+      const dayIndex = days.findIndex(candidate => candidate.key === day.key);
+      if (dayIndex < 0) {
+        return;
+      }
+      const rowStart = Math.floor(dayIndex / 7) * 7;
+      const week = days.slice(rowStart, rowStart + 7);
+      const orderedWeek = event.key === 'Home' ? week : [...week].reverse();
+      const target = orderedWeek.find(candidate => !this.isOutsideRange(candidate));
+      if (target) {
+        this.moveFocusToDay(target);
+      }
+      return;
+    }
+
+    let dayDelta: number | undefined;
+    if (event.key === 'ArrowLeft') {
+      dayDelta = -1;
+    } else if (event.key === 'ArrowRight') {
+      dayDelta = 1;
+    } else if (event.key === 'ArrowUp') {
+      dayDelta = -7;
+    } else if (event.key === 'ArrowDown') {
+      dayDelta = 7;
+    }
+
+    if (dayDelta !== undefined) {
+      event.preventDefault();
+      const target = this.addDays(day, dayDelta);
+      if (!this.isOutsideRange(target)) {
+        this.moveFocusToDay(target);
+      }
+      return;
+    }
+
+    if (event.key !== 'PageUp' && event.key !== 'PageDown') {
+      return;
+    }
+
+    const monthDelta = (event.key === 'PageUp' ? -1 : 1) * (event.shiftKey ? 12 : 1);
+    const nextMonth = addCxMonths(day.year, day.month, monthDelta);
+    const targetDay = Math.min(day.day, getCxDaysInMonth(nextMonth.year, nextMonth.month));
+    const target: CxCalendarDay = {
+      key: this.dayKey(nextMonth.year, nextMonth.month, targetDay),
+      year: nextMonth.year,
+      month: nextMonth.month,
+      day: targetDay,
+      isoDate: '',
+      inCurrentMonth: true,
+      isToday: false,
+    };
+    event.preventDefault();
+    if (!this.isOutsideRange(target)) {
+      this.moveFocusToDay(target);
+    }
+  }
+
+  protected dayAriaLabel(day: CxCalendarDay): string {
+    return calendarDayLabelFormatter.format(
+      new Date(day.year, day.month - 1, day.day, 12, 0, 0, 0),
+    );
+  }
+
   protected isOutsideRange(day: CxCalendarDay): boolean {
     const target: CxLocalDateParts = { year: day.year, month: day.month, day: day.day, hours: 0, minutes: 0 };
     const min = this.toDateParts(this.min);
@@ -263,6 +399,95 @@ export class CxCalendarComponent {
       hours: value.getHours(),
       minutes: value.getMinutes(),
     };
+  }
+
+  private resolveTabbableDay(): CxCalendarDay | undefined {
+    const days = this.calendarDays$();
+    const isAvailable = (day: CxCalendarDay | undefined): day is CxCalendarDay =>
+      !!day && !this.isOutsideRange(day);
+    const focusedDay = days.find(day => day.key === this.focusedDayKeyState());
+    if (isAvailable(focusedDay)) {
+      return focusedDay;
+    }
+
+    const selectedDates = [
+      this.selectedDate$(),
+      this.rangeStart$(),
+      this.rangeEnd$(),
+    ];
+    for (const preferredDate of selectedDates) {
+      const preferredDay = days.find(day => isSameCxDay(day, preferredDate));
+      if (isAvailable(preferredDay)) {
+        return preferredDay;
+      }
+    }
+
+    const today = getCxTodayParts();
+    const todayDay = days.find(day => day.inCurrentMonth && isSameCxDay(day, today));
+    if (isAvailable(todayDay)) {
+      return todayDay;
+    }
+
+    return (
+      days.find(day => day.inCurrentMonth && isAvailable(day)) ??
+      days.find(day => isAvailable(day))
+    );
+  }
+
+  private moveFocusToDay(day: CxCalendarDay): void {
+    this.focusedDayKeyState.set(day.key);
+    if (day.year !== this.viewYearState() || day.month !== this.viewMonthState()) {
+      this.setView(day.year, day.month);
+    }
+    this.scheduleDayFocus(day.key);
+  }
+
+  private scheduleDayFocus(dayKey: string): void {
+    if (typeof window === 'undefined') {
+      queueMicrotask(() => this.focusDayButton(dayKey));
+      return;
+    }
+    if (this.focusFrame !== undefined) {
+      window.cancelAnimationFrame(this.focusFrame);
+    }
+    this.focusFrame = window.requestAnimationFrame(() => {
+      this.focusFrame = undefined;
+      this.focusDayButton(dayKey);
+    });
+  }
+
+  private focusDayButton(dayKey: string): boolean {
+    const button = this.host.nativeElement.querySelector(
+      `[data-cx-calendar-day="${dayKey}"]`,
+    ) as HTMLButtonElement | null;
+    if (!button || button.disabled) {
+      return false;
+    }
+    button.focus({ preventScroll: true });
+    return true;
+  }
+
+  private addDays(
+    day: Pick<CxCalendarDay, 'year' | 'month' | 'day'>,
+    delta: number,
+  ): CxCalendarDay {
+    const date = new Date(day.year, day.month - 1, day.day + delta, 12, 0, 0, 0);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const dayOfMonth = date.getDate();
+    return {
+      key: this.dayKey(year, month, dayOfMonth),
+      year,
+      month,
+      day: dayOfMonth,
+      isoDate: '',
+      inCurrentMonth: month === this.viewMonthState() && year === this.viewYearState(),
+      isToday: false,
+    };
+  }
+
+  private dayKey(year: number, month: number, day: number): string {
+    return `${year}-${`${month}`.padStart(2, '0')}-${`${day}`.padStart(2, '0')}`;
   }
 
 }

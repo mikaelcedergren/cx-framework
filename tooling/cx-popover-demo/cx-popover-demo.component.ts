@@ -20,6 +20,7 @@ import {
 } from '../../primitives/overlay/floating-surface-controller';
 import { type CxFloatingSurfaceAlign } from '../../primitives/overlay/floating-surface';
 import { type CxIconName } from '../../icons/manifest';
+import { CX_THEMES } from '../../theme';
 
 export type CxPopoverDemoOption = {
   id: string;
@@ -55,13 +56,11 @@ const CX_POPOVER_DEMO_SUBMENU_LABELS: Record<CxPopoverDemoSubmenuId, string> = {
   theme: 'Theme',
 };
 const CX_POPOVER_DEMO_SUBMENU_ITEMS: Record<CxPopoverDemoSubmenuId, readonly CxPopoverDemoSubmenuItem[]> = {
-  theme: [
-    { id: 'light', label: 'Light', prependIcon: 'light-mode' },
-    { id: 'dark', label: 'Dark', prependIcon: 'dark-mode' },
-    { id: 'night', label: 'Night', prependIcon: 'night-mode' },
-    { id: 'high-contrast', label: 'High contrast', prependIcon: 'high-contrast-mode' },
-    { id: 'wireframe', label: 'Wireframe', prependIcon: 'browser-window' },
-  ],
+  theme: CX_THEMES.map(theme => ({
+    id: theme.id,
+    label: theme.label,
+    prependIcon: theme.icon,
+  })),
 };
 
 function clamp(value: number, min: number, max: number): number {

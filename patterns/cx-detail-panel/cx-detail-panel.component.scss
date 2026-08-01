@@ -24,7 +24,7 @@
 }
 
 .cx-detail-panel {
-  --cx-detail-panel-frame-padding: var(--space-xs);
+  --cx-detail-panel-frame-padding: var(--surface-separation);
   --cx-detail-panel-island-radius: var(--radius-lg);
 
   display: flex;
@@ -35,7 +35,7 @@
   max-width: 100%;
   flex-direction: column;
   overflow: hidden;
-  border: 0;
+  border: var(--floating-surface-border);
   border-radius: var(--radius-xl);
   background: var(--surface-alt);
   box-shadow: var(--shadow-low);
@@ -49,6 +49,7 @@
 .cx-detail-panel--fixed {
   --cx-detail-panel-island-radius: var(--radius-md);
 
+  border: 0;
   border-radius: 0;
   box-shadow: none;
 }

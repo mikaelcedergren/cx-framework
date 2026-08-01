@@ -14,7 +14,7 @@
   padding: var(--space-xl);
   overflow: auto;
   background: var(--overlay-backdrop);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(var(--frost-softness));
   box-sizing: border-box;
 }
 

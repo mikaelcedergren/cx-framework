@@ -9,14 +9,14 @@
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--surface-separation);
   overflow: hidden;
-  border: 1px solid var(--opacity-low);
+  border: var(--line-discreet);
   border-radius: var(--radius-xl);
   background-color: var(--surface-alt);
   box-shadow: none;
   box-sizing: border-box;
-  padding: var(--space-xs);
+  padding: var(--surface-separation);
   transition:
     background-color var(--motion-fast) ease,
     border-color var(--motion-fast) ease,
@@ -29,12 +29,12 @@
 
 :host(.cx-card-host--border) .cx-card {
   gap: 0;
-  border-color: var(--opacity-mid);
+  border: var(--line);
   padding: 0;
 }
 
 :host(.cx-card-host--border) .cx-card__content {
-  border-radius: calc(var(--radius-xl) - 1px);
+  border-radius: calc(var(--radius-xl) - var(--border-width));
 }
 
 :host(.cx-card-host--shadow) .cx-card {

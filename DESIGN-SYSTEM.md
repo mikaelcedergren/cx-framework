@@ -234,18 +234,46 @@ Type scale:
 
 Most component text uses body, not body-sm. Small and extra-small type are for labels, helper text, metadata, captions, badges, shortcut keys, chart ticks, and other genuinely secondary content.
 
-Corner geometry uses `--corner-shape: squircle`. Change that token to `round` to return rectangular surfaces to conventional rounded corners. Semantic circles and pills remain round.
+### Theme visual character
 
-Radius scale:
+Themes own visual character through one shared token contract. Components never branch on a theme
+class and never expose theme-specific styling props. A designer changes the theme profile; every
+sealed component resolves the same semantic tokens differently.
+
+- `--corner-shape` controls the curve family. The modern profile uses `squircle`; conventional
+  rounded corners use `round`.
+- `--corner-softness` controls the amount of rounding. The named non-pill radius scale derives from
+  this one unit so a theme stays proportionate instead of redefining every component radius.
+- `--surface-separation` controls the visible inset and seam around and between separate surfaces in
+  framed composites such as popovers, menus, dialogs, calendars, cards, and detail panels. It must
+  not replace content spacing, control padding, or layout gaps.
+- `--floating-surface-border` controls the boundary used by elevated surfaces that otherwise rely on
+  shadow. Other grounded and structural boundaries continue to use `--line` or `--line-discreet`.
+- `--frost-softness` controls backdrop blur intensity. Components may derive stronger frost from the
+  base unit while a flat theme can set the unit to zero.
+- `--shadow-low`, `--shadow-mid`, and `--shadow-high` keep their semantic elevation roles while each
+  theme chooses a soft, crisp, or flat depth profile.
+
+Every theme may also override the existing palette, semantic colour, border, spacing, size,
+typography, and motion tokens. Keep the token meanings stable: changing a theme must not change a
+component's role, state, behavior, accessible target, or content hierarchy. Semantic circles and
+pills remain round regardless of the rectangular corner profile.
+
+Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours,
+type, density, control sizes, and motion, then changes only visual character: conventional round
+corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost, and crisp
+shadows. It is a transition profile, never a component variant.
+
+The default radius scale derives from `--corner-softness: 4px`:
 
 - `--radius-none`: 0
-- `--radius-xs`: 4px
-- `--radius-sm`: 8px
-- `--radius-md`: 12px
-- `--radius-lg`: 16px
-- `--radius-media-lg`: 24px for large media corners
-- `--radius-xl`: 32px
-- `--radius-2xl`: 64px
+- `--radius-xs`: 1 × corner softness
+- `--radius-sm`: 2 × corner softness
+- `--radius-md`: 3 × corner softness
+- `--radius-lg`: 4 × corner softness
+- `--radius-media-lg`: 6 × corner softness for large media corners
+- `--radius-xl`: 8 × corner softness
+- `--radius-2xl`: 16 × corner softness
 - `--radius-pill`: 999px
 
 Use named shadows only for real elevation:

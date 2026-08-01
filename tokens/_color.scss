@@ -71,7 +71,7 @@
     --on-utility-bar: var(--on-emphasis);
 
     --opacity-high: color-mix(in srgb, rgb(255 255 255 / 60%) 92%, color-mix(in srgb, var(--blue) 60%, transparent) 8%);
-    --opacity-mid: color-mix(in srgb, rgb(255 255 255 / 14%) 92%, color-mix(in srgb, var(--blue) 14%, transparent) 8%);
+    --opacity-mid: color-mix(in srgb, rgb(255 255 255 / 8%) 92%, color-mix(in srgb, var(--blue) 8%, transparent) 8%);
     --opacity-low: color-mix(in srgb, rgb(255 255 255 / 3%) 92%, color-mix(in srgb, var(--blue) 3%, transparent) 8%);
     --opacity-darken: rgb(0 0 0 / 5%);
     --opacity-disabled: 0.55;

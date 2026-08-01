@@ -15,13 +15,13 @@
   min-height: 0;
   flex-direction: column;
   box-sizing: border-box;
-  border: 0;
+  border: var(--floating-surface-border);
   border-radius: var(--radius-xl);
   background: var(--surface-alt);
   overflow: hidden;
   overscroll-behavior: contain;
   box-shadow: var(--shadow-mid);
-  padding: var(--space-xs);
+  padding: var(--surface-separation);
   animation: cx-popover-enter var(--motion-base) var(--ease-out);
 }
 

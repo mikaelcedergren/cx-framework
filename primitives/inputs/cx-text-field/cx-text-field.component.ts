@@ -39,6 +39,7 @@ export class CxTextFieldComponent {
 
   @Input() label = 'Label';
   @Input() ariaLabel: string | undefined;
+  @Input() placeholder: string | undefined;
   @Input() name: string | undefined;
   @Input() autocomplete: string | undefined;
   @Input() inlineEdit = false;

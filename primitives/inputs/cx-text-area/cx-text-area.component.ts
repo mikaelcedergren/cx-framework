@@ -9,14 +9,14 @@ import {
   normalizeCxValidationMessages,
 } from '../shared/field.types';
 
-export type CxTextareaAnnotationMood = 'success' | 'danger';
+export type CxTextAreaAnnotationMood = 'success' | 'danger';
 
-export type CxTextareaAnnotation =
+export type CxTextAreaAnnotation =
   | {
       id?: string;
       kind: 'line';
       line: number;
-      mood: CxTextareaAnnotationMood;
+      mood: CxTextAreaAnnotationMood;
       message?: string;
     }
   | {
@@ -25,61 +25,61 @@ export type CxTextareaAnnotation =
       line: number;
       startIndex: number;
       endIndex: number;
-      mood: CxTextareaAnnotationMood;
+      mood: CxTextAreaAnnotationMood;
       message?: string;
     };
 
-type CxTextareaNormalizedLineAnnotation = Extract<CxTextareaAnnotation, { kind: 'line' }> & {
+type CxTextAreaNormalizedLineAnnotation = Extract<CxTextAreaAnnotation, { kind: 'line' }> & {
   order: number;
 };
 
-type CxTextareaNormalizedRangeAnnotation = Extract<CxTextareaAnnotation, { kind: 'range' }> & {
+type CxTextAreaNormalizedRangeAnnotation = Extract<CxTextAreaAnnotation, { kind: 'range' }> & {
   order: number;
 };
 
-type CxTextareaNormalizedAnnotation =
-  | CxTextareaNormalizedLineAnnotation
-  | CxTextareaNormalizedRangeAnnotation;
+type CxTextAreaNormalizedAnnotation =
+  | CxTextAreaNormalizedLineAnnotation
+  | CxTextAreaNormalizedRangeAnnotation;
 
-export type CxTextareaVariant = 'default' | 'inline-edit' | 'title';
-export type CxTextareaFocusVariant = 'default' | 'ring';
-export type CxTextareaLayout = 'default' | 'fill';
-export type CxTextareaPresentation = 'default' | 'document';
-export type CxTextareaSize = 'small' | 'default' | 'large';
-export type CxTextareaSizing = 'fixed' | 'auto' | 'resizable';
+export type CxTextAreaVariant = 'default' | 'inline-edit' | 'title';
+export type CxTextAreaFocusVariant = 'default' | 'ring';
+export type CxTextAreaLayout = 'default' | 'fill';
+export type CxTextAreaPresentation = 'default' | 'document';
+export type CxTextAreaSize = 'small' | 'default' | 'large';
+export type CxTextAreaSizing = 'fixed' | 'auto' | 'resizable';
 
-type CxTextareaRenderedLine = {
+type CxTextAreaRenderedLine = {
   number: number;
-  mood?: CxTextareaAnnotationMood;
-  iconMood?: CxTextareaAnnotationMood;
+  mood?: CxTextAreaAnnotationMood;
+  iconMood?: CxTextAreaAnnotationMood;
   title?: string;
   segments: ReadonlyArray<{
     text: string;
-    mood?: CxTextareaAnnotationMood;
+    mood?: CxTextAreaAnnotationMood;
   }>;
 };
 
 @Component({
-  selector: 'cx-textarea',
+  selector: 'cx-text-area',
   imports: [CxIconComponent, CxValidationMessageComponent],
-  templateUrl: './cx-textarea.component.html',
-  styleUrl: './cx-textarea.component.scss',
+  templateUrl: './cx-text-area.component.html',
+  styleUrl: './cx-text-area.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxTextareaComponent {
+export class CxTextAreaComponent {
   private static nextId = 0;
 
   private readonly valueState = signal('');
   private readonly focusedState = signal(false);
   private readonly markdownState = signal(false);
   private readonly disabledState = signal(false);
-  private readonly sizeState = signal<CxTextareaSize>('default');
-  private readonly sizingState = signal<CxTextareaSizing>('resizable');
+  private readonly sizeState = signal<CxTextAreaSize>('default');
+  private readonly sizingState = signal<CxTextAreaSizing>('resizable');
   private readonly minLinesState = signal(5);
   private readonly maxLinesState = signal<number | undefined>(undefined);
   private readonly maxLengthState = signal<number | undefined>(undefined);
   private readonly lineNumbersState = signal(false);
-  private readonly annotationsState = signal<ReadonlyArray<CxTextareaAnnotation>>([]);
+  private readonly annotationsState = signal<ReadonlyArray<CxTextAreaAnnotation>>([]);
   private readonly scrollTopState = signal(0);
   private readonly hintState = signal<string | undefined>(undefined);
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
@@ -89,12 +89,13 @@ export class CxTextareaComponent {
 
   @Input() label = 'Label';
   @Input() ariaLabel: string | undefined;
+  @Input() placeholder: string | undefined;
   @Input() optional = false;
   @Input() monospace = false;
-  @Input() variant: CxTextareaVariant = 'default';
-  @Input() focusVariant: CxTextareaFocusVariant = 'default';
-  @Input() layout: CxTextareaLayout = 'default';
-  @Input() presentation: CxTextareaPresentation = 'default';
+  @Input() variant: CxTextAreaVariant = 'default';
+  @Input() focusVariant: CxTextAreaFocusVariant = 'default';
+  @Input() layout: CxTextAreaLayout = 'default';
+  @Input() presentation: CxTextAreaPresentation = 'default';
 
   @Input()
   public set markdown(value: boolean) {
@@ -107,12 +108,12 @@ export class CxTextareaComponent {
   }
 
   @Input()
-  public set size(value: CxTextareaSize | undefined) {
+  public set size(value: CxTextAreaSize | undefined) {
     this.sizeState.set(value === 'small' || value === 'large' ? value : 'default');
   }
 
   @Input()
-  public set sizing(value: CxTextareaSizing | undefined) {
+  public set sizing(value: CxTextAreaSizing | undefined) {
     this.sizingState.set(value === 'fixed' || value === 'auto' || value === 'resizable' ? value : 'resizable');
   }
 
@@ -137,7 +138,7 @@ export class CxTextareaComponent {
   }
 
   @Input()
-  public set annotations(value: ReadonlyArray<CxTextareaAnnotation> | null | undefined) {
+  public set annotations(value: ReadonlyArray<CxTextAreaAnnotation> | null | undefined) {
     this.annotationsState.set(value ?? []);
   }
 
@@ -160,7 +161,7 @@ export class CxTextareaComponent {
   @Output() readonly focusChange = new EventEmitter<boolean>();
   @Output() readonly blurred = new EventEmitter<void>();
 
-  protected readonly messagesId = `cx-textarea-messages-${CxTextareaComponent.nextId++}`;
+  protected readonly messagesId = `cx-text-area-messages-${CxTextAreaComponent.nextId++}`;
 
   protected get resolvedAriaLabel(): string | undefined {
     const ariaLabel = this.ariaLabel?.trim();
@@ -186,8 +187,8 @@ export class CxTextareaComponent {
   });
   protected readonly maxLength$ = this.maxLengthState.asReadonly();
   protected readonly isFocused$ = computed(() => this.focusedState());
-  protected readonly normalizedAnnotations$ = computed<ReadonlyArray<CxTextareaNormalizedAnnotation>>(() => {
-    const normalized: CxTextareaNormalizedAnnotation[] = [];
+  protected readonly normalizedAnnotations$ = computed<ReadonlyArray<CxTextAreaNormalizedAnnotation>>(() => {
+    const normalized: CxTextAreaNormalizedAnnotation[] = [];
 
     this.annotationsState().forEach((annotation, index) => {
       const line = Math.max(1, Math.floor(annotation.line));
@@ -238,7 +239,7 @@ export class CxTextareaComponent {
     this.renderedLines$().some((line) => line.iconMood !== undefined),
   );
   protected readonly showGutter$ = computed(() => this.showLineNumbers$() || this.showGutterIconColumn$());
-  protected readonly renderedLines$ = computed<ReadonlyArray<CxTextareaRenderedLine>>(() => {
+  protected readonly renderedLines$ = computed<ReadonlyArray<CxTextAreaRenderedLine>>(() => {
     const textLines = this.valueState().split(/\r?\n/);
     const total = this.visibleLineCount$();
     return Array.from({ length: total }, (_, index) => {
@@ -287,7 +288,7 @@ export class CxTextareaComponent {
     return marked.parse(raw) as string;
   });
 
-  private dominantMood(moods: ReadonlyArray<CxTextareaAnnotationMood | undefined>): CxTextareaAnnotationMood | undefined {
+  private dominantMood(moods: ReadonlyArray<CxTextAreaAnnotationMood | undefined>): CxTextAreaAnnotationMood | undefined {
     if (moods.includes('danger')) {
       return 'danger';
     }
@@ -298,15 +299,15 @@ export class CxTextareaComponent {
   }
 
   private iconMoodForAnnotations(
-    annotations: ReadonlyArray<CxTextareaNormalizedAnnotation>,
-  ): CxTextareaAnnotationMood | undefined {
+    annotations: ReadonlyArray<CxTextAreaNormalizedAnnotation>,
+  ): CxTextAreaAnnotationMood | undefined {
     return this.dominantMood(annotations.map((annotation) => annotation.mood));
   }
 
   private renderSegments(
     text: string,
-    annotations: ReadonlyArray<CxTextareaNormalizedRangeAnnotation>,
-  ): ReadonlyArray<{ text: string; mood?: CxTextareaAnnotationMood }> {
+    annotations: ReadonlyArray<CxTextAreaNormalizedRangeAnnotation>,
+  ): ReadonlyArray<{ text: string; mood?: CxTextAreaAnnotationMood }> {
     if (!text || annotations.length === 0) {
       return text ? [{ text }] : [{ text: ' ' }];
     }
@@ -325,7 +326,7 @@ export class CxTextareaComponent {
     }
 
     const sortedBoundaries = Array.from(boundaries).sort((left, right) => left - right);
-    const segments: Array<{ text: string; mood?: CxTextareaAnnotationMood }> = [];
+    const segments: Array<{ text: string; mood?: CxTextAreaAnnotationMood }> = [];
     for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
       const startIndex = sortedBoundaries[index];
       const endIndex = sortedBoundaries[index + 1];
@@ -346,7 +347,7 @@ export class CxTextareaComponent {
     return segments.length > 0 ? segments : [{ text: ' ' }];
   }
 
-  private isAnnotationMood(value: string): value is CxTextareaAnnotationMood {
+  private isAnnotationMood(value: string): value is CxTextAreaAnnotationMood {
     return value === 'success' || value === 'danger';
   }
 

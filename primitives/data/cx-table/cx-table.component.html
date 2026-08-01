@@ -11,7 +11,7 @@
   <span class="cx-table__visually-hidden" aria-live="polite" aria-atomic="true">
     {{ columnReorderAnnouncement$() }}
   </span>
-  @if (loading || rows$().length > 0) {
+  @if (loading || rows$().length > 0 || columns$().length > 0) {
     <table #tableElement class="cx-table__table">
       <colgroup>
         @if (hasRowSelection$()) {
@@ -44,7 +44,8 @@
           @for (column of columns$(); track trackColumn($index, column)) {
             <th
               class="cx-table__head-cell"
-              [class.cx-table__head-cell--interactive]="isColumnSortable(column) || columnsReorderable || columnsResizable"
+              [class.cx-table__head-cell--interactive]="hasColumnHeaderMenu(column) || columnsReorderable || columnsResizable"
+              [class.cx-table__head-cell--filtered]="isColumnFilterActive(column)"
               [class.cx-table__head-cell--end]="column.align === 'end'"
               [class.cx-table__head-cell--pinned]="isColumnPinned(column)"
               [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
@@ -65,7 +66,7 @@
                     #headerTrigger
                     type="button"
                     class="cx-table__head-trigger"
-                    [attr.aria-label]="'Open ' + column.label + ' column actions'"
+                    [attr.aria-label]="columnHeaderTriggerAriaLabel(column)"
                     aria-haspopup="dialog"
                     [attr.aria-expanded]="isColumnHeaderMenuOpen(column)"
                     [attr.aria-controls]="columnHeaderDialogId"
@@ -74,6 +75,9 @@
                     <span class="cx-table__head-label">{{ column.label }}</span>
                     @if (sortIcon(column.id); as iconName) {
                       <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
+                    }
+                    @if (isColumnFilterActive(column)) {
+                      <cx-icon class="cx-table__filter-icon" name="filters" [size]="14" />
                     }
                   </button>
                 } @else {
@@ -278,6 +282,23 @@
             }
           </tr>
           }
+          @if (rows$().length === 0) {
+            <tr class="cx-table__empty-row">
+              <td
+                class="cx-table__empty-cell"
+                [attr.colspan]="columns$().length + (hasRowSelection$() ? 1 : 0)"
+              >
+                <div class="cx-table__empty-content" aria-live="polite">
+                  <span>{{ activeFilterCount$() > 0 ? noMatchesText : emptyText }}</span>
+                  @if (activeFilterCount$() > 0) {
+                    <button type="button" class="cx-table__empty-clear" (click)="clearFilters()">
+                      Clear filters
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>
@@ -291,51 +312,47 @@
           [left]="columnHeaderMenuPosition.left"
           [top]="columnHeaderMenuPosition.top"
           [bottom]="columnHeaderMenuPosition.bottom"
-          [width]="280"
+          [width]="320"
           [maxHeight]="columnHeaderMenuPosition.maxHeight"
           [placement]="columnHeaderMenuPosition.placement"
           [surfaceId]="columnHeaderDialogId"
           [role]="'dialog'"
           [ariaLabel]="columnHeaderMenuAriaLabel(column)"
+          surfaceVariant="grouped"
           (backdropPressed)="closeColumnHeaderMenu()"
         >
           <div class="cx-table__header-menu">
-            @if (isColumnSearchable(column)) {
-              <div
-                class="cx-table__header-menu-search"
-                [class.cx-table__header-menu-search--divided]="hasColumnHeaderMenuActions(column)"
-              >
-                <cx-text-field
-                  label=""
-                  [ariaLabel]="'Search ' + column.label"
-                  prependIcon="search"
-                  [clearable]="true"
-                  [value]="columnSearchValue(column)"
-                  (valueChange)="onColumnSearchValueChange(column, $event)"
-                  (keydown.enter)="onColumnSearchEnter($event)"
+            @if (column.filter; as filterDefinition) {
+              <div class="cx-table__header-menu-group cx-table__header-menu-filter">
+                <cx-column-filter-editor
+                  [label]="column.label"
+                  [ariaLabel]="column.label + ' filter'"
+                  [definition]="filterDefinition"
+                  [value]="columnFilterValue(column)"
+                  (valueChange)="onColumnFilterValueChange(column, $event)"
+                  (queryChange)="onColumnFilterQueryChange(column.id, $event)"
+                  (loadMore)="onColumnFilterLoadMore(column.id)"
                 />
               </div>
             }
 
-            @if (hasColumnHeaderMenuActions(column)) {
-              <div class="cx-table__header-menu-actions">
-                @if (isColumnSortable(column)) {
-                  <cx-option
-                    label="Sort ascending"
-                    prependIcon="arrow-up"
-                    (click)="onColumnHeaderAction(column, 'sort-asc')"
-                  />
-                  <cx-option
-                    label="Sort descending"
-                    prependIcon="arrow-down"
-                    (click)="onColumnHeaderAction(column, 'sort-desc')"
-                  />
-                }
+            @if (isColumnSortable(column)) {
+              <div class="cx-table__header-menu-group cx-table__header-menu-actions">
+                <cx-option
+                  label="Sort ascending"
+                  prependIcon="arrow-up"
+                  (click)="onColumnHeaderAction(column, 'sort-asc')"
+                />
+                <cx-option
+                  label="Sort descending"
+                  prependIcon="arrow-down"
+                  (click)="onColumnHeaderAction(column, 'sort-desc')"
+                />
+              </div>
+            }
 
-                @if (isColumnSortable(column) && hasColumnHeaderMenuProperties(column)) {
-                  <div class="cx-table__header-menu-divider" aria-hidden="true"></div>
-                }
-
+            @if (hasColumnHeaderMenuProperties(column)) {
+              <div class="cx-table__header-menu-group cx-table__header-menu-actions">
                 @if (isColumnPinnable(column)) {
                   @if (isColumnPinned(column)) {
                     <cx-option

@@ -79,6 +79,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   private readonly selectedIdsState = signal<readonly string[]>([]);
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly emptyTextState = signal('');
+  private readonly creatableState = signal(true);
   private readonly queryState = signal('');
   private readonly openState = signal(false);
   private readonly activeTargetState = signal<string | undefined>(undefined);
@@ -131,6 +132,28 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   @Input() hint: string | undefined;
 
   @Input()
+  public set creatable(value: boolean) {
+    const next = value !== false;
+    if (this.creatableState() === next) {
+      return;
+    }
+
+    this.creatableState.set(next);
+    if (!next && this.createDialogOpenState()) {
+      this.finishCreateDialog(false);
+      return;
+    }
+    if (this.openState()) {
+      this.refreshPopover();
+      return;
+    }
+    this.syncActiveTarget('keep');
+  }
+  public get creatable(): boolean {
+    return this.creatableState();
+  }
+
+  @Input()
   public set disabled(value: boolean) {
     this.disabledState = Boolean(value);
     if (this.disabledState) {
@@ -180,6 +203,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   @Output() readonly clear = new EventEmitter<void>();
 
   protected readonly isOpen$ = this.openState.asReadonly();
+  protected readonly creatable$ = this.creatableState.asReadonly();
   protected readonly query$ = this.queryState.asReadonly();
   protected readonly status$ = this.statusState.asReadonly();
   protected readonly createDialogOpen$ = this.createDialogOpenState.asReadonly();
@@ -209,6 +233,9 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     );
   });
   protected readonly showCreate$ = computed(() => {
+    if (!this.creatableState()) {
+      return false;
+    }
     const query = this.queryState().trim();
     if (!query) {
       return true;
@@ -328,7 +355,9 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   }
 
   protected setCreateActive(): void {
-    this.activeTargetState.set('create');
+    if (this.showCreate$()) {
+      this.activeTargetState.set('create');
+    }
   }
 
   protected onFieldClick(event: MouseEvent): void {
@@ -367,6 +396,9 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (eventMatchesShortcut(CX_TAG_FIELD_CREATE_SHORTCUT, event)) {
+      if (!this.creatableState()) {
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       if (this.showCreate$()) {
@@ -517,7 +549,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
 
   protected onCreateDialogOpenChange(open: boolean): void {
     if (open) {
-      this.createDialogOpenState.set(true);
+      this.createDialogOpenState.set(this.creatableState());
       return;
     }
     this.finishCreateDialog(false);
@@ -539,6 +571,12 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   }
 
   protected confirmCreateTag(): void {
+    if (!this.creatableState()) {
+      if (this.createDialogOpenState()) {
+        this.finishCreateDialog(false);
+      }
+      return;
+    }
     if (this.isLocked$()) {
       this.lockInteractions();
       return;

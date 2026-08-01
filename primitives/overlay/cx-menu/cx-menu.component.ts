@@ -912,7 +912,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return;
     }
     const target = resolve();
-    if (target) {
+    if (target && this.focusTargetIsStable(target)) {
       target.focus();
       return;
     }
@@ -920,6 +920,18 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return;
     }
     requestAnimationFrame(() => this.focusWhenReady(resolve, attempt + 1));
+  }
+
+  private focusTargetIsStable(target: HTMLElement): boolean {
+    if (!target.isConnected) {
+      return false;
+    }
+    const surface = target.closest<HTMLElement>('[data-cx-popover-surface]');
+    return (
+      !surface
+      || surface.classList.contains('cx-menu__inline-surface')
+      || surface.parentElement === document.body
+    );
   }
 
   private focusTrigger(): void {

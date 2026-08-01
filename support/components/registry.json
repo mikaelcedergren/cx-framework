@@ -280,6 +280,15 @@
       "path": "primitives/data/cx-chart/cx-chart.component.ts"
     },
     {
+      "name": "cx-column-filter-editor",
+      "selectors": [
+        "cx-column-filter-editor"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-column-filter-editor/cx-column-filter-editor.component.ts"
+    },
+    {
       "name": "cx-list-view",
       "selectors": [
         "cx-list-view"
@@ -784,13 +793,13 @@
       "path": "primitives/inputs/cx-tag-field/cx-tag-field.component.ts"
     },
     {
-      "name": "cx-textarea",
+      "name": "cx-text-area",
       "selectors": [
-        "cx-textarea"
+        "cx-text-area"
       ],
       "area": "primitive",
       "category": "inputs",
-      "path": "primitives/inputs/cx-textarea/cx-textarea.component.ts"
+      "path": "primitives/inputs/cx-text-area/cx-text-area.component.ts"
     },
     {
       "name": "cx-time-field",

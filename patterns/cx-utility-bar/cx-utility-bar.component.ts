@@ -7,6 +7,14 @@ import {
   booleanAttribute,
 } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
+import {
+  CX_THEMES,
+  CX_THEME_ICONS,
+  CX_THEME_LABELS,
+  cxThemeStartsGroup,
+  isCxThemeMode,
+  type CxThemeMode,
+} from '../../theme';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import {
   CxMenuComponent,
@@ -15,39 +23,15 @@ import {
   type CxMenuPresentation,
 } from '../../primitives/overlay/cx-menu';
 
-export type CxUtilityBarThemeMode = 'light' | 'dark' | 'night' | 'high-contrast' | 'wireframe';
+export type CxUtilityBarThemeMode = CxThemeMode;
 
-const THEME_MENU_ITEMS: readonly CxMenuItem[] = [
-  { id: 'light', label: 'Light', prependIcon: 'light-mode', type: 'choice' },
-  { id: 'dark', label: 'Dark', prependIcon: 'dark-mode', type: 'choice' },
-  { id: 'night', label: 'Night', prependIcon: 'night-mode', type: 'choice' },
-  { id: 'high-contrast', label: 'High contrast', prependIcon: 'high-contrast-mode', type: 'choice' },
-  { id: 'wireframe', label: 'Wireframe', prependIcon: 'browser-window', type: 'choice' },
-];
-
-const THEME_LABELS: Record<CxUtilityBarThemeMode, string> = {
-  light: 'Light',
-  dark: 'Dark',
-  night: 'Night',
-  'high-contrast': 'High contrast',
-  wireframe: 'Wireframe',
-};
-
-const THEME_ICONS: Record<CxUtilityBarThemeMode, CxIconName> = {
-  light: 'light-mode',
-  dark: 'dark-mode',
-  night: 'night-mode',
-  'high-contrast': 'high-contrast-mode',
-  wireframe: 'browser-window',
-};
-
-function isThemeMode(value: string): value is CxUtilityBarThemeMode {
-  return value === 'light'
-    || value === 'dark'
-    || value === 'night'
-    || value === 'high-contrast'
-    || value === 'wireframe';
-}
+const THEME_MENU_ITEMS: readonly CxMenuItem[] = CX_THEMES.map((theme, index) => ({
+  id: theme.id,
+  label: theme.label,
+  prependIcon: theme.icon,
+  type: 'choice',
+  dividerBefore: cxThemeStartsGroup(index),
+}));
 
 @Component({
   selector: 'cx-utility-bar',
@@ -74,15 +58,15 @@ export class CxUtilityBarComponent {
   }
 
   protected themeIcon(mode: CxUtilityBarThemeMode): CxIconName {
-    return THEME_ICONS[mode];
+    return CX_THEME_ICONS[mode];
   }
 
   protected themeTriggerLabel(mode: CxUtilityBarThemeMode): string {
-    return `Choose theme. Current theme: ${THEME_LABELS[mode]}.`;
+    return `Choose theme. Current theme: ${CX_THEME_LABELS[mode]}.`;
   }
 
   protected onThemeModeChange(value: string): void {
-    if (isThemeMode(value)) {
+    if (isCxThemeMode(value)) {
       this.themeModeChange.emit(value);
     }
   }

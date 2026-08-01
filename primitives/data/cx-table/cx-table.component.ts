@@ -5,12 +5,15 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Injector,
   Input,
   OnDestroy,
   Output,
   ViewChild,
+  afterNextRender,
   afterRenderEffect,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
@@ -43,7 +46,18 @@ import {
 } from '../../display/cx-trend-tag';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxCheckboxComponent } from '../../inputs/cx-checkbox';
-import { CxTextFieldComponent } from '../../inputs/cx-text-field';
+import {
+  CxColumnFilterEditorComponent,
+  type CxColumnFilterDefinition,
+  type CxColumnFilterLoadMoreEvent,
+  type CxColumnFilterQueryChangeEvent,
+  type CxColumnFilterValue,
+  type CxColumnFilterValueMap,
+  assertCxColumnFilterDefinition,
+  isCxColumnFilterValueActive,
+  summarizeCxColumnFilterValue,
+  withCxColumnFilterValue,
+} from '../cx-column-filter-editor';
 
 export type CxTableDensity = 'comfortable' | 'compact';
 export type CxTableColumnAlign = 'start' | 'end';
@@ -60,7 +74,7 @@ export interface CxTableColumn {
   size?: CxTableColumnSize;
   align?: CxTableColumnAlign;
   sortable?: boolean;
-  searchable?: boolean;
+  filter?: CxColumnFilterDefinition;
   hideable?: boolean;
   pinnable?: boolean;
   pinned?: boolean;
@@ -134,11 +148,6 @@ export interface CxTableRowActivateEvent {
   kind: CxTableRowKind;
 }
 
-export interface CxTableColumnSearchChangeEvent {
-  columnId: string;
-  value: string;
-}
-
 export interface CxTableColumnPinChangeEvent {
   columnId: string;
   pinned: boolean;
@@ -152,7 +161,7 @@ export interface CxTableColumnVisibilityChangeEvent {
 type CxTableColumnHeaderAction = 'sort-asc' | 'sort-desc' | 'pin' | 'unpin' | 'hide';
 
 const CX_TABLE_MAX_PINNED_COLUMNS = 3;
-const CX_TABLE_HEADER_MENU_WIDTH = 280;
+const CX_TABLE_HEADER_MENU_WIDTH = 320;
 
 type CxTableDropIndicator =
   | {
@@ -211,6 +220,17 @@ const CX_TABLE_INTERACTIVE_ROLES = new Set([
   'treeitem',
 ]);
 
+function hasSerializableFilterValue(value: CxColumnFilterValue): boolean {
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  const span = value as { start?: string; end?: string };
+  return Boolean(span.start || span.end);
+}
+
 @Component({
   selector: 'cx-table',
   imports: [
@@ -226,7 +246,7 @@ const CX_TABLE_INTERACTIVE_ROLES = new Set([
     CxTagComponent,
     CxTrendTagComponent,
     CxIconComponent,
-    CxTextFieldComponent,
+    CxColumnFilterEditorComponent,
   ],
   templateUrl: './cx-table.component.html',
   styleUrl: './cx-table.component.scss',
@@ -235,6 +255,7 @@ const CX_TABLE_INTERACTIVE_ROLES = new Set([
 export class CxTableComponent implements OnDestroy {
   private static instanceCounter = 0;
 
+  private readonly injector = inject(Injector);
   private readonly instanceId = ++CxTableComponent.instanceCounter;
   protected readonly columnHeaderDialogId = `cx-table-${this.instanceId}-column-dialog`;
   protected readonly columnMinWidth = CX_TABLE_COLUMN_MIN_WIDTH;
@@ -254,9 +275,12 @@ export class CxTableComponent implements OnDestroy {
   private readonly draggingColumnIdState = signal<string | undefined>(undefined);
   private readonly dropIndicatorState = signal<CxTableDropIndicator>(undefined);
   private readonly dragPreviewState = signal<CxTableDragPreview>(undefined);
+  private pendingContextMenuState?: CxTableContextMenuState;
+  private contextMenuTeardownPending = false;
+  private destroyed = false;
   private readonly columnReorderAnnouncementState = signal('');
   private readonly sortState = signal<CxTableSort | undefined>(undefined);
-  private readonly columnSearchValuesState = signal<Record<string, string>>({});
+  private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
   private readonly columnHeaderMenuColumnIdState = signal<string | undefined>(undefined);
   private readonly columnHeaderMenuPositionState = signal<
     | {
@@ -298,6 +322,8 @@ export class CxTableComponent implements OnDestroy {
 
   @ViewChild('tableElement') private readonly tableElement?: ElementRef<HTMLTableElement>;
   @ViewChild('columnHeaderPopover') private readonly columnHeaderPopover?: CxPopoverComponent;
+  @ViewChild(CxColumnFilterEditorComponent)
+  private readonly columnFilterEditor?: CxColumnFilterEditorComponent;
   @Input() density: CxTableDensity = 'compact';
   @Input() rowActivation: CxTableRowActivation = 'none';
   @Input() showHeaders = true;
@@ -309,6 +335,7 @@ export class CxTableComponent implements OnDestroy {
   @Input() showRowActions = true;
   @Input() rightClickMenu = true;
   @Input() emptyText = 'No rows to display.';
+  @Input() noMatchesText = 'No rows match the current filters.';
 
   @Input()
   public set selectionMode(value: CxTableSelectionMode) {
@@ -327,6 +354,11 @@ export class CxTableComponent implements OnDestroy {
       this.cancelKeyboardColumnReorder(false);
     }
     const nextColumns = value ?? [];
+    for (const column of nextColumns) {
+      if (column.filter) {
+        assertCxColumnFilterDefinition(column.filter);
+      }
+    }
     const nextIds = nextColumns.map(column => column.id);
     const currentOrder = this.columnOrderState();
     const preservedOrder = currentOrder.filter(id => nextIds.includes(id));
@@ -372,8 +404,8 @@ export class CxTableComponent implements OnDestroy {
   }
 
   @Input()
-  public set columnSearchValues(value: Record<string, string> | undefined) {
-    this.columnSearchValuesState.set({ ...(value ?? {}) });
+  public set filterValues(value: CxColumnFilterValueMap | undefined) {
+    this.filterValuesState.set({ ...(value ?? {}) });
   }
 
   @Input()
@@ -387,7 +419,10 @@ export class CxTableComponent implements OnDestroy {
   @Output() readonly rowActivate = new EventEmitter<CxTableRowActivateEvent>();
   @Output() readonly columnOrderChange = new EventEmitter<string[]>();
   @Output() readonly sortChange = new EventEmitter<CxTableSort | undefined>();
-  @Output() readonly columnSearchChange = new EventEmitter<CxTableColumnSearchChangeEvent>();
+  @Output() readonly filterValuesChange = new EventEmitter<CxColumnFilterValueMap>();
+  @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
+  @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
+  @Output() readonly columnHeaderMenuOpenChange = new EventEmitter<boolean>();
   @Output() readonly columnPinChange = new EventEmitter<CxTableColumnPinChangeEvent>();
   @Output() readonly columnVisibilityChange = new EventEmitter<CxTableColumnVisibilityChangeEvent>();
 
@@ -424,6 +459,7 @@ export class CxTableComponent implements OnDestroy {
   protected readonly dragPreview$ = this.dragPreviewState.asReadonly();
   protected readonly columnReorderAnnouncement$ = this.columnReorderAnnouncementState.asReadonly();
   protected readonly sort$ = this.sortState.asReadonly();
+  protected readonly filterValues$ = this.filterValuesState.asReadonly();
   protected readonly columnLeftOffsets$ = this.columnLeftOffsetsState.asReadonly();
   protected readonly columnHeaderMenuPosition$ = this.columnHeaderMenuPositionState.asReadonly();
   protected readonly skeletonRows = Array.from({ length: 5 }, (_, index) => index);
@@ -443,6 +479,21 @@ export class CxTableComponent implements OnDestroy {
   protected readonly partiallySelectedRows$ = computed(() => {
     const selectedCount = this.selectedVisibleRowIds$().length;
     return selectedCount > 0 && !this.allRowsSelected$();
+  });
+  protected readonly activeFilterCount$ = computed(() => {
+    const definitions = new Map(
+      this.columnsState()
+        .filter((column): column is CxTableColumn & { filter: CxColumnFilterDefinition } =>
+          column.filter !== undefined,
+        )
+        .map(column => [column.id, column.filter]),
+    );
+    return Object.entries(this.filterValuesState()).filter(([columnId, value]) => {
+      const definition = definitions.get(columnId);
+      return definition
+        ? isCxColumnFilterValueActive(definition, value)
+        : hasSerializableFilterValue(value);
+    }).length;
   });
 
   constructor() {
@@ -485,6 +536,8 @@ export class CxTableComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.destroyed = true;
+    this.pendingContextMenuState = undefined;
     this.stopResizeSession();
     this.stopReorderSession();
     this.cancelKeyboardColumnReorder(false);
@@ -583,11 +636,27 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected closeContextMenu(restoreFocus = true): void {
+    this.pendingContextMenuState = undefined;
     const contextMenu = this.contextMenuState();
     if (!contextMenu) {
       return;
     }
     this.contextMenuState.set(undefined);
+
+    if (!this.destroyed && !this.contextMenuTeardownPending) {
+      this.contextMenuTeardownPending = true;
+      afterNextRender(() => {
+        if (this.destroyed) {
+          return;
+        }
+        this.contextMenuTeardownPending = false;
+        const pendingContextMenu = this.pendingContextMenuState;
+        this.pendingContextMenuState = undefined;
+        if (pendingContextMenu) {
+          this.contextMenuState.set(pendingContextMenu);
+        }
+      }, { injector: this.injector });
+    }
 
     if (restoreFocus && contextMenu.invocation === 'keyboard' && contextMenu.originRow?.isConnected) {
       queueMicrotask(() => contextMenu.originRow?.focus());
@@ -686,7 +755,7 @@ export class CxTableComponent implements OnDestroy {
 
   protected hasColumnHeaderMenu(column: CxTableColumn): boolean {
     return (
-      this.isColumnSearchable(column) ||
+      this.isColumnFilterable(column) ||
       this.isColumnSortable(column) ||
       this.isColumnPinnable(column) ||
       this.isColumnHideable(column)
@@ -698,8 +767,8 @@ export class CxTableComponent implements OnDestroy {
     return columnId ? this.columns$().find(column => column.id === columnId) : undefined;
   }
 
-  protected isColumnSearchable(column: CxTableColumn): boolean {
-    return column.searchable === true;
+  protected isColumnFilterable(column: CxTableColumn): boolean {
+    return column.filter !== undefined;
   }
 
   protected isColumnPinnable(column: CxTableColumn): boolean {
@@ -710,16 +779,23 @@ export class CxTableComponent implements OnDestroy {
     return column.hideable === true;
   }
 
-  protected hasColumnHeaderMenuActions(column: CxTableColumn): boolean {
-    return this.isColumnSortable(column) || this.isColumnPinnable(column) || this.isColumnHideable(column);
-  }
-
   protected hasColumnHeaderMenuProperties(column: CxTableColumn): boolean {
     return this.isColumnPinnable(column) || this.isColumnHideable(column);
   }
 
-  protected columnSearchValue(column: CxTableColumn): string {
-    return this.columnSearchValuesState()[column.id] ?? '';
+  protected columnFilterValue(column: CxTableColumn): CxColumnFilterValue | undefined {
+    return this.filterValuesState()[column.id];
+  }
+
+  protected isColumnFilterActive(column: CxTableColumn): boolean {
+    return column.filter !== undefined
+      && isCxColumnFilterValueActive(column.filter, this.filterValuesState()[column.id]);
+  }
+
+  protected columnFilterSummary(column: CxTableColumn): string | undefined {
+    return column.filter
+      ? summarizeCxColumnFilterValue(column.filter, this.filterValuesState()[column.id])
+      : undefined;
   }
 
   protected canPinColumn(column: CxTableColumn): boolean {
@@ -738,6 +814,13 @@ export class CxTableComponent implements OnDestroy {
 
   protected columnHeaderMenuAriaLabel(column: CxTableColumn): string {
     return `${column.label} column actions`;
+  }
+
+  protected columnHeaderTriggerAriaLabel(column: CxTableColumn): string {
+    const summary = this.columnFilterSummary(column);
+    return summary
+      ? `Open ${column.label} column actions, filter ${summary}`
+      : `Open ${column.label} column actions`;
   }
 
   protected isColumnHeaderMenuOpen(column: CxTableColumn): boolean {
@@ -777,24 +860,40 @@ export class CxTableComponent implements OnDestroy {
     this.openColumnHeaderMenu(column, triggerElement);
   }
 
-  protected onColumnSearchValueChange(column: CxTableColumn, value: string): void {
-    const next = { ...this.columnSearchValuesState() };
-    if (value) {
-      next[column.id] = value;
-    } else {
-      delete next[column.id];
-    }
-    this.columnSearchValuesState.set(next);
-    this.columnSearchChange.emit({ columnId: column.id, value });
-  }
-
-  protected onColumnSearchEnter(event: Event): void {
-    if (event instanceof KeyboardEvent && event.isComposing) {
+  protected onColumnFilterValueChange(
+    column: CxTableColumn,
+    value: CxColumnFilterValue | undefined,
+  ): void {
+    if (!column.filter) {
       return;
     }
-    event.preventDefault();
-    event.stopPropagation();
-    this.closeColumnHeaderMenu();
+    const next = withCxColumnFilterValue(
+      this.filterValuesState(),
+      column.id,
+      column.filter,
+      value,
+    );
+    if (next === this.filterValuesState()) {
+      return;
+    }
+    this.filterValuesState.set(next);
+    this.filterValuesChange.emit(next);
+  }
+
+  protected onColumnFilterQueryChange(columnId: string, query: string): void {
+    this.filterQueryChange.emit({ columnId, query });
+  }
+
+  protected onColumnFilterLoadMore(columnId: string): void {
+    this.filterLoadMore.emit({ columnId });
+  }
+
+  protected clearFilters(): void {
+    if (this.activeFilterCount$() === 0) {
+      return;
+    }
+    this.filterValuesState.set({});
+    this.filterValuesChange.emit({});
   }
 
   protected onColumnHeaderAction(column: CxTableColumn, action: CxTableColumnHeaderAction): void {
@@ -837,18 +936,20 @@ export class CxTableComponent implements OnDestroy {
     this.openRowMenuIdState.set(undefined);
     this.closeColumnHeaderMenu(false);
     this.columnHeaderMenuColumnIdState.set(column.id);
+    this.columnHeaderMenuOpenChange.emit(true);
     this.columnHeaderMenuTrigger = triggerElement;
     this.syncColumnHeaderMenuPosition(column, triggerElement);
     this.scheduleColumnHeaderMenuFocus(column);
   }
 
-  protected closeColumnHeaderMenu(restoreFocus = true): void {
+  public closeColumnHeaderMenu(restoreFocus = true): void {
     if (!this.columnHeaderMenuColumnIdState()) {
       return;
     }
     const trigger = this.columnHeaderMenuTrigger;
     const fallbackTrigger = trigger ? this.adjacentColumnHeaderTrigger(trigger) : undefined;
     this.columnHeaderMenuColumnIdState.set(undefined);
+    this.columnHeaderMenuOpenChange.emit(false);
     this.columnHeaderMenuPositionState.set(undefined);
     this.columnHeaderMenuTrigger = undefined;
 
@@ -878,14 +979,12 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
     const surface = this.columnHeaderPopover?.surfaceElement();
-    const searchInput = this.isColumnSearchable(column)
-      ? surface?.querySelector<HTMLInputElement>('.cx-table__header-menu-search input:not(:disabled)')
-      : undefined;
-    if (searchInput) {
-      searchInput.focus();
-      return;
-    }
-    if (this.isColumnSearchable(column)) {
+    if (this.isColumnFilterable(column)) {
+      this.columnFilterEditor?.focus();
+      const activeElement = typeof document === 'undefined' ? undefined : document.activeElement;
+      if (activeElement && surface?.contains(activeElement)) {
+        return;
+      }
       this.retryColumnHeaderMenuFocus(column, attempt);
       return;
     }
@@ -923,10 +1022,18 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
     const rect = triggerElement.getBoundingClientRect();
+    const propertyActionCount =
+      Number(this.isColumnPinnable(column)) +
+      Number(this.isColumnHideable(column));
+    const islandCount =
+      Number(column.filter !== undefined) +
+      Number(this.isColumnSortable(column)) +
+      Number(propertyActionCount > 0);
     const estimatedHeight =
-      (this.isColumnSearchable(column) ? 64 : 0) +
-      (this.isColumnSortable(column) ? 72 : 0) +
-      (this.hasColumnHeaderMenuProperties(column) ? 80 : 0) +
+      this.estimatedColumnFilterHeight(column) +
+      (this.isColumnSortable(column) ? 80 + 8 : 0) +
+      (propertyActionCount > 0 ? propertyActionCount * 40 + 8 : 0) +
+      Math.max(0, islandCount - 1) * 4 +
       8;
     const surface = measureCxFloatingSurface({
       triggerRect: rect,
@@ -946,6 +1053,28 @@ export class CxTableComponent implements OnDestroy {
       maxHeight: surface.maxHeight,
       placement: surface.placement,
     });
+  }
+
+  private estimatedColumnFilterHeight(column: CxTableColumn): number {
+    const filter = column.filter;
+    if (!filter) {
+      return 0;
+    }
+    if (filter.kind !== 'multi-select') {
+      return 96;
+    }
+
+    const optionListHeight = Math.min(
+      Math.max(filter.options.length, 1) * 36,
+      320,
+    );
+    return (
+      48 +
+      optionListHeight +
+      (filter.searchable ? 40 : 0) +
+      (filter.hint ? 24 : 0) +
+      (filter.hasMore ? 36 : 0)
+    );
   }
 
   protected isColumnPinned(column: CxTableColumn): boolean {
@@ -1251,12 +1380,22 @@ export class CxTableComponent implements OnDestroy {
     this.openRowMenuIdState.set(undefined);
     this.closeColumnHeaderMenu(false);
     this.closeContextMenu(false);
-    this.contextMenuState.set({
+    const nextContextMenu: CxTableContextMenuState = {
       rowId: row.id,
       point: position ?? this.resolveRowContextMenuPosition(rowElement),
       invocation,
       originRow: rowElement,
-    });
+    };
+    if (this.contextMenuTeardownPending) {
+      // The previous controlled menu can be internally closed before its
+      // conditional host has rendered away. Reusing that host would leave its
+      // unchanged [open] input at true while its internal state stays false.
+      // Let teardown finish, then render the latest requested invocation as a
+      // fresh menu instance.
+      this.pendingContextMenuState = nextContextMenu;
+      return;
+    }
+    this.contextMenuState.set(nextContextMenu);
   }
 
   private resolveRowContextMenuPosition(rowElement?: HTMLElement): { left: number; top: number } {
@@ -1504,7 +1643,7 @@ export class CxTableComponent implements OnDestroy {
     );
     this.columnOrderState.set(this.normalizeColumnOrder(nextOrder, this.columnsState()));
     this.announceColumnPosition(column, 'Moving');
-    queueMicrotask(() => this.focusColumnGrip(column.id));
+    this.focusColumnGripAfterRender(column.id);
   }
 
   private commitKeyboardColumnReorder(): void {
@@ -1522,7 +1661,7 @@ export class CxTableComponent implements OnDestroy {
     if (changed) {
       this.columnOrderChange.emit(nextOrder);
     }
-    queueMicrotask(() => this.focusColumnGrip(session.columnId));
+    this.focusColumnGripAfterRender(session.columnId);
   }
 
   private cancelKeyboardColumnReorder(announce: boolean): void {
@@ -1535,10 +1674,14 @@ export class CxTableComponent implements OnDestroy {
     this.draggingColumnIdState.set(undefined);
     if (announce) {
       this.columnReorderAnnouncementState.set(`${session.columnLabel} column move cancelled.`);
-      queueMicrotask(() => this.focusColumnGrip(session.columnId));
+      this.focusColumnGripAfterRender(session.columnId);
     } else {
       this.columnReorderAnnouncementState.set('');
     }
+  }
+
+  private focusColumnGripAfterRender(columnId: string): void {
+    afterNextRender(() => this.focusColumnGrip(columnId), { injector: this.injector });
   }
 
   private announceColumnPosition(column: CxTableColumn, prefix: string): void {

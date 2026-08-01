@@ -11,7 +11,7 @@
   justify-content: center;
   padding: var(--space-md);
   background: var(--overlay-backdrop);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(var(--frost-softness));
   box-sizing: border-box;
 }
 
@@ -24,16 +24,16 @@
   max-width: min(95vw, calc(var(--controller-size) * 16));
   max-height: min(75vh, calc(100vh - (var(--space-md) * 2)));
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--surface-separation);
   overflow: hidden;
-  border: 0;
+  border: var(--floating-surface-border);
   border-radius: var(--radius-xl);
   background: var(--surface-alt);
   box-shadow: var(--shadow-high);
   box-sizing: border-box;
   color: var(--ink);
   opacity: 1;
-  padding: var(--space-xs);
+  padding: var(--surface-separation);
   animation: cx-dialog-enter calc(var(--motion-slow) * 2) var(--ease-out-strong);
 }
 

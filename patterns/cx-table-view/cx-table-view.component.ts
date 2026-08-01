@@ -1,10 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  computed,
+  signal,
+} from '@angular/core';
 import {
   CxFilterBarComponent,
   type CxFilterBarColumnOption,
+  type CxFilterBarFilter,
   type CxFilterBarMode,
-  type CxFilterBarSection,
 } from '../cx-filter-bar';
 import {
   CxTableComponent,
@@ -13,7 +22,6 @@ import {
   type CxTableRowActivation,
   type CxTableSelectionMode,
   type CxTableColumnPinChangeEvent,
-  type CxTableColumnSearchChangeEvent,
   type CxTableColumnVisibilityChangeEvent,
   type CxTableRowActivateEvent,
   type CxTableRow,
@@ -21,6 +29,12 @@ import {
   type CxTableSort,
   type CxTableSortDirection,
 } from '../../primitives/data/cx-table';
+import {
+  type CxColumnFilterLoadMoreEvent,
+  type CxColumnFilterQueryChangeEvent,
+  type CxColumnFilterValueMap,
+  normalizeCxColumnFilterValueMap,
+} from '../../primitives/data/cx-column-filter-editor';
 import { type CxButtonGroupOption } from '../../primitives/actions/cx-button-group';
 import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
@@ -37,17 +51,22 @@ export type CxTableViewPaginationMode = 'none' | 'pages';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxTableViewComponent {
+  private readonly columnsState = signal<CxTableColumn[]>([]);
+  private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
+
+  @ViewChild(CxFilterBarComponent)
+  private readonly filterBar?: CxFilterBarComponent;
+
+  @ViewChild(CxTableComponent)
+  private readonly table?: CxTableComponent;
+
   @Input() heading = '';
   @Input() showFilterBar = true;
   @Input() filterBarMode: CxFilterBarMode = 'filters';
   @Input() quickFilters: CxButtonGroupOption[] = [];
   @Input() selectedQuickFilterId: string | undefined;
-  @Input() filterOptions: CxDropdownOption[] = [];
-  @Input() selectedFilterValue: string | undefined;
-  @Input() filterPlaceholder = 'Select status';
   @Input() queryValue = '';
   @Input() queryAriaLabel = 'Search query';
-  @Input() filterSections: CxFilterBarSection[] = [];
   @Input() savedViews: CxMenuItem[] = [];
   @Input() groupByOptions: CxButtonGroupOption[] = [];
   @Input() groupBy = 'none';
@@ -59,8 +78,13 @@ export class CxTableViewComponent {
   @Input() columnOptions: CxFilterBarColumnOption[] = [];
   @Input() visibleColumnIds: string[] = [];
   @Input() pinnedColumnIds: string[] = [];
-  @Input() columnSearchValues: Record<string, string> = {};
-  @Input() columns: CxTableColumn[] = [];
+  @Input()
+  public set columns(value: CxTableColumn[] | undefined) {
+    this.columnsState.set(value ?? []);
+  }
+  public get columns(): CxTableColumn[] {
+    return this.columnsState();
+  }
   @Input() rows: CxTableRow[] = [];
   @Input() density: CxTableDensity = 'compact';
   @Input() rowActivation: CxTableRowActivation = 'none';
@@ -72,6 +96,8 @@ export class CxTableViewComponent {
   @Input() loading = false;
   @Input() showRowActions = true;
   @Input() rightClickMenu = true;
+  @Input() emptyText = 'No rows to display.';
+  @Input() noMatchesText = 'No rows match the current filters.';
   @Input() sort: CxTableSort | undefined;
   @Input() activeRowId: string | undefined;
   @Input() selectionMode: CxTableSelectionMode = 'none';
@@ -81,9 +107,16 @@ export class CxTableViewComponent {
   @Input() pageSizes: readonly number[] = [10, 25, 50, 100];
   @Input() actionBarData: CxActionBarData | undefined;
 
+  @Input()
+  public set filterValues(value: CxColumnFilterValueMap | undefined) {
+    this.filterValuesState.set({ ...(value ?? {}) });
+  }
+
   @Output() readonly filterBarModeChange = new EventEmitter<CxFilterBarMode>();
   @Output() readonly selectedQuickFilterIdChange = new EventEmitter<string>();
-  @Output() readonly selectedFilterValueChange = new EventEmitter<string | undefined>();
+  @Output() readonly filterValuesChange = new EventEmitter<CxColumnFilterValueMap>();
+  @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
+  @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
   @Output() readonly queryValueChange = new EventEmitter<string>();
   @Output() readonly savedViewSelect = new EventEmitter<string>();
   @Output() readonly activeSavedViewIdChange = new EventEmitter<string | undefined>();
@@ -98,7 +131,7 @@ export class CxTableViewComponent {
   @Output() readonly exportTable = new EventEmitter<void>();
   @Output() readonly resetTable = new EventEmitter<void>();
   @Output() readonly sortChange = new EventEmitter<CxTableSort | undefined>();
-  @Output() readonly columnSearchChange = new EventEmitter<CxTableColumnSearchChangeEvent>();
+  @Output() readonly columnOrderChange = new EventEmitter<string[]>();
   @Output() readonly activeRowIdChange = new EventEmitter<string>();
   @Output() readonly rowActivate = new EventEmitter<CxTableRowActivateEvent>();
   @Output() readonly selectedRowIdsChange = new EventEmitter<string[]>();
@@ -114,6 +147,24 @@ export class CxTableViewComponent {
   protected get showPagination(): boolean {
     return this.paginationMode === 'pages' && this.page !== undefined;
   }
+
+  protected readonly filters$ = computed<CxFilterBarFilter[]>(() =>
+    this.columnsState()
+      .filter((column): column is CxTableColumn & { filter: NonNullable<CxTableColumn['filter']> } =>
+        column.filter !== undefined,
+      )
+      .map(column => ({
+        id: column.id,
+        label: column.label,
+        filter: column.filter,
+      })),
+  );
+  protected readonly resolvedFilterValues$ = computed(() =>
+    normalizeCxColumnFilterValueMap(
+      Object.fromEntries(this.filters$().map(filter => [filter.id, filter.filter])),
+      this.filterValuesState(),
+    ),
+  );
 
   protected get visibleColumns(): CxTableColumn[] {
     const pinnedIds = new Set(this.pinnedColumnIds);
@@ -172,6 +223,24 @@ export class CxTableViewComponent {
     this.visibleColumnIdsChange.emit(next);
     if (this.pinnedColumnIds.includes(event.columnId)) {
       this.pinnedColumnIdsChange.emit(this.pinnedColumnIds.filter(id => id !== event.columnId));
+    }
+  }
+
+  protected onFilterValuesChange(values: CxColumnFilterValueMap): void {
+    this.filterValuesState.set(values);
+    this.filterBar?.invalidateSavedViewSelection();
+    this.filterValuesChange.emit(values);
+  }
+
+  protected onFilterPopoverOpenChange(open: boolean): void {
+    if (open) {
+      this.table?.closeColumnHeaderMenu(false);
+    }
+  }
+
+  protected onColumnHeaderMenuOpenChange(open: boolean): void {
+    if (open) {
+      this.filterBar?.closeFilterPopover(false);
     }
   }
 

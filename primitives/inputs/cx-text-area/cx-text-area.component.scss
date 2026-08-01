@@ -5,29 +5,29 @@
   width: 100%;
 }
 
-.cx-textarea {
-  --cx-textarea-font-size: var(--font-size-body);
-  --cx-textarea-line-height: var(--line-height-body);
+.cx-text-area {
+  --cx-text-area-font-size: var(--font-size-body);
+  --cx-text-area-line-height: var(--line-height-body);
 
   width: 100%;
 }
 
-.cx-textarea--small {
-  --cx-textarea-font-size: var(--font-size-body-sm);
+.cx-text-area--small {
+  --cx-text-area-font-size: var(--font-size-body-sm);
 }
 
-.cx-textarea--large {
-  --cx-textarea-font-size: var(--font-size-title-3);
+.cx-text-area--large {
+  --cx-text-area-font-size: var(--font-size-title-3);
 }
 
-.cx-textarea--document {
-  --cx-textarea-font-size: 18px;
-  --cx-textarea-line-height: 1.75;
+.cx-text-area--document {
+  --cx-text-area-font-size: 18px;
+  --cx-text-area-line-height: 1.75;
 }
 
-@include field.field-header('cx-textarea');
+@include field.field-header('cx-text-area');
 
-.cx-textarea__shell {
+.cx-text-area__shell {
   width: 100%;
   border: var(--line);
   border-radius: var(--radius-md);
@@ -36,98 +36,98 @@
   overflow: hidden;
 }
 
-@include field.field-shell-state('.cx-textarea__shell', '.cx-textarea__field');
-@include field.field-shell-interaction('.cx-textarea__shell');
+@include field.field-shell-state('.cx-text-area__shell', '.cx-text-area__field');
+@include field.field-shell-interaction('.cx-text-area__shell');
 
 // Ring focusVariant strengthens the keyboard state without changing pointer focus.
-:host-context([data-cx-keyboard-navigation]) .cx-textarea__shell--focus-ring:not(.cx-textarea__shell--error):has(.cx-textarea__field:focus) {
+:host-context([data-cx-keyboard-navigation]) .cx-text-area__shell--focus-ring:not(.cx-text-area__shell--error):has(.cx-text-area__field:focus) {
   border-color: var(--primary);
   outline: var(--outline-tab);
   outline-offset: 0;
 }
 
-@include field.field-shell-inline-edit('.cx-textarea__shell', '.cx-textarea__field');
+@include field.field-shell-inline-edit('.cx-text-area__shell', '.cx-text-area__field');
 
-.cx-textarea__editor {
+.cx-text-area__editor {
   display: grid;
   grid-template-columns: 0px minmax(0, 1fr);
   align-items: start;
   padding: var(--space-sm);
 }
 
-.cx-textarea--small .cx-textarea__editor {
+.cx-text-area--small .cx-text-area__editor {
   padding: var(--space-xs) var(--space-sm);
 }
 
-.cx-textarea--large .cx-textarea__editor,
-.cx-textarea--document .cx-textarea__editor {
+.cx-text-area--large .cx-text-area__editor,
+.cx-text-area--document .cx-text-area__editor {
   padding: var(--space-md);
 }
 
-.cx-textarea__editor--with-gutter {
+.cx-text-area__editor--with-gutter {
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--space-sm);
 }
 
-.cx-textarea__gutter {
+.cx-text-area__gutter {
   overflow: hidden;
   min-width: 0;
   color: var(--opacity-high);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-medium);
-  line-height: var(--cx-textarea-line-height);
+  line-height: var(--cx-text-area-line-height);
   text-align: right;
   user-select: none;
   letter-spacing: 0;
 }
 
-.cx-textarea__editor--with-gutter .cx-textarea__gutter {
+.cx-text-area__editor--with-gutter .cx-text-area__gutter {
   min-width: 2ch;
   padding-right: var(--space-sm);
   border-right: var(--line);
   border-color: var(--opacity-mid);
 }
 
-.cx-textarea__gutter-rows {
+.cx-text-area__gutter-rows {
   display: flex;
   flex-direction: column;
   width: 100%;
   will-change: transform;
 }
 
-.cx-textarea__gutter-row {
+.cx-text-area__gutter-row {
   display: grid;
   grid-template-columns: 12px minmax(2ch, auto);
   column-gap: var(--space-2xs);
-  min-height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+  min-height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
   align-items: center;
   justify-items: end;
 }
 
-.cx-textarea__gutter-row--error {
+.cx-text-area__gutter-row--error {
   color: var(--danger);
 }
 
-.cx-textarea__gutter-row--success {
+.cx-text-area__gutter-row--success {
   color: var(--success);
 }
 
-.cx-textarea__gutter-icon {
+.cx-text-area__gutter-icon {
   display: inline-flex;
   flex: 0 0 auto;
 }
 
-.cx-textarea__gutter-number {
+.cx-text-area__gutter-number {
   grid-column: 2;
 }
 
-.cx-textarea__field-wrap {
+.cx-text-area__field-wrap {
   position: relative;
   min-width: 0;
 }
 
-.cx-textarea__highlight {
+.cx-text-area__highlight {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -135,23 +135,23 @@
   z-index: 0;
 }
 
-.cx-textarea__highlight-lines {
+.cx-text-area__highlight-lines {
   will-change: transform;
 }
 
-.cx-textarea__highlight-line {
-  height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+.cx-text-area__highlight-line {
+  height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
 }
 
-.cx-textarea__highlight-line--error {
+.cx-text-area__highlight-line--error {
   background: var(--danger-opacity);
 }
 
-.cx-textarea__highlight-line--success {
+.cx-text-area__highlight-line--success {
   background: var(--success-opacity);
 }
 
-.cx-textarea__range-mirror {
+.cx-text-area__range-mirror {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -159,36 +159,36 @@
   pointer-events: none;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-textarea-font-size);
+  font-size: var(--cx-text-area-font-size);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-textarea-line-height);
+  line-height: var(--cx-text-area-line-height);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.cx-textarea__range-mirror--monospace {
+.cx-text-area__range-mirror--monospace {
   font-family: var(--font-family-mono);
 }
 
-.cx-textarea__range-lines {
+.cx-text-area__range-lines {
   will-change: transform;
 }
 
-.cx-textarea__range-line {
-  min-height: calc(var(--cx-textarea-font-size) * var(--cx-textarea-line-height));
+.cx-text-area__range-line {
+  min-height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
 }
 
-.cx-textarea__range-segment--success {
+.cx-text-area__range-segment--success {
   background: var(--success-opacity);
   color: var(--success-alt);
 }
 
-.cx-textarea__range-segment--error {
+.cx-text-area__range-segment--error {
   background: var(--danger-opacity);
   color: var(--danger-alt);
 }
 
-.cx-textarea__field {
+.cx-text-area__field {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -199,23 +199,23 @@
   background: transparent;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-textarea-font-size);
+  font-size: var(--cx-text-area-font-size);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-textarea-line-height);
+  line-height: var(--cx-text-area-line-height);
   box-sizing: border-box;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 
-.cx-textarea__field--monospace {
+.cx-text-area__field--monospace {
   font-family: var(--font-family-mono);
 }
 
-.cx-textarea__field::placeholder {
+.cx-text-area__field::placeholder {
   color: var(--placeholder);
 }
 
-.cx-textarea__field:focus-visible {
+.cx-text-area__field:focus-visible {
   outline: 0;
 }
 
@@ -227,28 +227,28 @@
 // container height was set by the markdown div alone (min-height: 80px),
 // and then on focus it snapped back to the textarea's intrinsic ~83px.
 // Now the textarea always sets the height; the markdown div is positioned
-// absolutely on top of it (see .cx-textarea__markdown below).
-.cx-textarea__field--hidden {
+// absolutely on top of it (see .cx-text-area__markdown below).
+.cx-text-area__field--hidden {
   opacity: 0;
   pointer-events: none;
 }
 
-.cx-textarea__field--auto-grow {
+.cx-text-area__field--auto-grow {
   resize: none;
   overflow: hidden;
 }
 
-.cx-textarea__field--resizable {
+.cx-text-area__field--resizable {
   resize: vertical;
   overflow: auto;
 }
 
-.cx-textarea__field--fixed {
+.cx-text-area__field--fixed {
   resize: none;
   overflow: auto;
 }
 
-.cx-textarea__field--with-range-annotations {
+.cx-text-area__field--with-range-annotations {
   color: transparent;
   caret-color: var(--ink);
 }
@@ -261,24 +261,24 @@
 // Positioned absolutely so it overlays the textarea (which stays in flow
 // driving the field-wrap's height). overflow-y: auto means long markdown
 // content scrolls inside the fixed-size box instead of growing it.
-.cx-textarea__markdown {
+.cx-text-area__markdown {
   position: absolute;
   inset: 0;
   overflow-y: auto;
   z-index: 2;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-textarea-font-size);
+  font-size: var(--cx-text-area-font-size);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-textarea-line-height);
+  line-height: var(--cx-text-area-line-height);
   cursor: text;
   box-sizing: border-box;
   overflow-wrap: anywhere;
 }
 
-@include field.field-messages('cx-textarea');
+@include field.field-messages('cx-text-area');
 
-.cx-textarea__validation {
+.cx-text-area__validation {
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr);
   align-items: start;
@@ -287,34 +287,34 @@
   line-height: var(--line-height-body);
 }
 
-.cx-textarea__validation--info {
+.cx-text-area__validation--info {
   color: var(--info);
 }
 
-.cx-textarea__validation--success {
+.cx-text-area__validation--success {
   color: var(--success);
 }
 
-.cx-textarea__validation--warning {
+.cx-text-area__validation--warning {
   color: var(--warning);
 }
 
-.cx-textarea__validation--error {
+.cx-text-area__validation--error {
   color: var(--danger);
 }
 
-.cx-textarea__validation-icon {
+.cx-text-area__validation-icon {
   display: inline-flex;
   margin-top: 1px;
 }
 
-.cx-textarea__validation-text {
+.cx-text-area__validation-text {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 // variant="title": render the field as an inline editable heading.
-.cx-textarea--title .cx-textarea__field {
+.cx-text-area--title .cx-text-area__field {
   font-size: var(--font-size-title-2);
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
@@ -322,43 +322,43 @@
 
 // layout="fill": grow the editor (and markdown preview) to fill a flex-column
 // parent. The host element must be a growing flex item for this to take effect.
-.cx-textarea--fill {
+.cx-text-area--fill {
   height: 100%;
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
 
-  .cx-textarea__shell {
+  .cx-text-area__shell {
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
     flex-direction: column;
   }
 
-  .cx-textarea__editor {
+  .cx-text-area__editor {
     flex: 1 1 auto;
     min-height: 0;
     grid-template-rows: 1fr;
     align-items: stretch;
   }
 
-  .cx-textarea__field-wrap {
+  .cx-text-area__field-wrap {
     height: 100%;
     min-height: 0;
   }
 
-  .cx-textarea__field,
-  .cx-textarea__markdown {
+  .cx-text-area__field,
+  .cx-text-area__markdown {
     height: 100%;
     min-height: 160px;
   }
 
-  .cx-textarea__field {
+  .cx-text-area__field {
     resize: none;
   }
 
-  .cx-textarea__markdown {
+  .cx-text-area__markdown {
     overflow-y: auto;
   }
 }

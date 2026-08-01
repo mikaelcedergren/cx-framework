@@ -1,14 +1,14 @@
-// Global styles for content rendered into `.cx-textarea__markdown` via
+// Global styles for content rendered into `.cx-text-area__markdown` via
 // `[innerHTML]`. These selectors target child elements (p, ul, ol, li, h1–h4,
 // code, pre, blockquote, a, hr) of the markdown preview. They live here, not
-// inside the cx-textarea component SCSS, because Angular's emulated view
+// inside the cx-text-area component SCSS, because Angular's emulated view
 // encapsulation tags template elements with `_ngcontent-X` and rewrites
 // descendant selectors to require that attribute — but innerHTML-injected
 // elements never receive it, so component-scoped rules would silently miss.
 
 @use 'article';
 
-.cx-textarea__markdown {
+.cx-text-area__markdown {
   h1, h2, h3, h4 {
     margin: var(--space-sm) 0 var(--space-xs);
     font-weight: var(--font-weight-bold);
@@ -65,6 +65,6 @@
 
 // Document mode shares the editorial type scale (styles/_article.scss)
 // instead of duplicating it.
-.cx-textarea--document .cx-textarea__markdown {
+.cx-text-area--document .cx-text-area__markdown {
   @include article.cx-editorial-type;
 }

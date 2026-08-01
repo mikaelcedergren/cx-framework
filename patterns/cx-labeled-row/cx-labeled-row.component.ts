@@ -12,7 +12,7 @@ import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxRadioComponent } from '../../primitives/inputs/cx-radio';
 import { CxDropdownComponent, type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
-import { CxTextareaComponent, type CxTextareaSizing } from '../../primitives/inputs/cx-textarea';
+import { CxTextAreaComponent, type CxTextAreaSizing } from '../../primitives/inputs/cx-text-area';
 import { type CxFieldValidation, normalizeCxValidation } from '../../primitives/inputs/shared/field.types';
 import {
   CxDynamicFieldsComponent,
@@ -46,7 +46,7 @@ export type CxLabeledRowContent =
       value?: string;
       hint?: string;
       minLines?: number;
-      sizing?: CxTextareaSizing;
+      sizing?: CxTextAreaSizing;
       disabled?: boolean;
       validation?: CxFieldValidation;
     }
@@ -109,7 +109,7 @@ export type CxLabeledRowContent =
     CxRadioComponent,
     CxDropdownComponent,
     CxSwitchComponent,
-    CxTextareaComponent,
+    CxTextAreaComponent,
   ],
   templateUrl: './cx-labeled-row.component.html',
   styleUrl: './cx-labeled-row.component.scss',

@@ -1,0 +1,12 @@
+/* Theme profiles change visual character without changing component anatomy. */
+:root.theme-legacy {
+  --corner-shape: round;
+  --corner-softness: 1px;
+  --surface-separation: 1px;
+  --line-discreet: var(--line);
+  --floating-surface-border: var(--line-discreet);
+  --frost-softness: 0px;
+  --shadow-low: 0 1px 1px hsl(0deg 0% 0% / 0.12);
+  --shadow-mid: 0 2px 4px hsl(0deg 0% 0% / 0.16);
+  --shadow-high: 0 3px 6px hsl(0deg 0% 0% / 0.20);
+}

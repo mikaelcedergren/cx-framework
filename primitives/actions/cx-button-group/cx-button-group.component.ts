@@ -50,6 +50,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   private readonly valueState = signal<string | undefined>(undefined);
   private readonly sizeState = signal<CxButtonGroupSize>('default');
   private readonly disabledState = signal(false);
+  private readonly fillState = signal(false);
   protected readonly indicatorVisible$ = signal(false);
   private readonly indicatorX$ = signal(0);
   private readonly indicatorY$ = signal(0);
@@ -85,11 +86,23 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
     this.disabledState.set(!!value);
   }
 
+  /** Stretches the group to its container width, distributing buttons evenly. */
+  @Input()
+  public set fill(value: boolean | undefined) {
+    this.fillState.set(!!value);
+    this.scheduleIndicatorRefresh();
+  }
+
   @Output() readonly valueChange = new EventEmitter<string>();
 
   @HostBinding('class.cx-button-group-disabled')
   protected get disabledHostClass(): boolean {
     return this.disabledState();
+  }
+
+  @HostBinding('class.cx-button-group-fill')
+  protected get fillHostClass(): boolean {
+    return this.fillState();
   }
 
   @HostBinding('style.--cx-button-group-indicator-x')

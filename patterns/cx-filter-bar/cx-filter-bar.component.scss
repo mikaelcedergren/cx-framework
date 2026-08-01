@@ -30,8 +30,7 @@
 }
 
 .cx-filter-bar__filter-trigger,
-.cx-filter-bar__properties-trigger,
-.cx-filter-bar__select {
+.cx-filter-bar__properties-trigger {
   flex: 0 0 auto;
 }
 
@@ -52,25 +51,77 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  padding: var(--space-md);
+  /* Keep controls inset while the filter-list container owns the
+     full-bleed accordion alignment as one group. */
+  padding: var(--space-md) var(--space-sm);
 }
 
 .cx-filter-bar__popover-content--properties {
-  gap: 0;
+  gap: var(--surface-separation);
   padding: 0;
 }
 
-.cx-filter-bar__sections {
+.cx-filter-bar__filters {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  margin-inline: calc(var(--space-sm) * -1);
 }
 
-.cx-filter-bar__section-copy {
-  margin: 0;
+.cx-filter-bar__filter-search,
+.cx-filter-bar__filter-panel,
+.cx-filter-bar__filter-editor {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-filter-bar__filter-panel {
+  border-bottom: var(--line);
+}
+
+.cx-filter-bar__filter-panel:first-child {
+  border-top: var(--line);
+}
+
+.cx-filter-bar__filter-actions {
+  display: flex;
+  min-height: var(--controller-size);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: 1.5;
+}
+
+.cx-filter-bar__filter-clear {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  font: inherit;
+}
+
+.cx-filter-bar__filter-clear:hover,
+.cx-filter-bar__filter-clear:focus-visible {
+  color: var(--ink);
+}
+
+.cx-filter-bar__filter-clear:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-filter-bar__filter-clear--column {
+  min-height: var(--controller-size);
+  padding: 0 var(--space-xs);
+}
+
+.cx-filter-bar__filter-empty {
+  padding: var(--space-md) var(--space-sm);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
 }
 
 .cx-filter-bar__properties-section {
@@ -86,14 +137,18 @@
   padding: var(--space-sm);
 }
 
-.cx-filter-bar__properties-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--opacity-low);
+.cx-filter-bar__properties-island {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface);
 }
 
 .cx-filter-bar__display-toggle {
-  align-self: flex-start;
+  align-self: stretch;
 }
 
 .cx-filter-bar__sort-row,

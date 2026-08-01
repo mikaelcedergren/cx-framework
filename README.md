@@ -134,6 +134,24 @@ Then imports can stay short:
 
 Use semantic tokens by purpose. Do not hardcode token values or rename tokens into local aliases just to make nicer names.
 
+### Theme profiles
+
+A theme is a complete visual profile, not a set of component overrides. Define its values on the
+root theme class; framework components continue to consume the same semantic roles.
+Profile-level overrides live together in `tokens/_theme.scss` so the character of a theme can be
+tuned as one coherent decision.
+
+The high-level visual-character controls are:
+
+- `--corner-shape` and `--corner-softness` for corner family and amount
+- `--surface-separation` for framed-surface insets and seams
+- `--floating-surface-border`, `--line`, and `--line-discreet` for boundaries
+- `--shadow-low`, `--shadow-mid`, and `--shadow-high` for elevation
+- `--frost-softness` for backdrop blur
+
+Palette, semantic colour, typography, spacing, size, and motion tokens remain available to every
+theme. Do not target `.theme-*` from a component stylesheet or add component-specific theme tokens.
+
 ## Fonts
 
 The package ships self-hosted `.woff2` files in `fonts/` and font-face declarations in `styles/fonts`.

@@ -1,0 +1,162 @@
+<div
+  class="cx-column-filter-editor"
+  [attr.data-filter-kind]="definition$()?.kind"
+>
+  @if (label.trim() || (showClearAction && hasMultiSelectValue$())) {
+    <div class="cx-column-filter-editor__heading">
+      @if (label.trim()) {
+        <div class="cx-column-filter-editor__label">{{ label.trim() }}</div>
+      }
+      @if (showClearAction && hasMultiSelectValue$()) {
+        <button
+          type="button"
+          class="cx-column-filter-editor__clear"
+          [attr.aria-label]="'Clear ' + (label.trim() || 'column') + ' filter'"
+          [disabled]="disabled || loading"
+          (click)="clear()"
+        >
+          Clear
+        </button>
+      }
+    </div>
+  }
+
+  @if (searchDefinition$(); as filter) {
+    <cx-text-field
+      #primaryControl
+      class="cx-column-filter-editor__control"
+      label=""
+      [ariaLabel]="resolvedAriaLabel()"
+      [placeholder]="filter.placeholder ?? ''"
+      [autocomplete]="filter.autocomplete"
+      [disabled]="disabled"
+      [loading]="loading"
+      [clearable]="showClearAction"
+      [prependIcon]="'search'"
+      [hint]="filter.hint"
+      [value]="searchValue$()"
+      (valueChange)="onSearchValueChange($event)"
+    />
+  }
+
+  @if (multiSelectDefinition$(); as filter) {
+    <div
+      #primaryControl
+      class="cx-column-filter-editor__multi-select"
+      role="group"
+      [attr.aria-label]="resolvedAriaLabel()"
+      [attr.aria-busy]="loading || filter.loadingMore === true ? 'true' : null"
+    >
+      @if (filter.searchable) {
+        <cx-text-field
+          class="cx-column-filter-editor__multi-select-search"
+          label=""
+          [ariaLabel]="filter.translations?.search ?? 'Search filter options'"
+          [placeholder]="filter.placeholder ?? ''"
+          [disabled]="disabled"
+          [loading]="loading"
+          [clearable]="true"
+          [prependIcon]="'search'"
+          [value]="multiSelectQueryState()"
+          (valueChange)="onMultiSelectQueryChange($event)"
+        />
+      }
+
+      @if (loading) {
+        <div
+          class="cx-column-filter-editor__status"
+          role="status"
+          aria-live="polite"
+        >
+          {{ multiSelectStatusText(filter) }}
+        </div>
+      } @else {
+        <div class="cx-column-filter-editor__multi-select-options">
+          @for (option of multiSelectOptions$(); track option.id) {
+            <cx-checkbox
+              class="cx-column-filter-editor__multi-select-option"
+              [text]="option.label"
+              [hint]="option.description"
+              [selected]="isMultiSelectOptionSelected(option.id)"
+              [disabled]="disabled || option.disabled === true"
+              (selectedChange)="onMultiSelectOptionChange(option.id, $event)"
+            />
+          } @empty {
+            <div
+              class="cx-column-filter-editor__status"
+              role="status"
+              aria-live="polite"
+            >
+              {{ multiSelectStatusText(filter) }}
+            </div>
+          }
+        </div>
+      }
+
+      @if (filter.hint) {
+        <div class="cx-column-filter-editor__hint">{{ filter.hint }}</div>
+      }
+
+      @if (filter.hasMore) {
+        <button
+          type="button"
+          class="cx-column-filter-editor__load-more"
+          [disabled]="disabled || loading || filter.loadingMore"
+          (click)="onLoadMore()"
+        >
+          {{
+            filter.loadingMore
+              ? (filter.translations?.loadingMore ?? 'Loading more options')
+              : 'Load more'
+          }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (tagFieldDefinition$(); as filter) {
+    <cx-tag-field
+      #primaryControl
+      class="cx-column-filter-editor__control"
+      label=""
+      [ariaLabel]="resolvedAriaLabel()"
+      [placeholder]="filter.placeholder ?? 'Select tags'"
+      [disabled]="disabled"
+      [loading]="loading"
+      [optional]="true"
+      [clearable]="showClearAction"
+      [creatable]="false"
+      [tags]="tagFieldTags$()"
+      [values]="selectedValues$()"
+      [emptyText]="filter.emptyText"
+      [hint]="filter.hint"
+      (valuesChange)="onSelectedValuesChange($event)"
+    />
+  }
+
+  @if (dateSpanDefinition$(); as filter) {
+    <cx-date-span-picker
+      #primaryControl
+      class="cx-column-filter-editor__control"
+      label=""
+      [ariaLabel]="resolvedAriaLabel()"
+      [placeholder]="filter.placeholder ?? 'Select date span'"
+      [disabled]="disabled"
+      [loading]="loading"
+      [optional]="true"
+      [clearable]="showClearAction"
+      [hint]="filter.hint"
+      [value]="dateSpanValue$()"
+      [quickRanges]="dateSpanQuickRanges$()"
+      [min]="filter.min"
+      [max]="filter.max"
+      [maxSpan]="filter.maxSpan"
+      [disabledDates]="filter.disabledDates"
+      [weekStart]="filter.weekStart ?? 'mon'"
+      [timeEnabled]="filter.timeEnabled ?? false"
+      [allDayEnabled]="false"
+      [closeOnSelect]="filter.closeOnSelect ?? true"
+      (valueChange)="onDateSpanValueChange($event)"
+    />
+  }
+</div>

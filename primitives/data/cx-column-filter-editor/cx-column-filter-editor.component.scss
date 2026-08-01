@@ -1,0 +1,113 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-column-filter-editor {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: var(--space-xs);
+}
+
+.cx-column-filter-editor__heading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.cx-column-filter-editor__label {
+  color: var(--ink);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-small);
+}
+
+.cx-column-filter-editor__clear,
+.cx-column-filter-editor__load-more {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  font: inherit;
+}
+
+.cx-column-filter-editor__clear {
+  flex: 0 0 auto;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-column-filter-editor__clear:hover,
+.cx-column-filter-editor__clear:focus-visible,
+.cx-column-filter-editor__load-more:hover,
+.cx-column-filter-editor__load-more:focus-visible {
+  color: var(--ink);
+}
+
+.cx-column-filter-editor__clear:focus-visible,
+.cx-column-filter-editor__load-more:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-column-filter-editor__clear:disabled,
+.cx-column-filter-editor__load-more:disabled {
+  opacity: var(--opacity-disabled, 0.45);
+  pointer-events: none;
+}
+
+.cx-column-filter-editor__control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-column-filter-editor__multi-select {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cx-column-filter-editor__multi-select-search {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-column-filter-editor__multi-select-options {
+  display: flex;
+  max-height: min(320px, 50vh);
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cx-column-filter-editor__multi-select-option {
+  display: flex;
+  width: 100%;
+  /* Filter options are a dense scannable list, not control rows: small row height on purpose. */
+  min-height: var(--controller-size-small);
+  align-items: center;
+}
+
+.cx-column-filter-editor__status,
+.cx-column-filter-editor__hint {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-column-filter-editor__load-more {
+  min-height: var(--controller-size);
+  align-self: flex-start;
+  font-size: var(--font-size-body-sm);
+}

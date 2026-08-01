@@ -74,7 +74,7 @@
       [role]="'dialog'"
       [ariaLabel]="'Choose date span'"
       surfaceVariant="grouped"
-      (backdropPressed)="toggleOpen()"
+      (backdropPressed)="closePopover()"
     >
       <div
         class="cx-date-span-picker__surface-inner"
@@ -98,6 +98,7 @@
         <div class="cx-date-span-picker__main">
           <div class="cx-date-span-picker__calendars">
             <cx-calendar
+              #leftCalendar
               class="cx-date-span-picker__calendar"
               variant="embedded"
               selectionMode="range"
@@ -114,6 +115,7 @@
             />
 
             <cx-calendar
+              #rightCalendar
               class="cx-date-span-picker__calendar"
               variant="embedded"
               selectionMode="range"
