@@ -26,6 +26,7 @@ $mobile-max: breakpoints.$mobile - 1px;
 
 // Type ramp — each size pairs a font-size token with its line-height token.
 $text-sizes: (
+  'display': ('size': var(--font-size-display), 'line': var(--line-height-display)),
   'title-1': ('size': var(--font-size-title-1), 'line': var(--line-height-heading)),
   'title-2': ('size': var(--font-size-title-2), 'line': var(--line-height-heading)),
   'title-3': ('size': var(--font-size-title-3), 'line': var(--line-height-heading)),

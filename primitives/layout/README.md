@@ -128,7 +128,7 @@ One breakpoint: **mobile is below 720px**; desktop is 720px and up (the `--break
 Single-purpose helpers for the raw elements and wrappers *you* write — not for patching a component from outside. They live in the low-priority `cx-utilities` cascade layer, so a component's own styles always win: a utility can only style your own elements. Every value is a token reference.
 
 - **Padding** — `cx-p-{step}` (all sides), `cx-px-` / `cx-py-` (axes), `cx-pt-` / `cx-pr-` / `cx-pb-` / `cx-pl-` (one side). Steps are the spacing scale: `cx-p-md`, `cx-px-sm`, …
-- **Type size** — `cx-text-{title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size *and* its matching line-height.
+- **Type size** — `cx-text-{display | title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size *and* its matching line-height. `display` is reserved for a marketing or editorial hero's primary headline.
 - **Font weight** — `cx-font-{regular | medium | bold}`.
 - **Text colour** — `cx-text-{ink | muted | primary | accent | success | warning | danger | info | link}`. `cx-text-muted` is the high-opacity ink for secondary text.
 - **Text align** — `cx-text-start` / `-center` / `-end`; `cx-truncate` (one line with an ellipsis).
@@ -139,7 +139,7 @@ There are deliberately **no margin or gap utilities** — gap belongs to the lay
 
 ## Article
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for hero scale) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The whole block scales from one custom property, `--cx-article-base`.
+Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for larger landing copy and a fluid display `h1`) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The block scales from `--cx-article-base`; the large variant's primary hero heading follows the shared display token.
 
 Native article elements need no classes. Three explicit roles cover meaning HTML does not provide on its own:
 

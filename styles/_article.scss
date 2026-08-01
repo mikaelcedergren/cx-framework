@@ -6,8 +6,9 @@
 // discreet text, and explained keywords use the explicit article roles below.
 //
 // Sizing is em-relative off a single base, so a whole block scales from one
-// number: `--cx-article-base`. `.cx-article--lg` bumps that base for hero/landing
-// contexts; set `--cx-article-base` inline for anything in between.
+// number: `--cx-article-base`. `.cx-article--lg` scales that base fluidly for
+// hero/landing contexts and gives its h1 the fluid display role; set
+// `--cx-article-base` inline for anything in between.
 //
 // Global (not component-scoped) on purpose: an article is usually injected via
 // [innerHTML] (markdown, CMS), which Angular's view encapsulation never tags —
@@ -262,7 +263,14 @@
 }
 
 .cx-article--lg {
-  --cx-article-base: 22px;
+  // Keep the complete editorial hierarchy below the display h1 as it reaches
+  // its 40px mobile floor, then grow to the 22px landing base on wide screens.
+  --cx-article-base: clamp(18px, 2.25vw, 22px);
+
+  h1 {
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-display);
+  }
 }
 
 .cx-article--start {

@@ -224,6 +224,7 @@ Default control size is `default`; `small` is for genuinely compact or secondary
 
 Type scale:
 
+- `--font-size-display`: fluid 40–72px
 - `--font-size-title-1`: 24px
 - `--font-size-title-2`: 20px
 - `--font-size-title-3`: 18px
@@ -231,6 +232,10 @@ Type scale:
 - `--font-size-body`: 14px
 - `--font-size-body-sm`: 12px
 - `--font-size-body-xs`: 10px
+
+Display type is reserved for the primary headline in a marketing or editorial hero. Use
+`--line-height-display` (1.05) with it. Ordinary page titles, section headings, dialogs, and other
+application UI remain on the fixed title scale.
 
 Most component text uses body, not body-sm. Small and extra-small type are for labels, helper text, metadata, captions, badges, shortcut keys, chart ticks, and other genuinely secondary content.
 
