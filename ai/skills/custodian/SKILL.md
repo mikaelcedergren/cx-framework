@@ -75,7 +75,7 @@ For every rendered implementation or release-candidate gate, inspect the actual 
    - **Grouping:** Group by meaning and task. Apply `RULE-ID: surfaces.one-boundary` when reviewing container composition.
    - **Affordance:** Apply `RULE-ID: surfaces.light-first`; keep interactive elements discoverable and read-only information non-editable without turning every action into a button.
    - **Semantic cues:** Use icons, typography, status treatment, and restrained color only when they improve recognition or scanning. Reject decoration without meaning.
-   - **Spacing:** Check rhythm, alignment, density, and consistency across siblings. Dense interfaces may remain dense only when deliberately composed.
+   - **Spacing:** Apply `RULE-ID: layout.breathing-room`; check rhythm, alignment, density, and consistency across siblings.
    - **Edge crowding:** Require a deliberate inner safe area on every side of a bounded surface. Align text, badges, metadata, controls, and progress information to that inset. Allow dividers, images, tables, or progress bars to reach an edge only when intentionally full-bleed; reject accidental edge contact, accidental clipping, near-contact, and inconsistent sibling insets.
    - **Data sufficiency:** Reject sparse happy-path evidence that cannot reveal real density, repetition, truncation, hierarchy, or scrolling behavior. Apply `RULE-ID: content.truncation` when deciding whether revealed truncation is a finding.
 

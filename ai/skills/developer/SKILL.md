@@ -70,6 +70,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 - Use `designer` when an unresolved product, flow, interaction, or visual decision would materially change the build.
 - Use `copywriter` when exact user-facing wording is unresolved.
 - Start from the existing design system. Define an owning component or pattern extension when the system lacks required behavior; do not build a page-level substitute.
+- Apply `RULE-ID: layout.breathing-room` and `RULE-ID: layout.component-spacing` to user-facing layout.
 - Account for each state the feature can actually reach; do not invent theoretical states solely to complete a checklist.
 - Update documentation and reference surfaces when public component behavior, props, slots, variants, or states change.
 

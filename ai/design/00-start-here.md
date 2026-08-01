@@ -19,7 +19,7 @@ A more specific applicable rule wins over a general rule at the same authority. 
 
 Start with the task, not the documents:
 
-- Any user-facing decision: read `RULE-ID: system.default-first` and `RULE-ID: surfaces.light-first` in `02-ux-rules.md` before considering non-default or additive options.
+- Any user-facing decision: read `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, and `RULE-ID: layout.breathing-room` in `02-ux-rules.md` before making or judging the result.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `02-ux-rules.md`.
 - Cross-cutting behavior, accessibility, layout, feedback, forms, navigation, or tokens: search `02-ux-rules.md` by `TOPIC:`, `SCOPE:`, or keyword.
 - A named component: search `03-component-rules.md` by `COMPONENT:`. Every returned rule carries its component name.

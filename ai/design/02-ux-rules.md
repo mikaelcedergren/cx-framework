@@ -98,6 +98,8 @@ RULE-ID: layout.z-index SCOPE: layout TYPE: should TOPIC: layout RULE: Use defin
 
 RULE-ID: layout.component-spacing SCOPE: design-system TYPE: must TOPIC: layout RULE: Let components own internal padding and containers own surrounding layout. DESCRIPTION: Containers control gaps, margins, width, placement, and page composition.
 
+RULE-ID: layout.breathing-room SCOPE: layout TYPE: must TOPIC: density RULE: Preserve visible breathing room between distinct adjacent elements. DESCRIPTION: Choose a tokenized gap by relationship and visual weight; a declared gap does not satisfy this rule when independently perceivable elements still render as touching or near-touching. EXCEPT: Parts may meet only when contact itself communicates a documented connected composite or an intentional continuous structure such as a table grid, chart, or full-bleed surface; text and controls within that structure still require deliberate internal insets.
+
 RULE-ID: layout.spacing-rhythm SCOPE: layout TYPE: should TOPIC: density RULE: Follow the product's tokenized spacing rhythm. DESCRIPTION: Use close spacing for related text-like content and more space for visually heavier groups. EXCEPT: Typography follows its own fitted scale.
 
 RULE-ID: layout.default-gaps SCOPE: layout TYPE: should TOPIC: density RULE: Start with 8px for close relationships and 16px for separate or weighty groups. DESCRIPTION: Larger pauses should correspond to a real mental or page-level shift.

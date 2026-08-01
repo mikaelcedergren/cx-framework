@@ -64,6 +64,7 @@ Design for a finished product, never a proof of concept.
 - Remove anything whose purpose is already implied by surrounding context.
 - Avoid noise unless it conveys structure, priority, state, or action.
 - Use spacing as communication, not only layout.
+- Apply `RULE-ID: layout.breathing-room` when composing or evaluating spacing.
 - Favor fewer elements, stronger grouping, disciplined density, and clear scan order.
 - Apply `RULE-ID: surfaces.one-boundary` before introducing a card, box, bordered container, or additional surface.
 - Review rhythm, alignment, affordance, typography hierarchy, redundancy, edge states, and copy fit before handoff.
