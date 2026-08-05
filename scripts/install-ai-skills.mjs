@@ -232,7 +232,23 @@ async function main() {
   console.log('Restart Codex if the skills do not appear automatically.');
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
+async function isMainModule() {
+  if (!process.argv[1]) {
+    return false;
+  }
+
+  try {
+    const [entryPath, modulePath] = await Promise.all([
+      realpath(process.argv[1]),
+      realpath(scriptPath),
+    ]);
+    return entryPath === modulePath;
+  } catch {
+    return path.resolve(process.argv[1]) === scriptPath;
+  }
+}
+
+if (await isMainModule()) {
   main().catch(error => {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
