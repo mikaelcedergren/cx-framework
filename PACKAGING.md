@@ -64,7 +64,6 @@ The package should include:
 
 - `README.md`
 - `PACKAGING.md`
-- `DESIGN-SYSTEM.md`
 - `tokens/`
 - `styles/`
 - `fonts/`
@@ -78,6 +77,8 @@ The package should include:
 - `tsconfig.lib.json`
 - `package.json`
 - built `dist/` from the prepare/build step
+
+The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The design-system contract lives at `ai/design/02-design-system.md`, never as a second root-level copy.
 
 It should not include generated or local junk such as `node_modules/`, `out-tsc/`, `.DS_Store`, `.framework-build.status.json`, or empty junk folders.
 

@@ -28,10 +28,11 @@ From this skill, the package lives at `../../design/`:
 
 - `00-start-here.md`
 - `01-design-philosophy.md`
-- `02-ux-rules.md`
-- `03-component-rules.md`
-- `04-copy-and-microcopy.md`
-- `05-fallback-copy.md`
+- `02-design-system.md`
+- `03-ux-rules.md`
+- `04-component-rules.md`
+- `05-copy-and-microcopy.md`
+- `06-fallback-copy.md`
 
 Search by topic, component, state, interaction, accessibility concern, or copy surface. Treat `must` as binding, `should` as the default, and `may` as allowed.
 

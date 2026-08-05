@@ -2,7 +2,7 @@
 
 This repository is generated. It is the published output of the Cortex design system, exported by `pnpm framework:package` from the Cortex repo, and consumed by other apps as `@mikaelcedergren/cx-framework` (`github:mikaelcedergren/cx-framework#main`).
 
-**Do not make design or code changes here.** Anything edited directly in this repo is overwritten on the next export. Make framework changes in Cortex — `framework/` for source, `docs/DESIGN-SYSTEM.md` for the reference — then re-run the packaging command.
+**Do not make design or code changes here.** Anything edited directly in this repo is overwritten on the next export. Make component and AI design-guidance changes in the source framework in Cortex, then re-run the packaging command.
 
 ## Role in the Cortex -> cx-framework -> projects loop
 
@@ -16,4 +16,5 @@ Rules that still apply:
 
 - Follow the shared Git policy in the development-root `AGENTS.md`: work on the current branch, never create a branch, pull when relevant, and push only after the user's specific current authorisation. Only after the package is pushed to GitHub `main` do consuming apps reinstall.
 - Cortex and this current package have authority over consumers. When the contract changes, migrate every consumer forward; never add compatibility shims, legacy aliases, deprecated props, or restored behavior for stale downstream code.
-- `README.md`, `DESIGN-SYSTEM.md`, and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, …) are copied from Cortex source.
+- `README.md` and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, `ai/`, …) are copied from Cortex source.
+- AI agents start at `ai/design/00-start-here.md`, also exposed by the package subpath `@mikaelcedergren/cx-framework/ai`.

@@ -89,6 +89,7 @@ export * from './primitives/inputs/cx-code-field';
 export * from './primitives/inputs/cx-color-picker';
 export * from './primitives/inputs/cx-date-picker';
 export * from './primitives/inputs/cx-date-span-picker';
+export * from './primitives/inputs/cx-drop-zone';
 export * from './primitives/inputs/cx-file-upload';
 export * from './primitives/inputs/cx-rating';
 export * from './primitives/inputs/cx-text-field';

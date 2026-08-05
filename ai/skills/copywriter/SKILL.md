@@ -23,17 +23,18 @@ From this skill, the package lives at `../../design/`:
 
 - `00-start-here.md`
 - `01-design-philosophy.md`
-- `02-ux-rules.md`
-- `03-component-rules.md`
-- `04-copy-and-microcopy.md`
-- `05-fallback-copy.md`
+- `02-design-system.md`
+- `03-ux-rules.md`
+- `04-component-rules.md`
+- `05-copy-and-microcopy.md`
+- `06-fallback-copy.md`
 
 Useful searches:
 
 - `rg "TOPIC: copy" ../../design`
 - `rg "TOPIC: microcopy" ../../design`
 - `rg "TOPIC: errors|TOPIC: validation" ../../design`
-- `rg "COMPONENT: buttons|COMPONENT: dialogs|COMPONENT: tabs" ../../design/03-component-rules.md`
+- `rg "COMPONENT: buttons|COMPONENT: dialogs|COMPONENT: tabs" ../../design/04-component-rules.md`
 
 Treat `must` as binding, `should` as the default, and `may` as allowed.
 

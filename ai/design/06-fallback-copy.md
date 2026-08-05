@@ -1,5 +1,7 @@
 # Fallback copy
 
+This file is the last-resort wording catalog in the AI design corpus. Apply the binding language rules in `05-copy-and-microcopy.md` first.
+
 ## Purpose
 
 Use this catalog only when known product behavior cannot support more specific wording. A fallback must never invent policy, capability, validation limits, supported formats, permission models, or recovery.

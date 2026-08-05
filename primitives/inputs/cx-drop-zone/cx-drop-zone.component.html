@@ -1,0 +1,155 @@
+<div
+  #surface
+  class="cx-drop-zone__surface"
+  [class.cx-drop-zone__surface--empty]="!hasValue"
+  [class.cx-drop-zone__surface--populated]="hasValue"
+  [class.cx-drop-zone__surface--dragging]="dragging$()"
+  [class.cx-drop-zone__surface--readonly]="readonly"
+  [class.cx-drop-zone__surface--disabled]="disabled"
+  [class.cx-drop-zone__surface--uploading]="isUploading"
+  role="group"
+  tabindex="-1"
+  [attr.aria-labelledby]="surfaceLabelledBy"
+  (click)="onSurfaceClick()"
+  (dragenter)="onDragEnter($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  @if (!readonly) {
+    <input
+      #nativeInput
+      class="cx-drop-zone__native-input"
+      type="file"
+      tabindex="-1"
+      [accept]="accept"
+      [disabled]="disabled || isUploading"
+      [attr.aria-label]="hasValue ? visibleReplaceText : visibleActionText"
+      [attr.aria-describedby]="nativeInputDescribedBy"
+      [attr.aria-invalid]="notice$()?.type === 'error' ? 'true' : null"
+      (change)="onNativeInputChange($event)"
+    />
+  }
+
+  @if (dragging$()) {
+    <div class="cx-drop-zone__drag-prompt" aria-hidden="true">
+      <cx-icon name="upload" size="32" mood="primary" shape="circle-subtle" />
+      <div class="cx-drop-zone__drag-copy">
+        <span [id]="headingId" class="cx-drop-zone__heading">{{ visibleHeading }}</span>
+        <span [id]="descriptionId" class="cx-drop-zone__description">{{ visibleDescription }}</span>
+      </div>
+    </div>
+  } @else if (!hasValue) {
+    <div class="cx-drop-zone__empty-content">
+      <cx-icon
+        class="cx-drop-zone__empty-icon"
+        [name]="icon"
+        [size]="readonly ? '32' : '64'"
+        mood="primary"
+        shape="circle-subtle"
+      />
+
+      <div class="cx-drop-zone__empty-copy">
+        <span [id]="headingId" class="cx-drop-zone__heading">{{ visibleHeading }}</span>
+        @if (visibleDescription) {
+          <span [id]="descriptionId" class="cx-drop-zone__description">{{ visibleDescription }}</span>
+        }
+        @if (visibleConstraints) {
+          <span [id]="constraintsId" class="cx-drop-zone__constraints">{{ visibleConstraints }}</span>
+        }
+      </div>
+
+      @if (!readonly) {
+        <span class="cx-drop-zone__primary-action" (click)="$event.stopPropagation()">
+          <cx-button
+            [text]="visibleActionText"
+            icon="upload"
+            mood="primary"
+            [disabled]="disabled"
+            (pressed)="openNativePicker()"
+          />
+        </span>
+      }
+    </div>
+  } @else if (selectedFile; as file) {
+    <div class="cx-drop-zone__file-row">
+      <cx-icon
+        class="cx-drop-zone__file-icon"
+        [name]="selectedFileIcon"
+        size="32"
+        shape="square-subtle"
+      />
+
+      <div class="cx-drop-zone__file-copy">
+        <span [id]="fileNameId" class="cx-drop-zone__file-name">{{ file.name }}</span>
+        @if (selectedFileMetadata) {
+          <span class="cx-drop-zone__file-meta">{{ selectedFileMetadata }}</span>
+        }
+      </div>
+
+      @if (lifecycleMessages$().length && !isFailed) {
+        <cx-validation-message
+          class="cx-drop-zone__file-state"
+          [messages]="lifecycleMessages$()"
+        />
+      }
+
+      @if (showMutationActions) {
+        <div class="cx-drop-zone__actions" (click)="$event.stopPropagation()">
+          @if (isFailed) {
+            <cx-button
+              text="Try again"
+              icon="reload"
+              mood="primary"
+              [disabled]="disabled"
+              (pressed)="retryUpload()"
+            />
+          }
+          <cx-button
+            [text]="visibleReplaceText"
+            icon="upload"
+            [disabled]="disabled"
+            [transparent]="isFailed"
+            (pressed)="openNativePicker()"
+          />
+          <cx-button
+            text="Remove file"
+            icon="delete"
+            [transparent]="true"
+            [disabled]="disabled"
+            (pressed)="removeValue()"
+          />
+        </div>
+      }
+    </div>
+
+    @if (isFailed) {
+      <cx-validation-message
+        class="cx-drop-zone__failure"
+        [messages]="lifecycleMessages$()"
+      />
+    }
+
+    @if (isUploading) {
+      <div class="cx-drop-zone__progress">
+        <cx-progress-bar
+          [label]="uploadingLabel"
+          [ariaLabel]="uploadProgressAriaLabel"
+          [value]="measuredProgress$() ?? 0"
+          [indeterminate]="measuredProgress$() === undefined"
+          [showValue]="measuredProgress$() !== undefined"
+        />
+      </div>
+    }
+  }
+</div>
+
+<span class="cx-drop-zone__announcement" role="status" aria-live="polite">{{ announcement$() }}</span>
+
+@if (noticeMessages$().length) {
+  <cx-validation-message
+    [id]="noticeId"
+    class="cx-drop-zone__notice"
+    [messages]="noticeMessages$()"
+  />
+}

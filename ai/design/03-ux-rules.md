@@ -1,6 +1,6 @@
 # UX rules
 
-Portable cross-cutting rules. Search by `RULE-ID:`, `SCOPE:`, `TYPE:`, `TOPIC:`, or keyword. User-facing language rules live only in `04-copy-and-microcopy.md`; component-specific behavior lives only in `03-component-rules.md`.
+Portable cross-cutting rules. Search by `RULE-ID:`, `SCOPE:`, `TYPE:`, `TOPIC:`, or keyword. User-facing language rules live only in `05-copy-and-microcopy.md`; component-specific behavior lives only in `04-component-rules.md`.
 
 ## System and component ownership
 
@@ -158,6 +158,8 @@ RULE-ID: forms.submit-reachable SCOPE: forms TYPE: should TOPIC: forms RULE: Kee
 
 RULE-ID: forms.selection-pattern SCOPE: choice-control TYPE: should TOPIC: forms RULE: Match the control to the selection model. DESCRIPTION: Use checkboxes for multi-select, radios for a short single-select set, and a picker or select for larger sets.
 
+RULE-ID: forms.choice-label-scope SCOPE: checkbox-radio-switch TYPE: must TOPIC: accessibility RULE: Give each individual choice its own adjacent label and label a collection separately only when the collection needs a group name. DESCRIPTION: A checkbox, radio option, or switch label explains that control and shares its activation target; a group label names the decision represented by multiple options and must not duplicate a standalone control label.
+
 ## Loading and feedback behavior
 
 RULE-ID: feedback.unknown-progress SCOPE: loading TYPE: should TOPIC: feedback RULE: Use activity feedback when duration cannot be measured. DESCRIPTION: A spinner or equivalent activity state communicates work without pretending to know completion.
@@ -184,6 +186,10 @@ RULE-ID: navigation.position-stability SCOPE: navigation TYPE: should TOPIC: nav
 
 RULE-ID: navigation.breadcrumb-depth SCOPE: navigation TYPE: should TOPIC: navigation RULE: Use breadcrumbs only for genuine hierarchical depth. DESCRIPTION: Do not add them to flat products or as a substitute for a correct Back action.
 
+RULE-ID: navigation.priority-frequency SCOPE: navigation TYPE: should TOPIC: navigation RULE: Make important and frequently used destinations easier to reach. DESCRIPTION: Placement and depth should reflect user value and observed task frequency rather than internal hierarchy; infrequent destinations may accept more disclosure without burying essential work.
+
+RULE-ID: navigation.information-scent SCOPE: navigation-label TYPE: must TOPIC: navigation RULE: Make a navigation label predict what its destination or menu contains. DESCRIPTION: Use the consuming product's specific concept instead of vague buckets such as `More` or `Other` when the label would otherwise force users to open the destination to learn its meaning.
+
 RULE-ID: data.user-importance SCOPE: data-display TYPE: must TOPIC: data-display RULE: Order information by user importance rather than storage order. DESCRIPTION: Lead with identity, current state, or the signal that changes what the user should do now.
 
 RULE-ID: content.truncation SCOPE: content-display TYPE: should TOPIC: hierarchy RULE: Allow intentional truncation for secondary or supporting text. DESCRIPTION: Treat truncation as a defect only when it hides task-primary information, an action, state, consequence, required recovery, or otherwise harms task success or accessibility.
@@ -191,6 +197,12 @@ RULE-ID: content.truncation SCOPE: content-display TYPE: should TOPIC: hierarchy
 RULE-ID: data.consistent-order SCOPE: data-display TYPE: should TOPIC: data-display RULE: Keep comparable views in the same information order. DESCRIPTION: Stable ordering improves scanning, comparison, and learned behavior.
 
 RULE-ID: data.missing-state SCOPE: data-display TYPE: must TOPIC: state RULE: Distinguish absent, pending, unavailable, and failed data. DESCRIPTION: Empty space or a broken placeholder must not force the user to guess which state occurred.
+
+RULE-ID: data.meaningful-absence SCOPE: data-display TYPE: should TOPIC: state RULE: Show absence when it answers a user question or confirms that the system completed its work. DESCRIPTION: No results, no activity, an empty expected region, and a known field with no value are meaningful states; use the correct state and copy rather than leaving unexplained space.
+
+RULE-ID: data.irrelevant-absence SCOPE: data-display TYPE: should TOPIC: state RULE: Omit an absent field or block when it does not apply and its absence conveys no useful state. DESCRIPTION: Do not expose inaccessible features, irrelevant relationships, or inapplicable optional facts as empty chrome that implies forgotten or lost data.
+
+RULE-ID: data.media-fallback SCOPE: media-display TYPE: must TOPIC: state RULE: Replace unavailable or failed media with an intentional non-broken fallback. DESCRIPTION: Use a stable placeholder or concise unavailable state that fits the surrounding design; use a skeleton only while media is genuinely loading and never leave the browser's broken-media treatment as the explanation.
 
 ## Motion
 

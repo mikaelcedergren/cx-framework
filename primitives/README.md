@@ -2,8 +2,8 @@
 
 Low-level reusable `cx-*` components live here. Do not infer the available API from folder names or this README; use the validated machine-readable discovery files:
 
-- `../support/components/registry.json`: selector, area, category, and source path
-- `../support/components/guidance.json`: component guidance
+- `../support/components/registry.json`: every public selector, area, category, and source path derived from the export graph
+- `../support/components/guidance.json`: required exact-component guidance
 
 Useful searches:
 

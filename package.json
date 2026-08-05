@@ -1,6 +1,6 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "Personal Angular UI framework and AI design package.",
   "type": "module",
   "packageManager": "pnpm@10.7.1",
@@ -12,10 +12,10 @@
       "types": "./dist/lib/public-api.d.ts",
       "default": "./dist/lib/public-api.js"
     },
-    "./DESIGN-SYSTEM.md": "./DESIGN-SYSTEM.md",
     "./PACKAGING.md": "./PACKAGING.md",
     "./README.md": "./README.md",
     "./package.json": "./package.json",
+    "./ai": "./ai/design/00-start-here.md",
     "./ai/*": "./ai/*",
     "./fonts/*": "./fonts/*",
     "./icons/*": "./icons/*",
@@ -37,7 +37,6 @@
   "files": [
     "README.md",
     "PACKAGING.md",
-    "DESIGN-SYSTEM.md",
     "dist/",
     "AGENTS.md",
     "ai/",

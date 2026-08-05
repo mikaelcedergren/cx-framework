@@ -68,6 +68,12 @@ Operational surfaces need concise, specific language. Learning surfaces may be w
 
 Words must preserve product truth. When behavior, consequence, or terminology is unknown, resolve the product question before writing around it.
 
+## Expertise proposes; evidence refines
+
+Use established design knowledge, product context, and perceptual judgment to form a strong default rather than treating every decision as an uninformed guess. Then test the decisions whose uncertainty or consequence matters with the people, behavior, accessibility evidence, or product data relevant to the task.
+
+Validation sharpens the design; it does not replace design responsibility. Record important assumptions, distinguish observation from preference, and refine the system when evidence shows that the current pattern does not work as intended.
+
 ## Finished-product judgment
 
 Before handoff, ask:

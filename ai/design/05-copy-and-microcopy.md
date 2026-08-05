@@ -38,6 +38,8 @@ RULE-ID: copy.buttons.pairs SCOPE: action-group TYPE: should TOPIC: copy RULE: G
 
 RULE-ID: copy.buttons.loading SCOPE: button-label TYPE: should TOPIC: feedback RULE: Keep processing language tied to the original action. DESCRIPTION: The control may show truthful activity while preserving what the user asked it to do.
 
+RULE-ID: copy.confirmation.alignment SCOPE: confirmation-dialog TYPE: must TOPIC: trust RULE: Align the confirmation statement with the committing action. DESCRIPTION: State the decision or consequence directly, then label the primary action as its continuation; use a safe exit plus the explicit action instead of a question answered by `Yes`, `No`, `OK`, or `Confirm`.
+
 ## Labels, placeholders, and help
 
 RULE-ID: copy.labels.object SCOPE: form-label TYPE: must TOPIC: forms RULE: Make a field label name the value or choice. DESCRIPTION: The label must keep the empty control understandable without turning into an instruction sentence.

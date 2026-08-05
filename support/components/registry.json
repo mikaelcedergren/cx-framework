@@ -190,7 +190,7 @@
       "path": "patterns/cx-wizard-dialog/cx-wizard-dialog.component.ts"
     },
     {
-      "name": "cxWizardDialogStep",
+      "name": "cx-wizard-dialog-step",
       "selectors": [
         "ng-template[cxWizardDialogStep]"
       ],
@@ -199,7 +199,7 @@
       "path": "patterns/cx-wizard-dialog/cx-wizard-dialog-step.directive.ts"
     },
     {
-      "name": "cxActiveWorkbench",
+      "name": "cx-active-workbench",
       "selectors": [
         "[cxActiveWorkbench]"
       ],
@@ -649,6 +649,15 @@
       "path": "primitives/inputs/cx-date-span-picker/cx-date-span-picker.component.ts"
     },
     {
+      "name": "cx-drop-zone",
+      "selectors": [
+        "cx-drop-zone"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-drop-zone/cx-drop-zone.component.ts"
+    },
+    {
       "name": "cx-file-upload",
       "selectors": [
         "cx-file-upload"
@@ -955,7 +964,7 @@
       "path": "primitives/overlay/cx-menu/cx-menu.component.ts"
     },
     {
-      "name": "cxMenuTrigger",
+      "name": "cx-menu-trigger",
       "selectors": [
         "[cxMenuTrigger]"
       ],
@@ -1070,15 +1079,6 @@
       "area": "primitive",
       "category": "inputs",
       "path": "primitives/inputs/cx-password-field/cx-password-field.component.ts"
-    },
-    {
-      "name": "cx-popover-backdrop",
-      "selectors": [
-        "cx-popover-backdrop"
-      ],
-      "area": "primitive",
-      "category": "overlay",
-      "path": "primitives/overlay/cx-popover-backdrop/cx-popover-backdrop.component.ts"
     }
   ]
 }

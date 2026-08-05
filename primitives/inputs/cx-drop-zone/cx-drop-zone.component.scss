@@ -1,0 +1,292 @@
+:host {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+  container-type: inline-size;
+}
+
+.cx-drop-zone__surface {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  border: var(--border-width) solid var(--opacity-mid);
+  border-radius: var(--radius-xl);
+  box-sizing: border-box;
+  background: var(--surface);
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease;
+}
+
+.cx-drop-zone__surface--empty {
+  min-height: calc(var(--controller-size) * 6);
+  border-style: dashed;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cx-drop-zone__surface--populated {
+  padding: var(--space-md);
+  gap: var(--space-md);
+}
+
+.cx-drop-zone__surface:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-drop-zone__surface--empty:not(.cx-drop-zone__surface--disabled):not(
+    .cx-drop-zone__surface--readonly
+  ):hover {
+  border-style: solid;
+  border-color: var(--border-hover);
+  background: var(--opacity-low);
+}
+
+.cx-drop-zone__surface--empty:not(.cx-drop-zone__surface--disabled):not(
+    .cx-drop-zone__surface--readonly
+  ):focus-within {
+  border-style: solid;
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-drop-zone__surface--dragging,
+.cx-drop-zone__surface--dragging:hover {
+  border-style: solid;
+  border-color: var(--primary);
+  background: var(--primary-opacity);
+  cursor: copy;
+}
+
+.cx-drop-zone__surface--readonly {
+  cursor: default;
+}
+
+.cx-drop-zone__surface--empty.cx-drop-zone__surface--readonly {
+  min-height: 0;
+  border-style: solid;
+  background: var(--opacity-low);
+}
+
+.cx-drop-zone__surface--disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
+.cx-drop-zone__surface--uploading {
+  cursor: default;
+}
+
+.cx-drop-zone__native-input {
+  display: none;
+}
+
+.cx-drop-zone__empty-content {
+  display: flex;
+  min-height: inherit;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl) var(--space-lg);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.cx-drop-zone__surface--empty.cx-drop-zone__surface--readonly .cx-drop-zone__empty-content {
+  min-height: 0;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: var(--space-md);
+  text-align: start;
+}
+
+.cx-drop-zone__empty-icon {
+  flex: 0 0 auto;
+}
+
+.cx-drop-zone__empty-copy,
+.cx-drop-zone__drag-copy,
+.cx-drop-zone__file-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cx-drop-zone__empty-copy {
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.cx-drop-zone__surface--empty.cx-drop-zone__surface--readonly .cx-drop-zone__empty-copy {
+  align-items: flex-start;
+  align-self: center;
+}
+
+.cx-drop-zone__heading,
+.cx-drop-zone__description,
+.cx-drop-zone__constraints,
+.cx-drop-zone__file-name,
+.cx-drop-zone__file-meta {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.cx-drop-zone__heading {
+  color: var(--ink);
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-body);
+}
+
+.cx-drop-zone__description,
+.cx-drop-zone__constraints {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+.cx-drop-zone__constraints {
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-drop-zone__primary-action {
+  display: inline-flex;
+}
+
+.cx-drop-zone__drag-prompt {
+  display: flex;
+  min-height: inherit;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  box-sizing: border-box;
+  text-align: start;
+}
+
+.cx-drop-zone__drag-copy {
+  gap: var(--space-2xs);
+}
+
+.cx-drop-zone__file-row {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: auto minmax(8rem, 1fr) auto auto;
+  gap: var(--space-sm);
+}
+
+.cx-drop-zone__file-icon {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+}
+
+.cx-drop-zone__file-copy {
+  gap: var(--space-2xs);
+}
+
+.cx-drop-zone__file-name {
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+}
+
+.cx-drop-zone__file-meta {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-drop-zone__file-state {
+  min-width: 0;
+  justify-self: end;
+}
+
+.cx-drop-zone__actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  grid-column: 4;
+}
+
+.cx-drop-zone__progress,
+.cx-drop-zone__failure {
+  min-width: 0;
+  padding-inline-start: calc(32px + var(--space-sm));
+}
+
+.cx-drop-zone__notice {
+  min-width: 0;
+}
+
+.cx-drop-zone__announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@container (max-width: 640px) {
+  .cx-drop-zone__file-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cx-drop-zone__file-state {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .cx-drop-zone__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: var(--space-xs);
+  }
+
+  .cx-drop-zone__progress,
+  .cx-drop-zone__failure {
+    padding-inline-start: 0;
+  }
+}
+
+@container (max-width: 380px) {
+  .cx-drop-zone__surface--populated {
+    padding: var(--space-sm);
+  }
+
+  .cx-drop-zone__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cx-drop-zone__actions cx-button {
+    width: 100%;
+    --cx-button-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-drop-zone__surface {
+    transition: none;
+  }
+}

@@ -1,6 +1,6 @@
 # Component rules
 
-Every rule carries its component name so `rg 'COMPONENT: buttons'` returns the applicable rules directly. Exact user-facing wording belongs in `04-copy-and-microcopy.md`.
+Every rule carries its component name so `rg 'COMPONENT: buttons'` returns the applicable component-pattern rules directly. Exact selector-level guidance lives in `../../support/components/guidance.json`, the canonical source shared with component reference pages; resolve public selectors through `../../support/components/registry.json`. Exact user-facing wording belongs in `05-copy-and-microcopy.md`.
 
 ## Banners
 
@@ -19,6 +19,12 @@ RULE-ID: utility-bars.internal-only SCOPE: component COMPONENT: utility-bars TYP
 ## Action areas
 
 RULE-ID: action-areas.explicit-only SCOPE: component COMPONENT: action-areas TYPE: must TOPIC: components RULE: Use an action area only when the product scope explicitly requires one. DESCRIPTION: Never introduce cx-action-area as a default wrapper, automatic enhancement, or substitute for ordinary inline actions, entity menus, section content, or navigation; when action-area use is not explicitly requested, omit it.
+
+## Action bars
+
+RULE-ID: action-bars.active-selection SCOPE: component COMPONENT: action-bars TYPE: must TOPIC: state RULE: Show cx-action-bar only while at least one item is selected. DESCRIPTION: The bar represents a current selection and must leave no empty toolbar, zero-selection count, or persistent selection chrome after the selection clears.
+
+RULE-ID: action-bars.selection-scope SCOPE: component COMPONENT: action-bars TYPE: must TOPIC: interaction RULE: Offer only actions that apply to the current selected set. DESCRIPTION: Derive the action collection from the selected items and the owning content region; hide irrelevant commands and explain a temporarily blocked command only when the user can understand or resolve its blocker.
 
 ## Buttons
 
@@ -91,6 +97,10 @@ RULE-ID: detail-panels.tabs SCOPE: component COMPONENT: detail-panels TYPE: must
 RULE-ID: detail-panels.sections SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: layout RULE: Compose the scrolling body from explicit cx-detail-panel-section children. DESCRIPTION: Each section owns a white surface, discreet border, fixed 16px internal padding, and an 8px gap between direct children; consumers group related content into sections instead of projecting unsectioned content or choosing body padding.
 
 RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panels TYPE: must TOPIC: interaction RULE: Keep the body independently scrollable and always provide close-button and Escape dismissal. DESCRIPTION: The panel body scrolls vertically only; content that genuinely requires horizontal movement owns a bounded local scroller. Outside-click dismissal remains optional because safety depends on whether closing can lose context or work.
+
+## Labeled rows
+
+RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: should TOPIC: layout RULE: Use cx-labeled-row for repeated structured form rows or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; do not wrap isolated controls, arbitrary page content, or layouts whose content does not share a label-value relationship. Apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch.
 
 ## Empty states
 
