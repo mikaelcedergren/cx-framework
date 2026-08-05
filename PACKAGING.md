@@ -80,11 +80,13 @@ The package should include:
 
 The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The design-system contract lives at `ai/design/02-design-system.md`, never as a second root-level copy.
 
+Codex discovers repository skills only under `.agents/skills`, not inside installed dependencies. The package therefore exposes the dependency-free `cx-framework-skills` command. From a consuming repository root, `pnpm exec cx-framework-skills` creates symlinked discovery folders that point to `node_modules/@mikaelcedergren/cx-framework/ai/skills/*`. The command exposes the complete portable set, preserves unrelated skills, and refuses to overwrite any existing local skill.
+
 It should not include generated or local junk such as `node_modules/`, `out-tsc/`, `.DS_Store`, `.framework-build.status.json`, or empty junk folders.
 
 ## After export
 
-The package command validates the AI/framework documentation layer, checks package-path relocation and the explicit export allowlist, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, verifies root TypeScript and Sass consumption while rejecting private code subpaths, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
+The package command validates the AI/framework documentation layer, checks package-path relocation and the explicit export allowlist, verifies the exact portable skill/resource graph and every internal relative reference, exercises consumer skill discovery in a clean fixture, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, verifies root TypeScript and Sass consumption while rejecting private code subpaths, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
 
 After the package repo is committed and pushed, consuming apps using:
 

@@ -49,7 +49,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 1. Inspect the current behavior and the layer that owns it; confirm the root cause before editing.
 2. Choose the smallest coherent change that fixes the cause within the approved scope.
-3. Implement the complete reachable behavior, contracts, states, and documentation owned by that change.
+3. Preserve the accepted semantic contract across the visible promise, relevant capabilities, state owner, effect lifetime, reachable behavior, and documentation.
 4. Verify each important claim with evidence proportional to its risk.
 5. Reread the touched area, remove duplication or dead work, and check an adjacent edge case before handoff.
 
@@ -71,6 +71,9 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 - Use `designer` when an unresolved product, flow, interaction, or visual decision would materially change the build.
 - Use `copywriter` when exact user-facing wording is unresolved.
 - Start from the existing design system. Define an owning component or pattern extension when the system lacks required behavior; do not build a page-level substitute.
+- Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, `RULE-ID: interaction.control-semantics`, and `RULE-ID: content.scannable` to every user-facing change.
+- Treat a control category as a state-boundary contract. View refinement may preserve view state but must never write entity data; entity, preference, and system changes use their explicit accepted semantics.
+- Return to `designer` when a named surface lacks a coherent relevant capability family or the accepted design does not establish what a control changes and for how long.
 - Apply `RULE-ID: layout.breathing-room` and `RULE-ID: layout.component-spacing` to user-facing layout.
 - Account for each state the feature can actually reach; do not invent theoretical states solely to complete a checklist.
 - Update documentation and reference surfaces when public component behavior, props, slots, variants, or states change.
@@ -89,6 +92,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 - Use the cheapest meaningful verification first, then escalate with risk.
 - Match evidence to the claim: tests for behavior, typecheck or build for integration, rendered interaction for UI behavior, and appropriate keyboard or semantic checks for accessibility.
+- For user-facing controls, verify the actual read and write owner, the result after revisit or reload when persistence matters, recovery where applicable, and the absence of unintended entity or system writes.
 - A passing build is not browser verification.
 - Use browser verification when rendered behavior, layout, interaction, responsive behavior, or accessibility confidence is below 90%.
 - Do not claim verification that did not run or evidence that was not observed.

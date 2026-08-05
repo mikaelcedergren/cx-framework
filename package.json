@@ -1,9 +1,12 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "description": "Personal Angular UI framework and AI design package.",
   "type": "module",
   "packageManager": "pnpm@10.7.1",
+  "bin": {
+    "cx-framework-skills": "./scripts/install-ai-skills.mjs"
+  },
   "main": "./dist/lib/public-api.js",
   "module": "./dist/lib/public-api.js",
   "types": "./dist/lib/public-api.d.ts",

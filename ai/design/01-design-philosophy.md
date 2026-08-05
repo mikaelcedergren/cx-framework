@@ -8,6 +8,12 @@ People experience software through perception, expectation, hesitation, confiden
 
 Preserve the user's mental model over the implementation model. A technically neat structure is still wrong when it makes the user stop and decode the product. If a flow feels mentally awkward, redesign the flow instead of explaining the machinery.
 
+## Patterns are promises
+
+Names, placement, appearance, and grouping teach people what a surface contains and what its controls will do. Judge that whole promise, not isolated components. A locally plausible element is still wrong when its contents, scope, persistence, or consequence contradict the task or surrounding surface.
+
+A named menu, panel, properties surface, or other category needs a coherent task boundary. Include the relevant peer functions, put deliberately separate functions somewhere predictable, or narrow or remove the wrapper when only one function remains. Do not expose every possible option merely because the system can.
+
 ## Discipline protects attention
 
 A design system deliberately settles recurring decisions: spacing, token roles, component shape, interaction behavior, state treatment, and language patterns. That discipline saves judgment for the few decisions that genuinely depend on context and perception.
@@ -33,6 +39,8 @@ Raw hue is appropriate only when hue itself is data or a user choice, such as a 
 Low-noise UI is not hidden UI. Remove chrome that does not clarify structure, action, state, or priority, but keep interactive elements visibly reachable. Current location, selected state, keyboard focus, destructive intent, and recovery paths must never become guesses.
 
 Dense information can remain dense. The goal is to reduce interface chrome around it. Use alignment, spacing, typography, and semantic weight before adding another box, border, fill, icon, or label.
+
+People scan operational interfaces before they read them closely. Lead with the point, keep labels and explanations short, group information by the decision it supports, and reveal detail only when it earns the attention it costs. When optional information has no demonstrated value, leave it out and begin from the cleaner surface.
 
 ## One unit gets one boundary
 
@@ -79,7 +87,9 @@ Validation sharpens the design; it does not replace design responsibility. Recor
 Before handoff, ask:
 
 - Does the structure match how the user thinks?
+- Do the surface's name, contents, and behavior make the same promise?
 - Is the primary task obvious without decoding?
+- Can the user scan the interface and grasp the point before reading detail?
 - Is every reachable state understandable and recoverable?
 - Is the system being used or strengthened at the owning layer?
 - Can anything be removed without reducing understanding?

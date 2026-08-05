@@ -18,3 +18,4 @@ Rules that still apply:
 - Cortex and this current package have authority over consumers. When the contract changes, migrate every consumer forward; never add compatibility shims, legacy aliases, deprecated props, or restored behavior for stale downstream code.
 - `README.md` and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, `ai/`, …) are copied from Cortex source.
 - AI agents start at `ai/design/00-start-here.md`, also exposed by the package subpath `@mikaelcedergren/cx-framework/ai`.
+- Installed dependencies are not Codex skill-discovery roots. From a consuming repository root, run `pnpm exec cx-framework-skills` to create non-copying `.agents/skills` bridges into this package.

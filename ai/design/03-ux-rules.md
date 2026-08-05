@@ -6,6 +6,8 @@ Portable cross-cutting rules. Search by `RULE-ID:`, `SCOPE:`, `TYPE:`, `TOPIC:`,
 
 RULE-ID: system.mental-model SCOPE: global TYPE: must TOPIC: system RULE: Organize the experience around the user's mental model. DESCRIPTION: Product structure, naming, grouping, and sequence must not expose internal ownership or backend shape.
 
+RULE-ID: system.semantic-coherence SCOPE: global TYPE: must TOPIC: system RULE: Make the interface's purpose, visible structure, and behavior form one coherent model. DESCRIPTION: A locally plausible element is still wrong when its name, contents, grouping, scope, persistence, or consequence contradicts the user's task or the surrounding surface. Treat interface choices inherited from a request, prototype, or component inventory as hypotheses unless product truth explicitly fixes them; their presence is not evidence of user value.
+
 RULE-ID: system.use-existing SCOPE: design-system TYPE: should TOPIC: system RULE: Start with the existing tokens, components, patterns, and documented behavior. DESCRIPTION: Familiar system pieces reduce drift and transfer learned behavior across the product.
 
 RULE-ID: system.default-first SCOPE: design-system TYPE: must TOPIC: system RULE: Begin with the framework defaults and the minimum configuration needed. DESCRIPTION: Change a default only when it fails to express a clear requirement in the current context; when several choices work, keep the default. The existence of another option or example is not a reason to use it.
@@ -17,6 +19,8 @@ RULE-ID: system.sealed-components SCOPE: design-system TYPE: must TOPIC: compone
 RULE-ID: system.no-external-patches SCOPE: design-system TYPE: must TOPIC: components RULE: Do not repair a component through consumer overrides. DESCRIPTION: Deep selectors, inline visual fixes, specificity battles, duplicated token values, and wrapper hacks hide the owning defect.
 
 RULE-ID: system.component-role-first SCOPE: component-api TYPE: should TOPIC: components RULE: Define a component's user-facing role before adding props. DESCRIPTION: Props should expose meaningful variation inside a clear role rather than accumulate styling knobs.
+
+RULE-ID: structure.category-integrity SCOPE: named-surface TYPE: must TOPIC: hierarchy RULE: Make every named group or surface fulfill the promise created by its label and pattern. DESCRIPTION: Include the relevant peer capabilities inside its task boundary, place deliberately separate peers somewhere predictable, or narrow or remove the wrapper when only one function remains; never fill the category with unrelated behavior or expose every possible option merely because it exists.
 
 RULE-ID: system.public-api-minimal SCOPE: component-api TYPE: should TOPIC: components RULE: Add public behavior only for a real repeatable need. DESCRIPTION: Defaults belong to the system; pages should not decorate components through one-off props.
 
@@ -55,6 +59,8 @@ RULE-ID: accessibility.no-flashing SCOPE: motion TYPE: must TOPIC: accessibility
 RULE-ID: interaction.visible-response SCOPE: interactive TYPE: must TOPIC: feedback RULE: Give every user action a perceivable response. DESCRIPTION: Feedback may be immediate state, progress, navigation, or a message, but the product must not feel silent or broken.
 
 RULE-ID: interaction.data-change SCOPE: data-change TYPE: must TOPIC: trust RULE: Make the intent and outcome of every data change visible. DESCRIPTION: Before an edit, move, toggle, or automated choice acts, users must understand what will change; afterward, show the resulting state.
+
+RULE-ID: interaction.control-semantics SCOPE: interactive TYPE: must TOPIC: trust RULE: Make a control's visible category match the kind, scope, and lifetime of change it performs. DESCRIPTION: Users must be able to predict from its label, placement, appearance, and convention whether it refines a view, changes selection, edits an entity, saves a preference, or affects persistent system behavior; a view-refinement control may preserve view state but must never silently mutate the entities shown.
 
 RULE-ID: interaction.truthful-state SCOPE: global TYPE: must TOPIC: trust RULE: Show only state and progress the system actually knows. DESCRIPTION: Never fabricate completion, capability, certainty, or measured progress for reassurance.
 
@@ -113,6 +119,8 @@ RULE-ID: layout.supported-viewports SCOPE: page-layout TYPE: must TOPIC: layout 
 RULE-ID: layout.stability SCOPE: dynamic-layout TYPE: should TOPIC: layout RULE: Keep existing content visually stable during loading and updates. DESCRIPTION: Reserve known space and avoid unexpected shifts around the user's reading position.
 
 RULE-ID: density.data-not-chrome SCOPE: data-display TYPE: should TOPIC: density RULE: Separate information density from interface density. DESCRIPTION: Dense data can remain readable without giving every value a box, icon, tag, or tooltip.
+
+RULE-ID: content.scannable SCOPE: product-interface TYPE: must TOPIC: hierarchy RULE: Make operational interfaces scannable before they are exhaustive. DESCRIPTION: Lead with the point, group related information, keep labels and text blocks brief, and reveal supporting detail only when it helps the task, consequence, recovery, or accessibility; when additional explanation has no demonstrated value, omit it.
 
 RULE-ID: surfaces.one-boundary SCOPE: visual-group TYPE: should TOPIC: surfaces RULE: Keep each visual group to one primary boundary; do not put a card, box, or bordered container inside another. DESCRIPTION: Flatten the composition with spacing, typography, dividers, or one shared surface instead of stacking borders, fills, shadows, and containers. EXCEPT: Nest a surface only when the user or product contract explicitly requires a distinct semantic plane.
 
@@ -190,7 +198,7 @@ RULE-ID: navigation.priority-frequency SCOPE: navigation TYPE: should TOPIC: nav
 
 RULE-ID: navigation.information-scent SCOPE: navigation-label TYPE: must TOPIC: navigation RULE: Make a navigation label predict what its destination or menu contains. DESCRIPTION: Use the consuming product's specific concept instead of vague buckets such as `More` or `Other` when the label would otherwise force users to open the destination to learn its meaning.
 
-RULE-ID: data.user-importance SCOPE: data-display TYPE: must TOPIC: data-display RULE: Order information by user importance rather than storage order. DESCRIPTION: Lead with identity, current state, or the signal that changes what the user should do now.
+RULE-ID: data.user-importance SCOPE: data-display TYPE: must TOPIC: data-display RULE: Order information by user importance rather than storage order. DESCRIPTION: Lead with the human-recognizable name or label, current state, or signal that changes what the user should do now. Keep opaque internal identifiers secondary unless people genuinely use them for lookup, disambiguation, support, audit, or communication.
 
 RULE-ID: content.truncation SCOPE: content-display TYPE: should TOPIC: hierarchy RULE: Allow intentional truncation for secondary or supporting text. DESCRIPTION: Treat truncation as a defect only when it hides task-primary information, an action, state, consequence, required recovery, or otherwise harms task success or accessibility.
 

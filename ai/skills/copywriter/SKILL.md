@@ -43,9 +43,11 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 ## Copy standard
 
 - Apply `RULE-ID: copy.reader-language` before drafting user-facing text.
+- Apply `RULE-ID: content.scannable` and `RULE-ID: copy.concise`; lead with the point and make the structure understandable before close reading.
 - Prefer the plainest accurate word.
 - Use one term for one concept and match the product's existing domain language.
-- Make the copy as short as possible without removing meaning, consequence, constraint, or the next useful action.
+- Use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action.
+- Prefer concise labels, short blocks, and progressive disclosure. Omit optional explanation when its value is uncertain; keep longer prose only when reading is the task.
 - Keep operational surfaces concise and professional.
 - Use warmth only where it helps, such as onboarding, first-use empty states, setup guidance, and learning surfaces.
 - Avoid business jargon, marketing gloss, cleverness, filler, decorative adjectives, blame, shame, and vague system language.
@@ -58,7 +60,7 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 3. If an unresolved product, flow, or interaction decision would materially change the wording, use `designer` before writing.
 4. Search the AI design package for the relevant topic or component.
 5. Draft the shortest specific wording that tells the user what the object, action, state, consequence, or recovery path is.
-6. Stress-test fit, scanability, ambiguity, tone, neighboring terminology, long values, and failure states that are in scope.
+6. Stress-test fit, scannability, chunking, adjacent repetition, ambiguity, tone, neighboring terminology, long values, and failure states that are in scope.
 7. Use `custodian` when the finalized wording needs an acceptance verdict.
 8. Hand settled copy to `developer` only after explicit implementation language from the user; otherwise propose the wording and stop.
 

@@ -43,9 +43,10 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 1. Identify the goal, artifact type, maturity, and decision being requested.
 2. Establish what the evidence can and cannot verify.
 3. Search only the rules relevant to the reachable behavior in scope.
-4. Find root issues and consolidate related symptoms.
-5. Choose the verdict against the next gate, not an imagined final release.
-6. For an implementation or release-candidate gate, complete the mandatory final rendered-UI review below.
+4. Run the independent semantic coherence gate below.
+5. Find root issues and consolidate related symptoms.
+6. Choose the verdict against the next gate, not an imagined final release.
+7. For an implementation or release-candidate gate, complete the mandatory final rendered-UI review below.
 
 Calibrate the review to the artifact:
 
@@ -63,16 +64,22 @@ Classify each possible issue internally:
 
 Only observed issues and well-supported inferences become findings. A not-verified area may appear as one short coverage note when it materially limits approval; it does not become a defect or blocker by itself.
 
+## Independent semantic coherence gate
+
+Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, `RULE-ID: interaction.control-semantics`, and `RULE-ID: content.scannable` without treating the maker's rationale as proof. Test the relationships between purpose and element, promise and contents, object and representation, intent and consequence, scope and lifetime, and value and interface cost.
+
+Classify each material relationship internally as `Pass`, `Concern`, or `Unknown`. A concern becomes a finding only when it is observed or well-supported by evidence. An unknown follows the `Unverified` rules above; do not fill it with the behavior that would make the design seem sensible. A direct contradiction between a surface's promise, contents, and observed behavior is a design error, even when each element looks plausible in isolation.
+
 ## Mandatory final rendered-UI review
 
 For every rendered implementation or release-candidate gate, inspect the actual UI at the intended desktop viewport. Use rendered screenshots as required visual evidence; code, DOM, component, and token inspection may support the review but cannot replace them. If screenshots do not cover every important page and applicable state, assign `Unverified` for this gate. Keep responsive review out of scope unless explicitly requested.
 
-1. Capture a before screenshot of every important page at one documented desktop viewport. Populate tables, lists, panels, and dashboards with enough realistic example data to expose density, repetition, truncation, hierarchy, and scrolling.
+1. Capture a before screenshot of every important page at one documented desktop viewport. Populate tables, lists, panels, and dashboards with representative normal data that exposes density, repetition, truncation, hierarchy, and scrolling; use separate stress data for edge cases rather than inflating normal content to justify permanent controls.
 2. Inspect every important interaction state at the same viewport, including applicable detail panels, popovers, menus, expanded rows, dialogs, loading, empty, and error states.
 3. After corrections, capture matching after screenshots and compare them directly with the before set at the same viewport.
 4. Re-run all eight lenses on the after set:
    - **Necessity:** Reject information, labels, containers, explanations, and controls that do not improve understanding or action. Detect repeated information expressed in slightly different forms.
-   - **Hierarchy:** Make the most important information and actions visually dominant. Reduce competing emphasis and unnecessary heading levels.
+   - **Hierarchy and scannability:** Apply `RULE-ID: content.scannable`; make the point and most important actions apparent before close reading, and reject competing emphasis, unnecessary heading levels, or text blocks longer than the task requires.
    - **Grouping:** Group by meaning and task. Apply `RULE-ID: surfaces.one-boundary` when reviewing container composition.
    - **Affordance:** Apply `RULE-ID: surfaces.light-first`; keep interactive elements discoverable and read-only information non-editable without turning every action into a button.
    - **Semantic cues:** Use icons, typography, status treatment, and restrained color only when they improve recognition or scanning. Reject decoration without meaning.
@@ -88,6 +95,8 @@ Use this checklist internally. Apply only relevant, reachable items; do not turn
 
 - User goal: the original goal is still the primary outcome.
 - Mental model: structure, naming, grouping, and hierarchy match how users think about the work.
+- Semantic coherence: purpose, surface promise, contents, behavior, scope, persistence, and consequence agree.
+- Scannability: the point, structure, actions, and state are understandable before supporting detail is read.
 - Design system: tokens, components, patterns, naming, states, and behavior are consistent.
 - UX patterns: navigation, forms, dialogs, tables, filters, empty states, destructive actions, and recovery paths behave as expected.
 - Reachable states: relevant state, content-length, permission, and unavailable behavior are covered; include responsive states only when they are in scope.
@@ -110,6 +119,7 @@ In the final rendered-UI review, `Polish` is not completion: any visible issue i
 Block when evidence shows the work:
 
 - Violates an applicable `must` rule in a way that makes the next gate unsafe, misleading, inaccessible, or wasteful.
+- Gives a control or named surface a promise that contradicts its contents, scope, persistence, or observed effect.
 - Breaks the user's core goal.
 - Hides or weakens the primary action.
 - Creates inaccessible interaction, unreadable content, keyboard traps, or color-only meaning.

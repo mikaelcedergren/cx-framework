@@ -8,7 +8,7 @@ On first encounter, read this file, `01-design-philosophy.md`, and `02-design-sy
 
 Apply guidance in this order:
 
-1. The user's current request and explicit constraints.
+1. The user's current goal, intended outcome, and explicitly fixed constraints. A proposed interface choice is not a constraint merely because it appears in a request or prototype, even when described declaratively; treat it as a candidate unless the user expressly makes it non-negotiable.
 2. The consuming product's local instructions, product truth, design-system contract, and public component API.
 3. The design-system facts and public component contract in `02-design-system.md`.
 4. The portable UX, component, and copy rules in this folder.
@@ -20,7 +20,7 @@ A more specific applicable rule wins over a general rule at the same authority. 
 
 Start with the task, not the documents:
 
-- Any user-facing decision: read `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
+- Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `03-ux-rules.md`.
 - Tokens, public APIs, ownership, workbenches, source discovery, or framework layout: read the matching section of `02-design-system.md`.
 - Cross-cutting behavior, accessibility, layout, feedback, forms, navigation, or state: search `03-ux-rules.md` by `TOPIC:`, `SCOPE:`, or keyword.
@@ -73,6 +73,8 @@ Consuming products keep deployment details, local safety rules, personal collabo
 ## Non-negotiable outcomes
 
 - Preserve the user's mental model over internal structure.
+- Make every surface's promise, contents, and behavior coherent.
+- Make operational interfaces scannable and omit unearned explanation.
 - Keep existing product truth and terminology intact.
 - Use the existing system before inventing a new pattern.
 - Make state, feedback, affordance, and consequences perceivable.

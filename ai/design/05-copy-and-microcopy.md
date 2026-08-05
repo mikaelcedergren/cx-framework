@@ -16,7 +16,7 @@ RULE-ID: copy.reader-language SCOPE: copy TYPE: should TOPIC: copy RULE: Write f
 
 RULE-ID: copy.sentence-case SCOPE: copy TYPE: should TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
 
-RULE-ID: copy.concise SCOPE: operational-copy TYPE: should TOPIC: voice RULE: Keep operational copy as short as accuracy allows. DESCRIPTION: Do not remove consequence, constraint, recovery, or the next useful action merely to save words.
+RULE-ID: copy.concise SCOPE: operational-copy TYPE: should TOPIC: voice RULE: Keep operational copy short and scannable as accuracy allows. DESCRIPTION: Lead with the point and use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action; a reading surface may remain long when reading is the task.
 
 RULE-ID: copy.warmth SCOPE: learning-copy TYPE: may TOPIC: voice RULE: Use restrained warmth on learning and first-use surfaces. DESCRIPTION: Onboarding, setup guidance, and first-use empty states may be kind and conversational without becoming cute, jokey, or vague.
 

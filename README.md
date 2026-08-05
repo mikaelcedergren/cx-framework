@@ -206,7 +206,13 @@ Portable skills live in `ai/skills/`:
 
 Use these as reusable role contracts. Keep product-specific instructions in the consuming app. A discovery bridge may point to the packaged source skill, but the complete `ai/` tree must remain available so each skill's relative `../../design/` references resolve.
 
-The package does not register skills in a consuming product automatically. Install or bridge only the roles that product intends to expose, and keep discovery frontmatter aligned with the source skill.
+Codex does not scan skills inside `node_modules`. From the consuming repository root, expose the complete packaged skill set through Codex's repository discovery folder:
+
+```sh
+pnpm exec cx-framework-skills
+```
+
+The command creates `.agents/skills/<name>` symlinks into the installed package. It does not copy skill bodies or overwrite an existing local skill. Existing bridges follow package updates automatically; rerun the command after an upgrade that adds a new role. Restart Codex only if the new skills do not appear automatically.
 
 ## Consumer rules
 
