@@ -85,8 +85,8 @@ async function assertProjectRoot(projectRoot) {
   }
 }
 
-async function findInstalledPackage(projectRoot) {
-  let current = projectRoot;
+async function findInstalledPackage(searchRoot) {
+  let current = path.resolve(searchRoot);
 
   while (true) {
     const candidate = path.join(
@@ -113,7 +113,7 @@ async function findInstalledPackage(projectRoot) {
   }
 
   throw new Error(
-    `Could not find ${packageName} in node_modules at or above ${projectRoot}. Install the package before exposing its skills.`,
+    `Could not find ${packageName} in node_modules at or above ${searchRoot}. Install the package before exposing its skills.`,
   );
 }
 
@@ -165,6 +165,7 @@ async function bridgeState(sourcePath, destinationPath) {
 export async function installSkillBridges({
   projectRoot = process.cwd(),
   packageRoot = null,
+  packageSearchRoot = process.cwd(),
 } = {}) {
   const requestedRoot = path.resolve(projectRoot);
   await assertProjectRoot(requestedRoot);
@@ -172,7 +173,7 @@ export async function installSkillBridges({
 
   const installedPackageRoot = packageRoot
     ? path.resolve(packageRoot)
-    : await findInstalledPackage(consumerRoot);
+    : await findInstalledPackage(packageSearchRoot);
   const names = await packagedSkillNames(installedPackageRoot);
   const discoveryRoot = path.join(consumerRoot, '.agents', 'skills');
   const bridges = [];

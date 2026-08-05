@@ -214,6 +214,12 @@ pnpm exec cx-framework-skills
 
 The command creates `.agents/skills/<name>` symlinks into the installed package. It does not copy skill bodies or overwrite an existing local skill. Existing bridges follow package updates automatically; rerun the command after an upgrade that adds a new role. Restart Codex only if the new skills do not appear automatically.
 
+If the framework dependency belongs to a nested workspace package, run its local command and point it at the repository root:
+
+```sh
+pnpm --dir app exec cx-framework-skills --root ..
+```
+
 ## Consumer rules
 
 - Build screens from framework primitives and patterns before writing local UI.
