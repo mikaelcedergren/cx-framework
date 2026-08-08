@@ -34,9 +34,11 @@ From this skill, the package lives at `../../design/`:
 - `05-copy-and-microcopy.md`
 - `06-fallback-copy.md`
 
-Search by topic, component, state, interaction, accessibility concern, or copy surface. Treat `must` as binding, `should` as the default, and `may` as allowed.
+Search by topic, component, state, interaction, accessibility concern, or copy surface. Apply the normative levels and conflict handling defined in `00-start-here.md`; structured rules use `TYPE: MUST`, `TYPE: SHOULD`, or `TYPE: MAY`.
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, flag the conflict instead of cherry-picking a convenient rule. Treat the conflict as a system issue, not a defect in the reviewed artifact, until the applicable authority is clear.
+
+When calibrating severity or separating defects from taste, load `../../profile/design-lead-profile.md` whole and weigh consequence the way that designer would. The profile is non-normative and carries the lowest authority: it cannot create a finding, downgrade a rule violation, or override any binding source; it only shapes judgment where the rules leave room.
 
 ## Review method
 

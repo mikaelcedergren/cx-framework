@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, computed, signal } from '@angular/core';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxBudgetFavor = 'low' | 'high';
 export type CxBudgetFormat = 'percent' | 'currency' | 'unit';
@@ -15,6 +16,7 @@ const CURRENCY_META: Record<CxBudgetCurrency, { symbol: string; placement: 'befo
 
 @Component({
   selector: 'cx-budget',
+  imports: [CxTooltipDirective],
   templateUrl: './cx-budget.component.html',
   styleUrl: './cx-budget.component.scss',
   host: {
@@ -149,7 +151,6 @@ export class CxBudgetComponent {
     this.formattedMaximumValue(),
     this.maximumLabelState(),
   ));
-
   private isCurrency(value: string | undefined): value is CxBudgetCurrency {
     return value === 'SEK' || value === 'USD' || value === 'EUR' || value === 'GBP';
   }

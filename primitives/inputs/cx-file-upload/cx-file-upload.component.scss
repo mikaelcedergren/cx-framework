@@ -29,7 +29,7 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -130,7 +130,7 @@
   color: var(--ink);
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

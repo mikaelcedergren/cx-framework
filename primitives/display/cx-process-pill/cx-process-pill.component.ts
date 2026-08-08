@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxProcessPillMood = 'default' | 'info' | 'success' | 'warning' | 'danger';
 
@@ -12,7 +13,7 @@ export type CxProcessPillMood = 'default' | 'info' | 'success' | 'warning' | 'da
  */
 @Component({
   selector: 'cx-process-pill',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-process-pill.component.html',
   styleUrl: './cx-process-pill.component.scss',
   host: {

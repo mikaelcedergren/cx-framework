@@ -3,6 +3,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 
 const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
 
@@ -41,7 +42,7 @@ let nextPanelId = 0;
  */
 @Component({
   selector: 'cx-masthead',
-  imports: [NgTemplateOutlet, CxIconComponent, RouterLink, RouterLinkActive],
+  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective, RouterLink, RouterLinkActive],
   templateUrl: './cx-masthead.component.html',
   styleUrl: './cx-masthead.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

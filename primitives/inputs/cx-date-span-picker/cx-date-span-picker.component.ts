@@ -16,6 +16,7 @@ import {
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import { CxCalendarComponent, type CxCalendarRange } from '../cx-calendar';
 import { CxCheckboxComponent } from '../cx-checkbox';
 import {
@@ -68,6 +69,7 @@ export type CxDateSpanPickerWeekStart = CxCalendarWeekStart;
     CxCheckboxComponent,
     CxIconComponent,
     CxPopoverComponent,
+    CxTooltipDirective,
     CxTimeFieldComponent,
     CxValidationMessageComponent,
   ],

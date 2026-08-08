@@ -52,7 +52,6 @@ type CxTextAreaRenderedLine = {
   number: number;
   mood?: CxTextAreaAnnotationMood;
   iconMood?: CxTextAreaAnnotationMood;
-  title?: string;
   segments: ReadonlyArray<{
     text: string;
     mood?: CxTextAreaAnnotationMood;
@@ -249,14 +248,10 @@ export class CxTextAreaComponent {
       const lineAnnotations = annotations.filter((annotation) => annotation.kind === 'line');
       const rangeAnnotations = annotations.filter((annotation) => annotation.kind === 'range');
       const iconMood = this.iconMoodForAnnotations(annotations);
-      const messages = annotations
-        .filter((annotation) => annotation.mood === 'danger' && annotation.message?.trim())
-        .map((annotation) => annotation.message!.trim());
       return {
         number,
         mood: this.dominantMood(lineAnnotations.map((annotation) => annotation.mood)),
         iconMood,
-        title: messages.join('\n') || undefined,
         segments: this.renderSegments(text, rangeAnnotations),
       };
     });

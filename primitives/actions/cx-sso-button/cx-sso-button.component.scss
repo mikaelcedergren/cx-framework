@@ -94,7 +94,7 @@
 
 .cx-sso-button__label {
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .cx-sso-button--loading > .cx-sso-button__mark,

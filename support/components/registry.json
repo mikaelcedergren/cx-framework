@@ -91,13 +91,13 @@
       "path": "patterns/cx-dynamic-fields/cx-dynamic-fields.component.ts"
     },
     {
-      "name": "cx-empty-state",
+      "name": "cx-state-message",
       "selectors": [
-        "cx-empty-state"
+        "cx-state-message"
       ],
       "area": "pattern",
-      "category": "cx-empty-state",
-      "path": "patterns/cx-empty-state/cx-empty-state.component.ts"
+      "category": "cx-state-message",
+      "path": "patterns/cx-state-message/cx-state-message.component.ts"
     },
     {
       "name": "cx-filter-bar",
@@ -1007,6 +1007,15 @@
       "area": "primitive",
       "category": "overlay",
       "path": "primitives/overlay/cx-tooltip/cx-tooltip.component.ts"
+    },
+    {
+      "name": "cx-tooltip-trigger",
+      "selectors": [
+        "[cxTooltip]"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-tooltip/cx-tooltip.directive.ts"
     },
     {
       "name": "cx-index-nav",

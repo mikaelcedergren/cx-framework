@@ -6,9 +6,21 @@
   }
 
   <div class="cx-item-card__body">
-    <div class="cx-item-card__heading">{{ heading }}</div>
+    <div
+      class="cx-item-card__heading"
+      [cxTooltip]="heading"
+      [cxTooltipOverflow]="true"
+    >
+      {{ heading }}
+    </div>
     @if (hasDescription) {
-      <div class="cx-item-card__description">{{ description }}</div>
+      <div
+        class="cx-item-card__description"
+        [cxTooltip]="description"
+        [cxTooltipOverflow]="true"
+      >
+        {{ description }}
+      </div>
     }
   </div>
 

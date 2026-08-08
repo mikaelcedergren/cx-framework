@@ -30,6 +30,8 @@
       [attr.aria-label]="resolvedFieldAriaLabel"
       [attr.aria-busy]="loading ? 'true' : null"
       aria-haspopup="dialog"
+      [cxTooltip]="displayText$()"
+      [cxTooltipOverflow]="true"
       (click)="toggleOpen(fieldButton)"
       (keydown)="onFieldKeydown($event, fieldButton)"
     >
@@ -37,6 +39,7 @@
       <span
         class="cx-date-span-picker__field-text"
         [class.cx-date-span-picker__field-text--placeholder]="showPlaceholder$()"
+        data-cx-tooltip-overflow
       >
         {{ displayText$() }}
       </span>

@@ -17,7 +17,7 @@ import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
-import { CxEmptyStateComponent } from '../cx-empty-state';
+import { CxStateMessageComponent } from '../cx-state-message';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxWizardDialogStepDirective } from './cx-wizard-dialog-step.directive';
 
@@ -61,7 +61,7 @@ const EMPTY_WIZARD: CxWizardDialogData = {
     A11yModule,
     CxButtonComponent,
     CxShortcutKeyComponent,
-    CxEmptyStateComponent,
+    CxStateMessageComponent,
     CxIconButtonComponent,
     CxIconComponent,
   ],

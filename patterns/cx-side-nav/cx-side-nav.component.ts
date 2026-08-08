@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, Ou
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 
 export type CxSideNavBadgeTone = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 
@@ -46,7 +47,7 @@ const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
 
 @Component({
   selector: 'cx-side-nav',
-  imports: [NgTemplateOutlet, CxIconComponent, RouterLink, RouterLinkActive],
+  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective, RouterLink, RouterLinkActive],
   templateUrl: './cx-side-nav.component.html',
   styleUrl: './cx-side-nav.component.scss',
   host: {

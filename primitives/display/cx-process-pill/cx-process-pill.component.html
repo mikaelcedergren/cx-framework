@@ -7,7 +7,11 @@
 </span>
 
 @if (label) {
-  <span class="cx-process-pill__label">{{ label }}</span>
+  <span
+    class="cx-process-pill__label"
+    [cxTooltip]="label"
+    [cxTooltipOverflow]="true"
+  >{{ label }}</span>
 }
 
 @if (hasCount()) {

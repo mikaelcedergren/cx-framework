@@ -1,8 +1,12 @@
 <div class="cx-option-group">
-  <span class="cx-option-group__label">{{ label }}</span>
+  <span class="cx-option-group__label" [cxTooltip]="label" [cxTooltipOverflow]="true">{{ label }}</span>
 
   @if (description) {
-    <span class="cx-option-group__description">{{ description }}</span>
+    <span
+      class="cx-option-group__description"
+      [cxTooltip]="description"
+      [cxTooltipOverflow]="true"
+    >{{ description }}</span>
   }
 
   <span class="cx-option-group__actions">

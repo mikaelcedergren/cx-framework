@@ -18,7 +18,7 @@
     <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
   }
   @if (visibleText) {
-    <span class="cx-tag__text">{{ visibleText }}</span>
+    <span class="cx-tag__text" [cxTooltip]="visibleText" [cxTooltipOverflow]="true">{{ visibleText }}</span>
   }
   @if (dismissible) {
     <button type="button" class="cx-tag__dismiss" [attr.aria-label]="dismissLabel" (click)="onDismiss($event)">

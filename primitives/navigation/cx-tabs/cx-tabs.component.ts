@@ -18,6 +18,7 @@ import {
 import { Subscription } from 'rxjs';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export interface CxTabItem {
   id: string;
@@ -32,7 +33,7 @@ function coerceBoolean(value: boolean | string | undefined): boolean {
 
 @Component({
   selector: 'cx-tabs',
-  imports: [CxIconButtonComponent, CxMenuComponent, CxMenuTriggerDirective],
+  imports: [CxIconButtonComponent, CxMenuComponent, CxMenuTriggerDirective, CxTooltipDirective],
   templateUrl: './cx-tabs.component.html',
   styleUrl: './cx-tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -234,7 +234,7 @@
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .cx-option__description {
@@ -244,9 +244,9 @@
   color: var(--placeholder);
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-body-relaxed);
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+  white-space: nowrap;
 }
 
 .cx-option__trailing {

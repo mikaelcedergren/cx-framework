@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxTagComponent, type CxTagColor } from '../../primitives/display/cx-tag';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { CxChatThreadComponent } from '../cx-chat-thread/cx-chat-thread.component';
 
 export interface CxChatMessageStatus {
@@ -11,7 +12,7 @@ export interface CxChatMessageStatus {
 
 @Component({
   selector: 'cx-chat-message',
-  imports: [CxTagComponent],
+  imports: [CxTagComponent, CxTooltipDirective],
   templateUrl: './cx-chat-message.component.html',
   styleUrl: './cx-chat-message.component.scss',
   host: {

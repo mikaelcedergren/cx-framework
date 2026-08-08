@@ -33,9 +33,13 @@ From this skill, the package lives at `../../design/`:
 - `05-copy-and-microcopy.md`
 - `06-fallback-copy.md`
 
-Search by `TOPIC:`, `COMPONENT:`, or keyword. Treat `must` as binding, `should` as the default, and `may` as allowed.
+Search by `TOPIC:`, `COMPONENT:`, or keyword. Apply the normative levels and conflict handling defined in `00-start-here.md`; structured rules use `TYPE: MUST`, `TYPE: SHOULD`, or `TYPE: MAY`.
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
+
+## Designer profile
+
+When the task requires design judgment rather than a rule lookup — exploring a direction, weighing a trade-off, challenging a requested UI, or choosing between rule-legal options — load `../../profile/design-lead-profile.md` whole and reason in that designer's style. The profile is non-normative and carries the lowest authority: when its instinct and a binding rule disagree, follow the rule and surface the tension.
 
 ## Design method
 

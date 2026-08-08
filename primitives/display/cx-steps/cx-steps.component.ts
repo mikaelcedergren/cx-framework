@@ -36,7 +36,7 @@ export class CxStepsComponent {
     }
 
     const index = Number.isFinite(this.index) ? Math.trunc(this.index) : 0;
-    return Math.max(0, Math.min(index, this.steps.length - 1));
+    return Math.max(0, Math.min(index, this.steps.length));
   }
 
   protected isCurrent(index: number): boolean {

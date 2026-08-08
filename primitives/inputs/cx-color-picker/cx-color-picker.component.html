@@ -30,6 +30,8 @@
     [attr.aria-describedby]="triggerAriaDescribedBy$()"
     [attr.aria-invalid]="hasError$() ? 'true' : null"
     [attr.aria-busy]="loading$() ? 'true' : null"
+    [cxTooltip]="displayText$()"
+    [cxTooltipOverflow]="true"
     (click)="toggleOpen(trigger)"
     (keydown)="onTriggerKeydown($event, trigger)"
   >
@@ -40,7 +42,7 @@
       aria-hidden="true"
     ></span>
     @if (showValue$()) {
-      <span class="cx-color-picker__value">
+      <span class="cx-color-picker__value" data-cx-tooltip-overflow>
         {{ displayText$() }}
       </span>
     }
@@ -104,10 +106,12 @@
             [class.cx-color-picker__option--selected]="isOptionSelected(option)"
             role="option"
             [attr.aria-selected]="isOptionSelected(option)"
+            [cxTooltip]="option.label"
+            [cxTooltipOverflow]="true"
             (click)="selectOption(option)"
           >
             <span class="cx-color-picker__swatch" [attr.data-color]="option.color" aria-hidden="true"></span>
-            <span class="cx-color-picker__option-label">{{ option.label }}</span>
+            <span class="cx-color-picker__option-label" data-cx-tooltip-overflow>{{ option.label }}</span>
           </button>
         }
       </div>

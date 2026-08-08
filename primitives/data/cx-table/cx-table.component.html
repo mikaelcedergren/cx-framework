@@ -70,9 +70,11 @@
                     aria-haspopup="dialog"
                     [attr.aria-expanded]="isColumnHeaderMenuOpen(column)"
                     [attr.aria-controls]="columnHeaderDialogId"
+                    [cxTooltip]="column.label"
+                    [cxTooltipOverflow]="true"
                     (click)="onColumnHeaderTriggerClick($event, column, headerTrigger)"
                   >
-                    <span class="cx-table__head-label">{{ column.label }}</span>
+                    <span class="cx-table__head-label" data-cx-tooltip-overflow>{{ column.label }}</span>
                     @if (sortIcon(column.id); as iconName) {
                       <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
                     }
@@ -82,7 +84,11 @@
                   </button>
                 } @else {
                   <span class="cx-table__head-trigger cx-table__head-trigger--static">
-                    <span class="cx-table__head-label">{{ column.label }}</span>
+                    <span
+                      class="cx-table__head-label"
+                      [cxTooltip]="column.label"
+                      [cxTooltipOverflow]="true"
+                    >{{ column.label }}</span>
                   </span>
                 }
                 @if (columnsReorderable) {
@@ -243,7 +249,11 @@
                             @if (resolvedTextIcon(row, column, cell); as iconName) {
                               <cx-icon class="cx-table__text-icon" [name]="iconName" [size]="16" />
                             }
-                            <span class="cx-table__text-value">{{ cell.value }}</span>
+                            <span
+                              class="cx-table__text-value"
+                              [cxTooltip]="cell.value"
+                              [cxTooltipOverflow]="true"
+                            >{{ cell.value }}</span>
                           </span>
                         }
                       }

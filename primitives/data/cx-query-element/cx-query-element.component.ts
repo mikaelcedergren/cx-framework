@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxQueryElementKind = 'insert' | 'field' | 'operator' | 'boolean' | 'parenthesis' | 'values';
 
@@ -24,6 +25,7 @@ const DEFAULT_QUERY_ELEMENT_DATA: CxQueryElementData = {
 
 @Component({
   selector: 'cx-query-element',
+  imports: [CxTooltipDirective],
   templateUrl: './cx-query-element.component.html',
   styleUrl: './cx-query-element.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,6 +72,15 @@ export class CxQueryElementComponent {
       return trimmed;
     }
     return this.defaultLabelFor(this.kind);
+  }
+
+  protected resolvedText(): string {
+    if (!this.isValues()) {
+      return this.resolvedLabel();
+    }
+
+    const values = this.values.map(value => value || '<Empty>');
+    return `${this.valuesPrefix}${values.join(this.valuesDivider)}${this.valuesSuffix}`;
   }
 
   protected onPressed(event: MouseEvent): void {

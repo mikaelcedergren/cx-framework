@@ -16,6 +16,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { type CxMenuGroup, type CxMenuItem, CxMenuComponent, CxMenuTriggerDirective } from '../../overlay/cx-menu';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import { CxIconComponent } from '../../media/cx-icon';
 
 export interface CxBreadcrumbOption {
@@ -43,7 +44,14 @@ export interface CxBreadcrumbOptionSelectEvent {
 
 @Component({
   selector: 'cx-breadcrumbs',
-  imports: [NgTemplateOutlet, RouterLink, CxIconComponent, CxMenuComponent, CxMenuTriggerDirective],
+  imports: [
+    NgTemplateOutlet,
+    RouterLink,
+    CxIconComponent,
+    CxMenuComponent,
+    CxMenuTriggerDirective,
+    CxTooltipDirective,
+  ],
   templateUrl: './cx-breadcrumbs.component.html',
   styleUrl: './cx-breadcrumbs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

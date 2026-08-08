@@ -300,7 +300,7 @@
   color: var(--ink);
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-small);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

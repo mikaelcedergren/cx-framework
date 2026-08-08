@@ -28,15 +28,19 @@
 
 .cx-labeled-row__label {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   align-items: flex-start;
   color: var(--opacity-high);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.cx-labeled-row__label-text {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .cx-labeled-row__optional {

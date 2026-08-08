@@ -180,9 +180,11 @@
           class="cx-side-nav__account"
           type="button"
           [attr.aria-label]="'Account actions for ' + accountName()"
+          [cxTooltip]="accountName()"
+          [cxTooltipOverflow]="true"
         >
           <span class="cx-side-nav__account-avatar" aria-hidden="true">{{ accountInitials() }}</span>
-          <span class="cx-side-nav__account-name">{{ accountName() }}</span>
+          <span class="cx-side-nav__account-name" data-cx-tooltip-overflow>{{ accountName() }}</span>
           <cx-icon class="cx-side-nav__account-icon" name="chevrons-vertical" [size]="16" />
         </button>
       }

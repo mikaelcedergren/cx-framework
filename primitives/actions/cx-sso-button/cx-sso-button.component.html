@@ -10,6 +10,8 @@
   [attr.aria-label]="label$()"
   [attr.aria-busy]="loading$() ? 'true' : null"
   [attr.tabindex]="loading$() ? -1 : null"
+  [cxTooltip]="label$()"
+  [cxTooltipOverflow]="true"
   (click)="onClick($event)"
 >
   <span class="cx-sso-button__mark" aria-hidden="true">
@@ -44,7 +46,7 @@
       }
     }
   </span>
-  <span class="cx-sso-button__label">{{ label$() }}</span>
+  <span class="cx-sso-button__label" data-cx-tooltip-overflow>{{ label$() }}</span>
   @if (loading$()) {
     <span class="cx-sso-button__spinner" aria-hidden="true"></span>
   }

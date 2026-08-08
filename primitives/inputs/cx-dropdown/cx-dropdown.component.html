@@ -35,6 +35,8 @@
     [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
     [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
     [attr.aria-label]="resolvedFieldAriaLabel"
+    [cxTooltip]="displayText$()"
+    [cxTooltipOverflow]="true"
     (click)="toggleOpenFromPointer(fieldButton)"
     (keydown)="onFieldKeydown($event, fieldButton)"
   >
@@ -42,6 +44,7 @@
       #valueText
       class="cx-dropdown__value"
       [class.cx-dropdown__value--placeholder]="showPlaceholder$()"
+      data-cx-tooltip-overflow
     >
       {{ displayText$() }}
     </span>

@@ -1,20 +1,28 @@
 # Fallback copy
 
-This file is the last-resort wording catalog in the AI design corpus. Apply the binding language rules in `05-copy-and-microcopy.md` first.
+This file is the last-resort wording catalog in the framework spec.
+
+> **Normative language:** `[MUST]` is mandatory; `[SHOULD]` is the default unless a concrete product reason justifies departure; `[MAY]` is optional; `[NOTE]` is non-normative and cannot override a rule. A marker governs only its paragraph or list item and any unmarked entries in one list, table, or code block it directly introduces; it never crosses a paragraph or heading boundary. Unlabelled prose with no inherited marker is `[NOTE]`. See `00-start-here.md` for the canonical definitions, precedence, and conflict handling.
+
+[MUST] Apply the binding language rules in `05-copy-and-microcopy.md` first.
 
 ## Purpose
 
-Use this catalog only when known product behavior cannot support more specific wording. A fallback must never invent policy, capability, validation limits, supported formats, permission models, or recovery.
+[NOTE] This catalog is the fallback resource referenced by `RULE-ID: copy.errors.fallback`; that rule owns when fallback wording is allowed.
 
-Before using a pattern:
+[MUST] Never let fallback wording invent policy, capability, validation limits, supported formats, permission models, or recovery.
 
-1. Confirm what the product actually knows.
-2. Decide whether the message belongs to one field or the whole request.
-3. Replace every bracketed value with a known product value.
-4. If a required value is unknown, resolve the product question instead of guessing.
-5. Prefer the consuming product's established terminology.
+[NOTE] Before using a pattern:
+
+1. [MUST] Confirm what the product actually knows.
+2. [MUST] Decide whether the message belongs to one field or the whole request.
+3. [MUST] Replace every bracketed value with a known product value.
+4. [MUST] If a required value is unknown, resolve the product question instead of guessing.
+5. [SHOULD] Prefer the consuming product's established terminology.
 
 ## Safe message patterns
+
+[MAY] Use the following patterns when their known situation matches exactly.
 
 | Known situation | Pattern |
 | --- | --- |
@@ -31,13 +39,15 @@ Before using a pattern:
 | Known size or length limit | `[Thing] is too [large/long/short]. [Known recovery].` |
 | Known temporary failure | `[Thing] can't be [completed/reached] right now. [Known recovery].` |
 
-Do not leave bracketed text in shipped copy.
+[MUST] Do not leave bracketed text in shipped copy.
 
 ## Inline validation
 
-Use beneath the field when the failure belongs to one value.
+[MUST] Apply `RULE-ID: forms.local-error` to determine whether a failure belongs to one field or the whole request.
 
 ### Generic required and invalid values
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Situation | Fallback |
 | --- | --- |
@@ -49,6 +59,8 @@ Use beneath the field when the failure belongs to one value.
 
 ### URL
 
+[MAY] Use an exact-matching fallback from this table.
+
 | Known situation | Fallback |
 | --- | --- |
 | Required | `Enter a URL.` |
@@ -57,9 +69,11 @@ Use beneath the field when the failure belongs to one value.
 | Unreachable | `The URL can't be reached. Check the address or try again.` |
 | Validation unavailable | `The URL can't be validated right now. Try again.` |
 
-Do not claim that one protocol, credential shape, hostname, or URL length is unsupported unless the product enforces that rule.
+[MUST] Do not claim that one protocol, credential shape, hostname, or URL length is unsupported unless the product enforces that rule.
 
 ### Email
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Known situation | Fallback |
 | --- | --- |
@@ -70,6 +84,8 @@ Do not claim that one protocol, credential shape, hostname, or URL length is uns
 
 ### Password
 
+[MAY] Use an exact-matching fallback from this table.
+
 | Known situation | Fallback |
 | --- | --- |
 | Required | `Enter a password.` |
@@ -77,9 +93,11 @@ Do not claim that one protocol, credential shape, hostname, or URL length is uns
 | Confirmation mismatch | `Passwords don't match. Enter the same password in both fields.` |
 | Known reuse restriction | `Password can't match [known previous-password rule]. Use a different password.` |
 
-Never invent length, complexity, character-set, language, symbol, or password-history policy. State only the requirements enforced by the product.
+[MUST] Never invent length, complexity, character-set, language, symbol, or password-history policy. State only the requirements enforced by the product.
 
 ### Network address or identifier
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Known situation | Fallback |
 | --- | --- |
@@ -89,9 +107,11 @@ Never invent length, complexity, character-set, language, symbol, or password-hi
 | Known unsupported version | `[Version] isn't supported. Use [supported version].` |
 | Known blocked value | `This [identifier name] isn't allowed. Enter a different value.` |
 
-Do not assume IPv4, IPv6, port, protocol, range, or address policy without product evidence.
+[MUST] Do not assume IPv4, IPv6, port, protocol, range, or address policy without product evidence.
 
 ### Name and text
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Known situation | Fallback |
 | --- | --- |
@@ -101,6 +121,8 @@ Do not assume IPv4, IPv6, port, protocol, range, or address policy without produ
 | Known character restriction | `Name contains unsupported characters. Remove [known unsupported characters].` |
 
 ### Number or range
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Known situation | Fallback |
 | --- | --- |
@@ -112,6 +134,8 @@ Do not assume IPv4, IPv6, port, protocol, range, or address policy without produ
 
 ### Date
 
+[MAY] Use an exact-matching fallback from this table.
+
 | Known situation | Fallback |
 | --- | --- |
 | Required | `Select a date.` |
@@ -122,6 +146,8 @@ Do not assume IPv4, IPv6, port, protocol, range, or address policy without produ
 
 ### File upload
 
+[MAY] Use an exact-matching fallback from this table.
+
 | Known situation | Fallback |
 | --- | --- |
 | Known unsupported type | `File type isn't supported. Choose [known supported type].` |
@@ -131,7 +157,9 @@ Do not assume IPv4, IPv6, port, protocol, range, or address policy without produ
 
 ## Form- and request-level alerts
 
-Use at form or page level when the issue does not belong to one field.
+[NOTE] These patterns cover failures that `RULE-ID: forms.local-error` assigns to form or request level rather than one field.
+
+[MAY] Use an exact-matching fallback from this table.
 
 | Known situation | Fallback |
 | --- | --- |
@@ -144,4 +172,4 @@ Use at form or page level when the issue does not belong to one field.
 | Server-side field validation | `Review the highlighted fields and try again.` |
 | Known rate limit | `Too many requests. Try again [known retry time].` |
 
-Do not tell the user to contact an administrator, owner, support team, or organization unless that recovery path exists in the consuming product.
+[MUST] Do not tell the user to contact an administrator, owner, support team, or organization unless that recovery path exists in the consuming product.

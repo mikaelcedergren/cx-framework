@@ -26,7 +26,13 @@ export type CxDetailPanelVariant = 'floating' | 'fixed';
 
 @Component({
   selector: 'cx-detail-panel',
-  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent, CxMenuTriggerDirective, CxTabsComponent],
+  imports: [
+    CxIconButtonComponent,
+    CxIconComponent,
+    CxMenuComponent,
+    CxMenuTriggerDirective,
+    CxTabsComponent,
+  ],
   templateUrl: './cx-detail-panel.component.html',
   styleUrl: './cx-detail-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

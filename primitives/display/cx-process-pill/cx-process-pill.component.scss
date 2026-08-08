@@ -61,7 +61,7 @@
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-small);
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 :host(.cx-process-pill--selected) .cx-process-pill__label {

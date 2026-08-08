@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export const CX_TAG_COLORS = [
   'default',
@@ -35,7 +36,7 @@ export const CX_TAG_COLOR_PICKER_OPTIONS = [
 
 @Component({
   selector: 'cx-tag',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-tag.component.html',
   styleUrl: './cx-tag.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

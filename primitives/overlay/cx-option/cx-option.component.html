@@ -24,6 +24,8 @@
     [attr.aria-checked]="ariaCheckedValue()"
     [attr.aria-posinset]="ariaPosInSet ?? null"
     [attr.aria-setsize]="ariaSetSize ?? null"
+    [cxTooltip]="label"
+    [cxTooltipOverflow]="true"
   >
     <ng-container [ngTemplateOutlet]="optionContent" />
   </button>
@@ -51,6 +53,8 @@
     [attr.aria-checked]="ariaCheckedValue()"
     [attr.aria-posinset]="ariaPosInSet ?? null"
     [attr.aria-setsize]="ariaSetSize ?? null"
+    [cxTooltip]="label"
+    [cxTooltipOverflow]="true"
   >
     <ng-container [ngTemplateOutlet]="optionContent" />
   </div>
@@ -74,12 +78,12 @@
   }
 
   <span class="cx-option__content">
-    <span class="cx-option__label">{{ label }}</span>
+    <span class="cx-option__label" data-cx-tooltip-overflow>{{ label }}</span>
   </span>
 
   <span class="cx-option__trailing">
     @if (description) {
-      <span class="cx-option__description">{{ description }}</span>
+      <span class="cx-option__description" data-cx-tooltip-overflow>{{ description }}</span>
     }
 
     <span class="cx-option__append-slot">

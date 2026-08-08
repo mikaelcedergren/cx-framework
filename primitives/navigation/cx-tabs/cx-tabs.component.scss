@@ -97,7 +97,7 @@
 .cx-tabs__label {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .cx-tabs__count {

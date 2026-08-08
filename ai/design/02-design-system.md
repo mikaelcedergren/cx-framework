@@ -1,23 +1,29 @@
 # Cortex design-system contract
 
-AI-facing source of truth for the design system authored in Cortex and distributed through `cx-framework`. Read the relevant section before changing or consuming tokens, primitives, patterns, component APIs, workbenches, reference surfaces, or page-shell styling.
+AI-facing source of truth for the design system authored in Cortex and distributed through `cx-framework`.
 
-This document owns Cortex and `cx-framework` facts. Portable judgment and behavior live in the sibling philosophy, UX, component, and copy files; link to their rule IDs instead of duplicating them here.
+> **Normative language:** `[MUST]` is mandatory; `[SHOULD]` is the default unless a concrete product reason justifies departure; `[MAY]` is optional; `[NOTE]` is non-normative and cannot override a rule. A marker governs only its paragraph or list item and any unmarked entries in one list, table, or code block it directly introduces; it never crosses a paragraph or heading boundary. Unlabelled prose with no inherited marker is `[NOTE]`. See `00-start-here.md` for the canonical definitions, precedence, and conflict handling.
+
+[MUST] Read the relevant section before changing or consuming tokens, primitives, patterns, component APIs, workbenches, reference surfaces, or page-shell styling.
+
+This document owns Cortex and `cx-framework` facts. Portable judgment and behavior live in the sibling philosophy, UX, component, and copy files.
+
+[MUST] Link to portable rule IDs instead of duplicating them here.
 
 ## Critical contracts
 
-1. **Cortex is the source.** Author framework work under `framework/`; package it outward as `@mikaelcedergren/cx-framework`. Cortex never consumes or patches its packaged output.
-2. **Use the existing system first.** Inspect the registry, public component, sibling API, token, and pattern before adding local UI.
-3. **Fix the owning layer.** Shared behavior belongs in the shared component or pattern. A consumer must not hide an owning defect with deep selectors, inline visual fixes, duplicated token values, specificity battles, or wrapper hacks.
-4. **Keep component work focused.** Using another component's public API is allowed. Changing a different component's implementation, API, styling, or behavior requires explicit scope.
-5. **Components are sealed.** Components own template, presentation, internal padding, state, and behavior. Containers own placement, width, surrounding gap, and page composition.
-6. **Workbenches are literal API inspectors.** They must tell the truth about the public component contract; the complete rules are below.
-7. **Hidden components are inert.** A visually hidden instance must not react to document-level interaction.
-8. **Keyboard focus is distinct from pointer focus.** The primary outline appears for keyboard navigation and leaves when pointer input resumes.
-9. **Consumers migrate forward.** Cortex defines the component, token, and behavior contract;
+1. [MUST] **Cortex is the source.** Author framework work under `framework/`; package it outward as `@mikaelcedergren/cx-framework`. Cortex never consumes or patches its packaged output.
+2. [MUST] **Use the existing system first.** Inspect the registry, public component, sibling API, token, and pattern before adding local UI.
+3. [MUST] **Fix the owning layer.** Shared behavior belongs in the shared component or pattern. A consumer does not hide an owning defect with deep selectors, inline visual fixes, duplicated token values, specificity battles, or wrapper hacks.
+4. [MUST] **Keep component work focused.** Changing a different component's implementation, API, styling, or behavior requires explicit scope. [MAY] Use another component's public API without expanding scope.
+5. [MUST] **Components are sealed.** Components own template, presentation, internal padding, state, and behavior. Containers own placement, width, surrounding gap, and page composition.
+6. [MUST] **Workbenches are literal API inspectors.** They tell the truth about the public component contract; the complete rules are below.
+7. [MUST] **Hidden components are inert.** A visually hidden instance does not react to document-level interaction.
+8. [MUST] **Keyboard focus is distinct from pointer focus.** The primary outline appears for keyboard navigation and leaves when pointer input resumes.
+9. [MUST] **Consumers migrate forward.** Cortex defines the component, token, and behavior contract;
    `cx-framework` packages it; consumers adopt it. Never add compatibility shims, legacy aliases,
    deprecated props, or restored behavior to preserve stale consumer usage.
-10. **Guidance ships with the component.** Every public component has one canonical structured guidance record. Component reference pages and AI retrieval consume that same record so usage advice cannot drift between audiences.
+10. [MUST] **Guidance ships with the component.** Every public component has one canonical structured guidance record. Component reference pages and AI retrieval consume that same record so usage advice cannot drift between audiences.
 
 ## Workbench contract
 
@@ -25,46 +31,46 @@ The user evaluates components through the workbench, not through source code. A 
 
 ### Public API fidelity
 
-- Expose every public input or prop.
-- Label every control with the exact public name or prop path, such as `mood`, `dismissible`, or `action.text`.
-- Do not expose implementation helpers, scenario presets, visual hacks, or workbench-only toggles as component props.
-- Put outputs and event demonstrations outside the prop-control list.
-- Project contextual workbench information through `[cxWorkbenchNote]`; the shell places it above the prop controls with a divider, keeping explanatory text out of the preview.
-- Keep component controls in one vertical stack; never place them side by side.
-- Make every control fill the full control-column width.
-- Keep preview width, preview height, alignment, and other shell controls in the shared workbench shell rather than the component's prop section.
-- Omit an individual shell control through its positive `show*Control` input when changing it cannot reveal meaningful component behavior; leave every applicable control visible.
+- [MUST] Expose every public input or prop.
+- [MUST] Label every control with the exact public name or prop path, such as `mood`, `dismissible`, or `action.text`.
+- [MUST] Do not expose implementation helpers, scenario presets, visual hacks, or workbench-only toggles as component props.
+- [MUST] Put outputs and event demonstrations outside the prop-control list.
+- [MUST] Project contextual workbench information through `[cxWorkbenchNote]`; the shell places it above the prop controls with a divider, keeping explanatory text out of the preview.
+- [MUST] Keep component controls in one vertical stack; never place them side by side.
+- [MUST] Make every control fill the full control-column width.
+- [MUST] Keep preview width, preview height, alignment, and other shell controls in the shared workbench shell rather than the component's prop section.
+- [MUST] Omit an individual shell control through its positive `show*Control` input when changing it cannot reveal meaningful component behavior; leave every applicable control visible.
 
 ### Control mapping
 
-Controls must reveal the public type:
+[MUST] Controls reveal the public type through this mapping:
 
-- boolean → switch
-- short string → text field
-- long, markdown, or multiline string → textarea
-- number → number field
-- bounded numeric range → slider only when the bound is explicit and exact entry is not primary
-- small finite union → button group
-- larger finite union → select
-- large searchable set, such as icons → searchable select
-- multi-select prop → multi-select control
-- optional or nullable prop → its real omitted, empty, or `none` state
-- object prop → controls for its public fields using exact paths such as `action.text`
-- array or collection → faithful repeated-item controls, or an explicit API review before the workbench is called complete
+- [MUST] boolean → switch
+- [MUST] short string → text field
+- [MUST] long, markdown, or multiline string → textarea
+- [MUST] number → number field
+- [MUST] bounded numeric range → slider only when the bound is explicit and exact entry is not primary
+- [MUST] small finite union → button group
+- [MUST] larger finite union → select
+- [MUST] large searchable set, such as icons → searchable select
+- [MUST] multi-select prop → multi-select control
+- [MUST] optional or nullable prop → its real omitted, empty, or `none` state
+- [MUST] object prop → controls for its public fields using exact paths such as `action.text`
+- [MUST] array or collection → faithful repeated-item controls, or an explicit API review before the workbench is called complete
 
-Do not invent a fake default to avoid representing absence.
+[MUST] Do not invent a fake default to avoid representing absence.
 
 ### Default and examples
 
-- Show the plain normal default first.
-- Start optional props inactive or empty.
-- Make workbench defaults match actual component defaults.
-- Use variants for believable in-context product examples, not as pretend prop controls.
-- Use slot markers to show slot existence and variants to show realistic slot content.
+- [MUST] Show the plain normal default first.
+- [MUST] Start optional props inactive or empty.
+- [MUST] Make workbench defaults match actual component defaults.
+- [SHOULD] Use variants for believable in-context product examples. [MUST] Do not use them as pretend prop controls.
+- [MUST] Use slot markers to show slot existence. [SHOULD] Use variants to show realistic slot content.
 
 ### Stress tests
 
-Before a component is called complete, probe the risks it can actually reach:
+[MUST] Before a component is called complete, probe every risk it can actually reach:
 
 - long and unbroken strings
 - empty values and omitted optional props
@@ -74,23 +80,25 @@ Before a component is called complete, probe the risks it can actually reach:
 - hover, keyboard focus, active, and selected states
 - narrow and wide preview widths
 - awkward but valid prop combinations
-- invalid combinations that should fail clearly
+- invalid combinations that are expected to fail clearly
 
 ## Hidden-instance behavior
 
-A hidden component is inert. Document-level listeners — Escape, outside click, and global shortcuts — must not react in an instance that is not part of the visible UI, such as a CSS-hidden workbench or tab.
+[MUST] A hidden component is inert. Document-level listeners — Escape, outside click, and global shortcuts — do not react in an instance that is not part of the visible UI, such as a CSS-hidden workbench or tab.
 
-Components whose surface renders inside their host gate these listeners on host visibility through `isHostVisible` in `../../primitives/shared/host-visibility.ts`. Components that portal a surface to `body` gate listeners on their own open state because the visible surface can outlive the host's visibility.
+[MUST] Components whose surface renders inside their host gate these listeners on host visibility through `isHostVisible` in `../../primitives/shared/host-visibility.ts`. [MUST] Components that portal a surface to `body` gate listeners on their own open state because the visible surface can outlive the host's visibility.
 
 ## Keyboard focus
 
-The primary focus outline belongs to keyboard navigation only. Show it after Tab navigation and remove it as soon as the user returns to a mouse, trackpad, pen, or touch; pointer focus keeps the component's quieter active state.
+[MUST] The primary focus outline belongs to keyboard navigation only. Show it after Tab navigation and remove it as soon as the user returns to a mouse, trackpad, pen, or touch; pointer focus keeps the component's quieter active state.
 
-Install `provideCxKeyboardFocus()` once in a consuming application's configuration. Do not recreate keyboard-modality logic per component.
+[MUST] Install `provideCxKeyboardFocus()` once in a consuming application's configuration. [MUST] Do not recreate keyboard-modality logic per component.
 
 ## Source map and discovery
 
-The same framework tree lives under `framework/` in Cortex and at the package root in the distributed `cx-framework`. Paths below are package-root paths; from this document, the root is `../../`:
+The same framework tree lives under `framework/` in Cortex and at the package root in the distributed `cx-framework`. From this document, the root is `../../`.
+
+[MUST] Use the following package-root ownership map for source discovery:
 
 - `tokens/`: semantic color, spacing, type, radius, border, shadow, motion, size, breakpoint, and stacking tokens
 - `styles/`: global framework styles and utilities
@@ -101,56 +109,64 @@ The same framework tree lives under `framework/` in Cortex and at the package ro
 - `tooling/`: workbench and inspection components; not product UI
 - `support/components/registry.json`: machine-readable public selector and source-path inventory
 - `support/components/guidance.json`: canonical structured guidance for every public component, shared by component reference pages and AI retrieval
-- `ai/design/`: this canonical AI design corpus
+- `ai/design/`: the framework spec
 - `ai/skills/`: portable role contracts that retrieve the smallest relevant part of this corpus
 
-Keep registry and guidance completeness aligned with the public export graph. Internal and tooling-only selectors must be explicitly classified and must not appear as public product guidance.
+[MUST] Keep registry and guidance completeness aligned with the public export graph. [MUST] Explicitly classify internal and tooling-only selectors and keep them out of public product guidance.
 
-Before inventing a component or pattern, search the registry and source. From this document's directory:
+[MUST] Before inventing a component or pattern, search the registry and source. From this document's directory:
 
 ```sh
 rg '"name": "cx-' ../../support/components/registry.json
 rg "selector: 'cx-" ../../primitives ../../patterns
 ```
 
-Cortex package tooling validates the registry against source before export. It must never advertise a removed selector or omit an existing public component/directive.
+Cortex package tooling validates the registry against source before export.
+
+[MUST] The registry never advertises a removed selector or omits an existing public component or directive.
 
 ## Cortex → cx-framework → projects
 
-Cortex authors components, tokens, icons, AI guidance, and reusable product standards. Packaging copies this source into the separate `cx-framework` repository. Consuming projects depend on `@mikaelcedergren/cx-framework`; they must not import Cortex, point dependencies at Cortex, copy framework source, or patch shared behavior in app code.
+Cortex authors components, tokens, icons, AI guidance, and reusable product standards. Packaging copies this source into the separate `cx-framework` repository.
+
+[MUST] Consuming projects depend on `@mikaelcedergren/cx-framework`; they do not import Cortex, point dependencies at Cortex, copy framework source, or patch shared behavior in app code.
 
 When another project reveals a reusable gap:
 
-1. Confirm the need belongs to the shared system.
-2. Change the owning Cortex framework layer within the accepted scope.
-3. Update its public API, workbench, guidance, and tests together.
-4. Package the framework.
-5. Let the consuming project update from the package.
+1. [MUST] Confirm the need belongs to the shared system.
+2. [MUST] Change the owning Cortex framework layer within the accepted scope.
+3. [MUST] Update its public API, workbench, guidance, and tests together.
+4. [MUST] Package the framework.
+5. [MUST] Let the consuming project update from the package.
 
 ## Product chain
 
-Nothing user-facing should skip:
+[MUST] Nothing user-facing skips this chain:
 
 ```text
 purpose → role → information → component → token
 ```
 
-Decide why the information exists and who owns it before choosing a component. Choose or extend the component before tuning tokens. A screen that begins from a favorite style or local workaround is already at the wrong layer.
+[MUST] Decide why the information exists and who owns it before choosing a component. [MUST] Choose or extend the component before tuning tokens.
+
+A screen that begins from a favorite style or local workaround is already at the wrong layer.
 
 ## Color and token contract
 
-Tokens name roles, not appearances. Use the semantic token at the property that consumes it; do not create a local `--cx-*` alias merely to rename a system token.
+[MUST] Tokens name roles, not appearances. Use the semantic token at the property that consumes it; do not create a local `--cx-*` alias merely to rename a system token.
 
-Keep a component custom property only when it:
+[MAY] Keep a component custom property when at least one of these permitted conditions applies:
 
-- carries a real runtime value
-- creates an intentional consumer boundary
-- centralizes a reused derived calculation
-- coordinates a variant across multiple internal declarations
+- it carries a real runtime value
+- it creates an intentional consumer boundary
+- it centralizes a reused derived calculation
+- it coordinates a variant across multiple internal declarations
+
+[MUST] Do not keep a component custom property when none of those conditions applies.
 
 ### Moods
 
-Canonical `mood` values:
+[MUST] Use these canonical shared `mood` values:
 
 - `default`
 - `primary`
@@ -160,19 +176,22 @@ Canonical `mood` values:
 - `danger`
 - `info`
 
-`default` is a real neutral state. `none` means absence. Never use them interchangeably.
+[MUST] Treat `default` as a real neutral state and `none` as absence; never use them interchangeably.
 
-- `primary`: the main forward action in one action region
-- `accent`: rare supporting emphasis, never a second primary
-- `success`: completion or health
-- `warning`: caution
-- `danger`: destructive or risky intent
-- `info`: neutral information
-- `emphasis`: strongest high-contrast surface; not a normal mood unless a component explicitly owns it
+- [MUST] `primary`: the main forward action in one action region
+- [MUST] `accent`: rare supporting emphasis, never a second primary
+- [MUST] `success`: completion or health
+- [MUST] `warning`: caution
+- [MUST] `danger`: destructive or risky intent
+- [MUST] `info`: neutral information
 
-Use `mood` for semantic intent. Use `color` only when hue itself is user-facing data or choice, such as a chart series, swatch, avatar, or tag color.
+[MAY] A component can additionally expose `emphasis` as its strongest high-contrast mood only when that component explicitly owns the meaning.
+
+[MUST] Use `mood` for semantic intent. [MAY] Use `color` only when hue itself is user-facing data or choice, such as a chart series, swatch, avatar, or tag color.
 
 ### Semantic mapping
+
+[MUST] Use this semantic mapping for the built-in theme defaults unless the active theme explicitly overrides the resolved values:
 
 - `--primary`: blue in light mode; violet in dark and night modes
 - `--accent`: cyan
@@ -181,31 +200,33 @@ Use `mood` for semantic intent. Use `color` only when hue itself is user-facing 
 - `--warning`: orange
 - `--danger`: red
 
-Components use the semantic role, never the mapped palette name.
+[MUST] Components use the semantic role, never the mapped palette name.
 
 ### Surfaces and ink
 
-- `--surface`: default app plane
-- `--surface-alt`: quiet alternate plane for recessed, framing, or grouped regions
-- `--opacity-high`: ordinary readable supporting text and subdued icons
-- `--ink`: prominent, selected, active, or actionable content
-- `--on-ink`: content on an ink-colored fill
-- `--on-emphasis`: content on emphasis
-- `--utility-bar-surface`: internal utility-bar plane
-- `--on-utility-bar`: content on the utility-bar plane
-- `--opacity-mid`: borders, separators, and medium structure
-- `--opacity-low`: quiet fills and near-background hierarchy; not readable body text
-- `--opacity-darken`: subtle pressed or shaded effects
-- `--opacity-disabled`: disabled visibility
-- `--overlay-backdrop`: dimming backdrop for modal and navigation overlays
+[MUST] Use surface and ink tokens according to these roles:
 
-Do not stack surfaces to fake depth. Floating surfaces use clear surface contrast and shadow; grounded regions use spacing, opacity, and restrained borders.
+- [MUST] `--surface`: default app plane
+- [MUST] `--surface-alt`: quiet alternate plane for recessed, framing, or grouped regions
+- [MUST] `--opacity-high`: ordinary readable supporting text and subdued icons
+- [MUST] `--ink`: prominent, selected, active, or actionable content
+- [MUST] `--on-ink`: content on an ink-colored fill
+- [MUST] `--on-emphasis`: content on emphasis
+- [MUST] `--utility-bar-surface`: internal utility-bar plane
+- [MUST] `--on-utility-bar`: content on the utility-bar plane
+- [MUST] `--opacity-mid`: borders, separators, and medium structure
+- [MUST] `--opacity-low`: quiet fills and near-background hierarchy; not readable body text
+- [MUST] `--opacity-darken`: subtle pressed or shaded effects
+- [MUST] `--opacity-disabled`: disabled visibility
+- [MUST] `--overlay-backdrop`: dimming backdrop for modal and navigation overlays
 
-Meaning never relies on color alone.
+[MUST] Do not stack surfaces to fake depth. [SHOULD] Use clear surface contrast and shadow for floating surfaces; use spacing, opacity, and restrained borders for grounded regions.
+
+[MUST] Apply `RULE-ID: accessibility.color-independent` whenever semantic color carries meaning.
 
 ## Spacing, type, radius, and depth
 
-Spacing follows a 4px rhythm:
+[MUST] The base spacing scale follows this 4px rhythm unless the active theme explicitly overrides the resolved values:
 
 - `--space-2xs`: 2px
 - `--space-xs`: 4px
@@ -215,11 +236,11 @@ Spacing follows a 4px rhythm:
 - `--space-xl`: 32px
 - `--space-2xl`: 64px
 
-Start with 8px for close text-like relationships and 16px for separate or visually heavier groups. Use larger gaps only for a real page pause. Typography is fitted perceptually and is not forced onto the spacing grid.
+[SHOULD] Start with 8px for close text-like relationships and 16px for separate or visually heavier groups. [SHOULD] Reserve larger gaps for a real page pause. [SHOULD] Fit typography perceptually instead of forcing it onto the spacing grid.
 
-Default control size is `default`; `small` is for genuinely compact or secondary repeated UI; `large` is rare and purposeful.
+[MUST] The default control size is `default`. [SHOULD] Use `small` for genuinely compact or secondary repeated UI. [SHOULD] Reserve `large` for rare, purposeful cases.
 
-Type scale:
+[MUST] Use this base type scale unless the active theme explicitly overrides the resolved values:
 
 - `--font-size-display`: fluid 40–72px
 - `--font-size-title-1`: 24px
@@ -230,136 +251,134 @@ Type scale:
 - `--font-size-body-sm`: 12px
 - `--font-size-body-xs`: 10px
 
-Display type is reserved for the primary headline in a marketing or editorial hero. Use
+[MUST] Reserve display type for the primary headline in a marketing or editorial hero. Use
 `--line-height-display` (1.05) with it. Ordinary page titles, section headings, dialogs, and other
 application UI remain on the fixed title scale.
 
-Most component text uses body, not body-sm. Small and extra-small type are for labels, helper text, metadata, captions, badges, shortcut keys, chart ticks, and other genuinely secondary content.
+[SHOULD] Use body, not body-sm, for most component text. [SHOULD] Reserve small and extra-small type for labels, helper text, metadata, captions, badges, shortcut keys, chart ticks, and other genuinely secondary content.
 
 ### Theme visual character
 
-Themes own visual character through one shared token contract. Components never branch on a theme
+[MUST] Themes own visual character through one shared token contract. Components never branch on a theme
 class and never expose theme-specific styling props. A designer changes the theme profile; every
 sealed component resolves the same semantic tokens differently.
 
-- `--corner-shape` controls the curve family. The modern profile uses `squircle`; conventional
+- [MUST] `--corner-shape` controls the curve family. The modern profile uses `squircle`; conventional
   rounded corners use `round`.
-- `--corner-softness` controls the amount of rounding. The named non-pill radius scale derives from
+- [MUST] `--corner-softness` controls the amount of rounding. The named non-pill radius scale derives from
   this one unit so a theme stays proportionate instead of redefining every component radius.
-- `--surface-separation` controls the visible inset and seam around and between separate surfaces in
-  framed composites such as popovers, menus, dialogs, calendars, cards, and detail panels. It must
+- [MUST] `--surface-separation` controls the visible inset and seam around and between separate surfaces in
+  framed composites such as popovers, menus, dialogs, calendars, cards, and detail panels. It does
   not replace content spacing, control padding, or layout gaps.
-- `--floating-surface-border` controls the boundary used by elevated surfaces that otherwise rely on
+- [MUST] `--floating-surface-border` controls the boundary used by elevated surfaces that otherwise rely on
   shadow. Other grounded and structural boundaries continue to use `--line` or `--line-discreet`.
-- `--frost-softness` controls backdrop blur intensity. Components may derive stronger frost from the
-  base unit while a flat theme can set the unit to zero.
-- `--shadow-low`, `--shadow-mid`, and `--shadow-high` keep their semantic elevation roles while each
-  theme chooses a soft, crisp, or flat depth profile.
+- [MUST] `--frost-softness` controls backdrop blur intensity. [MAY] Components can derive stronger frost from the
+  base unit. [MAY] A flat theme can set the unit to zero.
+- [MUST] `--shadow-low`, `--shadow-mid`, and `--shadow-high` keep their semantic elevation roles. [MAY] Each
+  theme can choose a soft, crisp, or flat depth profile.
 
-Every theme may also override the existing palette, semantic colour, border, spacing, size,
-typography, and motion tokens. Keep the token meanings stable: changing a theme must not change a
-component's role, state, behavior, accessible target, or content hierarchy. Semantic circles and
+[MAY] A theme can override the existing palette, semantic colour, border, spacing, size,
+typography, and motion tokens. [MUST] Keep the token meanings stable: changing a theme does not change a
+component's role, state, behavior, accessible target, or content hierarchy. [MUST] Semantic circles and
 pills remain round regardless of the rectangular corner profile.
 
-Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours,
+[MUST] Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours,
 type, density, control sizes, and motion, then changes only visual character: conventional round
 corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost, and crisp
 shadows. It is a transition profile, never a component variant.
 
-The default radius scale derives from `--corner-softness: 4px`:
+[MUST] The default radius scale derives from `--corner-softness: 4px`:
 
-- `--radius-none`: 0
-- `--radius-xs`: 1 × corner softness
-- `--radius-sm`: 2 × corner softness
-- `--radius-md`: 3 × corner softness
-- `--radius-lg`: 4 × corner softness
-- `--radius-media-lg`: 6 × corner softness for large media corners
-- `--radius-xl`: 8 × corner softness
-- `--radius-2xl`: 16 × corner softness
-- `--radius-pill`: 999px
+- [MUST] `--radius-none`: 0
+- [MUST] `--radius-xs`: 1 × corner softness
+- [MUST] `--radius-sm`: 2 × corner softness
+- [MUST] `--radius-md`: 3 × corner softness
+- [MUST] `--radius-lg`: 4 × corner softness
+- [MUST] `--radius-media-lg`: 6 × corner softness for large media corners
+- [MUST] `--radius-xl`: 8 × corner softness
+- [MUST] `--radius-2xl`: 16 × corner softness
+- [MUST] `--radius-pill`: 999px
 
-Use named shadows only for real elevation:
+[MUST] Use named shadows only for real elevation:
 
-- `--shadow-low`: raised controls and small lifted elements
-- `--shadow-mid`: menus, dropdowns, popovers, and toasts
-- `--shadow-high`: dialogs and strong overlays
+- [MUST] `--shadow-low`: raised controls and small lifted elements
+- [MUST] `--shadow-mid`: menus, dropdowns, popovers, and toasts
+- [MUST] `--shadow-high`: dialogs and strong overlays
 
-Motion uses named tokens and clarifies change. It must never move the page around someone who is reading.
+[MUST] Motion uses named tokens and clarifies change. It never moves the page around someone who is reading.
 
 ## Component API contract
 
-Prefer existing public shapes and sibling conventions.
+[MUST] When a public API exposes one of these concepts, use the corresponding shared shape:
 
-- `heading`, not `title`, for component heading copy unless `title` is genuinely domain content
-- positive booleans such as `dismissible`, `optional`, `disabled`, and `loading`
-- `dismissible`, never `dismissable`
-- `prependIcon` and `appendIcon` for before/after icons
-- `value` and `valueChange` for interactive value components unless a stronger sibling convention exists
-- intent outputs such as `dismiss`, `select`, `submit`, or `clear`, not DOM mechanics such as `clicked`
-- `variant` for structural chrome
-- `type` for native or functional behavior
-- `mood` for semantic intent
-- `color` for hue-as-data
-- `size`: `small`, `default`, `large`
-- `density`: information density such as `compact` or `comfortable`
-- `placement` or `align` for position choices
+- [MUST] `heading`, not `title`, for component heading copy unless `title` is genuinely domain content
+- [MUST] positive booleans such as `dismissible`, `optional`, `disabled`, and `loading`
+- [MUST] `dismissible`, never `dismissable`
+- [MUST] `prependIcon` and `appendIcon` for before/after icons
+- [MUST] `value` and `valueChange` for interactive value components unless a stronger sibling convention exists
+- [MUST] intent outputs such as `dismiss`, `select`, `submit`, or `clear`, not DOM mechanics such as `clicked`
+- [MUST] `variant` for structural chrome
+- [MUST] `type` for native or functional behavior
+- [MUST] `mood` for semantic intent
+- [MUST] `color` for hue-as-data
+- [MUST] `size`: `small`, `default`, `large`
+- [MUST] `density`: information density such as `compact` or `comfortable`
+- [MUST] `placement` or `align` for position choices
 
-Avoid negated correction props, companion booleans that only make sense together, styling slots, and new vocabulary for an existing concept.
+[SHOULD] Avoid negated correction props, companion booleans that only make sense together, styling slots, and new vocabulary for an existing concept.
 
-Conditional content leaves the DOM when empty. Invalid prop combinations fail clearly in the component surface instead of silently rendering broken chrome.
+[MUST] Conditional content leaves the DOM when empty. [MUST] Invalid prop combinations fail clearly in the component surface instead of silently rendering broken chrome.
 
 ## Page and layout contract
 
-Desktop is the primary Cortex layout. The shared mobile breakpoint is below 720px; there is no separate tablet tier.
+[SHOULD] Treat desktop as the primary Cortex layout. [MUST] The shared mobile breakpoint is below 720px; there is no separate tablet tier.
 
-Authenticated pages use the shared page rhythm:
+[MUST] Authenticated pages use the shared page rhythm:
 
-- root: `cx-page`
-- first direct child: `cx-top-bar`, not a locally wrapped header
-- normal content: `cx-page__content`
-- bounded board/editor: `cx-page--bounded` with `cx-page__fill`
-- desktop padding: `--space-lg`
-- narrow padding: `--space-md`
-- page padding: global `--gutter-page`
-- top-bar inner padding: `--space-md`
+- [MUST] root: `cx-page`
+- [MUST] first direct child: `cx-top-bar`, not a locally wrapped header
+- [MUST] normal content: `cx-page__content`
+- [MUST] bounded board/editor: `cx-page--bounded` with `cx-page__fill`
+- [MUST] desktop padding: `--space-lg`
+- [MUST] narrow padding: `--space-md`
+- [MUST] page padding: global `--gutter-page`
+- [MUST] top-bar inner padding: `--space-md`
 
-Pages take the full canvas width by default. Cap a specific readable text block, not the page shell. Do not add custom padding to individual page roots.
+[SHOULD] Let pages take the full canvas width by default. [SHOULD] Cap a specific readable text block, not the page shell. [MUST] Do not add custom padding to individual page roots.
 
-Layout primitives own ordinary composition:
+[SHOULD] Use layout primitives for ordinary composition:
 
-- `cx-stack`: vertical flow
-- `cx-inline`: horizontal flow; wrapping is explicit
-- `cx-grid`: columns
-- `cx-split`: start/end groups
+- [SHOULD] `cx-stack`: vertical flow
+- [SHOULD] `cx-inline`: horizontal flow; wrapping is explicit
+- [SHOULD] `cx-grid`: columns
+- [SHOULD] `cx-split`: start/end groups
 
-Use normal flow before absolute positioning. Use z-index only for genuine layering.
+[SHOULD] Use normal flow before absolute positioning. [MUST] Use z-index only for genuine layering.
 
 ## Accessibility and state
 
-Every component accounts for the states it can actually reach. Hover belongs only to interactive elements. Focus, current location, selection, disabled state, danger, loading, empty state, and failure must remain perceivable.
-
-Every interactive element is keyboard reachable. Semantic structure matches visible structure. Contrast survives real screens. Meaning uses more than color.
-
-Unavailable controls must not strand the user. Hide irrelevant actions; explain temporarily blocked actions when the user can understand or resolve the blocker.
+[MUST] Treat `RULE-ID: system.reachable-states`, `RULE-ID: accessibility.keyboard`, `RULE-ID: accessibility.semantic-structure`, `RULE-ID: accessibility.color-independent`, and `RULE-ID: interaction.unavailable` as acceptance criteria for every applicable framework component and public contract.
 
 ## Icons
 
-Canonical SVG sources live in `../../icons/svg/`; `../../icons/manifest.ts` and `../../icons/index.html` are generated. Do not hand-edit manifest entries. Cortex authors run the owning icon validation and generation workflow documented in `../../icons/README.md`; downstream consumers use the packaged result and do not regenerate it.
+[MUST] Canonical SVG sources live in `../../icons/svg/`; `../../icons/manifest.ts` and `../../icons/index.html` are generated. Do not hand-edit manifest entries. Cortex authors run the owning icon validation and generation workflow documented in `../../icons/README.md`; downstream consumers use the packaged result and do not regenerate it.
 
 ## Verification and documentation
 
-When public behavior changes, update together:
+[MUST] When public behavior changes, update every affected item together:
 
-- component implementation and public API
-- workbench controls and defaults
-- realistic variants and slot markers
-- usage guidance
-- canonical structured guidance and the public component registry
-- relevant tests
+- [MUST] component implementation and public API
+- [MUST] workbench controls and defaults
+- [MUST] realistic variants and slot markers
+- [MUST] usage guidance
+- [MUST] canonical structured guidance and the public component registry
+- [MUST] relevant tests
 
-Use source inspection for predictable token-only changes. Use rendered browser verification when layout, interaction, responsive behavior, accessibility, or Chrome behavior is not at least 90% predictable from source.
+[MAY] Use source inspection alone for predictable token-only changes. [MUST] Use rendered browser verification when layout, interaction, responsive behavior, accessibility, or Chrome behavior is not at least 90% predictable from source.
 
 ## Smells to stop
+
+[MUST] Stop when you encounter any of these conditions:
 
 - page-level replacement for an existing `cx-*` primitive or pattern
 - consumer reaching into component internals
@@ -375,4 +394,4 @@ Use source inspection for predictable token-only changes. Use rendered browser v
 - component registry entries that disagree with source
 - app code importing Cortex instead of the packaged framework
 
-Fix the owner or surface the scope boundary. Do not polish over the cause.
+[MUST] Fix the owner or surface the scope boundary. [MUST] Do not polish over the cause.

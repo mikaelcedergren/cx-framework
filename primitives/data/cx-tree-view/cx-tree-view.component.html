@@ -30,12 +30,14 @@
             class="cx-tree-view__label-button"
             [disabled]="disabled$() || item.disabled === true || !selectable$()"
             [attr.aria-current]="selectedId$() === item.id ? 'true' : null"
+            [cxTooltip]="item.label"
+            [cxTooltipOverflow]="true"
             (click)="onSelect(item)"
           >
             @if (showIcons$() && item.icon) {
               <cx-icon class="cx-tree-view__icon" [name]="item.icon" [size]="16" />
             }
-            <span class="cx-tree-view__label">{{ item.label }}</span>
+            <span class="cx-tree-view__label" data-cx-tooltip-overflow>{{ item.label }}</span>
           </button>
         </div>
 

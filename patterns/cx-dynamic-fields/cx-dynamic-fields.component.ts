@@ -32,7 +32,12 @@ type CxResolvedDynamicField = CxDynamicFieldValue & {
 
 @Component({
   selector: 'cx-dynamic-fields',
-  imports: [CxButtonComponent, CxIconButtonComponent, CxPasswordFieldComponent, CxTextFieldComponent],
+  imports: [
+    CxButtonComponent,
+    CxIconButtonComponent,
+    CxPasswordFieldComponent,
+    CxTextFieldComponent,
+  ],
   templateUrl: './cx-dynamic-fields.component.html',
   styleUrl: './cx-dynamic-fields.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

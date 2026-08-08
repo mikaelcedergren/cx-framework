@@ -53,7 +53,11 @@
     />
   } @else if (!multiple) {
     <div class="cx-file-upload__selected">
-      <div class="cx-file-upload__name">{{ firstFileName }}</div>
+      <div
+        class="cx-file-upload__name"
+        [cxTooltip]="firstFileName"
+        [cxTooltipOverflow]="true"
+      >{{ firstFileName }}</div>
       <cx-icon-button
         icon="remove"
         mood="default"
@@ -83,7 +87,11 @@
     @for (file of visibleFiles; track $index) {
       <li class="cx-file-upload__row">
         <cx-icon class="cx-file-upload__row-icon" name="document" size="20" />
-        <div class="cx-file-upload__row-name">{{ file.name }}</div>
+        <div
+          class="cx-file-upload__row-name"
+          [cxTooltip]="file.name"
+          [cxTooltipOverflow]="true"
+        >{{ file.name }}</div>
         @if (formatSize(file.size); as size) {
           <div class="cx-file-upload__row-size">{{ size }}</div>
         }

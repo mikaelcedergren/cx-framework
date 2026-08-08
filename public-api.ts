@@ -8,7 +8,7 @@ export * from './patterns/cx-chat-message';
 export * from './patterns/cx-chat-thread';
 export * from './patterns/cx-detail-panel';
 export * from './patterns/cx-dynamic-fields';
-export * from './patterns/cx-empty-state';
+export * from './patterns/cx-state-message';
 export * from './patterns/cx-filter-bar';
 export * from './patterns/cx-index-nav';
 export * from './patterns/cx-item-card';

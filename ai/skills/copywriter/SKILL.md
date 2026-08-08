@@ -36,9 +36,11 @@ Useful searches:
 - `rg "TOPIC: errors|TOPIC: validation" ../../design`
 - `rg "COMPONENT: buttons|COMPONENT: dialogs|COMPONENT: tabs" ../../design/04-component-rules.md`
 
-Treat `must` as binding, `should` as the default, and `may` as allowed.
+Apply the normative levels and conflict handling defined in `00-start-here.md`; structured rules use `TYPE: MUST`, `TYPE: SHOULD`, or `TYPE: MAY`.
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
+
+When tone or wording judgment is not settled by the copy rules, `../../profile/design-lead-profile.md` models the designer's voice and instincts; it is non-normative, carries the lowest authority, and never overrides a copy rule.
 
 ## Copy standard
 

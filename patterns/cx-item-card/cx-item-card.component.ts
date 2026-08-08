@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 
 export type CxItemCardVariant = 'default' | 'outline' | 'transparent';
 
@@ -12,7 +13,7 @@ export type CxItemCardVariant = 'default' | 'outline' | 'transparent';
  */
 @Component({
   selector: 'cx-item-card',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-item-card.component.html',
   styleUrl: './cx-item-card.component.scss',
   host: {

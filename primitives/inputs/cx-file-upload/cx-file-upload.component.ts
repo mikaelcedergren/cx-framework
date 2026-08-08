@@ -16,6 +16,7 @@ import { CxButtonComponent } from '../../actions/cx-button';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import { type CxValidationMessage } from '../shared/field.types';
 import { type CxIconName } from '../../../icons/manifest';
 
@@ -56,6 +57,7 @@ const SINGLE_FILE_MESSAGE: CxValidationMessage = {
     CxButtonComponent,
     CxIconButtonComponent,
     CxIconComponent,
+    CxTooltipDirective,
     CxValidationMessageComponent,
   ],
   templateUrl: './cx-file-upload.component.html',

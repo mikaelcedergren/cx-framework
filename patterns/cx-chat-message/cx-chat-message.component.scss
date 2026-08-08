@@ -55,7 +55,7 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

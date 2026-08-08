@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxTreeViewDensity = 'comfortable' | 'compact';
 
@@ -15,7 +16,7 @@ export interface CxTreeViewItem {
 
 @Component({
   selector: 'cx-tree-view',
-  imports: [NgTemplateOutlet, CxIconComponent],
+  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-tree-view.component.html',
   styleUrl: './cx-tree-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

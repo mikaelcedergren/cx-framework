@@ -27,36 +27,48 @@
       }
     </div>
 
-    @if (!hasValidMaximum$()) {
-      <div class="cx-budget-invalid" role="status">Set maximum above 0.</div>
-    } @else if (isDetailed$()) {
-      <div class="cx-budget-values">
-        <span
+    @if (hasValidMaximum$()) {
+      @if (isDetailed$()) {
+        <div class="cx-budget-values">
+          <span
+            class="cx-budget-label cx-budget-label--current"
+            [class.cx-budget-label--success]="color$() === 'success'"
+            [class.cx-budget-label--yellow]="color$() === 'yellow'"
+            [class.cx-budget-label--orange]="color$() === 'orange'"
+            [class.cx-budget-label--danger]="color$() === 'danger'"
+            [cxTooltip]="currentText$()"
+            [cxTooltipOverflow]="true"
+          >
+            {{ currentText$() }}
+          </span>
+          <span
+            class="cx-budget-label cx-budget-label--maximum"
+            [cxTooltip]="maximumText$()"
+            [cxTooltipOverflow]="true"
+          >{{ maximumText$() }}</span>
+        </div>
+      } @else {
+        <div
           class="cx-budget-label cx-budget-label--current"
           [class.cx-budget-label--success]="color$() === 'success'"
           [class.cx-budget-label--yellow]="color$() === 'yellow'"
           [class.cx-budget-label--orange]="color$() === 'orange'"
           [class.cx-budget-label--danger]="color$() === 'danger'"
+          [cxTooltip]="currentText$()"
+          [cxTooltipOverflow]="true"
         >
-          {{ currentText$() }}
-        </span>
-        <span class="cx-budget-label cx-budget-label--maximum">{{ maximumText$() }}</span>
-      </div>
-    } @else {
-      <div
-        class="cx-budget-label cx-budget-label--current"
-        [class.cx-budget-label--success]="color$() === 'success'"
-        [class.cx-budget-label--yellow]="color$() === 'yellow'"
-        [class.cx-budget-label--orange]="color$() === 'orange'"
-        [class.cx-budget-label--danger]="color$() === 'danger'"
-      >
-        <span class="cx-budget-label__value">{{ currentValueText$() }}</span>
-        @if (currentLabelText$()) {
-          <span class="cx-budget-label__context">{{ currentLabelText$() }}</span>
-        }
-      </div>
+          <span class="cx-budget-label__value" data-cx-tooltip-overflow>{{ currentValueText$() }}</span>
+          @if (currentLabelText$()) {
+            <span class="cx-budget-label__context" data-cx-tooltip-overflow>{{ currentLabelText$() }}</span>
+          }
+        </div>
+      }
     }
   </div>
+
+  @if (!hasValidMaximum$()) {
+    <div class="cx-budget-invalid" role="status">Set maximum above 0.</div>
+  }
 
   @if (hasValidMaximum$() && hint$()) {
     <div class="cx-budget-hint">{{ hint$() }}</div>

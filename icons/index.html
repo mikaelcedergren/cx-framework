@@ -24,8 +24,8 @@
         --ink: #11181c;
         --shadow: 0 1px 2px rgba(12, 24, 32, 0.08);
         --corner-shape: squircle;
-        --radius-sm: 8px;
-        --radius-md: 12px;
+        --radius-sm: calc(var(--corner-softness) * 2);
+        --radius-md: calc(var(--corner-softness) * 3);
         --radius-pill: 999px;
       }
 
@@ -118,6 +118,14 @@
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
+      }
+
+      .filter-description {
+        grid-column: 1 / -1;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
       }
 
       .filter-button {
@@ -425,6 +433,7 @@
         <input class="search" id="search" type="search" aria-label="Search icons" autocomplete="off">
         <div class="filters" id="filters"></div>
         <div class="result-count" id="result-count" aria-live="polite"></div>
+        <p class="filter-description" id="filter-description" aria-live="polite"></p>
       </section>
 
       <main class="grid" id="grid"></main>
@@ -459,6 +468,7 @@
       };
 
       const filtersEl = document.querySelector("#filters");
+      const filterDescriptionEl = document.querySelector("#filter-description");
       const gridEl = document.querySelector("#grid");
       const resultCountEl = document.querySelector("#result-count");
       const searchEl = document.querySelector("#search");
@@ -789,6 +799,7 @@
 
       function renderFilters() {
         filtersEl.innerHTML = "";
+        filterDescriptionEl.textContent = filters.find((filter) => filter.id === state.filter)?.description || "";
         for (const filter of filters) {
           const count = iconData.icons.filter((icon) => matchesFilterId(icon, filter.id)).length;
           const button = document.createElement("button");
@@ -797,7 +808,6 @@
 
           button.className = "filter-button";
           button.type = "button";
-          button.title = filter.description;
           button.setAttribute("aria-label", filter.label + ": " + filter.description);
           button.setAttribute("aria-pressed", String(state.filter === filter.id));
 

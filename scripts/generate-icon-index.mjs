@@ -742,6 +742,14 @@ const html = `<!doctype html>
         gap: 6px;
       }
 
+      .filter-description {
+        grid-column: 1 / -1;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
       .filter-button {
         align-items: center;
         appearance: none;
@@ -1047,6 +1055,7 @@ const html = `<!doctype html>
         <input class="search" id="search" type="search" aria-label="Search icons" autocomplete="off">
         <div class="filters" id="filters"></div>
         <div class="result-count" id="result-count" aria-live="polite"></div>
+        <p class="filter-description" id="filter-description" aria-live="polite"></p>
       </section>
 
       <main class="grid" id="grid"></main>
@@ -1081,6 +1090,7 @@ const html = `<!doctype html>
       };
 
       const filtersEl = document.querySelector("#filters");
+      const filterDescriptionEl = document.querySelector("#filter-description");
       const gridEl = document.querySelector("#grid");
       const resultCountEl = document.querySelector("#result-count");
       const searchEl = document.querySelector("#search");
@@ -1411,6 +1421,7 @@ const html = `<!doctype html>
 
       function renderFilters() {
         filtersEl.innerHTML = "";
+        filterDescriptionEl.textContent = filters.find((filter) => filter.id === state.filter)?.description || "";
         for (const filter of filters) {
           const count = iconData.icons.filter((icon) => matchesFilterId(icon, filter.id)).length;
           const button = document.createElement("button");
@@ -1419,7 +1430,6 @@ const html = `<!doctype html>
 
           button.className = "filter-button";
           button.type = "button";
-          button.title = filter.description;
           button.setAttribute("aria-label", filter.label + ": " + filter.description);
           button.setAttribute("aria-pressed", String(state.filter === filter.id));
 

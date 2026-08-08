@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxListViewDensity = 'comfortable' | 'compact';
 
@@ -15,7 +16,7 @@ export interface CxListViewItem {
 
 @Component({
   selector: 'cx-list-view',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-list-view.component.html',
   styleUrl: './cx-list-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

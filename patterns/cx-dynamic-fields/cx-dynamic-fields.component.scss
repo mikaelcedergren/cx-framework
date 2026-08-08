@@ -26,13 +26,11 @@
 
 .cx-dynamic-fields__label {
   min-width: 0;
-  overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--opacity-high);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .cx-dynamic-fields__input {

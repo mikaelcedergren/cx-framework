@@ -131,7 +131,7 @@ Single-purpose helpers for the raw elements and wrappers *you* write — not for
 - **Type size** — `cx-text-{display | title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size *and* its matching line-height. `display` is reserved for a marketing or editorial hero's primary headline.
 - **Font weight** — `cx-font-{regular | medium | bold}`.
 - **Text colour** — `cx-text-{ink | muted | primary | accent | success | warning | danger | info | link}`. `cx-text-muted` is the high-opacity ink for secondary text.
-- **Text align** — `cx-text-start` / `-center` / `-end`; `cx-truncate` (one line with an ellipsis).
+- **Text align** — `cx-text-start` / `-center` / `-end`; `cx-truncate` (one-line clipping without a browser tooltip). Pair `cx-truncate` with `cxTooltip` overflow mode when revealing the complete text is useful; never add a native `title` tooltip.
 - **Sizing** — `cx-w-full` (full width), `cx-measure-{sm | md | lg}` (capped + centred content column), `cx-min-h-screen` (full viewport height), `cx-fill` (grow to fill flex/grid space), `cx-center-inline` (centre a block).
 - **Visibility** — `cx-hide-mobile`, `cx-hide-desktop`.
 
@@ -145,7 +145,7 @@ Native article elements need no classes. Three explicit roles cover meaning HTML
 
 - `.cx-article__ingress` — the opening summary or lead paragraph
 - `.cx-article__discreet` — supporting text in the secondary foreground colour
-- `.cx-article__keyword` — a dotted-underlined term; pair it with `cx-tooltip` or an equivalent accessible explanation
+- `.cx-article__keyword` — a dotted-underlined term; pair it with the shared `cxTooltip` trigger or `cx-tooltip` composition wrapper
 
 Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored article sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. Articles centre within an open reading canvas by default. Add `.cx-article--start` when the article is embedded beside navigation or another fixed column and must share that content column's start edge. The `cx-markdown` equivalent is `variant="article" align="start"`.
 

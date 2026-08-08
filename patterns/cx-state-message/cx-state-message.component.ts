@@ -4,10 +4,11 @@ import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/c
 import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 
-export type CxEmptyStateState = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
-export type CxEmptyStateVisual = 'icon' | 'none';
+export type CxStateMessageState = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
+export type CxStateMessageVisual = 'icon' | 'none';
+export type CxStateMessageLayout = 'vertical' | 'horizontal';
 
-export interface CxEmptyStateAction {
+export interface CxStateMessageAction {
   readonly text: string;
   readonly mood?: CxButtonMood;
   readonly icon?: CxIconName;
@@ -18,7 +19,7 @@ export interface CxEmptyStateAction {
   readonly transparent?: boolean;
 }
 
-const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateState, 'default'>, {
+const CX_STATE_MESSAGE_PRESETS: Record<Exclude<CxStateMessageState, 'default'>, {
   heading: string;
   description: string;
   icon: CxIconName;
@@ -45,36 +46,36 @@ const CX_EMPTY_STATE_PRESETS: Record<Exclude<CxEmptyStateState, 'default'>, {
   },
 };
 
-const CX_EMPTY_STATE_STATE_ACTIONS: Partial<Record<CxEmptyStateState, CxEmptyStateAction>> = {
+const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStateMessageAction>> = {
   success: { text: 'Continue', transparent: true },
   danger: { text: 'Try again', transparent: true },
 };
 
 @Component({
-  selector: 'cx-empty-state',
+  selector: 'cx-state-message',
   imports: [CxButtonComponent, CxIconComponent, CxSpinnerComponent],
-  templateUrl: './cx-empty-state.component.html',
-  styleUrl: './cx-empty-state.component.scss',
+  templateUrl: './cx-state-message.component.html',
+  styleUrl: './cx-state-message.component.scss',
   host: {
     role: 'status',
-    '[class.cx-empty-state-host--success]': 'state === "success"',
-    '[class.cx-empty-state-host--scheduled]': 'state === "scheduled"',
-    '[class.cx-empty-state-host--danger]': 'state === "danger"',
+    '[class.cx-state-message-host--success]': 'state === "success"',
+    '[class.cx-state-message-host--scheduled]': 'state === "scheduled"',
+    '[class.cx-state-message-host--danger]': 'state === "danger"',
     '[attr.title]': 'null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxEmptyStateComponent {
+export class CxStateMessageComponent {
   private iconInputBound = false;
   private iconValue: CxIconName | undefined;
 
   @Input() heading = '';
   @Input() description: string | undefined;
-  @Input() action: CxEmptyStateAction | undefined;
-  @Input() secondaryAction: CxEmptyStateAction | undefined;
-  @Input() state: CxEmptyStateState = 'default';
-  @Input() visual: CxEmptyStateVisual = 'icon';
-  @Input() customContent = false;
+  @Input() action: CxStateMessageAction | undefined;
+  @Input() secondaryAction: CxStateMessageAction | undefined;
+  @Input() state: CxStateMessageState = 'default';
+  @Input() visual: CxStateMessageVisual = 'icon';
+  @Input() layout: CxStateMessageLayout = 'vertical';
 
   @Input()
   public set icon(icon: CxIconName | undefined) {
@@ -82,8 +83,8 @@ export class CxEmptyStateComponent {
     this.iconValue = icon;
   }
 
-  @Output('action') readonly actionEmitter = new EventEmitter<CxEmptyStateAction>();
-  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxEmptyStateAction>();
+  @Output('action') readonly actionEmitter = new EventEmitter<CxStateMessageAction>();
+  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxStateMessageAction>();
 
   protected get resolvedIcon(): CxIconName | undefined {
     if (this.iconInputBound) {
@@ -130,11 +131,11 @@ export class CxEmptyStateComponent {
     return this.visual === 'icon' && !this.showSpinner && this.resolvedIcon !== undefined;
   }
 
-  protected get visibleAction(): CxEmptyStateAction | undefined {
-    return this.visibleActionFor(this.action) ?? this.visibleActionFor(CX_EMPTY_STATE_STATE_ACTIONS[this.state]);
+  protected get visibleAction(): CxStateMessageAction | undefined {
+    return this.visibleActionFor(this.action) ?? this.visibleActionFor(CX_STATE_MESSAGE_STATE_ACTIONS[this.state]);
   }
 
-  protected get visibleSecondaryAction(): CxEmptyStateAction | undefined {
+  protected get visibleSecondaryAction(): CxStateMessageAction | undefined {
     return this.visibleActionFor(this.secondaryAction);
   }
 
@@ -142,30 +143,30 @@ export class CxEmptyStateComponent {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
   }
 
-  private get resolvedPreset(): typeof CX_EMPTY_STATE_PRESETS[keyof typeof CX_EMPTY_STATE_PRESETS] | undefined {
+  private get resolvedPreset(): typeof CX_STATE_MESSAGE_PRESETS[keyof typeof CX_STATE_MESSAGE_PRESETS] | undefined {
     if (this.state === 'default') {
       return undefined;
     }
-    return CX_EMPTY_STATE_PRESETS[this.state];
+    return CX_STATE_MESSAGE_PRESETS[this.state];
   }
 
-  private visibleActionFor(action: CxEmptyStateAction | undefined): CxEmptyStateAction | undefined {
+  private visibleActionFor(action: CxStateMessageAction | undefined): CxStateMessageAction | undefined {
     return action?.text.trim() ? action : undefined;
   }
 
-  protected resolveActionMood(action: CxEmptyStateAction): CxButtonMood {
+  protected resolveActionMood(action: CxStateMessageAction): CxButtonMood {
     return action.mood ?? 'default';
   }
 
-  protected isActionTransparent(action: CxEmptyStateAction): boolean {
+  protected isActionTransparent(action: CxStateMessageAction): boolean {
     return action.transparent ?? true;
   }
 
-  protected onActionPressed(action: CxEmptyStateAction): void {
+  protected onActionPressed(action: CxStateMessageAction): void {
     this.actionEmitter.emit(action);
   }
 
-  protected onSecondaryActionPressed(action: CxEmptyStateAction): void {
+  protected onSecondaryActionPressed(action: CxStateMessageAction): void {
     this.secondaryActionEmitter.emit(action);
   }
 }

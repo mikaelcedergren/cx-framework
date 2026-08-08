@@ -33,6 +33,7 @@ import {
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxOptionGroupComponent } from '../../overlay/cx-option-group';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxQueryElementComponent, type CxQueryElementData } from '../cx-query-element';
 
@@ -167,6 +168,7 @@ let cxQueryFieldId = 0;
     CxQueryElementComponent,
     CxShortcutKeyComponent,
     CxSpinnerComponent,
+    CxTooltipDirective,
     CxValidationMessageComponent,
   ],
   templateUrl: './cx-query-field.component.html',

@@ -80,11 +80,9 @@
 }
 
 .cx-list-view__label,
-.cx-list-view__meta,
-.cx-list-view__description,
 .cx-list-view__empty {
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .cx-list-view__label {
@@ -103,8 +101,10 @@
   line-height: var(--line-height-body);
 }
 
+.cx-list-view__meta,
 .cx-list-view__description {
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .cx-list-view__empty {

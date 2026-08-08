@@ -65,7 +65,7 @@
   min-width: 0;
   color: var(--opacity-high);
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);

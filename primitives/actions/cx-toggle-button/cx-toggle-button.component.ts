@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxToggleButtonSize = 'default' | 'small';
 
 @Component({
   selector: 'cx-toggle-button',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-toggle-button.component.html',
   styleUrl: './cx-toggle-button.component.scss',
   host: {

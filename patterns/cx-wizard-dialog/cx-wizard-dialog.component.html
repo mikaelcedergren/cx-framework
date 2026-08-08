@@ -63,7 +63,7 @@
                 @if (activeTemplate$(); as activeTemplate) {
                   <ng-container [ngTemplateOutlet]="activeTemplate" />
                 } @else {
-                  <cx-empty-state
+                  <cx-state-message
                     icon="document"
                     heading="Add a step template"
                     description="Use ng-template with cxWizardDialogStep so each step has a real body."

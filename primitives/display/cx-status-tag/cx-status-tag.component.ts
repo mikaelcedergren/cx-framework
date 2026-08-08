@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxStatusTagMood = 'default' | 'info' | 'success' | 'warning' | 'danger';
 
 @Component({
   selector: 'cx-status-tag',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-status-tag.component.html',
   styleUrl: './cx-status-tag.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

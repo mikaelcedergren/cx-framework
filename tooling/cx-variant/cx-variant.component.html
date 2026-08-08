@@ -11,10 +11,12 @@
         [attr.aria-selected]="variant.id === selectedVariant$() ? 'true' : 'false'"
         [attr.aria-controls]="panelId"
         [attr.tabindex]="variant.id === selectedVariant$() ? '0' : '-1'"
+        [cxTooltip]="variant.label"
+        [cxTooltipOverflow]="true"
         (click)="selectVariant(variant.id)"
         (keydown)="onTabKeydown($event, index)"
       >
-        {{ variant.label }}
+        <span class="cx-variant__tab-label" data-cx-tooltip-overflow>{{ variant.label }}</span>
       </button>
     }
   </div>

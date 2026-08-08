@@ -22,25 +22,50 @@
             class="cx-breadcrumbs__control cx-breadcrumbs__control--menu"
             [class.cx-breadcrumbs__current]="isCurrent(item.id)"
             [attr.aria-current]="isCurrent(item.id) ? 'page' : null"
-            [attr.title]="item.label"
+            [cxTooltip]="item.label"
+            [cxTooltipOverflow]="true"
           >
-            <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+            <span
+              class="cx-breadcrumbs__label"
+              data-cx-tooltip-overflow
+              [attr.data-text]="item.label"
+            >
+              {{ item.label }}
+            </span>
             <cx-icon class="cx-breadcrumbs__menu-icon" name="chevron-down" [size]="16" aria-hidden="true" />
           </button>
         </cx-menu>
       } @else if (isCurrent(item.id)) {
-        <span class="cx-breadcrumbs__current" aria-current="page" [attr.title]="item.label">
-          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+        <span
+          class="cx-breadcrumbs__current"
+          aria-current="page"
+          [cxTooltip]="item.label"
+          [cxTooltipOverflow]="true"
+        >
+          <span
+            class="cx-breadcrumbs__label"
+            data-cx-tooltip-overflow
+            [attr.data-text]="item.label"
+          >
+            {{ item.label }}
+          </span>
         </span>
       } @else if (hasRouterLink(item)) {
         <a
           class="cx-breadcrumbs__control"
           [routerLink]="item.routerLink"
           [fragment]="item.fragment"
-          [attr.title]="item.label"
+          [cxTooltip]="item.label"
+          [cxTooltipOverflow]="true"
           (click)="selectItem(item.id)"
         >
-          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+          <span
+            class="cx-breadcrumbs__label"
+            data-cx-tooltip-overflow
+            [attr.data-text]="item.label"
+          >
+            {{ item.label }}
+          </span>
         </a>
       } @else if (hasHref(item)) {
         <a
@@ -48,19 +73,33 @@
           [href]="item.href"
           [attr.target]="item.target ?? null"
           [attr.rel]="item.rel ?? null"
-          [attr.title]="item.label"
+          [cxTooltip]="item.label"
+          [cxTooltipOverflow]="true"
           (click)="selectItem(item.id)"
         >
-          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+          <span
+            class="cx-breadcrumbs__label"
+            data-cx-tooltip-overflow
+            [attr.data-text]="item.label"
+          >
+            {{ item.label }}
+          </span>
         </a>
       } @else {
         <button
           type="button"
           class="cx-breadcrumbs__control"
-          [attr.title]="item.label"
+          [cxTooltip]="item.label"
+          [cxTooltipOverflow]="true"
           (click)="selectItem(item.id)"
         >
-          <span class="cx-breadcrumbs__label" [attr.data-text]="item.label">{{ item.label }}</span>
+          <span
+            class="cx-breadcrumbs__label"
+            data-cx-tooltip-overflow
+            [attr.data-text]="item.label"
+          >
+            {{ item.label }}
+          </span>
         </button>
       }
 

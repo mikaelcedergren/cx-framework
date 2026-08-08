@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxSsoProvider = 'google' | 'apple' | 'microsoft' | 'sso';
 export type CxSsoAction = 'sign-in' | 'sign-up' | 'continue';
@@ -19,6 +20,7 @@ const ACTION_VERB: Record<CxSsoAction, string> = {
 
 @Component({
   selector: 'cx-sso-button',
+  imports: [CxTooltipDirective],
   templateUrl: './cx-sso-button.component.html',
   styleUrl: './cx-sso-button.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -11,13 +11,14 @@ import { NgTemplateOutlet } from '@angular/common';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../cx-tooltip';
 
 export type CxOptionMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 
 @Component({
   selector: 'cx-option',
-  imports: [NgTemplateOutlet, CxIconComponent, CxShortcutKeyComponent],
+  imports: [NgTemplateOutlet, CxIconComponent, CxShortcutKeyComponent, CxTooltipDirective],
   templateUrl: './cx-option.component.html',
   styleUrl: './cx-option.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

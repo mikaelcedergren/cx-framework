@@ -20,6 +20,7 @@ import {
   CxProcessPillComponent,
   type CxProcessPillMood,
 } from '../../primitives/display/cx-process-pill';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 
 export interface CxProcessStage {
   /** Stable id, emitted by `selectedIdChange` when the stage is selected. */
@@ -69,7 +70,7 @@ const ALL_TAB_KEY = '__all__';
  */
 @Component({
   selector: 'cx-process',
-  imports: [CxProcessPillComponent, CxIconButtonComponent],
+  imports: [CxProcessPillComponent, CxIconButtonComponent, CxTooltipDirective],
   templateUrl: './cx-process.component.html',
   styleUrl: './cx-process.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

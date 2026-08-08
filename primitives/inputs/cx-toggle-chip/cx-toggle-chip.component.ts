@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CxIconComponent } from '../../media/cx-icon';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
 export type CxToggleChipSize = 'default' | 'small' | 'large';
 
 @Component({
   selector: 'cx-toggle-chip',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-toggle-chip.component.html',
   styleUrl: './cx-toggle-chip.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

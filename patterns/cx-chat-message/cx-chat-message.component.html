@@ -1,7 +1,13 @@
 <div class="cx-chat-message__bubble">
   <div class="cx-chat-message__header">
     <div class="cx-chat-message__meta">
-      <div class="cx-chat-message__author">{{ authorLabel$() }}</div>
+      <div
+        class="cx-chat-message__author"
+        [cxTooltip]="authorLabel$()"
+        [cxTooltipOverflow]="true"
+      >
+        {{ authorLabel$() }}
+      </div>
       @if (timestamp$().trim()) {
         <div class="cx-chat-message__timestamp">{{ timestamp$() }}</div>
       }

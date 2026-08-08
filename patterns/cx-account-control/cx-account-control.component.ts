@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxAvatarComponent } from '../../primitives/display/cx-avatar';
 
@@ -14,7 +15,7 @@ const ACCOUNT_CONTROL_MENU_ITEMS: CxMenuItem[] = [
 
 @Component({
   selector: 'cx-account-control',
-  imports: [CxMenuComponent, CxMenuTriggerDirective, CxIconComponent, CxAvatarComponent],
+  imports: [CxMenuComponent, CxMenuTriggerDirective, CxTooltipDirective, CxIconComponent, CxAvatarComponent],
   templateUrl: './cx-account-control.component.html',
   styleUrl: './cx-account-control.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

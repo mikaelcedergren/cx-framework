@@ -1,0 +1,13 @@
+<div
+  class="cx-tooltip__surface"
+  [id]="tooltipId()"
+  [class.cx-tooltip__surface--top]="placement() === 'top'"
+  [class.cx-tooltip__surface--right]="placement() === 'right'"
+  [class.cx-tooltip__surface--bottom]="placement() === 'bottom'"
+  [class.cx-tooltip__surface--left]="placement() === 'left'"
+  role="tooltip"
+  (mouseenter)="hovered.emit(true)"
+  (mouseleave)="hovered.emit(false)"
+>
+  <span class="cx-tooltip__content">{{ text() }}</span>
+</div>

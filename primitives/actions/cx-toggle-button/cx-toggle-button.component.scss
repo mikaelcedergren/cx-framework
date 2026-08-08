@@ -72,7 +72,7 @@
 .cx-toggle-button span {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 :host(.cx-toggle-button-host--small) .cx-toggle-button {

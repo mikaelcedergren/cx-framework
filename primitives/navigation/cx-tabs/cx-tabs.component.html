@@ -25,11 +25,13 @@
         [attr.aria-selected]="selectedId$() === item.id ? 'true' : 'false'"
         [attr.aria-controls]="controlsId || null"
         [attr.tabindex]="tabIndexFor(item, index)"
+        [cxTooltip]="item.label"
+        [cxTooltipOverflow]="true"
         (pointerdown)="onTabPointerDown($event)"
         (click)="select(item.id, false)"
         (keydown)="onKeydown($event, index)"
       >
-        <span class="cx-tabs__label">{{ item.label }}</span>
+        <span class="cx-tabs__label" data-cx-tooltip-overflow>{{ item.label }}</span>
         @if (hasCount(item)) {
           <span class="cx-tabs__count">{{ item.count }}</span>
         }

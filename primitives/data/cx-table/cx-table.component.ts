@@ -24,6 +24,7 @@ import {
 } from '../../overlay/cx-menu';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { CxOptionComponent } from '../../overlay/cx-option';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import { measureCxFloatingSurface } from '../../overlay/floating-surface';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import {
@@ -246,6 +247,7 @@ function hasSerializableFilterValue(value: CxColumnFilterValue): boolean {
     CxTagComponent,
     CxTrendTagComponent,
     CxIconComponent,
+    CxTooltipDirective,
     CxColumnFilterEditorComponent,
   ],
   templateUrl: './cx-table.component.html',

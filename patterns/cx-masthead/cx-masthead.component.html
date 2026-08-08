@@ -4,11 +4,20 @@
       <ng-content select="[brand], [cxMastheadBrand]" />
       @if (hasDefaultBrand()) {
         @if (homeHref) {
-          <a class="cx-masthead__home" [href]="homeHref">
+          <a
+            class="cx-masthead__home"
+            [href]="homeHref"
+            [cxTooltip]="heading"
+            [cxTooltipOverflow]="true"
+          >
             <ng-container [ngTemplateOutlet]="brandContent" />
           </a>
         } @else {
-          <span class="cx-masthead__home cx-masthead__home--static">
+          <span
+            class="cx-masthead__home cx-masthead__home--static"
+            [cxTooltip]="heading"
+            [cxTooltipOverflow]="true"
+          >
             <ng-container [ngTemplateOutlet]="brandContent" />
           </span>
         }
@@ -75,7 +84,7 @@
     <cx-icon class="cx-masthead__logo-icon" [name]="logo" [size]="24" />
   }
   @if (heading) {
-    <span class="cx-masthead__title">{{ heading }}</span>
+    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{ heading }}</span>
   }
 </ng-template>
 

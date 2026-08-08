@@ -13,28 +13,35 @@
   [disabled]="disabled"
   [attr.tabindex]="tabIndex"
   [attr.aria-label]="ariaLabel ?? null"
+  [cxTooltip]="resolvedText()"
+  [cxTooltipOverflow]="true"
   (click)="onPressed($event)"
 >
-  @if (isValues()) {
-    @if (valuesPrefix) {
-      <span class="cx-query-element__muted">{{ valuesPrefix }}</span>
-    }
-    @for (value of values; track $index) {
-      <span class="cx-query-element__value" [class.cx-query-element__value--empty]="!value">
-        @if (value) {
-          {{ value }}
-        } @else {
-          &lt;Empty&gt;
-        }
-      </span>
-      @if ($index < values.length - 1) {
-        <span class="cx-query-element__muted">{{ valuesDivider }}</span>
+  <span class="cx-query-element__content" data-cx-tooltip-overflow>
+    @if (isValues()) {
+      @if (valuesPrefix) {
+        <span class="cx-query-element__muted">{{ valuesPrefix }}</span>
       }
+      @for (value of values; track $index) {
+        <span
+          class="cx-query-element__value"
+          [class.cx-query-element__value--empty]="!value"
+        >
+          @if (value) {
+            {{ value }}
+          } @else {
+            &lt;Empty&gt;
+          }
+        </span>
+        @if ($index < values.length - 1) {
+          <span class="cx-query-element__muted">{{ valuesDivider }}</span>
+        }
+      }
+      @if (valuesSuffix) {
+        <span class="cx-query-element__muted">{{ valuesSuffix }}</span>
+      }
+    } @else {
+      {{ resolvedLabel() }}
     }
-    @if (valuesSuffix) {
-      <span class="cx-query-element__muted">{{ valuesSuffix }}</span>
-    }
-  } @else {
-    {{ resolvedLabel() }}
-  }
+  </span>
 </button>

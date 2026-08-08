@@ -1,0 +1,100 @@
+:host {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+:host(.cx-state-message-host--success) .cx-state-message__icon {
+  color: var(--success);
+}
+
+:host(.cx-state-message-host--scheduled) .cx-state-message__icon {
+  color: var(--ink);
+}
+
+:host(.cx-state-message-host--danger) .cx-state-message__icon {
+  color: var(--danger);
+}
+
+.cx-state-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  max-width: calc(var(--controller-size) * 32);
+  text-align: center;
+}
+
+.cx-state-message__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--space-sm);
+}
+
+.cx-state-message__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: var(--space-sm);
+  color: var(--opacity-mid);
+}
+
+.cx-state-message--horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  text-align: start;
+}
+
+.cx-state-message--horizontal .cx-state-message__body {
+  align-items: flex-start;
+  align-self: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.cx-state-message--horizontal .cx-state-message__icon {
+  padding-bottom: 0;
+  align-self: flex-start;
+}
+
+.cx-state-message--horizontal .cx-state-message__actions {
+  justify-content: flex-start;
+}
+
+.cx-state-message__heading {
+  color: var(--ink);
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-heading);
+}
+
+.cx-state-message__text {
+  max-width: calc(var(--controller-size) * 13);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+.cx-state-message__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+}
+
+.cx-state-message__content {
+  width: 100%;
+}
+
+// The slot is always rendered; collapse it when nothing is projected so the
+// body gap does not create phantom spacing.
+.cx-state-message__content:empty {
+  display: none;
+}

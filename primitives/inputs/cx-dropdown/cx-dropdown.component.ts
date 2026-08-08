@@ -23,6 +23,7 @@ import { CxIconComponent } from '../../media/cx-icon';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxOptionComponent, type CxOptionMood } from '../../overlay/cx-option';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import {
   CxFloatingSurfaceController,
   type CxFloatingSurfaceRequest,
@@ -103,6 +104,7 @@ const CX_DROPDOWN_DEFAULT_TRANSLATIONS = {
     CxOptionComponent,
     CxPopoverComponent,
     CxSpinnerComponent,
+    CxTooltipDirective,
   ],
   templateUrl: './cx-dropdown.component.html',
   styleUrl: './cx-dropdown.component.scss',

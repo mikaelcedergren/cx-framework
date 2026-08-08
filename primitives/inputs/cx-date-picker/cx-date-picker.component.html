@@ -30,13 +30,19 @@
     [attr.aria-label]="resolvedFieldAriaLabel"
     [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
     [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+    [cxTooltip]="displayText$()"
+    [cxTooltipOverflow]="true"
     (click)="toggleOpen(field)"
     (keydown)="onFieldKeydown($event, field)"
     (focus)="onFieldFocus(true)"
     (blur)="onFieldFocus(false)"
   >
     <cx-icon class="cx-date-picker__field-icon" name="calendar" size="16" />
-    <span class="cx-date-picker__field-text" [class.cx-date-picker__field-text--placeholder]="showPlaceholder$()">
+    <span
+      class="cx-date-picker__field-text"
+      [class.cx-date-picker__field-text--placeholder]="showPlaceholder$()"
+      data-cx-tooltip-overflow
+    >
       {{ displayText$() }}
     </span>
     @if (hasClear$()) {

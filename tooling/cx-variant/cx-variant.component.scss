@@ -52,7 +52,14 @@
   font-weight: var(--font-weight-medium);
   letter-spacing: 0;
   line-height: var(--line-height-body);
-  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-variant__tab-label {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

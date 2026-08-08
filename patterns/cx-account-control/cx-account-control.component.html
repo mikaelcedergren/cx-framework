@@ -15,6 +15,8 @@
     [class.cx-account-control--open]="open$()"
     type="button"
     [attr.aria-label]="'Account actions for ' + username"
+    [cxTooltip]="username"
+    [cxTooltipOverflow]="true"
   >
     <span class="cx-account-control__identity">
       <cx-avatar
@@ -23,7 +25,7 @@
         size="small"
         color="cyan"
       />
-      <span class="cx-account-control__label">{{ username }}</span>
+      <span class="cx-account-control__label" data-cx-tooltip-overflow>{{ username }}</span>
     </span>
     <cx-icon class="cx-account-control__icon" name="chevrons-vertical" [size]="16" />
   </button>

@@ -11,7 +11,6 @@
   max-width: 100%;
   min-height: var(--cx-query-element-min-height, var(--controller-size-small));
   align-items: center;
-  gap: var(--space-2xs);
   overflow: hidden;
   padding: var(--cx-query-element-block-padding, var(--space-xs)) var(--space-xs);
   border: 0;
@@ -22,6 +21,17 @@
   font: inherit;
   line-height: var(--line-height-small);
   user-select: none;
+  white-space: nowrap;
+}
+
+.cx-query-element__content {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-2xs);
+  overflow: hidden;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -96,10 +106,7 @@
 
 .cx-query-element__value {
   min-width: 0;
-  overflow: hidden;
   color: var(--ink);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .cx-query-element__value--empty {

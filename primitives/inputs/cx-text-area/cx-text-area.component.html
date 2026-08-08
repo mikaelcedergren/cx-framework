@@ -35,7 +35,6 @@
                 class="cx-text-area__gutter-row"
                 [class.cx-text-area__gutter-row--success]="line.iconMood === 'success'"
                 [class.cx-text-area__gutter-row--error]="line.iconMood === 'danger'"
-                [attr.title]="line.title || null"
               >
                 @if (line.iconMood === 'danger') {
                   <cx-icon class="cx-text-area__gutter-icon" name="warning" [size]="12" />

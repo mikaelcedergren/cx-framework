@@ -137,8 +137,30 @@ $measures: (
 
   .cx-truncate {
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: clip;
     white-space: nowrap;
+  }
+
+  // Applied by cxTooltipOverflow only after measurement proves that the
+  // target is clipped. The fade follows the reading direction and never
+  // hides text when forced-colour rendering is active.
+  .cx-overflow-fade--clipped {
+    text-overflow: clip;
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--space-lg)), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-lg)), transparent);
+  }
+
+  .cx-overflow-fade--clipped:dir(rtl) {
+    mask-image: linear-gradient(to left, #000 calc(100% - var(--space-lg)), transparent);
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - var(--space-lg)), transparent);
+  }
+
+  @media (forced-colors: active) {
+    .cx-overflow-fade--clipped,
+    .cx-overflow-fade--clipped:dir(rtl) {
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
   }
 
   // Sizing — content measure (capped + centred), plus raw-page helpers.

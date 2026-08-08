@@ -118,7 +118,11 @@
                 @if (conditionNeedsValue(condition)) {
                   @if (isEditingPart(condition.id, 'value')) {
                     @if (!showStructuredNavigationTarget(condition.id, 'value') && draftValueSummary()) {
-                      <span class="cx-query-field__draft-values">{{ draftValueSummary() }}</span>
+                      <span
+                        class="cx-query-field__draft-values"
+                        [cxTooltip]="draftValueSummary()"
+                        [cxTooltipOverflow]="true"
+                      >{{ draftValueSummary() }}</span>
                     }
                     <ng-container [ngTemplateOutlet]="editorTemplate" />
                   }
@@ -164,7 +168,11 @@
                 } @else {
                   <cx-query-element [data]="draftOperatorElementData()" (pressed)="openDraftPart('operator')" />
                   @if (draftValueSummary()) {
-                    <span class="cx-query-field__draft-values">{{ draftValueSummary() }}</span>
+                    <span
+                      class="cx-query-field__draft-values"
+                      [cxTooltip]="draftValueSummary()"
+                      [cxTooltipOverflow]="true"
+                    >{{ draftValueSummary() }}</span>
                   }
                   <ng-container [ngTemplateOutlet]="editorTemplate" />
                 }

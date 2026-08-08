@@ -7,13 +7,15 @@
     [disabled]="disabled"
     [attr.aria-pressed]="selected$()"
     [attr.aria-label]="resolvedAriaLabel"
+    [cxTooltip]="visibleText"
+    [cxTooltipOverflow]="true"
     (click)="toggle()"
   >
     @if (displayIcon; as iconName) {
       <cx-icon class="cx-toggle-button__icon" [name]="iconName" [size]="size === 'small' ? '14' : '16'" aria-hidden="true" />
     }
     @if (visibleText) {
-      <span>{{ visibleText }}</span>
+      <span data-cx-tooltip-overflow>{{ visibleText }}</span>
     }
   </button>
 }

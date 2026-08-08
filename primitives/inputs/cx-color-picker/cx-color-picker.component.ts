@@ -17,6 +17,7 @@ import { CxValidationMessageComponent } from '../../feedback/cx-validation-messa
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
+import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import {
   CxFloatingSurfaceController,
   type CxFloatingSurfaceRequest,
@@ -67,7 +68,7 @@ const CX_COLOR_PICKER_COLOR_SET: ReadonlySet<string> = new Set<string>(CX_COLOR_
 
 @Component({
   selector: 'cx-color-picker',
-  imports: [CxIconComponent, CxPopoverComponent, CxSpinnerComponent, CxValidationMessageComponent],
+  imports: [CxIconComponent, CxPopoverComponent, CxSpinnerComponent, CxTooltipDirective, CxValidationMessageComponent],
   templateUrl: './cx-color-picker.component.html',
   styleUrl: './cx-color-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

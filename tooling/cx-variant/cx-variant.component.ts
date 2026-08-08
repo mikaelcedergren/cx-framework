@@ -10,6 +10,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 
 let nextCxVariantId = 0;
 
@@ -20,6 +21,7 @@ export interface CxVariantOption {
 
 @Component({
   selector: 'cx-variant',
+  imports: [CxTooltipDirective],
   templateUrl: './cx-variant.component.html',
   styleUrl: './cx-variant.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

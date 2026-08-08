@@ -23,6 +23,10 @@
   gap: var(--space-sm);
 }
 
+.cx-budget--compact.cx-budget--invalid {
+  gap: var(--space-xs);
+}
+
 .cx-budget-meter {
   min-width: 0;
 }
@@ -137,7 +141,6 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding: 0 var(--space-md);
-  pointer-events: none;
 }
 
 .cx-budget-label {
@@ -147,7 +150,7 @@
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-small);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -172,7 +175,7 @@
 .cx-budget--compact .cx-budget-label__context {
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 
@@ -219,20 +222,18 @@
 
 .cx-budget-invalid {
   min-width: 0;
-  overflow: hidden;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   color: var(--danger);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-small);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .cx-budget--detailed .cx-budget-invalid {
-  grid-area: 1 / 1;
-  padding: 0 var(--space-md);
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
+  text-align: center;
 }
 
 .cx-budget--invalid .cx-budget-track {

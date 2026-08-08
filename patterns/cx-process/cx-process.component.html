@@ -18,7 +18,7 @@
         [class.cx-process__tab--terminal]="tab.terminal"
         [attr.aria-selected]="tab.selected"
         [attr.aria-label]="tab.ariaLabel"
-        [attr.title]="tab.label"
+        [cxTooltip]="condensed$() ? tab.label : undefined"
         [disabled]="tab.disabled"
         [attr.tabindex]="i === focusIndex$() ? '0' : '-1'"
         (click)="select(tab)"

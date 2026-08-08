@@ -7,10 +7,12 @@
   [disabled]="disabled"
   [attr.aria-label]="ariaLabel || null"
   [attr.aria-pressed]="selected$()"
+  [cxTooltip]="text"
+  [cxTooltipOverflow]="true"
   (click)="toggle()"
 >
   <span class="cx-toggle-chip__check" aria-hidden="true">
     <cx-icon name="check" [size]="size === 'small' ? 12 : size === 'large' ? 24 : 16" shape="circle-solid" mood="primary" />
   </span>
-  <span class="cx-toggle-chip__label">{{ text }}</span>
+  <span class="cx-toggle-chip__label" data-cx-tooltip-overflow>{{ text }}</span>
 </button>
