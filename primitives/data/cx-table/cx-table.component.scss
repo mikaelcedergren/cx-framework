@@ -43,11 +43,6 @@
   background: var(--opacity-low);
 }
 
-.cx-table__head-cell--filtered {
-  background: color-mix(in srgb, var(--primary) 7%, transparent);
-  box-shadow: inset 0 -2px 0 var(--primary);
-}
-
 .cx-table--sticky-header .cx-table__head-cell {
   position: sticky;
   top: 0;
@@ -152,10 +147,6 @@
 
 .cx-table--zebra .cx-table__body .cx-table__row:nth-child(even):not(.cx-table__row--active) {
   background: color-mix(in srgb, var(--opacity-low) 48%, transparent);
-}
-
-.cx-table__row--folder .cx-table__cell--key {
-  font-weight: var(--font-weight-medium);
 }
 
 .cx-table__row-menu-trigger {
@@ -309,14 +300,9 @@
   text-align: right;
 }
 
-.cx-table__sort-icon,
-.cx-table__filter-icon {
+.cx-table__sort-icon {
   flex: 0 0 auto;
   color: var(--opacity-high);
-}
-
-.cx-table__filter-icon {
-  color: var(--primary);
 }
 
 .cx-table__header-menu {

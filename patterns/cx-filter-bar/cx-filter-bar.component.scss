@@ -21,12 +21,74 @@
   gap: var(--space-sm);
 }
 
+/* Quick filters keep priority: the left group never shrinks in filters mode.
+   The active-filters region is the only flexible part of the row. */
 .cx-filter-bar__left {
+  flex: 0 0 auto;
+}
+
+.cx-filter-bar--query .cx-filter-bar__left {
   flex: 1 1 auto;
 }
 
 .cx-filter-bar__right {
   flex: 0 0 auto;
+}
+
+/* Row-reverse plus wrap keeps every tag in normal flow: tags that no longer
+   fit wrap to a clipped second row instead of leaving the layout, so the
+   available width stays stable even inside shrink-to-fit containers. The +N
+   pill is first in DOM, which row-reverse places rightmost. */
+.cx-filter-bar__active-filters {
+  display: flex;
+  min-width: 0;
+  /* Basis auto (not 0) so the row claims its content width inside
+     shrink-to-fit containers; grow/shrink still fit it to definite widths. */
+  flex: 1 1 auto;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  gap: var(--space-sm);
+  max-height: var(--icon-size-md);
+  overflow: hidden;
+}
+
+.cx-filter-bar__active-filter {
+  max-width: 240px;
+}
+
+/* Wrapped tags are already clipped; hiding them also removes their dismiss
+   buttons from focus order and assistive tech. */
+.cx-filter-bar__active-filter--hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cx-filter-bar__active-filters-more {
+  display: inline-flex;
+  min-height: var(--icon-size-md);
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 var(--space-xs);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-small);
+}
+
+.cx-filter-bar__active-filters-more:hover,
+.cx-filter-bar__active-filters-more:focus-visible {
+  color: var(--ink);
+}
+
+.cx-filter-bar__active-filters-more:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
 }
 
 .cx-filter-bar__filter-trigger,

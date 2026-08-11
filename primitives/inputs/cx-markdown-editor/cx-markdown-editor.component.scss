@@ -1,0 +1,103 @@
+@use '../../../styles/markdown-type';
+
+// ViewEncapsulation.None: ProseMirror renders the contenteditable document
+// outside Angular's template, so every selector stays anchored to the
+// cx-markdown-editor element.
+
+cx-markdown-editor {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+cx-markdown-editor.cx-markdown-editor-host--fill {
+  height: 100%;
+  min-height: 0;
+}
+
+cx-markdown-editor > .cx-markdown-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+cx-markdown-editor .cx-markdown-editor__content {
+  height: 100%;
+  min-height: 0;
+}
+
+cx-markdown-editor.cx-markdown-editor-host--fill .cx-markdown-editor__content {
+  overflow-y: auto;
+}
+
+cx-markdown-editor .cx-markdown-editor__placeholder {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  color: var(--opacity-high);
+  pointer-events: none;
+}
+
+cx-markdown-editor .ProseMirror {
+  position: relative;
+  min-height: 100%;
+  box-sizing: border-box;
+  outline: none;
+  caret-color: var(--primary);
+  color: var(--ink);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-variant-ligatures: none;
+}
+
+// The compact UI markdown scale belongs to the default presentation only —
+// document mode gets its type from the global `.cx-article` contract (the
+// component puts that class on the ProseMirror root), and these
+// higher-specificity rules would override it.
+cx-markdown-editor:not(.cx-markdown-editor-host--document) .ProseMirror {
+  @include markdown-type.cx-markdown-type;
+}
+
+cx-markdown-editor,
+cx-markdown-editor .cx-markdown-editor__placeholder {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+// Match the article base (see styles/_article.scss) so the
+// placeholder overlay sits exactly where the first paragraph renders.
+cx-markdown-editor.cx-markdown-editor-host--document,
+cx-markdown-editor.cx-markdown-editor-host--document .cx-markdown-editor__placeholder {
+  font-size: var(--cx-article-base, 18px);
+  line-height: 1.6;
+}
+
+cx-markdown-editor.cx-markdown-editor-host--disabled .ProseMirror {
+  color: var(--opacity-high);
+  cursor: default;
+}
+
+// Minimal ProseMirror runtime styles (subset of prosemirror-view/style).
+cx-markdown-editor .ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+cx-markdown-editor .ProseMirror li {
+  position: relative;
+}
+
+cx-markdown-editor .ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+cx-markdown-editor .ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+cx-markdown-editor img.ProseMirror-separator {
+  display: inline !important;
+  border: none !important;
+  margin: 0 !important;
+}

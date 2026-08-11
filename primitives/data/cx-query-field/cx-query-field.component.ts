@@ -1435,7 +1435,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     this.structuredCaretState.set(false);
     this.editorTextState.set('');
     this.activeSuggestionIndexState.set(-1);
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
     if (focus) {
       this.suppressNextFocusOpen = true;
       this.focusEditor();
@@ -1445,7 +1445,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   private openPopoverAndFocus(): void {
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
     queueMicrotask(() => {
       this.overlay.sync(this.fieldContainerRef?.nativeElement);
       this.focusEditor();

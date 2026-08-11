@@ -1,4 +1,4 @@
-<div class="cx-filter-bar">
+<div class="cx-filter-bar" [class.cx-filter-bar--query]="mode$() === 'query'">
   <div class="cx-filter-bar__left">
     @if (mode$() === 'filters') {
       @if (filters$().length > 0) {
@@ -7,8 +7,7 @@
             icon="filters"
             [ariaLabel]="filterButtonAriaLabel$()"
             mood="default"
-            [selected]="activeFilterCount$() > 0"
-            [badgeValue]="activeFilterCount$() > 0 ? activeFilterCount$().toString() : undefined"
+            [badgeValue]="activeFilterCount$() > 0 ? '' : undefined"
             (pressed)="toggleFilterPopover()"
           />
         </div>
@@ -23,6 +22,17 @@
           (valueChange)="onQuickFilterSelect($event)"
         />
       }
+
+      @if (toggleFilters$().length > 0) {
+        <!-- Same scope strip as the quick filters, so the same small size. -->
+        <cx-toggle-chip-group
+          size="small"
+          selection="multiple"
+          [availableValues]="toggleFilters$()"
+          [selectedValues]="selectedToggleFilterIds$()"
+          (selectedValuesChange)="onToggleFilterSelect($event)"
+        />
+      }
     } @else {
       <div class="cx-filter-bar__query">
         <cx-text-field
@@ -35,6 +45,32 @@
       </div>
     }
   </div>
+
+  @if (mode$() === 'filters' && showActiveFilters$() && activeFilterTags$().length > 0) {
+    <div class="cx-filter-bar__active-filters" #activeFiltersRegion>
+      @if (hiddenActiveFilterCount$() > 0) {
+        <button
+          type="button"
+          class="cx-filter-bar__active-filters-more"
+          [attr.aria-label]="moreActiveFiltersLabel$()"
+          (click)="onMoreActiveFiltersPressed()"
+        >
+          +{{ hiddenActiveFilterCount$() }}
+        </button>
+      }
+      <!-- Reversed on purpose: row-reverse renders DOM order right-to-left, so
+           this keeps the visual order matching the filter list. -->
+      @for (tag of activeFilterTagsRow$(); track tag.id; let index = $index) {
+        <cx-tag
+          class="cx-filter-bar__active-filter"
+          [class.cx-filter-bar__active-filter--hidden]="isActiveFilterTagHidden(index)"
+          [text]="tag.text"
+          [dismissible]="true"
+          (dismiss)="onActiveFilterDismiss(tag.id)"
+        />
+      }
+    </div>
+  }
 
   <div class="cx-filter-bar__right">
     @if (savedViews$().length > 0) {
@@ -119,6 +155,7 @@
         <cx-expansion-panel
           class="cx-filter-bar__filter-panel"
           variant="flat"
+          [attr.data-cx-filter-panel]="filter.id"
           [heading]="filter.label"
           [expanded]="isFilterExpanded(filter.id)"
           (expandedChange)="onFilterExpandedChange(filter.id, $event)"

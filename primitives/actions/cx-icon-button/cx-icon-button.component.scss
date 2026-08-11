@@ -188,49 +188,68 @@
   flex: 0 0 auto;
 }
 
+.cx-icon-button--with-badge {
+  /* Single source of badge geometry: the badge wrapper and the background
+     cutout both derive from these, so they stay concentric by construction.
+     The center is measured from the button's top-right corner (x runs
+     inward, y runs down); the radius is half the indicator size. */
+  --cx-icon-button-badge-center-x: 0px;
+  --cx-icon-button-badge-center-y: 0px;
+  --cx-icon-button-badge-radius: 4px;
+  --cx-icon-button-badge-gap: 3px;
+
+  position: relative;
+  background: transparent;
+  /* Contain the negative z-index below so the background layer cannot
+     escape behind ancestor surfaces. */
+  isolation: isolate;
+}
+
+.cx-icon-button--with-badge-value {
+  --cx-icon-button-badge-center-x: 2px;
+  --cx-icon-button-badge-center-y: 2px;
+  --cx-icon-button-badge-radius: 8px;
+}
+
 .cx-icon-button__badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: var(--cx-icon-button-badge-center-y);
+  right: var(--cx-icon-button-badge-center-x);
   display: inline-flex;
   pointer-events: none;
+  /* Center the badge on the anchor point regardless of its rendered size. */
+  transform: translate(50%, -50%);
 }
 
 .cx-icon-button__badge cx-badge {
   display: inline-flex;
 }
 
-.cx-icon-button--with-badge {
-  position: relative;
-  background: transparent;
-}
-
 .cx-icon-button--with-badge::before {
+  --cx-icon-button-badge-cut: calc(var(--cx-icon-button-badge-radius) + var(--cx-icon-button-badge-gap));
+
   content: "";
   position: absolute;
+  z-index: -1;
   inset: 0;
   border-radius: inherit;
   corner-shape: inherit;
   background: var(--cx-icon-button-background, transparent);
   transition: background-color var(--motion-fast) ease;
   pointer-events: none;
-}
-
-.cx-icon-button--with-dot-badge::before {
-  -webkit-mask:
-    radial-gradient(circle 7px at calc(100% - 6px) 2px, transparent 98%, #000 100%);
+  /* Same anchor as the badge above; the 1px feather renders a crisp
+     antialiased edge instead of a sub-pixel hard stop. */
+  -webkit-mask: radial-gradient(
+    circle at calc(100% - var(--cx-icon-button-badge-center-x)) var(--cx-icon-button-badge-center-y),
+    transparent calc(var(--cx-icon-button-badge-cut) - 0.5px),
+    #000 calc(var(--cx-icon-button-badge-cut) + 0.5px)
+  );
   -webkit-mask-repeat: no-repeat;
-  mask:
-    radial-gradient(circle 7px at calc(100% - 6px) 2px, transparent 98%, #000 100%);
-  mask-repeat: no-repeat;
-}
-
-.cx-icon-button--with-badge-value::before {
-  -webkit-mask:
-    radial-gradient(circle 11px at calc(100% - 10px) 6px, transparent 98%, #000 100%);
-  -webkit-mask-repeat: no-repeat;
-  mask:
-    radial-gradient(circle 11px at calc(100% - 10px) 6px, transparent 98%, #000 100%);
+  mask: radial-gradient(
+    circle at calc(100% - var(--cx-icon-button-badge-center-x)) var(--cx-icon-button-badge-center-y),
+    transparent calc(var(--cx-icon-button-badge-cut) - 0.5px),
+    #000 calc(var(--cx-icon-button-badge-cut) + 0.5px)
+  );
   mask-repeat: no-repeat;
 }
 

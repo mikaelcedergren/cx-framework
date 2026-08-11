@@ -1,6 +1,6 @@
 # Layout
 
-How to arrange things on screen in the Cortex framework. Four primitive components handle the common arrangements, a small set of utility classes handle one-off spacing, and `.cx-page` is the frame a screen sits in.
+How to arrange things on screen in the Cortex framework. Five primitive components handle the common arrangements, a small set of utility classes handle one-off spacing, and `.cx-page` is the frame a screen sits in.
 
 The guiding rule: **components own the padding inside themselves; containers own the gaps between things.** A card or button never sets its own outside spacing — the layout container it sits in decides that. That is what lets any component drop cleanly into any layout. So you build screens by *composing these containers*, not by writing `display: flex` or adding margins.
 
@@ -11,6 +11,7 @@ The guiding rule: **components own the padding inside themselves; containers own
 | things in a vertical column | `cx-stack` |
 | things in a horizontal row | `cx-inline` |
 | equal-width columns / a card grid | `cx-grid` |
+| columns of items with different heights (a note or image wall) | `cx-masonry` |
 | two groups pushed to opposite ends (one fills, one hugs) | `cx-split` |
 | a little padding on your *own* wrapper element | `cx-p-*` utility classes |
 | to show or hide by screen size | `cx-hide-mobile` / `cx-hide-desktop` |
@@ -28,7 +29,7 @@ Reach for **8 (`sm`)** between text-like things and **16 (`md`)** between weight
 
 ## The primitives
 
-All four are invisible wrappers — no background, border, or colour of their own. They only arrange what you put inside.
+All five are invisible wrappers — no background, border, or colour of their own. They only arrange what you put inside.
 
 ### cx-stack — vertical column
 
@@ -90,6 +91,24 @@ A grid of equal-width columns.
   <cx-card>…</cx-card>
   <cx-card>…</cx-card>
 </cx-grid>
+```
+
+### cx-masonry — packed columns
+
+Items of varying height packed into columns without uniform row gaps — a Keep-style note wall. Items flow *down* each column in turn, so reading order runs down columns rather than across rows; use `cx-grid` when order or equal heights matter. Defaults to a single column on mobile.
+
+| prop | type | default |
+| --- | --- | --- |
+| `columns` | number 1–12 | `3` |
+| `columnsMobile` | number 1–12 | `1` |
+| `gap` | gap step | `md` |
+
+```html
+<cx-masonry [columns]="4" gap="md">
+  <cx-card>…</cx-card>
+  <cx-card>…</cx-card>
+  <cx-card>…</cx-card>
+</cx-masonry>
 ```
 
 ### cx-split — two ends

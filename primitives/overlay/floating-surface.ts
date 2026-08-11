@@ -11,6 +11,13 @@ export interface CxFloatingSurfaceInput {
   align?: CxFloatingSurfaceAlign;
   viewportPadding?: number;
   gap?: number;
+  /**
+   * Keep the surface on this side instead of re-deciding. Placement is chosen
+   * once when a surface opens; re-measures while it stays open pass the locked
+   * side so content growth can never flip an open surface — it scrolls within
+   * the side's max-height instead.
+   */
+  lockedPlacement?: CxFloatingSurfacePlacement;
 }
 
 export interface CxFloatingSurfaceMetrics {
@@ -31,7 +38,8 @@ export function measureCxFloatingSurface(input: CxFloatingSurfaceInput): CxFloat
   const spaceBelow = input.viewportHeight - input.triggerRect.bottom - viewportPadding - gap;
   const spaceAbove = input.triggerRect.top - viewportPadding - gap;
   const placement: CxFloatingSurfacePlacement =
-    spaceBelow < input.estimatedHeight && spaceAbove > spaceBelow ? 'top' : 'bottom';
+    input.lockedPlacement ??
+    (spaceBelow < input.estimatedHeight && spaceAbove > spaceBelow ? 'top' : 'bottom');
   const maxHeight = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0);
   const align = input.align ?? 'start';
   const leftBase = align === 'end' ? input.triggerRect.right - width : input.triggerRect.left;

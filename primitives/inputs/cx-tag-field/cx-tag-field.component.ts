@@ -91,7 +91,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   private readonly draftNameErrorState = signal<string | undefined>(undefined);
   private disabledState = false;
   private loadingState = false;
-  private focusTimer?: number;
   private dialogFocusTimer?: number;
 
   protected readonly inputId = `cx-tag-field-input-${this.instanceId}`;
@@ -109,8 +108,8 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('fieldShell', { read: ElementRef })
   private fieldShellRef?: ElementRef<HTMLElement>;
-  @ViewChild('tagField', { read: ElementRef })
-  private inputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('searchInput')
+  private searchInputRef?: CxTextFieldComponent;
   @ViewChild('popover')
   private popoverRef?: CxPopoverComponent;
   @ViewChild('draftNameInput')
@@ -266,8 +265,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     return index >= 0 ? this.optionDomId(index) : undefined;
   });
   protected readonly placeholderText$ = () => this.placeholder.trim() || this.defaultPlaceholderText();
-  protected readonly inputPlaceholder$ = () =>
-    this.selectedTags$().length === 0 ? this.placeholderText$() : '';
   protected readonly hasClear$ = () =>
     this.clearable && this.selectedTags$().length > 0 && !this.isLocked$();
   protected readonly emptyText$ = () => {
@@ -326,9 +323,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     if (typeof document !== 'undefined') {
       document.removeEventListener('scroll', this.onCapturedDocumentScroll, true);
     }
-    if (typeof window !== 'undefined' && this.focusTimer !== undefined) {
-      window.clearTimeout(this.focusTimer);
-    }
     if (typeof window !== 'undefined' && this.dialogFocusTimer !== undefined) {
       window.clearTimeout(this.dialogFocusTimer);
     }
@@ -368,30 +362,72 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     if (target instanceof HTMLElement && target.closest('button')) {
       return;
     }
+    if (this.openState()) {
+      this.closePopover();
+      return;
+    }
     this.openPopover('keep');
-    this.focusInput();
+    this.focusSearch();
   }
 
-  protected onInputFocus(): void {
-    if (!this.isLocked$() && !this.createDialogOpenState()) {
-      this.openPopover('keep');
+  /**
+   * Dropdown semantics: receiving focus never opens the popover — only
+   * explicit intent does (click, Enter/Space/ArrowDown, or typing).
+   */
+  protected onShellKeydown(event: KeyboardEvent): void {
+    if (this.isLocked$() || event.isComposing) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault();
+      if (!this.openState()) {
+        this.openPopover('first');
+        this.focusSearch();
+      }
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.openPopover(event.key === 'ArrowDown' ? 'first' : 'last');
+      this.focusSearch();
+      return;
+    }
+    if (event.key === 'Escape') {
+      if (this.openState()) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.closePopover();
+      }
+      return;
+    }
+    if (
+      (event.key === 'Backspace' || event.key === 'ArrowLeft')
+      && this.selectedTags$().length > 0
+    ) {
+      event.preventDefault();
+      this.focusSelectedTag(this.selectedTags$().length - 1);
+      return;
+    }
+    if (this.isPrintableKey(event)) {
+      event.preventDefault();
+      this.queryState.set(event.key);
+      this.openPopover('first');
+      this.focusSearch();
+      this.announceResults();
     }
   }
 
-  protected onInput(event: Event): void {
+  protected onSearchChange(value: string): void {
     if (this.isLocked$()) {
       return;
     }
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) {
-      return;
-    }
-    this.queryState.set(target.value);
-    this.openPopover('first');
+    this.queryState.set(value);
+    this.syncActiveTarget('first');
+    this.refreshPopover();
     this.announceResults();
   }
 
-  protected onInputKeydown(event: KeyboardEvent): void {
+  protected onSearchKeydown(event: KeyboardEvent): void {
     if (this.isLocked$() || event.isComposing) {
       return;
     }
@@ -408,11 +444,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
-      if (!this.openState()) {
-        this.openPopover(event.key === 'ArrowDown' ? 'first' : 'last');
-      } else {
-        this.moveActiveTarget(event.key === 'ArrowDown' ? 1 : -1);
-      }
+      this.moveActiveTarget(event.key === 'ArrowDown' ? 1 : -1);
       return;
     }
     if (
@@ -421,7 +453,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
       && !event.ctrlKey
       && !event.metaKey
       && !event.shiftKey
-      && this.openState()
       && !this.queryState()
       && this.activeTargetState()?.startsWith('tag:')
     ) {
@@ -430,34 +461,18 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (event.key === 'Enter') {
-      if (!this.openState()) {
-        this.openPopover('first');
-        return;
-      }
       event.preventDefault();
       this.commitActiveTarget();
       return;
     }
     if (event.key === 'Escape') {
-      if (this.openState()) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.closePopover();
-      }
+      event.preventDefault();
+      event.stopPropagation();
+      this.closePopover(true);
       return;
     }
     if (event.key === 'Tab') {
       this.closePopover();
-      return;
-    }
-    if (
-      (event.key === 'Backspace' || event.key === 'ArrowLeft')
-      && !this.queryState()
-      && this.inputAtStart()
-      && this.selectedTags$().length > 0
-    ) {
-      event.preventDefault();
-      this.focusSelectedTag(this.selectedTags$().length - 1);
     }
   }
 
@@ -477,7 +492,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     if (event.key === 'ArrowRight') {
       event.preventDefault();
       if (index >= this.selectedTags$().length - 1) {
-        this.focusInput();
+        this.focusShell();
       } else {
         this.focusSelectedTag(index + 1);
       }
@@ -490,17 +505,15 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     }
     if (event.key === 'Escape') {
       event.preventDefault();
-      if (this.openState()) {
-        this.closePopover();
-      }
-      this.focusInput();
+      this.closePopover();
+      this.focusShell();
       return;
     }
     if (this.isPrintableKey(event)) {
       event.preventDefault();
       this.queryState.set(event.key);
       this.openPopover('first');
-      this.focusInput();
+      this.focusSearch();
       this.announceResults();
     }
   }
@@ -508,8 +521,9 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   protected removeTagFromPointer(event: MouseEvent, tag: CxTagFieldTag): void {
     event.stopPropagation();
     this.removeTag(tag);
-    this.openPopover('keep');
-    this.focusInput();
+    if (this.openState()) {
+      this.refreshPopover();
+    }
   }
 
   protected onOptionPointerDown(event: PointerEvent): void {
@@ -531,7 +545,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     this.activeTargetState.set(this.tagTarget(tag.id));
     this.announce(`${this.formatOptionLabel(tag)} ${removing ? 'removed' : 'added'}.`);
     this.refreshPopover();
-    this.focusInput();
+    this.focusSearch();
   }
 
   protected openCreateDialog(): void {
@@ -540,7 +554,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     }
     this.openState.set(false);
     this.activeTargetState.set(undefined);
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
     this.resetDraftTag();
     this.draftNameState.set(this.queryState().trim());
     this.createDialogOpenState.set(true);
@@ -621,8 +635,9 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     this.valuesChange.emit([]);
     this.clear.emit();
     this.announce('Tags cleared.');
-    this.openPopover('first');
-    this.focusInput();
+    if (this.openState()) {
+      this.refreshPopover();
+    }
   }
 
   protected formatOptionLabel(tag: CxTagFieldTag): string {
@@ -676,10 +691,13 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  protected closePopover(): void {
+  protected closePopover(restoreFocus = false): void {
     this.openState.set(false);
     this.activeTargetState.set(undefined);
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
+    if (restoreFocus) {
+      this.focusShell();
+    }
   }
 
   private readonly onCapturedDocumentScroll = (event: Event): void => {
@@ -773,21 +791,35 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private focusInput(): void {
+  /**
+   * The search field renders with the popover one change-detection pass after
+   * opening, and the popover surface is then portaled to the body — a move
+   * that drops focus again. Retry until focus verifiably lands in the surface
+   * (bounded, open-gated). Timeout-based on purpose: animation frames are
+   * suspended in hidden tabs, timeouts are not.
+   */
+  private focusSearch(): void {
     if (typeof window === 'undefined') {
-      queueMicrotask(() => this.inputRef?.nativeElement.focus());
       return;
     }
-    if (this.focusTimer !== undefined) {
-      window.clearTimeout(this.focusTimer);
-    }
-    this.focusTimer = window.setTimeout(() => {
-      this.focusTimer = undefined;
-      const input = this.inputRef?.nativeElement;
-      input?.focus();
-      const end = input?.value.length ?? 0;
-      input?.setSelectionRange(end, end);
-    }, 0);
+    const searchHasFocus = (): boolean => {
+      const active = document.activeElement;
+      return Boolean(active && this.popoverRef?.surfaceElement()?.contains(active));
+    };
+    const tryFocus = (attempt: number): void => {
+      if (!this.openState() || searchHasFocus()) {
+        return;
+      }
+      this.searchInputRef?.focus();
+      if (attempt < 12) {
+        window.setTimeout(() => tryFocus(attempt + 1), 16);
+      }
+    };
+    window.setTimeout(() => tryFocus(0), 0);
+  }
+
+  private focusShell(): void {
+    queueMicrotask(() => this.fieldShellRef?.nativeElement.focus());
   }
 
   private focusSelectedTag(index: number): void {
@@ -800,7 +832,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     queueMicrotask(() => {
       const remaining = this.selectedTags$().length;
       if (remaining === 0) {
-        this.focusInput();
+        this.focusShell();
         return;
       }
       this.focusSelectedTag(Math.max(0, Math.min(index - 1, remaining - 1)));
@@ -828,7 +860,7 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
         return;
       }
       this.openPopover('first');
-      this.focusInput();
+      this.focusSearch();
     });
   }
 
@@ -867,11 +899,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     queueMicrotask(() => this.statusState.set(message));
   }
 
-  private inputAtStart(): boolean {
-    const input = this.inputRef?.nativeElement;
-    return Boolean(input && input.selectionStart === 0 && input.selectionEnd === 0);
-  }
-
   private isPrintableKey(event: KeyboardEvent): boolean {
     return event.key.length === 1
       && event.key !== ' '
@@ -906,11 +933,14 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     const viewportWidth = Math.max(viewport.width - 16, 0);
     const width = Math.floor(Math.min(Math.max(rect.width, 280), viewportWidth));
     const optionHeight = 44;
+    // The popover carries the search block above the options; without it in
+    // the estimate the height cap can collapse the option list entirely.
+    const searchHeight = 60;
     const emptyHeight = this.filteredTags$().length === 0 ? 72 : 0;
     const createHeight = this.showCreate$() ? optionHeight : 0;
     const estimatedHeight = Math.min(
-      this.filteredTags$().length * optionHeight + emptyHeight + createHeight + 8,
-      360,
+      searchHeight + this.filteredTags$().length * optionHeight + emptyHeight + createHeight + 8,
+      searchHeight + 360,
     );
     return {
       width,

@@ -1,0 +1,6 @@
+<div class="cx-markdown-editor">
+  @if (showPlaceholder()) {
+    <div class="cx-markdown-editor__placeholder" aria-hidden="true">{{ placeholder!.trim() }}</div>
+  }
+  <div class="cx-markdown-editor__content" #content></div>
+</div>

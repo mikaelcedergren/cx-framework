@@ -5,7 +5,9 @@
 }
 
 .cx-tag {
+  position: relative;
   display: inline-flex;
+  cursor: default;
   width: max-content;
   max-width: 100%;
   min-width: var(--controller-size-small);
@@ -43,11 +45,16 @@
   white-space: nowrap;
 }
 
+/* Out of flow and hidden at rest: a dismissible tag looks identical to a
+   plain one. Hover or keyboard focus reveals the button over the trailing
+   edge; its frosted background keeps the text beneath readable. */
 .cx-tag__dismiss {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2xs);
   display: inline-flex;
   width: 18px;
   height: 18px;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -60,10 +67,22 @@
   color: var(--ink);
   cursor: pointer;
   margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 -50%;
   transition:
+    opacity var(--motion-fast) var(--ease-out-in),
     transform var(--motion-fast) var(--ease-out-in),
     background var(--motion-fast) var(--ease-out-in),
     border-color var(--motion-fast) var(--ease-out-in);
+}
+
+/* :focus-visible (not :focus-within) so a pointer click can never leave the
+   dismiss button stuck visible; keyboard focus still reveals it. */
+.cx-tag:hover .cx-tag__dismiss,
+.cx-tag:has(.cx-tag__dismiss:focus-visible) .cx-tag__dismiss {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .cx-tag__dismiss:hover {

@@ -205,6 +205,7 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    this.overlay.endSession();
     this.overlay.setTrigger(field);
     queueMicrotask(() => {
       this.overlay.sync();

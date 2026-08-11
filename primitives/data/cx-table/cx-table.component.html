@@ -45,7 +45,6 @@
             <th
               class="cx-table__head-cell"
               [class.cx-table__head-cell--interactive]="hasColumnHeaderMenu(column) || columnsReorderable || columnsResizable"
-              [class.cx-table__head-cell--filtered]="isColumnFilterActive(column)"
               [class.cx-table__head-cell--end]="column.align === 'end'"
               [class.cx-table__head-cell--pinned]="isColumnPinned(column)"
               [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
@@ -77,9 +76,6 @@
                     <span class="cx-table__head-label" data-cx-tooltip-overflow>{{ column.label }}</span>
                     @if (sortIcon(column.id); as iconName) {
                       <cx-icon class="cx-table__sort-icon" [name]="iconName" [size]="14" />
-                    }
-                    @if (isColumnFilterActive(column)) {
-                      <cx-icon class="cx-table__filter-icon" name="filters" [size]="14" />
                     }
                   </button>
                 } @else {

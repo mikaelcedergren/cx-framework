@@ -11,6 +11,7 @@ import {
   Output,
   ViewChild,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -22,6 +23,11 @@ import {
 import { CxToggleButtonComponent } from '../../primitives/actions/cx-toggle-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxExpansionPanelComponent } from '../../primitives/display/cx-expansion-panel';
+import { CxTagComponent } from '../../primitives/display/cx-tag';
+import {
+  CxToggleChipGroupComponent,
+  type CxToggleChipGroupOption,
+} from '../../primitives/inputs/cx-toggle-chip-group';
 import { CxTextFieldComponent } from '../../primitives/inputs/cx-text-field';
 import { CxSwitchComponent } from '../../primitives/inputs/cx-switch';
 import {
@@ -36,7 +42,10 @@ import {
 import { CxOptionGroupComponent } from '../../primitives/overlay/cx-option-group';
 import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
 import { CxTooltipComponent } from '../../primitives/overlay/cx-tooltip';
-import { measureCxFloatingSurface } from '../../primitives/overlay/floating-surface';
+import {
+  measureCxFloatingSurface,
+  type CxFloatingSurfacePlacement,
+} from '../../primitives/overlay/floating-surface';
 import {
   CxColumnFilterEditorComponent,
   type CxColumnFilterDefinition,
@@ -79,6 +88,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CxColumnFilterEditorComponent,
     CxExpansionPanelComponent,
     CxIconButtonComponent,
+    CxTagComponent,
     CxTextFieldComponent,
     CxDropdownComponent,
     CxMenuComponent,
@@ -87,6 +97,7 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CxPopoverComponent,
     CxSwitchComponent,
     CxToggleButtonComponent,
+    CxToggleChipGroupComponent,
     CxTooltipComponent,
   ],
   templateUrl: './cx-filter-bar.component.html',
@@ -98,8 +109,13 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly modeState = signal<CxFilterBarMode>('filters');
   private readonly quickFiltersState = signal<CxButtonGroupOption[]>([]);
   private readonly selectedQuickFilterIdState = signal<string | undefined>(undefined);
+  private readonly toggleFiltersState = signal<CxToggleChipGroupOption[]>([]);
+  private readonly selectedToggleFilterIdsState = signal<string[]>([]);
   private readonly filtersState = signal<CxFilterBarFilter[]>([]);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
+  private readonly showActiveFiltersState = signal(true);
+  /** null means every active-filter tag fits; a number is how many fit from the newest end. */
+  private readonly visibleActiveFilterCountState = signal<number | null>(null);
   private readonly filterSearchValueState = signal('');
   private readonly expandedFilterIdState = signal<string | undefined>(
     undefined,
@@ -134,6 +150,20 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly propertiesPopoverMaxHeightState = signal<number | undefined>(undefined);
   private readonly propertiesPopoverPlacementState = signal<'bottom' | 'top'>('bottom');
   private resizeObserver?: ResizeObserver;
+  // Placement is decided once per open; re-syncs keep the side so an open
+  // popover never flips — growing content scrolls inside it instead.
+  private filterPopoverLockedPlacement?: CxFloatingSurfacePlacement;
+  private propertiesPopoverLockedPlacement?: CxFloatingSurfacePlacement;
+  private activeFiltersRegionEl?: HTMLElement;
+  private activeFilterMeasureFrame?: number;
+  private readonly activeFilterTagsChange = effect(() => {
+    this.activeFilterTags$();
+    // Re-measure after the +N pill enters or leaves the row: it takes row
+    // space itself, which can wrap one more tag. The pass converges because
+    // the signal only notifies on real changes.
+    this.visibleActiveFilterCountState();
+    this.scheduleActiveFilterMeasure();
+  });
 
   @ViewChild('filterTriggerAnchor', { read: ElementRef })
   private filterTriggerRef?: ElementRef<HTMLElement>;
@@ -149,6 +179,24 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('propertiesPopover')
   private propertiesPopoverRef?: CxPopoverComponent;
+
+  @ViewChild('activeFiltersRegion', { read: ElementRef })
+  protected set activeFiltersRegion(ref: ElementRef<HTMLElement> | undefined) {
+    const next = ref?.nativeElement;
+    if (this.activeFiltersRegionEl === next) {
+      return;
+    }
+    if (this.activeFiltersRegionEl) {
+      this.resizeObserver?.unobserve(this.activeFiltersRegionEl);
+    }
+    this.activeFiltersRegionEl = next;
+    if (next) {
+      this.resizeObserver?.observe(next);
+      this.scheduleActiveFilterMeasure();
+    } else {
+      this.visibleActiveFilterCountState.set(null);
+    }
+  }
 
   @Input() queryAriaLabel = 'Search query';
   @Input() filterSearchAriaLabel = 'Search filters';
@@ -170,6 +218,16 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
+  public set toggleFilters(value: CxToggleChipGroupOption[] | undefined) {
+    this.toggleFiltersState.set(value ?? []);
+  }
+
+  @Input()
+  public set selectedToggleFilterIds(value: string[] | undefined) {
+    this.selectedToggleFilterIdsState.set(value ?? []);
+  }
+
+  @Input()
   public set filters(value: CxFilterBarFilter[] | undefined) {
     const next = value ?? [];
     for (const filter of next) {
@@ -188,6 +246,11 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @Input()
   public set filterValues(value: CxColumnFilterValueMap | undefined) {
     this.filterValuesState.set({ ...(value ?? {}) });
+  }
+
+  @Input()
+  public set showActiveFilters(value: boolean | undefined) {
+    this.showActiveFiltersState.set(value !== false);
   }
 
   @Input()
@@ -257,6 +320,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   @Output() readonly modeChange = new EventEmitter<CxFilterBarMode>();
   @Output() readonly selectedQuickFilterIdChange = new EventEmitter<string>();
+  @Output() readonly selectedToggleFilterIdsChange = new EventEmitter<string[]>();
   @Output() readonly filterValuesChange = new EventEmitter<CxColumnFilterValueMap>();
   @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
   @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
@@ -278,6 +342,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly mode$ = this.modeState.asReadonly();
   protected readonly quickFilters$ = this.quickFiltersState.asReadonly();
   protected readonly selectedQuickFilterId$ = this.selectedQuickFilterIdState.asReadonly();
+  protected readonly toggleFilters$ = this.toggleFiltersState.asReadonly();
+  protected readonly selectedToggleFilterIds$ = this.selectedToggleFilterIdsState.asReadonly();
   protected readonly filters$ = this.filtersState.asReadonly();
   protected readonly filterSearchValue$ =
     this.filterSearchValueState.asReadonly();
@@ -315,6 +381,26 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       isCxColumnFilterValueActive(filter.filter, this.filterValuesState()[filter.id]),
     ).length,
   );
+  protected readonly showActiveFilters$ = this.showActiveFiltersState.asReadonly();
+  protected readonly activeFilterTags$ = computed(() => {
+    const values = this.filterValuesState();
+    return this.filtersState()
+      .filter(filter => isCxColumnFilterValueActive(filter.filter, values[filter.id]))
+      .map(filter => ({ id: filter.id, text: filter.label }));
+  });
+  /** Template order for the row-reverse layout: last DOM item lands leftmost. */
+  protected readonly activeFilterTagsRow$ = computed(() => this.activeFilterTags$().slice().reverse());
+  protected readonly hiddenActiveFilterCount$ = computed(() => {
+    const visibleCount = this.visibleActiveFilterCountState();
+    if (visibleCount === null) {
+      return 0;
+    }
+    return Math.max(this.activeFilterTags$().length - visibleCount, 0);
+  });
+  protected readonly moreActiveFiltersLabel$ = computed(() => {
+    const hiddenCount = this.hiddenActiveFilterCount$();
+    return hiddenCount === 1 ? 'Show 1 more active filter' : `Show ${hiddenCount} more active filters`;
+  });
   protected readonly filterButtonAriaLabel$ = computed(() => {
     const count = this.activeFilterCount$();
     return count === 0 ? 'Open filters' : `Open filters, ${count} active`;
@@ -388,6 +474,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       if (this.propertiesPopoverOpenState()) {
         this.syncPropertiesPopoverMetrics();
       }
+      if (this.activeFiltersRegionEl) {
+        this.scheduleActiveFilterMeasure();
+      }
     });
     const filterTrigger = this.filterTriggerRef?.nativeElement;
     if (filterTrigger) {
@@ -397,10 +486,17 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (propertiesTrigger) {
       this.resizeObserver.observe(propertiesTrigger);
     }
+    if (this.activeFiltersRegionEl) {
+      this.resizeObserver.observe(this.activeFiltersRegionEl);
+      this.scheduleActiveFilterMeasure();
+    }
   }
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    if (this.activeFilterMeasureFrame !== undefined && typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(this.activeFilterMeasureFrame);
+    }
   }
 
   protected onQuickFilterSelect(value: string | undefined): void {
@@ -409,6 +505,12 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     }
     this.selectedQuickFilterIdState.set(value);
     this.selectedQuickFilterIdChange.emit(value);
+    this.invalidateSavedViewSelection();
+  }
+
+  protected onToggleFilterSelect(values: string[]): void {
+    this.selectedToggleFilterIdsState.set(values);
+    this.selectedToggleFilterIdsChange.emit(values);
     this.invalidateSavedViewSelection();
   }
 
@@ -462,10 +564,62 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     expanded: boolean,
   ): void {
     this.expandedFilterIdState.set(expanded ? filterId : undefined);
+    if (expanded) {
+      this.scheduleExpandedFilterReveal(filterId);
+    }
+  }
+
+  /**
+   * The popover keeps its position when content grows, so an editor expanding
+   * near the bottom would otherwise open below the popover's fold. Follow the
+   * panel briefly while its editor renders and settles, keeping it in view.
+   */
+  private scheduleExpandedFilterReveal(filterId: string): void {
+    if (typeof requestAnimationFrame === 'undefined' || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (this.expandedFilterIdState() !== filterId) {
+        return;
+      }
+      const panel = this.filterPopoverRef
+        ?.surfaceElement()
+        ?.querySelector<HTMLElement>(`[data-cx-filter-panel="${CSS.escape(filterId)}"]`);
+      if (!panel) {
+        return;
+      }
+      const reveal = (): void => panel.scrollIntoView({ block: 'nearest' });
+      reveal();
+      const observer = new ResizeObserver(() => {
+        if (this.expandedFilterIdState() === filterId) {
+          reveal();
+        }
+      });
+      observer.observe(panel);
+      setTimeout(() => observer.disconnect(), 500);
+    });
   }
 
   protected clearFilter(filter: CxFilterBarFilter): void {
     this.onColumnFilterValueChange(filter, undefined);
+  }
+
+  protected isActiveFilterTagHidden(rowIndex: number): boolean {
+    // Row order is reversed, so the wrapped (hidden) tags are the last items.
+    return rowIndex >= this.activeFilterTags$().length - this.hiddenActiveFilterCount$();
+  }
+
+  protected onActiveFilterDismiss(filterId: string): void {
+    const filter = this.filtersState().find(candidate => candidate.id === filterId);
+    if (filter) {
+      this.clearFilter(filter);
+    }
+  }
+
+  protected onMoreActiveFiltersPressed(): void {
+    if (!this.filterPopoverOpenState()) {
+      this.toggleFilterPopover();
+    }
   }
 
   protected clearAllFilters(): void {
@@ -629,6 +783,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.propertiesPopoverOpenState.set(false);
     const next = !this.filterPopoverOpenState();
     if (next) {
+      // Fresh open: re-pick the side, then keep it for the whole session.
+      this.filterPopoverLockedPlacement = undefined;
       this.syncFilterPopoverMetrics();
     }
     this.filterPopoverOpenState.set(next);
@@ -642,6 +798,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.closeFilterPopover(false);
     const next = !this.propertiesPopoverOpenState();
     if (next) {
+      this.propertiesPopoverLockedPlacement = undefined;
       this.syncPropertiesPopoverMetrics();
     }
     this.propertiesPopoverOpenState.set(next);
@@ -785,7 +942,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       width: 560,
       estimatedHeight,
       align: 'start',
+      lockedPlacement: this.filterPopoverLockedPlacement,
     });
+    this.filterPopoverLockedPlacement = surface.placement;
 
     this.filterPopoverWidthState.set(surface.width);
     this.filterPopoverLeftState.set(surface.left);
@@ -810,7 +969,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       width: 320,
       estimatedHeight,
       align: 'end',
+      lockedPlacement: this.propertiesPopoverLockedPlacement,
     });
+    this.propertiesPopoverLockedPlacement = surface.placement;
 
     this.propertiesPopoverWidthState.set(surface.width);
     this.propertiesPopoverLeftState.set(surface.left);
@@ -818,6 +979,63 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.propertiesPopoverBottomState.set(surface.bottom);
     this.propertiesPopoverMaxHeightState.set(surface.maxHeight);
     this.propertiesPopoverPlacementState.set(surface.placement);
+  }
+
+  private scheduleActiveFilterMeasure(): void {
+    if (typeof requestAnimationFrame === 'undefined') {
+      return;
+    }
+    if (this.activeFilterMeasureFrame !== undefined) {
+      cancelAnimationFrame(this.activeFilterMeasureFrame);
+    }
+    this.activeFilterMeasureFrame = requestAnimationFrame(() => {
+      this.activeFilterMeasureFrame = undefined;
+      this.measureActiveFilterTags();
+    });
+  }
+
+  /**
+   * Counts how many tags wrapped past the first row. Tags stay in normal flow
+   * (wrapped rows are clipped by the container), so this read never changes
+   * layout and cannot oscillate.
+   */
+  private measureActiveFilterTags(): void {
+    const container = this.activeFiltersRegionEl;
+    if (!container) {
+      this.visibleActiveFilterCountState.set(null);
+      return;
+    }
+    const tagElements = Array.from(
+      container.querySelectorAll<HTMLElement>('.cx-filter-bar__active-filter'),
+    );
+    if (tagElements.length === 0) {
+      this.visibleActiveFilterCountState.set(null);
+      return;
+    }
+    // The first row is defined by every child including the +N pill; a tag
+    // sitting below it has wrapped even when no tag made the first row.
+    const firstRowTop = Math.min(
+      ...Array.from(container.children, child => (child as HTMLElement).offsetTop),
+    );
+    const rowHeight = tagElements[0].offsetHeight;
+    const wrappedCount = tagElements.filter(
+      element => element.offsetTop >= firstRowTop + rowHeight,
+    ).length;
+    if (wrappedCount === 0) {
+      this.visibleActiveFilterCountState.set(null);
+      return;
+    }
+    // The pill occupies row space too; without this check a single tag that
+    // fits on its own could stay collapsed behind a "+1" forever.
+    const gap = Number.parseFloat(getComputedStyle(container).columnGap) || 0;
+    const totalWidth =
+      tagElements.reduce((sum, element) => sum + element.offsetWidth, 0) +
+      gap * (tagElements.length - 1);
+    if (totalWidth <= container.clientWidth) {
+      this.visibleActiveFilterCountState.set(null);
+      return;
+    }
+    this.visibleActiveFilterCountState.set(tagElements.length - wrappedCount);
   }
 
   private scheduleFilterFocus(): void {

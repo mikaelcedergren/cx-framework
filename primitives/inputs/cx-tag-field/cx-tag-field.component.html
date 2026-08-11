@@ -15,11 +15,25 @@
   <div
     #fieldShell
     class="cx-tag-field__field-shell"
+    role="combobox"
+    aria-haspopup="listbox"
+    [id]="inputId"
+    [attr.tabindex]="isLocked$() ? -1 : 0"
+    [attr.aria-label]="resolvedFieldAriaLabel"
+    [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
+    [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
+    [attr.aria-expanded]="isOpen$()"
+    [attr.aria-controls]="isOpen$() ? listboxId : null"
+    [attr.aria-invalid]="hasError$() ? 'true' : null"
+    [attr.aria-required]="optional ? null : 'true'"
+    [attr.aria-disabled]="disabled ? 'true' : null"
+    [attr.aria-busy]="loading ? 'true' : null"
     [class.cx-tag-field__field-shell--open]="isOpen$()"
     [class.cx-tag-field__field-shell--disabled]="disabled"
     [class.cx-tag-field__field-shell--loading]="loading"
     [class.cx-tag-field__field-shell--error]="hasError$()"
     (click)="onFieldClick($event)"
+    (keydown)="onShellKeydown($event)"
   >
     <div class="cx-tag-field__tokens">
       @for (tag of selectedTags$(); track tag.id; let index = $index) {
@@ -44,35 +58,9 @@
         </span>
       }
 
-      <input
-        #tagField
-        class="cx-tag-field__input"
-        [id]="inputId"
-        type="text"
-        role="combobox"
-        autocomplete="off"
-        spellcheck="false"
-        [value]="query$()"
-        [placeholder]="inputPlaceholder$()"
-        [disabled]="isLocked$()"
-        [attr.aria-label]="resolvedFieldAriaLabel"
-        [attr.aria-labelledby]="resolvedFieldAriaLabelledBy"
-        [attr.aria-describedby]="resolvedFieldAriaDescribedBy"
-        [attr.aria-expanded]="isOpen$()"
-        [attr.aria-controls]="isOpen$() ? listboxId : null"
-        [attr.aria-activedescendant]="isOpen$() ? activeDescendant$() : null"
-        [attr.aria-keyshortcuts]="showCreate$() ? createShortcutAria : null"
-        [attr.aria-invalid]="hasError$() ? 'true' : null"
-        [attr.aria-required]="optional ? null : 'true'"
-        [attr.aria-disabled]="disabled ? 'true' : null"
-        [attr.aria-busy]="loading ? 'true' : null"
-        aria-autocomplete="list"
-        aria-haspopup="listbox"
-        data-shortcut-ignore="ArrowDown,ArrowUp,ArrowLeft,Enter,Escape,Backspace,Delete"
-        (focus)="onInputFocus()"
-        (input)="onInput($event)"
-        (keydown)="onInputKeydown($event)"
-      />
+      @if (selectedTags$().length === 0) {
+        <span class="cx-tag-field__placeholder">{{ placeholderText$() }}</span>
+      }
     </div>
 
     <span class="cx-tag-field__actions">
@@ -132,8 +120,23 @@
       [top]="overlay.top$()"
       [bottom]="overlay.bottom$()"
       [placement]="overlay.placement$()"
-      (backdropPressed)="closePopover()"
+      (backdropPressed)="closePopover(true)"
     >
+      <!-- The field acts like a dropdown trigger: the search lives here in
+           the popover, not in the field itself. -->
+      <div class="cx-tag-field__search">
+        <cx-text-field
+          #searchInput
+          label=""
+          ariaLabel="Search tags"
+          prependIcon="search"
+          [clearable]="true"
+          [value]="query$()"
+          (valueChange)="onSearchChange($event)"
+          (keydown)="onSearchKeydown($event)"
+        />
+      </div>
+
       <div
         class="cx-tag-field__surface"
         [id]="listboxId"

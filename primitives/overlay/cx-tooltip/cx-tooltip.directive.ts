@@ -27,10 +27,10 @@ let cxTooltipId = 0;
 
 const CX_TOOLTIP_DEFAULT_DELAY_MS = 1000;
 const CX_TOOLTIP_CLOSE_GRACE_MS = 120;
-const CX_TOOLTIP_OVERFLOW_CLASS = 'cx-overflow-fade--clipped';
 const CX_TOOLTIP_OVERFLOW_ATTRIBUTE = 'data-cx-tooltip-overflow';
 const CX_TOOLTIP_OVERFLOW_TARGET = `[${CX_TOOLTIP_OVERFLOW_ATTRIBUTE}]`;
 const CX_TOOLTIP_OVERFLOW_TEXT_ATTRIBUTE = 'data-cx-tooltip-text';
+const CX_TOOLTIP_OVERFLOW_CLIPPED_CLASS = 'cx-overflow-fade--clipped';
 const CX_TOOLTIP_FOCUS_OWNER = [
   'a[href]',
   'area[href]',
@@ -637,10 +637,12 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     const nextClippedTargets = new Set<HTMLElement>();
     for (const target of nextTargets) {
       const clipped = this.isClipped(target);
-      target.classList.toggle(CX_TOOLTIP_OVERFLOW_CLASS, clipped);
       if (clipped) {
         nextClippedTargets.add(target);
       }
+      // classList only mutates the attribute on a real change, so the shared
+      // mutation observer settles instead of re-triggering itself.
+      target.classList.toggle(CX_TOOLTIP_OVERFLOW_CLIPPED_CLASS, clipped);
     }
     this.clippedOverflowTargets = nextClippedTargets;
 
@@ -728,10 +730,10 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     for (const stopObserving of this.stopOverflowObservations) {
       stopObserving();
     }
-    this.stopOverflowObservations = [];
     for (const target of this.overflowTargets) {
-      target.classList.remove(CX_TOOLTIP_OVERFLOW_CLASS);
+      target.classList.remove(CX_TOOLTIP_OVERFLOW_CLIPPED_CLASS);
     }
+    this.stopOverflowObservations = [];
     this.overflowTargets = [];
     this.clippedOverflowTargets.clear();
     this.hoveredOverflowTarget = undefined;

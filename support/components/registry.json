@@ -532,13 +532,13 @@
       "path": "primitives/feedback/cx-budget/cx-budget.component.ts"
     },
     {
-      "name": "cx-loader",
+      "name": "cx-skeleton-loader",
       "selectors": [
-        "cx-loader"
+        "cx-skeleton-loader"
       ],
       "area": "primitive",
       "category": "feedback",
-      "path": "primitives/feedback/cx-loader/cx-loader.component.ts"
+      "path": "primitives/feedback/cx-skeleton-loader/cx-skeleton-loader.component.ts"
     },
     {
       "name": "cx-progress-bar",
@@ -793,6 +793,15 @@
       "path": "primitives/inputs/cx-switch/cx-switch.component.ts"
     },
     {
+      "name": "cx-markdown-editor",
+      "selectors": [
+        "cx-markdown-editor"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-markdown-editor/cx-markdown-editor.component.ts"
+    },
+    {
       "name": "cx-tag-field",
       "selectors": [
         "cx-tag-field"
@@ -845,6 +854,15 @@
       "area": "primitive",
       "category": "layout",
       "path": "primitives/layout/cx-grid/cx-grid.component.ts"
+    },
+    {
+      "name": "cx-masonry",
+      "selectors": [
+        "cx-masonry"
+      ],
+      "area": "primitive",
+      "category": "layout",
+      "path": "primitives/layout/cx-masonry/cx-masonry.component.ts"
     },
     {
       "name": "cx-inline",
@@ -935,6 +953,15 @@
       "area": "primitive",
       "category": "overlay",
       "path": "primitives/overlay/cx-dialog/cx-dialog.component.ts"
+    },
+    {
+      "name": "cx-loading-overlay",
+      "selectors": [
+        "cx-loading-overlay"
+      ],
+      "area": "primitive",
+      "category": "overlay",
+      "path": "primitives/overlay/cx-loading-overlay/cx-loading-overlay.component.ts"
     },
     {
       "name": "cx-fullscreen-dialog",

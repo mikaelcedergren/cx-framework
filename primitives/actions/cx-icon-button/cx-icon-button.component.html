@@ -40,8 +40,11 @@
   }
 
   @if (hasBadge()) {
+    <!-- Inline placement renders the bare indicator with no internal corner
+         offsets, so the wrapper alone decides where the badge sits — from the
+         same variables that position the background cutout. -->
     <span class="cx-icon-button__badge" aria-hidden="true">
-      <cx-badge [count]="badgeCount()" />
+      <cx-badge placement="inline" [count]="badgeCount()" />
     </span>
   }
 </button>

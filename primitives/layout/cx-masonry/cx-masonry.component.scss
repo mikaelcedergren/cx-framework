@@ -1,0 +1,38 @@
+@use '../../../tokens/breakpoints-scale' as bp;
+
+// ViewEncapsulation.None: keep every selector anchored to the cx-masonry
+// element so nothing leaks beyond the primitive.
+
+cx-masonry {
+  display: block;
+  width: 100%;
+}
+
+cx-masonry > .cx-masonry {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  column-count: var(--cx-masonry-columns, 3);
+  column-gap: var(--cx-masonry-gap, var(--space-md));
+}
+
+// Items flow down each column; keep each item whole and give the column flow
+// the same rhythm as the column gap. The negative bottom margin on the wrapper
+// swallows the trailing item margin of every column.
+cx-masonry > .cx-masonry {
+  margin-block-end: calc(var(--cx-masonry-gap, var(--space-md)) * -1);
+}
+
+cx-masonry > .cx-masonry > * {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  margin-block-end: var(--cx-masonry-gap, var(--space-md));
+}
+
+@media (max-width: (bp.$mobile - 1px)) {
+  cx-masonry > .cx-masonry {
+    column-count: var(--cx-masonry-columns-mobile, 1);
+  }
+}

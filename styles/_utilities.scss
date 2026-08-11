@@ -141,28 +141,6 @@ $measures: (
     white-space: nowrap;
   }
 
-  // Applied by cxTooltipOverflow only after measurement proves that the
-  // target is clipped. The fade follows the reading direction and never
-  // hides text when forced-colour rendering is active.
-  .cx-overflow-fade--clipped {
-    text-overflow: clip;
-    mask-image: linear-gradient(to right, #000 calc(100% - var(--space-lg)), transparent);
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--space-lg)), transparent);
-  }
-
-  .cx-overflow-fade--clipped:dir(rtl) {
-    mask-image: linear-gradient(to left, #000 calc(100% - var(--space-lg)), transparent);
-    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - var(--space-lg)), transparent);
-  }
-
-  @media (forced-colors: active) {
-    .cx-overflow-fade--clipped,
-    .cx-overflow-fade--clipped:dir(rtl) {
-      mask-image: none;
-      -webkit-mask-image: none;
-    }
-  }
-
   // Sizing — content measure (capped + centred), plus raw-page helpers.
   @each $name, $measure in $measures {
     .cx-measure-#{$name} {
@@ -211,5 +189,46 @@ $measures: (
     .cx-hide-desktop {
       display: none;
     }
+  }
+}
+
+// Shared clipped-text treatment — framework infrastructure, not a hand-applied
+// utility, so it lives outside the cx-utilities layer. The cxTooltip overflow
+// trigger measures every marked text target and applies this class only while
+// the text is actually clipped; the full text stays reachable through the
+// shared tooltip. Native text-overflow ellipsis is banned (it creates a Safari
+// tooltip), so clipping ends in a direction-aware fade instead.
+.cx-overflow-fade--clipped {
+  text-overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent);
+}
+
+// Kept as two rules: an engine without :dir() would otherwise drop the
+// attribute fallback together with the unsupported selector.
+[dir='rtl'] .cx-overflow-fade--clipped {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
+}
+
+.cx-overflow-fade--clipped:dir(rtl) {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
+}
+
+// Forced-colors mode draws text in system colors on a plain canvas; a partial
+// alpha fade would fight that contrast contract, so the clip stays hard. The
+// RTL variants repeat here because their higher specificity would otherwise
+// keep the fade alive.
+@media (forced-colors: active) {
+  .cx-overflow-fade--clipped,
+  [dir='rtl'] .cx-overflow-fade--clipped {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .cx-overflow-fade--clipped:dir(rtl) {
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }

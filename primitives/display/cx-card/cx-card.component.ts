@@ -1,4 +1,13 @@
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+} from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxIconComponent } from '../../media/cx-icon';
@@ -19,6 +28,10 @@ export type CxCardPadding = 'none' | 'default' | 'large';
     '[class.cx-card-host--padding-none]': 'padding === "none"',
     '[class.cx-card-host--padding-large]': 'padding === "large"',
     '[class.cx-card-host--interactive]': 'interactive',
+    '[attr.role]': 'interactive ? "button" : null',
+    '[attr.tabindex]': 'interactive ? 0 : null',
+    '(click)': 'onHostClick($event)',
+    '(keydown)': 'onHostKeydown($event)',
     '[class.cx-card-host--mood-primary]': 'mood === "primary"',
     '[class.cx-card-host--mood-accent]': 'mood === "accent"',
     '[class.cx-card-host--mood-info]': 'mood === "info"',
@@ -40,6 +53,34 @@ export class CxCardComponent {
   @Input() menuItems: readonly CxMenuItem[] | undefined;
 
   @Output() readonly menuItemSelect = new EventEmitter<string>();
+  @Output() readonly pressed = new EventEmitter<void>();
+
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  protected onHostClick(event: MouseEvent): void {
+    if (!this.interactive || this.isInteractiveDescendant(event.target)) {
+      return;
+    }
+    this.pressed.emit();
+  }
+
+  protected onHostKeydown(event: KeyboardEvent): void {
+    if (!this.interactive || event.target !== this.elementRef.nativeElement) {
+      return;
+    }
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    event.preventDefault();
+    this.pressed.emit();
+  }
+
+  private isInteractiveDescendant(target: EventTarget | null): boolean {
+    return (
+      target instanceof Element &&
+      !!target.closest('button, a, input, textarea, select, cx-menu, [contenteditable="true"]')
+    );
+  }
 
   protected hasHeading(): boolean {
     return !!this.heading?.trim();

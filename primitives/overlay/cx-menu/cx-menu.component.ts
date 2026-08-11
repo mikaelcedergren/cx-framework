@@ -22,7 +22,10 @@ import { CxOptionComponent } from '../cx-option';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
 import { CxHostVisibilityObserver, isHostVisible } from '../../shared/host-visibility';
-import { measureCxFloatingSurface } from '../floating-surface';
+import {
+  measureCxFloatingSurface,
+  type CxFloatingSurfacePlacement,
+} from '../floating-surface';
 import { CxMenuTriggerDirective } from './cx-menu-trigger.directive';
 
 export type CxMenuLayout = 'inline' | 'fill';
@@ -261,6 +264,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private readonly surfaceBottomState = signal<number | undefined>(undefined);
   private readonly surfaceLeftState = signal<number | undefined>(undefined);
   private readonly surfaceMaxHeightState = signal<number | undefined>(undefined);
+  // Placement is decided once per open; re-syncs while open keep the side so
+  // the surface never flips mid-interaction.
+  private surfaceLockedPlacement?: CxFloatingSurfacePlacement;
   private triggerElement?: HTMLElement;
   private triggerButton?: HTMLButtonElement;
   private triggerOriginalState?: {
@@ -311,6 +317,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
     queueMicrotask(() => this.connectTrigger());
     if (nextPresentation.kind === 'context' && this.openState()) {
+      // A context menu re-anchored to a new pointer position is a new
+      // session: re-pick the side for the new anchor.
+      this.surfaceLockedPlacement = undefined;
       queueMicrotask(() => {
         this.syncSurfaceMetrics();
         this.focusFirstEnabledOption();
@@ -351,6 +360,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     this.syncTriggerState();
     this.syncTriggerResizeObserver();
     if (nextOpen) {
+      this.surfaceLockedPlacement = undefined;
       queueMicrotask(() => {
         this.syncSurfaceMetrics();
         if (this.presentationState().kind === 'context') {
@@ -448,6 +458,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     event.preventDefault();
     event.stopImmediatePropagation();
     if (!this.openState()) {
+      this.surfaceLockedPlacement = undefined;
       this.syncSurfaceMetrics();
       this.setOpen(true);
     }
@@ -644,6 +655,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private toggleOpen(focusFirstOption = false): void {
     const nextOpen = !this.openState();
     if (nextOpen) {
+      this.surfaceLockedPlacement = undefined;
       this.syncSurfaceMetrics();
     }
     this.setOpen(nextOpen, !nextOpen);
@@ -695,7 +707,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       estimatedHeight: estimateMenuSurfaceHeight(this.rootItems()),
       align: presentation.kind === 'context' ? 'start' : this.alignState(),
       gap: presentation.kind === 'context' ? 0 : undefined,
+      lockedPlacement: this.surfaceLockedPlacement,
     });
+    this.surfaceLockedPlacement = surface.placement;
 
     this.surfaceLeftState.set(surface.left);
     this.surfaceTopState.set(surface.top);

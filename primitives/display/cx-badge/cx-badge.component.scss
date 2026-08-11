@@ -146,6 +146,12 @@
   gap: var(--space-xs);
 }
 
+/* An inline badge without projected content is just the indicator; an empty
+   content span must not reserve flex-gap space next to it. */
+.cx-badge--inline .cx-badge__content:empty {
+  display: none;
+}
+
 .cx-badge--inline .cx-badge__indicator {
   position: static;
   transform: none;

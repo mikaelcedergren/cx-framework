@@ -1,0 +1,90 @@
+:host {
+  display: contents;
+}
+
+.cx-loading-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: var(--overlay-backdrop);
+  backdrop-filter: blur(var(--frost-softness));
+  box-sizing: border-box;
+}
+
+.cx-loading-overlay {
+  display: flex;
+  min-width: min(95vw, calc(var(--controller-size) * 8));
+  max-width: min(95vw, calc(var(--controller-size) * 12));
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  border: var(--floating-surface-border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-alt);
+  box-shadow: var(--shadow-high);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  animation: cx-loading-overlay-enter calc(var(--motion-slow) * 2) var(--ease-out-strong);
+}
+
+// The surface takes focus so the wait cannot be tabbed past, but it is not an
+// interactive control and must not be painted as one.
+.cx-loading-overlay:focus,
+.cx-loading-overlay:focus-visible {
+  outline: none;
+}
+
+.cx-loading-overlay__status {
+  max-width: 100%;
+  min-width: 0;
+  text-align: center;
+  animation: cx-loading-overlay-status-enter var(--motion-base) var(--ease-out) both;
+}
+
+@keyframes cx-loading-overlay-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cx-loading-overlay-status-enter {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-loading-overlay,
+  .cx-loading-overlay__status {
+    animation: none;
+  }
+}
+
+.cx-loading-overlay__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

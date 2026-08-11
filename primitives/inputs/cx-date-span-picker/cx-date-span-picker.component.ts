@@ -265,7 +265,7 @@ export class CxDateSpanPickerComponent implements AfterViewInit, OnDestroy {
     }
 
     this.openState.set(true);
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
     this.overlay.setTrigger(field);
     this.syncViewToSelection();
     queueMicrotask(() => {

@@ -25,7 +25,10 @@ import {
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
-import { measureCxFloatingSurface } from '../../overlay/floating-surface';
+import {
+  measureCxFloatingSurface,
+  type CxFloatingSurfacePlacement,
+} from '../../overlay/floating-surface';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import {
   CxSeverityTagComponent,
@@ -271,6 +274,10 @@ export class CxTableComponent implements OnDestroy {
   private readonly selectedRowIdsState = signal<string[]>([]);
   private readonly columnOrderState = signal<string[]>([]);
   private readonly columnWidthOverridesState = signal<Record<string, number>>({});
+  // The first column carries the key information, so it auto-fits to its
+  // content until the user resizes it manually.
+  private appliedFirstColumnAutoFit?: { columnId: string; width: number };
+  private firstColumnAutoFitTimer?: number;
   private readonly contentWidthsState = signal<Record<string, number>>({});
   private readonly columnLeftOffsetsState = signal<Record<string, number>>({});
   private readonly resizingColumnIdState = signal<string | undefined>(undefined);
@@ -295,6 +302,9 @@ export class CxTableComponent implements OnDestroy {
     | undefined
   >(undefined);
   private columnHeaderMenuTrigger?: HTMLElement;
+  // Placement is decided once per open; window-resize re-syncs keep the side
+  // so an open header menu never flips.
+  private columnHeaderMenuLockedPlacement?: CxFloatingSurfacePlacement;
   private activeResizeSession:
     | {
         columnId: string;
@@ -336,8 +346,8 @@ export class CxTableComponent implements OnDestroy {
   @Input() loading = false;
   @Input() showRowActions = true;
   @Input() rightClickMenu = true;
-  @Input() emptyText = 'No rows to display.';
-  @Input() noMatchesText = 'No rows match the current filters.';
+  @Input() emptyText = 'No results to display.';
+  @Input() noMatchesText = 'No results match the current filters.';
 
   @Input()
   public set selectionMode(value: CxTableSelectionMode) {
@@ -375,6 +385,7 @@ export class CxTableComponent implements OnDestroy {
     this.columnWidthOverridesState.update(current =>
       Object.fromEntries(Object.entries(current).filter(([id]) => nextIds.includes(id))),
     );
+    this.scheduleFirstColumnAutoFit();
   }
 
   @Input()
@@ -382,6 +393,7 @@ export class CxTableComponent implements OnDestroy {
     const nextRows = value ?? [];
     const nextRowIds = new Set(nextRows.map(row => row.id));
     this.rowsState.set(nextRows);
+    this.scheduleFirstColumnAutoFit();
 
     const openRowMenuId = this.openRowMenuIdState();
     const openRowMenu = openRowMenuId ? nextRows.find(row => row.id === openRowMenuId) : undefined;
@@ -540,6 +552,9 @@ export class CxTableComponent implements OnDestroy {
   public ngOnDestroy(): void {
     this.destroyed = true;
     this.pendingContextMenuState = undefined;
+    if (typeof window !== 'undefined' && this.firstColumnAutoFitTimer !== undefined) {
+      window.clearTimeout(this.firstColumnAutoFitTimer);
+    }
     this.stopResizeSession();
     this.stopReorderSession();
     this.cancelKeyboardColumnReorder(false);
@@ -789,11 +804,6 @@ export class CxTableComponent implements OnDestroy {
     return this.filterValuesState()[column.id];
   }
 
-  protected isColumnFilterActive(column: CxTableColumn): boolean {
-    return column.filter !== undefined
-      && isCxColumnFilterValueActive(column.filter, this.filterValuesState()[column.id]);
-  }
-
   protected columnFilterSummary(column: CxTableColumn): string | undefined {
     return column.filter
       ? summarizeCxColumnFilterValue(column.filter, this.filterValuesState()[column.id])
@@ -940,6 +950,8 @@ export class CxTableComponent implements OnDestroy {
     this.columnHeaderMenuColumnIdState.set(column.id);
     this.columnHeaderMenuOpenChange.emit(true);
     this.columnHeaderMenuTrigger = triggerElement;
+    // Fresh open: re-pick the side, then keep it for the whole session.
+    this.columnHeaderMenuLockedPlacement = undefined;
     this.syncColumnHeaderMenuPosition(column, triggerElement);
     this.scheduleColumnHeaderMenuFocus(column);
   }
@@ -1046,7 +1058,9 @@ export class CxTableComponent implements OnDestroy {
       minWidth: 240,
       align: 'start',
       gap: 4,
+      lockedPlacement: this.columnHeaderMenuLockedPlacement,
     });
+    this.columnHeaderMenuLockedPlacement = surface.placement;
 
     this.columnHeaderMenuPositionState.set({
       left: surface.left,
@@ -1429,6 +1443,55 @@ export class CxTableComponent implements OnDestroy {
     }
   }
 
+  /**
+   * The first column carries the most important information, so it sizes to
+   * its content automatically whenever rows or columns change — until the
+   * user resizes it manually, which takes ownership of the width.
+   * Timeout-based (not animation frames) so it also runs in hidden tabs, and
+   * retried briefly because the new rows render one change-detection pass
+   * after the input setter fires.
+   */
+  private scheduleFirstColumnAutoFit(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (this.firstColumnAutoFitTimer !== undefined) {
+      window.clearTimeout(this.firstColumnAutoFitTimer);
+    }
+    const attempt = (tries: number): void => {
+      this.firstColumnAutoFitTimer = undefined;
+      if (this.destroyed || this.applyFirstColumnAutoFit() || tries >= 5) {
+        return;
+      }
+      this.firstColumnAutoFitTimer = window.setTimeout(() => attempt(tries + 1), 32);
+    };
+    this.firstColumnAutoFitTimer = window.setTimeout(() => attempt(0), 0);
+  }
+
+  /** Returns true when settled: applied, or skipped because the user owns the width. */
+  private applyFirstColumnAutoFit(): boolean {
+    const firstColumn = this.columns$()[0];
+    if (!firstColumn || this.rowsState().length === 0) {
+      return false;
+    }
+    const table = this.tableElement?.nativeElement;
+    if (!table?.querySelector(`td[data-column-id="${this.escapeColumnId(firstColumn.id)}"]`)) {
+      return false;
+    }
+    const override = this.columnWidthOverridesState()[firstColumn.id];
+    const applied = this.appliedFirstColumnAutoFit;
+    const autoFitOwnsWidth =
+      override === undefined ||
+      (applied?.columnId === firstColumn.id && applied.width === override);
+    if (!autoFitOwnsWidth) {
+      return true;
+    }
+    const width = this.clampColumnWidth(this.autoFitColumnWidth(firstColumn.id));
+    this.updateColumnWidth(firstColumn.id, width);
+    this.appliedFirstColumnAutoFit = { columnId: firstColumn.id, width };
+    return true;
+  }
+
   private updateColumnWidth(columnId: string, width: number): void {
     const nextWidth = this.clampColumnWidth(width);
     if (this.columnWidthOverridesState()[columnId] === nextWidth) {
@@ -1489,44 +1552,65 @@ export class CxTableComponent implements OnDestroy {
       return this.clampColumnWidth(120);
     }
 
+    // One measurement path for every cell kind: the natural width of the real
+    // rendered content container. Icons, gaps, sort arrows, and future cell
+    // kinds are included automatically because the actual DOM is measured —
+    // no per-kind branches, no pixel allowances.
     const selector = `[data-column-id="${this.escapeColumnId(columnId)}"]`;
     let maxContentWidth = 0;
+    let paddedCell: HTMLElement | undefined;
 
-    const headerLabel = table.querySelector(
-      `th${selector} .cx-table__head-label`,
-    ) as HTMLElement | null;
-    if (headerLabel) {
-      const headerGripAllowance = 24;
-      maxContentWidth = Math.max(
-        maxContentWidth,
-        this.measureTextWidth(headerLabel.textContent ?? '', headerLabel) + headerGripAllowance,
-      );
+    const headerCell = table.querySelector(`th${selector}`) as HTMLElement | null;
+    const headerContent = headerCell?.querySelector('.cx-table__head-content') as HTMLElement | null;
+    if (headerContent) {
+      maxContentWidth = Math.max(maxContentWidth, this.measureNaturalContentWidth(headerContent));
+      paddedCell = headerCell ?? undefined;
     }
 
     table.querySelectorAll(`td${selector}`).forEach(node => {
       const cell = node as HTMLElement;
-      const textValue = cell.querySelector('.cx-table__text-value') as HTMLElement | null;
-      if (textValue) {
-        let cellWidth = this.measureTextWidth(textValue.textContent ?? '', textValue);
-        if (cell.querySelector('.cx-table__text-icon')) {
-          cellWidth += 24;
-        }
-        maxContentWidth = Math.max(maxContentWidth, cellWidth);
-        return;
-      }
-
-      const content = cell.querySelector('.cx-table__measure-target > *') as HTMLElement | null;
+      const content = cell.querySelector('.cx-table__measure-target') as HTMLElement | null;
       if (content) {
-        maxContentWidth = Math.max(
-          maxContentWidth,
-          Math.ceil(content.getBoundingClientRect().width),
-        );
+        maxContentWidth = Math.max(maxContentWidth, this.measureNaturalContentWidth(content));
+        paddedCell = cell;
       }
     });
 
-    const horizontalPadding = this.density === 'comfortable' ? 40 : 16;
-    const resizeHandleAllowance = 12;
-    return this.clampColumnWidth(maxContentWidth + horizontalPadding + resizeHandleAllowance);
+    // The cell's real computed padding, not a constant mirroring the CSS.
+    let horizontalPadding = 0;
+    if (paddedCell && typeof window !== 'undefined') {
+      const cellStyles = window.getComputedStyle(paddedCell);
+      horizontalPadding =
+        (Number.parseFloat(cellStyles.paddingLeft) || 0) +
+        (Number.parseFloat(cellStyles.paddingRight) || 0);
+    }
+    return this.clampColumnWidth(maxContentWidth + horizontalPadding);
+  }
+
+  /**
+   * The live cell content shrinks to the current column width, so its rendered
+   * width is useless for auto-fit once it is already clipped. Measure an
+   * off-flow clone freed from the flex constraints instead — it reports the
+   * content's natural width while inheriting the same component styles.
+   */
+  private measureNaturalContentWidth(content: HTMLElement): number {
+    const parent = content.parentElement;
+    if (!parent) {
+      return Math.ceil(content.getBoundingClientRect().width);
+    }
+    const clone = content.cloneNode(true) as HTMLElement;
+    clone.style.position = 'fixed';
+    clone.style.left = '-10000px';
+    clone.style.top = '0';
+    clone.style.width = 'max-content';
+    clone.style.maxWidth = 'none';
+    clone.style.flex = 'none';
+    clone.style.visibility = 'hidden';
+    clone.style.pointerEvents = 'none';
+    parent.appendChild(clone);
+    const width = Math.ceil(clone.getBoundingClientRect().width);
+    clone.remove();
+    return width;
   }
 
   private escapeColumnId(columnId: string): string {
@@ -1822,22 +1906,4 @@ export class CxTableComponent implements OnDestroy {
     });
   }
 
-  private measureTextWidth(text: string, referenceElement: HTMLElement): number {
-    const probe = document.createElement('span');
-    const computedStyles = window.getComputedStyle(referenceElement);
-
-    probe.textContent = text;
-    probe.style.position = 'absolute';
-    probe.style.visibility = 'hidden';
-    probe.style.whiteSpace = 'nowrap';
-    probe.style.pointerEvents = 'none';
-    probe.style.font = computedStyles.font;
-    probe.style.letterSpacing = computedStyles.letterSpacing;
-    probe.style.textTransform = computedStyles.textTransform;
-
-    document.body.appendChild(probe);
-    const width = Math.ceil(probe.getBoundingClientRect().width);
-    probe.remove();
-    return width;
-  }
 }

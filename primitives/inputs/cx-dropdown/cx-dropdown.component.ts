@@ -886,7 +886,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     this.openChange.emit(open);
     if (!open) {
       this.resetOptionScroll();
-      this.overlay.resetMeasurement();
+      this.overlay.endSession();
     }
   }
 

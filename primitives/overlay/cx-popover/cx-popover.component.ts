@@ -81,7 +81,15 @@ export class CxPopoverComponent {
       currentNode.remove();
     }
     if (nextNode && nextNode.parentNode !== body) {
+      // Moving a node drops focus held inside it. Consumers may have focused
+      // surface content (e.g. a search field) before this pass runs, so
+      // restore that focus after the move.
+      const activeElement = this.document.activeElement;
+      const focusWasInside = activeElement instanceof HTMLElement && nextNode.contains(activeElement);
       body.appendChild(nextNode);
+      if (focusWasInside) {
+        activeElement.focus();
+      }
     }
     return nextNode;
   }

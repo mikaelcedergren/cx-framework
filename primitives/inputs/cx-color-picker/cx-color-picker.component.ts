@@ -228,7 +228,7 @@ export class CxColorPickerComponent implements AfterViewInit, OnDestroy {
 
   protected closePopover(): void {
     this.openState.set(false);
-    this.overlay.resetMeasurement();
+    this.overlay.endSession();
   }
 
   protected isOptionSelected(option: CxColorPickerOption): boolean {

@@ -23,6 +23,16 @@ Public Angular APIs must be exported from `public-api.ts`. If raw icon assets ch
 
 Angular code has one package entrypoint: `@mikaelcedergren/cx-framework`. Component, pattern, and tooling source folders are packaged for reference and build input but are not importable subpaths. Asset and maintainer subpaths are explicitly limited to `ai`, `fonts`, `icons`, `scripts`, `styles`, `support`, and `tokens`.
 
+## Runtime dependencies
+
+The package carries a deliberately small set of runtime dependencies, each owned by a specific component family:
+
+- `marked` — markdown rendering in `cx-markdown` and the `cx-text-area` markdown preview.
+- `ag-charts-community` — charting in `cx-chart`.
+- `prosemirror-*` (state, view, model, transform, markdown, inputrules, keymap, commands, history, schema-list) — the editing engine behind `cx-markdown-editor`. The component stores plain markdown strings; ProseMirror provides the inline rich-text editing surface, markdown input rules, and undo history.
+
+A new runtime dependency is an architectural decision: it ships to every consumer of the package, so it needs an owning component and explicit approval before it is added.
+
 Validate portable AI rules, component discovery metadata, and skill bridges before every dry run or apply:
 
 ```sh

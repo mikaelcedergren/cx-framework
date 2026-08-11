@@ -52,6 +52,7 @@ export class CxFloatingSurfaceController {
   private triggerElement?: HTMLElement;
   private resizeObserver?: ResizeObserver;
   private measurePassFrame?: number;
+  private lockedPlacement?: CxFloatingSurfacePlacement;
 
   readonly width$ = this.widthState.asReadonly();
   readonly minWidth$ = this.minWidthState.asReadonly();
@@ -106,7 +107,11 @@ export class CxFloatingSurfaceController {
       align: request.align,
       viewportPadding: request.viewportPadding,
       gap: request.gap,
+      lockedPlacement: this.lockedPlacement,
     });
+    // First sync of a session decides the side; every later sync keeps it so
+    // an open surface can never flip. resetMeasurement() ends the session.
+    this.lockedPlacement = surface.placement;
 
     if (this.surface) {
       // Content-sized mode: width$ publishes only real measurements, locking
@@ -131,12 +136,23 @@ export class CxFloatingSurfaceController {
   }
 
   /**
-   * Forget the locked surface width so the next open re-measures the content.
-   * Call when the surface closes or its content changes materially.
+   * Forget the locked surface width so the next sync re-measures the content.
+   * Call when the content changes materially while the surface stays open;
+   * the placement lock survives so the surface cannot flip mid-interaction.
    */
   resetMeasurement(): void {
     this.widthState.set(undefined);
     this.cancelMeasurePass();
+  }
+
+  /**
+   * End the open session: forget the locked width AND the locked placement so
+   * the next open re-measures the content and re-picks a side. Call when the
+   * surface closes (or right before a fresh open).
+   */
+  endSession(): void {
+    this.resetMeasurement();
+    this.lockedPlacement = undefined;
   }
 
   private measureSurfaceWidth(): number | undefined {

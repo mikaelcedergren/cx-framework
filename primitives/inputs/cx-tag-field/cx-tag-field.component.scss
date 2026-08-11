@@ -22,10 +22,15 @@
   border: var(--line);
   border-radius: var(--radius-md);
   background: transparent;
-  cursor: text;
+  cursor: pointer;
 }
 
-@include field.field-shell-state('.cx-tag-field__field-shell', '.cx-tag-field__input');
+@include field.field-shell-state('.cx-tag-field__field-shell');
+
+.cx-tag-field__field-shell:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
 
 .cx-tag-field__field-shell:hover:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error),
 .cx-tag-field__field-shell:focus-within:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error) {
@@ -81,8 +86,10 @@
     border-color var(--motion-fast) var(--ease-out-in);
 }
 
+/* :focus-visible (not :focus-within) so a pointer click can never leave the
+   remove button stuck visible; keyboard focus still reveals it. */
 .cx-tag-field__token:hover .cx-tag-field__token-remove,
-.cx-tag-field__token:focus-within .cx-tag-field__token-remove {
+.cx-tag-field__token:has(.cx-tag-field__token-remove:focus-visible) .cx-tag-field__token-remove {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(-50%) scale(1);
@@ -110,20 +117,21 @@
   }
 }
 
-.cx-tag-field__input {
-  width: auto;
-  min-width: min(10ch, 100%);
+.cx-tag-field__placeholder {
+  display: inline-flex;
   min-height: var(--icon-size-md);
-  flex: 1 1 10ch;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
+  align-items: center;
+  color: var(--placeholder);
   font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-control);
+}
+
+/* Same spacing rhythm as the dropdown search. */
+.cx-tag-field__search {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-sm) var(--space-sm) var(--space-xs);
 }
 
 .cx-tag-field--small .cx-tag-field__field-shell {
@@ -131,7 +139,7 @@
   padding-block: var(--space-2xs);
 }
 
-.cx-tag-field--small .cx-tag-field__input {
+.cx-tag-field--small .cx-tag-field__placeholder {
   font-size: var(--font-size-body-sm);
 }
 
@@ -141,16 +149,8 @@
   border-radius: var(--radius-xl);
 }
 
-.cx-tag-field--large .cx-tag-field__input {
+.cx-tag-field--large .cx-tag-field__placeholder {
   font-size: var(--font-size-body-lg);
-}
-
-.cx-tag-field__input::placeholder {
-  color: var(--placeholder);
-}
-
-.cx-tag-field__input:disabled {
-  cursor: default;
 }
 
 .cx-tag-field__actions {

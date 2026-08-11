@@ -12,7 +12,7 @@
   gap: var(--surface-separation);
   overflow: hidden;
   border: var(--line-discreet);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   background-color: var(--surface-alt);
   box-shadow: none;
   box-sizing: border-box;
@@ -34,7 +34,7 @@
 }
 
 :host(.cx-card-host--border) .cx-card__content {
-  border-radius: calc(var(--radius-xl) - var(--border-width));
+  border-radius: calc(var(--radius-lg) - var(--border-width));
 }
 
 :host(.cx-card-host--shadow) .cx-card {
@@ -157,6 +157,12 @@
 .cx-card__menu {
   display: inline-flex;
   flex: 0 0 auto;
+}
+
+// A heading-only card (e.g. a one-line note) projects no body; drop the empty
+// content surface the same way an unused header row is dropped above.
+.cx-card__content:empty {
+  display: none;
 }
 
 .cx-card__content {

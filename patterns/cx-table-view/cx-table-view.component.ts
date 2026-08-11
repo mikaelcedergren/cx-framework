@@ -15,6 +15,7 @@ import {
   type CxFilterBarFilter,
   type CxFilterBarMode,
 } from '../cx-filter-bar';
+import { type CxToggleChipGroupOption } from '../../primitives/inputs/cx-toggle-chip-group';
 import {
   CxTableComponent,
   type CxTableColumn,
@@ -62,9 +63,12 @@ export class CxTableViewComponent {
 
   @Input() heading = '';
   @Input() showFilterBar = true;
+  @Input() showActiveFilters = true;
   @Input() filterBarMode: CxFilterBarMode = 'filters';
   @Input() quickFilters: CxButtonGroupOption[] = [];
   @Input() selectedQuickFilterId: string | undefined;
+  @Input() toggleFilters: CxToggleChipGroupOption[] = [];
+  @Input() selectedToggleFilterIds: string[] = [];
   @Input() queryValue = '';
   @Input() queryAriaLabel = 'Search query';
   @Input() savedViews: CxMenuItem[] = [];
@@ -96,8 +100,8 @@ export class CxTableViewComponent {
   @Input() loading = false;
   @Input() showRowActions = true;
   @Input() rightClickMenu = true;
-  @Input() emptyText = 'No rows to display.';
-  @Input() noMatchesText = 'No rows match the current filters.';
+  @Input() emptyText = 'No results to display.';
+  @Input() noMatchesText = 'No results match the current filters.';
   @Input() sort: CxTableSort | undefined;
   @Input() activeRowId: string | undefined;
   @Input() selectionMode: CxTableSelectionMode = 'none';
@@ -114,6 +118,7 @@ export class CxTableViewComponent {
 
   @Output() readonly filterBarModeChange = new EventEmitter<CxFilterBarMode>();
   @Output() readonly selectedQuickFilterIdChange = new EventEmitter<string>();
+  @Output() readonly selectedToggleFilterIdsChange = new EventEmitter<string[]>();
   @Output() readonly filterValuesChange = new EventEmitter<CxColumnFilterValueMap>();
   @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
   @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();

@@ -1,0 +1,68 @@
+// Compact UI markdown typography as a CSS-less mixin.
+//
+// `cx-markdown-type` holds the element rules for markdown rendered inside
+// regular UI surfaces (previews, notes, inline copy) — denser than the
+// editorial `cx-editorial-type` scale. Shared by the cx-text-area markdown
+// preview and the cx-markdown-editor content, each of which applies it to its
+// own root selector. Kept CSS-less so component stylesheets can @use it
+// without emitting global CSS.
+
+@mixin cx-markdown-type {
+  h1, h2, h3, h4 {
+    margin: var(--space-sm) 0 var(--space-xs);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-heading);
+  }
+  h1 { font-size: var(--font-size-title-1); }
+  h2 { font-size: var(--font-size-title-2); }
+  h3 { font-size: var(--font-size-body); }
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+
+  p { margin: 0 0 var(--space-sm); }
+  // Outside markers: an inside marker sits inline, so any block child (the
+  // paragraph ProseMirror keeps in every list item, or a loose list's <p>)
+  // wraps to the line below its bullet.
+  ul, ol {
+    margin: 0 0 var(--space-sm);
+    padding-inline-start: 1.5em;
+    list-style-position: outside;
+  }
+  li { margin-bottom: var(--space-2xs); }
+  li > p { margin-bottom: var(--space-2xs); }
+  li > p:last-child { margin-bottom: 0; }
+  li::marker { color: var(--primary); }
+  code {
+    font-family: var(--font-family-mono);
+    background: var(--opacity-low);
+    padding: 1px 4px;
+    border-radius: var(--radius-xs);
+  }
+  pre {
+    margin: 0 0 var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--opacity-low);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+  }
+  pre code { background: transparent; padding: 0; }
+  blockquote {
+    margin: 0 0 var(--space-sm);
+    padding-left: var(--space-sm);
+    border-left: calc(var(--border-width) * 2) solid var(--opacity-mid);
+    color: var(--opacity-high);
+  }
+  a,
+  a:visited,
+  a:hover,
+  a:active {
+    color: var(--link);
+    text-decoration: underline;
+  }
+  hr {
+    margin: var(--space-sm) 0;
+    border: 0;
+    border-top: var(--line);
+  }
+}

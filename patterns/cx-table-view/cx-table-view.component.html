@@ -8,8 +8,11 @@
   @if (showFilterBar) {
     <cx-filter-bar
       [mode]="filterBarMode"
+      [showActiveFilters]="showActiveFilters"
       [quickFilters]="quickFilters"
       [selectedQuickFilterId]="selectedQuickFilterId"
+      [toggleFilters]="toggleFilters"
+      [selectedToggleFilterIds]="selectedToggleFilterIds"
       [filters]="filters$()"
       [filterValues]="resolvedFilterValues$()"
       [queryValue]="queryValue"
@@ -28,6 +31,7 @@
       [pinnedColumnIds]="pinnedColumnIds"
       (modeChange)="filterBarModeChange.emit($event)"
       (selectedQuickFilterIdChange)="selectedQuickFilterIdChange.emit($event)"
+      (selectedToggleFilterIdsChange)="selectedToggleFilterIdsChange.emit($event)"
       (filterValuesChange)="onFilterValuesChange($event)"
       (filterQueryChange)="filterQueryChange.emit($event)"
       (filterLoadMore)="filterLoadMore.emit($event)"
