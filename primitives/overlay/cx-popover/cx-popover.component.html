@@ -23,17 +23,15 @@
     [style.bottom.px]="bottom"
   >
     <div class="cx-popover__body" data-cx-popover-scroll-container>
-      @if (surfaceVariant === 'grouped') {
-        @if (normalizedTitle || normalizedTitleDescription) {
-          <div class="cx-popover__island">
-            <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
-          </div>
-        }
+      @if (surfaceVariant === 'grouped' && normalizedTitle) {
+        <div class="cx-popover__island cx-popover__island--heading">
+          <ng-container [ngTemplateOutlet]="headingRow" />
+        </div>
       }
 
       <div class="cx-popover__content" [class.cx-popover__island]="surfaceVariant !== 'grouped'">
-        @if (surfaceVariant !== 'grouped' && (normalizedTitle || normalizedTitleDescription)) {
-          <cx-option-group [label]="normalizedTitle || 'Popover'" [description]="normalizedTitleDescription" />
+        @if (surfaceVariant !== 'grouped' && normalizedTitle) {
+          <ng-container [ngTemplateOutlet]="headingRow" />
         }
 
         <ng-content />
@@ -41,3 +39,19 @@
     </div>
   </div>
 }
+
+<!--
+  One heading row for both surface variants, so the projected actions have a
+  single destination. Two <ng-content> elements with the same selector would
+  fill only the first, leaving the other variant's heading empty.
+-->
+<ng-template #headingRow>
+  <cx-option-group class="cx-popover__heading" [label]="normalizedTitle ?? ''" variant="heading">
+    <!--
+      ngProjectAs is required. A forwarded <ng-content> carries no attributes
+      of its own, so without it the content matches none of cx-option-group's
+      slots and is silently dropped.
+    -->
+    <ng-content select="[actions]" ngProjectAs="[actions]" />
+  </cx-option-group>
+</ng-template>

@@ -22,7 +22,7 @@ People experience software through perception, expectation, hesitation, confiden
 
 A design system deliberately settles recurring decisions: spacing, token roles, component shape, interaction behavior, state treatment, and language patterns. That discipline saves judgment for the few decisions that genuinely depend on context and perception.
 
-`RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, and `RULE-ID: system.shared-owner` own the operational behavior. Starting from the system transfers learned behavior and settled decisions into the feature. A missing repeatable need points back to the shared owner so later features can inherit the improvement.
+`RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, `RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, and `RULE-ID: system.shared-owner` own the operational behavior. Starting from the consuming product's system transfers learned behavior and settled decisions into the feature. A component-family word describes the role the interface needs, while the local system decides whether that role is fulfilled by a dedicated component, a supported configuration, or a composition. A missing repeatable need points back to an available shared owner so later features can inherit the improvement.
 
 ## Components are sealed pieces
 
@@ -30,7 +30,7 @@ A component owns its template, presentation, internal spacing, states, and behav
 
 `RULE-ID: system.sealed-components` and `RULE-ID: system.no-external-patches` own the boundary. Deep selectors, inline visual patches, specificity battles, and wrapper tricks break component ownership. A clean fix outside the task's scope remains a visible boundary rather than a reason for a local disguise.
 
-Opinionated components are useful because their public APIs can express meaningful product variation without exposing every technically possible styling knob. Normal use is a stronger default than a maximal demonstration.
+Opinionated components are useful because their supported interfaces can express meaningful product variation without exposing every technically possible styling knob. Normal use is a stronger default than a maximal demonstration.
 
 ## Tokens carry meaning
 
@@ -55,6 +55,8 @@ Dense information can remain dense because the goal is to reduce interface chrom
 `RULE-ID: system.visual-behavior-contract` owns the consistency requirement. Every repeated interaction teaches the user what labels mean, where actions live, what color signals, and how a control behaves. Similarity lets that learning transfer.
 
 Consistency is not sameness without context. The concept and behavior can remain stable while the surrounding layout adapts to the task.
+
+The same design thinking can survive different code structures. What must transfer is the role, hierarchy, interaction contract, state treatment, accessibility, and visual character—not one platform's component name or assembly method.
 
 ## Feedback protects trust
 

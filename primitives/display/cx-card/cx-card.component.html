@@ -1,4 +1,21 @@
 <div class="cx-card">
+  @if (resolvedHref; as href) {
+    <a
+      class="cx-card__activation"
+      [attr.href]="href"
+      [attr.target]="target?.trim() || null"
+      [attr.rel]="resolvedRel"
+      [attr.aria-label]="activationLabel"
+    ></a>
+  } @else if (interactive) {
+    <button
+      type="button"
+      class="cx-card__activation"
+      [attr.aria-label]="activationLabel"
+      (click)="onActivate()"
+    ></button>
+  }
+
   <div class="cx-card__header">
     <div class="cx-card__identity">
       @if (icon; as iconName) {

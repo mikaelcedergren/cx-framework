@@ -24,7 +24,7 @@
       <div class="cx-menu__groups">
         @if (heading$()) {
           <div class="cx-menu__group">
-            <cx-option-group [label]="heading$()" />
+            <cx-option-group [label]="heading$()" variant="heading" />
           </div>
         }
         @for (group of visualGroups$(); track group.id) {
@@ -75,8 +75,10 @@
       <div class="cx-menu__groups">
         @if (heading$()) {
           <div class="cx-menu__group">
-            <cx-option-group [label]="heading$()">
-              <ng-content select="[actions]" />
+            <cx-option-group [label]="heading$()" variant="heading">
+              <!-- ngProjectAs: a forwarded ng-content carries no attributes, so
+                   without it this content matches no slot and is dropped. -->
+              <ng-content select="[actions]" ngProjectAs="[actions]" />
             </cx-option-group>
           </div>
         }

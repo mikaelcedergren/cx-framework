@@ -58,6 +58,7 @@ import {
   type CxColumnFilterValue,
   type CxColumnFilterValueMap,
   assertCxColumnFilterDefinition,
+  estimateCxColumnFilterHeight,
   isCxColumnFilterValueActive,
   summarizeCxColumnFilterValue,
   withCxColumnFilterValue,
@@ -165,6 +166,9 @@ export interface CxTableColumnVisibilityChangeEvent {
 type CxTableColumnHeaderAction = 'sort-asc' | 'sort-desc' | 'pin' | 'unpin' | 'hide';
 
 const CX_TABLE_MAX_PINNED_COLUMNS = 3;
+const CX_TABLE_MIN_UNPINNED_WIDTH = 144;
+const CX_TABLE_MIN_UNPINNED_RATIO = 0.35;
+const CX_TABLE_SELECTION_COLUMN_WIDTH = 32;
 const CX_TABLE_HEADER_MENU_WIDTH = 320;
 
 type CxTableDropIndicator =
@@ -280,6 +284,7 @@ export class CxTableComponent implements OnDestroy {
   private firstColumnAutoFitTimer?: number;
   private readonly contentWidthsState = signal<Record<string, number>>({});
   private readonly columnLeftOffsetsState = signal<Record<string, number>>({});
+  private readonly effectivePinnedColumnIdsState = signal<readonly string[]>([]);
   private readonly resizingColumnIdState = signal<string | undefined>(undefined);
   private readonly draggingColumnIdState = signal<string | undefined>(undefined);
   private readonly dropIndicatorState = signal<CxTableDropIndicator>(undefined);
@@ -287,6 +292,8 @@ export class CxTableComponent implements OnDestroy {
   private pendingContextMenuState?: CxTableContextMenuState;
   private contextMenuTeardownPending = false;
   private destroyed = false;
+  private tableViewportResizeObserver?: ResizeObserver;
+  private observedTableViewport?: HTMLElement;
   private readonly columnReorderAnnouncementState = signal('');
   private readonly sortState = signal<CxTableSort | undefined>(undefined);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
@@ -514,6 +521,10 @@ export class CxTableComponent implements OnDestroy {
     afterRenderEffect(() => {
       const columns = this.columnsState();
       this.rowsState();
+      // Selection owns a real sticky leading column. Reading the mode here
+      // reruns this post-render measurement after that column enters or leaves
+      // the DOM, so existing pinned columns never retain its old offset.
+      this.selectionModeState();
 
       if (this.resizingColumnIdState() || this.draggingColumnIdState()) {
         return;
@@ -521,6 +532,8 @@ export class CxTableComponent implements OnDestroy {
       if (!this.tableElement?.nativeElement) {
         return;
       }
+
+      this.observeTableViewport();
 
       const current = this.contentWidthsState();
       const overrides = this.columnWidthOverridesState();
@@ -551,6 +564,9 @@ export class CxTableComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this.destroyed = true;
+    this.tableViewportResizeObserver?.disconnect();
+    this.tableViewportResizeObserver = undefined;
+    this.observedTableViewport = undefined;
     this.pendingContextMenuState = undefined;
     if (typeof window !== 'undefined' && this.firstColumnAutoFitTimer !== undefined) {
       window.clearTimeout(this.firstColumnAutoFitTimer);
@@ -817,7 +833,11 @@ export class CxTableComponent implements OnDestroy {
     if (this.isColumnPinned(column)) {
       return true;
     }
-    return this.columns$().filter(candidate => candidate.pinned === true).length < CX_TABLE_MAX_PINNED_COLUMNS;
+    const pinnedColumns = this.columns$().filter(candidate => candidate.pinned === true);
+    if (pinnedColumns.length >= CX_TABLE_MAX_PINNED_COLUMNS) {
+      return false;
+    }
+    return this.pinnedColumnsFit([...pinnedColumns, column]);
   }
 
   protected canHideColumn(column: CxTableColumn): boolean {
@@ -1044,7 +1064,7 @@ export class CxTableComponent implements OnDestroy {
       Number(this.isColumnSortable(column)) +
       Number(propertyActionCount > 0);
     const estimatedHeight =
-      this.estimatedColumnFilterHeight(column) +
+      estimateCxColumnFilterHeight(column.filter) +
       (this.isColumnSortable(column) ? 80 + 8 : 0) +
       (propertyActionCount > 0 ? propertyActionCount * 40 + 8 : 0) +
       Math.max(0, islandCount - 1) * 4 +
@@ -1071,42 +1091,24 @@ export class CxTableComponent implements OnDestroy {
     });
   }
 
-  private estimatedColumnFilterHeight(column: CxTableColumn): number {
-    const filter = column.filter;
-    if (!filter) {
-      return 0;
-    }
-    if (filter.kind !== 'multi-select') {
-      return 96;
-    }
-
-    const optionListHeight = Math.min(
-      Math.max(filter.options.length, 1) * 36,
-      320,
-    );
-    return (
-      48 +
-      optionListHeight +
-      (filter.searchable ? 40 : 0) +
-      (filter.hint ? 24 : 0) +
-      (filter.hasMore ? 36 : 0)
-    );
-  }
-
   protected isColumnPinned(column: CxTableColumn): boolean {
     return column.pinned === true;
   }
 
   protected isLastPinnedColumn(column: CxTableColumn): boolean {
-    const pinnedColumns = this.columns$().filter(candidate => candidate.pinned === true);
-    return pinnedColumns[pinnedColumns.length - 1]?.id === column.id;
+    const pinnedIds = this.effectivePinnedColumnIdsState();
+    return pinnedIds[pinnedIds.length - 1] === column.id;
   }
 
   protected columnPinnedLeft(column: CxTableColumn): string | null {
-    if (!this.isColumnPinned(column)) {
+    if (!this.isColumnEffectivelyPinned(column)) {
       return null;
     }
     return `${this.columnLeftOffsetsState()[column.id] ?? 0}px`;
+  }
+
+  protected isColumnEffectivelyPinned(column: CxTableColumn): boolean {
+    return this.effectivePinnedColumnIdsState().includes(column.id);
   }
 
   protected columnWidth(column: CxTableColumn): string | null {
@@ -1361,6 +1363,7 @@ export class CxTableComponent implements OnDestroy {
 
   @HostListener('window:resize')
   protected onWindowResize(): void {
+    this.syncPinnedColumnOffsets();
     const column = this.columnHeaderMenuColumn();
     if (!column || !this.columnHeaderMenuTrigger) {
       return;
@@ -1508,15 +1511,36 @@ export class CxTableComponent implements OnDestroy {
   private syncPinnedColumnOffsets(): void {
     const pinnedColumns = this.columns$().filter(column => column.pinned === true);
     if (pinnedColumns.length === 0) {
+      if (this.effectivePinnedColumnIdsState().length > 0) {
+        this.effectivePinnedColumnIdsState.set([]);
+      }
       if (Object.keys(this.columnLeftOffsetsState()).length > 0) {
         this.columnLeftOffsetsState.set({});
       }
       return;
     }
 
-    let left = 0;
+    const effectivePinnedColumns: CxTableColumn[] = [];
+    for (const column of pinnedColumns.slice(0, CX_TABLE_MAX_PINNED_COLUMNS)) {
+      const candidate = [...effectivePinnedColumns, column];
+      if (!this.pinnedColumnsFit(candidate)) {
+        break;
+      }
+      effectivePinnedColumns.push(column);
+    }
+
+    const effectiveIds = effectivePinnedColumns.map(column => column.id);
+    const currentEffectiveIds = this.effectivePinnedColumnIdsState();
+    if (
+      effectiveIds.length !== currentEffectiveIds.length ||
+      effectiveIds.some((id, index) => currentEffectiveIds[index] !== id)
+    ) {
+      this.effectivePinnedColumnIdsState.set(effectiveIds);
+    }
+
+    let left = this.currentSelectionColumnWidth();
     const next: Record<string, number> = {};
-    for (const column of pinnedColumns) {
+    for (const column of effectivePinnedColumns) {
       next[column.id] = left;
       left += this.currentColumnWidth(column.id);
     }
@@ -1530,6 +1554,57 @@ export class CxTableComponent implements OnDestroy {
     if (changed) {
       this.columnLeftOffsetsState.set(next);
     }
+  }
+
+  private observeTableViewport(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const viewport = this.tableElement?.nativeElement.parentElement;
+    if (!viewport || viewport === this.observedTableViewport) {
+      return;
+    }
+
+    this.tableViewportResizeObserver?.disconnect();
+    this.observedTableViewport = viewport;
+    this.tableViewportResizeObserver = new ResizeObserver(() => {
+      if (!this.destroyed) {
+        this.syncPinnedColumnOffsets();
+      }
+    });
+    this.tableViewportResizeObserver.observe(viewport);
+  }
+
+  private pinnedColumnsFit(pinnedColumns: readonly CxTableColumn[]): boolean {
+    if (pinnedColumns.length === 0) {
+      return true;
+    }
+    const table = this.tableElement?.nativeElement;
+    const viewportWidth = table?.parentElement?.clientWidth ?? 0;
+    if (viewportWidth <= 0) {
+      return pinnedColumns.length <= CX_TABLE_MAX_PINNED_COLUMNS;
+    }
+
+    const pinnedIds = new Set(pinnedColumns.map(column => column.id));
+    const hasUnpinnedColumn = this.columns$().some(column => !pinnedIds.has(column.id));
+    const selectionWidth = this.currentSelectionColumnWidth();
+    const reachableWidth = hasUnpinnedColumn
+      ? Math.max(CX_TABLE_MIN_UNPINNED_WIDTH, viewportWidth * CX_TABLE_MIN_UNPINNED_RATIO)
+      : 0;
+    const pinnedWidth = pinnedColumns.reduce(
+      (total, candidate) => total + this.currentColumnWidth(candidate.id),
+      selectionWidth,
+    );
+    return pinnedWidth <= Math.max(0, viewportWidth - reachableWidth);
+  }
+
+  private currentSelectionColumnWidth(): number {
+    if (!this.hasRowSelection$()) {
+      return 0;
+    }
+    const table = this.tableElement?.nativeElement;
+    const cell = table?.querySelector<HTMLElement>('.cx-table__head-cell--selection, .cx-table__cell--selection');
+    return cell?.getBoundingClientRect().width ?? CX_TABLE_SELECTION_COLUMN_WIDTH;
   }
 
   private currentColumnWidth(columnId: string): number {

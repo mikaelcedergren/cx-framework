@@ -23,15 +23,18 @@ import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-sta
 })
 export class CxFullscreenDialogComponent implements OnDestroy {
   private static readonly motionDurationMs = 480;
+  // The close button starts its pop-in before the canvas finishes settling so
+  // both read as one continuous motion instead of two sequential ones.
+  private static readonly closeButtonRevealMs = 180;
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly renderedState = signal(false);
   private readonly closingState = signal(false);
   private readonly closeButtonReadyState = signal(false);
   private requestedOpen = false;
-  private entranceComplete = false;
+  private closeButtonRevealed = false;
   private closeButtonValue = true;
   private overlayHandle?: CxOverlayStateHandle;
-  private entranceFallbackTimer?: number;
+  private closeButtonRevealTimer?: number;
   private exitFallbackTimer?: number;
   private overlayReleaseTimer?: number;
 
@@ -44,7 +47,7 @@ export class CxFullscreenDialogComponent implements OnDestroy {
   public set closeButton(value: boolean) {
     this.closeButtonValue = value !== false;
     this.closeButtonReadyState.set(
-      this.closeButtonValue && this.entranceComplete && !this.closingState(),
+      this.closeButtonValue && this.closeButtonRevealed && !this.closingState(),
     );
   }
   public get closeButton(): boolean {
@@ -95,7 +98,7 @@ export class CxFullscreenDialogComponent implements OnDestroy {
       return;
     }
     if (event.animationName === 'cx-fullscreen-dialog-enter' && this.requestedOpen && !this.closingState()) {
-      this.finishEntrance();
+      this.revealCloseButton();
       return;
     }
     if (event.animationName === 'cx-fullscreen-dialog-exit' && this.closingState()) {
@@ -124,12 +127,12 @@ export class CxFullscreenDialogComponent implements OnDestroy {
       if (!this.overlayHandle) {
         this.overlayHandle = this.overlayState.capture();
       }
-      this.entranceComplete = this.prefersReducedMotion();
+      this.closeButtonRevealed = this.prefersReducedMotion();
       this.closingState.set(false);
-      this.closeButtonReadyState.set(this.closeButton && this.entranceComplete);
+      this.closeButtonReadyState.set(this.closeButton && this.closeButtonRevealed);
       this.renderedState.set(true);
-      if (!this.entranceComplete) {
-        this.scheduleEntranceFallback();
+      if (!this.closeButtonRevealed) {
+        this.scheduleCloseButtonReveal();
       }
       return;
     }
@@ -139,8 +142,8 @@ export class CxFullscreenDialogComponent implements OnDestroy {
       return;
     }
 
-    this.entranceComplete = false;
-    this.clearEntranceFallback();
+    this.closeButtonRevealed = false;
+    this.clearCloseButtonReveal();
     this.dialogRootRef?.nativeElement.focus({ preventScroll: true });
     this.closeButtonReadyState.set(false);
     if (this.prefersReducedMotion()) {
@@ -151,12 +154,12 @@ export class CxFullscreenDialogComponent implements OnDestroy {
     this.scheduleExitFallback();
   }
 
-  private finishEntrance(): void {
+  private revealCloseButton(): void {
     if (!this.requestedOpen || this.closingState()) {
       return;
     }
-    this.clearEntranceFallback();
-    this.entranceComplete = true;
+    this.clearCloseButtonReveal();
+    this.closeButtonRevealed = true;
     this.closeButtonReadyState.set(this.closeButton);
   }
 
@@ -175,15 +178,15 @@ export class CxFullscreenDialogComponent implements OnDestroy {
     return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  private scheduleEntranceFallback(): void {
-    this.clearEntranceFallback();
+  private scheduleCloseButtonReveal(): void {
+    this.clearCloseButtonReveal();
     if (typeof window === 'undefined') {
-      this.finishEntrance();
+      this.revealCloseButton();
       return;
     }
-    this.entranceFallbackTimer = window.setTimeout(
-      () => this.finishEntrance(),
-      CxFullscreenDialogComponent.motionDurationMs + 20,
+    this.closeButtonRevealTimer = window.setTimeout(
+      () => this.revealCloseButton(),
+      CxFullscreenDialogComponent.closeButtonRevealMs,
     );
   }
 
@@ -200,15 +203,15 @@ export class CxFullscreenDialogComponent implements OnDestroy {
   }
 
   private clearMotionTimers(): void {
-    this.clearEntranceFallback();
+    this.clearCloseButtonReveal();
     this.clearExitFallback();
   }
 
-  private clearEntranceFallback(): void {
-    if (typeof window !== 'undefined' && this.entranceFallbackTimer !== undefined) {
-      window.clearTimeout(this.entranceFallbackTimer);
+  private clearCloseButtonReveal(): void {
+    if (typeof window !== 'undefined' && this.closeButtonRevealTimer !== undefined) {
+      window.clearTimeout(this.closeButtonRevealTimer);
     }
-    this.entranceFallbackTimer = undefined;
+    this.closeButtonRevealTimer = undefined;
   }
 
   private clearExitFallback(): void {

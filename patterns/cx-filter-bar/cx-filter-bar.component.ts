@@ -9,7 +9,9 @@ import {
   Input,
   OnDestroy,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
   computed,
   effect,
   inject,
@@ -54,6 +56,7 @@ import {
   type CxColumnFilterValue,
   type CxColumnFilterValueMap,
   assertCxColumnFilterDefinition,
+  estimateCxColumnFilterHeight,
   isCxColumnFilterValueActive,
   withCxColumnFilterValue,
 } from '../../primitives/data/cx-column-filter-editor';
@@ -74,7 +77,24 @@ export interface CxFilterBarColumnOption {
   pinnable?: boolean;
 }
 
+/**
+ * Position held for the surface anchored to an active-filter tag. The tag can
+ * disappear while its editor is open — clearing the last value deactivates the
+ * filter — so the surface keeps the metrics it opened with instead of
+ * re-reading an anchor that may already be detached.
+ */
+interface CxFilterBarTagSurfaceMetrics {
+  left: number | undefined;
+  top: number | undefined;
+  bottom: number | undefined;
+  width: number | undefined;
+  maxHeight: number | undefined;
+  placement: CxFloatingSurfacePlacement;
+}
+
 const CX_FILTER_BAR_MAX_PINNED_COLUMNS = 3;
+/** Same surface width as the table's column-header filter, so one filter reads the same in both places. */
+const CX_FILTER_BAR_TAG_POPOVER_WIDTH = 320;
 const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
   { id: 'compact', label: 'Compact' },
   { id: 'comfortable', label: 'Comfortable' },
@@ -105,6 +125,9 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
+  private static instanceCounter = 0;
+  private readonly instanceId = ++CxFilterBarComponent.instanceCounter;
+  protected readonly tagFilterDialogId = `cx-filter-bar-${this.instanceId}-tag-filter`;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly modeState = signal<CxFilterBarMode>('filters');
   private readonly quickFiltersState = signal<CxButtonGroupOption[]>([]);
@@ -149,6 +172,12 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly propertiesPopoverWidthState = signal<number | undefined>(undefined);
   private readonly propertiesPopoverMaxHeightState = signal<number | undefined>(undefined);
   private readonly propertiesPopoverPlacementState = signal<'bottom' | 'top'>('bottom');
+  private readonly tagFilterIdState = signal<string | undefined>(undefined);
+  private readonly tagFilterMetricsState = signal<
+    CxFilterBarTagSurfaceMetrics | undefined
+  >(undefined);
+  private tagFilterAnchor?: HTMLElement;
+  private tagFilterLockedPlacement?: CxFloatingSurfacePlacement;
   private resizeObserver?: ResizeObserver;
   // Placement is decided once per open; re-syncs keep the side so an open
   // popover never flips — growing content scrolls inside it instead.
@@ -180,6 +209,26 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @ViewChild('propertiesPopover')
   private propertiesPopoverRef?: CxPopoverComponent;
 
+  @ViewChild('tagFilterPopover')
+  private tagFilterPopoverRef?: CxPopoverComponent;
+
+  // The expansion panel and the tag popover render the same editor template,
+  // so the instance is identified by which surface contains it. The two lists
+  // come from one query and stay index-aligned.
+  @ViewChildren(CxColumnFilterEditorComponent)
+  private readonly columnFilterEditors?: QueryList<CxColumnFilterEditorComponent>;
+
+  @ViewChildren(CxColumnFilterEditorComponent, { read: ElementRef })
+  private readonly columnFilterEditorHosts?: QueryList<ElementRef<HTMLElement>>;
+
+  // Both lists follow activeFilterTagsRow$ order, so one index resolves the
+  // tag to focus and the element to anchor against.
+  @ViewChildren('activeFilterTag')
+  private readonly activeFilterTags?: QueryList<CxTagComponent>;
+
+  @ViewChildren('activeFilterTag', { read: ElementRef })
+  private readonly activeFilterTagHosts?: QueryList<ElementRef<HTMLElement>>;
+
   @ViewChild('activeFiltersRegion', { read: ElementRef })
   protected set activeFiltersRegion(ref: ElementRef<HTMLElement> | undefined) {
     const next = ref?.nativeElement;
@@ -204,7 +253,13 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   public set mode(value: CxFilterBarMode | undefined) {
-    this.modeState.set(value === 'query' ? 'query' : 'filters');
+    const next = value === 'query' ? 'query' : 'filters';
+    this.modeState.set(next);
+    if (next === 'query') {
+      // An owner can switch modes without going through applyMode, and query
+      // mode removes the tag row this surface is anchored to.
+      this.closeTagFilterPopover(false);
+    }
   }
 
   @Input()
@@ -241,6 +296,10 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     ) {
       this.expandedFilterIdState.set(undefined);
     }
+    const tagFilterId = this.tagFilterIdState();
+    if (tagFilterId && !next.some(filter => filter.id === tagFilterId)) {
+      this.closeTagFilterPopover(false);
+    }
   }
 
   @Input()
@@ -251,6 +310,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @Input()
   public set showActiveFilters(value: boolean | undefined) {
     this.showActiveFiltersState.set(value !== false);
+    if (value === false) {
+      this.closeTagFilterPopover(false);
+    }
   }
 
   @Input()
@@ -376,6 +438,18 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly propertiesPopoverWidth$ = this.propertiesPopoverWidthState.asReadonly();
   protected readonly propertiesPopoverMaxHeight$ = this.propertiesPopoverMaxHeightState.asReadonly();
   protected readonly propertiesPopoverPlacement$ = this.propertiesPopoverPlacementState.asReadonly();
+  protected readonly tagFilterMetrics$ = this.tagFilterMetricsState.asReadonly();
+  /**
+   * Resolved from the filter list, never from the active tags: clearing the
+   * last value removes the tag but must not empty the editor the user is
+   * still working in.
+   */
+  protected readonly tagFilter$ = computed(() => {
+    const filterId = this.tagFilterIdState();
+    return filterId
+      ? this.filtersState().find(filter => filter.id === filterId)
+      : undefined;
+  });
   protected readonly activeFilterCount$ = computed(() =>
     this.filtersState().filter(filter =>
       isCxColumnFilterValueActive(filter.filter, this.filterValuesState()[filter.id]),
@@ -473,6 +547,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       }
       if (this.propertiesPopoverOpenState()) {
         this.syncPropertiesPopoverMetrics();
+      }
+      if (this.tagFilterIdState()) {
+        this.syncTagFilterMetrics();
       }
       if (this.activeFiltersRegionEl) {
         this.scheduleActiveFilterMeasure();
@@ -614,6 +691,78 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (filter) {
       this.clearFilter(filter);
     }
+  }
+
+  protected isTagFilterOpen(filterId: string): boolean {
+    return this.tagFilterIdState() === filterId;
+  }
+
+  protected activeFilterTagAriaLabel(label: string): string {
+    return `Open ${label} filter`;
+  }
+
+  /**
+   * The tag opens the same editor the column header and the filter list use;
+   * only the surface around it differs.
+   */
+  protected onActiveFilterTagPressed(filterId: string): void {
+    if (this.tagFilterIdState() === filterId) {
+      this.closeTagFilterPopover();
+      return;
+    }
+    const filter = this.filtersState().find(candidate => candidate.id === filterId);
+    const anchor = this.activeFilterTagHost(filterId);
+    if (!filter || !anchor) {
+      return;
+    }
+
+    this.closeFilterPopover(false);
+    this.propertiesPopoverOpenState.set(false);
+    this.tagFilterAnchor = anchor;
+    // Fresh open: re-pick the side, then keep it for the whole session.
+    this.tagFilterLockedPlacement = undefined;
+    this.tagFilterIdState.set(filterId);
+    this.syncTagFilterMetrics();
+    this.filterPopoverOpenChange.emit(true);
+    this.scheduleTagFilterFocus(filterId);
+  }
+
+  public closeTagFilterPopover(restoreFocus = true): void {
+    const filterId = this.tagFilterIdState();
+    if (!filterId) {
+      return;
+    }
+    this.tagFilterIdState.set(undefined);
+    this.tagFilterMetricsState.set(undefined);
+    this.tagFilterAnchor = undefined;
+    this.tagFilterLockedPlacement = undefined;
+    this.filterPopoverOpenChange.emit(false);
+
+    if (!restoreFocus) {
+      return;
+    }
+    queueMicrotask(() => {
+      const index = this.activeFilterTagIndex(filterId);
+      const tag = index < 0 ? undefined : this.activeFilterTags?.get(index);
+      if (tag) {
+        tag.focus();
+        return;
+      }
+      // Clearing the last value removes the tag that opened this surface, so
+      // focus lands on the filter button instead of nothing.
+      this.filterTriggerRef?.nativeElement.querySelector<HTMLElement>('button')?.focus();
+    });
+  }
+
+  private activeFilterTagIndex(filterId: string): number {
+    return this.activeFilterTagsRow$().findIndex(tag => tag.id === filterId);
+  }
+
+  private activeFilterTagHost(filterId: string): HTMLElement | undefined {
+    const index = this.activeFilterTagIndex(filterId);
+    return index < 0
+      ? undefined
+      : this.activeFilterTagHosts?.get(index)?.nativeElement;
   }
 
   protected onMoreActiveFiltersPressed(): void {
@@ -780,6 +929,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (this.modeState() !== 'filters') {
       return;
     }
+    this.closeTagFilterPopover(false);
     this.propertiesPopoverOpenState.set(false);
     const next = !this.filterPopoverOpenState();
     if (next) {
@@ -805,6 +955,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   public closeFilterPopover(restoreFocus = true): void {
+    // One filter surface at a time; the tag popover has its own focus restore
+    // for the paths where the user dismissed it directly.
+    this.closeTagFilterPopover(false);
     if (!this.filterPopoverOpenState()) {
       return;
     }
@@ -867,7 +1020,11 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('document:pointerdown', ['$event'])
   protected onDocumentPointerDown(event: PointerEvent): void {
-    if (!this.filterPopoverOpenState() && !this.propertiesPopoverOpenState()) {
+    if (
+      !this.filterPopoverOpenState() &&
+      !this.propertiesPopoverOpenState() &&
+      !this.tagFilterIdState()
+    ) {
       return;
     }
     const target = event.target;
@@ -882,6 +1039,10 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       this.propertiesPopoverOpenState.set(false);
       return;
     }
+    if (this.tagFilterIdState()) {
+      this.closeTagFilterPopover();
+      return;
+    }
     if (this.filterPopoverOpenState()) {
       this.closeFilterPopover();
     }
@@ -894,6 +1055,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     }
     if (this.propertiesPopoverOpenState()) {
       this.syncPropertiesPopoverMetrics();
+    }
+    if (this.tagFilterIdState()) {
+      this.syncTagFilterMetrics();
     }
   }
 
@@ -921,6 +1085,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       return true;
     }
     if (this.propertiesPopoverRef?.surfaceElement()?.contains(target)) {
+      return true;
+    }
+    if (this.tagFilterPopoverRef?.surfaceElement()?.contains(target)) {
       return true;
     }
     const targetElement = target instanceof Element ? target : target.parentElement;
@@ -954,6 +1121,82 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.filterPopoverPlacementState.set(surface.placement);
   }
 
+  private syncTagFilterMetrics(): void {
+    const anchor = this.tagFilterAnchor;
+    const filter = this.tagFilter$();
+    if (!anchor || !filter || typeof window === 'undefined') {
+      return;
+    }
+    // A detached anchor measures as a zero rect, which would throw the surface
+    // into the viewport corner. Keep the position it was opened with instead.
+    if (!anchor.isConnected) {
+      return;
+    }
+
+    const surface = measureCxFloatingSurface({
+      triggerRect: anchor.getBoundingClientRect(),
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      width: CX_FILTER_BAR_TAG_POPOVER_WIDTH,
+      // One island of padding around the editor.
+      estimatedHeight: estimateCxColumnFilterHeight(filter.filter) + 16,
+      minWidth: 240,
+      align: 'start',
+      gap: 4,
+      lockedPlacement: this.tagFilterLockedPlacement,
+    });
+    this.tagFilterLockedPlacement = surface.placement;
+
+    this.tagFilterMetricsState.set({
+      left: surface.left,
+      top: surface.top,
+      bottom: surface.bottom,
+      width: surface.width,
+      maxHeight: surface.maxHeight,
+      placement: surface.placement,
+    });
+  }
+
+  private scheduleTagFilterFocus(filterId: string, attempt = 0): void {
+    if (typeof requestAnimationFrame === 'undefined') {
+      queueMicrotask(() => this.focusTagFilterEditor(filterId, attempt));
+      return;
+    }
+    requestAnimationFrame(() => this.focusTagFilterEditor(filterId, attempt));
+  }
+
+  /**
+   * The surface is portaled after render, so the editor may not exist on the
+   * first frame; retry a bounded number of times, as the column header does.
+   */
+  private focusTagFilterEditor(filterId: string, attempt: number): void {
+    if (this.tagFilterIdState() !== filterId) {
+      return;
+    }
+    const surface = this.tagFilterPopoverRef?.surfaceElement();
+    this.columnFilterEditorIn(surface)?.focus();
+    const activeElement = typeof document === 'undefined' ? undefined : document.activeElement;
+    if (activeElement && surface?.contains(activeElement)) {
+      return;
+    }
+    if (attempt >= 12) {
+      return;
+    }
+    this.scheduleTagFilterFocus(filterId, attempt + 1);
+  }
+
+  private columnFilterEditorIn(
+    surface: HTMLElement | undefined,
+  ): CxColumnFilterEditorComponent | undefined {
+    if (!surface) {
+      return undefined;
+    }
+    const index = (this.columnFilterEditorHosts?.toArray() ?? []).findIndex(host =>
+      surface.contains(host.nativeElement),
+    );
+    return index < 0 ? undefined : this.columnFilterEditors?.get(index);
+  }
+
   private syncPropertiesPopoverMetrics(): void {
     const trigger = this.propertiesTriggerRef?.nativeElement;
     if (!trigger || typeof window === 'undefined') {
@@ -961,7 +1204,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     }
 
     const rect = trigger.getBoundingClientRect();
-    const estimatedHeight = Math.min(Math.max(this.columnOptionsState().length, 1) * 32 + 292, 620);
+    // 292 covers the fixed sections; 40 is the heading island and its gap.
+    const estimatedHeight = Math.min(Math.max(this.columnOptionsState().length, 1) * 32 + 332, 620);
     const surface = measureCxFloatingSurface({
       triggerRect: rect,
       viewportWidth: window.innerWidth,

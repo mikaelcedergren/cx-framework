@@ -73,6 +73,21 @@
   overscroll-behavior: contain;
 }
 
+/* Islands share the surface height, and .cx-popover__content is display:
+   contents, so in both variants the heading is a flex sibling of the
+   scrolling content. Without this it is the first thing squeezed to nothing
+   once the content is taller than the surface. */
+.cx-popover__heading,
+.cx-popover__island--heading {
+  flex: 0 0 auto;
+}
+
+/* The body sets no gap — consumers space their own islands — so the heading
+   island owns the separation that makes it read as a separate island. */
+.cx-popover__island--heading {
+  margin-bottom: var(--surface-separation);
+}
+
 @keyframes cx-popover-enter {
   from {
     opacity: 0;

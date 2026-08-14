@@ -37,6 +37,8 @@ Search by `TOPIC:`, `COMPONENT:`, or keyword. Apply the normative levels and con
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
 
+Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not a component name or implementation API.
+
 ## Designer profile
 
 When the task requires design judgment rather than a rule lookup — exploring a direction, weighing a trade-off, challenging a requested UI, or choosing between rule-legal options — load `../../profile/design-lead-profile.md` whole and reason in that designer's style. The profile is non-normative and carries the lowest authority: when its instinct and a binding rule disagree, follow the rule and surface the tension.
@@ -45,7 +47,7 @@ When the task requires design judgment rather than a rule lookup — exploring a
 
 1. Define the user goal, primary task, mental model, and constraints.
 2. Inventory every proposed or inherited interface choice and separate it from product facts, desired outcomes, and explicitly fixed constraints. Classify each choice internally as `Keep`, `Correct`, `Remove`, or `Unknown`; do not carry one into the brief unexamined.
-3. Inspect the existing product system before proposing new structure or components.
+3. Inspect the consuming product's local instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage before proposing new structure or components.
 4. Run the semantic coherence gate below against the input before resolving information architecture, flow, behavior, hierarchy, and affordance.
 5. Declare the hierarchy: primary task or focal information, primary action when one exists, secondary actions, supporting information, and what remains hidden until relevant.
 6. Define reachable states, accessibility expectations, and copy needs.
@@ -66,7 +68,7 @@ Classify each material area internally as `Pass`, `Concern`, or `Unknown`. Revis
 
 For optional interface choices, lack of demonstrated value resolves to `Remove`, not `Keep` or a speculative rationale. Do not call an interface choice required unless the user expressly fixed it or a binding product or component contract requires it. When a material input choice is corrected or removed, name that correction briefly in the design response so the rejected assumption cannot silently return downstream.
 
-For a named shared component or pattern, inspect its canonical guidance and public contract. Require a coherent set of relevant capabilities, not every possible option the API happens to expose.
+For a named component role or pattern, discover how the consuming product currently fulfills that role. When a local implementation exists, inspect its local guidance and public contract. Require a coherent set of relevant capabilities, not every possible option its API happens to expose, and do not import an exact component name or API from another platform.
 
 ## Product bar
 
@@ -97,8 +99,10 @@ Design for a finished product, never a proof of concept.
 
 ## System thinking
 
-- Start with the existing system: tokens, primitives, components, patterns, and documented behavior.
-- If the system lacks the right answer, define the needed system extension instead of patching one screen.
+- Start with the consuming product's existing system: tokens, primitives, components, patterns, public APIs, and documented behavior.
+- Apply the complete resolution order in `RULE-ID: system.component-resolution` to each semantic component role. Base the choice on local evidence rather than transferring a solution from another platform.
+- Do not invent an exact component name, prop, slot, or composition when local evidence is unavailable. Keep the brief semantic and require implementation-time discovery instead.
+- If resolution reaches a shared-system extension or custom fallback, make the owner, scope boundary, preserved local qualities, and reason explicit in the brief. Never prescribe changes to an unavailable owner or disguise an editable system defect as freedom to improvise.
 - Components own their internal behavior, padding, states, and chrome. Containers own placement, width, gaps, and layout.
 - Choose tokens by meaning, not appearance.
 - Keep product-level concepts, labels, and grouping consistent across the surface.
@@ -110,7 +114,7 @@ Before the build gate, make the brief concrete:
 - goal and primary task
 - user-facing behavior and flow
 - information architecture
-- components and patterns to use or extend
+- semantic component roles and the discovered local components or patterns to use, configure, compose, or extend, plus any necessary documented minimal fallback
 - control semantics, state ownership, and effect lifetime
 - relevant capability families and deliberately separate peer functions
 - reachable states and recovery paths

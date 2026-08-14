@@ -13,6 +13,7 @@ Use this skill as the design-quality guardian. Evaluate existing work; do not cr
 - Review only behavior that is relevant, reachable, and supported by the available evidence.
 - Preserve the product's established structure and conventions unless the assigned design explicitly changes them; do not turn refinement into an unrelated redesign.
 - Treat responsive behavior as out of scope unless the user or current gate explicitly includes it.
+- Treat accessibility as out of scope for every prototype gate, whether static or interactive. Do not inspect, infer, report, mark `Unverified`, assign severity, or record design-system gaps for prototype accessibility, including contrast, color dependence, semantics, roles, ARIA, accessible names or label associations, keyboard reachability or operation, focus management, motion preferences, target size, or screen-reader behavior. A visible clarity, legibility, or affordance problem may still be judged on its ordinary prototype impact, never as accessibility. Accessibility enters scope only at an implementation or release-candidate gate, or in an explicitly requested accessibility audit.
 - Treat unmentioned or unobservable behavior as unverified, not defective.
 - Say what is wrong, unclear, inconsistent, risky, unsupported, inaccessible, or incomplete for the current gate.
 - Explain findings through visible user impact, design-system rules, UX rules, accessibility expectations, or copy quality.
@@ -38,6 +39,8 @@ Search by topic, component, state, interaction, accessibility concern, or copy s
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, flag the conflict instead of cherry-picking a convenient rule. Treat the conflict as a system issue, not a defect in the reviewed artifact, until the applicable authority is clear.
 
+Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not an exact component name or implementation API.
+
 When calibrating severity or separating defects from taste, load `../../profile/design-lead-profile.md` whole and weigh consequence the way that designer would. The profile is non-normative and carries the lowest authority: it cannot create a finding, downgrade a rule violation, or override any binding source; it only shapes judgment where the rules leave room.
 
 ## Review method
@@ -55,7 +58,7 @@ Calibrate the review to the artifact:
 - Briefs and proposals: judge product decisions and readiness for the next design or build step; do not claim rendered defects.
 - Screenshots and static mockups: judge visible hierarchy, copy, layout, affordance, and states shown; do not claim keyboard, semantics, or responsive behavior was tested.
 - Source and component APIs: judge structure, contracts, and predictable outcomes; inspect the owning component before claiming it lacks a capability.
-- Rendered, interactive work: judge only behavior that was observed or reliably verified.
+- Rendered, interactive work: judge only behavior that was observed or reliably verified, subject to the prototype accessibility exclusion above.
 - Accessibility audits: pass only the aspects supported by appropriate contrast, keyboard, semantic, or assistive-technology evidence.
 
 Classify each possible issue internally:
@@ -89,7 +92,9 @@ For every rendered implementation or release-candidate gate, inspect the actual 
    - **Edge crowding:** Require a deliberate inner safe area on every side of a bounded surface. Align text, badges, metadata, controls, and progress information to that inset. Allow dividers, images, tables, or progress bars to reach an edge only when intentionally full-bleed; reject accidental edge contact, accidental clipping, near-contact, and inconsistent sibling insets.
    - **Data sufficiency:** Reject sparse happy-path evidence that cannot reveal real density, repetition, truncation, hierarchy, or scrolling behavior. Apply `RULE-ID: content.truncation` when deciding whether revealed truncation is a finding.
 
-Do not pass or declare the final UI complete while any visible issue from these lenses remains unresolved. Prefer fewer containers and repeated labels, stronger alignment, calmer hierarchy, and clearer actions. Require the consuming product's shared components, tokens, and patterns, including cx-framework where it is the product contract. If the shared system cannot express the required result, record a framework gap instead of approving a local substitute.
+Do not pass or declare the final UI complete while any visible issue from these lenses remains unresolved. Prefer fewer containers and repeated labels, stronger alignment, calmer hierarchy, and clearer actions. Discover the consuming product's system from its local instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage. Review component choices against the complete order in `RULE-ID: system.component-resolution`; do not require a component name or API merely because another platform uses it.
+
+Do not accept custom UI merely because the reviewer cannot find an identically named component. A custom fallback may pass only when local evidence demonstrates that the resolution rule reached that fallback, the consuming product's authority permits it, and the departure and reason are documented. Require an extension only when an appropriate shared owner exists, the need is repeatable, and that owner is in scope and editable.
 
 ## Review checklist
 
@@ -104,7 +109,7 @@ Use this checklist internally. Apply only relevant, reachable items; do not turn
 - Reachable states: relevant state, content-length, permission, and unavailable behavior are covered; include responsive states only when they are in scope.
 - Visual review: rendered implementations and release candidates pass all eight lenses in the mandatory review above.
 - Interaction design: feedback, timing, reversibility, keyboard behavior, touch targets, and accidental-action protection are sound.
-- Accessibility: contrast, focus visibility, semantic structure, keyboard reachability, color-independent meaning, readable copy, and screen-reader expectations.
+- Accessibility (implementation, release-candidate, or explicitly requested accessibility-audit gates only): contrast, focus visibility, semantic structure, keyboard reachability, color-independent meaning, readable copy, and screen-reader expectations.
 - Microcopy: labels name things, buttons name actions, errors say what is wrong and how to recover, terminology stays consistent.
 - Implementation shape: no one-off UI, parent overrides, inline style patches, duplicated token values, specificity fights, or local workarounds when the system should own the behavior.
 
@@ -124,8 +129,8 @@ Block when evidence shows the work:
 - Gives a control or named surface a promise that contradicts its contents, scope, persistence, or observed effect.
 - Breaks the user's core goal.
 - Hides or weakens the primary action.
-- Creates inaccessible interaction, unreadable content, keyboard traps, or color-only meaning.
-- Uses one-off UI where an existing shared primitive or pattern should own the behavior.
+- At an implementation or release-candidate gate, or in an explicitly requested accessibility audit, creates inaccessible interaction, unreadable content, keyboard traps, or color-only meaning.
+- Uses one-off UI without first exhausting an available local component, supported configuration, or supported composition, or disguises a repeatable in-scope system gap as a custom fallback.
 - Reaches release without necessary failure, empty, loading, disabled, or recovery states.
 - Relies on a workaround that hides a root system problem.
 
@@ -155,13 +160,13 @@ Keep recommendations directional unless the user asks for a redesign.
 - Hand approved implementation work to `developer`.
 - Remain the reviewer. A combined review-and-change request moves solution work to the owning skill after the verdict; Custodian does not continue as the maker.
 
-## Framework feedback
+## Design-system feedback
 
 When the same issue appears more than once, flag it as a recurring lesson. Recommend where it belongs:
 
 - UX behavior or principle: AI design philosophy or UX rules
 - Component-specific rule: component rules
 - Reusable fallback wording: fallback copy
-- Primitive or pattern behavior: the shared UI framework
+- Primitive or pattern behavior: the consuming product's shared UI system, when one exists
 
 Do not update durable guidance automatically during a review unless the user explicitly asks to make the change.

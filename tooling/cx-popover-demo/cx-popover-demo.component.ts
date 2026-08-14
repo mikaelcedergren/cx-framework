@@ -113,6 +113,7 @@ export class CxPopoverDemoComponent implements OnDestroy {
   @Input() triggerWidth: number | undefined;
   @Input() scenario: CxPopoverDemoScenario = 'options';
   @Input() heading: string | undefined;
+  /** Rendered into the popover's heading-row slot as a link, not as an input. */
   @Input() description: string | undefined;
   @Input() text: string | undefined;
   @Input() showCheckboxes = false;
@@ -290,7 +291,8 @@ export class CxPopoverDemoComponent implements OnDestroy {
       };
     }
 
-    const headerHeight = this.heading || this.description ? CX_POPOVER_DEMO_ROW_HEIGHT : 0;
+    // The heading row exists only when there is a heading; the slot rides in it.
+    const headerHeight = this.heading ? CX_POPOVER_DEMO_ROW_HEIGHT : 0;
     const textHeight = this.text ? 96 : 0;
     const estimatedContentHeight = Math.min(
       headerHeight + textHeight + this.options.length * CX_POPOVER_DEMO_ROW_HEIGHT,

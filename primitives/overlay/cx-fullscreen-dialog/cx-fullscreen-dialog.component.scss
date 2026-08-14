@@ -29,11 +29,18 @@
   background: var(--surface);
   box-shadow: var(--shadow-high);
   color: var(--ink);
+  /* Keep the panel compositor-promoted between enter and exit so the
+     slide-out does not stutter while the layer is rebuilt. */
+  will-change: transform;
   animation: cx-fullscreen-dialog-enter calc(var(--motion-slow) * 2) var(--ease-out-strong) both;
 }
 
+.cx-fullscreen-dialog__overlay--closing {
+  animation: cx-fullscreen-dialog-backdrop-exit calc(var(--motion-slow) * 2) var(--ease-in) both;
+}
+
 .cx-fullscreen-dialog__overlay--closing .cx-fullscreen-dialog {
-  animation: cx-fullscreen-dialog-exit calc(var(--motion-slow) * 2) var(--ease-out) both;
+  animation: cx-fullscreen-dialog-exit calc(var(--motion-slow) * 2) var(--ease-in) both;
 }
 
 .cx-fullscreen-dialog__close {
@@ -113,8 +120,16 @@
   }
 }
 
+@keyframes cx-fullscreen-dialog-backdrop-exit {
+  to {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cx-fullscreen-dialog,
+  .cx-fullscreen-dialog__overlay--closing,
   .cx-fullscreen-dialog__overlay--closing .cx-fullscreen-dialog {
     animation: none;
   }

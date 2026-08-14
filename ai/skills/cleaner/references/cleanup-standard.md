@@ -46,7 +46,15 @@ When a consumer exposes an upstream weakness:
 1. Prove the weakness belongs upstream independently of the consumer's stale usage.
 2. Fix it only if the upstream owner is in scope and local instructions allow the change.
 3. Otherwise record the issue under **🚨 Upstream action required**.
-4. Never recreate missing shared functionality locally.
+4. Do not recreate missing shared functionality locally unless the consuming product's authority explicitly permits a documented fallback after supported options are exhausted.
+
+## Local UI-system resolution
+
+Component-family terms such as button, dialog, tabs, tooltip, or icon button describe semantic roles and expected behavior. They do not prescribe a selector, import, prop, component name, or implementation structure from another platform.
+
+When user-facing UI is in scope, apply `RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, and `RULE-ID: system.shared-owner` from the portable design rules. Those rules own the resolution order. Cleaner supplies the evidence: discover the consuming product's local instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage before classifying an implementation.
+
+The absence of a component with the same name as one used on another platform is not a defect. A custom implementation is a finding only when local evidence shows that the canonical resolution order should have produced a different result.
 
 ## Evidence required for deletion
 

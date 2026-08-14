@@ -289,13 +289,22 @@
       "path": "primitives/data/cx-column-filter-editor/cx-column-filter-editor.component.ts"
     },
     {
-      "name": "cx-list-view",
+      "name": "cx-list",
       "selectors": [
-        "cx-list-view"
+        "cx-list"
       ],
       "area": "primitive",
       "category": "data",
-      "path": "primitives/data/cx-list-view/cx-list-view.component.ts"
+      "path": "primitives/data/cx-list/cx-list.component.ts"
+    },
+    {
+      "name": "cx-list-item",
+      "selectors": [
+        "cx-list-item"
+      ],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-list/cx-list-item.component.ts"
     },
     {
       "name": "cx-query-element",

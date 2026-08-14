@@ -6,7 +6,7 @@ This repository is generated. It is the published output of the Cortex design sy
 
 ## Role in the Cortex -> cx-framework -> projects loop
 
-Cortex is the source layer for components, tokens, AI skills, guidelines, and design-system decisions. This repo is only the packaged delivery layer.
+Cortex is the source layer for components, tokens, AI skills, guidelines, and design-system decisions. This repo is only the packaged delivery layer. The `ai/` tree is a platform-neutral design and working-method contract: component-family words describe semantic roles, and agents resolve those roles through the consuming product's own design system. Concrete `cx-*` selectors and APIs belong to this package's technical component source and `support/` metadata, not to the portable AI contract.
 
 Every product using the shared UI consumes this repo as `@mikaelcedergren/cx-framework` from GitHub `main`. Content and operations repos stay independent, and no downstream repo depends on Cortex directly through app imports, package dependencies, local `file:` links, scripts, styles, or copied source.
 
@@ -17,5 +17,5 @@ Rules that still apply:
 - Follow the shared Git policy in the development-root `AGENTS.md`: work on the current branch, never create a branch, pull when relevant, and push only after the user's specific current authorisation. Only after the package is pushed to GitHub `main` do consuming apps reinstall.
 - Cortex and this current package have authority over consumers. When the contract changes, migrate every consumer forward; never add compatibility shims, legacy aliases, deprecated props, or restored behavior for stale downstream code.
 - `README.md` and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, `ai/`, …) are copied from Cortex source.
-- AI agents start at `ai/design/00-start-here.md`, also exposed by the package subpath `@mikaelcedergren/cx-framework/ai`.
+- AI agents start at `ai/design/00-start-here.md`, also exposed by the package subpath `@mikaelcedergren/cx-framework/ai`. They inspect the consuming product's local components and public APIs instead of assuming this Angular library is installed or mapping semantic component roles to `cx-*` names.
 - Installed dependencies are not Codex skill-discovery roots. From a consuming repository root, run `pnpm exec cx-framework-skills` to create non-copying `.agents/skills` bridges into this package.

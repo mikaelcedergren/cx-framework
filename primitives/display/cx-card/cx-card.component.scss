@@ -3,6 +3,7 @@
 }
 
 .cx-card {
+  position: relative;
   display: flex;
   width: 100%;
   height: 100%;
@@ -18,9 +19,10 @@
   box-sizing: border-box;
   padding: var(--surface-separation);
   transition:
-    background-color var(--motion-fast) ease,
-    border-color var(--motion-fast) ease,
-    box-shadow var(--motion-fast) ease;
+    background-color var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 :host(.cx-card-host--background) .cx-card {
@@ -42,23 +44,79 @@
 }
 
 :host(.cx-card-host--interactive) {
+  // The hover lift grows the card past its layout box; keep a raised card above
+  // later siblings so a flush grid cannot clip the grown edge.
+  position: relative;
+}
+
+:host(.cx-card-host--interactive:has(.cx-card__activation:hover)) {
+  z-index: 1;
+}
+
+.cx-card__activation {
+  position: absolute;
+  z-index: 1;
+  border: 0;
+  border-radius: inherit;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  inset: 0;
   outline: none;
 }
 
-:host(.cx-card-host--interactive) .cx-card {
-  cursor: pointer;
+:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__content) {
+  pointer-events: none;
 }
 
-:host(.cx-card-host--interactive) .cx-card:hover {
+/* Passive header metadata belongs to the card-wide action. Only the menu is a
+   separate sibling control above that action surface. */
+:host(.cx-card-host--interactive) .cx-card__header-actions {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+:host(.cx-card-host--interactive) .cx-card__menu {
+  pointer-events: auto;
+}
+
+:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover) {
   background-color: var(--opacity-low);
 }
 
-:host(.cx-card-host--interactive.cx-card-host--background) .cx-card:hover,
-:host(.cx-card-host--interactive) .cx-card:active {
+:host(.cx-card-host--interactive.cx-card-host--background) .cx-card:has(.cx-card__activation:hover),
+:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
   background-color: var(--opacity-darken);
 }
 
-:host(.cx-card-host--interactive:focus-visible) .cx-card {
+// Pointer only: on touch the hover state sticks after a tap, which would leave
+// the card raised with no pointer on it.
+@media (hover: hover) {
+  :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover) {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-mid);
+  }
+}
+
+// A press releases the lift back to rest rather than dipping below the surface.
+:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
+  transform: none;
+  box-shadow: none;
+}
+
+:host(.cx-card-host--interactive.cx-card-host--shadow) .cx-card:has(.cx-card__activation:active) {
+  box-shadow: var(--shadow-low);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover),
+  :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
+    transform: none;
+  }
+}
+
+:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:focus-visible) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }

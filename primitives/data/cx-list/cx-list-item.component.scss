@@ -1,0 +1,181 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/* The list draws separators from the row so projected content stays sealed. */
+:host(.cx-list-item-host--divided) {
+  border-top: var(--line-discreet);
+}
+
+:host(.cx-list-item-host--divided:first-child) {
+  border-top: 0;
+}
+
+:host(.cx-list-item-host--disabled) {
+  opacity: var(--opacity-disabled);
+}
+
+.cx-list-item {
+  display: block;
+  min-width: 0;
+}
+
+.cx-list-item__row {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+:host(:not(.cx-list-item-host--disabled)) .cx-list-item__row:has(.cx-list-item__body:hover:not(:disabled)),
+:host(.cx-list-item-host--expanded) .cx-list-item__row {
+  background: var(--opacity-low);
+}
+
+.cx-list-item__body {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 0;
+  margin: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+}
+
+.cx-list-item__body--static {
+  cursor: default;
+}
+
+.cx-list-item__body:disabled {
+  cursor: default;
+}
+
+:host(.cx-list-item-host--disabled) .cx-list-item__body {
+  cursor: default;
+}
+
+.cx-list-item__body:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(var(--outline-tab-offset) * -1);
+}
+
+:host(.cx-list-item-host--compact) .cx-list-item__body {
+  padding: var(--space-sm);
+}
+
+.cx-list-item__icon {
+  color: var(--opacity-high);
+}
+
+.cx-list-item__text,
+.cx-list-item__main {
+  display: flex;
+  min-width: 0;
+}
+
+.cx-list-item__text {
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.cx-list-item__main {
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.cx-list-item__heading {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.cx-list-item__meta,
+.cx-list-item__description {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.cx-list-item__meta {
+  flex: 0 0 auto;
+}
+
+.cx-list-item__chevron {
+  color: var(--opacity-high);
+  transition: transform var(--motion-base) var(--ease-out-in);
+}
+
+:host(.cx-list-item-host--expanded) .cx-list-item__chevron {
+  transform: rotate(180deg);
+}
+
+/* Actions sit beside the body, never inside it; a nested button is invalid. */
+.cx-list-item__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding-inline-end: var(--space-sm);
+}
+
+.cx-list-item__actions:empty {
+  display: none;
+}
+
+.cx-list-item__content-shell {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-base) var(--ease-out-in);
+}
+
+.cx-list-item__content-shell--expanded {
+  grid-template-rows: 1fr;
+}
+
+.cx-list-item__content-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cx-list-item__content {
+  padding: 0 var(--space-md) var(--space-md);
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+:host(.cx-list-item-host--compact) .cx-list-item__content {
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+.cx-list-item__content-shell--expanded .cx-list-item__content {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cx-list-item__row,
+  .cx-list-item__content-shell,
+  .cx-list-item__content,
+  .cx-list-item__chevron {
+    transition: none;
+  }
+}

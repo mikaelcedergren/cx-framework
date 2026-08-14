@@ -145,6 +145,19 @@
   border-top: var(--line);
 }
 
+/* Single-filter surface: one island around the shared editor, matching the
+   column header's filter group. */
+.cx-filter-bar__tag-filter {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
 .cx-filter-bar__filter-actions {
   display: flex;
   min-height: var(--controller-size);

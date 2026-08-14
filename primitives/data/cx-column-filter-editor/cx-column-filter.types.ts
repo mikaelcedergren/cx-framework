@@ -288,6 +288,36 @@ export function normalizeCxColumnFilterValueMap(
   return normalizedValues;
 }
 
+/**
+ * Rendered height an editor is likely to need, for the pre-render placement
+ * pass of a surface that hosts a single filter. Owned here because it depends
+ * only on the filter definition; every surface that opens one editor — the
+ * table's column header and the filter bar's active-filter tag — measures the
+ * same way.
+ */
+export function estimateCxColumnFilterHeight(
+  definition: CxColumnFilterDefinition | undefined,
+): number {
+  if (!definition) {
+    return 0;
+  }
+  if (definition.kind !== 'multi-select') {
+    return 96;
+  }
+
+  const optionListHeight = Math.min(
+    Math.max(definition.options.length, 1) * 36,
+    320,
+  );
+  return (
+    48 +
+    optionListHeight +
+    (definition.searchable ? 40 : 0) +
+    (definition.hint ? 24 : 0) +
+    (definition.hasMore ? 36 : 0)
+  );
+}
+
 function normalizeSearchValue(value: unknown): string | undefined {
   if (typeof value !== 'string' || !value.trim()) {
     return undefined;

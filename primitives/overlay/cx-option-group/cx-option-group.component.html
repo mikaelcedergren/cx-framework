@@ -1,4 +1,4 @@
-<div class="cx-option-group">
+<div class="cx-option-group" [class.cx-option-group--heading]="variant === 'heading'">
   <span class="cx-option-group__label" [cxTooltip]="label" [cxTooltipOverflow]="true">{{ label }}</span>
 
   @if (description) {

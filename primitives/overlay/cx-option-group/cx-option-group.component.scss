@@ -27,6 +27,14 @@
   white-space: nowrap;
 }
 
+/* A surface title, not a divider between options: full ink and weight at the
+   body size so it reads as the name of everything below it. */
+.cx-option-group--heading .cx-option-group__label {
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
 .cx-option-group__description {
   min-width: 0;
   max-width: 40%;

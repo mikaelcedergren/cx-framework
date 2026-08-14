@@ -33,7 +33,7 @@ The package carries a deliberately small set of runtime dependencies, each owned
 
 A new runtime dependency is an architectural decision: it ships to every consumer of the package, so it needs an owning component and explicit approval before it is added.
 
-Validate portable AI rules, component discovery metadata, and skill bridges before every dry run or apply:
+Validate the platform-neutral AI contract, the separate exact `cx-*` component metadata, and skill bridges before every dry run or apply:
 
 ```sh
 pnpm framework:ai:check
@@ -80,23 +80,25 @@ The package should include:
 - `icons/`
 - `primitives/`
 - `patterns/`
-- `ai/`
-- `support/`
+- `ai/` — the self-contained, platform-neutral design guidance and skills
+- `support/` — exact technical metadata for this Angular component library; not part of the portable AI contract
 - `scripts/`
 - `public-api.ts`
 - `tsconfig.lib.json`
 - `package.json`
 - built `dist/` from the prepare/build step
 
-The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The design-system contract lives at `ai/design/02-design-system.md`, never as a second root-level copy.
+The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The portable design-system application contract lives at `ai/design/02-design-system.md`, never as a second root-level copy. Component-family terms in this tree are semantic roles: an agent inspects the consuming product's own design system and public APIs, then uses the best available component, configuration, or composition. The portable tree never maps those roles to `cx-*` names or depends on `support/` metadata.
 
 Codex discovers repository skills only under `.agents/skills`, not inside installed dependencies. The package therefore exposes the dependency-free `cx-framework-skills` command. From a consuming repository root, `pnpm exec cx-framework-skills` creates symlinked discovery folders that point to the installed package's `ai/skills/*`. If the dependency belongs to a nested workspace, invoke that package's command with `--root` pointing to the repository root. The command exposes the complete portable set, preserves unrelated skills, and refuses to overwrite any existing local skill.
 
-It should not include generated or local junk such as `node_modules/`, `out-tsc/`, `.DS_Store`, `.framework-build.status.json`, or empty junk folders.
+It should not include generated or local junk such as `node_modules/`, `out-tsc/`, `.DS_Store`,
+`.framework-build.status.json`, interrupted `.framework-build-publish-*` directories, or empty junk
+folders.
 
 ## After export
 
-The package command validates the AI/framework documentation layer, checks package-path relocation and the explicit export allowlist, verifies the exact portable skill/resource graph and every internal relative reference, exercises consumer skill discovery in a clean fixture, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, verifies root TypeScript and Sass consumption while rejecting private code subpaths, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
+The package command validates every file in the explicit portable `ai/` allowlist for platform neutrality and AI-local references, validates the exact component registry separately, checks package-path relocation and the public export allowlist, verifies the complete portable skill/resource graph, exercises consumer skill discovery in a clean fixture, bumps `framework/package.json`, exports the package repo, refreshes package dependencies, builds the Angular library, verifies root TypeScript and Sass consumption while rejecting private code subpaths, and runs `npm pack --dry-run` so the packed file list is visible before commit/push.
 
 After the package repo is committed and pushed, consuming apps using:
 

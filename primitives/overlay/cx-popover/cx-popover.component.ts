@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -20,7 +20,7 @@ export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 
 @Component({
   selector: 'cx-popover',
-  imports: [CxOptionGroupComponent, CxPopoverBackdropComponent],
+  imports: [NgTemplateOutlet, CxOptionGroupComponent, CxPopoverBackdropComponent],
   templateUrl: './cx-popover.component.html',
   styleUrl: './cx-popover.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -121,7 +121,6 @@ export class CxPopoverComponent {
   @Input() role: string | undefined;
   @Input() ariaLabel: string | undefined;
   @Input() heading: string | undefined;
-  @Input() description: string | undefined;
   @Input() left: number | undefined;
   @Input() top: number | undefined;
   @Input() bottom: number | undefined;
@@ -161,11 +160,6 @@ export class CxPopoverComponent {
 
   protected get normalizedTitle(): string | undefined {
     const next = this.heading?.trim();
-    return next ? next : undefined;
-  }
-
-  protected get normalizedTitleDescription(): string | undefined {
-    const next = this.description?.trim();
     return next ? next : undefined;
   }
 

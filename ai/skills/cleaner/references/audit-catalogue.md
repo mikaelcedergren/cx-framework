@@ -56,14 +56,14 @@ Do not add speculative tests solely to increase counts. Add or repair tests when
 
 ## 6. UI, UX, accessibility, and shared systems
 
-- one-off UI that duplicates an existing primitive or pattern
+- one-off UI that duplicates an available local component, supported configuration, or supported composition
 - consumer overrides of shared-component internals
 - duplicated tokens, fonts, assets, icons, or component behavior
 - broken hierarchy, affordance, responsive behavior, keyboard access, focus, contrast, semantics, or reachable states
 - stale UI routes and unreachable screens
 - accidental visual drift versus deliberate product identity
 
-Cleaner may correct verified implementation defects and system drift. It must not invent a redesign or blindly convert an intentional visual exception.
+Cleaner may correct verified implementation defects and system drift. It must not invent a redesign, require an exact component name or API from another platform, or blindly convert an intentional visual exception. Before classifying custom UI as debt, discover the consuming product's local system and exhaust its supported components, configurations, and compositions. If no viable option remains, judge the custom solution against local authority and whether it is the smallest documented departure that preserves local system behavior.
 
 ## 7. Data, security, and external contracts
 

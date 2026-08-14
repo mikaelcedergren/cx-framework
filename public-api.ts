@@ -42,7 +42,7 @@ export * from './primitives/actions/cx-reaction';
 
 export * from './primitives/data/cx-chart';
 export * from './primitives/data/cx-column-filter-editor';
-export * from './primitives/data/cx-list-view';
+export * from './primitives/data/cx-list';
 export * from './primitives/data/cx-query-element';
 export * from './primitives/data/cx-query-field';
 export * from './primitives/data/cx-table';

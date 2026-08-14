@@ -1,0 +1,11 @@
+<div
+  class="cx-list"
+  [class.cx-list--flat]="variant === 'flat'"
+  role="list"
+>
+  <ng-content />
+
+  @if (empty$()) {
+    <div class="cx-list__empty">{{ emptyText }}</div>
+  }
+</div>

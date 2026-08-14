@@ -1,6 +1,8 @@
 <span
   class="cx-tag"
   [class.cx-tag--outline]="outline"
+  [class.cx-tag--interactive]="interactive"
+  [class.cx-tag--dismissible]="dismissible"
   [class.cx-tag--with-icon]="!!icon"
   [class.cx-tag--blue]="color === 'blue'"
   [class.cx-tag--cyan]="color === 'cyan'"
@@ -14,11 +16,35 @@
   [class.cx-tag--purple]="color === 'purple'"
   [class.cx-tag--violet]="color === 'violet'"
 >
-  @if (icon; as iconName) {
-    <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
-  }
-  @if (visibleText) {
-    <span class="cx-tag__text" [cxTooltip]="visibleText" [cxTooltipOverflow]="true">{{ visibleText }}</span>
+  @if (interactive) {
+    <!-- The overflow tooltip moves onto the button: a tooltip on the inner
+         span would never see focusin once an ancestor owns focus, and one on
+         the root span would describe two focusable children. -->
+    <button
+      type="button"
+      class="cx-tag__body"
+      [attr.aria-label]="bodyLabel"
+      [attr.aria-haspopup]="popupKind"
+      [attr.aria-expanded]="expanded === undefined ? null : expanded"
+      [attr.aria-controls]="controls || null"
+      [cxTooltip]="visibleText"
+      [cxTooltipOverflow]="true"
+      (click)="onPressed($event)"
+    >
+      @if (icon; as iconName) {
+        <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+      }
+      @if (visibleText) {
+        <span class="cx-tag__text" data-cx-tooltip-overflow>{{ visibleText }}</span>
+      }
+    </button>
+  } @else {
+    @if (icon; as iconName) {
+      <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+    }
+    @if (visibleText) {
+      <span class="cx-tag__text" [cxTooltip]="visibleText" [cxTooltipOverflow]="true">{{ visibleText }}</span>
+    }
   }
   @if (dismissible) {
     <button type="button" class="cx-tag__dismiss" [attr.aria-label]="dismissLabel" (click)="onDismiss($event)">

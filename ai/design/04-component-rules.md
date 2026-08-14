@@ -1,6 +1,6 @@
 # Component rules
 
-Every rule carries its component name so `rg 'COMPONENT: buttons'` returns the applicable component-pattern rules directly. Exact selector-level guidance lives in `../../support/components/guidance.json`, the canonical source shared with component reference pages; resolve public selectors through `../../support/components/registry.json`. Exact user-facing wording belongs in `05-copy-and-microcopy.md`.
+Every rule carries its semantic component-family name so `rg 'COMPONENT: buttons'` returns the applicable role rules directly. A `COMPONENT:` value describes a user-facing role, not an implementation name. Resolve that role through the consuming product's own design system by applying `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` in `03-ux-rules.md`. Exact user-facing wording belongs in `05-copy-and-microcopy.md`.
 
 > **Normative language:** `TYPE: MUST` is mandatory; `TYPE: SHOULD` is the default unless a concrete product reason justifies departure; `TYPE: MAY` is optional. `DESCRIPTION` is `[NOTE]`; `[NOTE]` is non-normative and cannot override a rule. A marker governs only its paragraph or list item and any unmarked entries in one list, table, or code block it directly introduces; it never crosses a paragraph or heading boundary. Unlabelled prose with no inherited marker is `[NOTE]`. See `00-start-here.md` for the canonical definitions, precedence, and conflict handling.
 
@@ -20,11 +20,11 @@ RULE-ID: utility-bars.internal-only SCOPE: component COMPONENT: utility-bars TYP
 
 ## Action areas
 
-RULE-ID: action-areas.explicit-only SCOPE: component COMPONENT: action-areas TYPE: MUST TOPIC: components RULE: Use an action area only when the product scope explicitly requires one. DESCRIPTION: Never introduce cx-action-area as a default wrapper, automatic enhancement, or substitute for ordinary inline actions, entity menus, section content, or navigation; when action-area use is not explicitly requested, omit it.
+RULE-ID: action-areas.explicit-only SCOPE: component COMPONENT: action-areas TYPE: MUST TOPIC: components RULE: Use an action area only when the product scope explicitly requires one. DESCRIPTION: Never introduce an action-area component or pattern as a default wrapper, automatic enhancement, or substitute for ordinary inline actions, entity menus, section content, or navigation; when action-area use is not explicitly requested, omit it.
 
 ## Action bars
 
-RULE-ID: action-bars.active-selection SCOPE: component COMPONENT: action-bars TYPE: MUST TOPIC: state RULE: Show cx-action-bar only while at least one item is selected. DESCRIPTION: The bar represents a current selection and must leave no empty toolbar, zero-selection count, or persistent selection chrome after the selection clears.
+RULE-ID: action-bars.active-selection SCOPE: component COMPONENT: action-bars TYPE: MUST TOPIC: state RULE: Show a selection action bar only while at least one item is selected. DESCRIPTION: The bar represents a current selection and must leave no empty toolbar, zero-selection count, or persistent selection chrome after the selection clears.
 
 RULE-ID: action-bars.selection-scope SCOPE: component COMPONENT: action-bars TYPE: MUST TOPIC: interaction RULE: Offer only actions that apply to the current selected set. DESCRIPTION: Derive the action collection from the selected items and the owning content region; hide irrelevant commands and explain a temporarily blocked command only when the user can understand or resolve its blocker.
 
@@ -40,6 +40,8 @@ RULE-ID: buttons.loading SCOPE: component COMPONENT: buttons TYPE: MUST TOPIC: f
 
 RULE-ID: buttons.order SCOPE: component COMPONENT: buttons TYPE: SHOULD TOPIC: consistency RULE: Keep repeated action groups in a consistent order. DESCRIPTION: Stable ordering supports scanning and motor memory while allowing locale-aware layout.
 
+RULE-ID: buttons.icon-only SCOPE: component COMPONENT: buttons TYPE: MUST TOPIC: accessibility RULE: Use the consuming product's supported icon-only button form only for a familiar compact action. DESCRIPTION: The role may be fulfilled by a dedicated component or by the ordinary button component configured with only an icon; give it a specific accessible name, preserve the local button's target and interaction states, and use visible text when the action is unfamiliar or needs explanation.
+
 ## Context menus
 
 RULE-ID: context-menus.relevant SCOPE: component COMPONENT: context-menus TYPE: MUST TOPIC: state RULE: Show actions relevant to the current object and user. DESCRIPTION: Hide actions that never apply or cannot be influenced in the current context.
@@ -52,7 +54,7 @@ RULE-ID: context-menus.groups SCOPE: component COMPONENT: context-menus TYPE: SH
 
 RULE-ID: context-menus.destructive-last SCOPE: component COMPONENT: context-menus TYPE: MUST TOPIC: interaction RULE: Put destructive commands last in a distinct group. DESCRIPTION: Position and danger treatment should make consequence visible before activation.
 
-RULE-ID: context-menus.invocation SCOPE: component COMPONENT: context-menus TYPE: MUST TOPIC: interaction RULE: Open a context menu without activating its object. DESCRIPTION: Right-click, Menu, and Shift+F10 reveal the same actions without triggering row navigation, selection, or another object command.
+RULE-ID: context-menus.invocation SCOPE: component COMPONENT: context-menus TYPE: MUST TOPIC: interaction RULE: Open a context menu without activating its object. DESCRIPTION: Pointer, keyboard, and other locally supported context-menu gestures reveal the same actions without triggering navigation, selection, or another object command.
 
 ## Menus
 
@@ -76,9 +78,9 @@ RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: 
 
 RULE-ID: detail-panels.placement SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Own the available application frame beneath any explicit persistent utility bar. DESCRIPTION: Mount the panel in the top-level application frame so source tables, cards, split panes, and other content regions never determine its bounds; the component owns its edge treatment, responsive full-frame behavior, and stacking role.
 
-RULE-ID: detail-panels.variants SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Let floating cover the canvas and fixed reflow it. DESCRIPTION: On desktop, floating overlays the application frame without changing its geometry and uses a 4px top, trailing-edge, and bottom inset with low elevation; fixed stays flush to the frame while the owning shell reserves the panel’s rendered inline size so the application body reflows beside it. Below the mobile breakpoint, both variants cover the complete frame and the shell reserves no space.
+RULE-ID: detail-panels.variants SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Let floating cover the canvas and fixed reflow it. DESCRIPTION: On wider layouts, floating overlays the application frame without changing its geometry and keeps a small tokenized inset with low elevation; fixed stays flush to the frame while the owning shell reserves its rendered width so the application body reflows beside it. At the consuming product's narrow-layout breakpoint, both variants cover the complete frame and the shell reserves no space.
 
-RULE-ID: detail-panels.overlay-ownership SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Let the topmost child overlay handle dismissal before the detail panel. DESCRIPTION: Menus, pickers, popovers, and dialogs opened from the panel own Escape and outside interaction until they close; consumers never inspect child selectors to guard the panel.
+RULE-ID: detail-panels.overlay-ownership SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Let the topmost child overlay handle dismissal before the detail panel. DESCRIPTION: Menus, pickers, popovers, and dialogs opened from the panel own Escape and outside interaction until they close; consumers never inspect child implementation details to guard the panel.
 
 RULE-ID: detail-panels.entity-continuity SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: consistency RULE: Treat the detail panel as a deeper view of the invoking entity. DESCRIPTION: Preserve the entity’s identity, state, and already-visible facts before adding detail so opening the panel expands the same mental object instead of presenting a separate or reinterpreted one.
 
@@ -86,23 +88,23 @@ RULE-ID: detail-panels.information-depth SCOPE: component COMPONENT: detail-pane
 
 RULE-ID: detail-panels.labeled-rows SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Present compact label-value facts as horizontal labeled rows by default. DESCRIPTION: Keep labels in one stable leading column with values beside them so the body scans as relationships rather than stacked fragments, and keep the orientation consistent across comparable detail surfaces. EXCEPT: Use a vertical label-value layout only when the product explicitly requires it or a documented narrow-layout constraint makes the horizontal row unreadable.
 
-RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Keep the header order identity, main status, then the rightmost entity menu. DESCRIPTION: When the entity has a main status, project exactly one cx-status-tag through detail-panel-status at the right of the header immediately before the menu; never substitute severity, classification, or secondary metadata, never repeat the main status in the body, tabs, or footer, and leave the slot empty rather than inventing a status for an entity without one.
+RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Keep the header order identity, main status, then the rightmost entity menu. DESCRIPTION: When the entity has a main status, show exactly one status indicator at the right of the header immediately before the menu; never substitute severity, classification, or secondary metadata, never repeat the main status in the body, tabs, or footer, and omit the indicator rather than inventing a status for an entity without one.
 
-RULE-ID: detail-panels.entity-actions SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Drive every entity action menu from one collection and selection handler. DESCRIPTION: The table-row kebab, right-click menu, other source menu, and detail-panel kebab must match exactly in action set, order, availability, disabled state, and danger treatment; opening details is source activation rather than an action-menu command, and consumers never copy actions into a panel-only model or handler.
+RULE-ID: detail-panels.entity-actions SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep every entity action menu aligned to one shared action contract. DESCRIPTION: The table-row overflow menu, source context menu, other source menu, and detail-panel overflow menu must match exactly in action set, order, availability, disabled state, and danger treatment; opening details is source activation rather than an action-menu command, and consumers never define a panel-only copy.
 
 RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: The main status belongs only in the header; supporting metadata, navigation, and passive copy belong in content, while ordinary entity actions belong in the shared entity menu. EXCEPT: A pinned panel-wide task may add persistent completion controls only when they must remain reachable while the task body scrolls.
 
-RULE-ID: detail-panels.frame SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Use a quiet grey frame behind the panel’s separate white surfaces. DESCRIPTION: The header, bordered content sections, and footer read as distinct surfaces while the frame creates one coherent vertical structure.
+RULE-ID: detail-panels.frame SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Use a quiet framing plane behind the panel's separate content surfaces. DESCRIPTION: The header, bounded content sections, and footer read as distinct surfaces while the frame creates one coherent vertical structure through the consuming product's semantic surface roles.
 
-RULE-ID: detail-panels.tabs SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: navigation RULE: Render supplied peer-section tabs bare on the grey frame immediately beneath the header. DESCRIPTION: Tabs stay transparent, undivided, pinned, and free of surrounding padding or rounded island chrome above the panel-owned scrolling body; consumers never recreate a second tab bar.
+RULE-ID: detail-panels.tabs SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: navigation RULE: Render supplied peer-section tabs directly on the framing plane immediately beneath the header. DESCRIPTION: Tabs stay transparent, undivided, pinned, and free of surrounding padding or rounded island chrome above the panel-owned scrolling body; consumers never recreate a second tab bar.
 
-RULE-ID: detail-panels.sections SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Compose the scrolling body from explicit cx-detail-panel-section children. DESCRIPTION: Each section owns a white surface, discreet border, fixed 16px internal padding, and an 8px gap between direct children; consumers group related content into sections instead of projecting unsectioned content or choosing body padding.
+RULE-ID: detail-panels.sections SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Compose the scrolling body from explicit section surfaces. DESCRIPTION: Each section owns a raised content surface, discreet boundary, ordinary local internal padding, and a close relationship gap between direct children; consumers group related content into sections instead of inserting unsectioned content or independently choosing body padding.
 
 RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep the body independently scrollable and always provide close-button and Escape dismissal. DESCRIPTION: The panel body scrolls vertically only; content that genuinely requires horizontal movement owns a bounded local scroller. Outside-click dismissal remains optional because safety depends on whether closing can lose context or work.
 
 ## Labeled rows
 
-RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use cx-labeled-row for repeated structured form rows or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; do not wrap isolated controls, arbitrary page content, or layouts whose content does not share a label-value relationship. Apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch.
+RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use the consuming product's established labeled-row component or pattern for repeated structured form rows or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; do not wrap isolated controls, arbitrary page content, or layouts whose content does not share a label-value relationship. Apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch.
 
 ## State messages
 
@@ -152,7 +154,7 @@ RULE-ID: steps.exact-sequence SCOPE: component COMPONENT: steps TYPE: MUST TOPIC
 
 RULE-ID: steps.accessible-labels SCOPE: component COMPONENT: steps TYPE: MUST TOPIC: accessibility RULE: Keep every step name and status available when labels are visually suppressed. DESCRIPTION: Compact presentation may hide words from view but never removes current, completed, upcoming, pending, or needs-attention meaning from the accessibility tree.
 
-RULE-ID: steps.pending SCOPE: component COMPONENT: steps TYPE: MUST TOPIC: state RULE: Treat pending as an explicit waiting status independent of mood and indexed position. DESCRIPTION: Pending overrides index-derived completion without moving the current index; add danger when attention is needed, and keep the cause and recovery action outside the passive indicator.
+RULE-ID: steps.pending SCOPE: component COMPONENT: steps TYPE: MUST TOPIC: state RULE: Treat pending as an explicit waiting status independent of semantic intent and indexed position. DESCRIPTION: Pending overrides index-derived completion without moving the current index; add danger treatment when attention is needed, and keep the cause and recovery action outside the passive indicator.
 
 RULE-ID: steps.passive SCOPE: component COMPONENT: steps TYPE: MUST TOPIC: state RULE: Do not disable a passive step indicator. DESCRIPTION: A non-interactive progress sequence describes state; it is not an unavailable control.
 
@@ -198,9 +200,9 @@ RULE-ID: tabs.divider SCOPE: component COMPONENT: tabs TYPE: SHOULD TOPIC: affor
 
 RULE-ID: tooltips.clarification SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: feedback RULE: Use a tooltip only for brief optional clarification. DESCRIPTION: Core understanding, instructions, and required state must remain available without it.
 
-RULE-ID: tooltips.shared-owner SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: components RULE: Use the shared cx-tooltip system for every user-facing explanatory tooltip. DESCRIPTION: Attach cxTooltip directly to the real trigger when possible or use the cx-tooltip composition wrapper; native HTML title tooltips and one-off tooltip implementations are not allowed. EXCEPT: Document metadata titles, SVG accessibility titles, slider value feedback, and chart datum overlays are not explanatory tooltips.
+RULE-ID: tooltips.shared-owner SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: components RULE: Resolve every user-facing explanatory tooltip through the consuming product's established tooltip component or pattern. DESCRIPTION: Attach tooltip behavior directly to the real trigger when the local system supports it or use its supported composition; automatic platform metadata tooltips and one-off tooltip implementations are not allowed. If no established tooltip capability exists, follow `RULE-ID: system.component-resolution`. EXCEPT: Document metadata titles, image accessibility titles, slider value feedback, and chart datum overlays are not explanatory tooltips.
 
-RULE-ID: tooltips.trigger SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: accessibility RULE: Make tooltip content available from keyboard focus as well as pointer hover. DESCRIPTION: Hover-only information excludes keyboard and touch interaction. EXCEPT: A passive overflow preview may be pointer-only when it exactly duplicates complete text already present in the DOM, adds no information, and is never task-critical; do not add mass tab stops to clipped values.
+RULE-ID: tooltips.trigger SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: accessibility RULE: Make tooltip content available from keyboard focus as well as pointer hover. DESCRIPTION: Hover-only information excludes keyboard and touch interaction. EXCEPT: A passive overflow preview may be pointer-only when it exactly duplicates complete text already available to accessibility services, adds no information, and is never task-critical; do not add mass focus stops to clipped values.
 
 RULE-ID: tooltips.delay SCOPE: component COMPONENT: tooltips TYPE: SHOULD TOPIC: interaction RULE: Use a short intentional delay before showing hover-triggered tooltips. DESCRIPTION: Avoid flashing incidental content while the pointer simply crosses the page.
 
@@ -208,7 +210,7 @@ RULE-ID: tooltips.placement SCOPE: component COMPONENT: tooltips TYPE: MUST TOPI
 
 RULE-ID: tooltips.persistence SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: accessibility RULE: Keep an open tooltip visible while its trigger or surface is hovered or its trigger remains focused, and let Escape dismiss it. DESCRIPTION: Users need enough time to reach and read hover content without the surface vanishing across the placement gap.
 
-RULE-ID: tooltips.overflow SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: components RULE: Route useful clipped-text previews through cxTooltip overflow mode and its shared truncation treatment. DESCRIPTION: Native text-overflow ellipsis can create a browser tooltip in Safari, so the framework measures clipping, uses text-overflow clip, and applies its own direction-aware end fade. Mark every independently clipped descendant; its complete DOM text supplies the overflow message even without a base message, and data-cx-tooltip-text is only an explicit override. When there are no marked descendants, the measured host supplies its complete DOM text instead. Task-critical text stays visible instead of moving into a tooltip.
+RULE-ID: tooltips.overflow SCOPE: component COMPONENT: tooltips TYPE: MUST TOPIC: components RULE: Route useful clipped-text previews through the consuming product's established tooltip or overflow-disclosure pattern. DESCRIPTION: Show a preview only when text is actually clipped, use the complete text as its message, and keep direction-aware truncation treatment consistent; do not rely on automatic platform overflow or metadata-tooltip behavior. Task-critical text stays visible instead of moving into a tooltip.
 
 ## Wizard dialogs
 

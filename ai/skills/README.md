@@ -1,6 +1,6 @@
 # AI skills
 
-These skills are portable agent roles for products that use this framework. They are supported by the AI design documents in `../design/`.
+These skills are portable agent roles for products that apply the shared design guidance. They do not assume a particular UI framework, component library, selector, import, or API. They are supported by the AI design documents in `../design/`.
 
 The skills define how an agent should behave. The design documents define the durable philosophy, UX rules, component rules, and copy rules the skills apply.
 
@@ -29,3 +29,9 @@ Do not run the entire lifecycle automatically for a task that starts at a later 
 - Product-specific runtime rules belong in the consuming product's local agent instructions, not in these skills.
 - Durable UX, copy, or design-system principles belong in `../design/`.
 - A recurring lesson found during skill use should be promoted into the AI design documents instead of being hidden inside one skill.
+
+## Component language and resolution
+
+Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever a task names a component family such as a button, dialog, tabs, tooltip, or icon button.
+
+Those rules own the complete resolution and fallback order. Each skill applies that order at its own stage using evidence from the consuming product. This is dynamic local discovery, not a maintained cross-platform adapter; an exact component name or API is binding only when an applicable higher-authority source makes it so.

@@ -10,27 +10,31 @@ RULE-ID: system.mental-model SCOPE: global TYPE: MUST TOPIC: system RULE: Organi
 
 RULE-ID: system.semantic-coherence SCOPE: global TYPE: MUST TOPIC: system RULE: Make the interface's purpose, visible structure, and behavior form one coherent model. DESCRIPTION: A locally plausible element is still wrong when its name, contents, grouping, scope, persistence, or consequence contradicts the user's task or the surrounding surface. Treat interface choices inherited from a request, prototype, or component inventory as hypotheses unless product truth explicitly fixes them; their presence is not evidence of user value.
 
-RULE-ID: system.use-existing SCOPE: design-system TYPE: MUST TOPIC: system RULE: Start with the existing tokens, components, patterns, and documented behavior. DESCRIPTION: Familiar system pieces reduce drift and transfer learned behavior across the product.
+RULE-ID: system.use-existing SCOPE: design-system TYPE: MUST TOPIC: system RULE: Start with the consuming product's established tokens, components, patterns, and documented behavior. DESCRIPTION: Inspect the local system before choosing an implementation; familiar supported pieces reduce drift and transfer learned behavior across the product.
 
-RULE-ID: system.default-first SCOPE: design-system TYPE: MUST TOPIC: system RULE: Begin with the framework defaults and the minimum configuration needed. DESCRIPTION: Change a default only when it fails to express a clear requirement in the current context; when several choices work, keep the default. The existence of another option or example is not a reason to use it.
+RULE-ID: system.default-first SCOPE: design-system TYPE: MUST TOPIC: system RULE: Begin with the chosen local component's defaults and the minimum supported configuration needed. DESCRIPTION: Change a default only when it fails to express a clear requirement in the current context; when several choices work, keep the default. The existence of another option or example is not a reason to use it.
 
-RULE-ID: system.shared-owner SCOPE: design-system TYPE: MUST TOPIC: components RULE: Put repeatable behavior in the shared owner. DESCRIPTION: Extend the owning component or pattern instead of creating a private page-level substitute.
+RULE-ID: system.component-terms SCOPE: design-system TYPE: MUST TOPIC: components RULE: Treat component-family terms as semantic roles rather than implementation names. DESCRIPTION: A term such as button, dialog, tabs, or icon button describes the user-facing capability and behavior to find in the consuming product; it never prescribes a selector, import, property name, class, platform primitive, or internal structure.
+
+RULE-ID: system.component-resolution SCOPE: design-system TYPE: MUST TOPIC: components RULE: Resolve every component role through the consuming product's established design system before creating custom UI. DESCRIPTION: Inspect local instructions, design-system documentation, dependencies, supported components, and nearby established use; follow this order without skipping a stage: (1) choose the closest existing component, (2) use a supported configuration, (3) use a supported composition, (4) adapt the design to the system's available capabilities, and (5) create the smallest custom solution only as a last resort while preserving local tokens, states, interaction behavior, accessibility, and visual character.
+
+RULE-ID: system.shared-owner SCOPE: design-system TYPE: MUST TOPIC: components RULE: Put repeatable behavior in the nearest available shared owner when the accepted scope permits it. DESCRIPTION: Prefer improving the consuming product's owning component or pattern over creating a private feature substitute; when that owner is unavailable or outside scope, surface the gap and continue only through the fallback order in `RULE-ID: system.component-resolution`.
 
 RULE-ID: system.sealed-components SCOPE: design-system TYPE: MUST TOPIC: components RULE: Keep component internals sealed from consumers. DESCRIPTION: Consumers control placement and composition, not internal templates, styles, padding, or state logic.
 
 RULE-ID: system.no-external-patches SCOPE: design-system TYPE: MUST TOPIC: components RULE: Do not repair a component through consumer overrides. DESCRIPTION: Deep selectors, inline visual fixes, specificity battles, duplicated token values, and wrapper hacks hide the owning defect.
 
-RULE-ID: system.component-role-first SCOPE: component-api TYPE: MUST TOPIC: components RULE: Define a component's user-facing role before adding props. DESCRIPTION: Props should expose meaningful variation inside a clear role rather than accumulate styling knobs.
+RULE-ID: system.component-role-first SCOPE: design-system-component TYPE: MUST TOPIC: components RULE: Define a shared component's user-facing role before adding public options. DESCRIPTION: Supported options should expose meaningful variation inside a clear role rather than accumulate styling knobs.
 
 RULE-ID: structure.category-integrity SCOPE: named-surface TYPE: MUST TOPIC: hierarchy RULE: Make every named group or surface fulfill the promise created by its label and pattern. DESCRIPTION: Include the relevant peer capabilities inside its task boundary, place deliberately separate peers somewhere predictable, or narrow or remove the wrapper when only one function remains; never fill the category with unrelated behavior or expose every possible option merely because it exists.
 
-RULE-ID: system.public-api-minimal SCOPE: component-api TYPE: MUST TOPIC: components RULE: Add public behavior only for a real repeatable need. DESCRIPTION: Defaults belong to the system; pages should not decorate components through one-off props.
+RULE-ID: system.public-api-minimal SCOPE: design-system-component TYPE: MUST TOPIC: components RULE: Add public behavior only for a real repeatable need. DESCRIPTION: Defaults belong to the system; features should not decorate components through one-off options.
 
-RULE-ID: system.default-normal SCOPE: component-api TYPE: MUST TOPIC: state RULE: Make the default state represent normal product use. DESCRIPTION: Defaults should not be maximal demos or unusually intrusive examples.
+RULE-ID: system.default-normal SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make the default state represent normal product use. DESCRIPTION: Defaults should not be maximal demos or unusually intrusive examples.
 
-RULE-ID: system.reachable-states SCOPE: component-api TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states.
+RULE-ID: system.reachable-states SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states.
 
-RULE-ID: system.invalid-combinations SCOPE: component-api TYPE: MUST TOPIC: state RULE: Make invalid public-state combinations fail clearly at the owning component. DESCRIPTION: Do not silently render broken or misleading chrome.
+RULE-ID: system.invalid-combinations SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make invalid supported-option combinations fail clearly at the owning component. DESCRIPTION: Do not silently render broken or misleading chrome.
 
 RULE-ID: system.visual-behavior-contract SCOPE: global TYPE: MUST TOPIC: consistency RULE: Make elements that look alike behave alike. DESCRIPTION: Visual similarity teaches a behavioral expectation that must transfer across the product.
 
@@ -68,7 +72,7 @@ RULE-ID: interaction.truthful-state SCOPE: global TYPE: MUST TOPIC: trust RULE: 
 
 RULE-ID: interaction.preserve-work SCOPE: forms TYPE: MUST TOPIC: trust RULE: Preserve user-entered work after validation and request failures. DESCRIPTION: A recoverable failure must not clear unrelated input or force the user to start over.
 
-RULE-ID: interaction.unsaved-warning SCOPE: unsaved-work TYPE: MUST TOPIC: trust RULE: Warn before navigation or closure can discard unsaved work. DESCRIPTION: Preserve native browser protection and add product-level guards when changed content would otherwise be lost.
+RULE-ID: interaction.unsaved-warning SCOPE: unsaved-work TYPE: MUST TOPIC: trust RULE: Warn before navigation or closure can discard unsaved work. DESCRIPTION: Preserve platform-native protection and add product-level guards when changed content would otherwise be lost.
 
 RULE-ID: interaction.preserve-context SCOPE: navigation TYPE: SHOULD TOPIC: state RULE: Preserve useful view context after local actions. DESCRIPTION: Keep relevant filters, sorting, selection, scroll position, and view mode when the task continues in the same place.
 
@@ -142,7 +146,7 @@ RULE-ID: color.semantic-intent SCOPE: semantic-color TYPE: MUST TOPIC: color RUL
 
 RULE-ID: color.raw-hue SCOPE: hue-as-data TYPE: MAY TOPIC: color RULE: Use a raw palette hue when hue itself is data or a user choice. DESCRIPTION: Charts, swatches, and chosen tag colors are valid examples; pair the hue with another signal when meaning matters.
 
-RULE-ID: color.mood-prop SCOPE: component-api TYPE: MUST TOPIC: color RULE: Name semantic color intent `mood`. DESCRIPTION: Reserve `color` for direct hue data or user choice and keep structural `variant` separate.
+RULE-ID: color.intent-vs-hue SCOPE: design-system TYPE: MUST TOPIC: color RULE: Keep semantic color intent distinct from direct hue as data or choice. DESCRIPTION: Use the consuming product's established vocabulary for semantic intent, direct hue, and structural variation rather than forcing one platform's option names onto another.
 
 RULE-ID: color.large-area SCOPE: visual-group TYPE: SHOULD TOPIC: color RULE: Use large colored areas sparingly. DESCRIPTION: Surface area changes a color from a detail into the mood of the whole screen.
 
@@ -212,7 +216,7 @@ RULE-ID: data.meaningful-absence SCOPE: data-display TYPE: MUST TOPIC: state RUL
 
 RULE-ID: data.irrelevant-absence SCOPE: data-display TYPE: MUST TOPIC: state RULE: Omit an absent field or block when it does not apply and its absence conveys no useful state. DESCRIPTION: Do not expose inaccessible features, irrelevant relationships, or inapplicable optional facts as empty chrome that implies forgotten or lost data.
 
-RULE-ID: data.media-fallback SCOPE: media-display TYPE: MUST TOPIC: state RULE: Replace unavailable or failed media with an intentional non-broken fallback. DESCRIPTION: Use a stable placeholder or concise unavailable state that fits the surrounding design; use a skeleton only while media is genuinely loading and never leave the browser's broken-media treatment as the explanation.
+RULE-ID: data.media-fallback SCOPE: media-display TYPE: MUST TOPIC: state RULE: Replace unavailable or failed media with an intentional non-broken fallback. DESCRIPTION: Use a stable placeholder or concise unavailable state that fits the surrounding design; use a skeleton only while media is genuinely loading and never leave the platform's default broken-media treatment as the explanation.
 
 ## Motion
 

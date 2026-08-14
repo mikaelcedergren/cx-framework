@@ -6,7 +6,7 @@ Edit the source framework README or AI folder in the Cortex repo and re-package.
 
 # cx-framework
 
-`cx-framework` is a personal Angular UI framework and AI design package for building consistent product interfaces across apps.
+`cx-framework` combines a concrete Angular UI library with a platform-neutral AI design package for building consistent product interfaces across different codebases.
 
 Use it for:
 
@@ -16,6 +16,8 @@ Use it for:
 - portable agent skills for design, copy, review, and implementation
 
 Product-specific runtime rules, domain behavior, routes, data models, secrets, and local safety rules belong in the consuming app, not in this package.
+
+The two packaged surfaces have different scopes. Angular component documentation names the real `cx-*` APIs. The `ai/` surface describes semantic component roles and design behavior without assuming Angular, a selector, an import, or a dedicated component implementation.
 
 ## Install
 
@@ -136,21 +138,7 @@ Use semantic tokens by purpose. Do not hardcode token values or rename tokens in
 
 ### Theme profiles
 
-A theme is a complete visual profile, not a set of component overrides. Define its values on the
-root theme class; framework components continue to consume the same semantic roles.
-Profile-level overrides live together in `tokens/_theme.scss` so the character of a theme can be
-tuned as one coherent decision.
-
-The high-level visual-character controls are:
-
-- `--corner-shape` and `--corner-softness` for corner family and amount
-- `--surface-separation` for framed-surface insets and seams
-- `--floating-surface-border`, `--line`, and `--line-discreet` for boundaries
-- `--shadow-low`, `--shadow-mid`, and `--shadow-high` for elevation
-- `--frost-softness` for backdrop blur
-
-Palette, semantic colour, typography, spacing, size, and motion tokens remain available to every
-theme. Do not target `.theme-*` from a component stylesheet or add component-specific theme tokens.
+A theme is a complete visual profile, not a set of component overrides. The exact semantic roles, scales, and theme-character contract live in `tokens/README.md`.
 
 ## Fonts
 
@@ -194,6 +182,8 @@ The canonical AI design package lives in `ai/design/`. Consumers can resolve its
 
 Agents should not load the whole package by default. Search by stable `RULE-ID:`, `SCOPE:`, `TOPIC:`, `COMPONENT:`, or keyword.
 
+Component-family words in this AI surface describe roles. When it says button, dialog, tabs, tooltip, or icon button, the agent inspects the consuming product's local design system and resolves that role through an existing component, a supported configuration, or a supported composition before considering custom UI. The portable AI surface does not route through the exact `cx-*` registry.
+
 ## AI skills
 
 Portable skills live in `ai/skills/`:
@@ -220,7 +210,7 @@ If the framework dependency belongs to a nested workspace package, run its local
 pnpm --dir app exec cx-framework-skills --root ..
 ```
 
-## Consumer rules
+## Angular library consumer rules
 
 - Build screens from framework primitives and patterns before writing local UI.
 - Fix shared UI behavior in the framework, not screen by screen.
@@ -232,8 +222,10 @@ pnpm --dir app exec cx-framework-skills --root ..
 
 ## More docs
 
-- `ai/design/02-design-system.md` owns the design-system model, token rules, component discipline, and reference expectations.
+- `ai/design/02-design-system.md` owns the portable contract for discovering and using the consuming product's design system.
 - `ai/README.md` explains how the AI design docs and skills relate.
-- `support/README.md` explains machine-readable component discovery.
+- `support/README.md` explains exact `cx-*` component discovery for products actually using this Angular library.
+- `tokens/README.md` owns the concrete Angular library's token and theme contract.
+- `tooling/README.md` owns the Cortex component-reference and workbench contract.
 - `icons/README.md` explains the icon source and manifest workflow.
 - `PACKAGING.md` explains how this package is exported and maintained.

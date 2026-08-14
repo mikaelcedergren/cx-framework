@@ -2,11 +2,11 @@ import {
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   EventEmitter,
-  inject,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
@@ -27,11 +27,7 @@ export type CxCardPadding = 'none' | 'default' | 'large';
     '[class.cx-card-host--shadow]': 'shadow',
     '[class.cx-card-host--padding-none]': 'padding === "none"',
     '[class.cx-card-host--padding-large]': 'padding === "large"',
-    '[class.cx-card-host--interactive]': 'interactive',
-    '[attr.role]': 'interactive ? "button" : null',
-    '[attr.tabindex]': 'interactive ? 0 : null',
-    '(click)': 'onHostClick($event)',
-    '(keydown)': 'onHostKeydown($event)',
+    '[class.cx-card-host--interactive]': 'activatable',
     '[class.cx-card-host--mood-primary]': 'mood === "primary"',
     '[class.cx-card-host--mood-accent]': 'mood === "accent"',
     '[class.cx-card-host--mood-info]': 'mood === "info"',
@@ -41,7 +37,9 @@ export type CxCardPadding = 'none' | 'default' | 'large';
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxCardComponent {
+export class CxCardComponent implements OnChanges {
+  private warnedInvalidActivation = false;
+
   @Input() heading: string | undefined;
   @Input() icon: CxIconName | undefined;
   @Input() mood: CxCardMood = 'default';
@@ -49,37 +47,49 @@ export class CxCardComponent {
   @Input({ transform: booleanAttribute }) background = false;
   @Input({ transform: booleanAttribute }) border = false;
   @Input({ transform: booleanAttribute }) shadow = false;
+  /** Action mode. The card exposes a real button surface and emits pressed. */
   @Input({ transform: booleanAttribute }) interactive = false;
+  /** Navigation mode. Takes precedence over interactive and exposes a real link surface. */
+  @Input() href: string | undefined;
+  @Input() target: string | undefined;
+  @Input() rel: string | undefined;
+  /** Accessible name for the card action or link; falls back to heading. */
+  @Input() ariaLabel: string | undefined;
   @Input() menuItems: readonly CxMenuItem[] | undefined;
 
   @Output() readonly menuItemSelect = new EventEmitter<string>();
+  /** Emitted only by action mode. Navigation mode follows native link behavior. */
   @Output() readonly pressed = new EventEmitter<void>();
 
-  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-
-  protected onHostClick(event: MouseEvent): void {
-    if (!this.interactive || this.isInteractiveDescendant(event.target)) {
+  public ngOnChanges(_changes: SimpleChanges): void {
+    if (this.warnedInvalidActivation || !this.resolvedHref || !this.interactive) {
       return;
     }
-    this.pressed.emit();
-  }
-
-  protected onHostKeydown(event: KeyboardEvent): void {
-    if (!this.interactive || event.target !== this.elementRef.nativeElement) {
-      return;
-    }
-    if (event.key !== 'Enter' && event.key !== ' ') {
-      return;
-    }
-    event.preventDefault();
-    this.pressed.emit();
-  }
-
-  private isInteractiveDescendant(target: EventTarget | null): boolean {
-    return (
-      target instanceof Element &&
-      !!target.closest('button, a, input, textarea, select, cx-menu, [contenteditable="true"]')
+    this.warnedInvalidActivation = true;
+    console.warn(
+      `cx-card "${this.heading?.trim() || 'Untitled card'}" sets both href and interactive. ` +
+        'A card navigates or acts; href wins and pressed will not emit.',
     );
+  }
+
+  protected get resolvedHref(): string | undefined {
+    return this.href?.trim() || undefined;
+  }
+
+  protected get activatable(): boolean {
+    return Boolean(this.resolvedHref) || this.interactive;
+  }
+
+  protected get resolvedRel(): string | null {
+    return this.rel?.trim() || (this.target?.trim() === '_blank' ? 'noopener' : null);
+  }
+
+  protected get activationLabel(): string {
+    return this.ariaLabel?.trim() || this.heading?.trim() || (this.resolvedHref ? 'Open card' : 'Activate card');
+  }
+
+  protected onActivate(): void {
+    this.pressed.emit();
   }
 
   protected hasHeading(): boolean {

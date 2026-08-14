@@ -1,4 +1,4 @@
-import { baseKeymap, toggleMark } from 'prosemirror-commands';
+import { baseKeymap, chainCommands, exitCode, toggleMark } from 'prosemirror-commands';
 import { history, redo, undo } from 'prosemirror-history';
 import {
   InputRule,
@@ -74,7 +74,17 @@ function buildInputRules(): Plugin {
 }
 
 function buildKeymap(): Plugin {
+  // Shift-Enter breaks the line without leaving the current block — inside a
+  // list item it continues the same bullet. In a code block (which cannot hold
+  // hard breaks) it exits below instead.
+  const insertHardBreak = chainCommands(exitCode, (state, dispatch) => {
+    if (dispatch) {
+      dispatch(state.tr.replaceSelectionWith(schema.nodes['hard_break'].create()).scrollIntoView());
+    }
+    return true;
+  });
   return keymap({
+    'Shift-Enter': insertHardBreak,
     'Mod-z': undo,
     'Shift-Mod-z': redo,
     'Mod-y': redo,

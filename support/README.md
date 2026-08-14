@@ -1,9 +1,12 @@
 # Framework discovery metadata
 
-This folder is the machine-readable map of the framework.
+This folder is the machine-readable technical map of the concrete Angular `cx-*` library. It supports Cortex's component reference, source validation, and package tooling; it is intentionally implementation-specific.
+
+The portable design guidance and skills under `../ai/` do not read this metadata or map semantic roles such as “button” and “dialog” to these component names. They discover and use the consuming product's own components, public APIs, configurations, and supported compositions. A consumer may still inspect this folder when `cx-framework` itself is its local component library, but the portable AI contract never assumes that relationship.
 
 - `components/registry.json`: every component and directive reachable from `public-api.ts`, with selector and source path; exported tooling is marked as `area: tooling`, `category: reference`
-- `components/guidance.json`: complete exact-component guidance shared by the component reference and packaged AI consumers
+- `components/guidance.json`: complete, substantive exact-component guidance for the Cortex component reference and technical library consumers; every key must resolve through the registry
+- `components/locks.json`: a sorted list of registry components the user has locked as read-only source; only the workbench Lock switch writes it, and Cortex's source-side lock guard fails closed when this authority cannot be trusted
 - `validation/composition.rules.json`: composition constraints
 - `validation/placement.rules.json`: placement constraints
 - `validation/visibility.rules.json`: visibility constraints

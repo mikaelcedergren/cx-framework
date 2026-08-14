@@ -45,6 +45,8 @@ Search by `TOPIC:`, `COMPONENT:`, or keyword. Apply the normative levels and con
 
 Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
 
+Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the accepted work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not an exact component name, selector, import, prop, or implementation structure.
+
 ## Implementation method
 
 1. Inspect the current behavior and the layer that owns it; confirm the root cause before editing.
@@ -70,7 +72,10 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 - Use `designer` when an unresolved product, flow, interaction, or visual decision would materially change the build.
 - Use `copywriter` when exact user-facing wording is unresolved.
-- Start from the existing design system. Define an owning component or pattern extension when the system lacks required behavior; do not build a page-level substitute.
+- Discover the consuming product's system before choosing implementation: read its local instructions and design-system documentation, then inspect dependencies, public APIs, imports, and established nearby usage.
+- Execute the complete order in `RULE-ID: system.component-resolution` against the discovered public contract. Never transfer a component name or API from another platform without local evidence.
+- Extend an owning component or pattern only when the product has an appropriate shared owner, the need is repeatable, and that owner is in scope and editable. If it belongs to an external or protected owner, surface the gap instead of hiding it in a consumer.
+- If resolution reaches its custom fallback and local authority permits the task to continue, document what was tried and why the departure is necessary. Do not disguise an editable shared-system defect as a custom fallback.
 - Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, `RULE-ID: interaction.control-semantics`, and `RULE-ID: content.scannable` to every user-facing change.
 - Treat a control category as a state-boundary contract. View refinement may preserve view state but must never write entity data; entity, preference, and system changes use their explicit accepted semantics.
 - Return to `designer` when a named surface lacks a coherent relevant capability family or the accepted design does not establish what a control changes and for how long.

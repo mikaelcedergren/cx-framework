@@ -30,6 +30,8 @@ Before auditing, read these files completely:
 
 Before creating or resuming the working ledger, read `references/ledger-and-reporting.md` completely.
 
+When the cleanup scope includes user-facing UI, also read `../../design/00-start-here.md` and the smallest relevant rule sections. Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution`: component-family terms describe semantic roles and expected behavior, not exact component names or APIs.
+
 ## 1. Discover the scope
 
 Run `scripts/discover_workspace.py` from the invocation location and inspect its JSON output.
@@ -62,7 +64,7 @@ If it does not exist, create it from the template in `references/ledger-and-repo
 
 Before changing source:
 
-1. Map repository roles, dependency direction, public boundaries, generated sources, deliberate exceptions, and verification commands.
+1. Map repository roles, dependency direction, public boundaries, generated sources, deliberate exceptions, and verification commands. When UI is in scope, discover each product's local system from its instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage.
 2. Capture relevant build, test, typecheck, lint, package-manager, and runtime state.
 3. Distinguish existing failures from failures introduced later.
 4. Audit the complete scope using `references/audit-catalogue.md`.
@@ -87,7 +89,9 @@ Never execute multiple cleanup items simultaneously. Read-only discovery may be 
 
 Prefer deletion and direct simplification over preserving obsolete behavior. Remove dead code, duplication, compatibility shims, aliases, wrappers, redirects, stale routes, abandoned assets, misleading commands, redundant documentation, and local workarounds when evidence proves they are unnecessary.
 
-Do not replace one workaround with another. When the durable fix belongs to an in-scope shared owner, fix that owner. When it belongs to an off-limits or external upstream, leave the consumer honest and record the issue under **🚨 Upstream action required**.
+Do not replace one workaround with another. For a semantic component role, apply the complete order in `RULE-ID: system.component-resolution` using the local evidence captured at baseline. Never transfer an exact component name or API from another platform without local evidence.
+
+When resolution reaches a repeatable need in an in-scope, editable shared owner, fix that owner. When the owner is off limits or external, leave the consumer honest, record the issue under **🚨 Upstream action required**, and follow local authority. A custom solution is not automatically debt when the resolution rule legitimately reaches its fallback; preserve or create it only as that rule and local authority permit.
 
 Maintain one canonical implementation. Add a shared abstraction only when it simplifies the current system now.
 
@@ -95,7 +99,7 @@ Maintain one canonical implementation. Add a shared abstraction only when it sim
 
 Compatibility is not a goal for stale internal implementation. External contracts, user data, migrations, security boundaries, public URLs, SEO behavior, integrations, and deliberate UX require evidence and explicit impact accounting before breakage.
 
-Cleaner is not a redesign skill. Do not normalize a deliberate visual identity merely because another repository uses a shared framework. When cleanup affects rendered UI, interaction, responsiveness, or accessibility, verify the actual experience rather than relying only on source inspection or a passing build.
+Cleaner is not a redesign skill. Do not normalize a deliberate visual identity merely because another repository uses a shared UI system. When cleanup affects rendered UI, interaction, responsiveness, or accessibility, verify the actual experience rather than relying only on source inspection or a passing build.
 
 ## 6. Verify the completed scope
 

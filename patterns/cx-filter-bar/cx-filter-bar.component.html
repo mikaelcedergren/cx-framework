@@ -62,10 +62,16 @@
            this keeps the visual order matching the filter list. -->
       @for (tag of activeFilterTagsRow$(); track tag.id; let index = $index) {
         <cx-tag
+          #activeFilterTag
           class="cx-filter-bar__active-filter"
           [class.cx-filter-bar__active-filter--hidden]="isActiveFilterTagHidden(index)"
           [text]="tag.text"
+          [interactive]="true"
+          [ariaLabel]="activeFilterTagAriaLabel(tag.text)"
+          [expanded]="isTagFilterOpen(tag.id)"
+          [controls]="isTagFilterOpen(tag.id) ? tagFilterDialogId : undefined"
           [dismissible]="true"
+          (pressed)="onActiveFilterTagPressed(tag.id)"
           (dismiss)="onActiveFilterDismiss(tag.id)"
         />
       }
@@ -173,16 +179,11 @@
           }
 
           @if (isFilterExpanded(filter.id)) {
-            <cx-column-filter-editor
-              class="cx-filter-bar__filter-editor"
-              [label]="''"
-              [ariaLabel]="filter.label + ' filter'"
-              [showClearAction]="false"
-              [definition]="filter.filter"
-              [value]="filterValue(filter.id)"
-              (valueChange)="onColumnFilterValueChange(filter, $event)"
-              (queryChange)="onFilterQueryChange(filter.id, $event)"
-              (loadMore)="onFilterLoadMore(filter.id)"
+            <!-- Heading and Clear come from the panel here, so the editor
+                 renders neither; the tag popover has no such chrome. -->
+            <ng-container
+              [ngTemplateOutlet]="columnFilterEditor"
+              [ngTemplateOutletContext]="{ filter, label: '', showClear: false }"
             />
           }
         </cx-expansion-panel>
@@ -196,6 +197,51 @@
 </cx-popover>
 
 <cx-popover
+  #tagFilterPopover
+  [open]="tagFilter$() !== undefined && tagFilterMetrics$() !== undefined && mode$() === 'filters' && showActiveFilters$()"
+  [showBackdrop]="true"
+  [left]="tagFilterMetrics$()?.left"
+  [top]="tagFilterMetrics$()?.top"
+  [bottom]="tagFilterMetrics$()?.bottom"
+  [width]="tagFilterMetrics$()?.width"
+  [maxHeight]="tagFilterMetrics$()?.maxHeight"
+  [placement]="tagFilterMetrics$()?.placement"
+  [surfaceId]="tagFilterDialogId"
+  [role]="'dialog'"
+  [ariaLabel]="(tagFilter$()?.label ?? '') + ' filter'"
+  surfaceVariant="grouped"
+  (backdropPressed)="closeTagFilterPopover()"
+>
+  @if (tagFilter$(); as filter) {
+    <div class="cx-filter-bar__tag-filter">
+      <!-- Same shape as the column header: the editor owns the label and the
+           Clear action because nothing around it does. -->
+      <ng-container
+        [ngTemplateOutlet]="columnFilterEditor"
+        [ngTemplateOutletContext]="{ filter, label: filter.label, showClear: true }"
+      />
+    </div>
+  }
+</cx-popover>
+
+<!-- One editor wiring for every surface in this bar: the definition, the
+     current value and the three outputs can never drift between them. Only
+     the surrounding chrome differs, through label and showClear. -->
+<ng-template #columnFilterEditor let-filter="filter" let-label="label" let-showClear="showClear">
+  <cx-column-filter-editor
+    class="cx-filter-bar__filter-editor"
+    [label]="label"
+    [ariaLabel]="filter.label + ' filter'"
+    [showClearAction]="showClear"
+    [definition]="filter.filter"
+    [value]="filterValue(filter.id)"
+    (valueChange)="onColumnFilterValueChange(filter, $event)"
+    (queryChange)="onFilterQueryChange(filter.id, $event)"
+    (loadMore)="onFilterLoadMore(filter.id)"
+  />
+</ng-template>
+
+<cx-popover
   #propertiesPopover
   [open]="propertiesPopoverOpen$()"
   [showBackdrop]="filterPopoverOpen$() || propertiesPopoverOpen$()"
@@ -205,6 +251,7 @@
   [width]="propertiesPopoverWidth$()"
   [maxHeight]="propertiesPopoverMaxHeight$()"
   [placement]="propertiesPopoverPlacement$()"
+  [heading]="'Table properties'"
   [role]="'dialog'"
   ariaLabel="Table properties"
   surfaceVariant="grouped"

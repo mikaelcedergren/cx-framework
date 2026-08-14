@@ -99,8 +99,16 @@
 }
 
 .cx-table__head-cell--selection {
+  position: sticky;
+  left: 0;
   width: 32px;
+  z-index: var(--cx-table-z-pinned-header);
+  background: var(--surface);
   text-align: center;
+}
+
+.cx-table--sticky-header .cx-table__head-cell--selection {
+  z-index: calc(var(--cx-table-z-pinned-header) + 1);
 }
 
 .cx-table__menu-column {
@@ -173,7 +181,11 @@
 }
 
 .cx-table__cell--selection {
+  position: sticky;
+  left: 0;
   width: 32px;
+  z-index: var(--cx-table-z-pinned-cell);
+  background: var(--surface);
   text-align: center;
 }
 

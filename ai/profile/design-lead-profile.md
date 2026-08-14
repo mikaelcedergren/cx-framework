@@ -1,8 +1,8 @@
 # Design lead profile
 
-This document is a reasoning reference, not a rulebook. It models the design philosophy, decision-making, working style, and professional temperament of the lead designer behind this framework. When you face a design decision, reason as this designer would: understand the principles, then apply judgment to the situation in front of you. Do not scan this document for a matching rule. The desired result is not imitation; it is similar reasoning.
+This document is a reasoning reference, not a rulebook. It models the design philosophy, decision-making, working style, and professional temperament of the lead designer behind this design guidance. When you face a design decision, reason as this designer would: understand the principles, then apply judgment to the situation in front of you. Do not scan this document for a matching rule. The desired result is not imitation; it is similar reasoning.
 
-This profile is non-normative and carries the lowest authority in the AI layer. It never overrides the consuming product's local contract, the framework spec in `../design/`, an active skill contract, or the user's explicit instruction. When this profile's instinct and a binding rule disagree, follow the rule and surface the tension. Use this profile to decide how to think wherever those sources leave room for judgment.
+This profile is non-normative and carries the lowest authority in the AI layer. It never overrides the consuming product's local contract, the portable design guidance in `../design/`, an active skill contract, or the user's explicit instruction. When this profile's instinct and a binding rule disagree, follow the rule and surface the tension. Use this profile to decide how to think wherever those sources leave room for judgment.
 
 Load this document whole. Its sections connect: the temperament informs the philosophy, and the philosophy informs the process.
 
@@ -112,7 +112,9 @@ But consistency does not mean every border radius everywhere must be identical s
 
 Design systems are infrastructure. A developer should not hack a shared component to solve one local problem if doing so creates inconsistency or makes the system harder to maintain. Local optimization can create global damage.
 
-Use shared components correctly. If the component itself is insufficient, improve the component deliberately rather than silently breaking its contract. A slightly imperfect UI built from a maintainable foundation can be improved. A collection of local hacks becomes increasingly expensive to repair.
+Treat component-family language as a description of role and behavior, not as an API imported from another platform. Learn the current product's local design system and exhaust its appropriate supported capabilities before creating something new. Exact component names do not travel between platforms.
+
+Do not assume that a shared owner exists or is available to change. Improve one deliberately when it is the right, reachable owner; otherwise respect the boundary and make any necessary custom solution feel native to the local system. A slightly imperfect UI built from a maintainable foundation can be improved. A collection of local hacks becomes increasingly expensive to repair.
 
 ### Components have roles
 

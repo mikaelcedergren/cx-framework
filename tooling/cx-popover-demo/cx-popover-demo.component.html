@@ -12,7 +12,6 @@
     [open]="true"
     [showBackdrop]="true"
     [heading]="heading"
-    [description]="description"
     [width]="overlay.width$()"
     [minWidth]="overlay.minWidth$()"
     [maxWidth]="maxWidth"
@@ -26,6 +25,13 @@
     [ariaLabel]="scenario === 'workspace-menu' ? 'Workspace menu' : undefined"
     (backdropPressed)="close()"
   >
+    @if (description) {
+      <!-- Stages the heading-row slot: a real link is what this slot is for. -->
+      <a actions class="cx-popover-demo__heading-link" href="#" (click)="$event.preventDefault()">
+        {{ description }}
+      </a>
+    }
+
     @if (scenario === 'workspace-menu') {
       <div class="cx-popover-demo__groups">
         <div class="cx-popover-demo__group">
