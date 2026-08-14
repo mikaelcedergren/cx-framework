@@ -1,9 +1,15 @@
 @if (isOpen$()) {
-  <div class="cx-dialog-backdrop" role="presentation" (click)="onBackdropClick()">
+  <div
+    class="cx-dialog-backdrop"
+    role="presentation"
+    (click)="onBackdropClick()"
+    (mousedown)="onBackdropMousedown($event)"
+  >
     <section
+      #dialogRoot
       class="cx-dialog"
       cdkTrapFocus
-      [cdkTrapFocusAutoCapture]="true"
+      tabindex="-1"
       [class.cx-dialog--confirm]="variant === 'confirm'"
       [class.cx-dialog--info]="variant === 'info'"
       [class.cx-dialog--small]="size === 'small'"
@@ -71,6 +77,7 @@
             <cx-button
               [text]="secondaryText"
               mood="default"
+              [attr.cdkFocusInitial]="showPrimaryShortcut() ? null : ''"
               (pressed)="onSecondary()"
             />
 
@@ -92,7 +99,7 @@
             [mood]="mood"
             [disabled]="primaryDisabled"
             [loading]="primaryLoading"
-            cdkFocusInitial
+            [attr.cdkFocusInitial]="showPrimaryShortcut() ? '' : null"
             (pressed)="onPrimary()"
           />
         </div>

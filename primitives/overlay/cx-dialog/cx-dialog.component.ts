@@ -1,6 +1,17 @@
-import { A11yModule } from '@angular/cdk/a11y';
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, inject, signal } from '@angular/core';
+import { A11yModule, CdkTrapFocus, InteractivityChecker } from '@angular/cdk/a11y';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   CxButtonComponent,
   type CxButtonMood,
@@ -8,6 +19,7 @@ import {
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { eventMatchesShortcut } from '../../actions/shared/shortcuts';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
+import { isHostVisible } from '../../shared/host-visibility';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../cx-menu';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
@@ -35,10 +47,32 @@ export type CxDialogSize = 'small' | 'default' | 'large';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxDialogComponent implements OnDestroy {
+  private readonly document = inject(DOCUMENT);
+  private readonly interactivityChecker = inject(InteractivityChecker);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
   private readonly menuOpenState = signal(false);
   private overlayHandle?: CxOverlayStateHandle;
+  private dialogElement?: HTMLElement;
+  private focusMutationObserver?: MutationObserver;
+  private focusPortalObserver?: MutationObserver;
+  private focusCheckQueued = false;
+  private initialFocusPending = false;
+  private readonly documentFocusInListener = () => this.queueFocusOwnershipCheck();
+
+  @ViewChild(CdkTrapFocus)
+  private focusTrapDirective?: CdkTrapFocus;
+
+  @ViewChild('dialogRoot', { read: ElementRef })
+  private set dialogRootRef(value: ElementRef<HTMLElement> | undefined) {
+    this.stopFocusOwnership();
+    if (!value) {
+      return;
+    }
+
+    this.dialogElement = value.nativeElement;
+    this.startFocusOwnership(value.nativeElement);
+  }
 
   protected readonly titleId = `cx-dialog-title-${++cxDialogId}`;
   protected readonly descriptionId = `cx-dialog-description-${cxDialogId}`;
@@ -77,6 +111,7 @@ export class CxDialogComponent implements OnDestroy {
   @Output() readonly menuItemSelect = new EventEmitter<string>();
 
   ngOnDestroy(): void {
+    this.stopFocusOwnership();
     this.releaseOverlay();
   }
 
@@ -151,6 +186,12 @@ export class CxDialogComponent implements OnDestroy {
     this.dismissFromUser();
   }
 
+  protected onBackdropMousedown(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      event.preventDefault();
+    }
+  }
+
   protected onDismiss(): void {
     if (!this.canDismiss()) {
       return;
@@ -189,6 +230,25 @@ export class CxDialogComponent implements OnDestroy {
   }
 
   protected onDialogKeydown(event: KeyboardEvent): void {
+    if (
+      event.key === 'Tab'
+      && !event.altKey
+      && !event.ctrlKey
+      && !event.metaKey
+      && this.document.activeElement === this.dialogElement
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      const focusTrap = this.focusTrapDirective?.focusTrap;
+      const moved = event.shiftKey
+        ? focusTrap?.focusLastTabbableElement({ preventScroll: true })
+        : focusTrap?.focusFirstTabbableElement({ preventScroll: true });
+      if (!moved) {
+        this.focusDialogFallback();
+      }
+      return;
+    }
+
     if (event.isComposing || this.menuOpenState()) {
       return;
     }
@@ -238,6 +298,134 @@ export class CxDialogComponent implements OnDestroy {
     }
 
     this.openState.set(nextOpen);
+  }
+
+  private startFocusOwnership(dialogElement: HTMLElement): void {
+    this.initialFocusPending = true;
+    this.document.addEventListener('focusin', this.documentFocusInListener, true);
+
+    if (typeof MutationObserver !== 'undefined') {
+      this.focusMutationObserver = new MutationObserver(() => this.queueFocusOwnershipCheck());
+      this.focusMutationObserver.observe(dialogElement, {
+        attributes: true,
+        attributeFilter: [
+          'aria-disabled',
+          'aria-expanded',
+          'aria-hidden',
+          'class',
+          'contenteditable',
+          'disabled',
+          'hidden',
+          'href',
+          'inert',
+          'style',
+          'tabindex',
+          'type',
+        ],
+        childList: true,
+        subtree: true,
+      });
+
+      // Framework popovers are direct body portals. Removing their focused
+      // surface does not necessarily emit focusin or mutate the dialog tree.
+      this.focusPortalObserver = new MutationObserver(() => this.queueFocusOwnershipCheck());
+      this.focusPortalObserver.observe(this.document.body, { childList: true });
+    }
+
+    queueMicrotask(() => this.focusInitialTarget(dialogElement));
+  }
+
+  private stopFocusOwnership(): void {
+    this.focusMutationObserver?.disconnect();
+    this.focusMutationObserver = undefined;
+    this.focusPortalObserver?.disconnect();
+    this.focusPortalObserver = undefined;
+    this.document.removeEventListener('focusin', this.documentFocusInListener, true);
+    this.dialogElement = undefined;
+    this.focusCheckQueued = false;
+    this.initialFocusPending = false;
+  }
+
+  private focusInitialTarget(dialogElement: HTMLElement): void {
+    if (this.dialogElement !== dialogElement) {
+      return;
+    }
+
+    this.initialFocusPending = false;
+    if (!this.canOwnFocus(dialogElement)) {
+      return;
+    }
+    if (!this.hasValidOwnedFocus(dialogElement)) {
+      this.rehomeFocus();
+    }
+  }
+
+  private queueFocusOwnershipCheck(): void {
+    if (this.focusCheckQueued) {
+      return;
+    }
+    this.focusCheckQueued = true;
+    queueMicrotask(() => {
+      this.focusCheckQueued = false;
+      if (!this.initialFocusPending) {
+        this.ensureFocusOwnership();
+      }
+    });
+  }
+
+  private ensureFocusOwnership(): void {
+    const dialogElement = this.dialogElement;
+    if (
+      !dialogElement
+      || !this.canOwnFocus(dialogElement)
+      || this.hasValidOwnedFocus(dialogElement)
+    ) {
+      return;
+    }
+    this.rehomeFocus();
+  }
+
+  private rehomeFocus(): void {
+    const dialogElement = this.dialogElement;
+    if (!dialogElement || !this.canOwnFocus(dialogElement)) {
+      return;
+    }
+
+    const focusTrap = this.focusTrapDirective?.focusTrap;
+    const moved = focusTrap?.focusInitialElement({ preventScroll: true });
+    if (!moved || !this.hasValidOwnedFocus(dialogElement)) {
+      this.focusDialogFallback();
+    }
+  }
+
+  private focusDialogFallback(): void {
+    this.dialogElement?.focus({ preventScroll: true });
+  }
+
+  private canOwnFocus(dialogElement: HTMLElement): boolean {
+    return (
+      this.openState()
+      && this.overlayState.isTopmost(this.overlayHandle)
+      && isHostVisible(dialogElement)
+    );
+  }
+
+  private hasValidOwnedFocus(dialogElement: HTMLElement): boolean {
+    const activeElement = this.document.activeElement;
+    if (
+      typeof HTMLElement === 'undefined'
+      || !(activeElement instanceof HTMLElement)
+      || !dialogElement.contains(activeElement)
+    ) {
+      return false;
+    }
+    if (
+      activeElement.matches(':disabled')
+      || activeElement.closest('[aria-disabled="true"], [aria-hidden="true"], [hidden], [inert]')
+    ) {
+      return false;
+    }
+    return this.interactivityChecker.isFocusable(activeElement);
   }
 
   private releaseOverlay(): void {
