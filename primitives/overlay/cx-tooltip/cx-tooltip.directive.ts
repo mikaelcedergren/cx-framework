@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
   ComponentRef,
@@ -7,6 +7,7 @@ import {
   HostListener,
   Injectable,
   OnDestroy,
+  PLATFORM_ID,
   ViewContainerRef,
   booleanAttribute,
   effect,
@@ -272,6 +273,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly overflowObserver = inject(CxTooltipOverflowObserver);
   private readonly interactionCoordinator = inject(CxTooltipInteractionCoordinator);
+  private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly viewReady = signal(false);
   private readonly tooltipId = `cx-tooltip-${++cxTooltipId}`;
 
@@ -340,6 +342,9 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    if (!this.browser) {
+      return;
+    }
     this.viewReady.set(true);
   }
 
@@ -627,6 +632,9 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   }
 
   private syncOverflowMeasurement(reconcile = true): void {
+    if (!this.browser) {
+      return;
+    }
     const nextTargets = this.resolveOverflowTargets();
     const targetsChanged = !this.sameTargets(nextTargets, this.overflowTargets);
     if (targetsChanged) {
