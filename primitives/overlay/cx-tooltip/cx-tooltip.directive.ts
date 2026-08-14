@@ -122,7 +122,11 @@ class CxTooltipOverflowObserver {
 
   private scheduleMeasurements(): void {
     const view = this.document.defaultView;
-    if (!view || this.measurementFrame !== undefined) {
+    if (
+      !view ||
+      typeof view.requestAnimationFrame !== 'function' ||
+      this.measurementFrame !== undefined
+    ) {
       return;
     }
     this.measurementFrame = view.requestAnimationFrame(() => {
@@ -142,7 +146,11 @@ class CxTooltipOverflowObserver {
     this.mutationObserver?.disconnect();
     this.mutationObserver = undefined;
     const view = this.document.defaultView;
-    if (view && this.measurementFrame !== undefined) {
+    if (
+      view &&
+      typeof view.cancelAnimationFrame === 'function' &&
+      this.measurementFrame !== undefined
+    ) {
       view.cancelAnimationFrame(this.measurementFrame);
     }
     this.measurementFrame = undefined;
