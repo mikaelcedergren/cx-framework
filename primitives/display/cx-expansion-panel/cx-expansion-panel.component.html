@@ -38,11 +38,18 @@
     </span>
   </div>
 
+  <!-- `inert` is what makes a closed panel closed, and it is deliberately an
+       attribute rather than a style. The collapsed row is zero-height and its
+       body is transparent, but neither of those takes anything out of the tab
+       order or out of the accessibility tree: without this, a keyboard user tabs
+       from the heading straight into a link nobody can see. `inert` covers focus,
+       pointer events and screen readers in one place, and no stylesheet — print,
+       theme, or consumer override — can undo it. -->
   <div
     class="cx-expansion-panel__content-shell"
     [class.cx-expansion-panel__content-shell--expanded]="expanded$()"
     [id]="contentId"
-    [attr.aria-hidden]="expanded$() ? null : 'true'"
+    [attr.inert]="expanded$() ? null : ''"
   >
     <div class="cx-expansion-panel__content-clip">
       <div class="cx-expansion-panel__content">

@@ -4,6 +4,7 @@ import {
   ElementRef,
   Input,
   ViewChild,
+  signal,
   type OnChanges,
   type SimpleChanges,
 } from '@angular/core';
@@ -51,10 +52,19 @@ export class CxOptionComponent implements OnChanges {
   @ViewChild('control', { read: ElementRef })
   private controlRef?: ElementRef<HTMLElement>;
 
-  private warnedInvalidCheckboxIcon = false;
+  @ViewChild('labelContent', { read: ElementRef })
+  private labelContentRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('appendSlot', { read: ElementRef })
+  private appendSlotRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('controlSlot', { read: ElementRef })
+  private controlSlotRef?: ElementRef<HTMLElement>;
 
   ngOnChanges(_changes: SimpleChanges): void {
-    this.warnInvalidCombinations();
+    if (this.showCheckbox && this.prependIcon) {
+      throw new Error('[cx-option] showCheckbox and prependIcon cannot be used together.');
+    }
   }
 
   /** Move keyboard focus to the option's control. */
@@ -94,15 +104,4 @@ export class CxOptionComponent implements OnChanges {
     event.stopPropagation();
   }
 
-  private warnInvalidCombinations(): void {
-    if (this.showCheckbox && this.prependIcon) {
-      if (!this.warnedInvalidCheckboxIcon) {
-        console.warn('[cx-option] showCheckbox and prependIcon cannot be used together. The checkbox affordance replaces the prepend icon.');
-        this.warnedInvalidCheckboxIcon = true;
-      }
-      return;
-    }
-
-    this.warnedInvalidCheckboxIcon = false;
-  }
 }

@@ -269,8 +269,8 @@ export class CxTableComponent implements OnDestroy {
   protected readonly columnHeaderDialogId = `cx-table-${this.instanceId}-column-dialog`;
   protected readonly columnMinWidth = CX_TABLE_COLUMN_MIN_WIDTH;
   protected readonly columnMaxWidth = CX_TABLE_COLUMN_MAX_WIDTH;
-  private readonly columnsState = signal<CxTableColumn[]>([]);
-  private readonly rowsState = signal<CxTableRow[]>([]);
+  private readonly columnsState = signal<readonly CxTableColumn[]>([]);
+  private readonly rowsState = signal<readonly CxTableRow[]>([]);
   private readonly activeRowIdState = signal<string | undefined>(undefined);
   private readonly openRowMenuIdState = signal<string | undefined>(undefined);
   private readonly contextMenuState = signal<CxTableContextMenuState | undefined>(undefined);
@@ -362,7 +362,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   @Input()
-  public set columns(value: CxTableColumn[]) {
+  public set columns(value: readonly CxTableColumn[]) {
     if (this.activeResizeSession) {
       this.stopResizeSession();
     }
@@ -396,7 +396,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   @Input()
-  public set rows(value: CxTableRow[]) {
+  public set rows(value: readonly CxTableRow[]) {
     const nextRows = value ?? [];
     const nextRowIds = new Set(nextRows.map(row => row.id));
     this.rowsState.set(nextRows);

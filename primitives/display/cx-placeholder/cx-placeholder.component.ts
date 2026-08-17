@@ -16,7 +16,8 @@ export class CxPlaceholderComponent {
   @Input() text = 'Design placeholder';
   @Input() size: CxPlaceholderSize = 'default';
 
-  protected hasText(): boolean {
-    return !!this.text.trim();
+  protected visibleText$(): string {
+    return this.text.trim();
   }
+
 }

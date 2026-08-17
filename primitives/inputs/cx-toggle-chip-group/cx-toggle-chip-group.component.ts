@@ -18,9 +18,19 @@ export interface CxToggleChipGroupOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxToggleChipGroupComponent {
+  private readonly availableValuesState = signal<readonly CxToggleChipGroupOption[]>([]);
   private readonly selectedValuesState = signal<string[]>([]);
 
-  @Input() availableValues: CxToggleChipGroupOption[] = [];
+  @Input()
+  public set availableValues(values: readonly CxToggleChipGroupOption[] | undefined) {
+    this.availableValuesState.set(this.normalizeOptions(values));
+    this.selectedValuesState.set(this.normalize(this.selectedValuesState()));
+  }
+
+  public get availableValues(): readonly CxToggleChipGroupOption[] {
+    return this.availableValuesState();
+  }
+
   @Input() selection: CxToggleChipGroupSelection = 'multiple';
   @Input() size: CxToggleChipSize = 'default';
   @Input() disabled = false;
@@ -33,6 +43,7 @@ export class CxToggleChipGroupComponent {
 
   @Output() readonly selectedValuesChange = new EventEmitter<string[]>();
 
+  protected readonly availableValues$ = this.availableValuesState.asReadonly();
   protected readonly selectedValues$ = this.selectedValuesState.asReadonly();
   protected readonly role$ = computed(() => (this.selection === 'single' ? 'radiogroup' : 'group'));
 
@@ -63,10 +74,35 @@ export class CxToggleChipGroupComponent {
   }
 
   private normalize(values: string[]): string[] {
-    const ids = this.availableValues.map(option => option.id);
-    const known = values.filter((value, index) =>
-      values.indexOf(value) === index && (ids.length === 0 || ids.includes(value)),
+    const ids = this.availableValuesState().map(option => option.id);
+    const normalizedValues = values.map(value => value.trim()).filter(Boolean);
+    const known = normalizedValues.filter((value, index) =>
+      normalizedValues.indexOf(value) === index && (ids.length === 0 || ids.includes(value)),
     );
     return this.selection === 'single' ? known.slice(0, 1) : known;
+  }
+
+  private normalizeOptions(
+    values: readonly CxToggleChipGroupOption[] | undefined,
+  ): readonly CxToggleChipGroupOption[] {
+    const ids = new Set<string>();
+    return (values ?? []).map((option, index) => {
+      const id = option?.id?.trim() ?? '';
+      if (!id) {
+        throw new Error(`[cx-toggle-chip-group] option at index ${index} requires a non-empty id.`);
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-toggle-chip-group] option id "${id}" must be unique.`);
+      }
+      ids.add(id);
+
+      const label = option?.label?.trim() ?? '';
+      return {
+        ...option,
+        id,
+        label,
+        ariaLabel: option.ariaLabel?.trim() || undefined,
+      };
+    });
   }
 }

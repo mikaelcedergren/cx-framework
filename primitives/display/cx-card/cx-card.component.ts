@@ -2,11 +2,13 @@ import {
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
   Output,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
@@ -39,6 +41,12 @@ export type CxCardPadding = 'none' | 'default' | 'large';
 })
 export class CxCardComponent implements OnChanges {
   private warnedInvalidActivation = false;
+
+  @ViewChild('cardContent', { read: ElementRef })
+  private cardContentRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('cardMeta', { read: ElementRef })
+  private cardMetaRef?: ElementRef<HTMLElement>;
 
   @Input() heading: string | undefined;
   @Input() icon: CxIconName | undefined;

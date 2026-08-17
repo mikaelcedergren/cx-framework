@@ -14,6 +14,31 @@ export interface CxTreeViewItem {
   readonly children?: readonly CxTreeViewItem[];
 }
 
+function normalizeTreeItems(
+  items: readonly CxTreeViewItem[],
+  seenIds = new Set<string>(),
+): readonly CxTreeViewItem[] {
+  if (!Array.isArray(items)) {
+    throw new Error('[cx-tree-view] items must be an array.');
+  }
+  return items.map(item => {
+    const id = item.id?.trim();
+    if (!id) {
+      throw new Error('[cx-tree-view] every item requires a non-empty id.');
+    }
+    if (seenIds.has(id)) {
+      throw new Error(`[cx-tree-view] item ids must be unique; received "${id}" more than once.`);
+    }
+    seenIds.add(id);
+    return {
+      ...item,
+      id,
+      label: item.label.trim(),
+      children: item.children ? normalizeTreeItems(item.children, seenIds) : undefined,
+    };
+  });
+}
+
 @Component({
   selector: 'cx-tree-view',
   imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective],
@@ -52,7 +77,7 @@ export class CxTreeViewComponent {
 
   @Input()
   public set items(value: readonly CxTreeViewItem[] | null | undefined) {
-    this.itemsState.set(value ?? []);
+    this.itemsState.set(normalizeTreeItems(value ?? []));
   }
 
   @Input()

@@ -98,7 +98,23 @@ export class CxProcessComponent implements AfterViewInit, OnDestroy {
   /** The ordered lifecycle stages, left (open) to right (terminal). */
   @Input()
   public set stages(value: CxProcessStage[] | undefined) {
-    this.stagesState.set(value ?? []);
+    const ids = new Set<string>();
+    const stages = (value ?? []).map(stage => {
+      const id = stage.id?.trim();
+      const label = stage.label?.trim();
+      if (!id || !label) {
+        throw new Error('[cx-process] every stage requires a visible label and non-empty id.');
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-process] stage ids must be unique; received "${id}" more than once.`);
+      }
+      if (stage.count !== undefined && (!Number.isInteger(stage.count) || stage.count < 0)) {
+        throw new Error(`[cx-process] stage "${id}" count must be a non-negative integer when supplied.`);
+      }
+      ids.add(id);
+      return { ...stage, id, label };
+    });
+    this.stagesState.set(stages);
     this.scheduleMeasure();
   }
 
@@ -168,6 +184,9 @@ export class CxProcessComponent implements AfterViewInit, OnDestroy {
 
   protected readonly tabs$ = computed<CxProcessTab[]>(() => {
     const stages = this.stagesState();
+    if (stages.length === 0) {
+      return [];
+    }
     const selected = this.selectedIdState();
     const clear = this.isClear$();
     const tabs: CxProcessTab[] = [];

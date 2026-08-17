@@ -1,74 +1,76 @@
 @if (isRendered$()) {
-  <div
-    class="cx-banner"
-    [class.cx-banner--dismissible]="isDismissible$()"
-    [class.cx-banner--persistent]="!isDismissible$()"
-    [class.cx-banner--open]="isOpen$()"
-    [class.cx-banner--closing]="!isOpen$() && isDismissible$()"
-    [class.cx-banner--default]="mood === 'default'"
-    [class.cx-banner--warning]="mood === 'warning'"
-    [class.cx-banner--success]="mood === 'success'"
-    [class.cx-banner--danger]="mood === 'danger'"
-    [attr.role]="resolvedRole"
-    (transitionend)="onTransitionEnd($event)"
-  >
-    <div class="cx-banner__main">
-      <cx-icon class="cx-banner__icon" [name]="resolvedIcon" [size]="32" aria-hidden="true" />
+    <div
+      class="cx-banner"
+      [class.cx-banner--dismissible]="isDismissible$()"
+      [class.cx-banner--persistent]="!isDismissible$()"
+      [class.cx-banner--open]="isOpen$()"
+      [class.cx-banner--closing]="!isOpen$() && isDismissible$()"
+      [class.cx-banner--default]="mood === 'default'"
+      [class.cx-banner--warning]="mood === 'warning'"
+      [class.cx-banner--success]="mood === 'success'"
+      [class.cx-banner--danger]="mood === 'danger'"
+      [attr.role]="resolvedRole"
+      (transitionend)="onTransitionEnd($event)"
+    >
+      @if (hasCopy) {
+        <div class="cx-banner__main">
+          <cx-icon class="cx-banner__icon" [name]="resolvedIcon" [size]="32" aria-hidden="true" />
 
-      <div class="cx-banner__copy">
-        @if (heading.trim()) {
-          <div class="cx-banner__title">{{ heading }}</div>
-        }
+          <div class="cx-banner__copy">
+            @if (heading.trim()) {
+              <div class="cx-banner__title">{{ heading }}</div>
+            }
 
-        @if (description.trim()) {
-          <div class="cx-banner__description">{{ description }}</div>
-        }
-      </div>
+            @if (description.trim()) {
+              <div class="cx-banner__description">{{ description }}</div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (hasActions() || isDismissible$()) {
+        <div class="cx-banner__actions">
+          @if (visibleAction; as action) {
+            <cx-button
+              class="cx-banner__action"
+              [transparent]="action.transparent ?? false"
+              [mood]="actionButtonMood(action)"
+              [text]="action.text"
+              [icon]="action.icon"
+              [appendIcon]="action.appendIcon"
+              [disabled]="action.disabled ?? false"
+              [loading]="action.loading ?? false"
+              [ariaLabel]="action.ariaLabel"
+              (pressed)="onActionSelect(action)"
+            />
+          }
+
+          @if (visibleSecondaryAction; as action) {
+            <cx-button
+              class="cx-banner__action"
+              [transparent]="action.transparent ?? false"
+              [mood]="actionButtonMood(action)"
+              [text]="action.text"
+              [icon]="action.icon"
+              [appendIcon]="action.appendIcon"
+              [disabled]="action.disabled ?? false"
+              [loading]="action.loading ?? false"
+              [ariaLabel]="action.ariaLabel"
+              (pressed)="onSecondaryActionSelect(action)"
+            />
+          }
+
+          @if (isDismissible$()) {
+            <button
+              type="button"
+              class="cx-banner__dismiss"
+              [attr.aria-label]="dismissAriaLabel"
+              (click)="onDismissPress()"
+            >
+              <cx-icon name="remove" [size]="14" aria-hidden="true" />
+            </button>
+          }
+        </div>
+      }
     </div>
-
-    @if (hasActions() || isDismissible$()) {
-      <div class="cx-banner__actions">
-        @if (visibleAction; as action) {
-          <cx-button
-            class="cx-banner__action"
-            [transparent]="action.transparent ?? false"
-            [mood]="actionButtonMood(action)"
-            [text]="action.text"
-            [icon]="action.icon"
-            [appendIcon]="action.appendIcon"
-            [disabled]="action.disabled ?? false"
-            [loading]="action.loading ?? false"
-            [ariaLabel]="action.ariaLabel"
-            (pressed)="onActionSelect(action)"
-          />
-        }
-
-        @if (visibleSecondaryAction; as action) {
-          <cx-button
-            class="cx-banner__action"
-            [transparent]="action.transparent ?? false"
-            [mood]="actionButtonMood(action)"
-            [text]="action.text"
-            [icon]="action.icon"
-            [appendIcon]="action.appendIcon"
-            [disabled]="action.disabled ?? false"
-            [loading]="action.loading ?? false"
-            [ariaLabel]="action.ariaLabel"
-            (pressed)="onSecondaryActionSelect(action)"
-          />
-        }
-
-        @if (isDismissible$()) {
-          <button
-            type="button"
-            class="cx-banner__dismiss"
-            [attr.aria-label]="dismissAriaLabel"
-            (click)="onDismissPress()"
-          >
-            <cx-icon name="remove" [size]="14" aria-hidden="true" />
-          </button>
-        }
-      </div>
-    }
-  </div>
 }

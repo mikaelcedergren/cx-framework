@@ -137,6 +137,61 @@
   --violet-alt: #223da8;
 }
 
+/* Aqua keeps Light's palette hue for hue, with one deliberate exception: the two
+   greens trade jobs. The theme leans its whole surface on green — accent,
+   paper, borders, shadows — so it needs two of them, or the healthy state
+   disappears into the emphasis around it.
+
+   So --green becomes the deep sea tone that carries --accent, and --lime becomes
+   the fresh leaf tone that carries --success. They are separated on both axes a
+   reader actually perceives: 162deg against 101deg, and 4.4:1 against 3.4:1 on
+   this theme's paper. Every other family is Light's, untouched. */
+:root.theme-aqua {
+  --blue: #057dff;
+  --blue-opacity: rgb(5 125 255 / 10%);
+  --blue-alt: #0358b2;
+
+  --cyan: #00ccc5;
+  --cyan-opacity: rgb(0 204 197 / 10%);
+  --cyan-alt: #018a86;
+
+  --lime: #4e9c2b;
+  --lime-opacity: rgb(78 156 43 / 10%);
+  --lime-alt: #3a7420;
+
+  --green: #068a63;
+  --green-opacity: rgb(6 138 99 / 10%);
+  --green-alt: #045f45;
+
+  --yellow: #edc31c;
+  --yellow-opacity: rgb(237 195 28 / 10%);
+  --yellow-alt: #a68712;
+
+  --orange: #ff980a;
+  --orange-opacity: rgb(255 152 10 / 10%);
+  --orange-alt: #b26b05;
+
+  --tangerine: #ff6c2e;
+  --tangerine-opacity: rgb(255 108 46 / 10%);
+  --tangerine-alt: #b24b20;
+
+  --red: #ff4043;
+  --red-opacity: rgb(255 64 67 / 10%);
+  --red-alt: #992629;
+
+  --pink: #f2559c;
+  --pink-opacity: rgb(242 85 156 / 10%);
+  --pink-alt: #a83d6d;
+
+  --purple: #ae4ede;
+  --purple-opacity: rgb(174 78 222 / 10%);
+  --purple-alt: #7a3d99;
+
+  --violet: #3057f2;
+  --violet-opacity: rgb(48 87 242 / 10%);
+  --violet-alt: #223da8;
+}
+
 :root.theme-high-contrast {
   --blue: #0047b8;
   --blue-opacity: rgb(0 71 184 / 14%);

@@ -27,6 +27,7 @@ export type CxIconName =
   | "api"
   | "appliance"
   | "application"
+  | "aqua-mode"
   | "archive"
   | "arrow-down"
   | "arrow-left"
@@ -410,6 +411,20 @@ export const cxIcons: CxIconDefinition[] = [
     "nodes": [
       {
         "d": "M4 7.5V16.5L12 21L20 16.5V7.5L12 3L4 7.5ZM20 7.5L12 12M12 21V12M4 7.5L12 12",
+        "stroke": "currentColor",
+        "fill": "none",
+        "strokeWidth": 1.5,
+        "strokeLinecap": "round",
+        "strokeLinejoin": "round"
+      }
+    ]
+  },
+  {
+    "name": "aqua-mode",
+    "viewBox": "0 0 24 24",
+    "nodes": [
+      {
+        "d": "M12 3C12 3 18.5 10 18.5 14A6.5 6.5 0 0 1 5.5 14C5.5 10 12 3 12 3Z",
         "stroke": "currentColor",
         "fill": "none",
         "strokeWidth": 1.5,

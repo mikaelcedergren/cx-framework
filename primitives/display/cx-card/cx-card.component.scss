@@ -223,6 +223,10 @@
   display: none;
 }
 
+.cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(.cx-card__content:empty) {
+  display: none;
+}
+
 .cx-card__content {
   display: flex;
   min-width: 0;

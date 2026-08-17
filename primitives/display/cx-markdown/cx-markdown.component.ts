@@ -49,6 +49,26 @@ export class CxMarkdownComponent {
     if (!raw) return '';
     return marked.parse(raw, { gfm: true }) as string;
   });
+  protected readonly hasVisibleContent$ = computed(() => {
+    const rendered = this.renderedMarkdown$();
+    const visibleMarkup = rendered
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<(?:script|style|template|head)\b[^>]*>[\s\S]*?<\/(?:script|style|template|head)>/gi, '');
+    const hasImage = /<img\b[^>]*\bsrc\s*=\s*(?:"[^"]+"|'[^']+'|[^\s>]+)/i.test(visibleMarkup);
+    const hasNonEmptySvg = Array.from(visibleMarkup.matchAll(/<svg\b[^>]*>([\s\S]*?)<\/svg>/gi))
+      .some(([, body]) => Boolean(body?.trim()));
+    const hasMedia = Array.from(visibleMarkup.matchAll(/<(video|audio)\b([^>]*)>([\s\S]*?)<\/\1>/gi))
+      .some(([, , attributes, body]) =>
+        /\bsrc\s*=\s*(?:"[^"]+"|'[^']+'|[^\s>]+)/i.test(attributes ?? '') ||
+        /<source\b[^>]*\bsrc\s*=\s*(?:"[^"]+"|'[^']+'|[^\s>]+)/i.test(body ?? ''),
+      );
+    const hasVisualElement = hasImage || hasNonEmptySvg || hasMedia;
+    const visibleText = visibleMarkup
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&(?:nbsp|ensp|emsp|thinsp|zwnj|zwj);/gi, ' ')
+      .trim();
+    return visibleText.length > 0 || hasVisualElement === true;
+  });
 
   @HostListener('click', ['$event'])
   protected onClick(event: MouseEvent): void {

@@ -10,14 +10,16 @@
   (animationend)="onDismissAnimationEnd($event)"
 >
   <header class="cx-detail-panel__header">
-    <div class="cx-detail-panel__heading-group">
-      @if (icon; as iconName) {
-        <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
-      }
-      @if (normalizedHeading) {
-        <h2 class="cx-detail-panel__heading" [id]="headingId">{{ normalizedHeading }}</h2>
-      }
-    </div>
+    @if (icon || normalizedHeading) {
+      <div class="cx-detail-panel__heading-group">
+        @if (icon; as iconName) {
+          <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
+        }
+        @if (normalizedHeading) {
+          <h2 class="cx-detail-panel__heading" [id]="headingId">{{ normalizedHeading }}</h2>
+        }
+      </div>
+    }
 
     <div class="cx-detail-panel__header-actions">
       <ng-content select="cx-status-tag[detail-panel-status]" />

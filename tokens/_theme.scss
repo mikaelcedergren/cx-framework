@@ -1,4 +1,30 @@
 /* Theme profiles change visual character without changing component anatomy. */
+
+/* Aqua keeps Light's geometry — same corner family, same separation, same
+   elevation roles — and changes only what light does on its way past an object.
+   Its shadows are cast in the theme's own deep sea tone rather than neutral
+   black, at slightly raised alpha because a tinted shadow reads lighter than a
+   black one at the same opacity. Nothing else about depth moves: low is still a
+   raised control, mid a menu, high a dialog. */
+:root.theme-aqua {
+  --shadow-low:
+    0 1px 1px hsl(168deg 55% 12% / 0.065),
+    0 2px 2px hsl(168deg 55% 12% / 0.042),
+    0 4px 4px hsl(168deg 55% 12% / 0.024);
+  --shadow-mid:
+    0 1px 1px hsl(168deg 55% 12% / 0.070),
+    0 2px 2px hsl(168deg 55% 12% / 0.052),
+    0 4px 4px hsl(168deg 55% 12% / 0.042),
+    0 8px 8px hsl(168deg 55% 12% / 0.030),
+    0 16px 16px hsl(168deg 55% 12% / 0.022);
+  --shadow-high:
+    0 1px 1px hsl(168deg 55% 12% / 0.075),
+    0 3px 3px hsl(168deg 55% 12% / 0.058),
+    0 8px 8px hsl(168deg 55% 12% / 0.046),
+    0 16px 16px hsl(168deg 55% 12% / 0.035),
+    0 32px 32px hsl(168deg 55% 12% / 0.026);
+}
+
 :root.theme-legacy {
   --corner-shape: round;
   --corner-softness: 1px;

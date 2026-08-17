@@ -31,7 +31,7 @@
   align-items: center;
   gap: var(--space-2xs);
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

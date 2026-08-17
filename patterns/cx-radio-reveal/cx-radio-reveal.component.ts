@@ -34,12 +34,17 @@ export class CxRadioRevealComponent {
   @Input()
   public set options(value: readonly CxRadioRevealOption[] | null | undefined) {
     const nextOptions: CxResolvedRadioRevealOption[] = [];
+    const ids = new Set<string>();
     for (const option of value ?? []) {
-      const id = option.id.trim();
-      const label = option.label.trim();
+      const id = option.id?.trim();
+      const label = option.label?.trim();
       if (!id || !label) {
-        continue;
+        throw new Error('[cx-radio-reveal] every option requires a visible label and non-empty id.');
       }
+      if (ids.has(id)) {
+        throw new Error(`[cx-radio-reveal] option ids must be unique; received "${id}" more than once.`);
+      }
+      ids.add(id);
       nextOptions.push({
         id,
         label,

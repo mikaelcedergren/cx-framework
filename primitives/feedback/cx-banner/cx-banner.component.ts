@@ -3,6 +3,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   Output,
   signal,
@@ -21,10 +22,11 @@ export type CxBannerMood = 'default' | 'warning' | 'success' | 'danger';
   styleUrl: './cx-banner.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxBannerComponent implements OnDestroy {
+export class CxBannerComponent implements OnChanges, OnDestroy {
   private readonly renderedState = signal(false);
   private readonly openState = signal(false);
   private readonly dismissibleState = signal(true);
+  private visibleInput = false;
   private requestedOpen = false;
   private openFrame: number | undefined;
 
@@ -51,7 +53,8 @@ export class CxBannerComponent implements OnDestroy {
 
   @Input()
   public set visible(value: boolean) {
-    this.setOpen(Boolean(value));
+    this.visibleInput = Boolean(value);
+    this.setOpen(this.visibleInput);
   }
 
   @Output() readonly actionSelect = new EventEmitter<CxFeedbackAction>();
@@ -108,8 +111,16 @@ export class CxBannerComponent implements OnDestroy {
     return visibleCxFeedbackAction(this.secondaryAction);
   }
 
+  protected get hasCopy(): boolean {
+    return this.heading.trim().length > 0 || this.description.trim().length > 0;
+  }
+
   protected hasActions(): boolean {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
+  }
+
+  public ngOnChanges(): void {
+    this.setOpen(this.visibleInput);
   }
 
   ngOnDestroy(): void {
@@ -127,6 +138,7 @@ export class CxBannerComponent implements OnDestroy {
   }
 
   protected onDismissPress(): void {
+    this.visibleInput = false;
     this.setOpen(false);
     this.visibleChange.emit(false);
   }

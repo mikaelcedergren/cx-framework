@@ -35,7 +35,7 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 
 [MUST] Start with the task, not the documents:
 
-- Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
+- Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `03-ux-rules.md`.
 - Any component choice, mention, or implementation: read `RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, `RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, and `RULE-ID: system.shared-owner` in `03-ux-rules.md`, then inspect the consuming product's own design system before choosing an implementation.
 - Design-system discovery, tokens, ownership, supported configuration, composition, theming, or layout foundations: read the matching section of `02-design-system.md`.

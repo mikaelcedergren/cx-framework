@@ -7,9 +7,7 @@ The portable design guidance and skills under `../ai/` do not read this metadata
 - `components/registry.json`: every component and directive reachable from `public-api.ts`, with selector and source path; exported tooling is marked as `area: tooling`, `category: reference`
 - `components/guidance.json`: complete, substantive exact-component guidance for the Cortex component reference and technical library consumers; every key must resolve through the registry
 - `components/locks.json`: a sorted list of registry components the user has locked as read-only source; only the workbench Lock switch writes it, and Cortex's source-side lock guard fails closed when this authority cannot be trusted
-- `validation/composition.rules.json`: composition constraints
-- `validation/placement.rules.json`: placement constraints
-- `validation/visibility.rules.json`: visibility constraints
+- `validation/visibility.rules.json`: the executable, framework-wide critical contract that no user-facing element renders without visible purpose
 
 Do not create empty placeholder catalogs. A discovery file must be populated and consumed, or it should not exist.
 

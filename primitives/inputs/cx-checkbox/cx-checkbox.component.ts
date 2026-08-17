@@ -63,5 +63,4 @@ export class CxCheckboxComponent {
   protected onFocus(focused: boolean): void {
     this.focusChange.emit(focused);
   }
-
 }

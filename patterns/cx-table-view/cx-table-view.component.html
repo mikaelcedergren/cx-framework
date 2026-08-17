@@ -1,56 +1,60 @@
 <div class="cx-table-view">
-  @if (hasHeading) {
-    <div class="cx-table-view__header">
+  <div class="cx-table-view__header">
+    @if (hasHeading) {
       <h2 class="cx-table-view__heading">{{ heading }}</h2>
+    }
+    <div class="cx-table-view__actions">
+      <ng-content select="[actions], [cxTableViewActions]" />
     </div>
-  }
 
-  @if (showFilterBar) {
-    <cx-filter-bar
-      [mode]="filterBarMode"
-      [showActiveFilters]="showActiveFilters"
-      [quickFilters]="quickFilters"
-      [selectedQuickFilterId]="selectedQuickFilterId"
-      [toggleFilters]="toggleFilters"
-      [selectedToggleFilterIds]="selectedToggleFilterIds"
-      [filters]="filters$()"
-      [filterValues]="resolvedFilterValues$()"
-      [queryValue]="queryValue"
-      [queryAriaLabel]="queryAriaLabel"
-      [savedViews]="savedViews"
-      [displayMode]="density === 'comfortable' ? 'comfortable' : 'compact'"
-      [groupByOptions]="groupByOptions"
-      [groupBy]="groupBy"
-      [sortOptions]="sortOptions"
-      [sortBy]="sortBy"
-      [sortDirection]="sortDirection"
-      [thenBy]="thenBy"
-      [thenByDirection]="thenByDirection"
-      [columnOptions]="columnOptions"
-      [visibleColumnIds]="visibleColumnIds"
-      [pinnedColumnIds]="pinnedColumnIds"
-      (modeChange)="filterBarModeChange.emit($event)"
-      (selectedQuickFilterIdChange)="selectedQuickFilterIdChange.emit($event)"
-      (selectedToggleFilterIdsChange)="selectedToggleFilterIdsChange.emit($event)"
-      (filterValuesChange)="onFilterValuesChange($event)"
-      (filterQueryChange)="filterQueryChange.emit($event)"
-      (filterLoadMore)="filterLoadMore.emit($event)"
-      (filterPopoverOpenChange)="onFilterPopoverOpenChange($event)"
-      (queryValueChange)="queryValueChange.emit($event)"
-      (savedViewSelect)="savedViewSelect.emit($event)"
-      (activeSavedViewIdChange)="activeSavedViewIdChange.emit($event)"
-      (displayModeChange)="densityChange.emit($event === 'comfortable' ? 'comfortable' : 'compact')"
-      (groupByChange)="groupByChange.emit($event)"
-      (sortByChange)="sortByChange.emit($event)"
-      (sortDirectionChange)="sortDirectionChange.emit($event)"
-      (thenByChange)="thenByChange.emit($event)"
-      (thenByDirectionChange)="thenByDirectionChange.emit($event)"
-      (visibleColumnIdsChange)="visibleColumnIdsChange.emit($event)"
-      (pinnedColumnIdsChange)="pinnedColumnIdsChange.emit($event)"
-      (exportTable)="exportTable.emit()"
-      (resetTable)="resetTable.emit()"
-    />
-  }
+    @if (showFilterBar) {
+      <cx-filter-bar
+        class="cx-table-view__filters"
+        [mode]="filterBarMode"
+        [showActiveFilters]="showActiveFilters"
+        [quickFilters]="quickFilters"
+        [selectedQuickFilterId]="selectedQuickFilterId"
+        [toggleFilters]="toggleFilters"
+        [selectedToggleFilterIds]="selectedToggleFilterIds"
+        [filters]="filters$()"
+        [filterValues]="resolvedFilterValues$()"
+        [queryValue]="queryValue"
+        [queryAriaLabel]="queryAriaLabel"
+        [savedViews]="savedViews"
+        [displayMode]="density === 'comfortable' ? 'comfortable' : 'compact'"
+        [groupByOptions]="groupByOptions"
+        [groupBy]="groupBy"
+        [sortOptions]="sortOptions"
+        [sortBy]="sortBy"
+        [sortDirection]="sortDirection"
+        [thenBy]="thenBy"
+        [thenByDirection]="thenByDirection"
+        [columnOptions]="columnOptions"
+        [visibleColumnIds]="visibleColumnIds"
+        [pinnedColumnIds]="pinnedColumnIds"
+        (modeChange)="filterBarModeChange.emit($event)"
+        (selectedQuickFilterIdChange)="selectedQuickFilterIdChange.emit($event)"
+        (selectedToggleFilterIdsChange)="selectedToggleFilterIdsChange.emit($event)"
+        (filterValuesChange)="onFilterValuesChange($event)"
+        (filterQueryChange)="filterQueryChange.emit($event)"
+        (filterLoadMore)="filterLoadMore.emit($event)"
+        (filterPopoverOpenChange)="onFilterPopoverOpenChange($event)"
+        (queryValueChange)="queryValueChange.emit($event)"
+        (savedViewSelect)="savedViewSelect.emit($event)"
+        (activeSavedViewIdChange)="activeSavedViewIdChange.emit($event)"
+        (displayModeChange)="densityChange.emit($event === 'comfortable' ? 'comfortable' : 'compact')"
+        (groupByChange)="groupByChange.emit($event)"
+        (sortByChange)="sortByChange.emit($event)"
+        (sortDirectionChange)="sortDirectionChange.emit($event)"
+        (thenByChange)="thenByChange.emit($event)"
+        (thenByDirectionChange)="thenByDirectionChange.emit($event)"
+        (visibleColumnIdsChange)="visibleColumnIdsChange.emit($event)"
+        (pinnedColumnIdsChange)="pinnedColumnIdsChange.emit($event)"
+        (exportTable)="exportTable.emit()"
+        (resetTable)="resetTable.emit()"
+      />
+    }
+  </div>
 
   <div class="cx-table-view__surface">
     <cx-table

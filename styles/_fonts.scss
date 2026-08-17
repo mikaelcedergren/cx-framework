@@ -9,7 +9,18 @@
 //
 //   Inter             — base UI font  (--font-family-base),  variable 100–900
 //   Roboto Mono       — code / mono   (--font-family-mono),  variable 100–700
-//   DM Serif Display  — article heads (--font-family-fancy), 400 only
+//
+// The rest are the heading menu — the faces `--font-family-heading` may point
+// at, one per product (see `--typeface-*` in tokens/_typography.scss). They are
+// all declared here, but a browser only fetches a face when rendered text
+// actually matches it, so a product pays for the one face it chose and nothing
+// for the three it did not. A specimen page showing all four is the exception,
+// and pays for all four on purpose.
+//
+//   DM Serif Display  — --typeface-editorial, 400 only
+//   Rubik             — --typeface-friendly,  variable 300–900
+//   Raleway           — --typeface-elegant,   variable 100–900
+//   Archivo Narrow    — --typeface-condensed, variable 400–700
 
 @font-face {
   font-family: 'Inter';
@@ -41,4 +52,31 @@
   font-weight: 400;
   font-display: swap;
   src: url('/assets/fonts/DMSerifDisplay.woff2') format('woff2');
+}
+
+// The declared weight range must match the file's actual wght axis. Claiming a
+// range the file does not carry makes the browser synthesise the difference,
+// which reads as a subtly wrong weight rather than as an error.
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/assets/fonts/Rubik.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/Raleway.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Archivo Narrow';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/assets/fonts/ArchivoNarrow.woff2') format('woff2');
 }

@@ -20,10 +20,6 @@
   --cx-alert-accent: var(--danger);
 }
 
-:host(.cx-alert--hidden) {
-  display: none;
-}
-
 .cx-alert__surface {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr) auto;

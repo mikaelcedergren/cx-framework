@@ -17,15 +17,18 @@
       [class.cx-dialog--dismissible]="canDismiss()"
       [attr.role]="dialogRole()"
       aria-modal="true"
-      [attr.aria-labelledby]="titleId"
-      [attr.aria-describedby]="hasDescription() ? descriptionId : null"
+      [attr.aria-labelledby]="hasHeading() ? titleId : descriptionId"
+      [attr.aria-describedby]="hasHeading() && hasDescription() ? descriptionId : null"
       [attr.aria-keyshortcuts]="dialogShortcutAria()"
       (click)="$event.stopPropagation()"
       (keydown)="onDialogKeydown($event)"
     >
       <div class="cx-dialog__content">
+        @if (hasHeading() || hasHeaderActions()) {
         <header class="cx-dialog__header">
-          <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+          @if (hasHeading()) {
+            <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+          }
 
           @if (hasHeaderActions()) {
             <div class="cx-dialog__header-actions">
@@ -59,13 +62,16 @@
             </div>
           }
         </header>
+        }
 
+        @if (hasDescription()) {
         <div class="cx-dialog__body">
-          @if (hasDescription()) {
-            <p class="cx-dialog__description" [id]="descriptionId">{{ description }}</p>
-          }
-          <ng-content select="[body]" />
+          <p class="cx-dialog__description" [id]="descriptionId">{{ description }}</p>
+          <ng-container [ngTemplateOutlet]="dialogBody" />
         </div>
+        } @else {
+          <ng-container [ngTemplateOutlet]="dialogBody" />
+        }
       </div>
 
       <footer
@@ -107,3 +113,7 @@
     </section>
   </div>
 }
+
+<ng-template #dialogBody>
+  <ng-content select="[body]" />
+</ng-template>

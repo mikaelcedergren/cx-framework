@@ -13,6 +13,12 @@
   box-sizing: border-box;
 }
 
+.cx-split:not(:has(.cx-split__start > *, .cx-split__end > *)),
+.cx-split__start:empty,
+.cx-split__end:empty {
+  display: none;
+}
+
 .cx-split__start {
   display: flex;
   min-width: 0;
@@ -27,8 +33,9 @@
   align-items: inherit;
 }
 
-@include layout.gap-attr('.cx-split', 'data-gap', column-gap, $mobile-attr: 'data-gap-mobile');
+@include layout.gap-attr('.cx-split', $mobile-attr: 'data-gap-mobile');
 @include layout.align-attr('.cx-split');
+@include layout.wrap-attr('.cx-split');
 
 :host([data-start-width='sm']) .cx-split__start {
   flex: 0 0 min(280px, 32%);

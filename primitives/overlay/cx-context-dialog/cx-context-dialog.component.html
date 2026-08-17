@@ -4,12 +4,25 @@
   [class.cx-context-dialog--bottom]="align === 'bottomLeft'"
   role="dialog"
   aria-modal="false"
+  [attr.aria-labelledby]="hasHeading ? headingId : hasDescription ? descriptionId : null"
+  [attr.aria-describedby]="hasHeading && hasDescription ? descriptionId : null"
+  [attr.aria-label]="actionOnlyAccessibleName"
   tabindex="-1"
 >
-  <div class="cx-context-dialog__heading">{{ heading }}</div>
-  <p class="cx-context-dialog__message">{{ description }}</p>
-  <footer class="cx-context-dialog__actions">
-    <cx-button [text]="cancelText" mood="default" (pressed)="onCancel()" />
-    <cx-button [text]="confirmText" [mood]="mood" (pressed)="onConfirm()" />
-  </footer>
+  @if (hasHeading) {
+    <div class="cx-context-dialog__heading" [id]="headingId">{{ heading }}</div>
+  }
+  @if (hasDescription) {
+    <p class="cx-context-dialog__message" [id]="descriptionId">{{ description }}</p>
+  }
+  @if (hasActions) {
+    <footer class="cx-context-dialog__actions">
+      @if (hasCancelAction) {
+        <cx-button [text]="cancelText" mood="default" (pressed)="onCancel()" />
+      }
+      @if (hasConfirmAction) {
+        <cx-button [text]="confirmText" [mood]="mood" (pressed)="onConfirm()" />
+      }
+    </footer>
+  }
 </section>

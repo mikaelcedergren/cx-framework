@@ -50,12 +50,37 @@ export class CxDynamicFieldsComponent {
 
   @Input()
   public set options(value: CxDynamicFieldOption[] | null | undefined) {
-    this.optionsState.set((value ?? []).map(option => ({ ...option })));
+    const ids = new Set<string>();
+    const options = (value ?? []).map(option => {
+      const id = option.id?.trim();
+      const label = option.label?.trim();
+      if (!id || !label) {
+        throw new Error('[cx-dynamic-fields] every option requires a visible label and non-empty id.');
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-dynamic-fields] option ids must be unique; received "${id}" more than once.`);
+      }
+      ids.add(id);
+      return { ...option, id, label };
+    });
+    this.optionsState.set(options);
   }
 
   @Input()
   public set fields(value: CxDynamicFieldValue[] | null | undefined) {
-    this.fieldsState.set((value ?? []).map(field => ({ id: field.id, value: field.value ?? '' })));
+    const ids = new Set<string>();
+    const fields = (value ?? []).map(field => {
+      const id = field.id?.trim();
+      if (!id) {
+        throw new Error('[cx-dynamic-fields] every field requires a non-empty id.');
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-dynamic-fields] field ids must be unique; received "${id}" more than once.`);
+      }
+      ids.add(id);
+      return { id, value: field.value ?? '' };
+    });
+    this.fieldsState.set(fields);
   }
 
   @Output() readonly fieldsChange = new EventEmitter<CxDynamicFieldValue[]>();
@@ -76,14 +101,13 @@ export class CxDynamicFieldsComponent {
       .map(field => {
         const option = optionsById.get(field.id);
         if (!option) {
-          return null;
+          throw new Error(`[cx-dynamic-fields] field "${field.id}" has no matching visible option.`);
         }
         return {
           ...field,
           ...option,
         } satisfies CxResolvedDynamicField;
-      })
-      .filter((field): field is CxResolvedDynamicField => field !== null);
+      });
   });
   protected readonly addableOptions$ = computed(() => {
     const activeIds = new Set(this.fieldsState().map(field => field.id));

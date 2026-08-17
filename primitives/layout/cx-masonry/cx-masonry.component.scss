@@ -16,6 +16,10 @@ cx-masonry > .cx-masonry {
   column-gap: var(--cx-masonry-gap, var(--space-md));
 }
 
+cx-masonry > .cx-masonry:empty {
+  display: none;
+}
+
 // Items flow down each column; keep each item whole and give the column flow
 // the same rhythm as the column gap. The negative bottom margin on the wrapper
 // swallows the trailing item margin of every column.

@@ -4,11 +4,32 @@
   min-height: 0;
 }
 
-:host(.cx-side-nav-host--hidden) {
-  display: none;
-}
-
 .cx-side-nav {
+  // Nesting geometry, all derived from the top-level row so nested labels land
+  // exactly under their parent's label and the guide runs down the middle of
+  // the parent's icon.
+  //
+  //   4px  ┆ 24px icon slot ┆ 8px ┆ label
+  //        └─ guide at 15px  rail ends at 32px
+  //
+  // The icon column's centre falls on a pixel boundary (16px), so a 1px stroke
+  // cannot straddle it — it has to take the column on one side. It takes the
+  // near side: one border-width back, which reads as centred, where the far side
+  // reads as a pixel too far right.
+  --cx-side-nav-row-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
+  // Separation between rows. The guide has to bridge it, or a 1px line reads as
+  // a dashed one.
+  --cx-side-nav-row-gap: 1px;
+  --cx-side-nav-rail: calc(var(--controller-size-small) + var(--space-sm));
+  --cx-side-nav-guide: calc(var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width));
+  --cx-side-nav-guide-offset: calc(var(--cx-side-nav-guide) - var(--cx-side-nav-rail));
+  --cx-side-nav-elbow: calc(var(--space-sm) + var(--space-xs));
+  // The guide is structure, not decoration: quieter than the labels it belongs
+  // to, but it has to survive being 1px wide, which the `--line` tokens do not
+  // at this length. Mixed from `--ink` so every theme scales it against its own
+  // surface.
+  --cx-side-nav-guide-line: var(--border-width) solid color-mix(in srgb, var(--ink) 18%, transparent);
+
   display: flex;
   width: 240px;
   height: 100%;
@@ -22,12 +43,20 @@
   overflow: hidden;
 }
 
+.cx-side-nav:not(:has(.cx-side-nav__header > *, .cx-side-nav__skeleton, .cx-side-nav__items, .cx-side-nav__footer > *)) {
+  display: none;
+}
+
 .cx-side-nav__header {
   display: flex;
   width: 100%;
   min-height: var(--controller-size);
   align-items: center;
   flex: 0 0 auto;
+}
+
+.cx-side-nav__header:empty {
+  display: none;
 }
 
 .cx-side-nav__skeleton {
@@ -42,7 +71,7 @@
 
 .cx-side-nav__skeleton-row {
   display: block;
-  height: calc(28px + var(--space-sm) + var(--space-sm));
+  height: var(--cx-side-nav-row-height);
   border-radius: var(--radius-sm);
   background:
     linear-gradient(
@@ -61,7 +90,7 @@
   flex: 1 1 auto;
   width: 100%;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
   overflow: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
@@ -71,7 +100,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
 }
 
 .cx-side-nav__node {
@@ -79,14 +108,14 @@
   width: 100%;
   min-width: 0;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
 }
 
 .cx-side-nav__group-items {
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
 }
 
 .cx-side-nav__group-items--collapsible {
@@ -122,11 +151,67 @@
   width: 100%;
   min-height: 0;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
 }
 
-.cx-side-nav__group-items-inner--nested {
-  padding-left: calc(16px + var(--space-sm));
+/* Reserves the rail that the tree guide is drawn in. Sits on the container so
+   the rows inside keep the same padding as top-level rows — which is what makes
+   a nested label align with its parent's label. */
+.cx-side-nav__branch {
+  padding-left: var(--cx-side-nav-rail);
+}
+
+/* Elbow: brings the guide down to the row's centre, then hooks right toward the
+   label. Anchored to the row (not the node) so `50%` is the row's own centre
+   however tall the node's sub-tree grows. */
+.cx-side-nav__node--branch > .cx-side-nav__item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--cx-side-nav-guide-offset);
+  width: var(--cx-side-nav-elbow);
+  height: 50%;
+  border-left: var(--cx-side-nav-guide-line);
+  border-bottom: var(--cx-side-nav-guide-line);
+  border-bottom-left-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* Guide carried on from the row's centre to the next sibling. Overruns by the
+   row gap so the line arrives unbroken — each segment is drawn once, so the
+   translucent colour stays even where they meet. */
+.cx-side-nav__node--branch > .cx-side-nav__item::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  bottom: calc(-1 * var(--cx-side-nav-row-gap));
+  left: var(--cx-side-nav-guide-offset);
+  border-left: var(--cx-side-nav-guide-line);
+  pointer-events: none;
+}
+
+/* Guide passing an expanded sub-tree, so later siblings stay connected. Height
+   collapses to zero with the grid track, which retracts the line as it closes —
+   leaving just the gap bridge behind. */
+.cx-side-nav__node--branch > .cx-side-nav__children {
+  position: relative;
+}
+
+.cx-side-nav__node--branch > .cx-side-nav__children::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: calc(-1 * var(--cx-side-nav-row-gap));
+  left: var(--cx-side-nav-guide-offset);
+  border-left: var(--cx-side-nav-guide-line);
+  pointer-events: none;
+}
+
+/* The last row on a level ends the line: its elbow is the terminus, so there is
+   nothing below it to reach. Without this the guide dangles into empty space. */
+.cx-side-nav__node--branch:last-child > .cx-side-nav__item::after,
+.cx-side-nav__node--branch:last-child > .cx-side-nav__children::before {
+  content: none;
 }
 
 .cx-side-nav__children {
@@ -140,7 +225,7 @@
   display: flex;
   min-height: 0;
   flex-direction: column;
-  gap: 1px;
+  gap: var(--cx-side-nav-row-gap);
   overflow: hidden;
   visibility: hidden;
   pointer-events: none;
@@ -171,9 +256,12 @@
 }
 
 .cx-side-nav__item {
+  position: relative;
   display: flex;
   width: 100%;
-  min-height: 28px;
+  // Pinned so an iconless nested row is exactly as tall as an iconed top-level
+  // row; without it the icon alone would set the height and nesting would shrink.
+  min-height: var(--cx-side-nav-row-height);
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-xs);
@@ -308,6 +396,10 @@
   box-sizing: border-box;
 }
 
+.cx-side-nav__footer:empty {
+  display: none;
+}
+
 .cx-side-nav__account {
   display: flex;
   width: 100%;
@@ -352,7 +444,7 @@
   min-width: 0;
   flex: 1 1 auto;
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);

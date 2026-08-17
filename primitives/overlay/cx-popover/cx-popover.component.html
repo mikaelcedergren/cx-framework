@@ -29,7 +29,7 @@
         </div>
       }
 
-      <div class="cx-popover__content" [class.cx-popover__island]="surfaceVariant !== 'grouped'">
+      <div #content class="cx-popover__content" [class.cx-popover__island]="surfaceVariant !== 'grouped'">
         @if (surfaceVariant !== 'grouped' && normalizedTitle) {
           <ng-container [ngTemplateOutlet]="headingRow" />
         }

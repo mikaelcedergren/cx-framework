@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   host: {
     role: 'status',
     '[class.cx-text-shimmer--active]': 'active',
-    '[attr.aria-label]': 'text || null',
+    '[attr.aria-label]': 'visibleText$() || null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,4 +24,9 @@ export class CxTextShimmerComponent {
 
   /** Whether the highlight sweeps. When false the readable base label remains still. */
   @Input() active = true;
+
+  protected visibleText$(): string {
+    return this.text.trim();
+  }
+
 }

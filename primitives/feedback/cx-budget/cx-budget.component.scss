@@ -150,7 +150,7 @@
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-small);
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -175,7 +175,7 @@
 .cx-budget--compact .cx-budget-label__context {
   min-width: 0;
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

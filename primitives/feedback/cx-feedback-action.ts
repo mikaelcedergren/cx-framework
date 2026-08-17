@@ -12,7 +12,7 @@ export interface CxFeedbackAction {
   readonly transparent?: boolean;
 }
 
-/** An action renders only when it has visible text; otherwise it vanishes. */
+/** An action renders only when a person can perceive it; otherwise it vanishes. */
 export function visibleCxFeedbackAction<T extends CxFeedbackAction>(action: T | undefined): T | undefined {
-  return action?.text.trim() ? action : undefined;
+  return action && Boolean(action.text?.trim() || action.icon || action.appendIcon) ? action : undefined;
 }

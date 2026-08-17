@@ -10,11 +10,13 @@
           <span class="cx-side-nav__skeleton-row"></span>
         }
       </div>
-    } @else {
+    } @else if (hasNavigationItems()) {
       <nav class="cx-side-nav__items">
+        <!-- `level` 0 is a top-level row: it carries an icon. Level 1 and deeper
+             are nested rows: no icon, and the tree guide marks the nesting. -->
         <ng-template #navItems let-items let-level="level">
           @for (item of items; track item.id) {
-            <div class="cx-side-nav__node">
+            <div class="cx-side-nav__node" [class.cx-side-nav__node--branch]="level > 0">
               @if (hasChildren(item)) {
                 <button
                   class="cx-side-nav__item cx-side-nav__item--toggle"
@@ -23,14 +25,13 @@
                   type="button"
                   [disabled]="item.disabled"
                   [attr.aria-expanded]="isItemExpanded(item)"
-                  [style.padding-left.px]="itemPadding(level)"
                   (click)="toggleItem(item)"
                 >
-                  @if (item.icon) {
+                  @if (item.icon && level === 0) {
                     <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
-                  @if (item.badge) {
+                  @if (hasBadge(item)) {
                     <span
                       class="cx-side-nav__badge"
                       [class.cx-side-nav__badge--dot]="item.badge === true"
@@ -54,7 +55,7 @@
                   class="cx-side-nav__children"
                   [class.cx-side-nav__children--expanded]="showItemChildren(item)"
                 >
-                  <div class="cx-side-nav__children-inner">
+                  <div class="cx-side-nav__children-inner cx-side-nav__branch">
                     <ng-container
                       [ngTemplateOutlet]="navItems"
                       [ngTemplateOutletContext]="{ $implicit: item.children, level: level + 1 }"
@@ -70,14 +71,13 @@
                   [attr.rel]="item.rel ?? (item.target === '_blank' ? 'noopener' : null)"
                   [attr.aria-disabled]="item.disabled ? 'true' : null"
                   [attr.tabindex]="item.disabled ? '-1' : null"
-                  [style.padding-left.px]="itemPadding(level)"
                   (click)="onItemClick($event, item)"
                 >
-                  @if (item.icon) {
+                  @if (item.icon && level === 0) {
                     <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
-                  @if (item.badge) {
+                  @if (hasBadge(item)) {
                     <span
                       class="cx-side-nav__badge"
                       [class.cx-side-nav__badge--dot]="item.badge === true"
@@ -104,14 +104,13 @@
                   [attr.aria-current]="rla.isActive && !item.disabled ? 'page' : null"
                   [attr.aria-disabled]="item.disabled ? 'true' : null"
                   [attr.tabindex]="item.disabled ? '-1' : null"
-                  [style.padding-left.px]="itemPadding(level)"
                   (click)="onItemClick($event, item)"
                 >
-                  @if (item.icon) {
+                  @if (item.icon && level === 0) {
                     <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
-                  @if (item.badge) {
+                  @if (hasBadge(item)) {
                     <span
                       class="cx-side-nav__badge"
                       [class.cx-side-nav__badge--dot]="item.badge === true"
@@ -133,7 +132,7 @@
 
         @for (group of normalizedGroups(); track group.id) {
           <div class="cx-side-nav__group">
-            @if (group.collapsible && group.label) {
+            @if (hasGroupToggle(group)) {
               <button
                 class="cx-side-nav__item cx-side-nav__group-toggle"
                 [class.cx-side-nav__item--active]="groupContainsActive(group)"
@@ -161,11 +160,11 @@
             >
               <div
                 class="cx-side-nav__group-items-inner"
-                [class.cx-side-nav__group-items-inner--nested]="group.collapsible"
+                [class.cx-side-nav__branch]="hasGroupToggle(group)"
               >
                 <ng-container
                   [ngTemplateOutlet]="navItems"
-                  [ngTemplateOutletContext]="{ $implicit: group.items, level: 0 }"
+                  [ngTemplateOutletContext]="{ $implicit: group.items, level: groupItemLevel(group) }"
                 />
               </div>
             </div>

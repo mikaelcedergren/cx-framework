@@ -25,14 +25,14 @@
       }
     </span>
   </div>
-  <div class="cx-big-checkbox__content">
-    @if (visibleHeading$()) {
-      <div class="cx-big-checkbox__label">{{ visibleHeading$() }}</div>
-    }
-    @if (visibleDescription$()) {
-      <div class="cx-big-checkbox__description">{{ visibleDescription$() }}</div>
-    }
-    <ng-content />
+  <div #choiceContent class="cx-big-checkbox__content">
+      @if (visibleHeading$()) {
+        <div class="cx-big-checkbox__label">{{ visibleHeading$() }}</div>
+      }
+      @if (visibleDescription$()) {
+        <div class="cx-big-checkbox__description">{{ visibleDescription$() }}</div>
+      }
+      <ng-content />
   </div>
   @if (icon; as iconName) {
     <cx-icon

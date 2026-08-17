@@ -1,4 +1,5 @@
 <div class="cx-chat-message__bubble">
+  @if (hasHeader$()) {
   <div class="cx-chat-message__header">
     <div class="cx-chat-message__meta">
       <div
@@ -21,6 +22,7 @@
       />
     }
   </div>
+  }
 
   <div class="cx-chat-message__body">
     <ng-content />

@@ -83,7 +83,7 @@ purpose → role → information → component role → local implementation →
 
 [SHOULD] Prefer positive, user-concept options and intent-named events when changing a shared component's supported contract. [MUST] Do not require these exact words when the local system has an established alternative vocabulary.
 
-[MUST] Empty optional content leaves no empty visual or semantic wrapper. [MUST] Invalid supported-option combinations fail clearly at the owning component instead of rendering misleading chrome.
+[MUST] Apply `RULE-ID: system.no-empty-chrome` whenever optional content or supported variation can leave a user-facing control, wrapper, overlay, container, or surface without a visible purpose. [MUST] Invalid supported-option combinations fail clearly at the owning component instead of rendering misleading chrome.
 
 ## Semantic tokens and themes
 
@@ -134,6 +134,20 @@ purpose → role → information → component role → local implementation →
 [MUST] Use defined stacking roles only for genuine layers such as overlays, anchored surfaces, and navigation planes.
 
 [MUST] Apply `RULE-ID: layout.component-spacing`, `RULE-ID: layout.breathing-room`, `RULE-ID: layout.supported-viewports`, and `RULE-ID: layout.no-page-horizontal-scroll` to applicable layout work.
+
+## Utility classes
+
+[NOTE] A utility class is a single-purpose, token-backed helper the product exposes for elements an author writes by hand. Utilities exist for freedom at the edges of the system, not as a parallel styling language.
+
+[MUST] Follow the authoring hierarchy: component first, layout primitive second, utility last. Reach for a utility only when no supported component, pattern, or layout capability expresses the intent.
+
+[MUST] Never use a utility to patch, override, or reach inside a sealed component from outside. A component defect or gap is fixed in the component's owning layer, or logged for its owner.
+
+[MUST] Use only utilities whose values resolve to semantic tokens. Do not introduce raw values, one-off classes, or inline styles to escape the utility set; a missing value is a token or utility gap to surface, not a license to hardcode.
+
+[SHOULD] Treat more than three utilities on one element as a design smell: the composition is trying to be a component or pattern. Stop, use or propose the owning construct, and log the gap where the product tracks them.
+
+[NOTE] A page built mostly from utilities has inverted the hierarchy even if every individual class is legal. The reviewable signal is proportion: utilities should read as occasional annotations on an otherwise component-composed surface.
 
 ## Accessibility and reachable state
 

@@ -18,6 +18,9 @@
   flex-direction: row;
   align-items: center;
   gap: var(--space-sm);
+  // Steps report progress; nothing here is editable or clickable, so no step
+  // should raise a text caret or any other pointer that implies otherwise.
+  cursor: default;
   transition: color var(--motion-fast) ease;
 }
 

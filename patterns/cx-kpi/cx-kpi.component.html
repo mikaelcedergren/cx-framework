@@ -11,8 +11,11 @@
     </div>
   }
 
+  @if (visibleValue || hasTrend) {
   <div class="cx-kpi__metric">
-    <div class="cx-kpi__value">{{ value }}</div>
+    @if (visibleValue) {
+      <div class="cx-kpi__value">{{ visibleValue }}</div>
+    }
 
     @if (hasTrend) {
       <cx-trend-tag
@@ -23,6 +26,7 @@
       />
     }
   </div>
+  }
 
   @if (hasProgress) {
     <cx-progress-bar

@@ -1,6 +1,8 @@
 import {
+  AfterViewChecked,
   ChangeDetectionStrategy,
   Component,
+  ContentChildren,
   ElementRef,
   EventEmitter,
   HostBinding,
@@ -8,6 +10,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  QueryList,
   ViewChild,
   inject,
   signal,
@@ -19,6 +22,7 @@ import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { CxTabsComponent, type CxTabItem } from '../../primitives/navigation/cx-tabs';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
+import { CxDetailPanelSectionComponent } from './cx-detail-panel-section.component';
 
 const DETAIL_PANEL_DISMISS_FALLBACK_BUFFER_MS = 50;
 
@@ -37,7 +41,7 @@ export type CxDetailPanelVariant = 'floating' | 'fixed';
   styleUrl: './cx-detail-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxDetailPanelComponent implements OnDestroy {
+export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   private static nextId = 0;
 
   private readonly host = inject(ElementRef<HTMLElement>);
@@ -48,7 +52,12 @@ export class CxDetailPanelComponent implements OnDestroy {
   private restoreFocusOnDismiss = true;
   private dismissCompleted = false;
   private selectedTabIdValue: string | undefined;
+  private menuItemsValue: readonly CxMenuItem[] | undefined;
+  private tabsValue: readonly CxTabItem[] = [];
   private readonly instanceId = CxDetailPanelComponent.nextId++;
+
+  @ContentChildren(CxDetailPanelSectionComponent, { read: ElementRef })
+  private readonly contentSections?: QueryList<ElementRef<HTMLElement>>;
 
   @ViewChild('contentViewport', { read: ElementRef })
   private readonly contentViewport?: ElementRef<HTMLElement>;
@@ -59,9 +68,21 @@ export class CxDetailPanelComponent implements OnDestroy {
   @Input() icon: CxIconName | undefined;
   @Input() heading = '';
   @Input() variant: CxDetailPanelVariant = 'floating';
-  @Input() menuItems: readonly CxMenuItem[] | undefined;
+  @Input()
+  public set menuItems(value: readonly CxMenuItem[] | undefined) {
+    this.menuItemsValue = validateDetailPanelMenuItems(value);
+  }
+  public get menuItems(): readonly CxMenuItem[] | undefined {
+    return this.menuItemsValue;
+  }
   @Input() menuAriaLabel: string | undefined;
-  @Input() tabs: readonly CxTabItem[] = [];
+  @Input()
+  public set tabs(value: readonly CxTabItem[]) {
+    this.tabsValue = validateDetailPanelTabs(value);
+  }
+  public get tabs(): readonly CxTabItem[] {
+    return this.tabsValue;
+  }
   @Input() tabsAriaLabel: string | undefined;
   /** Optional width / min-width overrides (any CSS length) for the panel host. */
   @Input() width: string | null = null;
@@ -101,6 +122,9 @@ export class CxDetailPanelComponent implements OnDestroy {
 
   public get selectedTabId(): string | undefined {
     return this.selectedTabIdValue;
+  }
+
+  public ngAfterViewChecked(): void {
   }
 
   // Exposed as custom properties so the responsive width rules can replace
@@ -283,4 +307,79 @@ function parseCssTimes(value: string): number[] {
     return normalized.endsWith('ms') ? numeric : numeric * 1000;
   });
   return times.length > 0 ? times : [0];
+}
+
+function validateDetailPanelMenuItems(
+  value: readonly CxMenuItem[] | undefined,
+): readonly CxMenuItem[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(value)) {
+    throw new Error('[cx-detail-panel] menuItems must be an array.');
+  }
+
+  validateDetailPanelMenuLevel(value, 'menuItems', new Set<string>());
+  return [...value];
+}
+
+function validateDetailPanelMenuLevel(
+  items: readonly CxMenuItem[],
+  path: string,
+  ids: Set<string>,
+): void {
+  const labels = new Set<string>();
+  items.forEach((item, index) => {
+    const itemPath = `${path}[${index}]`;
+    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-detail-panel] ${itemPath} requires a non-empty id.`);
+    }
+    if (ids.has(id)) {
+      throw new Error(`[cx-detail-panel] menu item id "${id}" must be unique.`);
+    }
+    ids.add(id);
+
+    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    const labelKey = label.toLowerCase();
+    if (labels.has(labelKey)) {
+      throw new Error(`[cx-detail-panel] menu item label "${label}" must be unique within ${path}.`);
+    }
+    labels.add(labelKey);
+
+    if (item.items !== undefined) {
+      if (!Array.isArray(item.items)) {
+        throw new Error(`[cx-detail-panel] ${itemPath}.items must be an array.`);
+      }
+      validateDetailPanelMenuLevel(item.items, `${itemPath}.items`, ids);
+    }
+  });
+}
+
+function validateDetailPanelTabs(value: readonly CxTabItem[]): readonly CxTabItem[] {
+  if (!Array.isArray(value)) {
+    throw new Error('[cx-detail-panel] tabs must be an array.');
+  }
+
+  const ids = new Set<string>();
+  const labels = new Set<string>();
+  value.forEach((tab, index) => {
+    const id = typeof tab?.id === 'string' ? tab.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-detail-panel] tab at index ${index} requires a non-empty id.`);
+    }
+    if (ids.has(id)) {
+      throw new Error(`[cx-detail-panel] tab id "${id}" must be unique.`);
+    }
+    ids.add(id);
+
+    const label = typeof tab?.label === 'string' ? tab.label.trim() : '';
+    const labelKey = label.toLowerCase();
+    if (labels.has(labelKey)) {
+      throw new Error(`[cx-detail-panel] tab label "${label}" must be unique.`);
+    }
+    labels.add(labelKey);
+  });
+
+  return [...value];
 }

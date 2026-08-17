@@ -1,6 +1,7 @@
 export * from './icons/manifest';
 export * from './primitives/shared/keyboard-focus';
 export * from './theme';
+export * from './typeface';
 
 export * from './patterns/cx-account-control';
 export * from './patterns/cx-action-bar';

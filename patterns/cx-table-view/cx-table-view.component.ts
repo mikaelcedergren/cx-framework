@@ -52,7 +52,7 @@ export type CxTableViewPaginationMode = 'none' | 'pages';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxTableViewComponent {
-  private readonly columnsState = signal<CxTableColumn[]>([]);
+  private readonly columnsState = signal<readonly CxTableColumn[]>([]);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
 
   @ViewChild(CxFilterBarComponent)
@@ -83,13 +83,13 @@ export class CxTableViewComponent {
   @Input() visibleColumnIds: string[] = [];
   @Input() pinnedColumnIds: string[] = [];
   @Input()
-  public set columns(value: CxTableColumn[] | undefined) {
+  public set columns(value: readonly CxTableColumn[] | undefined) {
     this.columnsState.set(value ?? []);
   }
-  public get columns(): CxTableColumn[] {
+  public get columns(): readonly CxTableColumn[] {
     return this.columnsState();
   }
-  @Input() rows: CxTableRow[] = [];
+  @Input() rows: readonly CxTableRow[] = [];
   @Input() density: CxTableDensity = 'compact';
   @Input() rowActivation: CxTableRowActivation = 'none';
   @Input() showHeaders = true;

@@ -22,16 +22,16 @@
       }
     </span>
   </div>
-  <div class="cx-big-radio__content">
-    @if (visibleHeading$()) {
-      <div class="cx-big-radio__title-row">
-        <div class="cx-big-radio__label">{{ visibleHeading$() }}</div>
-      </div>
-    }
-    @if (visibleDescription$()) {
-      <div class="cx-big-radio__description">{{ visibleDescription$() }}</div>
-    }
-    <ng-content />
+  <div #choiceContent class="cx-big-radio__content">
+      @if (visibleHeading$()) {
+        <div class="cx-big-radio__title-row">
+          <div class="cx-big-radio__label">{{ visibleHeading$() }}</div>
+        </div>
+      }
+      @if (visibleDescription$()) {
+        <div class="cx-big-radio__description">{{ visibleDescription$() }}</div>
+      }
+      <ng-content />
   </div>
   @if (icon; as iconName) {
     <cx-icon

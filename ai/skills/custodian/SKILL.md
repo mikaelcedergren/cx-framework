@@ -41,6 +41,8 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not an exact component name or implementation API.
 
+Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-facing control, optional wrapper, overlay, container, surface, or empty, loading, or error state.
+
 When calibrating severity or separating defects from taste, load `../../profile/design-lead-profile.md` whole and weigh consequence the way that designer would. The profile is non-normative and carries the lowest authority: it cannot create a finding, downgrade a rule violation, or override any binding source; it only shapes judgment where the rules leave room.
 
 ## Review method
@@ -72,6 +74,8 @@ Only observed issues and well-supported inferences become findings. A not-verifi
 ## Independent semantic coherence gate
 
 Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, `RULE-ID: interaction.control-semantics`, and `RULE-ID: content.scannable` without treating the maker's rationale as proof. Test the relationships between purpose and element, promise and contents, object and representation, intent and consequence, scope and lifetime, and value and interface cost.
+
+Apply `RULE-ID: system.no-empty-chrome` to every control, optional wrapper, overlay, container, and surface in scope.
 
 Classify each material relationship internally as `Pass`, `Concern`, or `Unknown`. A concern becomes a finding only when it is observed or well-supported by evidence. An unknown follows the `Unverified` rules above; do not fill it with the behavior that would make the design seem sensible. A direct contradiction between a surface's promise, contents, and observed behavior is a design error, even when each element looks plausible in isolation.
 

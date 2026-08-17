@@ -64,4 +64,7 @@ export class CxChatMessageComponent {
     }
     return this.authorState();
   });
+  protected readonly hasHeader$ = computed(() =>
+    Boolean(this.authorLabel$().trim() || this.timestampState().trim() || this.statusState()),
+  );
 }

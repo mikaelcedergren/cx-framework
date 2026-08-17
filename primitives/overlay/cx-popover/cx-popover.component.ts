@@ -36,6 +36,9 @@ export class CxPopoverComponent {
   @ViewChild('surface', { read: ElementRef })
   private surfaceRef?: ElementRef<HTMLElement>;
 
+  @ViewChild('content', { read: ElementRef })
+  private contentRef?: ElementRef<HTMLElement>;
+
   @ViewChild('backdrop', { read: ElementRef })
   private backdropRef?: ElementRef<HTMLElement>;
 

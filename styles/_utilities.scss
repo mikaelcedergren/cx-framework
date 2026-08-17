@@ -6,6 +6,12 @@
 // no global utility patches to fix a component from outside — fix the component
 // itself.
 //
+// Utilities are the system's escape hatch, not its building material. The
+// authoring hierarchy is: component first, layout primitive second, utility
+// last — a utility is only correct when no component or primitive expresses
+// the intent. If one element needs more than ~3 utilities, that is a missing
+// component or pattern: stop and log the gap instead of stacking classes.
+//
 // They live in the low-priority `cx-utilities` cascade layer, so any unlayered
 // style — every cx-* component, plus your own app CSS — always wins over a
 // utility. A utility can style your own <p> or <div>, but it cannot override a
@@ -101,6 +107,24 @@ $measures: (
     }
   }
 
+  // Font family — semantic faces, never named fonts, so a site-level token
+  // override flows through. cx-font-serif carries the editorial voice
+  // (--font-family-heading) and resets to the face's natural weight, since the
+  // default serif ships a single weight; an explicit weight utility after it
+  // still wins.
+  .cx-font-sans {
+    font-family: var(--font-family-base);
+  }
+
+  .cx-font-serif {
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .cx-font-mono {
+    font-family: var(--font-family-mono);
+  }
+
   // Typography — font size paired with its line-height; weight is separate.
   @each $name, $ramp in $text-sizes {
     .cx-text-#{$name} {
@@ -122,6 +146,26 @@ $measures: (
     }
   }
 
+  // Line height — the semantic leading tokens, for the rare case where a size's
+  // paired leading is wrong (e.g. a tightened display line outside an article).
+  .cx-leading-heading {
+    line-height: var(--line-height-heading);
+  }
+
+  .cx-leading-body {
+    line-height: var(--line-height-body);
+  }
+
+  .cx-leading-small {
+    line-height: var(--line-height-small);
+  }
+
+  // Headline wrapping — evens out multi-line headings so no line strands a
+  // single word. For headings and short standalone lines, not body copy.
+  .cx-text-balance {
+    text-wrap: balance;
+  }
+
   // Text alignment + truncation.
   .cx-text-start {
     text-align: start;
@@ -137,7 +181,7 @@ $measures: (
 
   .cx-truncate {
     overflow: hidden;
-    text-overflow: clip;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -149,6 +193,16 @@ $measures: (
     }
   }
 
+  // Measure without the centring — caps line length and stays at the start
+  // edge. Capping and centring are different intentions; the plain
+  // cx-measure-* welds them, these split them (mirroring .cx-article--start).
+  @each $name, $measure in $measures {
+    .cx-measure-#{$name}-start {
+      max-inline-size: $measure;
+      margin-inline: 0;
+    }
+  }
+
   // Page container — a gutter-aware centred column: content caps at the xl measure and always
   // keeps a page gutter of air against the viewport edge. Full-bleed sections that need their
   // content aligned with this column pad with --gutter-centered instead.
@@ -157,6 +211,44 @@ $measures: (
     max-inline-size: calc(var(--measure-xl) + (var(--gutter-page) * 2));
     margin-inline: auto;
     padding-inline: var(--gutter-page);
+  }
+
+  // Surface backgrounds — the two semantic canvases, for section bands on
+  // public pages. Anything richer than a flat canvas is a card's job.
+  .cx-bg-surface {
+    background-color: var(--surface);
+  }
+
+  .cx-bg-surface-alt {
+    background-color: var(--surface-alt);
+  }
+
+  // Full-bleed — breaks a section out of a centred content column to run the
+  // full viewport width, then re-aligns its content with the page column via
+  // --gutter-centered. Only valid inside a column centred in the viewport
+  // (public-page shells); next to a side nav the arithmetic is wrong by design.
+  .cx-full-bleed {
+    inline-size: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: var(--gutter-centered);
+  }
+
+  // Corner radius — for raw media and wrappers you author yourself (an <img>,
+  // an inline illustration); components round their own corners.
+  .cx-rounded-sm {
+    border-radius: var(--radius-sm);
+  }
+
+  .cx-rounded-md {
+    border-radius: var(--radius-md);
+  }
+
+  .cx-rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+
+  .cx-rounded-xl {
+    border-radius: var(--radius-xl);
   }
 
   .cx-w-full {
@@ -190,45 +282,36 @@ $measures: (
       display: none;
     }
   }
-}
 
-// Shared clipped-text treatment — framework infrastructure, not a hand-applied
-// utility, so it lives outside the cx-utilities layer. The cxTooltip overflow
-// trigger measures every marked text target and applies this class only while
-// the text is actually clipped; the full text stays reachable through the
-// shared tooltip. Native text-overflow ellipsis is banned (it creates a Safari
-// tooltip), so clipping ends in a direction-aware fade instead.
-.cx-overflow-fade--clipped {
-  text-overflow: clip;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 1.5em), transparent);
-}
-
-// Kept as two rules: an engine without :dir() would otherwise drop the
-// attribute fallback together with the unsupported selector.
-[dir='rtl'] .cx-overflow-fade--clipped {
-  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
-  mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
-}
-
-.cx-overflow-fade--clipped:dir(rtl) {
-  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
-  mask-image: linear-gradient(to left, #000 calc(100% - 1.5em), transparent);
-}
-
-// Forced-colors mode draws text in system colors on a plain canvas; a partial
-// alpha fade would fight that contrast contract, so the clip stays hard. The
-// RTL variants repeat here because their higher specificity would otherwise
-// keep the fade alive.
-@media (forced-colors: active) {
-  .cx-overflow-fade--clipped,
-  [dir='rtl'] .cx-overflow-fade--clipped {
-    -webkit-mask-image: none;
-    mask-image: none;
+  // Anchor landing room — keeps a jumped-to section clear of a sticky masthead.
+  // The default clears the masthead's content-sized height with air to spare;
+  // a page with taller chrome sets --cx-scroll-offset once on its root.
+  .cx-scroll-target {
+    scroll-margin-block-start: var(--cx-scroll-offset, calc(var(--space-2xl) + var(--space-md)));
   }
 
-  .cx-overflow-fade--clipped:dir(rtl) {
-    -webkit-mask-image: none;
-    mask-image: none;
+  // Screen-reader-only — visually hidden, still read aloud. For skip links and
+  // text labels on icon-only affordances you author yourself.
+  .cx-sr-only {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    margin: -1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
+
+// Clipped text ends in an ellipsis, and every component that clips text owns
+// that `text-overflow: ellipsis` itself. It is deliberately not a class the
+// cxTooltip overflow trigger switches on: the browser draws the ellipsis only
+// while the text genuinely does not fit, so the treatment can never disagree
+// with what is on screen, and it flips end-of-line for RTL on its own.
+//
+// The trigger still measures those targets, but only to decide whether the
+// shared tooltip has a full text worth disclosing. It marks what it found with
+// `cx-overflow-clipped` — a state hook carrying no styling. See
+// `CxTooltipDirective`.

@@ -42,6 +42,13 @@
   overflow-wrap: anywhere;
 }
 
+// The trail owns its own responsive collapse, which measures against this
+// element's width — so it has to be a shrinkable block, not an inline box.
+.cx-top-bar__breadcrumbs {
+  display: block;
+  min-width: 0;
+}
+
 .cx-top-bar__description {
   max-width: 720px;
   margin: 0;
@@ -71,6 +78,15 @@
     outline: var(--outline-tab);
     outline-offset: var(--outline-tab-offset);
   }
+
+  // An empty editable description would otherwise be an invisible click
+  // target: it holds a line of space while showing nothing to click. The
+  // prompt makes that space do a job. Read-only descriptions render no element
+  // at all when empty, so they cost nothing.
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: var(--placeholder);
+  }
 }
 
 .cx-top-bar__actions {
@@ -80,6 +96,10 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-sm);
+}
+
+.cx-top-bar__actions:empty {
+  display: none;
 }
 
 .cx-top-bar__menu {

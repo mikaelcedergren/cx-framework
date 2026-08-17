@@ -22,6 +22,11 @@
     color var(--motion-fast) ease;
 }
 
+.cx-big-checkbox--empty,
+.cx-big-checkbox__content:empty {
+  display: none;
+}
+
 .cx-big-checkbox--checked {
   background: var(--surface);
   box-shadow: var(--shadow-low);

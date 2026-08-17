@@ -1,3 +1,5 @@
+@if (steps$(); as steps) {
+@if (steps.length > 0) {
 <ol class="cx-steps__list" aria-label="Steps">
   @for (step of steps; track index; let index = $index) {
     <li
@@ -8,7 +10,20 @@
       [class.cx-step--danger]="isDanger(step)"
       [attr.aria-current]="isCurrent(index) ? 'step' : null"
     >
-      <span class="cx-step__number" aria-hidden="true">
+      <!--
+        While compact, every step but the current one hides its name, leaving a
+        bare number; the tooltip restores that name on hover. It hangs on the
+        aria-hidden number deliberately: this is a visual stand-in only, and the
+        name stays readable to assistive tech through .cx-step__name below, so
+        nothing is announced twice.
+      -->
+      <span
+        class="cx-step__number"
+        aria-hidden="true"
+        [cxTooltip]="stepTooltip(step)"
+        [cxTooltipDisabled]="labelIsVisible(index)"
+        cxTooltipDelay="none"
+      >
         @if (isPending(step)) {
           <cx-icon name="pending" [size]="14" />
         } @else if (isDanger(step)) {
@@ -35,3 +50,5 @@
     </li>
   }
 </ol>
+}
+}

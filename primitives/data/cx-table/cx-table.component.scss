@@ -243,7 +243,7 @@
   overflow: hidden;
   font-size: var(--font-size-body);
   line-height: 1.3;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -304,7 +304,7 @@
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -342,6 +342,8 @@
   padding: var(--space-xs) 0;
 }
 
+// The handle straddles the boundary between two columns, so half of its
+// 12px target deliberately sits outside its own cell.
 .cx-table__column-resizer {
   position: absolute;
   top: 0;
@@ -351,6 +353,19 @@
   height: 100%;
   cursor: col-resize;
   pointer-events: auto;
+}
+
+// The final header cell has no neighbour to straddle, so its outer half would
+// land beyond the table itself. `.cx-table` scrolls on the inline axis, so that
+// overhang reads as content and every table wide enough to fill its container
+// gets a permanent horizontal scrollbar — no matter how little it holds.
+//
+// Anchoring the last handle inside the cell keeps a usable target on the one
+// edge that has nothing beyond it. `:last-child` rather than a modifier class,
+// so it stays correct as the trailing selection and row-menu cells come and go.
+.cx-table__head-cell:last-child .cx-table__column-resizer {
+  right: 0;
+  width: 6px;
 }
 
 .cx-table__column-resizer::after {
@@ -444,7 +459,7 @@
   overflow: hidden;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

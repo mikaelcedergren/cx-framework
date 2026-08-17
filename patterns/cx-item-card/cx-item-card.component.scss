@@ -47,7 +47,7 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body);
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -56,7 +56,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   line-height: var(--line-height-body);
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -64,4 +64,8 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
+}
+
+.cx-item-card__action:empty {
+  display: none;
 }

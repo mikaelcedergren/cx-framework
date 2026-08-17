@@ -1,18 +1,22 @@
-<div
-  class="cx-toggle-chip-group"
-  [class.cx-toggle-chip-group--small]="size === 'small'"
-  [class.cx-toggle-chip-group--large]="size === 'large'"
-  [attr.role]="role$()"
-  [attr.aria-disabled]="disabled ? 'true' : null"
->
-  @for (option of availableValues; track option.id) {
-    <cx-toggle-chip
-      [text]="option.label"
-      [size]="size"
-      [selected]="isSelected(option.id)"
-      [disabled]="disabled || option.disabled === true"
-      [ariaLabel]="option.ariaLabel"
-      (selectedChange)="toggle(option)"
-    />
+@if (availableValues$(); as options) {
+  @if (options.length > 0) {
+    <div
+      class="cx-toggle-chip-group"
+      [class.cx-toggle-chip-group--small]="size === 'small'"
+      [class.cx-toggle-chip-group--large]="size === 'large'"
+      [attr.role]="role$()"
+      [attr.aria-disabled]="disabled ? 'true' : null"
+    >
+      @for (option of options; track option.id) {
+        <cx-toggle-chip
+          [text]="option.label"
+          [size]="size"
+          [selected]="isSelected(option.id)"
+          [disabled]="disabled || option.disabled === true"
+          [ariaLabel]="option.ariaLabel"
+          (selectedChange)="toggle(option)"
+        />
+      }
+    </div>
   }
-</div>
+}

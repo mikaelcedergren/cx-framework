@@ -30,7 +30,10 @@
 .cx-article {
   --cx-article-base: 18px;
 
-  max-inline-size: var(--measure-md);
+  // The reading measure is configurable the same way the type base is: set
+  // --cx-article-measure inline (or on a wrapper) for anything the default
+  // does not fit — e.g. `none` for a full-width hero summary.
+  max-inline-size: var(--cx-article-measure, var(--measure-md));
   margin-inline: auto;
   color: var(--ink);
   font-family: var(--font-family-base);
@@ -40,14 +43,15 @@
 
   @include editorial-type.cx-editorial-type;
 
-  // The two largest headings carry the editorial display serif. DM Serif Display
-  // ships a single weight, so let it stand at its natural weight rather than
+  // The two largest headings carry the editorial heading face (a display serif
+  // by default; --font-family-heading is the site-level override). It may ship
+  // a single weight, so let it stand at its natural weight rather than
   // faux-bolding the 700 the mixin sets. Lower headings stay in the base sans.
   // Scoped to .cx-article on purpose — other surfaces sharing cx-editorial-type
   // (e.g. the markdown preview) keep the base sans headings.
   h1,
   h2 {
-    font-family: var(--font-family-fancy);
+    font-family: var(--font-family-heading);
     font-weight: var(--font-weight-regular);
   }
 

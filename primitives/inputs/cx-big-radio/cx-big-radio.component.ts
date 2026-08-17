@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 
@@ -11,6 +20,9 @@ import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 })
 export class CxBigRadioComponent {
   private readonly selectedState = signal(false);
+
+  @ViewChild('choiceContent', { read: ElementRef })
+  private choiceContentRef?: ElementRef<HTMLElement>;
 
   @Input() heading = '';
   @Input() description = '';
@@ -47,5 +59,4 @@ export class CxBigRadioComponent {
   protected onFocus(focused: boolean): void {
     this.focusChange.emit(focused);
   }
-
 }

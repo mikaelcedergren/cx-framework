@@ -7,6 +7,7 @@ export const CX_THEMES = [
   { id: 'light', label: 'Light', icon: 'light-mode', group: 'appearance' },
   { id: 'dark', label: 'Dark', icon: 'dark-mode', group: 'appearance' },
   { id: 'night', label: 'Night', icon: 'night-mode', group: 'appearance' },
+  { id: 'aqua', label: 'Aqua', icon: 'aqua-mode', group: 'appearance' },
   { id: 'high-contrast', label: 'High contrast', icon: 'high-contrast-mode', group: 'utility' },
   { id: 'wireframe', label: 'Wireframe', icon: 'browser-window', group: 'utility' },
   { id: 'legacy', label: 'Legacy', icon: 'history', group: 'utility' },

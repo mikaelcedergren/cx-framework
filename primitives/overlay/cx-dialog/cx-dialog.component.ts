@@ -6,6 +6,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   Output,
   ViewChild,
@@ -46,12 +47,13 @@ export type CxDialogSize = 'small' | 'default' | 'large';
   styleUrl: './cx-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxDialogComponent implements OnDestroy {
+export class CxDialogComponent implements OnChanges, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly interactivityChecker = inject(InteractivityChecker);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
   private readonly menuOpenState = signal(false);
+  private openInput = false;
   private overlayHandle?: CxOverlayStateHandle;
   private dialogElement?: HTMLElement;
   private focusMutationObserver?: MutationObserver;
@@ -101,7 +103,8 @@ export class CxDialogComponent implements OnDestroy {
 
   @Input()
   public set open(value: boolean) {
-    this.syncOpen(Boolean(value));
+    this.openInput = Boolean(value);
+    this.syncOpen(this.openInput);
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
@@ -109,6 +112,10 @@ export class CxDialogComponent implements OnDestroy {
   @Output() readonly secondary = new EventEmitter<void>();
   @Output() readonly dismiss = new EventEmitter<void>();
   @Output() readonly menuItemSelect = new EventEmitter<string>();
+
+  public ngOnChanges(): void {
+    this.syncOpen(this.openInput);
+  }
 
   ngOnDestroy(): void {
     this.stopFocusOwnership();
@@ -156,6 +163,10 @@ export class CxDialogComponent implements OnDestroy {
 
   protected hasDescription(): boolean {
     return this.description.trim().length > 0;
+  }
+
+  protected hasHeading(): boolean {
+    return this.heading.trim().length > 0;
   }
 
   protected hasMenuItems(): boolean {
@@ -282,6 +293,7 @@ export class CxDialogComponent implements OnDestroy {
   }
 
   private closeFromUser(): void {
+    this.openInput = false;
     this.syncOpen(false);
     this.openChange.emit(false);
   }

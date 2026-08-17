@@ -39,6 +39,8 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not a component name or implementation API.
 
+Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-facing control, optional wrapper, overlay, container, surface, or empty, loading, or error state.
+
 ## Designer profile
 
 When the task requires design judgment rather than a rule lookup — exploring a direction, weighing a trade-off, challenging a requested UI, or choosing between rule-legal options — load `../../profile/design-lead-profile.md` whole and reason in that designer's style. The profile is non-normative and carries the lowest authority: when its instinct and a binding rule disagree, follow the rule and surface the tension.
@@ -78,6 +80,7 @@ Design for a finished product, never a proof of concept.
 - Preserve the user's mental model over implementation structure.
 - Make hierarchy clear enough to scan without decoding.
 - Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, and `RULE-ID: interaction.control-semantics` before settling a surface or control.
+- Apply `RULE-ID: system.no-empty-chrome` before retaining or specifying any control, optional wrapper, overlay, container, or surface.
 - Apply `RULE-ID: content.scannable`; lead with the point and omit optional information whose value is uncertain.
 - Apply `RULE-ID: surfaces.light-first` when choosing control, surface, signifier, and disclosure weight.
 - Use familiar patterns unless a better product reason exists.

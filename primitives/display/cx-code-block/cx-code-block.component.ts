@@ -107,7 +107,7 @@ export class CxCodeBlockComponent implements OnDestroy {
   }
 
   protected copyDisabled(): boolean {
-    return !this.copyable || this.code.length === 0;
+    return !this.copyable || !this.code.trim();
   }
 
   protected async copy(): Promise<void> {

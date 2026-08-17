@@ -10,11 +10,15 @@ export type CxSideNavBadgeTone = 'default' | 'primary' | 'accent' | 'info' | 'su
 export type CxSideNavItem = {
   id: string;
   label: string;
+  /**
+   * Icon for a top-level row only. Nested rows are identified by the tree
+   * guide instead, so setting an icon on a sub item is rejected — see
+   * {@link CxSideNavGroup} for what counts as nested.
+   */
   icon?: CxIconName;
   badge?: string | number | boolean;
   badgeTone?: CxSideNavBadgeTone;
   disabled?: boolean;
-  defaultExpanded?: boolean;
   children?: CxSideNavItem[];
   /** Router target — renders the item as an `<a routerLink>`, e.g. `['/dashboard']`. */
   routerLink?: string | readonly unknown[];
@@ -34,12 +38,19 @@ export type CxSideNavItem = {
   rel?: string;
 };
 
+/**
+ * A section of the nav. A labelled `collapsible` group renders a parent row
+ * that opens and closes, which makes its items *nested* — they lose their icon
+ * and gain the tree guide. A group that is only labelled renders a plain
+ * heading, so its items stay top-level and keep their icons.
+ *
+ * Groups always start closed; expansion is a user action, never a default.
+ */
 export type CxSideNavGroup = {
   id: string;
   label?: string;
   icon?: CxIconName;
   collapsible?: boolean;
-  defaultExpanded?: boolean;
   items: CxSideNavItem[];
 };
 
@@ -51,14 +62,30 @@ const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
   templateUrl: './cx-side-nav.component.html',
   styleUrl: './cx-side-nav.component.scss',
   host: {
-    '[class.cx-side-nav-host--hidden]': '!navbarVisible',
     '[class.cx-side-nav-host--loading]': 'loading',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxSideNavComponent {
-  @Input() items: CxSideNavItem[] = [];
-  @Input() groups: CxSideNavGroup[] = [];
+  private itemsValue: CxSideNavItem[] = [];
+  private groupsValue: CxSideNavGroup[] = [];
+
+  @Input()
+  public set items(value: CxSideNavItem[]) {
+    this.itemsValue = validateSideNavItems(value, 'items');
+  }
+  public get items(): CxSideNavItem[] {
+    return this.itemsValue;
+  }
+
+  @Input()
+  public set groups(value: CxSideNavGroup[]) {
+    this.groupsValue = validateSideNavGroups(value);
+  }
+  public get groups(): CxSideNavGroup[] {
+    return this.groupsValue;
+  }
+
   @Input() name = '';
   @Input() initials = '';
   @Input() navbarVisible = true;
@@ -97,19 +124,36 @@ export class CxSideNavComponent {
     return [{ id: 'default', items: this.items }];
   }
 
+  protected hasNavigationItems(): boolean {
+    return this.groups.length > 0 || this.items.length > 0;
+  }
+
   protected activeOptions(item: CxSideNavItem): { exact: boolean } | IsActiveMatchOptions {
     return item.routerLinkActiveOptions ?? DEFAULT_ACTIVE_OPTIONS;
   }
 
+  /**
+   * True when the group renders its own parent row. Such a group owns the
+   * nesting: its items sit one level in, behind the tree guide.
+   */
+  protected hasGroupToggle(group: CxSideNavGroup): boolean {
+    return Boolean(group.collapsible && group.label);
+  }
+
+  /** Nesting level the group's own items start at — 1 behind a parent row. */
+  protected groupItemLevel(group: CxSideNavGroup): number {
+    return this.hasGroupToggle(group) ? 1 : 0;
+  }
+
+  // Collapsed is the only starting state: a group opens because the user opened
+  // it, never because it happens to hold the active route. The collapsed parent
+  // row still carries the active highlight, so the section is identifiable
+  // without being unfolded.
   protected isGroupExpanded(group: CxSideNavGroup): boolean {
     if (!group.collapsible) {
-      return !group.collapsible;
+      return true;
     }
-    const override = this.expandedGroups[group.id];
-    if (override !== undefined) {
-      return override;
-    }
-    return (group.defaultExpanded ?? false) || this.groupContainsActive(group);
+    return this.expandedGroups[group.id] ?? false;
   }
 
   protected groupContainsActive(group: CxSideNavGroup): boolean {
@@ -134,23 +178,16 @@ export class CxSideNavComponent {
     }, {});
   }
 
-  protected itemPadding(level: number): number | null {
-    return 8 + Math.max(0, level) * 18;
-  }
-
   protected hasChildren(item: CxSideNavItem): boolean {
     return (item.children?.length ?? 0) > 0;
   }
 
+  /** See {@link isGroupExpanded} — nested parents start closed for the same reason. */
   protected isItemExpanded(item: CxSideNavItem): boolean {
     if (!this.hasChildren(item)) {
       return false;
     }
-    const override = this.expandedItems[item.id];
-    if (override !== undefined) {
-      return override;
-    }
-    return (item.defaultExpanded ?? false) || this.itemContainsActive(item);
+    return this.expandedItems[item.id] ?? false;
   }
 
   protected showItemChildren(item: CxSideNavItem): boolean {
@@ -182,6 +219,13 @@ export class CxSideNavComponent {
       return '';
     }
     return String(item.badge);
+  }
+
+  protected hasBadge(item: CxSideNavItem): boolean {
+    // A finite number counts as visible even at 0; a string must be non-blank.
+    if (typeof item.badge === 'number') return Number.isFinite(item.badge);
+    if (typeof item.badge === 'string') return item.badge.trim().length > 0;
+    return item.badge === true;
   }
 
   protected badgeTone(item: CxSideNavItem): CxSideNavBadgeTone {
@@ -231,4 +275,99 @@ export class CxSideNavComponent {
   private firstInitial(value: string): string {
     return Array.from(value.trim()).find(char => /\p{L}|\p{N}/u.test(char))?.toUpperCase() ?? '';
   }
+}
+
+function validateSideNavItems(value: CxSideNavItem[], inputName: string): CxSideNavItem[] {
+  if (!Array.isArray(value)) {
+    throw new Error(`[cx-side-nav] ${inputName} must be an array.`);
+  }
+  validateSideNavItemLevel(value, inputName, new Set<string>(), 0);
+  return [...value];
+}
+
+function validateSideNavItemLevel(
+  items: readonly CxSideNavItem[],
+  path: string,
+  ids: Set<string>,
+  level: number,
+): void {
+  const labels = new Set<string>();
+  items.forEach((item, index) => {
+    const itemPath = `${path}[${index}]`;
+    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-side-nav] ${itemPath} requires a non-empty id.`);
+    }
+    if (ids.has(id)) {
+      throw new Error(`[cx-side-nav] item id "${id}" must be unique.`);
+    }
+    ids.add(id);
+
+    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    const labelKey = label.toLowerCase();
+    if (labels.has(labelKey)) {
+      throw new Error(`[cx-side-nav] item label "${label}" must be unique within ${path}.`);
+    }
+    labels.add(labelKey);
+
+    // The tree guide is the nesting signal below the top level; an icon there
+    // would compete with it and break the label alignment. Rejected rather than
+    // dropped silently so the consumer learns where icons belong.
+    if (level > 0 && item.icon !== undefined) {
+      throw new Error(
+        `[cx-side-nav] ${itemPath} must not set an icon. Nested items are marked by the tree guide — icons belong to top-level items and group parent rows.`,
+      );
+    }
+
+    if (item.children !== undefined) {
+      if (!Array.isArray(item.children)) {
+        throw new Error(`[cx-side-nav] ${itemPath}.children must be an array.`);
+      }
+      validateSideNavItemLevel(item.children, `${itemPath}.children`, ids, level + 1);
+    }
+  });
+}
+
+function validateSideNavGroups(value: CxSideNavGroup[]): CxSideNavGroup[] {
+  if (!Array.isArray(value)) {
+    throw new Error('[cx-side-nav] groups must be an array.');
+  }
+
+  const groupIds = new Set<string>();
+  const groupLabels = new Set<string>();
+  const itemIds = new Set<string>();
+  value.forEach((group, index) => {
+    const path = `groups[${index}]`;
+    const id = typeof group?.id === 'string' ? group.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-side-nav] ${path} requires a non-empty id.`);
+    }
+    if (groupIds.has(id)) {
+      throw new Error(`[cx-side-nav] group id "${id}" must be unique.`);
+    }
+    groupIds.add(id);
+
+    const label = typeof group?.label === 'string' ? group.label.trim() : '';
+    // A collapsible group's label *is* its parent row; without one there is no
+    // control to open it and the items would be unreachable.
+    if (group.collapsible && !label) {
+      throw new Error(`[cx-side-nav] group "${id}" is collapsible and needs a label to act as its parent row.`);
+    }
+    if (label) {
+      const labelKey = label.toLowerCase();
+      if (groupLabels.has(labelKey)) {
+        throw new Error(`[cx-side-nav] group label "${label}" must be unique.`);
+      }
+      groupLabels.add(labelKey);
+    }
+
+    if (!Array.isArray(group.items) || group.items.length === 0) {
+      throw new Error(`[cx-side-nav] group "${id}" requires at least one item.`);
+    }
+    // A labelled collapsible group owns a parent row, so its items are already
+    // one level in and must follow the nested rules.
+    validateSideNavItemLevel(group.items, `${path}.items`, itemIds, group.collapsible && label ? 1 : 0);
+  });
+
+  return [...value];
 }

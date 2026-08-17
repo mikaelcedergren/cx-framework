@@ -1,20 +1,43 @@
 <header class="cx-top-bar">
   <div class="cx-top-bar__inner">
     <div class="cx-top-bar__copy">
-      <h1 class="cx-top-bar__heading">{{ resolvedHeading() }}</h1>
-      @if (editableDescription) {
-        <p
-          #descriptionElement
-          class="cx-top-bar__description cx-top-bar__description--editable"
-          [attr.contenteditable]="'plaintext-only'"
-          role="textbox"
-          spellcheck="true"
-          (blur)="commitDescription(descriptionElement.innerText)"
-          (keydown.enter)="$event.preventDefault(); descriptionElement.blur()"
-          (keydown.escape)="descriptionElement.innerText = description ?? ''; descriptionElement.blur()"
-        >{{ description }}</p>
-      } @else if (hasDescription()) {
-        <p class="cx-top-bar__description">{{ description }}</p>
+      @if (breadcrumbsTitle(); as crumbs) {
+        <!--
+          Breadcrumbs are a nav landmark, not a heading, so the page would lose
+          its h1 outright. The current crumb is the page's own name, so it
+          carries the heading for assistive tech while the trail carries it
+          visually.
+        -->
+        @if (currentCrumbLabel(); as crumbLabel) {
+          <h1 class="cx-sr-only">{{ crumbLabel }}</h1>
+        }
+
+        <cx-breadcrumbs
+          class="cx-top-bar__breadcrumbs"
+          [items]="crumbs.items"
+          [currentId]="crumbs.currentId"
+          [ariaLabel]="crumbs.ariaLabel"
+          (itemSelect)="breadcrumbSelect.emit($event)"
+          (optionSelect)="breadcrumbOptionSelect.emit($event)"
+        />
+      } @else if (headingTitle(); as headingCopy) {
+        <h1 class="cx-top-bar__heading">{{ resolvedHeading() }}</h1>
+
+        @if (headingCopy.editableDescription) {
+          <p
+            #descriptionElement
+            class="cx-top-bar__description cx-top-bar__description--editable"
+            [attr.contenteditable]="'plaintext-only'"
+            [attr.data-placeholder]="'Add a description'"
+            role="textbox"
+            spellcheck="true"
+            (blur)="commitDescription(headingCopy, descriptionElement.innerText)"
+            (keydown.enter)="$event.preventDefault(); descriptionElement.blur()"
+            (keydown.escape)="descriptionElement.innerText = headingCopy.description ?? ''; descriptionElement.blur()"
+          >{{ headingCopy.description }}</p>
+        } @else if (hasDescription(headingCopy)) {
+          <p class="cx-top-bar__description">{{ headingCopy.description }}</p>
+        }
       }
     </div>
 

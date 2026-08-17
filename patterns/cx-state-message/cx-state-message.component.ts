@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
 import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
@@ -68,6 +77,9 @@ const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStat
 export class CxStateMessageComponent {
   private iconInputBound = false;
   private iconValue: CxIconName | undefined;
+
+  @ViewChild('messageBody', { read: ElementRef })
+  private messageBodyRef?: ElementRef<HTMLElement>;
 
   @Input() heading = '';
   @Input() description: string | undefined;
@@ -151,7 +163,7 @@ export class CxStateMessageComponent {
   }
 
   private visibleActionFor(action: CxStateMessageAction | undefined): CxStateMessageAction | undefined {
-    return action?.text.trim() ? action : undefined;
+    return action && Boolean(action.text?.trim() || action.icon || action.appendIcon) ? action : undefined;
   }
 
   protected resolveActionMood(action: CxStateMessageAction): CxButtonMood {

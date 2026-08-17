@@ -1,7 +1,34 @@
 :root {
+  // The fixed half of a product's identity. Body and mono do not vary: every
+  // product reads in Inter and shows code in Roboto Mono, so these are literal
+  // values rather than entries in the typeface menu below.
   --font-family-base: 'Inter', sans-serif;
   --font-family-mono: 'Roboto Mono', monospace;
-  --font-family-fancy: 'DM Serif Display', serif;
+
+  // The heading menu — the faces --font-family-heading may point at, named by
+  // voice rather than by font, so swapping the file never makes the name lie.
+  // Exactly one is live per product: an identity here is Inter plus one of
+  // these, never two heading faces on the same page.
+  //
+  // `condensed` names proportion rather than voice on purpose. Width is the
+  // reason you reach for that face, so it is the honest name; a construction
+  // name like `geometric` would not be, and none belong here.
+  --typeface-editorial: 'DM Serif Display', serif;
+  --typeface-friendly: 'Rubik', sans-serif;
+  --typeface-elegant: 'Raleway', sans-serif;
+  --typeface-condensed: 'Archivo Narrow', sans-serif;
+
+  // The one role that varies — what .cx-article headings and cx-font-serif
+  // render in. A consuming product overrides this single token to pick its
+  // face, and should point it at a --typeface-* entry rather than naming a
+  // font directly, so it inherits whatever that voice resolves to.
+  //
+  // The default ships a single weight (400), so bold headings on it are
+  // synthesised by the browser; the other three carry real weight axes.
+  --font-family-heading: var(--typeface-editorial);
+
+  // Legacy alias, kept for downstream consumers; prefer --font-family-heading.
+  --font-family-fancy: var(--font-family-heading);
 
   --font-size-display: clamp(40px, 5vw, 72px);
   --font-size-title-1: 24px;

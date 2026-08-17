@@ -88,13 +88,3 @@
   gap: var(--space-sm);
   padding-top: var(--space-sm);
 }
-
-.cx-state-message__content {
-  width: 100%;
-}
-
-// The slot is always rendered; collapse it when nothing is projected so the
-// body gap does not create phantom spacing.
-.cx-state-message__content:empty {
-  display: none;
-}

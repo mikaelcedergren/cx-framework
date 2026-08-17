@@ -39,6 +39,10 @@ export class CxKpiComponent {
     return Boolean(this.heading.trim());
   }
 
+  protected get visibleValue(): string {
+    return this.value?.trim() ?? '';
+  }
+
   protected get hasTrend(): boolean {
     return typeof this.trendAmount === 'number' && Number.isFinite(this.trendAmount);
   }

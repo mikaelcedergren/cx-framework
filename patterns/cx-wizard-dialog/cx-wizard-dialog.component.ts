@@ -1,12 +1,17 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
+  AfterContentChecked,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   Output,
+  SimpleChanges,
+  ViewChild,
   computed,
   contentChildren,
   inject,
@@ -69,7 +74,7 @@ const EMPTY_WIZARD: CxWizardDialogData = {
   styleUrl: './cx-wizard-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxWizardDialogComponent implements OnDestroy {
+export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
@@ -77,6 +82,16 @@ export class CxWizardDialogComponent implements OnDestroy {
   private readonly stepTemplates = contentChildren(CxWizardDialogStepDirective);
   private readonly documentKeydownListener = (event: KeyboardEvent) => this.onDialogKeydown(event);
   private overlayHandle?: CxOverlayStateHandle;
+  private requestedOpen = false;
+
+  @ViewChild('feedbackContent', { read: ElementRef })
+  private readonly feedbackContent?: ElementRef<HTMLElement>;
+
+  @ViewChild('dialogBackdrop', { read: ElementRef })
+  private readonly dialogBackdrop?: ElementRef<HTMLElement>;
+
+  @ViewChild('stepContent', { read: ElementRef })
+  private readonly stepContent?: ElementRef<HTMLElement>;
 
   protected readonly titleId = `cx-wizard-dialog-title-${++cxWizardDialogId}`;
   protected readonly isOpen$ = this.openState.asReadonly();
@@ -126,11 +141,25 @@ export class CxWizardDialogComponent implements OnDestroy {
 
   @Input()
   public set open(value: boolean) {
-    this.syncOpen(Boolean(value));
+    this.requestedOpen = Boolean(value);
+    this.syncOpen(this.requestedOpen);
+  }
+  public get open(): boolean {
+    return this.requestedOpen;
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
   @Output() readonly action = new EventEmitter<CxWizardDialogAction>();
+
+  public ngOnChanges(_changes: SimpleChanges): void {
+    this.syncOpen(this.requestedOpen);
+  }
+
+  public ngAfterContentChecked(): void {
+    if (this.isOpen$()) {
+      this.assertStepTemplates();
+    }
+  }
 
   public ngOnDestroy(): void {
     this.releaseKeyboardShortcuts();
@@ -217,6 +246,7 @@ export class CxWizardDialogComponent implements OnDestroy {
   }
 
   private closeFromUser(): void {
+    this.requestedOpen = false;
     this.syncOpen(false);
     this.openChange.emit(false);
   }
@@ -250,6 +280,26 @@ export class CxWizardDialogComponent implements OnDestroy {
     this.overlayHandle = undefined;
   }
 
+  private assertStepTemplates(): void {
+    const templateIds = new Set<string>();
+    this.stepTemplates().forEach((template, index) => {
+      const id = template.stepId.trim();
+      if (!id) {
+        throw new Error(`[cx-wizard-dialog] step template at index ${index} requires a non-empty id.`);
+      }
+      if (templateIds.has(id)) {
+        throw new Error(`[cx-wizard-dialog] step template id "${id}" must be unique.`);
+      }
+      templateIds.add(id);
+    });
+
+    for (const step of this.steps$()) {
+      if (!templateIds.has(step.id)) {
+        throw new Error(`[cx-wizard-dialog] step "${step.id}" requires a matching cxWizardDialogStep template.`);
+      }
+    }
+  }
+
   private clampIndex(index: number): number {
     const maxIndex = this.steps$().length - 1;
     if (maxIndex < 0) {
@@ -264,20 +314,46 @@ export class CxWizardDialogComponent implements OnDestroy {
       return EMPTY_WIZARD;
     }
 
-    const steps: CxWizardDialogStep[] = Array.isArray(value.steps)
-      ? value.steps
-          .filter((step): step is CxWizardDialogStep => !!step && typeof step.id === 'string' && step.id.trim().length > 0)
-          .map(step => ({
-            id: step.id.trim(),
-            name: step.name?.trim() || 'Step',
-            heading: step.heading?.trim() || step.name?.trim() || 'Step',
-            infoHeading: step.infoHeading?.trim() || step.name?.trim() || 'Step guidance',
-            infoDescription: step.infoDescription?.trim() || '',
-            icon: step.icon,
-            infoCustom: step.infoCustom === true,
-            status: step.status === 'success' ? 'success' as const : 'default' as const,
-          }))
-      : [];
+    if (!Array.isArray(value.steps)) {
+      throw new Error('[cx-wizard-dialog] wizard.steps must be an array.');
+    }
+
+    const ids = new Set<string>();
+    const names = new Set<string>();
+    const steps: CxWizardDialogStep[] = value.steps.map((step, index) => {
+      const id = typeof step?.id === 'string' ? step.id.trim() : '';
+      if (!id) {
+        throw new Error(`[cx-wizard-dialog] step at index ${index} requires a non-empty id.`);
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-wizard-dialog] step id "${id}" must be unique.`);
+      }
+      ids.add(id);
+
+      const name = typeof step?.name === 'string' ? step.name.trim() : '';
+      const nameKey = name.toLowerCase();
+      if (names.has(nameKey)) {
+        throw new Error(`[cx-wizard-dialog] step name "${name}" must be unique.`);
+      }
+      names.add(nameKey);
+
+      const heading = typeof step?.heading === 'string' ? step.heading.trim() : '';
+      const infoHeading = typeof step?.infoHeading === 'string' ? step.infoHeading.trim() : '';
+      const infoDescription = typeof step?.infoDescription === 'string' ? step.infoDescription.trim() : '';
+      if (step.infoCustom !== true) {
+      }
+
+      return {
+        id,
+        name,
+        heading,
+        infoHeading,
+        infoDescription,
+        icon: step.icon,
+        infoCustom: step.infoCustom === true,
+        status: step.status === 'success' ? 'success' as const : 'default' as const,
+      };
+    });
 
     const index = Math.max(0, Math.min(Math.trunc(value.index ?? 0), Math.max(steps.length - 1, 0)));
 

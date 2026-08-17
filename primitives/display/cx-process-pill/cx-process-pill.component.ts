@@ -53,4 +53,5 @@ export class CxProcessPillComponent {
   protected hasCount(): boolean {
     return this.count !== undefined && this.count !== null;
   }
+
 }

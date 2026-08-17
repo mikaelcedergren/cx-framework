@@ -1,6 +1,6 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.7.16",
+  "version": "0.8.0",
   "description": "Personal Angular UI framework and AI design package.",
   "type": "module",
   "packageManager": "pnpm@10.7.1",
@@ -54,7 +54,8 @@
     "theme.ts",
     "tokens/",
     "tooling/",
-    "tsconfig.lib.json"
+    "tsconfig.lib.json",
+    "typeface.ts"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

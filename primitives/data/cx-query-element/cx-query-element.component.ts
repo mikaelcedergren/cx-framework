@@ -49,7 +49,7 @@ export class CxQueryElementComponent {
 
     this.kind = data.kind;
     this.label = data.label ?? this.defaultLabelFor(data.kind);
-    this.values = data.values ?? [];
+    this.values = (data.values ?? []).map(item => item?.trim() ?? '');
     this.valuesPrefix = data.valuesPrefix ?? '';
     this.valuesDivider = data.valuesDivider ?? ', ';
     this.valuesSuffix = data.valuesSuffix ?? '';

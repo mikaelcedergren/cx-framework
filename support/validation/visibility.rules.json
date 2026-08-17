@@ -1,3 +1,31 @@
 {
-  "rules": []
+  "rules": [
+    {
+      "id": "system.no-empty-chrome",
+      "source": "ai/design/03-ux-rules.md",
+      "severity": "critical",
+      "scope": "user-facing",
+      "subjects": [
+        "element",
+        "control",
+        "overlay",
+        "container",
+        "surface",
+        "optional-wrapper"
+      ],
+      "visiblePurposeEvidence": [
+        "visible-text",
+        "meaningful-icon",
+        "perceivable-signifier",
+        "explicit-visible-state"
+      ],
+      "insufficientEvidence": [
+        "accessible-name",
+        "decorative-chrome"
+      ],
+      "emptyOptional": "omit",
+      "emptySurface": "omit-or-visible-empty-loading-error",
+      "invalidCombination": "owner-error"
+    }
+  ]
 }

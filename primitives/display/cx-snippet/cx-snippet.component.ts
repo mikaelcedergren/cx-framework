@@ -62,7 +62,7 @@ export class CxSnippetComponent {
 
   private resolvedSnippet(): CxSnippet {
     const snippet = this.snippet;
-    if (!snippet?.code) {
+    if (!snippet?.code.trim()) {
       return EMPTY_SNIPPET;
     }
     return {

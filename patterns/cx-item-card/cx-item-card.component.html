@@ -5,6 +5,7 @@
     </div>
   }
 
+  @if (heading.trim() || hasDescription) {
   <div class="cx-item-card__body">
     <div
       class="cx-item-card__heading"
@@ -23,6 +24,7 @@
       </div>
     }
   </div>
+  }
 
   <div class="cx-item-card__action">
     <ng-content />

@@ -34,7 +34,34 @@ export class CxActionBarComponent {
 
   @Input()
   public set data(value: CxActionBarData | null | undefined) {
-    this.data$.set(value ?? undefined);
+    if (value == null) {
+      this.data$.set(undefined);
+      return;
+    }
+    if (!Number.isInteger(value.count) || value.count <= 0) {
+      throw new Error('[cx-action-bar] data.count must be a positive integer when data is supplied.');
+    }
+    if (!Array.isArray(value.menu)) {
+      throw new Error('[cx-action-bar] data.menu must be an array.');
+    }
+
+    const actionIds = new Set<string>();
+    for (const group of value.menu) {
+      if (!Array.isArray(group.items)) {
+        throw new Error('[cx-action-bar] every group requires an items array.');
+      }
+      for (const item of group.items) {
+        const id = item.id?.trim();
+        if (!id) {
+          throw new Error('[cx-action-bar] every action requires a non-empty id.');
+        }
+        if (actionIds.has(id)) {
+          throw new Error(`[cx-action-bar] action ids must be unique; received "${id}" more than once.`);
+        }
+        actionIds.add(id);
+      }
+    }
+    this.data$.set(value);
   }
 
   @Output() readonly deselectAll = new EventEmitter<void>();
@@ -54,11 +81,11 @@ export class CxActionBarComponent {
   }
 
   protected actionText(item: CxActionBarItem): string {
-    return item.priority === 'primary' ? item.name ?? '' : '';
+    return item.priority === 'primary' || !item.icon ? item.name?.trim() ?? '' : '';
   }
 
   protected actionAriaLabel(item: CxActionBarItem): string {
-    return item.name ?? item.id;
+    return item.name?.trim() || item.id.trim();
   }
 
   protected actionTransparent(item: CxActionBarItem): boolean {

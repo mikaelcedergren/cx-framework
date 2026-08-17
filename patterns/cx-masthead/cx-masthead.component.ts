@@ -48,6 +48,8 @@ let nextPanelId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxMastheadComponent {
+  private itemsValue: CxMastheadItem[] = [];
+
   /** Brand title shown next to the logo, e.g. a name or product wordmark. */
   @Input() heading = '';
   /** Icon used as the brand mark when no `[brand]` slot or `logoSrc` is provided. */
@@ -61,7 +63,13 @@ export class CxMastheadComponent {
    */
   @Input() homeHref: string | undefined;
   /** Primary navigation links. */
-  @Input() items: CxMastheadItem[] = [];
+  @Input()
+  public set items(value: CxMastheadItem[]) {
+    this.itemsValue = validateMastheadItems(value);
+  }
+  public get items(): CxMastheadItem[] {
+    return this.itemsValue;
+  }
   /** Sticks the masthead to the top of its scroll container. */
   @Input({ transform: booleanAttribute }) sticky = false;
   /** Accessible label for the collapsed-navigation toggle. */
@@ -74,7 +82,7 @@ export class CxMastheadComponent {
   protected readonly menuOpen = signal(false);
 
   protected hasDefaultBrand(): boolean {
-    return this.heading.trim().length > 0 || !!this.logo || !!this.logoSrc;
+    return Boolean(this.heading?.trim() || this.logo || this.logoSrc);
   }
 
   protected activeOptions(item: CxMastheadItem): { exact: boolean } | IsActiveMatchOptions {
@@ -102,4 +110,32 @@ export class CxMastheadComponent {
     this.itemSelect.emit(item);
     this.closeMenu();
   }
+}
+
+function validateMastheadItems(value: CxMastheadItem[]): CxMastheadItem[] {
+  if (!Array.isArray(value)) {
+    throw new Error('[cx-masthead] items must be an array.');
+  }
+
+  const ids = new Set<string>();
+  const labels = new Set<string>();
+  value.forEach((item, index) => {
+    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-masthead] item at index ${index} requires a non-empty id.`);
+    }
+    if (ids.has(id)) {
+      throw new Error(`[cx-masthead] item id "${id}" must be unique.`);
+    }
+    ids.add(id);
+
+    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    const labelKey = label.toLowerCase();
+    if (labels.has(labelKey)) {
+      throw new Error(`[cx-masthead] item label "${label}" must be unique.`);
+    }
+    labels.add(labelKey);
+  });
+
+  return [...value];
 }

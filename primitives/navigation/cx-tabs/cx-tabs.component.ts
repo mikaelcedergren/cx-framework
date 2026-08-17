@@ -250,14 +250,25 @@ export class CxTabsComponent implements AfterViewInit, OnDestroy {
   }
 
   private normalizeItems(value: readonly CxTabItem[] | undefined): CxTabItem[] {
-    return [...(value ?? [])]
-      .map(item => ({
-        id: item.id?.trim() ?? '',
-        label: item.label?.trim() || item.id?.trim() || '',
+    const ids = new Set<string>();
+    return [...(value ?? [])].map((item, index) => {
+      const id = item?.id?.trim() ?? '';
+      if (!id) {
+        throw new Error(`[cx-tabs] item at index ${index} requires a non-empty id.`);
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-tabs] item id "${id}" must be unique.`);
+      }
+      ids.add(id);
+
+      const label = item?.label?.trim() ?? '';
+      return {
+        id,
+        label,
         count: this.normalizeCount(item.count),
         disabled: !!item.disabled,
-      }))
-      .filter(item => item.id && item.label);
+      };
+    });
   }
 
   private normalizeCount(value: number | undefined): number | undefined {

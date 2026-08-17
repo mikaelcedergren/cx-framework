@@ -49,6 +49,7 @@
   </ul>
 </ng-template>
 
+@if (items$().length > 0) {
 <div
   class="cx-tree-view"
   [class.cx-tree-view--compact]="density$() === 'compact'"
@@ -57,3 +58,4 @@
 >
   <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: items$() }" />
 </div>
+}

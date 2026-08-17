@@ -6,6 +6,11 @@
   gap: var(--space-md);
 }
 
+.cx-chat-thread__messages:empty,
+.cx-chat-thread__footer:empty {
+  display: none;
+}
+
 .cx-chat-thread__messages {
   display: flex;
   min-width: 0;

@@ -1,3 +1,5 @@
+@use '../../tokens/breakpoints-scale' as breakpoints;
+
 :host {
   display: block;
 }
@@ -35,6 +37,10 @@
   min-width: 0;
   align-items: center;
   flex: 0 1 auto;
+}
+
+.cx-masthead__brand:empty {
+  display: none;
 }
 
 .cx-masthead__home {
@@ -77,7 +83,7 @@
   font-size: var(--font-size-title-3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading);
-  text-overflow: clip;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -89,6 +95,14 @@
   align-items: center;
   flex: 0 0 auto;
   gap: var(--space-lg);
+}
+
+.cx-masthead__cluster:not(:has(.cx-masthead__nav, .cx-masthead__actions > *)) {
+  display: none;
+}
+
+.cx-masthead:not(:has(.cx-masthead__brand > *, .cx-masthead__nav, .cx-masthead__actions > *)) {
+  display: none;
 }
 
 .cx-masthead__nav {
@@ -227,9 +241,18 @@
   background: var(--primary-opacity);
 }
 
-/* ---- Collapse below the available inline width ---- */
+/* ---- Collapse below the available inline width ----
+ *
+ * At the system's phone breakpoint, not at a number of this component's own.
+ * The old 500px threshold had nothing to do with whether the links fit: a
+ * masthead with a handful of nav items plus an action needs roughly 650px, so
+ * between 501px and its natural width the cluster — `flex: 0 0 auto`, so it
+ * never shrinks — pushed straight past the page and gave the whole document a
+ * horizontal scrollbar. The framework has one breakpoint and one rule about it:
+ * a viewport gets the desktop UI or the phone UI. This is the phone UI.
+ */
 
-@container (max-width: 500px) {
+@container (max-width: #{breakpoints.$mobile - 1px}) {
   .cx-masthead__nav {
     display: none;
   }

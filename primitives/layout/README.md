@@ -121,6 +121,12 @@ A start group that fills the space and an end group that hugs its content, pushe
 | `gapMobile` | gap step | — |
 | `align` | `start \| center \| end \| stretch` | `center` |
 | `startWidth` | `auto \| sm \| md \| lg` | `auto` |
+| `wrap` | boolean | `false` |
+
+Set `wrap` when the end group holds controls rather than a button or two. A
+search field and a dropdown squeezed into the space a long heading leaves over
+are worse than useless — form controls clip their own content long before they
+look cramped — so let them take a row of their own instead.
 
 ```html
 <cx-split>

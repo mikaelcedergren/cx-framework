@@ -82,6 +82,10 @@
   box-sizing: border-box;
 }
 
+.cx-detail-panel__header:not(:has(.cx-detail-panel__heading-group, .cx-detail-panel__header-actions > *)) {
+  display: none;
+}
+
 .cx-detail-panel__heading-group {
   display: flex;
   min-width: 0;

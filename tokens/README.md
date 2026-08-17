@@ -24,7 +24,9 @@ The shared component API uses these `mood` values: `default`, `primary`, `accent
 
 Use `mood` for semantic intent. Use `color` only when hue itself is user-facing data or choice, such as a chart series, swatch, avatar, or tag colour. Components consume semantic roles rather than palette names.
 
-The built-in theme defaults map `--primary` to blue in Light and violet in Dark and Night. `--accent` is cyan, `--info` blue, `--success` green, `--warning` orange, and `--danger` red unless a complete active theme overrides the resolved values.
+The built-in theme defaults map `--primary` to blue in Light and Aqua and violet in Dark and Night. `--accent` is cyan except in Aqua, where it is sea green. `--info` is blue, `--success` green, `--warning` orange, and `--danger` red unless a complete active theme overrides the resolved values.
+
+Aqua is the one built-in theme that moves `--success` off the green family, onto lime. It leans its whole surface on green — accent, paper, borders, shadows — and without the move the healthy state disappears into the emphasis around it. A theme that takes a semantic hue somewhere new owes the same separation to whatever role already lived there.
 
 Surface and ink roles are:
 

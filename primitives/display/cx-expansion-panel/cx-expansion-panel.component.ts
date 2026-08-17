@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+} from '@angular/core';
 import { CxIconComponent } from '../../media/cx-icon';
 
 let nextExpansionPanelId = 0;
@@ -15,7 +22,21 @@ export type CxExpansionPanelVariant = 'default' | 'flat';
 export class CxExpansionPanelComponent {
   private readonly expandedState = signal(false);
 
-  @Input() heading = 'Severity';
+  /**
+   * The words on the toggle, and the panel's whole name.
+   *
+   * The default says what the component is, the way `cx-toast` defaults to
+   * "Notification" and `cx-drop-zone` to "Add a file". It used to say "Severity",
+   * which is a field in a security product rather than anything a disclosure is —
+   * a domain name that had leaked into a primitive and read as a mistake on every
+   * other surface.
+   *
+   * Do not "tidy" this to `''`. The heading is the trigger button's only content,
+   * so an empty one leaves that button with no accessible name at all, and the
+   * expand control announcing "Expand " into silence. A generic word is worth
+   * less than the real one and far more than nothing.
+   */
+  @Input() heading = 'Details';
   @Input() variant: CxExpansionPanelVariant = 'default';
 
   @Input()

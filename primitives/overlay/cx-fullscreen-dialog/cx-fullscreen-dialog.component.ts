@@ -41,6 +41,9 @@ export class CxFullscreenDialogComponent implements OnDestroy {
   @ViewChild('dialogRoot', { read: ElementRef })
   private dialogRootRef?: ElementRef<HTMLElement>;
 
+  @ViewChild('dialogContent', { read: ElementRef })
+  private dialogContentRef?: ElementRef<HTMLElement>;
+
   @Input() ariaLabel = 'Fullscreen dialog';
 
   @Input()

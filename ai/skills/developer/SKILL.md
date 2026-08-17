@@ -47,6 +47,8 @@ Follow the authority order in `00-start-here.md`. If binding sources at the same
 
 Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the accepted work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not an exact component name, selector, import, prop, or implementation structure.
 
+Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-facing control, optional wrapper, overlay, container, surface, or empty, loading, or error state.
+
 ## Implementation method
 
 1. Inspect the current behavior and the layer that owns it; confirm the root cause before editing.
@@ -77,6 +79,7 @@ Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolutio
 - Extend an owning component or pattern only when the product has an appropriate shared owner, the need is repeatable, and that owner is in scope and editable. If it belongs to an external or protected owner, surface the gap instead of hiding it in a consumer.
 - If resolution reaches its custom fallback and local authority permits the task to continue, document what was tried and why the departure is necessary. Do not disguise an editable shared-system defect as a custom fallback.
 - Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, `RULE-ID: interaction.control-semantics`, and `RULE-ID: content.scannable` to every user-facing change.
+- Apply `RULE-ID: system.no-empty-chrome` at the owning layer before rendering any control, optional wrapper, overlay, container, or surface.
 - Treat a control category as a state-boundary contract. View refinement may preserve view state but must never write entity data; entity, preference, and system changes use their explicit accepted semantics.
 - Return to `designer` when a named surface lacks a coherent relevant capability family or the accepted design does not establish what a control changes and for how long.
 - Apply `RULE-ID: layout.breathing-room` and `RULE-ID: layout.component-spacing` to user-facing layout.

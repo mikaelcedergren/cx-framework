@@ -34,6 +34,8 @@ RULE-ID: system.default-normal SCOPE: design-system-component TYPE: MUST TOPIC: 
 
 RULE-ID: system.reachable-states SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states.
 
+RULE-ID: system.no-empty-chrome SCOPE: global TYPE: MUST TOPIC: state RULE: No user-facing element may render empty or without enough visible content or an explicit visible state to explain its purpose. DESCRIPTION: This includes every control, overlay, container, surface, and optional wrapper. Accessible naming alone is insufficient: each interactive control needs visible text, an icon, or another perceivable signifier. An empty optional wrapper does not render. A dialog, dropdown, popover, or similar surface without meaningful content either shows a meaningful empty, loading, or error state or does not render.
+
 RULE-ID: system.invalid-combinations SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make invalid supported-option combinations fail clearly at the owning component. DESCRIPTION: Do not silently render broken or misleading chrome.
 
 RULE-ID: system.visual-behavior-contract SCOPE: global TYPE: MUST TOPIC: consistency RULE: Make elements that look alike behave alike. DESCRIPTION: Visual similarity teaches a behavioral expectation that must transfer across the product.

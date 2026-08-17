@@ -128,13 +128,16 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   protected readonly size$ = this.sizeState.asReadonly();
   protected readonly disabled$ = this.disabledState.asReadonly();
   protected readonly buttons$ = computed<CxButtonGroupButton[]>(() =>
-    this.availableValuesState().map(option => ({
-      id: option.id,
-      name: option.label ?? option.id,
-      icon: option.icon,
-      disabled: !!option.disabled,
-      selected: option.id === this.valueState(),
-    })),
+    this.availableValuesState().map(option => {
+      const name = option.label?.trim() || option.id?.trim() || '';
+      return {
+        id: option.id,
+        name,
+        icon: option.icon,
+        disabled: !!option.disabled,
+        selected: option.id === this.valueState(),
+      };
+    }),
   );
 
   public ngAfterViewInit(): void {

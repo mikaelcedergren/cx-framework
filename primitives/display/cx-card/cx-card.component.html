@@ -27,7 +27,7 @@
     </div>
 
     <div class="cx-card__header-actions">
-      <div class="cx-card__meta">
+      <div #cardMeta class="cx-card__meta">
         <ng-content select="[slot=meta], [cxCardMeta]" />
       </div>
 
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <div class="cx-card__content">
+  <div #cardContent class="cx-card__content">
     <ng-content />
   </div>
 </div>

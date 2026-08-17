@@ -77,26 +77,13 @@ export class CxBreadcrumbsComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   public set items(value: readonly CxBreadcrumbItem[] | undefined) {
-    const normalizedItems = (value ?? [])
-      .filter(item => item?.id && item?.label)
-      .map(item => ({
-        id: item.id,
-        label: item.label,
-        href: item.href,
-        routerLink: item.routerLink,
-        fragment: item.fragment,
-        target: item.target,
-        rel: item.rel,
-        selectedOptionId: item.selectedOptionId,
-        options: (item.options ?? []).filter(option => option?.id && option?.label),
-      }));
-    this.itemsState.set(normalizedItems);
+    this.itemsState.set(this.normalizeItems(value));
     this.scheduleCompactSync();
   }
 
   @Input()
   public set currentId(value: string | undefined) {
-    this.currentIdState.set(value);
+    this.currentIdState.set(value?.trim() || undefined);
     this.scheduleCompactSync();
   }
 
@@ -191,6 +178,53 @@ export class CxBreadcrumbsComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.optionSelect.emit({ itemId: item.id, optionId });
+  }
+
+  private normalizeItems(value: readonly CxBreadcrumbItem[] | undefined): CxBreadcrumbItem[] {
+    const ids = new Set<string>();
+    return (value ?? []).map((item, index) => {
+      const id = item?.id?.trim() ?? '';
+      if (!id) {
+        throw new Error(`[cx-breadcrumbs] item at index ${index} requires a non-empty id.`);
+      }
+      if (ids.has(id)) {
+        throw new Error(`[cx-breadcrumbs] item id "${id}" must be unique.`);
+      }
+      ids.add(id);
+
+      const label = item?.label?.trim() ?? '';
+      return {
+        ...item,
+        id,
+        label,
+        selectedOptionId: item.selectedOptionId?.trim() || undefined,
+        options: this.normalizeOptions(item.options, id),
+      };
+    });
+  }
+
+  private normalizeOptions(
+    value: readonly CxBreadcrumbOption[] | undefined,
+    itemId: string,
+  ): readonly CxBreadcrumbOption[] {
+    const ids = new Set<string>();
+    return (value ?? []).map((option, index) => {
+      const id = option?.id?.trim() ?? '';
+      if (!id) {
+        throw new Error(
+          `[cx-breadcrumbs] option at index ${index} for item "${itemId}" requires a non-empty id.`,
+        );
+      }
+      if (ids.has(id)) {
+        throw new Error(
+          `[cx-breadcrumbs] option id "${id}" for item "${itemId}" must be unique.`,
+        );
+      }
+      ids.add(id);
+
+      const label = option?.label?.trim() ?? '';
+      return { ...option, id, label };
+    });
   }
 
   private scheduleCompactSync(): void {

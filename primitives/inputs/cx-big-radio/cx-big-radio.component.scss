@@ -22,6 +22,11 @@
     color var(--motion-fast) ease;
 }
 
+.cx-big-radio--empty,
+.cx-big-radio__content:empty {
+  display: none;
+}
+
 .cx-big-radio--selected {
   background: var(--surface);
   box-shadow: var(--shadow-low);

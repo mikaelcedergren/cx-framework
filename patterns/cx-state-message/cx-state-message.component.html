@@ -1,4 +1,7 @@
-<div class="cx-state-message" [class.cx-state-message--horizontal]="layout === 'horizontal'">
+<div
+  class="cx-state-message"
+  [class.cx-state-message--horizontal]="layout === 'horizontal'"
+>
   @if (showSpinner) {
     <div class="cx-state-message__icon">
       <cx-spinner size="xlarge" mood="default" />
@@ -9,7 +12,7 @@
     </div>
   }
 
-  <div class="cx-state-message__body">
+  <div #messageBody class="cx-state-message__body">
     @if (hasHeading) {
       <div class="cx-state-message__heading">{{ resolvedHeading }}</div>
     }
@@ -18,7 +21,7 @@
       <div class="cx-state-message__text">{{ resolvedDescription }}</div>
     }
 
-    <div class="cx-state-message__content"><ng-content /></div>
+    <ng-content />
 
     @if (hasActions()) {
       <div class="cx-state-message__actions">

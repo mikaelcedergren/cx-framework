@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  signal,
+} from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 
@@ -70,6 +77,9 @@ const DEFAULT_STEP = CxLogStep.empty();
 export class CxLogStepComponent {
   private stepState = DEFAULT_STEP;
 
+  @ViewChild('logContent', { read: ElementRef })
+  private logContentRef?: ElementRef<HTMLElement>;
+
   @Input()
   public set step(step: CxLogStep | undefined) {
     this.stepState = step ?? DEFAULT_STEP;
@@ -82,4 +92,5 @@ export class CxLogStepComponent {
   @Input() datestamp = '';
   @Input() description = '';
   @Input() author = '';
+
 }

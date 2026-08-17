@@ -18,15 +18,53 @@ body {
 
 html {
   background: var(--surface);
+
+  // Anchors animate to their target rather than jumping. One declaration covers
+  // every route to the same behaviour — a plain `<a href="#id">`, a component
+  // calling `scrollIntoView()`, and a router with anchor scrolling enabled — so
+  // nothing has to be wired up per page. Pair it with `.cx-scroll-target` on
+  // anchored sections wherever the page has sticky chrome: with an instant jump
+  // nobody notices a heading landing under a masthead, with an animation you
+  // watch it slide under. The reduced-motion block at the end of this file
+  // turns it back off.
+  scroll-behavior: smooth;
+
+  // `.cx-full-bleed` is 100vw, and 100vw does not subtract a classic scrollbar
+  // the way the content width does — so on any platform showing one (macOS with
+  // a mouse attached, Windows), every full-bleed band is a scrollbar wider than
+  // the page and the document scrolls sideways. `clip` rather than `hidden` on
+  // purpose: `hidden` makes this a scroll container and breaks `position:
+  // sticky` on everything inside it. Wide content scrolls in its own container
+  // here — `.cx-table` already does — so nothing relies on the document
+  // scrolling sideways.
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
+}
+
+// Containers own the gaps: text blocks carry no outer margin of their own, so a
+// raw <p> or heading composes cleanly inside cards, stacks, and grids. Editorial
+// surfaces (.cx-article, the markdown preview/editor) re-add flow margins where
+// prose wants them.
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+body {
   background: var(--surface);
   color: var(--ink);
   font-family: var(--font-family-base);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
   font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

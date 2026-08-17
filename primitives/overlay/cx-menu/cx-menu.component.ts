@@ -149,6 +149,24 @@ function childItemsFor(item: CxMenuItem): readonly CxMenuItem[] {
   return item.items ?? [];
 }
 
+function validateMenuItems(items: readonly CxMenuItem[], seenIds = new Set<string>()): void {
+  if (!Array.isArray(items)) {
+    throw new Error('[cx-menu] items must be an array.');
+  }
+  const preservesPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
+  for (const item of items) {
+    const id = item.id?.trim();
+    if (!id) {
+      throw new Error('[cx-menu] every item requires a non-empty id.');
+    }
+    if (seenIds.has(id)) {
+      throw new Error(`[cx-menu] item ids must be unique; received "${id}" more than once.`);
+    }
+    seenIds.add(id);
+    validateMenuItems(childItemsFor(item), seenIds);
+  }
+}
+
 function resolveMenuGroups(groups: readonly CxMenuGroup[]): CxResolvedMenuGroup[] {
   return groups.map((group, index) => ({
     ...group,
@@ -335,12 +353,22 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
   @Input()
   public set items(value: readonly CxMenuItem[] | undefined) {
-    this.itemsState.set([...(value ?? [])]);
+    const items = value ?? [];
+    validateMenuItems(items);
+    this.itemsState.set([...items]);
   }
 
   @Input()
   public set groups(value: readonly CxMenuGroup[] | undefined) {
-    this.groupsState.set([...(value ?? [])]);
+    const groups = value ?? [];
+    if (!Array.isArray(groups)) {
+      throw new Error('[cx-menu] groups must be an array.');
+    }
+    const seenIds = new Set<string>();
+    for (const group of groups) {
+      validateMenuItems(group.items, seenIds);
+    }
+    this.groupsState.set([...groups]);
   }
 
   @Input()

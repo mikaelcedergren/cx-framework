@@ -12,6 +12,10 @@
   box-sizing: border-box;
 }
 
+.cx-inline:empty {
+  display: none;
+}
+
 @include layout.gap-attr('.cx-inline', $mobile-attr: 'data-gap-mobile');
 @include layout.align-attr('.cx-inline');
 @include layout.justify-attr('.cx-inline');

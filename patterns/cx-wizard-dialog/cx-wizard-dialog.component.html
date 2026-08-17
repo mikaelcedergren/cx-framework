@@ -1,5 +1,10 @@
 @if (isOpen$()) {
-  <div class="cx-wizard-dialog-backdrop" role="presentation" (click)="onBackdropClick($event)">
+  <div
+    #dialogBackdrop
+    class="cx-wizard-dialog-backdrop"
+    role="presentation"
+    (click)="onBackdropClick($event)"
+  >
     <section
       class="cx-wizard-dialog"
       [class.cx-wizard-dialog--large]="isLarge$()"
@@ -13,7 +18,7 @@
     >
       @if (showFeedback$()) {
         <div class="cx-wizard-dialog__feedback">
-          <div class="cx-wizard-dialog__feedback-content">
+          <div #feedbackContent class="cx-wizard-dialog__feedback-content">
             <ng-content select="[cxWizardDialogFeedback], [slot=feedback]" />
           </div>
 
@@ -59,7 +64,7 @@
                 <div class="cx-wizard-dialog__content-divider" aria-hidden="true"></div>
               </div>
 
-              <div class="cx-wizard-dialog__content-body">
+              <div #stepContent class="cx-wizard-dialog__content-body">
                 @if (activeTemplate$(); as activeTemplate) {
                   <ng-container [ngTemplateOutlet]="activeTemplate" />
                 } @else {

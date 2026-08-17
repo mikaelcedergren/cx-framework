@@ -1,3 +1,4 @@
+@if (pathItems$().length > 0) {
 <nav class="cx-breadcrumbs" [attr.aria-label]="ariaLabel$()">
   <ng-template #breadcrumbItem let-item let-last="last" let-kind="kind">
     <li
@@ -177,3 +178,4 @@
     }
   </ol>
 </nav>
+}

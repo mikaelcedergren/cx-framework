@@ -31,4 +31,5 @@ export class CxItemCardComponent {
   protected get hasDescription(): boolean {
     return Boolean(this.description?.trim());
   }
+
 }

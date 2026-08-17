@@ -29,7 +29,7 @@
       class="cx-fullscreen-dialog"
       (animationend)="onCanvasAnimationEnd($event)"
     >
-      <div class="cx-fullscreen-dialog__content">
+      <div #dialogContent class="cx-fullscreen-dialog__content">
         <ng-content />
       </div>
     </section>

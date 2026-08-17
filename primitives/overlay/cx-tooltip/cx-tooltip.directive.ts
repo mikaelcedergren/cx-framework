@@ -31,7 +31,11 @@ const CX_TOOLTIP_CLOSE_GRACE_MS = 120;
 const CX_TOOLTIP_OVERFLOW_ATTRIBUTE = 'data-cx-tooltip-overflow';
 const CX_TOOLTIP_OVERFLOW_TARGET = `[${CX_TOOLTIP_OVERFLOW_ATTRIBUTE}]`;
 const CX_TOOLTIP_OVERFLOW_TEXT_ATTRIBUTE = 'data-cx-tooltip-text';
-const CX_TOOLTIP_OVERFLOW_CLIPPED_CLASS = 'cx-overflow-fade--clipped';
+// State hook, not a treatment: it marks the targets this trigger measured as
+// clipped, so the disclosure is inspectable and testable. Clipped text gets its
+// ellipsis from the component's own `text-overflow`, which the browser draws
+// only while the text really does not fit — never from this class.
+const CX_TOOLTIP_OVERFLOW_CLIPPED_CLASS = 'cx-overflow-clipped';
 const CX_TOOLTIP_FOCUS_OWNER = [
   'a[href]',
   'area[href]',
@@ -771,8 +775,23 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     const clipsInline = style.overflowX === 'hidden' || style.overflowX === 'clip';
     const clipsBlock = style.overflowY === 'hidden' || style.overflowY === 'clip';
     const inlineClipped = clipsInline && target.scrollWidth > target.clientWidth + 1;
-    const blockClipped = clipsBlock && target.scrollHeight > target.clientHeight + 1;
+    const blockClipped =
+      clipsBlock && target.scrollHeight > target.clientHeight + this.blockTolerance(style);
     return inlineClipped || blockClipped;
+  }
+
+  /**
+   * How much block overflow to forgive before calling the text clipped.
+   *
+   * A line box only as tall as the font size — `line-height: 1` — is shorter
+   * than the glyphs the face actually draws, so a single fully visible line
+   * reports a couple of pixels of block overflow on its own. That is the font's
+   * own leading, not hidden text. Real block clipping hides at least part of a
+   * line, so half a line is the honest place to draw the boundary.
+   */
+  private blockTolerance(style: CSSStyleDeclaration): number {
+    const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) || 0;
+    return Math.max(1, lineHeight / 2);
   }
 
   private resolveDescriptionTarget(eventTarget?: EventTarget | null): HTMLElement {

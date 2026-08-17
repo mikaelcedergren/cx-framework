@@ -19,6 +19,10 @@ Use this shape for new entries:
 
 Keep entries short. The important part is whether an icon's purpose, name, or availability changed.
 
+## 2026-08-16
+
+- Added `aqua-mode.svg` — theme icon for the Aqua appearance, alongside `light-mode`, `dark-mode`, and `night-mode`. A water droplet: the theme is a light theme on green-tinted paper, with blue actions and sea-green emphasis.
+
 ## 2026-06-27
 
 - Restored `chevrons-right.svg` — double chevron used by `cx-tabs`. Its source SVG was missing while the generated `manifest.ts` still carried a stale entry for it; recreated from the manifest's path data so the source set, the manifest, and `cx-tabs` are consistent again.

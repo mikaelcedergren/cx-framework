@@ -12,6 +12,10 @@
   box-sizing: border-box;
 }
 
+.cx-grid:empty {
+  display: none;
+}
+
 @include layout.grid-columns-attr('.cx-grid', $mobile-attr: 'data-columns-mobile');
 @include layout.gap-attr('.cx-grid', 'data-column-gap', column-gap, $mobile-attr: 'data-gap-mobile');
 @include layout.gap-attr('.cx-grid', 'data-row-gap', row-gap, $mobile-attr: 'data-gap-mobile');

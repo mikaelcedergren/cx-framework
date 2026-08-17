@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, signal } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { CxIconButtonComponent } from '../../actions/cx-icon-button';
@@ -17,12 +17,13 @@ const TOAST_DURATION_MS = 5000;
   styleUrl: './cx-toast.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxToastComponent implements OnDestroy {
+export class CxToastComponent implements OnChanges, OnDestroy {
   private hideTimer: number | undefined;
   private openFrame: number | undefined;
   private timerFrame: number | undefined;
   private timerStartedAt: number | undefined;
   private remainingTime = TOAST_DURATION_MS;
+  private openInput = false;
   private requestedOpen = false;
   private dismissibleValue = false;
   private pointerInside = false;
@@ -62,7 +63,8 @@ export class CxToastComponent implements OnDestroy {
 
   @Input()
   public set open(value: boolean) {
-    this.setOpen(Boolean(value));
+    this.openInput = Boolean(value);
+    this.setOpen(this.openInput);
   }
 
   @Input()
@@ -152,6 +154,10 @@ export class CxToastComponent implements OnDestroy {
       default:
         return 'primary';
     }
+  }
+
+  public ngOnChanges(): void {
+    this.setOpen(this.openInput);
   }
 
   ngOnDestroy(): void {
@@ -256,6 +262,7 @@ export class CxToastComponent implements OnDestroy {
     if (!this.requestedOpen) {
       return;
     }
+    this.openInput = false;
     this.setOpen(false);
     this.openChange.emit(false);
   }
