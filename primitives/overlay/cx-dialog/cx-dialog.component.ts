@@ -1,5 +1,5 @@
 import { A11yModule, CdkTrapFocus, InteractivityChecker } from '@angular/cdk/a11y';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,7 +35,6 @@ export type CxDialogSize = 'small' | 'default' | 'large';
 @Component({
   selector: 'cx-dialog',
   imports: [
-    CommonModule,
     A11yModule,
     CxButtonComponent,
     CxIconButtonComponent,

@@ -64,14 +64,13 @@
         </header>
         }
 
-        @if (hasDescription()) {
         <div class="cx-dialog__body">
-          <p class="cx-dialog__description" [id]="descriptionId">{{ description }}</p>
-          <ng-container [ngTemplateOutlet]="dialogBody" />
+          @if (hasDescription()) {
+            <p class="cx-dialog__description" [id]="descriptionId">{{ description }}</p>
+          }
+
+          <ng-content select="[body]" />
         </div>
-        } @else {
-          <ng-container [ngTemplateOutlet]="dialogBody" />
-        }
       </div>
 
       <footer
@@ -113,7 +112,3 @@
     </section>
   </div>
 }
-
-<ng-template #dialogBody>
-  <ng-content select="[body]" />
-</ng-template>

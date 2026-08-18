@@ -57,6 +57,8 @@ purpose → role → information → component role → local implementation →
 
 [MUST] A shared component owns its internal structure, presentation, internal spacing, reachable states, and interaction behavior. A container owns placement, width, surrounding gap, and page composition.
 
+[MUST] A shared component is responsible for being correct, complete, and predictable; using it correctly is the consumer's responsibility. A component never adds a defensive branch, tolerated bad input, or absorbing structure so that consumer misuse still looks acceptable. It makes correct use obvious, fails clearly otherwise, and the misuse is fixed at the call site.
+
 [MUST] Use documented component boundaries. Do not reach into internal structure through deep selectors, inline visual patches, specificity escalation, duplicated token values, or wrapper tricks.
 
 [MUST] Keep a focused change within its accepted owner. Using another component's supported behavior does not expand scope; changing that component does.
@@ -184,6 +186,7 @@ purpose → role → information → component role → local implementation →
 - a copied component from another platform despite an adequate local capability
 - a feature-level replacement for an established shared component or pattern
 - a consumer reaching into shared-component internals
+- a shared component defending itself against consumer misuse instead of the consumer being fixed
 - an unexplained departure from local defaults or established usage
 - raw visual values where suitable semantic tokens exist
 - multiple primary actions in one action region
