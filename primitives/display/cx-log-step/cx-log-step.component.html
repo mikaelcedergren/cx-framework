@@ -14,7 +14,19 @@
   @if (step.text.trim()) {
     <div class="cx-log-step__title-row">
       <div class="cx-log-step__text">
-        {{ step.text }}
+        @if (routerLink(); as routerLink) {
+          <a class="cx-log-step__link" [routerLink]="routerLink">{{ step.text }}</a>
+        } @else if (href(); as href) {
+          <a
+            class="cx-log-step__link"
+            [href]="href"
+            [attr.target]="target()"
+            [attr.rel]="rel()"
+            >{{ step.text }}</a
+          >
+        } @else {
+          {{ step.text }}
+        }
         @if (author.trim()) {
           <span class="cx-log-step__author"> by {{ author }}</span>
         }

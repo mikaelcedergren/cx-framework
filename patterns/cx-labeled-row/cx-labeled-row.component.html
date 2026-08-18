@@ -26,6 +26,7 @@
           <div class="cx-labeled-row__field-shell">
             <cx-text-field
               [label]="''"
+              [ariaLabel]="label"
               [value]="content.value"
               [prependText]="content.prependText"
               [appendText]="content.appendText"
@@ -41,6 +42,7 @@
           <div class="cx-labeled-row__field-shell">
             <cx-text-area
               [label]="''"
+              [ariaLabel]="label"
               [value]="content.value"
               [hint]="content.hint"
               [minLines]="content.minLines ?? 5"
@@ -56,6 +58,7 @@
           <div class="cx-labeled-row__field-shell">
             <cx-dropdown
               [label]="''"
+              [ariaLabel]="label"
               [availableValues]="content.options"
               [value]="content.value"
               [values]="content.values"

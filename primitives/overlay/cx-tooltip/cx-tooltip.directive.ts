@@ -22,6 +22,7 @@ import {
   OverlayRef,
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
+import { CxOverlayStateService } from '../overlay-state';
 import { CxTooltipSurfaceComponent } from './cx-tooltip-surface.component';
 
 let cxTooltipId = 0;
@@ -277,13 +278,13 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly overflowObserver = inject(CxTooltipOverflowObserver);
   private readonly interactionCoordinator = inject(CxTooltipInteractionCoordinator);
+  private readonly overlayState = inject(CxOverlayStateService);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly viewReady = signal(false);
   private readonly tooltipId = `cx-tooltip-${++cxTooltipId}`;
 
   private triggerHovered = false;
   private triggerFocused = false;
-  private surfaceHovered = false;
   private escapeDismissed = false;
   private open = false;
   private openTimer?: number;
@@ -301,7 +302,6 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private overlayRef?: OverlayRef;
   private positionStrategy?: FlexibleConnectedPositionStrategy;
   private surfaceRef?: ComponentRef<CxTooltipSurfaceComponent>;
-  private surfaceHoverSubscription?: { unsubscribe(): void };
   private positionSubscription?: { unsubscribe(): void };
 
   constructor() {
@@ -341,6 +341,16 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
         this.openNow();
       } else if (this.triggerHovered) {
         this.requestOpen(delay);
+      }
+    });
+
+    effect(() => {
+      // Read the overlay state first, unconditionally: `open` is a plain
+      // boolean, and an effect that short-circuits before its only signal
+      // read never registers the dependency and never re-runs.
+      const ownerOpenedOverlay = this.overlayState.ownsOpenOverlay(this.host);
+      if (ownerOpenedOverlay && this.open) {
+        this.closeNow();
       }
     });
   }
@@ -401,7 +411,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   protected onTriggerMouseLeave(): void {
     this.triggerHovered = false;
     this.clearDismissalWhenIdle();
-    if (!this.open && !this.surfaceHovered) {
+    if (!this.open) {
       this.hoveredOverflowTarget = undefined;
     }
     this.scheduleClose();
@@ -412,6 +422,12 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     if (this.host.matches(CX_TOOLTIP_FOCUS_OWNER) && event.target !== this.host) {
       // Focus belongs to an independent nested action (for example a field's
       // Clear button), not to the host trigger described by this tooltip.
+      return;
+    }
+    if (!this.isKeyboardFocus(event.target)) {
+      // Pointer-driven focus must not raise or pin the tooltip: the pointer
+      // user already had hover, and click focus regularly precedes the trigger
+      // opening its own overlay. Only keyboard focus describes.
       return;
     }
     this.triggerFocused = true;
@@ -441,6 +457,18 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     this.triggerFocused = false;
     this.clearDismissalWhenIdle();
     this.scheduleClose();
+  }
+
+  private isKeyboardFocus(target: EventTarget | null): boolean {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+    try {
+      return target.matches(':focus-visible');
+    } catch {
+      // An engine without :focus-visible keeps the older show-on-any-focus behavior.
+      return true;
+    }
   }
 
   private onEscapeKey(): void {
@@ -491,9 +519,6 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
       this.surfaceRef = overlayRef.attach(
         new ComponentPortal(CxTooltipSurfaceComponent, this.viewContainerRef),
       );
-      this.surfaceHoverSubscription = this.surfaceRef.instance.hovered.subscribe(hovered => {
-        this.onSurfaceHoverChange(hovered);
-      });
     }
     this.open = true;
     this.startEscapeHandling();
@@ -533,19 +558,9 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     this.overlayRef?.updatePosition();
   }
 
-  private onSurfaceHoverChange(hovered: boolean): void {
-    this.surfaceHovered = hovered;
-    if (hovered) {
-      this.clearCloseTimer();
-      return;
-    }
-    this.clearDismissalWhenIdle();
-    this.scheduleClose();
-  }
-
   private scheduleClose(): void {
     this.clearOpenTimer();
-    if (this.triggerHovered || this.triggerFocused || this.surfaceHovered) {
+    if (this.triggerHovered || this.triggerFocused) {
       return;
     }
     if (!this.open) {
@@ -557,7 +572,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     }
     this.closeTimer = view.setTimeout(() => {
       this.closeTimer = undefined;
-      if (!this.triggerHovered && !this.triggerFocused && !this.surfaceHovered) {
+      if (!this.triggerHovered && !this.triggerFocused) {
         this.closeNow();
       }
     }, CX_TOOLTIP_CLOSE_GRACE_MS);
@@ -565,7 +580,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
 
   private scheduleOverflowTargetClose(): void {
     this.clearOpenTimer();
-    if (!this.open || this.triggerFocused || this.surfaceHovered) {
+    if (!this.open || this.triggerFocused) {
       return;
     }
     const view = this.host.ownerDocument.defaultView;
@@ -574,7 +589,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     }
     this.closeTimer = view.setTimeout(() => {
       this.closeTimer = undefined;
-      if (!this.triggerFocused && !this.surfaceHovered && !this.overflowAllowsOpen()) {
+      if (!this.triggerFocused && !this.overflowAllowsOpen()) {
         this.closeNow();
       }
     }, CX_TOOLTIP_CLOSE_GRACE_MS);
@@ -583,13 +598,12 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private closeNow(): void {
     this.clearOpenTimer();
     this.clearCloseTimer();
-    this.surfaceHovered = false;
     this.clearDismissalWhenIdle();
     this.removeDescription();
     if (!this.open) {
       this.releaseOverlay();
       this.stopEscapeHandlingIfIdle();
-      if (!this.triggerHovered && !this.surfaceHovered) {
+      if (!this.triggerHovered) {
         this.hoveredOverflowTarget = undefined;
       }
       return;
@@ -607,13 +621,14 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
       !this.cxTooltipDisabled() &&
       !!this.effectiveMessageText() &&
       !this.escapeDismissed &&
+      !this.overlayState.ownsOpenOverlay(this.host) &&
       this.overflowAllowsOpen() &&
-      (this.triggerHovered || this.triggerFocused || this.surfaceHovered)
+      (this.triggerHovered || this.triggerFocused)
     );
   }
 
   private clearDismissalWhenIdle(): void {
-    if (!this.triggerHovered && !this.triggerFocused && !this.surfaceHovered) {
+    if (!this.triggerHovered && !this.triggerFocused) {
       this.escapeDismissed = false;
     }
   }
@@ -698,9 +713,6 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
       return true;
     }
     if (this.triggerFocused) {
-      return this.clippedOverflowTargets.size > 0;
-    }
-    if (this.surfaceHovered) {
       return this.clippedOverflowTargets.size > 0;
     }
     if (this.hoveredOverflowTarget) {
@@ -947,8 +959,6 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   }
 
   private releaseOverlay(): void {
-    this.surfaceHoverSubscription?.unsubscribe();
-    this.surfaceHoverSubscription = undefined;
     this.positionSubscription?.unsubscribe();
     this.positionSubscription = undefined;
     this.overlayRef?.dispose();

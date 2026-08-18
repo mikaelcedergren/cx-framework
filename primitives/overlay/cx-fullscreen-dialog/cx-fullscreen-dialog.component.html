@@ -9,7 +9,6 @@
     aria-modal="true"
     [attr.aria-label]="resolvedAriaLabel()"
     [attr.tabindex]="dialogTabIndex()"
-    (keydown)="onEscape($event)"
   >
     @if (closeButton) {
       <button

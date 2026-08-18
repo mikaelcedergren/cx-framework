@@ -35,7 +35,7 @@
   padding: 0;
 }
 
-:host(.cx-card-host--border) .cx-card__content {
+:host(.cx-card-host--border) :is(.cx-card__viewport, .cx-card__content) {
   border-radius: calc(var(--radius-lg) - var(--border-width));
 }
 
@@ -65,7 +65,7 @@
   outline: none;
 }
 
-:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__content) {
+:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__viewport) {
   pointer-events: none;
 }
 
@@ -219,12 +219,38 @@
 
 // A heading-only card (e.g. a one-line note) projects no body; drop the empty
 // content surface the same way an unused header row is dropped above.
-.cx-card__content:empty {
+.cx-card__viewport:has(> .cx-card__content:empty) {
   display: none;
 }
 
 .cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(.cx-card__content:empty) {
   display: none;
+}
+
+// The tab row is a dedicated flush section between the header and the content
+// island: it sits on the card frame like the header does, outside the island's
+// padding. Tabs projected inside the content keep the normal padded treatment.
+.cx-card__tabs {
+  min-width: 0;
+  flex: 0 0 auto;
+  padding-inline: var(--space-sm);
+}
+
+.cx-card__viewport {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  transition: max-height var(--motion-base) var(--ease-out-in);
+}
+
+.cx-card__viewport:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(-1 * var(--outline-tab-offset));
 }
 
 .cx-card__content {
@@ -239,4 +265,70 @@
   background: var(--surface);
   padding: var(--space-sm);
   box-sizing: border-box;
+}
+
+// An expandable card promises the content its natural height; without this the
+// collapsed viewport would squeeze the content instead of clipping it, and the
+// measured height would collapse to the clamp.
+.cx-card__viewport--expandable .cx-card__content {
+  flex-shrink: 0;
+}
+
+// The fade is the truncation cue: it tells the reader there is more before they
+// find the control. It fades to the content island's own surface.
+.cx-card__viewport--clamped::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
+}
+
+.cx-card__expand {
+  display: flex;
+  min-height: var(--controller-size);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+:host(.cx-card-host--border) .cx-card__expand {
+  border-radius: 0 0 calc(var(--radius-lg) - var(--border-width)) calc(var(--radius-lg) - var(--border-width));
+}
+
+.cx-card__expand:hover {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+.cx-card__expand:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-card__expand-chevron {
+  flex: 0 0 auto;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.cx-card__expand[aria-expanded='true'] .cx-card__expand-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-card__viewport,
+  .cx-card__expand-chevron {
+    transition: none;
+  }
 }

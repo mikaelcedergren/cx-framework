@@ -42,6 +42,8 @@ RULE-ID: system.visual-behavior-contract SCOPE: global TYPE: MUST TOPIC: consist
 
 ## Accessibility and perception
 
+RULE-ID: accessibility.usability-precedence SCOPE: global TYPE: MUST TOPIC: accessibility RULE: When an assistive-technology accommodation genuinely conflicts with core usability for the product's primary users, usability wins. DESCRIPTION: These products serve an advanced expert audience. Provide accessibility wherever it coexists with the best interaction — which is nearly always — but do not degrade pointer precision, interaction speed, or direct manipulation to preserve an accommodation such as screen-reader or screen-magnification support. Dropping an accommodation is a deliberate, recorded decision at the owning component, never a shortcut taken silently; the accessibility rules below continue to apply wherever no such conflict exists.
+
 RULE-ID: accessibility.keyboard SCOPE: interactive TYPE: MUST TOPIC: accessibility RULE: Make every interactive element keyboard reachable. DESCRIPTION: Links, controls, menus, dialogs, and composite widgets must support appropriate keyboard operation.
 
 RULE-ID: accessibility.focus SCOPE: interactive TYPE: MUST TOPIC: accessibility RULE: Keep keyboard focus clearly visible. DESCRIPTION: The focused element and current position must be perceivable without relying on pointer hover.
@@ -130,6 +132,8 @@ RULE-ID: density.data-not-chrome SCOPE: data-display TYPE: SHOULD TOPIC: density
 
 RULE-ID: content.scannable SCOPE: product-interface TYPE: MUST TOPIC: hierarchy RULE: Make operational interfaces scannable before they are exhaustive. DESCRIPTION: Lead with the point, group related information, keep labels and text blocks brief, and reveal supporting detail only when it helps the task, consequence, recovery, or accessibility; when additional explanation has no demonstrated value, omit it.
 
+RULE-ID: content.body-is-primary SCOPE: product-interface TYPE: MUST TOPIC: hierarchy RULE: Treat body content as primary content, never as supporting text to de-emphasize. DESCRIPTION: The content a surface exists to show keeps the default type size and the prominent text color. Supporting data means metadata in a footer, a side note, or a hint, and is signalled by the muted color and by placement, not by shrinking it; body text under a heading is content, not supporting data.
+
 RULE-ID: surfaces.one-boundary SCOPE: visual-group TYPE: SHOULD TOPIC: surfaces RULE: Keep each visual group to one primary boundary; do not put a card, box, or bordered container inside another. DESCRIPTION: Flatten the composition with spacing, typography, dividers, or one shared surface instead of stacking borders, fills, shadows, and containers. EXCEPT: Nest a surface only when the user or product contract explicitly requires a distinct semantic plane.
 
 RULE-ID: surfaces.floating-depth SCOPE: floating-surface TYPE: SHOULD TOPIC: surfaces RULE: Reserve shadow for floating elements and real elevation. DESCRIPTION: Grounded regions should rely on surfaces, spacing, opacity, and restrained borders.
@@ -156,7 +160,11 @@ RULE-ID: surfaces.default-plane SCOPE: visual-group TYPE: SHOULD TOPIC: surfaces
 
 RULE-ID: typography.structure SCOPE: global TYPE: MUST TOPIC: typography RULE: Use typography to represent real document hierarchy. DESCRIPTION: Do not use heading semantics, weight, or decorative letter spacing merely to make text louder.
 
+RULE-ID: typography.size-ladder SCOPE: global TYPE: MUST TOPIC: typography RULE: Use the default type and component size as the standard; small requires a proper stated reason, and tiny is used only where the product owner has explicitly defined its use. DESCRIPTION: Default is not a starting point to shrink from. Choose a small size only for a specific, nameable reason in that design, never as a habit or to mark text as secondary; an agent never chooses a tiny size on its own. Reusing an existing class or example does not launder its size: check what a copied style resolves to before adopting it.
+
 ## Forms and validation behavior
+
+RULE-ID: forms.horizontal-layout SCOPE: forms TYPE: SHOULD TOPIC: layout RULE: Arrange form controls as horizontal labeled rows by default. DESCRIPTION: Keep labels in one stable leading column with their controls beside them so related fields scan quickly; use the consuming product's established labeled-row pattern when it exists. EXCEPT: Stack a label above its control when the product explicitly requires a vertical form or a documented narrow-layout constraint makes the horizontal row unreadable.
 
 RULE-ID: forms.label SCOPE: form-control TYPE: MUST TOPIC: forms RULE: Give every form control a persistent accessible label. DESCRIPTION: The control must remain understandable when empty, populated, focused, or reporting an error.
 

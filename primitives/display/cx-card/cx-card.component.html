@@ -51,7 +51,47 @@
     </div>
   </div>
 
-  <div #cardContent class="cx-card__content">
-    <ng-content />
+  @if (hasTabs) {
+    <cx-tabs
+      class="cx-card__tabs"
+      [items]="tabs ?? []"
+      [selectedId]="selectedTabId"
+      [ariaLabel]="resolvedTabsAriaLabel"
+      [controlsId]="contentId"
+      [transparent]="true"
+      [divided]="false"
+      (selectedIdChange)="onTabSelect($event)"
+    />
+  }
+
+  <div
+    #cardViewport
+    class="cx-card__viewport"
+    [id]="contentId"
+    [class.cx-card__viewport--expandable]="expansionEnabled"
+    [class.cx-card__viewport--clamped]="clamped()"
+    [style.maxHeight.px]="viewportMaxHeight()"
+    [attr.role]="hasTabs ? 'tabpanel' : null"
+    [attr.aria-labelledby]="hasTabs ? selectedTabButtonId : null"
+    [attr.aria-label]="hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null"
+    [attr.tabindex]="hasTabs ? '0' : null"
+    (focusin)="onViewportFocusIn($event)"
+  >
+    <div #cardContent class="cx-card__content">
+      <ng-content />
+    </div>
   </div>
+
+  @if (overflowing()) {
+    <button
+      type="button"
+      class="cx-card__expand"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-controls]="contentId"
+      [attr.aria-label]="expandAriaLabel()"
+      (click)="toggleExpanded()"
+    >
+      <cx-icon class="cx-card__expand-chevron" name="chevron-down" [size]="16" />
+    </button>
+  }
 </div>

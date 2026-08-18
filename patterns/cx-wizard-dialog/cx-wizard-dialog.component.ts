@@ -7,11 +7,13 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  Injector,
   OnChanges,
   OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
+  afterNextRender,
   computed,
   contentChildren,
   inject,
@@ -22,6 +24,7 @@ import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
+import { isHostVisible } from '../../primitives/shared/host-visibility';
 import { CxStateMessageComponent } from '../cx-state-message';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxWizardDialogStepDirective } from './cx-wizard-dialog-step.directive';
@@ -76,11 +79,11 @@ const EMPTY_WIZARD: CxWizardDialogData = {
 })
 export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, OnDestroy {
   private readonly document = inject(DOCUMENT);
+  private readonly injector = inject(Injector);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
   private readonly wizardState = signal<CxWizardDialogData>(EMPTY_WIZARD);
   private readonly stepTemplates = contentChildren(CxWizardDialogStepDirective);
-  private readonly documentKeydownListener = (event: KeyboardEvent) => this.onDialogKeydown(event);
   private overlayHandle?: CxOverlayStateHandle;
   private requestedOpen = false;
 
@@ -92,6 +95,12 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
   @ViewChild('stepContent', { read: ElementRef })
   private readonly stepContent?: ElementRef<HTMLElement>;
+
+  @ViewChild('stepInfoContent', { read: ElementRef })
+  private readonly stepInfoContent?: ElementRef<HTMLElement>;
+
+  @ViewChild('stepHeading', { read: ElementRef })
+  private readonly stepHeading?: ElementRef<HTMLElement>;
 
   protected readonly titleId = `cx-wizard-dialog-title-${++cxWizardDialogId}`;
   protected readonly isOpen$ = this.openState.asReadonly();
@@ -136,7 +145,22 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
   @Input()
   public set wizard(value: CxWizardDialogData | null | undefined) {
-    this.wizardState.set(this.normalizeWizard(value));
+    const previousStepId = this.currentStep$()?.id;
+    const activeElement = this.document.activeElement;
+    const focusedInOutgoingStep = this.openState()
+      && !!previousStepId
+      && activeElement instanceof HTMLElement
+      && (
+        !!this.stepContent?.nativeElement.contains(activeElement)
+        || !!this.stepInfoContent?.nativeElement.contains(activeElement)
+      );
+    const nextWizard = this.normalizeWizard(value);
+    const nextStepId = nextWizard.steps[nextWizard.index ?? 0]?.id;
+
+    this.wizardState.set(nextWizard);
+    if (focusedInOutgoingStep && nextStepId && nextStepId !== previousStepId) {
+      this.focusStepAfterRender(nextStepId);
+    }
   }
 
   @Input()
@@ -162,7 +186,6 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   public ngOnDestroy(): void {
-    this.releaseKeyboardShortcuts();
     this.releaseOverlay();
   }
 
@@ -185,13 +208,6 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
   protected onDialogKeydown(event: KeyboardEvent): void {
     if (event.isComposing || this.isLoading$()) {
-      return;
-    }
-
-    if (event.key === 'Escape' && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.onSecondaryAction();
       return;
     }
 
@@ -257,22 +273,29 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     }
 
     if (nextOpen) {
-      this.overlayHandle = this.overlayState.capture();
-      this.captureKeyboardShortcuts();
+      this.overlayHandle = this.overlayState.capture({
+        surface: () => this.dialogBackdrop?.nativeElement,
+        isActive: () => this.openState() && isHostVisible(this.dialogBackdrop?.nativeElement),
+        onEscape: () => this.onSecondaryAction(),
+      });
     } else {
-      this.releaseKeyboardShortcuts();
       this.releaseOverlay();
     }
 
     this.openState.set(nextOpen);
   }
 
-  private captureKeyboardShortcuts(): void {
-    this.document.addEventListener('keydown', this.documentKeydownListener, true);
-  }
-
-  private releaseKeyboardShortcuts(): void {
-    this.document.removeEventListener('keydown', this.documentKeydownListener, true);
+  private focusStepAfterRender(expectedStepId: string): void {
+    afterNextRender(() => {
+      if (
+        !this.openState()
+        || !this.overlayState.isTopmost(this.overlayHandle)
+        || this.currentStep$()?.id !== expectedStepId
+      ) {
+        return;
+      }
+      this.stepHeading?.nativeElement.focus({ preventScroll: true });
+    }, { injector: this.injector });
   }
 
   private releaseOverlay(): void {

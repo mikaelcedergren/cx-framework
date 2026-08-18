@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import type { CxTooltipPosition } from './cx-tooltip.directive';
 
 @Component({
@@ -11,5 +11,4 @@ export class CxTooltipSurfaceComponent {
   readonly tooltipId = input('');
   readonly text = input('');
   readonly placement = input<CxTooltipPosition>('top');
-  readonly hovered = output<boolean>();
 }

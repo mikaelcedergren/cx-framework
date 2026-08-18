@@ -7,7 +7,7 @@
       <cx-spinner size="xlarge" mood="default" />
     </div>
   } @else if (showIcon) {
-    <div class="cx-state-message__icon">
+    <div #iconRegion class="cx-state-message__icon">
       <cx-icon [name]="resolvedIcon" size="64" />
     </div>
   }
@@ -28,7 +28,6 @@
         @if (visibleAction; as action) {
           <cx-button
             [text]="action.text"
-            [transparent]="isActionTransparent(action)"
             [mood]="resolveActionMood(action)"
             [icon]="action.icon"
             [appendIcon]="action.appendIcon"
@@ -41,7 +40,6 @@
         @if (visibleSecondaryAction; as action) {
           <cx-button
             [text]="action.text"
-            [transparent]="isActionTransparent(action)"
             [mood]="resolveActionMood(action)"
             [icon]="action.icon"
             [appendIcon]="action.appendIcon"

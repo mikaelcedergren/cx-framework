@@ -1,15 +1,20 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
+  type AfterViewChecked,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   EventEmitter,
   Input,
   Output,
+  PLATFORM_ID,
   ViewChild,
+  inject,
   signal,
 } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
+import { type CxFeedbackAction, visibleCxFeedbackAction } from '../../primitives/feedback/cx-feedback-action';
 import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 
@@ -17,16 +22,8 @@ export type CxStateMessageState = 'default' | 'pending' | 'success' | 'scheduled
 export type CxStateMessageVisual = 'icon' | 'none';
 export type CxStateMessageLayout = 'vertical' | 'horizontal';
 
-export interface CxStateMessageAction {
-  readonly text: string;
-  readonly mood?: CxButtonMood;
-  readonly icon?: CxIconName;
-  readonly appendIcon?: CxIconName;
-  readonly disabled?: boolean;
-  readonly loading?: boolean;
-  readonly ariaLabel?: string;
-  readonly transparent?: boolean;
-}
+/** A state message answers with solid buttons; transparency is not one of its choices. */
+export type CxStateMessageAction = Omit<CxFeedbackAction, 'transparent'>;
 
 const CX_STATE_MESSAGE_PRESETS: Record<Exclude<CxStateMessageState, 'default'>, {
   heading: string;
@@ -56,8 +53,8 @@ const CX_STATE_MESSAGE_PRESETS: Record<Exclude<CxStateMessageState, 'default'>, 
 };
 
 const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStateMessageAction>> = {
-  success: { text: 'Continue', transparent: true },
-  danger: { text: 'Try again', transparent: true },
+  success: { text: 'Continue' },
+  danger: { text: 'Try again' },
 };
 
 @Component({
@@ -74,12 +71,15 @@ const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStat
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxStateMessageComponent {
-  private iconInputBound = false;
-  private iconValue: CxIconName | undefined;
+export class CxStateMessageComponent implements AfterViewChecked {
+  private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
+  private measuredInk = '';
 
   @ViewChild('messageBody', { read: ElementRef })
   private messageBodyRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('iconRegion', { read: ElementRef })
+  private iconRegionRef?: ElementRef<HTMLElement>;
 
   @Input() heading = '';
   @Input() description: string | undefined;
@@ -88,25 +88,18 @@ export class CxStateMessageComponent {
   @Input() state: CxStateMessageState = 'default';
   @Input() visual: CxStateMessageVisual = 'icon';
   @Input() layout: CxStateMessageLayout = 'vertical';
-
-  @Input()
-  public set icon(icon: CxIconName | undefined) {
-    this.iconInputBound = true;
-    this.iconValue = icon;
-  }
+  @Input() icon: CxIconName | undefined;
 
   @Output('action') readonly actionEmitter = new EventEmitter<CxStateMessageAction>();
   @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxStateMessageAction>();
 
-  protected get resolvedIcon(): CxIconName | undefined {
-    if (this.iconInputBound) {
-      return this.iconValue;
-    }
-    const preset = this.resolvedPreset;
-    if (preset) {
-      return preset.icon;
-    }
-    return 'placeholder';
+  public ngAfterViewChecked(): void {
+    this.syncIconInkOffset();
+  }
+
+  /** The state carries the mark that matches it; an icon of the consumer's own always wins. */
+  protected get resolvedIcon(): CxIconName {
+    return this.icon ?? this.resolvedPreset?.icon ?? 'placeholder';
   }
 
   protected get resolvedHeading(): string {
@@ -140,7 +133,7 @@ export class CxStateMessageComponent {
   }
 
   protected get showIcon(): boolean {
-    return this.visual === 'icon' && !this.showSpinner && this.resolvedIcon !== undefined;
+    return this.visual === 'icon' && !this.showSpinner;
   }
 
   protected get visibleAction(): CxStateMessageAction | undefined {
@@ -163,15 +156,11 @@ export class CxStateMessageComponent {
   }
 
   private visibleActionFor(action: CxStateMessageAction | undefined): CxStateMessageAction | undefined {
-    return action && Boolean(action.text?.trim() || action.icon || action.appendIcon) ? action : undefined;
+    return visibleCxFeedbackAction(action);
   }
 
   protected resolveActionMood(action: CxStateMessageAction): CxButtonMood {
     return action.mood ?? 'default';
-  }
-
-  protected isActionTransparent(action: CxStateMessageAction): boolean {
-    return action.transparent ?? true;
   }
 
   protected onActionPressed(action: CxStateMessageAction): void {
@@ -181,4 +170,67 @@ export class CxStateMessageComponent {
   protected onSecondaryActionPressed(action: CxStateMessageAction): void {
     this.secondaryActionEmitter.emit(action);
   }
+
+  /**
+   * A top-aligned mark reads as dropped unless its ink starts on the heading's cap
+   * line. Both offsets are real and neither is knowable from CSS: an icon carries
+   * its own air inside its box, and that air differs per glyph, while the heading
+   * keeps half its leading above the caps. Publish the difference so the layout can
+   * lift the mark by exactly that much.
+   */
+  private syncIconInkOffset(): void {
+    const region = this.iconRegionRef?.nativeElement;
+    if (!this.browser || !region) {
+      this.measuredInk = '';
+      return;
+    }
+
+    const key = `${this.resolvedIcon}|${this.layout}`;
+    if (key === this.measuredInk) {
+      return;
+    }
+
+    const air = this.iconInkAir(region);
+    const heading = this.messageBodyRef?.nativeElement.querySelector('.cx-state-message__heading');
+    const offset = Math.max(0, air - (heading ? capLeading(heading) : 0));
+    region.style.setProperty('--cx-state-message-icon-ink', `${offset}px`);
+    this.measuredInk = key;
+  }
+
+  /** Blank space between the icon box's top edge and the first painted pixel of its glyph. */
+  private iconInkAir(region: HTMLElement): number {
+    const svg = region.querySelector('svg');
+    const height = svg?.getBoundingClientRect().height ?? 0;
+    const viewBox = svg?.viewBox.baseVal;
+    if (!svg || !height || !viewBox?.height) {
+      return 0;
+    }
+    let ink: DOMRect;
+    try {
+      ink = svg.getBBox();
+    } catch {
+      return 0;
+    }
+    return ink.height ? ((ink.y - viewBox.y) / viewBox.height) * height : 0;
+  }
+}
+
+/** Blank space a line of text keeps above its cap height, from the font's own metrics. */
+function capLeading(heading: Element): number {
+  const style = getComputedStyle(heading);
+  const context = document.createElement('canvas').getContext('2d');
+  if (!context) {
+    return 0;
+  }
+  context.font = `${style.fontWeight} ${style.fontSize}/${style.lineHeight} ${style.fontFamily}`;
+  const metrics = context.measureText('H');
+  const ascent = metrics.fontBoundingBoxAscent;
+  const descent = metrics.fontBoundingBoxDescent;
+  const cap = metrics.actualBoundingBoxAscent;
+  if (!ascent || !cap) {
+    return 0;
+  }
+  const lineHeight = Number.parseFloat(style.lineHeight);
+  const halfLeading = Number.isFinite(lineHeight) ? (lineHeight - (ascent + descent)) / 2 : 0;
+  return Math.max(0, halfLeading + (ascent - cap));
 }

@@ -59,6 +59,13 @@ When the dry run looks right:
 pnpm framework:package -- --apply
 ```
 
+`--apply` refuses to package a version that has no `## <version>` section in
+`support/UPGRADES.md`, and the dry run reports the same gap before you get there. That file
+is how a consuming product's agent learns what it must adapt, so write the section for the
+version being cut: every removed or renamed prop, changed default, required markup, and new
+behaviour, each with the action to take. When a version changes nothing for a consumer, say
+that in the section instead of leaving it out.
+
 Use `--bump minor`, `--bump major`, or `--version x.y.z` when the default patch bump is not right:
 
 ```sh

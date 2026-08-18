@@ -207,6 +207,9 @@ export class CxLightboxComponent implements OnDestroy {
     if (this.isOpen$()) {
       if (!this.overlayHandle) {
         this.overlayHandle = this.overlayState.capture({
+          surface: () => (
+            this.host.nativeElement.querySelector('.cx-lightbox') as HTMLElement | null
+          ) ?? undefined,
           isActive: () => isHostVisible(
             this.host.nativeElement.querySelector('.cx-lightbox'),
           ),

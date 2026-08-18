@@ -12,6 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { CxIconComponent } from '../../media/cx-icon';
+import { isHostVisible } from '../../shared/host-visibility';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 @Component({
@@ -36,7 +37,6 @@ export class CxFullscreenDialogComponent implements OnDestroy {
   private overlayHandle?: CxOverlayStateHandle;
   private closeButtonRevealTimer?: number;
   private exitFallbackTimer?: number;
-  private overlayReleaseTimer?: number;
 
   @ViewChild('dialogRoot', { read: ElementRef })
   private dialogRootRef?: ElementRef<HTMLElement>;
@@ -71,7 +71,6 @@ export class CxFullscreenDialogComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.clearMotionTimers();
-    this.clearOverlayReleaseTimer();
     this.releaseOverlay();
   }
 
@@ -85,15 +84,6 @@ export class CxFullscreenDialogComponent implements OnDestroy {
     }
     this.dismiss.emit();
     this.closeFromUser();
-  }
-
-  protected onEscape(event: KeyboardEvent): void {
-    if (event.key !== 'Escape' || !this.closeButton || this.closingState()) {
-      return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    this.onDismiss();
   }
 
   protected onCanvasAnimationEnd(event: AnimationEvent): void {
@@ -126,9 +116,12 @@ export class CxFullscreenDialogComponent implements OnDestroy {
 
     if (nextOpen) {
       this.clearMotionTimers();
-      this.clearOverlayReleaseTimer();
       if (!this.overlayHandle) {
-        this.overlayHandle = this.overlayState.capture();
+        this.overlayHandle = this.overlayState.capture({
+          surface: () => this.dialogRootRef?.nativeElement,
+          isActive: () => this.renderedState() && isHostVisible(this.dialogRootRef?.nativeElement),
+          onEscape: () => this.onDismiss(),
+        });
       }
       this.closeButtonRevealed = this.prefersReducedMotion();
       this.closingState.set(false);
@@ -171,10 +164,10 @@ export class CxFullscreenDialogComponent implements OnDestroy {
       return;
     }
     this.clearMotionTimers();
+    this.releaseOverlay();
     this.renderedState.set(false);
     this.closingState.set(false);
     this.closeButtonReadyState.set(false);
-    this.scheduleOverlayRelease();
   }
 
   private prefersReducedMotion(): boolean {
@@ -222,27 +215,6 @@ export class CxFullscreenDialogComponent implements OnDestroy {
       window.clearTimeout(this.exitFallbackTimer);
     }
     this.exitFallbackTimer = undefined;
-  }
-
-  private scheduleOverlayRelease(): void {
-    this.clearOverlayReleaseTimer();
-    if (typeof window === 'undefined') {
-      this.releaseOverlay();
-      return;
-    }
-    this.overlayReleaseTimer = window.setTimeout(() => {
-      this.overlayReleaseTimer = undefined;
-      if (!this.requestedOpen && !this.renderedState()) {
-        this.releaseOverlay();
-      }
-    });
-  }
-
-  private clearOverlayReleaseTimer(): void {
-    if (typeof window !== 'undefined' && this.overlayReleaseTimer !== undefined) {
-      window.clearTimeout(this.overlayReleaseTimer);
-    }
-    this.overlayReleaseTimer = undefined;
   }
 
   private releaseOverlay(): void {

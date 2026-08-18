@@ -17,6 +17,9 @@
   // near side: one border-width back, which reads as centred, where the far side
   // reads as a pixel too far right.
   --cx-side-nav-row-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
+  // Nested rows are tighter: they carry only a label, so top-level breathing
+  // room reads as airiness one level in.
+  --cx-side-nav-subrow-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
   // Separation between rows. The guide has to bridge it, or a 1px line reads as
   // a dashed one.
   --cx-side-nav-row-gap: 1px;
@@ -161,6 +164,14 @@
   padding-left: var(--cx-side-nav-rail);
 }
 
+/* Nested rows keep the top-level content box but shed vertical air; the guide
+   geometry follows automatically because the elbow anchors to the row's own
+   centre. */
+.cx-side-nav__node--branch > .cx-side-nav__item {
+  min-height: var(--cx-side-nav-subrow-height);
+  padding-block: var(--space-xs);
+}
+
 /* Elbow: brings the guide down to the row's centre, then hooks right toward the
    label. Anchored to the row (not the node) so `50%` is the row's own centre
    however tall the node's sub-tree grows. */
@@ -259,8 +270,9 @@
   position: relative;
   display: flex;
   width: 100%;
-  // Pinned so an iconless nested row is exactly as tall as an iconed top-level
-  // row; without it the icon alone would set the height and nesting would shrink.
+  // Pinned so the row's height comes from the design, not from whether it
+  // happens to carry an icon — an iconless row would otherwise shrink to its
+  // text height.
   min-height: var(--cx-side-nav-row-height);
   align-items: center;
   gap: var(--space-sm);

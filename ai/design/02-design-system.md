@@ -63,9 +63,9 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Keep a focused change within its accepted owner. Using another component's supported behavior does not expand scope; changing that component does.
 
-[MUST] A hidden component is inert. It does not react to global keyboard shortcuts, Escape, outside interaction, or other document-level behavior while absent from the visible experience.
+[MUST] A hidden or inactive component is inert. It does not react to global keyboard shortcuts, Escape, outside interaction, or other document-level behavior while absent from the visible experience. A closing overlay emits no further action; while it remains visible, it still blocks every surface behind it.
 
-[MUST] When nested overlays are open, the topmost active overlay handles dismissal before its parent surface.
+[MUST] When nested overlays are open, visual stacking and interaction ownership follow the same opening order. The topmost visible, active overlay alone owns and consumes Escape. An eligible dismissal follows the same controlled cancel or close path as its visible action; an overlay that cannot dismiss still blocks every surface behind it, and one keypress produces at most one action.
 
 ## Defaults and supported variation
 

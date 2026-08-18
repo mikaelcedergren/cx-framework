@@ -6,11 +6,17 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent, type CxIconMood } from '../../media/cx-icon';
 
 export type CxLogStepPosition = 'first' | 'middle' | 'last' | 'single';
 export type CxLogStepSize = 'default' | 'large';
+
+/** A step whose text names something with its own destination. Route in-app, href outward. */
+export type CxLogStepLink =
+  | { readonly routerLink: string | readonly unknown[] }
+  | { readonly href: string; readonly target?: string };
 
 export class CxLogStep {
   private constructor(
@@ -19,10 +25,11 @@ export class CxLogStep {
     public readonly size: CxLogStepSize,
     public readonly icon: CxIconName | undefined,
     public readonly mood: CxIconMood,
+    public readonly link: CxLogStepLink | undefined,
   ) {}
 
   public static of(text: string): CxLogStep {
-    return new CxLogStep('middle', text, 'default', undefined, 'default');
+    return new CxLogStep('middle', text, 'default', undefined, 'default', undefined);
   }
 
   public static empty(): CxLogStep {
@@ -30,23 +37,27 @@ export class CxLogStep {
   }
 
   public withPosition(position: CxLogStepPosition): CxLogStep {
-    return new CxLogStep(position, this.text, this.size, this.icon, this.mood);
+    return new CxLogStep(position, this.text, this.size, this.icon, this.mood, this.link);
   }
 
   public withText(text: string): CxLogStep {
-    return new CxLogStep(this.position, text, this.size, this.icon, this.mood);
+    return new CxLogStep(this.position, text, this.size, this.icon, this.mood, this.link);
   }
 
   public withSize(size: CxLogStepSize): CxLogStep {
-    return new CxLogStep(this.position, this.text, size, this.icon, this.mood);
+    return new CxLogStep(this.position, this.text, size, this.icon, this.mood, this.link);
   }
 
   public withIcon(icon: CxIconName): CxLogStep {
-    return new CxLogStep(this.position, this.text, 'large', icon, this.mood);
+    return new CxLogStep(this.position, this.text, 'large', icon, this.mood, this.link);
   }
 
   public withMood(mood: CxIconMood): CxLogStep {
-    return new CxLogStep(this.position, this.text, this.size, this.icon, mood);
+    return new CxLogStep(this.position, this.text, this.size, this.icon, mood, this.link);
+  }
+
+  public withLink(link: CxLogStepLink): CxLogStep {
+    return new CxLogStep(this.position, this.text, this.size, this.icon, this.mood, link);
   }
 }
 
@@ -54,7 +65,7 @@ const DEFAULT_STEP = CxLogStep.empty();
 
 @Component({
   selector: 'cx-log-step',
-  imports: [CxIconComponent],
+  imports: [CxIconComponent, RouterLink],
   templateUrl: './cx-log-step.component.html',
   styleUrl: './cx-log-step.component.scss',
   host: {
@@ -93,4 +104,23 @@ export class CxLogStepComponent {
   @Input() description = '';
   @Input() author = '';
 
+  protected routerLink(): string | readonly unknown[] | undefined {
+    const link = this.step.link;
+    return link && 'routerLink' in link ? link.routerLink : undefined;
+  }
+
+  protected href(): string | undefined {
+    const link = this.step.link;
+    return link && 'href' in link ? link.href : undefined;
+  }
+
+  protected target(): string | null {
+    const link = this.step.link;
+    return (link && 'href' in link ? link.target : undefined) ?? null;
+  }
+
+  protected rel(): string | null {
+    const link = this.step.link;
+    return link && 'href' in link && link.target === '_blank' ? 'noopener' : null;
+  }
 }

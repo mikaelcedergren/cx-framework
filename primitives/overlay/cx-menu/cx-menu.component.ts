@@ -287,6 +287,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private surfaceLockedPlacement?: CxFloatingSurfacePlacement;
   private triggerElement?: HTMLElement;
   private triggerButton?: HTMLButtonElement;
+
+  protected get rootPopoverOwner(): HTMLElement | undefined {
+    return this.triggerElement;
+  }
   private triggerOriginalState?: {
     disabled: boolean;
     type: string | null;

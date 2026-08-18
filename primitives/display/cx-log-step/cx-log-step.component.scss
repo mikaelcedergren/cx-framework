@@ -130,6 +130,23 @@
   line-height: var(--line-height-body);
 }
 
+.cx-log-step__link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width);
+  text-underline-offset: 2px;
+  transition: text-decoration-thickness var(--motion-fast) ease;
+}
+
+.cx-log-step__link:hover {
+  text-decoration-thickness: calc(var(--border-width) * 2);
+}
+
+.cx-log-step__link:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
 .cx-log-step__author,
 .cx-log-step__datestamp,
 .cx-log-step__description {

@@ -3,16 +3,19 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   Output,
+  ViewChild,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { CxTextShimmerComponent } from '../../display/cx-text-shimmer';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
+import { isHostVisible } from '../../shared/host-visibility';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 /**
@@ -56,6 +59,9 @@ export class CxLoadingOverlayComponent implements OnDestroy {
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
   private overlayHandle?: CxOverlayStateHandle;
+
+  @ViewChild('overlayBackdrop', { read: ElementRef })
+  private readonly overlayBackdrop?: ElementRef<HTMLElement>;
 
   private readonly displayedState = signal('');
   private readonly revisionState = signal(0);
@@ -149,20 +155,17 @@ export class CxLoadingOverlayComponent implements OnDestroy {
     if (this.openState() === next) {
       return;
     }
-    this.openState.set(next);
     if (next) {
+      this.openState.set(true);
       this.overlayHandle = this.overlayState.capture({
         kind: 'modal',
-        isActive: () => this.openState(),
-        // Registering a handler that does nothing is what swallows Escape: the
-        // overlay service only stops the key for the topmost handle that claims
-        // it, and without this the key would fall through and dismiss whatever
-        // sits behind the wait.
-        onEscape: () => undefined,
+        surface: () => this.overlayBackdrop?.nativeElement,
+        isActive: () => this.openState() && isHostVisible(this.overlayBackdrop?.nativeElement),
       });
       return;
     }
     this.releaseOverlay();
+    this.openState.set(false);
   }
 
   private releaseOverlay(): void {

@@ -1,3 +1,4 @@
+<!-- Tooltips sit off the list axis (right) so an open tooltip never covers sibling options. -->
 @if (clickable) {
   <button
     #control
@@ -26,6 +27,7 @@
     [attr.aria-setsize]="ariaSetSize ?? null"
     [cxTooltip]="label"
     [cxTooltipOverflow]="true"
+    cxTooltipPosition="right"
   >
     <ng-container [ngTemplateOutlet]="optionContent" />
   </button>
@@ -55,6 +57,7 @@
     [attr.aria-setsize]="ariaSetSize ?? null"
     [cxTooltip]="label"
     [cxTooltipOverflow]="true"
+    cxTooltipPosition="right"
   >
     <ng-container [ngTemplateOutlet]="optionContent" />
   </div>

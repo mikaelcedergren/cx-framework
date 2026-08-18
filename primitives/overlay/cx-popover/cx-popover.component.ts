@@ -13,6 +13,7 @@ import {
   signal,
 } from '@angular/core';
 import { CxOptionGroupComponent } from '../cx-option-group';
+import { isHostVisible } from '../../shared/host-visibility';
 import { CxPopoverBackdropComponent } from '../cx-popover-backdrop/cx-popover-backdrop.component';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
@@ -29,6 +30,7 @@ export class CxPopoverComponent {
   private readonly document = inject(DOCUMENT);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
+  private readonly showBackdropState = signal(true);
   private overlayHandle?: CxOverlayStateHandle;
   private portaledSurface: HTMLElement | null = null;
   private portaledBackdrop: HTMLElement | null = null;
@@ -48,6 +50,7 @@ export class CxPopoverComponent {
     afterRenderEffect(() => {
       const body = this.document?.body;
       if (!body) return;
+      const showBackdrop = this.showBackdropState();
       if (!this.openState()) {
         this.releasePortaledNodes();
         return;
@@ -56,15 +59,16 @@ export class CxPopoverComponent {
       // surface paints on top in every engine. Chromium honours the z-index
       // (popover 1110 > backdrop 1100) regardless of DOM order, but WebKit
       // hit-tests the later-painted sibling and swallows clicks on options.
-      const backdrop = this.backdropRef?.nativeElement ?? null;
+      const backdrop = showBackdrop ? this.backdropRef?.nativeElement ?? null : null;
       this.portaledBackdrop = this.syncPortaledNode(this.portaledBackdrop, backdrop, body);
       const surface = this.surfaceRef?.nativeElement ?? null;
       this.portaledSurface = this.syncPortaledNode(this.portaledSurface, surface, body);
     });
 
     destroyRef.onDestroy(() => {
-      this.releasePortaledNodes();
+      this.prepareFocusRestoration();
       this.releaseOverlayOwnership();
+      this.releasePortaledNodes();
     });
   }
 
@@ -100,26 +104,44 @@ export class CxPopoverComponent {
   @Input()
   public set open(value: boolean) {
     const nextOpen = !!value;
-    if (!nextOpen) {
-      // Remove the click-catching body nodes synchronously. Angular will
-      // destroy the view on the following render, but interaction must be
-      // restored the moment the owner closes the popover.
-      this.releasePortaledNodes();
-    }
     if (this.openState() === nextOpen) {
+      if (!nextOpen) {
+        this.releasePortaledNodes();
+      }
       return;
     }
-    this.openState.set(nextOpen);
     if (nextOpen) {
+      this.openState.set(true);
       this.captureOverlayOwnership();
     } else {
+      // Release while this visible surface still owns the stack, then remove
+      // the click-catching body nodes before the following Angular render.
+      this.prepareFocusRestoration();
       this.releaseOverlayOwnership();
+      this.openState.set(false);
+      this.releasePortaledNodes();
     }
   }
   public get open(): boolean {
     return this.openState();
   }
-  @Input() showBackdrop = true;
+  @Input()
+  public set showBackdrop(value: boolean) {
+    this.showBackdropState.set(!!value);
+  }
+  public get showBackdrop(): boolean {
+    return this.showBackdropState();
+  }
+  /** The element that opened this popover. Registered with the overlay state so tooltips anchored to the opener stand down while it owns the surface. */
+  @Input()
+  public set owner(value: HTMLElement | undefined) {
+    this.ownerElement = value;
+    this.overlayState.assignOwner(this.overlayHandle, value);
+  }
+  public get owner(): HTMLElement | undefined {
+    return this.ownerElement;
+  }
+  private ownerElement?: HTMLElement;
   @Input() surfaceId: string | undefined;
   @Input() role: string | undefined;
   @Input() ariaLabel: string | undefined;
@@ -172,8 +194,18 @@ export class CxPopoverComponent {
     }
     this.overlayHandle = this.overlayState.capture({
       kind: 'transient',
-      restoreFocus: false,
-      isActive: () => this.openState() && this.backdropPressed.observed,
+      restoreFocus: true,
+      owner: this.ownerElement,
+      surface: () => this.surfaceRef?.nativeElement,
+      layerSurfaces: () => {
+        const backdropSurface = this.backdropRef?.nativeElement.querySelector<HTMLElement>(
+          '.cx-popover-backdrop__surface',
+        );
+        return [backdropSurface, this.surfaceRef?.nativeElement].filter(
+          (surface): surface is HTMLElement => !!surface,
+        );
+      },
+      isActive: () => this.openState() && isHostVisible(this.surfaceRef?.nativeElement),
       onEscape: () => this.backdropPressed.emit(),
     });
   }
@@ -181,5 +213,16 @@ export class CxPopoverComponent {
   private releaseOverlayOwnership(): void {
     this.overlayState.release(this.overlayHandle);
     this.overlayHandle = undefined;
+  }
+
+  private prepareFocusRestoration(): void {
+    const activeElement = this.document.activeElement;
+    const surface = this.surfaceRef?.nativeElement;
+    if (!this.overlayHandle) {
+      return;
+    }
+    this.overlayHandle.restoreFocus = activeElement === this.document.body
+      || activeElement === this.document.documentElement
+      || (activeElement instanceof HTMLElement && !!surface && surface.contains(activeElement));
   }
 }

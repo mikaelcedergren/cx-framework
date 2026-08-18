@@ -70,7 +70,7 @@ RULE-ID: dialogs.explicit-outcomes SCOPE: component COMPONENT: dialogs TYPE: MUS
 
 RULE-ID: dialogs.dismissal-risk SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: interaction RULE: Match outside-click and Escape dismissal to consequence. DESCRIPTION: Prevent accidental dismissal when work or a consequential decision could be lost; allow it for safe transient dialogs.
 
-RULE-ID: dialogs.focus SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: accessibility RULE: Move focus into an opened modal and return it to the invoking control on close. DESCRIPTION: Modal focus must remain within the active dialog while it is open.
+RULE-ID: dialogs.focus SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: accessibility RULE: Move focus into an opened modal and restore it deliberately on close. DESCRIPTION: Modal focus remains within the topmost active dialog while it is open. On close, return it to the invoking control when that control still exists and is focusable; otherwise move it to a meaningful target in the surviving parent surface, never the document body, removed content, or behind another active modal.
 
 RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: layout RULE: Keep dialog content and actions reachable within the viewport. DESCRIPTION: Preserve edge space and provide an intentional inner scroll region when content is taller than the available area.
 
@@ -104,7 +104,7 @@ RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panel
 
 ## Labeled rows
 
-RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use the consuming product's established labeled-row component or pattern for repeated structured form rows or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; do not wrap isolated controls, arbitrary page content, or layouts whose content does not share a label-value relationship. Apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch.
+RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use the consuming product's established labeled-row component or pattern for forms or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; apply `RULE-ID: forms.horizontal-layout` to form orientation, and apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch. Do not wrap arbitrary page content or content without a label-value relationship.
 
 ## State messages
 
@@ -219,6 +219,8 @@ RULE-ID: wizard-dialogs.fit SCOPE: component COMPONENT: wizard-dialogs TYPE: MUS
 RULE-ID: wizard-dialogs.required-only SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: complexity RULE: Ask only for information required for the current outcome. DESCRIPTION: Optional detail should not become a step merely to fill the sequence.
 
 RULE-ID: wizard-dialogs.relevant-steps SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: state RULE: Show only steps relevant to the user's choices. DESCRIPTION: The owner derives the exact presented sequence and explicitly remaps the current step when a branch changes; the dialog never searches hidden steps for a replacement.
+
+RULE-ID: wizard-dialogs.step-focus SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: accessibility RULE: Move focus deliberately when an active-step change removes the focused control. DESCRIPTION: After the destination step renders, focus its established heading or first meaningful control when focus belonged to the outgoing main content or step-specific sidebar content; preserve focus on persistent controls and do not steal it for unrelated background state changes.
 
 RULE-ID: wizard-dialogs.progress SCOPE: component COMPONENT: wizard-dialogs TYPE: SHOULD TOPIC: navigation RULE: Show current position and remaining shape. DESCRIPTION: Condense the indicator when every step label would no longer fit or help.
 

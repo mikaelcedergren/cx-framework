@@ -142,6 +142,7 @@ export class CxPopoverDemoComponent implements OnDestroy {
   private readonly activeSubmenuState = signal<CxPopoverDemoSubmenuSurface | undefined>(undefined);
   private readonly themeSelectionState = signal('night');
   private submenuFocusFrame: number | undefined;
+  private suppressNextSubmenuFocusOpen = false;
   protected readonly digestEnabled$ = signal(true);
   protected readonly isOpen$ = this.openState.asReadonly();
   protected readonly activeSubmenu$ = this.activeSubmenuState.asReadonly();
@@ -206,6 +207,14 @@ export class CxPopoverDemoComponent implements OnDestroy {
     });
   }
 
+  protected openSubmenuFromFocus(submenuId: CxPopoverDemoSubmenuId, anchor: HTMLElement): void {
+    if (this.suppressNextSubmenuFocusOpen) {
+      this.suppressNextSubmenuFocusOpen = false;
+      return;
+    }
+    this.openSubmenu(submenuId, anchor);
+  }
+
   protected openSubmenuFromClick(submenuId: CxPopoverDemoSubmenuId, anchor: HTMLElement, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
@@ -225,6 +234,11 @@ export class CxPopoverDemoComponent implements OnDestroy {
   protected closeSubmenu(): void {
     this.cancelSubmenuFocus();
     this.activeSubmenuState.set(undefined);
+  }
+
+  protected closeSubmenuFromEscape(): void {
+    this.suppressNextSubmenuFocusOpen = true;
+    this.closeSubmenu();
   }
 
   protected submenuItems(submenuId: CxPopoverDemoSubmenuId): readonly CxPopoverDemoSubmenuItem[] {

@@ -263,27 +263,6 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    if (
-      event.key === 'Escape'
-      && !event.altKey
-      && !event.ctrlKey
-      && !event.metaKey
-      && !event.shiftKey
-    ) {
-      if (this.variant === 'confirm') {
-        event.preventDefault();
-        event.stopPropagation();
-        this.onSecondary();
-        return;
-      }
-      if (this.canDismiss()) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.onDismiss();
-      }
-      return;
-    }
-
     if (eventMatchesShortcut(CX_DIALOG_PRIMARY_SHORTCUT, event)) {
       event.preventDefault();
       event.stopPropagation();
@@ -303,12 +282,29 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
     }
 
     if (nextOpen) {
-      this.overlayHandle = this.overlayState.capture();
+      this.overlayHandle = this.overlayState.capture({
+        surface: () => this.dialogElement?.parentElement ?? undefined,
+        isActive: () => this.openState() && isHostVisible(this.dialogElement),
+        onEscape: () => this.onEscape(),
+      });
     } else {
       this.releaseOverlay();
     }
 
     this.openState.set(nextOpen);
+  }
+
+  private onEscape(): void {
+    if (this.menuOpenState()) {
+      return;
+    }
+    if (this.variant === 'confirm') {
+      this.onSecondary();
+      return;
+    }
+    if (this.canDismiss()) {
+      this.onDismiss();
+    }
   }
 
   private startFocusOwnership(dialogElement: HTMLElement): void {

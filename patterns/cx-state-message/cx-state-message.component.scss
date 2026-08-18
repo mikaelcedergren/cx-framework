@@ -45,21 +45,21 @@
 
 .cx-state-message--horizontal {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-lg);
   text-align: start;
 }
 
 .cx-state-message--horizontal .cx-state-message__body {
   align-items: flex-start;
-  align-self: center;
   flex: 1;
   min-width: 0;
 }
 
 .cx-state-message--horizontal .cx-state-message__icon {
   padding-bottom: 0;
-  align-self: flex-start;
+  /* The mark's own air plus the heading's leading, measured by the component. */
+  margin-top: calc(-1 * var(--cx-state-message-icon-ink, 0px));
 }
 
 .cx-state-message--horizontal .cx-state-message__actions {

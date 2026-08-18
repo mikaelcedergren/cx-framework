@@ -1,9 +1,20 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  UrlTree,
+  type IsActiveMatchOptions,
+  type Params,
+  type QueryParamsHandling,
+} from '@angular/router';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
+import { assertCompatibleSideNavUrlTreeExtras } from './cx-side-nav.validation';
 
 export type CxSideNavBadgeTone = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 
@@ -21,10 +32,14 @@ export type CxSideNavItem = {
   disabled?: boolean;
   children?: CxSideNavItem[];
   /** Router target — renders the item as an `<a routerLink>`, e.g. `['/dashboard']`. */
-  routerLink?: string | readonly unknown[];
+  routerLink?: string | readonly unknown[] | UrlTree;
+  /** Query parameters included in the router destination. */
+  queryParams?: Params;
+  /** How the destination combines its query parameters with the current URL. */
+  queryParamsHandling?: QueryParamsHandling;
   /** Optional URL fragment (e.g. a scrollable section on a workbench page). */
   fragment?: string;
-  /** How `routerLinkActive` decides this item is active. Defaults to exact-path. */
+  /** How `routerLinkActive` decides this item is active. Defaults to Angular's exact destination matching. */
   routerLinkActiveOptions?: { exact: boolean } | IsActiveMatchOptions;
   /**
    * External link target. When set, the item renders as a plain `<a href>`
@@ -44,7 +59,9 @@ export type CxSideNavItem = {
  * and gain the tree guide. A group that is only labelled renders a plain
  * heading, so its items stay top-level and keep their icons.
  *
- * Groups always start closed; expansion is a user action, never a default.
+ * Groups start closed, with one exception: the group holding the active route
+ * starts open, so landing on or reloading a sub page keeps its section
+ * unfolded. An explicit user toggle always wins over that default.
  */
 export type CxSideNavGroup = {
   id: string;
@@ -94,6 +111,7 @@ export class CxSideNavComponent {
   @Output() readonly itemSelect = new EventEmitter<CxSideNavItem>();
 
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly skeletonItems = Array.from({ length: 7 }, (_, index) => `skeleton-${index}`);
 
@@ -145,19 +163,19 @@ export class CxSideNavComponent {
     return this.hasGroupToggle(group) ? 1 : 0;
   }
 
-  // Collapsed is the only starting state: a group opens because the user opened
-  // it, never because it happens to hold the active route. The collapsed parent
-  // row still carries the active highlight, so the section is identifiable
-  // without being unfolded.
+  // Collapsed is the starting state, except for the group holding the active
+  // route: it derives open from the URL, so entering or reloading a sub page
+  // keeps its section unfolded without anything being persisted. An explicit
+  // user toggle overrides the derived default, and a collapsed parent row
+  // still carries the active highlight so the section stays identifiable.
   protected isGroupExpanded(group: CxSideNavGroup): boolean {
     if (!group.collapsible) {
       return true;
     }
-    return this.expandedGroups[group.id] ?? false;
+    return this.expandedGroups[group.id] ?? this.groupContainsActive(group);
   }
 
   protected groupContainsActive(group: CxSideNavGroup): boolean {
-    this.activeUrl(); // establish the navigation dependency for OnPush
     return group.items.some(item => this.itemContainsActive(item));
   }
 
@@ -182,12 +200,12 @@ export class CxSideNavComponent {
     return (item.children?.length ?? 0) > 0;
   }
 
-  /** See {@link isGroupExpanded} — nested parents start closed for the same reason. */
+  /** See {@link isGroupExpanded} — a nested parent holding the active route derives open too. */
   protected isItemExpanded(item: CxSideNavItem): boolean {
     if (!this.hasChildren(item)) {
       return false;
     }
-    return this.expandedItems[item.id] ?? false;
+    return this.expandedItems[item.id] ?? this.itemContainsActive(item);
   }
 
   protected showItemChildren(item: CxSideNavItem): boolean {
@@ -205,6 +223,7 @@ export class CxSideNavComponent {
   }
 
   protected itemContainsActive(item: CxSideNavItem): boolean {
+    this.activeUrl(); // establish the navigation dependency for OnPush
     if (this.isItemActive(item)) {
       return true;
     }
@@ -264,8 +283,15 @@ export class CxSideNavComponent {
     if (item.disabled || item.routerLink === undefined) {
       return false;
     }
-    const commands = Array.isArray(item.routerLink) ? item.routerLink : [item.routerLink];
-    const tree = this.router.createUrlTree([...commands], { fragment: item.fragment });
+    const tree =
+      item.routerLink instanceof UrlTree
+        ? item.routerLink
+        : this.router.createUrlTree(Array.isArray(item.routerLink) ? item.routerLink : [item.routerLink], {
+            relativeTo: this.route,
+            queryParams: item.queryParams,
+            queryParamsHandling: item.queryParamsHandling,
+            fragment: item.fragment,
+          });
     const options = this.activeOptions(item);
     return typeof (options as { exact?: unknown }).exact === 'boolean'
       ? this.router.isActive(tree, (options as { exact: boolean }).exact)
@@ -318,6 +344,8 @@ function validateSideNavItemLevel(
         `[cx-side-nav] ${itemPath} must not set an icon. Nested items are marked by the tree guide — icons belong to top-level items and group parent rows.`,
       );
     }
+
+    assertCompatibleSideNavUrlTreeExtras(item, itemPath);
 
     if (item.children !== undefined) {
       if (!Array.isArray(item.children)) {

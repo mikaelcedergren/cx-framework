@@ -11,7 +11,9 @@
   border-radius: var(--radius-md);
   background: var(--ink);
   color: var(--surface);
-  pointer-events: auto;
+  // The surface must never intercept the pointer: a tooltip anchored over
+  // interactive siblings (option lists) would otherwise swallow their clicks.
+  pointer-events: none;
   animation: cx-tooltip-in var(--motion-base) var(--ease-out) forwards;
   will-change: opacity, transform;
 }

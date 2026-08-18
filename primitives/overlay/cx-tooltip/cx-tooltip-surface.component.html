@@ -6,8 +6,6 @@
   [class.cx-tooltip__surface--bottom]="placement() === 'bottom'"
   [class.cx-tooltip__surface--left]="placement() === 'left'"
   role="tooltip"
-  (mouseenter)="hovered.emit(true)"
-  (mouseleave)="hovered.emit(false)"
 >
   <span class="cx-tooltip__content">{{ text() }}</span>
 </div>

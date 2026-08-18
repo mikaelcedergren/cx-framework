@@ -52,7 +52,7 @@
             label="Theme"
             [submenu]="submenuState('theme')"
             (pointerenter)="openSubmenu('theme', $any($event.currentTarget))"
-            (focusin)="openSubmenu('theme', $any($event.currentTarget))"
+            (focusin)="openSubmenuFromFocus('theme', $any($event.currentTarget))"
             (click)="openSubmenuFromClick('theme', $any($event.currentTarget), $event)"
             (keydown)="openSubmenuFromKeyboard('theme', $any($event.currentTarget), $event)"
           />
@@ -103,6 +103,7 @@
     [left]="submenu.left"
     [top]="submenu.top"
     surfaceVariant="grouped"
+    (backdropPressed)="closeSubmenuFromEscape()"
   >
     <div class="cx-popover-demo__groups">
       <div class="cx-popover-demo__group">

@@ -5,11 +5,13 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnDestroy,
   Output,
   inject,
 } from '@angular/core';
 import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
 import { isHostVisible } from '../../shared/host-visibility';
+import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 export type CxContextDialogMood = Extract<CxButtonMood, 'default' | 'warning' | 'danger'>;
 export type CxContextDialogAlign = 'bottomLeft' | 'topLeft';
@@ -23,9 +25,33 @@ let cxContextDialogId = 0;
   styleUrl: './cx-context-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxContextDialogComponent {
-  private readonly host = inject(ElementRef<HTMLElement>);
+export class CxContextDialogComponent implements OnDestroy {
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly overlayState = inject(CxOverlayStateService);
   private readonly instanceId = ++cxContextDialogId;
+  private overlayHandle?: CxOverlayStateHandle;
+  private destroying = false;
+
+  constructor() {
+    this.overlayHandle = this.overlayState.capture({
+      kind: 'transient',
+      restoreFocus: true,
+      surface: () => this.surfaceElement(),
+      isActive: () => this.destroying || isHostVisible(this.surfaceElement()),
+      onEscape: () => {
+        if (this.hasCancelAction) {
+          this.onCancel();
+        }
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroying = true;
+    this.prepareFocusRestoration();
+    this.overlayState.release(this.overlayHandle);
+    this.overlayHandle = undefined;
+  }
 
   @Input() heading = 'Confirm action';
   @Input() description = 'Review this before continuing.';
@@ -84,6 +110,22 @@ export class CxContextDialogComponent {
   private get meaningfulCancelText(): string {
     const text = this.cancelText.trim();
     return text.toLocaleLowerCase() === 'cancel' ? '' : text;
+  }
+
+  private surfaceElement(): HTMLElement | undefined {
+    return this.host.nativeElement.querySelector<HTMLElement>('.cx-context-dialog') ?? undefined;
+  }
+
+  private prepareFocusRestoration(): void {
+    const ownerDocument = this.host.nativeElement.ownerDocument;
+    const activeElement = ownerDocument.activeElement;
+    const surface = this.surfaceElement();
+    if (!this.overlayHandle) {
+      return;
+    }
+    this.overlayHandle.restoreFocus = activeElement === ownerDocument.body
+      || activeElement === ownerDocument.documentElement
+      || (activeElement instanceof HTMLElement && !!surface && surface.contains(activeElement));
   }
 
   @HostListener('document:click', ['$event'])

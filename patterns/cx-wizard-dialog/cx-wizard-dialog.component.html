@@ -15,6 +15,7 @@
       aria-modal="true"
       [attr.aria-labelledby]="showFeedback$() ? null : titleId"
       (click)="$event.stopPropagation()"
+      (keydown)="onDialogKeydown($event)"
     >
       @if (showFeedback$()) {
         <div class="cx-wizard-dialog__feedback">
@@ -60,7 +61,7 @@
           <div class="cx-wizard-dialog__content-shell">
             <section class="cx-wizard-dialog__content-card">
               <div class="cx-wizard-dialog__content-title">
-                <h2 [id]="titleId">{{ currentHeading$() }}</h2>
+                <h2 #stepHeading [id]="titleId" tabindex="-1">{{ currentHeading$() }}</h2>
                 <div class="cx-wizard-dialog__content-divider" aria-hidden="true"></div>
               </div>
 
@@ -129,7 +130,7 @@
               <cx-icon class="cx-wizard-dialog__sidebar-icon" [name]="sidebarIcon" [size]="32" />
             }
 
-            <div class="cx-wizard-dialog__sidebar-copy">
+            <div #stepInfoContent class="cx-wizard-dialog__sidebar-copy">
               <h3 class="cx-wizard-dialog__sidebar-heading">{{ currentInfoHeading$() }}</h3>
 
               @if (currentStep$()?.infoCustom) {

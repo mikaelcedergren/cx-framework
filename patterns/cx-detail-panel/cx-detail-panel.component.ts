@@ -102,6 +102,8 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     this.overlayHandle = this.overlayState.capture({
       kind: 'transient',
       restoreFocus: true,
+      surface: () => this.panelSurface?.nativeElement,
+      layerSurfaces: () => [this.host.nativeElement],
       isActive: () => isHostVisible(this.host.nativeElement),
       onEscape: () => {
         if (!this.closing$()) {

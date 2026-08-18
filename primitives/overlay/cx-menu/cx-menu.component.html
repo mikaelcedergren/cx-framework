@@ -9,6 +9,7 @@
     <cx-popover
       #rootPopover
       [open]="isOpen$()"
+      [owner]="rootPopoverOwner"
       [showBackdrop]="true"
       [surfaceId]="rootSurfaceId"
       [role]="'menu'"
@@ -133,6 +134,7 @@
       [top]="surface.top"
       [surfaceId]="submenuSurfaceId(surface.path)"
       surfaceVariant="grouped"
+      (backdropPressed)="onEscapeKey()"
     >
       <div class="cx-menu__groups">
         @for (group of visualGroupsForItems(surface.items, surface.path); track group.id) {
