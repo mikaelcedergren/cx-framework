@@ -14,6 +14,18 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.8.3
+
+- All overlays coordinated by `CxOverlayStateService` — including `cx-dialog`,
+  `cx-context-dialog`, `cx-fullscreen-dialog`, `cx-lightbox`, `cx-loading-overlay`,
+  `cx-popover`, `cx-detail-panel`, `cx-wizard-dialog`, and direct integrations — now settle
+  focus restoration after the closing child has torn down and the surviving parent's focus
+  maintenance has finished. A newer top overlay still takes precedence; otherwise the exact
+  connected, visible, and focusable invoker is the final focus target. If that invoker is no
+  longer valid, focus moves to the established target inside its owning surviving parent.
+  Remove close timers, manual parent refocus, and focus-containment workarounds; no API
+  migration is required.
+
 ## 0.8.2
 
 - `cx-tooltip` — the tooltip surface is click-through (`pointer-events: none`), so a tooltip

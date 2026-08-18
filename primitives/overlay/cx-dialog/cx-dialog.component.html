@@ -27,7 +27,7 @@
         @if (hasHeading() || hasHeaderActions()) {
         <header class="cx-dialog__header">
           @if (hasHeading()) {
-            <h2 class="cx-dialog__title" [id]="titleId">{{ heading }}</h2>
+            <h2 class="cx-dialog__title" [id]="titleId" tabindex="-1">{{ heading }}</h2>
           }
 
           @if (hasHeaderActions()) {

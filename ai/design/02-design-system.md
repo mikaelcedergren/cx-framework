@@ -67,6 +67,8 @@ purpose → role → information → component role → local implementation →
 
 [MUST] When nested overlays are open, visual stacking and interaction ownership follow the same opening order. The topmost visible, active overlay alone owns and consumes Escape. An eligible dismissal follows the same controlled cancel or close path as its visible action; an overlay that cannot dismiss still blocks every surface behind it, and one keypress produces at most one action.
 
+[MUST] Restore focus only after a closing child overlay has torn down and the surviving surface's focus maintenance has settled. A newly opened top overlay takes precedence; otherwise the exact invoking control is the final focus target when it remains connected, visible, and focusable. When it does not, use a deterministic target inside the owning surviving parent surface, never the document body or unrelated content.
+
 ## Defaults and supported variation
 
 [MUST] Show normal product use in the default state. Defaults are not maximal demonstrations, unusual scenarios, or invitations to expose every possible option.

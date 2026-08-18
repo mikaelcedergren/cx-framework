@@ -15,10 +15,18 @@ export type CxOverlayStateKind = 'modal' | 'transient';
 
 export type CxOverlayStateCaptureOptions = {
   kind?: CxOverlayStateKind;
+  /**
+   * Whether release restores focus. Defaults to true for modal captures and
+   * false for transient captures. Restoration settles after child teardown and
+   * parent focus maintenance; a newer top overlay takes precedence.
+   */
   restoreFocus?: boolean;
   /** The element that opened the overlay, so descriptions anchored to it (tooltips) can stand down while it owns an open surface. */
   owner?: HTMLElement;
-  /** The rendered overlay root. It keeps visual stack order and fallback focus aligned with this capture. */
+  /**
+   * The rendered overlay root. It keeps visual stack order aligned with this
+   * capture and identifies the owning surface for deterministic focus fallback.
+   */
   surface?: () => HTMLElement | undefined;
   /**
    * Every independently positioned root that paints this overlay, ordered from
@@ -143,6 +151,7 @@ export class CxOverlayStateService {
     );
   }
 
+  /** Release a capture and restore its valid invoker, or owning-parent fallback, after teardown settles. */
   release(handle: CxOverlayStateHandle | undefined): void {
     if (!handle || handle.released) {
       return;
@@ -255,6 +264,7 @@ export class CxOverlayStateService {
     exposedTop: CxOverlayStateHandle | undefined,
   ): void {
     let completed = false;
+    let restoreScheduled = false;
     const restore = () => {
       if (completed) {
         return;
@@ -290,15 +300,44 @@ export class CxOverlayStateService {
       }
     };
 
-    afterNextRender(restore, { injector: this.injector });
+    const scheduleFinalRestore = () => {
+      if (completed || restoreScheduled) {
+        return;
+      }
+      restoreScheduled = true;
+      const finalize = () => {
+        restoreScheduled = false;
+        restore();
+      };
+      if (typeof MutationObserver === 'undefined') {
+        queueMicrotask(finalize);
+        return;
+      }
+
+      // Existing parent focus observers receive the teardown mutation first.
+      // A detached marker gives this coordinator a final observer turn, then a
+      // microtask after the complete observer batch makes restoration decisive.
+      const marker = this.document.createTextNode('pending');
+      const observer = new MutationObserver(() => {
+        observer.disconnect();
+        queueMicrotask(finalize);
+      });
+      observer.observe(marker, { characterData: true });
+      marker.data = 'ready';
+    };
+
+    // Focus maintenance owned by the surviving surface (CDK traps, mutation
+    // observers, and step rendering) also settles after render. Enter one final
+    // microtask from that boundary so the exact invoker remains the final target.
+    afterNextRender(scheduleFinalRestore, { injector: this.injector });
     // A conditionally rendered overlay may release from its destroy hook,
     // after Angular's callback window for that render has already passed.
-    // Once its surface is gone, a microtask is safely post-teardown and keeps
-    // focus from falling to body even when no later render is scheduled.
+    // Once its surface is gone, enter the same final scheduling lane even when
+    // no later render is scheduled.
     queueMicrotask(() => {
       const releasedSurface = this.surfaceFor(releasedHandle);
       if (!releasedSurface || !releasedSurface.isConnected || !isHostVisible(releasedSurface)) {
-        restore();
+        scheduleFinalRestore();
       }
     });
   }
