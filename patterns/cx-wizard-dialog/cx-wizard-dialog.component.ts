@@ -23,6 +23,7 @@ import { type CxIconName } from '../../icons/manifest';
 import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key';
+import { CxDismissRequest, type CxDismissReason } from '../../primitives/overlay/dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
 import { CxStateMessageComponent } from '../cx-state-message';
@@ -173,6 +174,8 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
+  /** Synchronous request emitted before a user dismissal would close this wizard. */
+  @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly action = new EventEmitter<CxWizardDialogAction>();
 
   public ngOnChanges(_changes: SimpleChanges): void {
@@ -222,6 +225,9 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     if (this.isLoading$()) {
       return;
     }
+    if (!this.requestDismiss('dismiss')) {
+      return;
+    }
     this.action.emit('dismiss');
     this.closeFromUser();
   }
@@ -240,6 +246,9 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     }
 
     if (this.isFirstStep$()) {
+      if (!this.requestDismiss('cancel')) {
+        return;
+      }
       this.action.emit('cancel');
       this.closeFromUser();
       return;
@@ -265,6 +274,12 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     this.requestedOpen = false;
     this.syncOpen(false);
     this.openChange.emit(false);
+  }
+
+  private requestDismiss(reason: CxDismissReason): boolean {
+    const request = new CxDismissRequest(reason);
+    this.dismissRequest.emit(request);
+    return !request.defaultPrevented;
   }
 
   private syncOpen(nextOpen: boolean): void {

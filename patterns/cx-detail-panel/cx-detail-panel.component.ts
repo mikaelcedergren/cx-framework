@@ -19,6 +19,7 @@ import { type CxIconName } from '../../icons/manifest';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { CxTabsComponent, type CxTabItem } from '../../primitives/navigation/cx-tabs';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
@@ -91,6 +92,8 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   @Input() dismissOnClickOutside = false;
 
   @Output() readonly dismissed = new EventEmitter<void>();
+  /** Synchronous request emitted before a user dismissal would close this panel. */
+  @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly menuItemSelect = new EventEmitter<string>();
   @Output() readonly selectedTabIdChange = new EventEmitter<string>();
 
@@ -197,12 +200,20 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     if (!isHostVisible(this.host.nativeElement)) return;
     if (!this.overlayState.isTopmost(this.overlayHandle)) return;
     if (this.host.nativeElement.contains(target)) return;
-    this.dismiss(false);
+    if (!this.dismiss(false)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 
-  protected dismiss(restoreFocus = true): void {
+  protected dismiss(restoreFocus = true): boolean {
     if (this.closing$()) {
-      return;
+      return false;
+    }
+    const request = new CxDismissRequest('dismiss');
+    this.dismissRequest.emit(request);
+    if (request.defaultPrevented) {
+      return false;
     }
     const activeElement = document.activeElement;
     // Blur only panel-owned focus so in-progress field edits commit without
@@ -213,6 +224,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     this.restoreFocusOnDismiss = restoreFocus;
     this.closing$.set(true);
     this.scheduleDismissFallback();
+    return true;
   }
 
   protected onDismissAnimationEnd(event: AnimationEvent): void {

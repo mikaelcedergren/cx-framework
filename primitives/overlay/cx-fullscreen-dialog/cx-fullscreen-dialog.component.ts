@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { CxIconComponent } from '../../media/cx-icon';
 import { isHostVisible } from '../../shared/host-visibility';
+import { CxDismissRequest } from '../dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 @Component({
@@ -63,6 +64,8 @@ export class CxFullscreenDialogComponent implements OnDestroy {
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
+  /** Synchronous request emitted before a user dismissal would close this dialog. */
+  @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly dismiss = new EventEmitter<void>();
 
   protected readonly isRendered$ = this.renderedState.asReadonly();
@@ -80,6 +83,11 @@ export class CxFullscreenDialogComponent implements OnDestroy {
 
   protected onDismiss(): void {
     if (!this.closeButton || this.closingState()) {
+      return;
+    }
+    const request = new CxDismissRequest('dismiss');
+    this.dismissRequest.emit(request);
+    if (request.defaultPrevented) {
       return;
     }
     this.dismiss.emit();

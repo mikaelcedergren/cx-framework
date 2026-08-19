@@ -22,6 +22,7 @@ import { eventMatchesShortcut } from '../../actions/shared/shortcuts';
 import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { isHostVisible } from '../../shared/host-visibility';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../cx-menu';
+import { CxDismissRequest, type CxDismissReason } from '../dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 
 let cxDialogId = 0;
@@ -107,6 +108,8 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
   }
 
   @Output() readonly openChange = new EventEmitter<boolean>();
+  /** Synchronous request emitted before a user dismissal would close this dialog. */
+  @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly primary = new EventEmitter<void>();
   @Output() readonly secondary = new EventEmitter<void>();
   @Output() readonly dismiss = new EventEmitter<void>();
@@ -210,6 +213,9 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
   }
 
   private dismissFromUser(): void {
+    if (!this.requestDismiss('dismiss')) {
+      return;
+    }
     this.dismiss.emit();
     this.closeFromUser();
   }
@@ -225,6 +231,9 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
   }
 
   protected onSecondary(): void {
+    if (this.closeOnSecondary && !this.requestDismiss('cancel')) {
+      return;
+    }
     this.secondary.emit();
     if (this.closeOnSecondary) {
       this.closeFromUser();
@@ -274,6 +283,12 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
     this.openInput = false;
     this.syncOpen(false);
     this.openChange.emit(false);
+  }
+
+  private requestDismiss(reason: CxDismissReason): boolean {
+    const request = new CxDismissRequest(reason);
+    this.dismissRequest.emit(request);
+    return !request.defaultPrevented;
   }
 
   private syncOpen(nextOpen: boolean): void {

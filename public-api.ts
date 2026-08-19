@@ -126,6 +126,7 @@ export * from './primitives/navigation/cx-tabs';
 export * from './primitives/navigation/cx-pagination';
 
 export * from './primitives/overlay/cx-dialog';
+export * from './primitives/overlay/dismiss-request';
 export * from './primitives/overlay/cx-loading-overlay';
 export * from './primitives/overlay/cx-context-dialog';
 export * from './primitives/overlay/cx-fullscreen-dialog';

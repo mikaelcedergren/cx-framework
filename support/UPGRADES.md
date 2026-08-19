@@ -14,6 +14,20 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.8.4
+
+- `cx-dialog`, `cx-wizard-dialog`, `cx-fullscreen-dialog`, and `cx-detail-panel` — gained
+  the additive synchronous `dismissRequest` output for user Cancel and dismiss routes. Its
+  `CxDismissRequest` carries semantic reason `cancel` or `dismiss`; call
+  `preventDefault()` before the handler returns to keep the original surface's DOM, state,
+  open value, and overlay stack entry intact and run no closing focus restoration or
+  fallback. A prevented request emits no legacy action, `openChange`, or `dismissed`. The
+  handler may open a nested confirmation, which then becomes the top surface and may own
+  focus. An
+  unhandled request keeps the previous close behavior. Programmatic `[open]=false`,
+  destruction, and completion routes do not emit this request. Use it where changed work
+  may need confirmation; no migration is required otherwise.
+
 ## 0.8.3
 
 - All overlays coordinated by `CxOverlayStateService` — including `cx-dialog`,
