@@ -35,9 +35,9 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 
 [MUST] Start with the task, not the documents:
 
-- Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
+- Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, `RULE-ID: layout.start-alignment`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `03-ux-rules.md`.
-- Any component choice, mention, or implementation: read `RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, `RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, and `RULE-ID: system.shared-owner` in `03-ux-rules.md`, then inspect the consuming product's own design system before choosing an implementation.
+- Any component choice, mention, or implementation: read `RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, `RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, `RULE-ID: system.component-state-contract`, and `RULE-ID: system.shared-owner` in `03-ux-rules.md`, then inspect the consuming product's own design system before choosing an implementation.
 - Design-system discovery, tokens, ownership, supported configuration, composition, theming, or layout foundations: read the matching section of `02-design-system.md`.
 - Cross-cutting behavior, accessibility, layout, feedback, forms, navigation, or state: search `03-ux-rules.md` by `TOPIC:`, `SCOPE:`, or keyword.
 - A named component family such as buttons, dialogs, or tabs: treat the name as a semantic role, inspect the consuming product's local components and established usage, then search `04-component-rules.md` by `COMPONENT:` for applicable role behavior. Never infer a selector, import, property name, or code structure from the portable term.
@@ -93,9 +93,11 @@ COMPONENT: <component-name>
 - user mental model: `system.mental-model`
 - coherent surface promise and behavior: `system.semantic-coherence`
 - scannability and earned explanation: `content.scannable`, `surfaces.light-first`
+- stable visual origin: `layout.start-alignment`
 - product truth and terminology: `copy.truth`, `copy.terminology`
 - existing-system and shared ownership: `system.use-existing`, `system.shared-owner`, `system.no-external-patches`
 - semantic component language and local resolution: `system.component-terms`, `system.component-resolution`
+- component-owned state presentation: `system.component-state-contract`
 - perceivable state, feedback, affordance, and consequence: `interaction.visible-response`, `interaction.consequence`, `accessibility.focus`
 - harm prevention and preserved work: `interaction.destructive-intent`, `interaction.preserve-work`, `interaction.unsaved-warning`
 - keyboard and color-independent meaning: `accessibility.keyboard`, `accessibility.color-independent`

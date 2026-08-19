@@ -36,7 +36,7 @@ RULE-ID: buttons.destructive SCOPE: component COMPONENT: buttons TYPE: MUST TOPI
 
 RULE-ID: buttons.reachable-validation SCOPE: component COMPONENT: buttons TYPE: MUST TOPIC: feedback RULE: Keep a button reachable when pressing it is how the user receives recovery guidance. DESCRIPTION: Do not replace useful submit-time validation with an unexplained disabled state.
 
-RULE-ID: buttons.loading SCOPE: component COMPONENT: buttons TYPE: MUST TOPIC: feedback RULE: Prevent duplicate activation while a button action is processing. DESCRIPTION: Show truthful local progress or activity without changing the action into a fabricated completion state.
+RULE-ID: buttons.loading SCOPE: component COMPONENT: buttons TYPE: MUST TOPIC: feedback RULE: Use the button's supported loading state while its action is processing. DESCRIPTION: The component owns duplicate-activation prevention and its complete activity presentation; consumers activate the state as-is without rewriting its label, replacing its content, or adding parallel loading treatment.
 
 RULE-ID: buttons.order SCOPE: component COMPONENT: buttons TYPE: SHOULD TOPIC: consistency RULE: Keep repeated action groups in a consistent order. DESCRIPTION: Stable ordering supports scanning and motor memory while allowing locale-aware layout.
 

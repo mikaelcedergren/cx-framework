@@ -73,7 +73,8 @@ const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStat
 })
 export class CxStateMessageComponent implements AfterViewChecked {
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
-  private measuredInk = '';
+  private measuredRegion: HTMLElement | undefined;
+  private measuredOffset: number | undefined;
 
   @ViewChild('messageBody', { read: ElementRef })
   private messageBodyRef?: ElementRef<HTMLElement>;
@@ -181,20 +182,20 @@ export class CxStateMessageComponent implements AfterViewChecked {
   private syncIconInkOffset(): void {
     const region = this.iconRegionRef?.nativeElement;
     if (!this.browser || !region) {
-      this.measuredInk = '';
-      return;
-    }
-
-    const key = `${this.resolvedIcon}|${this.layout}`;
-    if (key === this.measuredInk) {
+      this.measuredRegion = undefined;
+      this.measuredOffset = undefined;
       return;
     }
 
     const air = this.iconInkAir(region);
     const heading = this.messageBodyRef?.nativeElement.querySelector('.cx-state-message__heading');
     const offset = Math.max(0, air - (heading ? capLeading(heading) : 0));
+    if (region === this.measuredRegion && offset === this.measuredOffset) {
+      return;
+    }
     region.style.setProperty('--cx-state-message-icon-ink', `${offset}px`);
-    this.measuredInk = key;
+    this.measuredRegion = region;
+    this.measuredOffset = offset;
   }
 
   /** Blank space between the icon box's top edge and the first painted pixel of its glyph. */

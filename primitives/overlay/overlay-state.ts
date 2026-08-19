@@ -35,7 +35,7 @@ export type CxOverlayStateCaptureOptions = {
   layerSurfaces?: () => readonly HTMLElement[];
   /** Whether this capture currently participates in topmost overlay ownership. Hidden and inactive surfaces return false. */
   isActive?: () => boolean;
-  /** Runs after the coordinator consumes Escape for this topmost active overlay. Omit to block dismissal without acting. */
+  /** Runs after the coordinator consumes Escape for this topmost active overlay. Omit to consume Escape without invoking a callback. */
   onEscape?: (event: KeyboardEvent) => void;
 };
 

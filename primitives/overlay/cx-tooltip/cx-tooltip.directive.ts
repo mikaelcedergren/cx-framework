@@ -55,6 +55,10 @@ export type CxTooltipDelay = 'default' | 'none';
 export type CxTooltipPosition = 'top' | 'right' | 'bottom' | 'left';
 
 type CxTooltipMeasurementCallback = () => void;
+type CxTooltipPointerRegistration = Readonly<{
+  move(clientX: number, clientY: number): void;
+  down(): void;
+}>;
 
 /**
  * Shares one resize observer and one document mutation observer across every
@@ -164,14 +168,16 @@ class CxTooltipOverflowObserver {
 }
 
 /**
- * Owns document-level interaction needed only by active tooltips. One Escape
- * listener serves every open/pending trigger, and one mutation observer keeps
- * active aria-describedby relationships merged with consumer updates.
+ * Owns document-level interaction needed only by active tooltips. One set of
+ * keyboard/pointer listeners serves every open or pending trigger, and one
+ * mutation observer keeps active aria-describedby relationships merged with
+ * consumer updates.
  */
 @Injectable({ providedIn: 'root' })
 class CxTooltipInteractionCoordinator {
   private readonly document = inject(DOCUMENT);
   private readonly escapeCallbacks = new Set<() => void>();
+  private readonly pointerRegistrations = new Set<CxTooltipPointerRegistration>();
   private readonly descriptionCallbacks = new Map<HTMLElement, Set<() => void>>();
   private descriptionObserver?: MutationObserver;
 
@@ -181,6 +187,18 @@ class CxTooltipInteractionCoordinator {
     }
     for (const callback of [...this.escapeCallbacks]) {
       callback();
+    }
+  };
+
+  private readonly onDocumentPointerMove = (event: PointerEvent): void => {
+    for (const registration of [...this.pointerRegistrations]) {
+      registration.move(event.clientX, event.clientY);
+    }
+  };
+
+  private readonly onDocumentPointerDown = (): void => {
+    for (const registration of [...this.pointerRegistrations]) {
+      registration.down();
     }
   };
 
@@ -199,6 +217,27 @@ class CxTooltipInteractionCoordinator {
       this.escapeCallbacks.delete(callback);
       if (this.escapeCallbacks.size === 0) {
         this.document.removeEventListener('keydown', this.onDocumentKeydown);
+      }
+    };
+  }
+
+  registerPointer(registration: CxTooltipPointerRegistration): () => void {
+    if (this.pointerRegistrations.size === 0) {
+      this.document.addEventListener('pointermove', this.onDocumentPointerMove, { passive: true });
+      this.document.addEventListener('pointerdown', this.onDocumentPointerDown, true);
+    }
+    this.pointerRegistrations.add(registration);
+
+    let active = true;
+    return () => {
+      if (!active) {
+        return;
+      }
+      active = false;
+      this.pointerRegistrations.delete(registration);
+      if (this.pointerRegistrations.size === 0) {
+        this.document.removeEventListener('pointermove', this.onDocumentPointerMove);
+        this.document.removeEventListener('pointerdown', this.onDocumentPointerDown, true);
       }
     };
   }
@@ -285,7 +324,8 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
 
   private triggerHovered = false;
   private triggerFocused = false;
-  private escapeDismissed = false;
+  private surfaceHovered = false;
+  private dismissed = false;
   private open = false;
   private openTimer?: number;
   private closeTimer?: number;
@@ -296,6 +336,11 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private readonly overflowMeasurementCallback = () => this.syncOverflowMeasurement();
   private stopEscapeHandling?: () => void;
   private readonly escapeCallback = () => this.onEscapeKey();
+  private stopPointerHandling?: () => void;
+  private readonly pointerRegistration: CxTooltipPointerRegistration = {
+    move: (clientX, clientY) => this.onDocumentPointerMove(clientX, clientY),
+    down: () => this.onDocumentPointerDown(),
+  };
   private descriptionTarget?: HTMLElement;
   private stopDescriptionObservation?: () => void;
   private readonly descriptionMutationCallback = () => this.mergeDescription();
@@ -367,6 +412,8 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     this.closeNow();
     this.stopEscapeHandling?.();
     this.stopEscapeHandling = undefined;
+    this.stopPointerHandling?.();
+    this.stopPointerHandling = undefined;
   }
 
   @HostListener('mouseenter')
@@ -475,8 +522,33 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     if (!this.open && this.openTimer === undefined) {
       return;
     }
-    this.escapeDismissed = true;
+    this.dismissed = true;
     this.clearOpenTimer();
+    this.closeNow();
+  }
+
+  private onDocumentPointerMove(clientX: number, clientY: number): void {
+    if (!this.open) {
+      return;
+    }
+    const hovered = this.pointerWithinTooltip(clientX, clientY);
+    if (hovered === this.surfaceHovered) {
+      return;
+    }
+    this.surfaceHovered = hovered;
+    if (hovered) {
+      this.clearCloseTimer();
+    } else {
+      this.scheduleClose();
+    }
+  }
+
+  private onDocumentPointerDown(): void {
+    if (!this.open && this.openTimer === undefined) {
+      return;
+    }
+    this.dismissed = true;
+    this.surfaceHovered = false;
     this.closeNow();
   }
 
@@ -495,13 +567,13 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     if (!view) {
       return;
     }
-    this.startEscapeHandling();
+    this.startInteractionHandling();
     this.openTimer = view.setTimeout(() => {
       this.openTimer = undefined;
       if (this.triggerHovered) {
         this.openNow();
       } else {
-        this.stopEscapeHandlingIfIdle();
+        this.stopInteractionHandlingIfIdle();
       }
     }, CX_TOOLTIP_DEFAULT_DELAY_MS);
   }
@@ -520,8 +592,11 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
         new ComponentPortal(CxTooltipSurfaceComponent, this.viewContainerRef),
       );
     }
+    // CDK enables pane hit-testing during attach; restore this component's
+    // pointer-inert contract after that lifecycle step.
+    overlayRef.overlayElement.style.pointerEvents = 'none';
     this.open = true;
-    this.startEscapeHandling();
+    this.startInteractionHandling();
     this.syncOpenSurface(this.cxTooltipPosition());
     this.setDescriptionTarget(descriptionTarget);
   }
@@ -545,6 +620,10 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
       positionStrategy: this.positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
     });
+    // The CDK pane is the actual hit-test box. Keep both it and the child
+    // surface inert; document-level geometry preserves hover without ever
+    // swallowing the action already targeted underneath the tooltip.
+    this.overlayRef.overlayElement.style.pointerEvents = 'none';
     return this.overlayRef;
   }
 
@@ -558,9 +637,57 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     this.overlayRef?.updatePosition();
   }
 
+  /**
+   * Pointer-inert tooltips still have to remain available while the pointer
+   * crosses the placement gap or rests over the visible surface. The bridge is
+   * only the narrow axis-aligned space between origin and surface, not a broad
+   * invisible hover layer that could pin the tooltip over unrelated content.
+   */
+  private pointerWithinTooltip(clientX: number, clientY: number): boolean {
+    const surfaceHost = this.surfaceRef?.location.nativeElement as HTMLElement | undefined;
+    const surface = surfaceHost?.querySelector<HTMLElement>('.cx-tooltip__surface');
+    const origin = this.tooltipOrigin();
+    if (!surface?.isConnected || !origin.isConnected) {
+      return false;
+    }
+
+    const surfaceRect = surface.getBoundingClientRect();
+    if (pointInRect(clientX, clientY, surfaceRect)) {
+      return true;
+    }
+
+    const originRect = origin.getBoundingClientRect();
+    const slop = 4;
+    if (surfaceRect.bottom <= originRect.top) {
+      return clientY >= surfaceRect.bottom - slop
+        && clientY <= originRect.top + slop
+        && clientX >= Math.min(surfaceRect.left, originRect.left) - slop
+        && clientX <= Math.max(surfaceRect.right, originRect.right) + slop;
+    }
+    if (surfaceRect.top >= originRect.bottom) {
+      return clientY >= originRect.bottom - slop
+        && clientY <= surfaceRect.top + slop
+        && clientX >= Math.min(surfaceRect.left, originRect.left) - slop
+        && clientX <= Math.max(surfaceRect.right, originRect.right) + slop;
+    }
+    if (surfaceRect.right <= originRect.left) {
+      return clientX >= surfaceRect.right - slop
+        && clientX <= originRect.left + slop
+        && clientY >= Math.min(surfaceRect.top, originRect.top) - slop
+        && clientY <= Math.max(surfaceRect.bottom, originRect.bottom) + slop;
+    }
+    if (surfaceRect.left >= originRect.right) {
+      return clientX >= originRect.right - slop
+        && clientX <= surfaceRect.left + slop
+        && clientY >= Math.min(surfaceRect.top, originRect.top) - slop
+        && clientY <= Math.max(surfaceRect.bottom, originRect.bottom) + slop;
+    }
+    return false;
+  }
+
   private scheduleClose(): void {
     this.clearOpenTimer();
-    if (this.triggerHovered || this.triggerFocused) {
+    if (this.triggerHovered || this.triggerFocused || this.surfaceHovered) {
       return;
     }
     if (!this.open) {
@@ -572,7 +699,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     }
     this.closeTimer = view.setTimeout(() => {
       this.closeTimer = undefined;
-      if (!this.triggerHovered && !this.triggerFocused) {
+      if (!this.triggerHovered && !this.triggerFocused && !this.surfaceHovered) {
         this.closeNow();
       }
     }, CX_TOOLTIP_CLOSE_GRACE_MS);
@@ -580,7 +707,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
 
   private scheduleOverflowTargetClose(): void {
     this.clearOpenTimer();
-    if (!this.open || this.triggerFocused) {
+    if (!this.open || this.triggerFocused || this.surfaceHovered) {
       return;
     }
     const view = this.host.ownerDocument.defaultView;
@@ -589,7 +716,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     }
     this.closeTimer = view.setTimeout(() => {
       this.closeTimer = undefined;
-      if (!this.triggerFocused && !this.overflowAllowsOpen()) {
+      if (!this.triggerFocused && !this.surfaceHovered && !this.overflowAllowsOpen()) {
         this.closeNow();
       }
     }, CX_TOOLTIP_CLOSE_GRACE_MS);
@@ -598,11 +725,12 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private closeNow(): void {
     this.clearOpenTimer();
     this.clearCloseTimer();
+    this.surfaceHovered = false;
     this.clearDismissalWhenIdle();
     this.removeDescription();
     if (!this.open) {
       this.releaseOverlay();
-      this.stopEscapeHandlingIfIdle();
+      this.stopInteractionHandlingIfIdle();
       if (!this.triggerHovered) {
         this.hoveredOverflowTarget = undefined;
       }
@@ -610,7 +738,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     }
     this.open = false;
     this.releaseOverlay();
-    this.stopEscapeHandlingIfIdle();
+    this.stopInteractionHandlingIfIdle();
     if (!this.triggerHovered) {
       this.hoveredOverflowTarget = undefined;
     }
@@ -620,16 +748,16 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     return (
       !this.cxTooltipDisabled() &&
       !!this.effectiveMessageText() &&
-      !this.escapeDismissed &&
+      !this.dismissed &&
       !this.overlayState.ownsOpenOverlay(this.host) &&
       this.overflowAllowsOpen() &&
-      (this.triggerHovered || this.triggerFocused)
+      (this.triggerHovered || this.triggerFocused || this.surfaceHovered)
     );
   }
 
   private clearDismissalWhenIdle(): void {
-    if (!this.triggerHovered && !this.triggerFocused) {
-      this.escapeDismissed = false;
+    if (!this.triggerHovered && !this.triggerFocused && !this.surfaceHovered) {
+      this.dismissed = false;
     }
   }
 
@@ -935,7 +1063,7 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
       view.clearTimeout(this.openTimer);
     }
     this.openTimer = undefined;
-    this.stopEscapeHandlingIfIdle();
+    this.stopInteractionHandlingIfIdle();
   }
 
   private clearCloseTimer(): void {
@@ -946,16 +1074,19 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
     this.closeTimer = undefined;
   }
 
-  private startEscapeHandling(): void {
+  private startInteractionHandling(): void {
     this.stopEscapeHandling ??= this.interactionCoordinator.registerEscape(this.escapeCallback);
+    this.stopPointerHandling ??= this.interactionCoordinator.registerPointer(this.pointerRegistration);
   }
 
-  private stopEscapeHandlingIfIdle(): void {
+  private stopInteractionHandlingIfIdle(): void {
     if (this.open || this.openTimer !== undefined) {
       return;
     }
     this.stopEscapeHandling?.();
     this.stopEscapeHandling = undefined;
+    this.stopPointerHandling?.();
+    this.stopPointerHandling = undefined;
   }
 
   private releaseOverlay(): void {
@@ -970,4 +1101,11 @@ export class CxTooltipDirective implements AfterViewInit, OnDestroy {
   private messageText(): string {
     return this.cxTooltip()?.trim() ?? '';
   }
+}
+
+function pointInRect(clientX: number, clientY: number, rect: DOMRect): boolean {
+  return clientX >= rect.left
+    && clientX <= rect.right
+    && clientY >= rect.top
+    && clientY <= rect.bottom;
 }

@@ -11,8 +11,9 @@
   border-radius: var(--radius-md);
   background: var(--ink);
   color: var(--surface);
-  // The surface must never intercept the pointer: a tooltip anchored over
-  // interactive siblings (option lists) would otherwise swallow their clicks.
+  // The surface and its CDK pane stay pointer-inert so content underneath keeps
+  // its native target. The shared interaction coordinator follows pointer
+  // geometry to keep the tooltip hoverable without adding an interception layer.
   pointer-events: none;
   animation: cx-tooltip-in var(--motion-base) var(--ease-out) forwards;
   will-change: opacity, transform;

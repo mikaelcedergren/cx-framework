@@ -34,6 +34,8 @@ RULE-ID: system.default-normal SCOPE: design-system-component TYPE: MUST TOPIC: 
 
 RULE-ID: system.reachable-states SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states.
 
+RULE-ID: system.component-state-contract SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Use each component's supported state presentation as a complete contract. DESCRIPTION: Activate documented loading, selected, on or off, disabled, success, error, and other states without consumer-authored changes to the component's label, icons, structure, feedback, or state treatment, and do not narrate or duplicate state the component already communicates; if a required state is missing, surface the gap to the owning design system instead of improvising a local substitute.
+
 RULE-ID: system.no-empty-chrome SCOPE: global TYPE: MUST TOPIC: state RULE: No user-facing element may render empty or without enough visible content or an explicit visible state to explain its purpose. DESCRIPTION: This includes every control, overlay, container, surface, and optional wrapper. Accessible naming alone is insufficient: each interactive control needs visible text, an icon, or another perceivable signifier. An empty optional wrapper does not render. A dialog, dropdown, popover, or similar surface without meaningful content either shows a meaningful empty, loading, or error state or does not render.
 
 RULE-ID: system.invalid-combinations SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make invalid supported-option combinations fail clearly at the owning component. DESCRIPTION: Do not silently render broken or misleading chrome.
@@ -113,6 +115,8 @@ RULE-ID: layout.absolute-layer SCOPE: layout TYPE: MUST TOPIC: layout RULE: Use 
 RULE-ID: layout.z-index SCOPE: layout TYPE: MUST TOPIC: layout RULE: Use defined stacking roles for real layering. DESCRIPTION: Do not add arbitrary z-index values to repair click targets or local overlap.
 
 RULE-ID: layout.component-spacing SCOPE: design-system TYPE: MUST TOPIC: layout RULE: Let components own internal padding and containers own surrounding layout. DESCRIPTION: Containers control gaps, margins, width, placement, and page composition.
+
+RULE-ID: layout.start-alignment SCOPE: layout TYPE: SHOULD TOPIC: layout RULE: Align ordinary content to the block start and direction-aware inline start by default. DESCRIPTION: A shared starting edge gives related elements a stable visual origin for scanning, comparison, and wrapping; choose center, end, baseline, or distributed alignment only when it materially improves the content's meaning, comparison, or operation, because available space or visual symmetry alone does not justify the departure.
 
 RULE-ID: layout.breathing-room SCOPE: layout TYPE: MUST TOPIC: density RULE: Preserve visible breathing room between distinct adjacent elements. DESCRIPTION: Choose a tokenized gap by relationship and visual weight; a declared gap does not satisfy this rule when independently perceivable elements still render as touching or near-touching. EXCEPT: Parts may meet only when contact itself communicates a documented connected composite or an intentional continuous structure such as a table grid, chart, or full-bleed surface; text and controls within that structure still require deliberate internal insets.
 

@@ -38,7 +38,7 @@ RULE-ID: copy.buttons.destructive SCOPE: button-label TYPE: MUST TOPIC: trust RU
 
 RULE-ID: copy.buttons.pairs SCOPE: action-group TYPE: SHOULD TOPIC: copy RULE: Give paired actions distinct outcomes. DESCRIPTION: Use a safe exit plus the real action rather than ambiguous `No` and `Yes` labels.
 
-RULE-ID: copy.buttons.loading SCOPE: button-label TYPE: SHOULD TOPIC: feedback RULE: Keep processing language tied to the original action. DESCRIPTION: The control may show truthful activity while preserving what the user asked it to do.
+RULE-ID: copy.buttons.loading SCOPE: button-label TYPE: MUST TOPIC: feedback RULE: Do not author alternate button copy for processing states. DESCRIPTION: Activate the button's supported loading state as-is; its component contract owns whether and how visible text changes.
 
 RULE-ID: copy.confirmation.alignment SCOPE: confirmation-dialog TYPE: MUST TOPIC: trust RULE: Align the confirmation statement with the committing action. DESCRIPTION: State the decision or consequence directly, then label the primary action as its continuation; use a safe exit plus the explicit action instead of a question answered by `Yes`, `No`, `OK`, or `Confirm`.
 

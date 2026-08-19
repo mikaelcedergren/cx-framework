@@ -63,9 +63,9 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Keep a focused change within its accepted owner. Using another component's supported behavior does not expand scope; changing that component does.
 
-[MUST] A hidden or inactive component is inert. It does not react to global keyboard shortcuts, Escape, outside interaction, or other document-level behavior while absent from the visible experience. A closing overlay emits no further action; while it remains visible, it still blocks every surface behind it.
+[MUST] A hidden or inactive component is inert. It does not react to global keyboard shortcuts, Escape, outside interaction, or other document-level behavior while absent from the visible experience. Once dismissal begins, an overlay accepts no further user action and preserves its established interaction boundary until teardown: a modal or otherwise blocking overlay continues to block lower surfaces, while a non-modal overlay preserves its documented outside interaction.
 
-[MUST] When nested overlays are open, visual stacking and interaction ownership follow the same opening order. The topmost visible, active overlay alone owns and consumes Escape. An eligible dismissal follows the same controlled cancel or close path as its visible action; an overlay that cannot dismiss still blocks every surface behind it, and one keypress produces at most one action.
+[MUST] When nested overlays are open, visual stacking and interaction ownership follow the same opening order. The topmost visible, active overlay alone owns and consumes Escape. An eligible dismissal follows the same controlled cancel or close path as its visible action; an overlay that cannot dismiss still consumes Escape before it can reach a lower overlay or page handler, and one keypress produces at most one action.
 
 [MUST] Resolve any consumer-interceptable user cancellation or dismissal synchronously before the surface emits its established outcome or changes visibility, state, overlay ownership, motion, or focus. When the consumer blocks dismissal, preserve the original surface's rendering, state, open state, and overlay registration, and run no closing focus restoration or fallback. A nested confirmation opened by the handler may then take top interaction and focus ownership. When unblocked, preserve the established close behavior. Programmatic closure, destruction, and task-completion routes bypass user-dismissal interception.
 
@@ -88,6 +88,8 @@ purpose → role → information → component role → local implementation →
 - placement or alignment
 
 [SHOULD] Prefer positive, user-concept options and intent-named events when changing a shared component's supported contract. [MUST] Do not require these exact words when the local system has an established alternative vocabulary.
+
+[MUST] Apply `RULE-ID: system.component-state-contract` whenever a chosen component exposes a supported state.
 
 [MUST] Apply `RULE-ID: system.no-empty-chrome` whenever optional content or supported variation can leave a user-facing control, wrapper, overlay, container, or surface without a visible purpose. [MUST] Invalid supported-option combinations fail clearly at the owning component instead of rendering misleading chrome.
 
@@ -139,7 +141,7 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Use defined stacking roles only for genuine layers such as overlays, anchored surfaces, and navigation planes.
 
-[MUST] Apply `RULE-ID: layout.component-spacing`, `RULE-ID: layout.breathing-room`, `RULE-ID: layout.supported-viewports`, and `RULE-ID: layout.no-page-horizontal-scroll` to applicable layout work.
+[MUST] Apply `RULE-ID: layout.component-spacing`, `RULE-ID: layout.start-alignment`, `RULE-ID: layout.breathing-room`, `RULE-ID: layout.supported-viewports`, and `RULE-ID: layout.no-page-horizontal-scroll` to applicable layout work.
 
 ## Utility classes
 

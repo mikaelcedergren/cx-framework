@@ -88,7 +88,11 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   /** Optional width / min-width overrides (any CSS length) for the panel host. */
   @Input() width: string | null = null;
   @Input() minWidth: string | null = null;
-  /** Also dismiss on a click outside the panel after any owned overlay closes. */
+  /**
+   * Also dismiss on a click outside the panel after any owned overlay closes.
+   * A successful dismissal lets that pointer action continue to its outside
+   * target and does not restore focus to the panel's invoker.
+   */
   @Input() dismissOnClickOutside = false;
 
   @Output() readonly dismissed = new EventEmitter<void>();
