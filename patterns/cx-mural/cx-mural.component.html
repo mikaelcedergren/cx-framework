@@ -1,0 +1,71 @@
+@if (pickerOpen()) {
+  <div class="cx-mural__picker" role="group" aria-label="Change image" (keydown.escape)="onEscape($event)">
+    <cx-search-field
+      class="cx-mural__search"
+      label=""
+      ariaLabel="Search"
+      [clearable]="true"
+      [value]="query()"
+      (valueChange)="onQueryChange($event)"
+    />
+    @let browsing = query().length === 0;
+    @if (!browsing && searchLoading) {
+      <div class="cx-mural__search-state">
+        <cx-spinner size="small" ariaLabel="Searching" />
+      </div>
+    } @else if (!browsing && searchError) {
+      <p class="cx-mural__search-state cx-mural__search-state--error" role="status">{{ searchError }}</p>
+    } @else if (!browsing && results.length === 0) {
+      <p class="cx-mural__search-state" role="status">No matches</p>
+    } @else if ((browsing ? images : results).length > 0) {
+      <div class="cx-mural__options">
+        @for (option of browsing ? images : results; track option.id) {
+          <button
+            class="cx-mural__option"
+            type="button"
+            [attr.aria-label]="option.label"
+            [attr.aria-pressed]="pending()?.id === option.id"
+            (click)="onPick(option)"
+          >
+            <img class="cx-mural__thumb" [src]="option.thumb || option.src" alt="" />
+            <span class="cx-mural__option-label">{{ option.label }}</span>
+          </button>
+        }
+      </div>
+    }
+    <div class="cx-mural__picker-actions">
+      <cx-button text="Cancel" (pressed)="onCancel()" />
+      <cx-button text="Apply" mood="primary" [disabled]="!pending()" (pressed)="onApply()" />
+    </div>
+  </div>
+} @else {
+  <div class="cx-mural__frame" [class.cx-mural__frame--empty]="!displayImage">
+    @if (displayImage; as image) {
+      <img class="cx-mural__image" [src]="image.src" alt="" (error)="onImageError()" />
+      @if (image.attribution; as credit) {
+        <p class="cx-mural__credit">
+          @if (credit.href) {
+            <a class="cx-mural__credit-link" [href]="credit.href" target="_blank" rel="noopener noreferrer">{{ credit.name }}</a>
+          } @else {
+            <span>{{ credit.name }}</span>
+          }
+          @if (credit.source) {
+            <span aria-hidden="true">·</span>
+            @if (credit.sourceHref) {
+              <a class="cx-mural__credit-link" [href]="credit.sourceHref" target="_blank" rel="noopener noreferrer">{{ credit.source }}</a>
+            } @else {
+              <span>{{ credit.source }}</span>
+            }
+          }
+        </p>
+      }
+    }
+    <cx-icon-button
+      class="cx-mural__change"
+      icon="settings"
+      variant="transparent"
+      ariaLabel="Change image"
+      (pressed)="onOpenPicker()"
+    />
+  </div>
+}

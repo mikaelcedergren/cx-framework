@@ -14,6 +14,29 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.8.7
+
+- `cx-mural` — new pattern: a decorative image pane that fills the container the consumer
+  sizes and lets the user swap the picture in place. `images` (`CxMuralImage[]`) offers the
+  browsable catalog; `value` is the picture on display — a whole `CxMuralImage | null`,
+  painted from its own `src`, so it need not be present in `images`; null keeps a quiet
+  empty frame. Hovering reveals a transparent settings control (held visible on touch and
+  while no picture resolves) that swaps the pane into an in-place picker: it browses the
+  catalog while its search field is empty, and typing streams the debounced query out
+  through `search` (`''` included on clear) for the consumer to answer with `results`
+  (`CxMuralImage[]`), `searchLoading`, and `searchError` — the component never fetches
+  anything itself, and a consumer with no remote source should supply a standing
+  `searchError` saying search is unavailable there. Apply commits the picked image through
+  `valueChange` only when the choice changed; Cancel or Escape leaves it untouched, so wire
+  `valueChange` straight to persistence. `CxMuralImage` carries optional `thumb` (picker
+  preview) and `attribution` (`CxMuralAttribution`: `name`, `href`, `source`, `sourceHref`),
+  rendered as a quiet credit on the pane with the settings control's reveal. A displayed
+  picture that fails to load returns the pane to the empty frame and emits `imageError`, so
+  the consumer can swap in a locally resolvable fallback. The pane contributes no intrinsic
+  size (`contain: size`) and renders its picture decorative (empty alt): the container owns
+  width, height, and placement outright — size it explicitly, and a tall picker scrolls
+  inside the pane rather than inflating an auto-sized row.
+
 ## 0.8.6
 
 - `cx-side-nav` — additive: `collapsible` renders a collapse toggle at the end of the

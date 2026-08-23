@@ -136,6 +136,15 @@
       "path": "patterns/cx-labeled-row/cx-labeled-row-group.component.ts"
     },
     {
+      "name": "cx-mural",
+      "selectors": [
+        "cx-mural"
+      ],
+      "area": "pattern",
+      "category": "cx-mural",
+      "path": "patterns/cx-mural/cx-mural.component.ts"
+    },
+    {
       "name": "cx-navigation-recovery",
       "selectors": [
         "cx-navigation-recovery"

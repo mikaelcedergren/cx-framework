@@ -1,0 +1,186 @@
+:host {
+  // The container owns the pane's width, height, and placement; the mural owns
+  // everything painted inside it. Containing size makes that contract physical:
+  // the pane contributes no intrinsic size, so a tall picker can never inflate
+  // an auto-sized row or flex line — the grid scrolls inside the pane instead.
+  display: block;
+  contain: size;
+}
+
+.cx-mural__frame {
+  position: relative;
+  height: 100%;
+}
+
+.cx-mural__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+}
+
+// No resolvable picture yet: the frame stays visible as a quiet surface so the
+// settings control still has somewhere to live.
+.cx-mural__frame--empty {
+  border-radius: var(--radius-lg);
+  background: var(--surface-alt);
+}
+
+// The button carries its own chrome; the mural only places it. Revealed on
+// pane hover or keyboard focus; held visible when there is no picture, and on
+// touch, where hover cannot reveal it.
+.cx-mural__change {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-mural__frame:hover .cx-mural__change,
+.cx-mural__change:focus-within,
+.cx-mural__frame--empty .cx-mural__change {
+  opacity: 1;
+}
+
+// The credit is a whisper, not a caption: bare tiny text in muted ink, with
+// no backing surface of its own. It follows the settings control's reveal:
+// pane hover, keyboard focus, and held visible on touch.
+.cx-mural__credit {
+  position: absolute;
+  bottom: var(--space-sm);
+  left: var(--space-sm);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  align-items: baseline;
+  box-sizing: border-box;
+  max-width: calc(100% - 2 * var(--space-sm));
+  margin: 0;
+  color: var(--opacity-mid);
+  font-size: var(--font-size-body-xs);
+  line-height: var(--line-height-small);
+  overflow-wrap: anywhere;
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-mural__frame:hover .cx-mural__credit,
+.cx-mural__credit:focus-within {
+  opacity: 1;
+}
+
+.cx-mural__credit-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (hover: none) {
+  .cx-mural__change,
+  .cx-mural__credit {
+    opacity: 1;
+  }
+}
+
+.cx-mural__picker {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  padding: var(--space-md);
+  border: var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.cx-mural__search {
+  flex: none;
+}
+
+// Loading, failure, and no-matches all hold the grid's slot so the picker's
+// actions never jump while a search settles.
+.cx-mural__search-state {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+  text-align: center;
+}
+
+.cx-mural__search-state--error {
+  color: var(--danger);
+}
+
+.cx-mural__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: start;
+  gap: var(--space-sm);
+  overflow: auto;
+  // The selected ring draws 4px outside its tile (2px outline + 2px offset).
+  // Bleed the scroll box outward by that much so the ring survives the grid's
+  // own clipping while the tiles keep their alignment.
+  padding: 4px;
+  margin: -4px;
+}
+
+.cx-mural__option {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--opacity-high);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cx-mural__option:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-mural__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.cx-mural__option[aria-pressed='true'] {
+  color: var(--ink);
+}
+
+.cx-mural__option[aria-pressed='true'] .cx-mural__thumb {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.cx-mural__option-label {
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-mural__picker-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-mural__change,
+  .cx-mural__credit {
+    transition: none;
+  }
+}
