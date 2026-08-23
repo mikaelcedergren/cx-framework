@@ -14,6 +14,69 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.8.6
+
+- `cx-side-nav` — additive: `collapsible` renders a collapse toggle at the end of the
+  header row, and `collapsed` (two-way via `collapsedChange`) switches the nav into an
+  icon-only rail: instant right-side tooltips carry the labels, badges become a tone dot
+  on the icon corner, an iconless top-level row shows its first letter, and clicking a
+  parent row opens its section as a flyout menu beside the rail — headed by the section
+  label, marking the active destination, navigating on select while the nav stays
+  collapsed. Flyout rows are menu commands, not anchors, so in-flyout selection has no
+  cmd-click/new-tab semantics; the expanded menu keeps real links. A collapsible nav
+  clips labels to a single line to keep row geometry stable between states, and the nav
+  fades slotted `[header]` content out itself while collapsed; slotted `[footer]` content
+  must follow the state through its own API. Existing navs change nothing without opting
+  in.
+- `cx-account-control` — additive: `collapsed` shrinks the control to its avatar and
+  moves the username into an instant tooltip on the right; the menu keeps working from
+  the avatar. Bind it to the surrounding navigation's collapsed state.
+- `cx-menu` and `cx-popover` — additive: `placement` (`'auto' | 'top' | 'right' |
+  'bottom' | 'left'`, default `auto`) chooses which side of the anchor a menu surface
+  opens on; explicit sides are honored and viewport-clamped, with `left`/`right` falling
+  back to the opposite side only when the requested one has no room. A context
+  presentation may now carry an `owner` element: tooltips on it stand down while the
+  menu is open, focus returns to it on close, and a side placement hugs its rect.
+  `cx-popover` accepts `left`/`right` in its `placement` input and animates the surface
+  in along the matching axis. Menus that pass no placement keep their exact previous
+  behavior; the root surface merely gained the same entry-origin treatment submenus
+  always had.
+- `cx-dialog` — the default size now grows with its content up to 640px instead of
+  capping at 512px, and the built-in `description` paragraph caps its own line length
+  for readability. Dialogs whose body content wants more room (chip rows, forms) get
+  wider on their own; remove any consumer workaround that forced `size="large"` or
+  patched dialog width to win space. Text-only confirms stay compact.
+- `cx-labeled-row-group` — new pattern. Wrap a set of `cx-labeled-row` elements in it
+  to share one label column sized to the longest label instead of each row reserving a
+  fixed 160px. Rows must be direct children of the group; other direct children span
+  the full width, and the group owns the vertical gap between rows. Standalone
+  `cx-labeled-row` behavior is unchanged, so existing markup needs no migration.
+- `cx-explorer` — new pattern. A content-management rail for one-level collections:
+  folders hold items, and rows are created, renamed, restyled (icon and color from the
+  shared `CxTagColor` palette), and deleted in place. The rail owns no data — it emits
+  intents (`folderCreate`, `itemCreate`, `folderChange`, `itemChange`, `folderDelete`,
+  `itemDelete`) for the consumer to persist and echo back through `folders`, and deletes
+  are intents only, so the consumer owns confirmation. It is not navigation; `cx-side-nav`
+  keeps app destinations. No existing markup is affected.
+- `cx-icon` — breaking: the public `name` input is now `icon`, matching the thing the
+  control chooses and the icon APIs used by the rest of the framework. Replace
+  `name="settings"` with `icon="settings"` and `[name]="value"` with `[icon]="value"`.
+  The old input is removed rather than retained as an alias.
+- `cx-icon` — the spinner icon now remains still when the user prefers reduced motion.
+  No consumer change is required.
+- `cx-dropdown` — keyboard typeahead and Home/End now work reliably on virtualized lists
+  (more than 80 options). The scroll jump no longer strands keyboard focus on the page
+  body, and Enter or Space on the closed-looking field commits a pending single-select
+  typeahead choice instead of silently discarding it. No consumer change is required.
+- `cx-option` — `focus()` now accepts an optional standard `FocusOptions` argument
+  (for example `{ preventScroll: true }`). Existing no-argument calls behave exactly as
+  before; no migration is required.
+- Fonts — the `elegant` heading voice now resolves to Plus Jakarta Sans;
+  `fonts/Raleway.woff2` is replaced by `fonts/PlusJakartaSans.woff2` (variable 200–800).
+  Products pointing `--font-family-heading` at `--typeface-elegant` render the new face
+  with no markup change. Re-copy the package's `fonts/*.woff2` into the app's public
+  assets and delete any stale `Raleway.woff2`.
+
 ## 0.8.5
 
 - `cx-tooltip` — a visible tooltip now stays available while the pointer crosses the

@@ -33,7 +33,7 @@
 
   @if (dragging$()) {
     <div class="cx-drop-zone__drag-prompt" aria-hidden="true">
-      <cx-icon name="upload" size="32" mood="primary" shape="circle-subtle" />
+      <cx-icon icon="upload" size="32" mood="primary" shape="circle-subtle" />
       <div class="cx-drop-zone__drag-copy">
         <span [id]="headingId" class="cx-drop-zone__heading">{{ visibleHeading }}</span>
         <span [id]="descriptionId" class="cx-drop-zone__description">{{ visibleDescription }}</span>
@@ -43,7 +43,7 @@
     <div class="cx-drop-zone__empty-content">
       <cx-icon
         class="cx-drop-zone__empty-icon"
-        [name]="icon"
+        [icon]="icon"
         [size]="readonly ? '32' : '64'"
         mood="primary"
         shape="circle-subtle"
@@ -75,7 +75,7 @@
     <div class="cx-drop-zone__file-row">
       <cx-icon
         class="cx-drop-zone__file-icon"
-        [name]="selectedFileIcon"
+        [icon]="selectedFileIcon"
         size="32"
         shape="square-subtle"
       />

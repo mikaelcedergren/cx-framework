@@ -32,7 +32,7 @@
       (click)="onPressed($event)"
     >
       @if (icon; as iconName) {
-        <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+        <cx-icon class="cx-tag__icon" [icon]="iconName" [size]="12" aria-hidden="true" />
       }
       @if (visibleText) {
         <span class="cx-tag__text" data-cx-tooltip-overflow>{{ visibleText }}</span>
@@ -40,7 +40,7 @@
     </button>
   } @else {
     @if (icon; as iconName) {
-      <cx-icon class="cx-tag__icon" [name]="iconName" [size]="12" aria-hidden="true" />
+      <cx-icon class="cx-tag__icon" [icon]="iconName" [size]="12" aria-hidden="true" />
     }
     @if (visibleText) {
       <span class="cx-tag__text" [cxTooltip]="visibleText" [cxTooltipOverflow]="true">{{ visibleText }}</span>
@@ -48,7 +48,7 @@
   }
   @if (dismissible) {
     <button type="button" class="cx-tag__dismiss" [attr.aria-label]="dismissLabel" (click)="onDismiss($event)">
-      <cx-icon name="remove" [size]="12" />
+      <cx-icon icon="remove" [size]="12" />
     </button>
   }
 </span>

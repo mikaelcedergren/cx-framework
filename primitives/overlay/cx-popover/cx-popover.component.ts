@@ -156,7 +156,8 @@ export class CxPopoverComponent {
   /** Raises or lowers the compact content cap. Always viewport-clamped. */
   @Input() maxWidth: number | undefined;
   @Input() maxHeight: number | undefined;
-  @Input() placement: 'top' | 'bottom' | undefined;
+  /** Which side of its anchor the surface sits on — drives the entry animation's origin. */
+  @Input() placement: 'top' | 'right' | 'bottom' | 'left' | undefined;
   @Input() surfaceVariant: CxPopoverSurfaceVariant = 'default';
 
   @Output() readonly backdropPressed = new EventEmitter<void>();

@@ -14,7 +14,7 @@
     >
       @if (hasCopy) {
         <div class="cx-banner__main">
-          <cx-icon class="cx-banner__icon" [name]="resolvedIcon" [size]="32" aria-hidden="true" />
+          <cx-icon class="cx-banner__icon" [icon]="resolvedIcon" [size]="32" aria-hidden="true" />
 
           <div class="cx-banner__copy">
             @if (heading.trim()) {
@@ -67,7 +67,7 @@
               [attr.aria-label]="dismissAriaLabel"
               (click)="onDismissPress()"
             >
-              <cx-icon name="remove" [size]="14" aria-hidden="true" />
+              <cx-icon icon="remove" [size]="14" aria-hidden="true" />
             </button>
           }
         </div>

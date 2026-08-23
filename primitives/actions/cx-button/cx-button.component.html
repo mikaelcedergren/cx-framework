@@ -59,7 +59,7 @@
     [attr.aria-hidden]="showSpinner$() ? 'true' : null"
   >
     @if (icon; as iconName) {
-      <cx-icon class="cx-button__icon" [name]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
+      <cx-icon class="cx-button__icon" [icon]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
     }
     @if (visibleText) {
       <span class="cx-button__label">{{ visibleText }}</span>
@@ -68,7 +68,7 @@
       <cx-shortcut-key class="cx-button__shortcut" [parts]="normalizedShortcutParts" aria-hidden="true" />
     }
     @if (appendIcon; as iconName) {
-      <cx-icon class="cx-button__icon" [name]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
+      <cx-icon class="cx-button__icon" [icon]="iconName" [size]="size === 'small' ? 12 : size === 'large' ? 18 : 16" />
     }
   </span>
 

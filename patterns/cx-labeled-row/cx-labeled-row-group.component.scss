@@ -1,0 +1,38 @@
+// No inline-size containment here on purpose: the group's intrinsic width is
+// how a form asks its surface (a dialog, a panel) for the room its widest row
+// needs on one line.
+cx-labeled-row-group {
+  display: block;
+  width: 100%;
+}
+
+.cx-labeled-row-group {
+  // Content-sized labels sit flush against their controls without a generous
+  // gutter; grouped rows read this so their subgrid keeps the same gap.
+  --cx-labeled-row-group-column-gap: var(--space-xl);
+
+  display: grid;
+  width: 100%;
+  // The label column fits the longest label in the group instead of reserving a
+  // fixed width, so short labels stop taxing the controls beside them.
+  grid-template-columns: fit-content(200px) minmax(0, 1fr);
+  column-gap: var(--cx-labeled-row-group-column-gap);
+  // Form rhythm: one full breathing step between rows. --space-md read as too
+  // dense against bordered fields and chip groups (user-judged 2026-08-22).
+  row-gap: var(--space-lg);
+}
+
+// Every direct child spans both tracks: grouped rows redistribute the tracks
+// internally via subgrid, and non-row content simply takes the full width.
+.cx-labeled-row-group > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+// On narrow viewports the group collapses to one track and grouped rows stack
+// their labels above their controls together.
+@media (max-width: 480px) {
+  .cx-labeled-row-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

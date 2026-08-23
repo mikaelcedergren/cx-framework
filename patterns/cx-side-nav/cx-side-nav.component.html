@@ -1,7 +1,26 @@
 @if (navbarVisible) {
-  <aside class="cx-side-nav" aria-label="Main navigation">
+  <aside
+    class="cx-side-nav"
+    [class.cx-side-nav--collapsible]="collapsible"
+    [class.cx-side-nav--collapsed]="collapsed"
+    aria-label="Main navigation"
+  >
     <div class="cx-side-nav__header">
-      <ng-content select="[header]" />
+      <div class="cx-side-nav__header-slot">
+        <ng-content select="[header]" />
+      </div>
+      @if (collapsible) {
+        <cx-icon-button
+          class="cx-side-nav__collapse-toggle"
+          icon="sidebar-left"
+          variant="transparent"
+          [ariaLabel]="collapsed ? 'Expand' : 'Collapse'"
+          [cxTooltip]="collapsed ? 'Expand' : 'Collapse'"
+          cxTooltipPosition="right"
+          [cxTooltipDelay]="collapsed ? 'none' : 'default'"
+          (pressed)="toggleCollapsed()"
+        />
+      }
     </div>
 
     @if (loading) {
@@ -24,11 +43,32 @@
                   [class.cx-side-nav__item--disabled]="item.disabled"
                   type="button"
                   [disabled]="item.disabled"
-                  [attr.aria-expanded]="isItemExpanded(item)"
-                  (click)="toggleItem(item)"
+                  [attr.aria-haspopup]="collapsed ? 'menu' : null"
+                  [attr.aria-expanded]="collapsed ? isFlyoutOpen(item.id) : showItemChildren(item)"
+                  [cxTooltip]="item.label"
+                  cxTooltipPosition="right"
+                  cxTooltipDelay="none"
+                  [cxTooltipDisabled]="!collapsed"
+                  (click)="toggleItem(item, $event)"
                 >
-                  @if (item.icon && level === 0) {
-                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  @if (level === 0) {
+                    @if (item.icon) {
+                      <cx-icon class="cx-side-nav__icon" [icon]="item.icon" [size]="16" />
+                    } @else {
+                      <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(item.label) }}</span>
+                    }
+                    @if (hasBadge(item)) {
+                      <span
+                        class="cx-side-nav__rail-dot"
+                        [class.cx-side-nav__rail-dot--primary]="badgeTone(item) === 'primary'"
+                        [class.cx-side-nav__rail-dot--accent]="badgeTone(item) === 'accent'"
+                        [class.cx-side-nav__rail-dot--info]="badgeTone(item) === 'info'"
+                        [class.cx-side-nav__rail-dot--success]="badgeTone(item) === 'success'"
+                        [class.cx-side-nav__rail-dot--warning]="badgeTone(item) === 'warning'"
+                        [class.cx-side-nav__rail-dot--danger]="badgeTone(item) === 'danger'"
+                        aria-hidden="true"
+                      ></span>
+                    }
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
                   @if (hasBadge(item)) {
@@ -47,7 +87,7 @@
                   }
                   <cx-icon
                     class="cx-side-nav__item-chevron"
-                    [name]="isItemExpanded(item) ? 'chevron-up' : 'chevron-down'"
+                    [icon]="showItemChildren(item) ? 'chevron-up' : 'chevron-down'"
                     [size]="16"
                   />
                 </button>
@@ -71,10 +111,30 @@
                   [attr.rel]="item.rel ?? (item.target === '_blank' ? 'noopener' : null)"
                   [attr.aria-disabled]="item.disabled ? 'true' : null"
                   [attr.tabindex]="item.disabled ? '-1' : null"
+                  [cxTooltip]="item.label"
+                  cxTooltipPosition="right"
+                  cxTooltipDelay="none"
+                  [cxTooltipDisabled]="!collapsed"
                   (click)="onItemClick($event, item)"
                 >
-                  @if (item.icon && level === 0) {
-                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  @if (level === 0) {
+                    @if (item.icon) {
+                      <cx-icon class="cx-side-nav__icon" [icon]="item.icon" [size]="16" />
+                    } @else {
+                      <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(item.label) }}</span>
+                    }
+                    @if (hasBadge(item)) {
+                      <span
+                        class="cx-side-nav__rail-dot"
+                        [class.cx-side-nav__rail-dot--primary]="badgeTone(item) === 'primary'"
+                        [class.cx-side-nav__rail-dot--accent]="badgeTone(item) === 'accent'"
+                        [class.cx-side-nav__rail-dot--info]="badgeTone(item) === 'info'"
+                        [class.cx-side-nav__rail-dot--success]="badgeTone(item) === 'success'"
+                        [class.cx-side-nav__rail-dot--warning]="badgeTone(item) === 'warning'"
+                        [class.cx-side-nav__rail-dot--danger]="badgeTone(item) === 'danger'"
+                        aria-hidden="true"
+                      ></span>
+                    }
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
                   @if (hasBadge(item)) {
@@ -105,10 +165,30 @@
                   ariaCurrentWhenActive="page"
                   [attr.aria-disabled]="item.disabled ? 'true' : null"
                   [attr.tabindex]="item.disabled ? '-1' : null"
+                  [cxTooltip]="item.label"
+                  cxTooltipPosition="right"
+                  cxTooltipDelay="none"
+                  [cxTooltipDisabled]="!collapsed"
                   (click)="onItemClick($event, item)"
                 >
-                  @if (item.icon && level === 0) {
-                    <cx-icon class="cx-side-nav__icon" [name]="item.icon" [size]="16" />
+                  @if (level === 0) {
+                    @if (item.icon) {
+                      <cx-icon class="cx-side-nav__icon" [icon]="item.icon" [size]="16" />
+                    } @else {
+                      <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(item.label) }}</span>
+                    }
+                    @if (hasBadge(item)) {
+                      <span
+                        class="cx-side-nav__rail-dot"
+                        [class.cx-side-nav__rail-dot--primary]="badgeTone(item) === 'primary'"
+                        [class.cx-side-nav__rail-dot--accent]="badgeTone(item) === 'accent'"
+                        [class.cx-side-nav__rail-dot--info]="badgeTone(item) === 'info'"
+                        [class.cx-side-nav__rail-dot--success]="badgeTone(item) === 'success'"
+                        [class.cx-side-nav__rail-dot--warning]="badgeTone(item) === 'warning'"
+                        [class.cx-side-nav__rail-dot--danger]="badgeTone(item) === 'danger'"
+                        aria-hidden="true"
+                      ></span>
+                    }
                   }
                   <span class="cx-side-nav__label">{{ item.label }}</span>
                   @if (hasBadge(item)) {
@@ -138,16 +218,23 @@
                 class="cx-side-nav__item cx-side-nav__group-toggle"
                 [class.cx-side-nav__item--active]="groupContainsActive(group)"
                 type="button"
-                [attr.aria-expanded]="isGroupExpanded(group)"
-                (click)="toggleGroup(group)"
+                [attr.aria-haspopup]="collapsed ? 'menu' : null"
+                [attr.aria-expanded]="collapsed ? isFlyoutOpen(group.id) : showGroupItems(group)"
+                [cxTooltip]="group.label"
+                cxTooltipPosition="right"
+                cxTooltipDelay="none"
+                [cxTooltipDisabled]="!collapsed"
+                (click)="toggleGroup(group, $event)"
               >
                 @if (group.icon) {
-                  <cx-icon class="cx-side-nav__icon" [name]="group.icon" [size]="16" />
+                  <cx-icon class="cx-side-nav__icon" [icon]="group.icon" [size]="16" />
+                } @else {
+                  <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(group.label ?? '') }}</span>
                 }
                 <span class="cx-side-nav__label">{{ group.label }}</span>
                 <cx-icon
                   class="cx-side-nav__group-chevron"
-                  [name]="isGroupExpanded(group) ? 'chevron-up' : 'chevron-down'"
+                  [icon]="showGroupItems(group) ? 'chevron-up' : 'chevron-down'"
                   [size]="16"
                 />
               </button>
@@ -174,6 +261,23 @@
       </nav>
     }
 
+    <!-- Rail flyout: one menu beside the clicked parent row. The popover is
+         fixed-positioned, so the aside's overflow clipping never touches it. -->
+    @if (flyout(); as railFlyout) {
+      <cx-menu
+        class="cx-side-nav__flyout"
+        [presentation]="railFlyout.presentation"
+        placement="right"
+        [heading]="railFlyout.heading"
+        [items]="railFlyout.items"
+        [currentId]="railFlyout.currentId"
+        [open]="true"
+        [width]="208"
+        (openChange)="onFlyoutOpenChange($event)"
+        (itemSelect)="onFlyoutSelect($event)"
+      />
+    }
+
     <div class="cx-side-nav__footer">
       @if (accountName()) {
         <button
@@ -181,11 +285,13 @@
           type="button"
           [attr.aria-label]="'Account actions for ' + accountName()"
           [cxTooltip]="accountName()"
-          [cxTooltipOverflow]="true"
+          [cxTooltipOverflow]="!collapsed"
+          [cxTooltipPosition]="collapsed ? 'right' : 'top'"
+          [cxTooltipDelay]="collapsed ? 'none' : 'default'"
         >
           <span class="cx-side-nav__account-avatar" aria-hidden="true">{{ accountInitials() }}</span>
           <span class="cx-side-nav__account-name" data-cx-tooltip-overflow>{{ accountName() }}</span>
-          <cx-icon class="cx-side-nav__account-icon" name="chevrons-vertical" [size]="16" />
+          <cx-icon class="cx-side-nav__account-icon" icon="chevrons-vertical" [size]="16" />
         </button>
       }
       <ng-content select="[footer]" />

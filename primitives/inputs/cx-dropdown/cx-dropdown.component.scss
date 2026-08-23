@@ -227,6 +227,10 @@
   flex-direction: column;
   overflow-y: auto;
   overscroll-behavior: contain;
+  // The virtual spacer resizes on every window shift; without this the
+  // browser's scroll anchoring "corrects" programmatic jumps (typeahead,
+  // Home/End) back toward the old position and strands keyboard focus.
+  overflow-anchor: none;
 }
 
 .cx-dropdown__virtual-spacer {

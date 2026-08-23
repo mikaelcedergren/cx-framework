@@ -20,7 +20,7 @@
             [attr.role]="roleFor(item.type)"
           >
             @if (iconFor(item.type); as icon) {
-              <cx-icon class="cx-validation-message__icon" [name]="icon" [size]="14" />
+              <cx-icon class="cx-validation-message__icon" [icon]="icon" [size]="14" />
             }
             <span class="cx-validation-message__text">{{ item.message }}</span>
           </div>

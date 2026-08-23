@@ -15,7 +15,7 @@
 export const CX_TYPEFACES = [
   { id: 'editorial', label: 'Editorial', voice: 'Considered, print-derived, assertive at size' },
   { id: 'friendly', label: 'Friendly', voice: 'Warm, rounded, contemporary' },
-  { id: 'elegant', label: 'Elegant', voice: 'Airy, refined, fashion-leaning' },
+  { id: 'elegant', label: 'Elegant', voice: 'Refined, geometric, quietly confident' },
   { id: 'condensed', label: 'Condensed', voice: 'Dense, journalistic, width-efficient' },
 ] as const satisfies readonly { id: string; label: string; voice: string }[];
 

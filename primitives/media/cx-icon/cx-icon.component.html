@@ -1,10 +1,10 @@
-@if (iconDef; as icon) {
+@if (iconDefinition; as definition) {
   <svg
     class="cx-icon"
-    [attr.viewBox]="icon.viewBox"
+    [attr.viewBox]="definition.viewBox"
     aria-hidden="true"
   >
-    @for (node of icon.nodes; track $index) {
+    @for (node of definition.nodes; track $index) {
       <path
         class="cx-icon__path"
         [attr.d]="node.d"

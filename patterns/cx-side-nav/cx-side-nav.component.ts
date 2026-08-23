@@ -12,7 +12,9 @@ import {
   type QueryParamsHandling,
 } from '@angular/router';
 import { type CxIconName } from '../../icons/manifest';
+import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { CxMenuComponent, type CxMenuItem, type CxMenuPresentation } from '../../primitives/overlay/cx-menu';
 import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { assertCompatibleSideNavUrlTreeExtras } from './cx-side-nav.validation';
 
@@ -75,7 +77,15 @@ const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
 
 @Component({
   selector: 'cx-side-nav',
-  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective, RouterLink, RouterLinkActive],
+  imports: [
+    NgTemplateOutlet,
+    CxIconButtonComponent,
+    CxIconComponent,
+    CxMenuComponent,
+    CxTooltipDirective,
+    RouterLink,
+    RouterLinkActive,
+  ],
   templateUrl: './cx-side-nav.component.html',
   styleUrl: './cx-side-nav.component.scss',
   host: {
@@ -107,8 +117,16 @@ export class CxSideNavComponent {
   @Input() initials = '';
   @Input() navbarVisible = true;
   @Input() loading = false;
+  /** Renders the collapse toggle at the end of the header row. */
+  @Input() collapsible = false;
+  /**
+   * Rail state: only top-level icons remain, each described by an instant
+   * tooltip. Two-way bindable so the consumer can persist the choice.
+   */
+  @Input() collapsed = false;
 
   @Output() readonly itemSelect = new EventEmitter<CxSideNavItem>();
+  @Output() readonly collapsedChange = new EventEmitter<boolean>();
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -125,6 +143,20 @@ export class CxSideNavComponent {
   private expandedGroups: Record<string, boolean> = {};
   /** Explicit user expand/collapse choices, keyed by item id. */
   private expandedItems: Record<string, boolean> = {};
+
+  /**
+   * The rail's stand-in for in-place expansion: one flyout menu beside the
+   * clicked parent row, carrying that section's items. `source` keeps the
+   * original nav items so a selection navigates with full link semantics.
+   */
+  protected readonly flyout = signal<{
+    nodeId: string;
+    heading: string;
+    source: readonly CxSideNavItem[];
+    items: CxMenuItem[];
+    currentId: string | undefined;
+    presentation: CxMenuPresentation;
+  } | null>(null);
 
   constructor() {
     const subscription = this.router.events.subscribe(event => {
@@ -179,12 +211,21 @@ export class CxSideNavComponent {
     return group.items.some(item => this.itemContainsActive(item));
   }
 
+  // The rail cannot draw nested rows, so while collapsed every sub-tree stays
+  // visually closed. The underlying expansion choices are kept, which is what
+  // lets expanding the nav restore exactly the sections that were open.
   protected showGroupItems(group: CxSideNavGroup): boolean {
-    return !group.collapsible || this.isGroupExpanded(group);
+    return !group.collapsible || (!this.collapsed && this.isGroupExpanded(group));
   }
 
-  protected toggleGroup(group: CxSideNavGroup): void {
+  protected toggleGroup(group: CxSideNavGroup, event?: Event): void {
     if (!group.collapsible) {
+      return;
+    }
+    // A rail parent row cannot unfold in place: its section opens as a flyout
+    // beside the rail instead, and the nav stays collapsed.
+    if (this.collapsed) {
+      this.openFlyout(group.id, group.label ?? '', group.items, event);
       return;
     }
     const nextExpanded = !this.isGroupExpanded(group);
@@ -209,17 +250,97 @@ export class CxSideNavComponent {
   }
 
   protected showItemChildren(item: CxSideNavItem): boolean {
-    return this.hasChildren(item) && this.isItemExpanded(item);
+    return this.hasChildren(item) && !this.collapsed && this.isItemExpanded(item);
   }
 
-  protected toggleItem(item: CxSideNavItem): void {
+  protected toggleItem(item: CxSideNavItem, event?: Event): void {
     if (item.disabled || !this.hasChildren(item)) {
+      return;
+    }
+    if (this.collapsed) {
+      this.openFlyout(item.id, item.label, item.children ?? [], event);
       return;
     }
     this.expandedItems = {
       ...this.expandedItems,
       [item.id]: !this.isItemExpanded(item),
     };
+  }
+
+  protected toggleCollapsed(): void {
+    this.setCollapsed(!this.collapsed);
+  }
+
+  /** Rail stand-in for a top-level row without an icon, so no destination vanishes. */
+  protected railInitial(label: string): string {
+    return this.firstInitial(label);
+  }
+
+  protected isFlyoutOpen(nodeId: string): boolean {
+    return this.flyout()?.nodeId === nodeId;
+  }
+
+  protected onFlyoutOpenChange(open: boolean): void {
+    if (!open) {
+      this.flyout.set(null);
+    }
+  }
+
+  protected onFlyoutSelect(itemId: string): void {
+    const flyout = this.flyout();
+    this.flyout.set(null);
+    const item = flyout ? findSideNavItem(flyout.source, itemId) : undefined;
+    if (!item || item.disabled) {
+      return;
+    }
+    if (item.href) {
+      if (item.target === '_blank') {
+        window.open(item.href, '_blank', item.rel ?? 'noopener');
+      } else {
+        window.location.assign(item.href);
+      }
+    } else if (item.routerLink !== undefined) {
+      void this.router.navigateByUrl(this.destinationTree(item));
+    }
+    this.itemSelect.emit(item);
+  }
+
+  private openFlyout(nodeId: string, heading: string, items: readonly CxSideNavItem[], event?: Event): void {
+    const origin = event?.currentTarget;
+    if (!(origin instanceof HTMLElement) || items.length === 0) {
+      return;
+    }
+    const rect = origin.getBoundingClientRect();
+    this.flyout.set({
+      nodeId,
+      heading,
+      source: items,
+      items: items.map(item => toFlyoutMenuItem(item)),
+      currentId: this.findActiveFlyoutId(items),
+      presentation: { kind: 'context', left: rect.right, top: rect.top, owner: origin },
+    });
+  }
+
+  private findActiveFlyoutId(items: readonly CxSideNavItem[]): string | undefined {
+    for (const item of items) {
+      if (this.isItemActive(item)) {
+        return item.id;
+      }
+      const childId = item.children?.length ? this.findActiveFlyoutId(item.children) : undefined;
+      if (childId) {
+        return childId;
+      }
+    }
+    return undefined;
+  }
+
+  private setCollapsed(collapsed: boolean): void {
+    if (this.collapsed === collapsed) {
+      return;
+    }
+    this.collapsed = collapsed;
+    this.flyout.set(null);
+    this.collapsedChange.emit(collapsed);
   }
 
   protected itemContainsActive(item: CxSideNavItem): boolean {
@@ -283,24 +404,51 @@ export class CxSideNavComponent {
     if (item.disabled || item.routerLink === undefined) {
       return false;
     }
-    const tree =
-      item.routerLink instanceof UrlTree
-        ? item.routerLink
-        : this.router.createUrlTree(Array.isArray(item.routerLink) ? item.routerLink : [item.routerLink], {
-            relativeTo: this.route,
-            queryParams: item.queryParams,
-            queryParamsHandling: item.queryParamsHandling,
-            fragment: item.fragment,
-          });
+    const tree = this.destinationTree(item);
     const options = this.activeOptions(item);
     return typeof (options as { exact?: unknown }).exact === 'boolean'
       ? this.router.isActive(tree, (options as { exact: boolean }).exact)
       : this.router.isActive(tree, options as IsActiveMatchOptions);
   }
 
+  /** The one destination an item declares — shared by active matching and flyout navigation. */
+  private destinationTree(item: CxSideNavItem): UrlTree {
+    return item.routerLink instanceof UrlTree
+      ? item.routerLink
+      : this.router.createUrlTree(Array.isArray(item.routerLink) ? [...item.routerLink] : [item.routerLink], {
+          relativeTo: this.route,
+          queryParams: item.queryParams,
+          queryParamsHandling: item.queryParamsHandling,
+          fragment: item.fragment,
+        });
+  }
+
   private firstInitial(value: string): string {
     return Array.from(value.trim()).find(char => /\p{L}|\p{N}/u.test(char))?.toUpperCase() ?? '';
   }
+}
+
+/** Rail flyout row: same identity and nesting, menu vocabulary. Children carry no icons by contract. */
+function toFlyoutMenuItem(item: CxSideNavItem): CxMenuItem {
+  return {
+    id: item.id,
+    label: item.label,
+    ...(item.disabled ? { disabled: true } : {}),
+    ...(item.children?.length ? { items: item.children.map(child => toFlyoutMenuItem(child)) } : {}),
+  };
+}
+
+function findSideNavItem(items: readonly CxSideNavItem[], id: string): CxSideNavItem | undefined {
+  for (const item of items) {
+    if (item.id === id) {
+      return item;
+    }
+    const child = item.children?.length ? findSideNavItem(item.children, id) : undefined;
+    if (child) {
+      return child;
+    }
+  }
+  return undefined;
 }
 
 function validateSideNavItems(value: CxSideNavItem[], inputName: string): CxSideNavItem[] {

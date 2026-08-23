@@ -107,17 +107,17 @@
                   [attr.aria-label]="(isGroupExpanded(group) ? 'Collapse ' : 'Expand ') + group.label"
                   (click)="toggleGroup(group)"
                 >
-                  <cx-icon class="cx-index-nav__folder-icon" [name]="folderIcon(group)" [size]="16" />
+                  <cx-icon class="cx-index-nav__folder-icon" [icon]="folderIcon(group)" [size]="16" />
                   <span class="cx-index-nav__folder-label">{{ group.label }}</span>
                   <cx-icon
                     class="cx-index-nav__folder-chevron"
-                    [name]="isGroupExpanded(group) ? 'chevron-up' : 'chevron-down'"
+                    [icon]="isGroupExpanded(group) ? 'chevron-up' : 'chevron-down'"
                     [size]="16"
                   />
                 </button>
               } @else {
                 <div class="cx-index-nav__folder">
-                  <cx-icon class="cx-index-nav__folder-icon" [name]="folderIcon(group)" [size]="16" />
+                  <cx-icon class="cx-index-nav__folder-icon" [icon]="folderIcon(group)" [size]="16" />
                   <span class="cx-index-nav__folder-label">{{ group.label }}</span>
                 </div>
               }

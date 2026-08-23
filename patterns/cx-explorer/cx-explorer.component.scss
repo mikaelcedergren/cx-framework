@@ -1,0 +1,368 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.cx-explorer {
+  --cx-explorer-row-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
+  --cx-explorer-subrow-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
+  --cx-explorer-row-gap: 1px;
+  // Item rows indent by the folder icon slot so their labels align under the
+  // folder's label, mirroring the side-nav rail geometry.
+  --cx-explorer-rail: calc(var(--controller-size-small) + var(--space-sm));
+
+  display: flex;
+  width: 260px;
+  height: 100%;
+  min-height: 100%;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border-right: var(--line);
+  background: var(--surface-alt);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cx-explorer__header {
+  display: flex;
+  width: 100%;
+  min-height: var(--controller-size);
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.cx-explorer__header:empty {
+  display: none;
+}
+
+.cx-explorer__skeleton {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0;
+}
+
+.cx-explorer__skeleton-row {
+  display: block;
+  height: var(--cx-explorer-row-height);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(
+      90deg,
+      var(--opacity-low),
+      var(--opacity-mid),
+      var(--opacity-low)
+    );
+  background-size: 180% 100%;
+  animation: cx-explorer-skeleton 1.2s ease-in-out infinite;
+}
+
+.cx-explorer__folders {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.cx-explorer__folder {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--cx-explorer-row-gap);
+}
+
+// A row is the hover/reveal container: one main button plus the actions that
+// surface on hover, keyboard focus, or an open row menu.
+.cx-explorer__row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  border-radius: var(--radius-md);
+}
+
+.cx-explorer__row:hover {
+  background: var(--opacity-mid);
+}
+
+.cx-explorer__row-main {
+  display: flex;
+  min-width: 0;
+  min-height: var(--cx-explorer-row-height);
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--opacity-high);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cx-explorer__row:hover .cx-explorer__row-main {
+  color: var(--ink);
+}
+
+.cx-explorer__row-main:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-explorer__row-main--selected {
+  background: var(--opacity-low);
+  color: var(--ink);
+  font-weight: var(--font-weight-medium);
+}
+
+.cx-explorer__row--item {
+  list-style: none;
+}
+
+.cx-explorer__row--item .cx-explorer__row-main {
+  min-height: var(--cx-explorer-subrow-height);
+  padding-block: var(--space-xs);
+}
+
+.cx-explorer__row-icon {
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  flex: 0 0 var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+}
+
+// The identity accent: the closed color union maps 1:1 onto palette tokens,
+// falling back to the row's own ink when no color is set.
+.cx-explorer__row-icon--accent {
+  color: var(--cx-explorer-accent, currentColor);
+}
+
+// Folders carry one fixed identity hue: purple marks structure, so item
+// accents (any hue, user-chosen) always read against it. Constant across
+// hover and selection.
+.cx-explorer__row--folder .cx-explorer__row-icon {
+  color: var(--purple);
+}
+
+.cx-explorer__row-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-body);
+  line-height: 1.2;
+}
+
+.cx-explorer__row-label--folder {
+  font-weight: var(--font-weight-medium);
+}
+
+.cx-explorer__chevron {
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+}
+
+// Actions stay out of the visual field until the row is engaged, but they are
+// always real focusable controls — revealed, not mounted, on demand.
+.cx-explorer__row-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding-right: var(--space-2xs);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out-in);
+}
+
+.cx-explorer__row:hover .cx-explorer__row-actions,
+.cx-explorer__row:focus-within .cx-explorer__row-actions,
+.cx-explorer__row-actions:has([aria-expanded='true']) {
+  opacity: 1;
+}
+
+// Without hover there is no reveal gesture, so the actions stay visible.
+@media (hover: none) {
+  .cx-explorer__row-actions {
+    opacity: 1;
+  }
+}
+
+.cx-explorer__rename-input {
+  min-width: 0;
+  min-height: var(--cx-explorer-subrow-height);
+  flex: 1 1 auto;
+  margin: 0;
+  padding: var(--space-xs);
+  border: var(--border-width) solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--font-size-body);
+  line-height: 1.2;
+}
+
+.cx-explorer__rename-input:focus-visible {
+  outline: none;
+}
+
+.cx-explorer__items {
+  display: grid;
+  width: 100%;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--motion-slow) var(--ease-out-strong);
+}
+
+.cx-explorer__items--expanded {
+  grid-template-rows: 1fr;
+}
+
+.cx-explorer__items-inner {
+  display: flex;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 0 var(--cx-explorer-rail);
+  flex-direction: column;
+  gap: var(--cx-explorer-row-gap);
+  list-style: none;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity var(--motion-base) ease,
+    transform var(--motion-slow) var(--ease-out-strong);
+}
+
+.cx-explorer__items--expanded .cx-explorer__items-inner {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cx-explorer__footer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: var(--line-discreet);
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+.cx-explorer__picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+}
+
+.cx-explorer__picker-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.cx-explorer__swatch {
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--cx-explorer-swatch) 80%, var(--surface));
+  cursor: pointer;
+}
+
+.cx-explorer__swatch--none {
+  // The "no color" choice shows the neutral ink the icon actually falls back to.
+  --cx-explorer-swatch: var(--ink);
+  background: color-mix(in srgb, var(--ink) 30%, var(--surface));
+}
+
+.cx-explorer__swatch:hover {
+  border-color: var(--opacity-strong);
+}
+
+.cx-explorer__swatch[aria-pressed='true'] {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--surface);
+}
+
+.cx-explorer__swatch:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-explorer__picker-icons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2xs);
+}
+
+.cx-explorer__picker-icon {
+  display: inline-flex;
+  min-height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+}
+
+.cx-explorer__picker-icon:hover {
+  background: var(--opacity-mid);
+  color: var(--ink);
+}
+
+.cx-explorer__picker-icon[aria-pressed='true'] {
+  background: var(--opacity-low);
+  color: var(--cx-explorer-accent, var(--ink));
+}
+
+.cx-explorer__picker-icon:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-explorer__items,
+  .cx-explorer__items-inner,
+  .cx-explorer__skeleton-row,
+  .cx-explorer__row-actions {
+    transition: none;
+    animation: none;
+  }
+}
+
+@keyframes cx-explorer-skeleton {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -80% 0;
+  }
+}

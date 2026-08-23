@@ -63,7 +63,7 @@
 
 <ng-template #body>
   @if (prependIcon) {
-    <cx-icon class="cx-list-item__icon" [name]="prependIcon" [size]="16" />
+    <cx-icon class="cx-list-item__icon" [icon]="prependIcon" [size]="16" />
   }
 
   <span class="cx-list-item__text">
@@ -86,6 +86,6 @@
   </span>
 
   @if (expandable) {
-    <cx-icon class="cx-list-item__chevron" name="chevron-down" [size]="16" />
+    <cx-icon class="cx-list-item__chevron" icon="chevron-down" [size]="16" />
   }
 </ng-template>

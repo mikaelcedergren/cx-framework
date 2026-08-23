@@ -27,7 +27,7 @@
       (keydown)="onKeydown($event, buttonIndex)"
     >
       @if (button.icon; as iconName) {
-        <cx-icon [name]="iconName" />
+        <cx-icon [icon]="iconName" />
       }
       {{ button.name }}
     </button>

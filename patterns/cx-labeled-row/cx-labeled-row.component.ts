@@ -1,5 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  Input,
+  Output,
+  inject,
+  signal,
+} from '@angular/core';
+import { CxLabeledRowGroupComponent } from './cx-labeled-row-group.component';
 import { CxValidationMessageComponent } from '../../primitives/feedback/cx-validation-message';
 import { CxCheckboxComponent } from '../../primitives/inputs/cx-checkbox';
 import {
@@ -117,6 +128,15 @@ export type CxLabeledRowContent =
 })
 export class CxLabeledRowComponent {
   private readonly radioValueState = signal<string | undefined>(undefined);
+  private readonly hostElement: HTMLElement = inject(ElementRef).nativeElement;
+  private readonly group = inject(CxLabeledRowGroupComponent, { optional: true });
+
+  /** A row placed directly in a cx-labeled-row-group defers its label column to the group. */
+  @HostBinding('class.cx-labeled-row--grouped')
+  protected get grouped(): boolean {
+    const parent = this.hostElement.parentElement;
+    return parent !== null && (this.group?.isGridElement(parent) ?? false);
+  }
 
   @Input() label = 'Label';
   @Input() size: CxLabeledRowSize = 'default';

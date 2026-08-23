@@ -162,7 +162,7 @@ import { CxButtonComponent, CxIconComponent } from '@mikaelcedergren/cx-framewor
 ```
 
 ```html
-<cx-icon name="settings" />
+<cx-icon icon="settings" />
 <cx-button text="Export report" icon="export" />
 ```
 

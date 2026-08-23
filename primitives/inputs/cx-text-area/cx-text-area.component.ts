@@ -74,7 +74,7 @@ export class CxTextAreaComponent {
   private readonly disabledState = signal(false);
   private readonly sizeState = signal<CxTextAreaSize>('default');
   private readonly sizingState = signal<CxTextAreaSizing>('resizable');
-  private readonly minLinesState = signal(5);
+  private readonly minLinesState = signal(3);
   private readonly maxLinesState = signal<number | undefined>(undefined);
   private readonly maxLengthState = signal<number | undefined>(undefined);
   private readonly lineNumbersState = signal(false);
@@ -118,7 +118,7 @@ export class CxTextAreaComponent {
 
   @Input()
   public set minLines(value: number | undefined) {
-    this.minLinesState.set(this.normalizeLineCount(value, 5));
+    this.minLinesState.set(this.normalizeLineCount(value, 3));
   }
 
   @Input()
@@ -485,7 +485,9 @@ export class CxTextAreaComponent {
 
   private normalizeLineCount(value: number | undefined, fallback: number): number {
     const numeric = Number(value);
-    return Number.isFinite(numeric) ? Math.max(1, Math.floor(numeric)) : fallback;
+    // Floor of 3: fewer lines would make the area read as a single-line text
+    // field instead of an invitation to write more.
+    return Number.isFinite(numeric) ? Math.max(3, Math.floor(numeric)) : fallback;
   }
 
   private normalizeOptionalCount(value: number | null | undefined): number | undefined {

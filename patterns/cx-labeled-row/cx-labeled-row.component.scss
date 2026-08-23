@@ -26,6 +26,28 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+// A direct parent cx-labeled-row-group owns the label column. The host and the
+// row adopt the group's tracks via subgrid so every grouped row shares one
+// content-sized label column, and the host drops its own containment so the
+// row's natural width can reach the surface that sizes around the group.
+:host(.cx-labeled-row--grouped) {
+  display: grid;
+  grid-template-columns: subgrid;
+  container-type: normal;
+}
+
+:host(.cx-labeled-row--grouped) .cx-labeled-row {
+  grid-column: 1 / -1;
+}
+
+:host(.cx-labeled-row--grouped) .cx-labeled-row:not(.cx-labeled-row--no-label) {
+  grid-template-columns: subgrid;
+  // A subgrid's own gap wins over the parent grid's within its tracks, so the
+  // group's gutter is restated here through the property the group defines.
+  column-gap: var(--cx-labeled-row-group-column-gap, var(--space-sm));
+  row-gap: var(--space-2xs);
+}
+
 .cx-labeled-row__label {
   display: flex;
   min-width: 0;
@@ -97,8 +119,25 @@
   width: 100%;
 }
 
-@container (max-width: 480px) {
-  .cx-labeled-row:not(.cx-labeled-row--no-label) {
+// Stack only when the horizontal row becomes unreadable: the label column
+// plus ~140px of value space. Narrow surfaces such as the detail panel keep
+// the horizontal layout down to their minimum width.
+@container (max-width: 300px) {
+  .cx-labeled-row:not(.cx-labeled-row--no-label, .cx-labeled-row--small, .cx-labeled-row--large) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-2xs);
+  }
+}
+
+@container (max-width: 260px) {
+  .cx-labeled-row--small:not(.cx-labeled-row--no-label) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-2xs);
+  }
+}
+
+@container (max-width: 340px) {
+  .cx-labeled-row--large:not(.cx-labeled-row--no-label) {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-2xs);
   }

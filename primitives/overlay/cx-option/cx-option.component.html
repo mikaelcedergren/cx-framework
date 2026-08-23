@@ -76,7 +76,7 @@
 
   @if (showPrependIcon(); as prependIconValue) {
     <span class="cx-option__icon cx-option__icon--prepend" aria-hidden="true">
-      <cx-icon [name]="prependIconValue" size="16" />
+      <cx-icon [icon]="prependIconValue" size="16" />
     </span>
   }
 
@@ -101,7 +101,7 @@
 
     @if (appendIconName(); as appendIconValue) {
       <span class="cx-option__icon cx-option__icon--append" aria-hidden="true">
-        <cx-icon [name]="appendIconValue" size="16" />
+        <cx-icon [icon]="appendIconValue" size="16" />
       </span>
     }
 

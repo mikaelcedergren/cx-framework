@@ -7,7 +7,9 @@
   inset-block: 0;
   inset-inline-end: 0;
   width: var(--cx-detail-panel-width, min(450px, 100%));
-  min-width: min(var(--cx-detail-panel-min-width, 0px), 100%);
+  // Hard floor for every width source, drag included: 380px unless the
+  // consumer asks for more, never wider than the available frame.
+  min-width: min(max(380px, var(--cx-detail-panel-min-width, 0px)), 100%);
   max-width: 100%;
   height: 100%;
   min-height: 0;
@@ -28,9 +30,9 @@
   --cx-detail-panel-island-radius: var(--radius-lg);
 
   display: flex;
+  position: relative;
   width: 100%;
   height: 100%;
-  min-width: min(450px, 100%);
   min-height: 0;
   max-width: 100%;
   flex-direction: column;
@@ -64,6 +66,53 @@
     inset: 0;
     width: 100%;
     min-width: 0;
+  }
+}
+
+// Mirrors the table's column resizer: a 12px target anchored inside the start
+// edge (the frame clips overhang), with a pill indicator on hover, focus, and
+// while dragging.
+.cx-detail-panel__resize-handle {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  width: 12px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.cx-detail-panel__resize-handle::after {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 50%;
+  width: 3px;
+  height: calc(100% - (var(--cx-detail-panel-frame-padding) * 2));
+  border-radius: var(--radius-pill);
+  corner-shape: round;
+  background: transparent;
+  content: '';
+  transform: translate(-50%, -50%);
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-detail-panel__resize-handle:hover::after,
+.cx-detail-panel__resize-handle:focus-visible::after,
+.cx-detail-panel__resize-handle--active::after {
+  background: var(--info);
+}
+
+.cx-detail-panel__resize-handle:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(-1 * var(--outline-tab-offset));
+}
+
+// Below the mobile breakpoint the panel always fills the frame, so there is
+// nothing to resize.
+@media (max-width: #{bp.$mobile - 1px}) {
+  .cx-detail-panel__resize-handle {
+    display: none;
   }
 }
 
@@ -103,11 +152,13 @@
 .cx-detail-panel__heading {
   min-width: 0;
   margin: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
   color: var(--ink);
   font-size: var(--font-size-title-3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cx-detail-panel__header-actions,

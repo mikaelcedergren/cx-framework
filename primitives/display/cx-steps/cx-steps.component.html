@@ -25,11 +25,11 @@
         cxTooltipDelay="none"
       >
         @if (isPending(step)) {
-          <cx-icon name="exclamation" [size]="14" />
+          <cx-icon icon="exclamation" [size]="14" />
         } @else if (isDanger(step)) {
-          <cx-icon name="warning" [size]="14" />
+          <cx-icon icon="warning" [size]="14" />
         } @else if (isCompleted(step, index)) {
-          <cx-icon name="check" [size]="14" />
+          <cx-icon icon="check" [size]="14" />
         } @else {
           {{ index + 1 }}
         }

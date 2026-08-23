@@ -17,7 +17,7 @@ Use this skill as the finished-product engineering lens. Execute the approved sc
 - Do not stop for implementation trivia the user should not need to decide.
 - Ask only when blocked by user intent, an off-limits or unclear root cause, a missing product decision, a risky tradeoff, a new dependency, secrets, destructive action, or live-system safety.
 - If visual or product ambiguity appears, pause because the design brief is incomplete. Do not silently choose taste directions.
-- Avoid interrupting live operations unless explicitly asked.
+- Follow the consuming product's local delivery contract. A registered, reversible browser release may be part of authorised UI work; service restarts, live-data writes, new destinations, and other external effects still require local authority or explicit approval.
 
 ## Quality-gate contract
 
@@ -102,6 +102,7 @@ Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-fac
 - Match evidence to the claim: tests for behavior, typecheck or build for integration, rendered interaction for UI behavior, and appropriate keyboard or semantic checks for accessibility.
 - For user-facing controls, verify the actual read and write owner, the result after revisit or reload when persistence matters, recovery where applicable, and the absence of unintended entity or system writes.
 - A passing build is not browser verification.
+- When local authority defines a served delivery target, verify that target's build identity against the released source before claiming completion; an isolated preview is not delivery.
 - Use browser verification when rendered behavior, layout, interaction, responsive behavior, or accessibility confidence is below 90%.
 - Do not claim verification that did not run or evidence that was not observed.
 - If a check cannot run, say what blocked it and what was verified instead.

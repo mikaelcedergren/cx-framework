@@ -32,6 +32,11 @@
   // at this length. Mixed from `--ink` so every theme scales it against its own
   // surface.
   --cx-side-nav-guide-line: var(--border-width) solid color-mix(in srgb, var(--ink) 18%, transparent);
+  // Collapsed rail. Derived from the same pieces that place the icon column —
+  // aside padding, row padding, icon slot — so the icons keep their exact x in
+  // both states: collapsing reads as the right edge sweeping in past pinned
+  // icons, never as icons re-centring.
+  --cx-side-nav-rail-width: calc(var(--space-sm) * 2 + var(--space-xs) * 2 + var(--controller-size-small));
 
   display: flex;
   width: 240px;
@@ -44,9 +49,27 @@
   background: var(--surface-alt);
   box-sizing: border-box;
   overflow: hidden;
+  transition: width var(--motion-slow) var(--ease-out-strong);
 }
 
-.cx-side-nav:not(:has(.cx-side-nav__header > *, .cx-side-nav__skeleton, .cx-side-nav__items, .cx-side-nav__footer > *)) {
+.cx-side-nav--collapsed {
+  width: var(--cx-side-nav-rail-width);
+}
+
+/* A classic (non-overlay) scrollbar would take a third of the rail: the stable
+   gutter squeezes every row and un-centres the icons. The rail keeps scrolling
+   but drops the scrollbar's visual — wheel, trackpad, and keyboard focus still
+   move the list, as in any icon rail. */
+.cx-side-nav--collapsed .cx-side-nav__items {
+  scrollbar-gutter: auto;
+  scrollbar-width: none;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__items::-webkit-scrollbar {
+  display: none;
+}
+
+.cx-side-nav:not(:has(.cx-side-nav__header-slot > *, .cx-side-nav__collapse-toggle, .cx-side-nav__skeleton, .cx-side-nav__items, .cx-side-nav__footer > *)) {
   display: none;
 }
 
@@ -58,8 +81,49 @@
   flex: 0 0 auto;
 }
 
-.cx-side-nav__header:empty {
+.cx-side-nav__header:not(:has(.cx-side-nav__header-slot > *, .cx-side-nav__collapse-toggle)) {
   display: none;
+}
+
+// Takes the room the toggle leaves free, which is also what centres the toggle
+// once the rail is only one control wide: the slot's share is simply zero.
+.cx-side-nav__header-slot {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  // Optical nudge: slotted brand marks read better a touch off the edge.
+  margin-left: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    opacity var(--motion-base) ease var(--motion-fast),
+    margin-left var(--motion-slow) var(--ease-out-strong),
+    visibility 0s;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__header-slot {
+  opacity: 0;
+  // The nudge must return to zero in the rail or it pushes the lone,
+  // exactly-rail-wide toggle off centre and into the clipped edge.
+  margin-left: 0;
+  // Off the accessibility tree and unclickable, but only after the fade — an
+  // instant visibility cut would pop against the sweeping edge.
+  visibility: hidden;
+  transition:
+    opacity var(--motion-base) ease,
+    margin-left var(--motion-slow) var(--ease-out-strong),
+    visibility 0s var(--motion-base);
+}
+
+.cx-side-nav__collapse-toggle {
+  flex: 0 0 auto;
+}
+
+/* The flyout host renders no box of its own — its popover is fixed-positioned.
+   Taken out of flow so the aside's column gap never counts an invisible child. */
+.cx-side-nav__flyout {
+  position: fixed;
 }
 
 .cx-side-nav__skeleton {
@@ -468,7 +532,155 @@
   color: var(--opacity-high);
 }
 
+/* --- Collapse choreography -------------------------------------------------
+   One property drives the collapse: the aside's width. Rows never reflow —
+   labels are single-line and the icon column is pinned — so everything textual
+   only fades: out immediately as the edge sweeps in, back in slightly late so
+   letters never squeeze against the moving edge. Rail stand-ins (letters,
+   dots, dividers) run the same timing mirrored. */
+
+/* Single-line labels are what keep row heights identical in both states; a
+   label that wrapped would bounce the whole column during the sweep. */
+.cx-side-nav--collapsible .cx-side-nav__label,
+.cx-side-nav--collapsible .cx-side-nav__group-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cx-side-nav__label,
+.cx-side-nav__badge,
+.cx-side-nav__item-chevron,
+.cx-side-nav__group-chevron,
+.cx-side-nav__account-name,
+.cx-side-nav__account-icon {
+  transition: opacity var(--motion-base) ease var(--motion-fast);
+}
+
+.cx-side-nav--collapsed .cx-side-nav__label,
+.cx-side-nav--collapsed .cx-side-nav__badge,
+.cx-side-nav--collapsed .cx-side-nav__item-chevron,
+.cx-side-nav--collapsed .cx-side-nav__group-chevron,
+.cx-side-nav--collapsed .cx-side-nav__account-name,
+.cx-side-nav--collapsed .cx-side-nav__account-icon {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/* The heading crossfades with a short rule over the icon column, so grouping
+   survives the rail. Text leaves via color (opacity would take the rule with
+   it); the rule is the ::after. */
+.cx-side-nav__group-label {
+  position: relative;
+  transition: color var(--motion-base) ease var(--motion-fast);
+}
+
+.cx-side-nav__group-label::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--space-xs);
+  width: var(--controller-size-small);
+  border-top: var(--line-discreet);
+  opacity: 0;
+  transition: opacity var(--motion-base) ease;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__group-label {
+  color: transparent;
+  transition-delay: 0s;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__group-label::after {
+  opacity: 1;
+  transition-delay: var(--motion-fast);
+}
+
+/* Rail stand-in for a top-level row without an icon. Absolute, so it costs the
+   expanded layout nothing; it occupies the icon slot only visually. */
+.cx-side-nav__rail-letter {
+  position: absolute;
+  top: 50%;
+  left: var(--space-xs);
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  translate: 0 -50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-base) ease;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__rail-letter {
+  opacity: 1;
+  transition-delay: var(--motion-fast);
+}
+
+/* A count cannot live in the rail; "something needs you" survives as a dot on
+   the icon's corner, in the badge's own tone. */
+.cx-side-nav__rail-dot {
+  position: absolute;
+  top: calc(50% - var(--controller-size-small) / 2);
+  left: calc(var(--space-xs) + var(--controller-size-small) - 6px);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--opacity-high);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-base) ease;
+}
+
+.cx-side-nav--collapsed .cx-side-nav__rail-dot {
+  opacity: 1;
+  transition-delay: var(--motion-fast);
+}
+
+.cx-side-nav__rail-dot--primary {
+  background: var(--primary);
+}
+
+.cx-side-nav__rail-dot--accent {
+  background: var(--accent);
+}
+
+.cx-side-nav__rail-dot--info {
+  background: var(--info);
+}
+
+.cx-side-nav__rail-dot--success {
+  background: var(--success);
+}
+
+.cx-side-nav__rail-dot--warning {
+  background: var(--warning);
+}
+
+.cx-side-nav__rail-dot--danger {
+  background: var(--danger);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .cx-side-nav,
+  .cx-side-nav__header-slot,
+  .cx-side-nav__label,
+  .cx-side-nav__badge,
+  .cx-side-nav__item-chevron,
+  .cx-side-nav__group-chevron,
+  .cx-side-nav__group-label,
+  .cx-side-nav__group-label::after,
+  .cx-side-nav__rail-letter,
+  .cx-side-nav__rail-dot,
+  .cx-side-nav__account-name,
+  .cx-side-nav__account-icon,
   .cx-side-nav__group-items--collapsible,
   .cx-side-nav__group-items--collapsible .cx-side-nav__group-items-inner,
   .cx-side-nav__children,

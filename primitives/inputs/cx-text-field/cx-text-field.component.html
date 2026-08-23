@@ -23,7 +23,7 @@
   >
     @if (prependIcon; as iconName) {
       <span class="cx-text-field__prepend" aria-hidden="true">
-        <cx-icon [name]="iconName" [size]="16" />
+        <cx-icon [icon]="iconName" [size]="16" />
       </span>
     }
     @if (prependText) {
@@ -58,12 +58,12 @@
     }
     @if (hasClear$()) {
       <button type="button" class="cx-text-field__clear" aria-label="Clear" (click)="onClear($event)">
-        <cx-icon name="remove" [size]="14" />
+        <cx-icon icon="remove" [size]="14" />
       </button>
     }
     @if (appendIcon; as iconName) {
       <span class="cx-text-field__append" aria-hidden="true">
-        <cx-icon [name]="iconName" [size]="16" />
+        <cx-icon [icon]="iconName" [size]="16" />
       </span>
     }
     <ng-content select="[cxTrailing]" />

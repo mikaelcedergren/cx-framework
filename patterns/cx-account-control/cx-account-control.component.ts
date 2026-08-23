@@ -26,6 +26,12 @@ export class CxAccountControlComponent {
 
   @Input() username = 'Wolfie';
   @Input() disabled = false;
+  /**
+   * Rail presentation: only the avatar stays visible and the username moves
+   * into an instant tooltip on the right. Bind it to the surrounding
+   * navigation's collapsed state; the menu keeps working from the avatar.
+   */
+  @Input() collapsed = false;
 
   @Input()
   public set menuItems(value: CxMenuItem[] | undefined) {

@@ -50,7 +50,7 @@
           [attr.aria-label]="resolvedMenuAriaLabel()"
           (click)="toggleMenu()"
         >
-          <cx-icon [name]="menuOpen() ? 'cross-circle' : 'menu-horizontal'" [size]="20" />
+          <cx-icon [icon]="menuOpen() ? 'cross-circle' : 'menu-horizontal'" [size]="20" />
         </button>
       }
     </div>
@@ -81,7 +81,7 @@
   @if (logoSrc) {
     <img class="cx-masthead__logo" [src]="logoSrc" alt="" aria-hidden="true" />
   } @else if (logo) {
-    <cx-icon class="cx-masthead__logo-icon" [name]="logo" [size]="24" />
+    <cx-icon class="cx-masthead__logo-icon" [icon]="logo" [size]="24" />
   }
   @if (heading) {
     <span class="cx-masthead__title" data-cx-tooltip-overflow>{{ heading }}</span>

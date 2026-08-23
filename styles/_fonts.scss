@@ -19,7 +19,7 @@
 //
 //   DM Serif Display  — --typeface-editorial, 400 only
 //   Rubik             — --typeface-friendly,  variable 300–900
-//   Raleway           — --typeface-elegant,   variable 100–900
+//   Plus Jakarta Sans — --typeface-elegant,   variable 200–800
 //   Archivo Narrow    — --typeface-condensed, variable 400–700
 
 @font-face {
@@ -66,11 +66,11 @@
 }
 
 @font-face {
-  font-family: 'Raleway';
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 200 800;
   font-display: swap;
-  src: url('/assets/fonts/Raleway.woff2') format('woff2');
+  src: url('/assets/fonts/PlusJakartaSans.woff2') format('woff2');
 }
 
 @font-face {

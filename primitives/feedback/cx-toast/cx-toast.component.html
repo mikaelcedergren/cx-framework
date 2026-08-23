@@ -21,7 +21,7 @@
     (transitionend)="onTransitionEnd($event)"
   >
     @if (moodIcon; as iconName) {
-      <cx-icon class="cx-toast__mood-icon" [name]="iconName" [mood]="mood" shape="circle-outline" size="24" />
+      <cx-icon class="cx-toast__mood-icon" [icon]="iconName" [mood]="mood" shape="circle-outline" size="24" />
     }
 
     @if (hasContent) {

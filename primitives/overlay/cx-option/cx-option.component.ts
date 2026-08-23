@@ -68,8 +68,8 @@ export class CxOptionComponent implements OnChanges {
   }
 
   /** Move keyboard focus to the option's control. */
-  public focus(): void {
-    this.controlRef?.nativeElement.focus();
+  public focus(options?: FocusOptions): void {
+    this.controlRef?.nativeElement.focus(options);
   }
 
   protected hasAppendOnlyLayout(): boolean {

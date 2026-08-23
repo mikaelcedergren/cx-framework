@@ -27,7 +27,7 @@
         [disabled]="!canDecrement$()"
         (click)="onStep(-1)"
       >
-        <cx-icon name="minus" [size]="16" />
+        <cx-icon icon="minus" [size]="16" />
       </button>
     }
 
@@ -69,7 +69,7 @@
 
     @if (hasClear$()) {
       <button type="button" class="cx-number-field__clear" aria-label="Clear" (click)="onClear($event)">
-        <cx-icon name="remove" [size]="14" />
+        <cx-icon icon="remove" [size]="14" />
       </button>
     }
 
@@ -81,7 +81,7 @@
         [disabled]="!canIncrement$()"
         (click)="onStep(1)"
       >
-        <cx-icon name="plus" [size]="16" />
+        <cx-icon icon="plus" [size]="16" />
       </button>
     }
   </div>

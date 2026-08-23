@@ -21,7 +21,7 @@
     (drop)="onDrop($event)"
   >
     @if (icon) {
-      <cx-icon class="cx-file-upload__zone-icon" [name]="icon" size="32" />
+      <cx-icon class="cx-file-upload__zone-icon" [icon]="icon" size="32" />
     }
 
     <div class="cx-file-upload__zone-heading">{{ resolvedHeading }}</div>
@@ -86,7 +86,7 @@
   <ul class="cx-file-upload__list" aria-live="polite">
     @for (file of visibleFiles; track $index) {
       <li class="cx-file-upload__row">
-        <cx-icon class="cx-file-upload__row-icon" name="document" size="20" />
+        <cx-icon class="cx-file-upload__row-icon" icon="document" size="20" />
         <div
           class="cx-file-upload__row-name"
           [cxTooltip]="file.name"

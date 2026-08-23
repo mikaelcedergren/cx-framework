@@ -9,6 +9,8 @@
     data-cx-popover-surface
     [class.cx-popover--top]="placement === 'top'"
     [class.cx-popover--bottom]="placement === 'bottom'"
+    [class.cx-popover--left]="placement === 'left'"
+    [class.cx-popover--right]="placement === 'right'"
     [class.cx-popover--raised]="surfaceVariant === 'raised'"
     [class.cx-popover--grouped]="surfaceVariant === 'grouped'"
     [attr.id]="surfaceId || null"

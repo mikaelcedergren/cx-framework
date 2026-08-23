@@ -37,9 +37,9 @@
                 [class.cx-text-area__gutter-row--error]="line.iconMood === 'danger'"
               >
                 @if (line.iconMood === 'danger') {
-                  <cx-icon class="cx-text-area__gutter-icon" name="warning" [size]="12" />
+                  <cx-icon class="cx-text-area__gutter-icon" icon="warning" [size]="12" />
                 } @else if (line.iconMood === 'success') {
-                  <cx-icon class="cx-text-area__gutter-icon" name="check" [size]="12" />
+                  <cx-icon class="cx-text-area__gutter-icon" icon="check" [size]="12" />
                 }
                 @if (showLineNumbers$()) {
                   <span class="cx-text-area__gutter-number">{{ line.number }}</span>

@@ -3,12 +3,16 @@
   --cx-icon-glyph-size: var(--cx-icon-size, 16px);
   --cx-icon-square-radius: var(--radius-sm);
   --cx-icon-outline-width: 4px;
+  --cx-icon-color: inherit;
+  --cx-icon-subtle-background: var(--opacity-low);
+  --cx-icon-solid-background: var(--surface);
+  --cx-icon-solid-color: inherit;
   width: var(--cx-icon-size, 16px);
   height: var(--cx-icon-size, 16px);
   aspect-ratio: 1 / 1;
   align-items: center;
   justify-content: center;
-  color: inherit;
+  color: var(--cx-icon-color);
   line-height: 0;
 }
 
@@ -30,10 +34,6 @@
   --cx-icon-glyph-size: 100%;
 }
 
-:host(.cx-icon--shaped) {
-  background: var(--opacity-low);
-}
-
 :host(.cx-icon--size-auto.cx-icon--shaped) {
   height: auto;
   --cx-icon-glyph-size: 66.66%;
@@ -41,8 +41,6 @@
 
 :host(.cx-icon--size-12.cx-icon--shaped) {
   --cx-icon-glyph-size: 8px;
-  --cx-icon-outline-width: 2px;
-  --cx-icon-square-radius: var(--radius-xs);
 }
 
 :host(.cx-icon--size-14.cx-icon--shaped),
@@ -50,6 +48,7 @@
   --cx-icon-glyph-size: 10px;
 }
 
+:host(.cx-icon--size-12.cx-icon--shaped),
 :host(.cx-icon--size-14.cx-icon--shaped) {
   --cx-icon-outline-width: 2px;
   --cx-icon-square-radius: var(--radius-xs);
@@ -66,7 +65,6 @@
 :host(.cx-icon--size-32.cx-icon--shaped) {
   --cx-icon-glyph-size: 20px;
   --cx-icon-outline-width: 6px;
-  --cx-icon-square-radius: var(--radius-sm);
 }
 
 :host(.cx-icon--size-64.cx-icon--shaped) {
@@ -85,11 +83,12 @@
 }
 
 :host(.cx-icon--subtle) {
-  background: var(--opacity-low);
+  background: var(--cx-icon-subtle-background);
 }
 
 :host(.cx-icon--solid) {
-  background: var(--surface);
+  background: var(--cx-icon-solid-background);
+  color: var(--cx-icon-solid-color);
 }
 
 :host(.cx-icon--outline) {
@@ -104,85 +103,56 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 :host(.cx-icon--mood-primary) {
-  color: var(--primary);
+  --cx-icon-color: var(--primary);
+  --cx-icon-subtle-background: var(--primary-opacity);
+  --cx-icon-solid-background: var(--primary);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
 :host(.cx-icon--mood-accent) {
-  color: var(--accent);
+  --cx-icon-color: var(--accent);
+  --cx-icon-subtle-background: var(--accent-opacity);
+  --cx-icon-solid-background: var(--accent);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
 :host(.cx-icon--mood-info) {
-  color: var(--info);
+  --cx-icon-color: var(--info);
+  --cx-icon-subtle-background: var(--info-opacity);
+  --cx-icon-solid-background: var(--info);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
 :host(.cx-icon--mood-success) {
-  color: var(--success);
+  --cx-icon-color: var(--success);
+  --cx-icon-subtle-background: var(--success-opacity);
+  --cx-icon-solid-background: var(--success);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
 :host(.cx-icon--mood-warning) {
-  color: var(--warning);
+  --cx-icon-color: var(--warning);
+  --cx-icon-subtle-background: var(--warning-opacity);
+  --cx-icon-solid-background: var(--warning);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
 :host(.cx-icon--mood-danger) {
-  color: var(--danger);
+  --cx-icon-color: var(--danger);
+  --cx-icon-subtle-background: var(--danger-opacity);
+  --cx-icon-solid-background: var(--danger);
+  --cx-icon-solid-color: var(--on-ink);
 }
 
-:host(.cx-icon--mood-primary.cx-icon--subtle) {
-  background: var(--primary-opacity);
-}
-
-:host(.cx-icon--mood-accent.cx-icon--subtle) {
-  background: var(--accent-opacity);
-}
-
-:host(.cx-icon--mood-info.cx-icon--subtle) {
-  background: var(--info-opacity);
-}
-
-:host(.cx-icon--mood-success.cx-icon--subtle) {
-  background: var(--success-opacity);
-}
-
-:host(.cx-icon--mood-warning.cx-icon--subtle) {
-  background: var(--warning-opacity);
-}
-
-:host(.cx-icon--mood-danger.cx-icon--subtle) {
-  background: var(--danger-opacity);
-}
-
-:host(.cx-icon--mood-primary.cx-icon--solid) {
-  background: var(--primary);
-  color: var(--on-ink);
-}
-
-:host(.cx-icon--mood-accent.cx-icon--solid) {
-  background: var(--accent);
-  color: var(--on-ink);
-}
-
-:host(.cx-icon--mood-info.cx-icon--solid) {
-  background: var(--info);
-  color: var(--on-ink);
-}
-
-:host(.cx-icon--mood-success.cx-icon--solid) {
-  background: var(--success);
-  color: var(--on-ink);
-}
-
-:host(.cx-icon--mood-warning.cx-icon--solid) {
-  background: var(--warning);
-  color: var(--on-ink);
-}
-
-:host(.cx-icon--mood-danger.cx-icon--solid) {
-  background: var(--danger);
-  color: var(--on-ink);
+@media (prefers-reduced-motion: reduce) {
+  :host(.cx-icon--spinner) .cx-icon {
+    animation: none;
+  }
 }

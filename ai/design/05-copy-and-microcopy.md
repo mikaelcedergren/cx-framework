@@ -28,11 +28,15 @@ RULE-ID: copy.opt-out-neutral SCOPE: opt-out-copy TYPE: MUST TOPIC: trust RULE: 
 
 RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Remove filler, apology, and performative politeness. DESCRIPTION: Words such as `just`, `simply`, `easily`, `please`, `oops`, and `sorry` rarely improve operational clarity.
 
+RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every piece of interface text from the fewest words that stay unambiguous; extra words are an explicit product decision, never a default. DESCRIPTION: Applies to all UI copy — menu items, buttons, calls to action, dialog primaries, labels, headings, hints, and empty states. Add a noun, qualifier, or explanation only when the product owner decides the extra information earns its place; never speculatively or out of habit.
+
+RULE-ID: copy.no-context-restatement SCOPE: copy TYPE: MUST TOPIC: copy RULE: Do not restate context the surface already establishes. DESCRIPTION: Applies to all UI copy. A row or card menu says `Edit` and `Delete` — the row is the object. A page-level call to action says `New` — the page heading names what is created. A form dialog's primary says `Add` or `Save` — the dialog heading names the entity. Labels, hints, and headings follow the same principle: never repeat what the page, section, or component around them has already said. Words survive only when they add information the surface does not carry: a different object or destination (`Open report`, `Move to pending`), a resulting state (`Create draft`), genuinely mixed targets (a global surface such as a command palette), or the final destructive commit, which copy.buttons.destructive governs. EXCEPT: A field label or picker placeholder naming its own value per copy.labels.object and copy.pickers.placeholder is establishing context, not restating it — a `Reminder` field label inside a `New reminder` dialog is correct.
+
 ## Buttons and actions
 
 RULE-ID: copy.buttons.action SCOPE: button-label TYPE: MUST TOPIC: copy RULE: Label a button with the action it performs. DESCRIPTION: Button text names the result of activation rather than the current state or a generic confirmation.
 
-RULE-ID: copy.buttons.object SCOPE: button-label TYPE: SHOULD TOPIC: copy RULE: Name the action's object when it removes ambiguity. DESCRIPTION: Prefer `Delete file`, `Send invitation`, or `Save changes`; concise conventional actions such as `Cancel`, `Back`, and `Continue` do not need invented objects.
+RULE-ID: copy.buttons.object SCOPE: button-label TYPE: SHOULD TOPIC: copy RULE: Name the action's object only when it removes real ambiguity. DESCRIPTION: `Send invitation` earns its noun on a surface that could send several things; where the surface already names the object copy.no-context-restatement applies, and concise conventional actions such as `Cancel`, `Back`, and `Continue` never need invented objects.
 
 RULE-ID: copy.buttons.destructive SCOPE: button-label TYPE: MUST TOPIC: trust RULE: Name destructive action explicitly. DESCRIPTION: The final action must say what will be deleted, removed, discarded, or ended.
 

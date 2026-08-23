@@ -91,6 +91,15 @@
       "path": "patterns/cx-dynamic-fields/cx-dynamic-fields.component.ts"
     },
     {
+      "name": "cx-explorer",
+      "selectors": [
+        "cx-explorer"
+      ],
+      "area": "pattern",
+      "category": "cx-explorer",
+      "path": "patterns/cx-explorer/cx-explorer.component.ts"
+    },
+    {
       "name": "cx-state-message",
       "selectors": [
         "cx-state-message"
@@ -116,6 +125,15 @@
       "area": "pattern",
       "category": "cx-labeled-row",
       "path": "patterns/cx-labeled-row/cx-labeled-row.component.ts"
+    },
+    {
+      "name": "cx-labeled-row-group",
+      "selectors": [
+        "cx-labeled-row-group"
+      ],
+      "area": "pattern",
+      "category": "cx-labeled-row",
+      "path": "patterns/cx-labeled-row/cx-labeled-row-group.component.ts"
     },
     {
       "name": "cx-navigation-recovery",

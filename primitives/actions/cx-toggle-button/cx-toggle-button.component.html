@@ -12,7 +12,7 @@
     (click)="toggle()"
   >
     @if (displayIcon; as iconName) {
-      <cx-icon class="cx-toggle-button__icon" [name]="iconName" [size]="size === 'small' ? '14' : '16'" aria-hidden="true" />
+      <cx-icon class="cx-toggle-button__icon" [icon]="iconName" [size]="size === 'small' ? '14' : '16'" aria-hidden="true" />
     }
     @if (visibleText) {
       <span data-cx-tooltip-overflow>{{ visibleText }}</span>

@@ -36,7 +36,7 @@
           <option [value]="option.code">{{ option.label }}</option>
         }
       </select>
-      <cx-icon class="cx-phone-field__country-icon" name="chevron-down" [size]="12" />
+      <cx-icon class="cx-phone-field__country-icon" icon="chevron-down" [size]="12" />
     </span>
 
     <span class="cx-phone-field__divider" aria-hidden="true"></span>
@@ -66,7 +66,7 @@
 
     @if (hasClear$()) {
       <button type="button" class="cx-phone-field__clear" aria-label="Clear" (click)="onClear($event)">
-        <cx-icon name="remove" [size]="14" />
+        <cx-icon icon="remove" [size]="14" />
       </button>
     }
   </div>

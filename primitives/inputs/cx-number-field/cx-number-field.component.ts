@@ -213,6 +213,7 @@ export class CxNumberFieldComponent {
   protected onBlur(): void {
     this.focusedState.set(false);
     this.focusChange.emit(false);
+    this.settleToBounds();
   }
 
   protected onCommitOnEnter(event: Event): void {
@@ -224,6 +225,7 @@ export class CxNumberFieldComponent {
       return;
     }
     this.commit(target.value);
+    this.settleToBounds();
   }
 
   protected onEscapeKey(): void {
@@ -266,6 +268,18 @@ export class CxNumberFieldComponent {
       return value;
     }
     return this.minState() ?? 0;
+  }
+
+  // Typed values are left free while editing so multi-digit entry isn't
+  // interrupted; bounds settle when the edit ends (blur or Enter).
+  private settleToBounds(): void {
+    const value = this.valueState();
+    if (value === undefined || !this.isInteractive$()) {
+      return;
+    }
+    const clamped = this.clampToBounds(value);
+    this.draftState.set(this.formatValue(clamped));
+    this.emitValue(clamped);
   }
 
   private clampToBounds(value: number): number {

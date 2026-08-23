@@ -9,14 +9,38 @@
   [attr.inert]="closing$() ? '' : null"
   (animationend)="onDismissAnimationEnd($event)"
 >
+  @if (resizable) {
+    <div
+      class="cx-detail-panel__resize-handle"
+      [class.cx-detail-panel__resize-handle--active]="resizing$()"
+      role="separator"
+      tabindex="0"
+      aria-orientation="vertical"
+      [attr.aria-label]="resolvedResizeAriaLabel"
+      [attr.aria-valuenow]="renderedWidthPx"
+      [attr.aria-valuetext]="renderedWidthPx + ' pixels'"
+      (pointerdown)="onResizePointerDown($event)"
+      (pointermove)="onResizePointerMove($event)"
+      (pointerup)="onResizePointerUp($event)"
+      (pointercancel)="onResizePointerCancel($event)"
+      (lostpointercapture)="onResizeLostPointerCapture($event)"
+      (keydown)="onResizeKeydown($event)"
+      (dblclick)="onResizeDoubleClick($event)"
+    ></div>
+  }
+
   <header class="cx-detail-panel__header">
     @if (icon || normalizedHeading) {
-      <div class="cx-detail-panel__heading-group">
+      <div
+        class="cx-detail-panel__heading-group"
+        [cxTooltip]="normalizedHeading"
+        [cxTooltipOverflow]="true"
+      >
         @if (icon; as iconName) {
-          <cx-icon class="cx-detail-panel__heading-icon" [name]="iconName" [size]="24" />
+          <cx-icon class="cx-detail-panel__heading-icon" [icon]="iconName" [size]="24" [mood]="mood" />
         }
         @if (normalizedHeading) {
-          <h2 class="cx-detail-panel__heading" [id]="headingId">{{ normalizedHeading }}</h2>
+          <h2 class="cx-detail-panel__heading" [id]="headingId" data-cx-tooltip-overflow>{{ normalizedHeading }}</h2>
         }
       </div>
     }
@@ -70,17 +94,19 @@
     </div>
   </div>
 
-  <footer class="cx-detail-panel__footer">
-    <div class="cx-detail-panel__footer-slot">
-      <ng-content select="[detail-panel-footer]" />
-    </div>
+  @if (footer) {
+    <footer class="cx-detail-panel__footer">
+      <div class="cx-detail-panel__footer-slot">
+        <ng-content select="[detail-panel-footer]" />
+      </div>
 
-    <cx-icon-button
-      class="cx-detail-panel__footer-close"
-      icon="arrow-right"
-      [ariaLabel]="resolvedCloseAriaLabel"
-      mood="default"
-      (pressed)="dismiss()"
-    />
-  </footer>
+      <cx-icon-button
+        class="cx-detail-panel__footer-close"
+        icon="arrow-right"
+        [ariaLabel]="resolvedCloseAriaLabel"
+        mood="default"
+        (pressed)="dismiss()"
+      />
+    </footer>
+  }
 </aside>

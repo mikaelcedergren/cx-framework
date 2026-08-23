@@ -294,6 +294,7 @@ export class CxTableComponent implements OnDestroy {
   private destroyed = false;
   private tableViewportResizeObserver?: ResizeObserver;
   private observedTableViewport?: HTMLElement;
+  private lastViewportWidth = 0;
   private readonly columnReorderAnnouncementState = signal('');
   private readonly sortState = signal<CxTableSort | undefined>(undefined);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
@@ -1489,10 +1490,39 @@ export class CxTableComponent implements OnDestroy {
     if (!autoFitOwnsWidth) {
       return true;
     }
-    const width = this.clampColumnWidth(this.autoFitColumnWidth(firstColumn.id));
+    const width = this.capFirstColumnWidthToViewport(
+      firstColumn.id,
+      this.clampColumnWidth(this.autoFitColumnWidth(firstColumn.id)),
+    );
     this.updateColumnWidth(firstColumn.id, width);
     this.appliedFirstColumnAutoFit = { columnId: firstColumn.id, width };
     return true;
+  }
+
+  /**
+   * Auto-fit must never be the reason a horizontal scrollbar exists: the key
+   * column prefers its content width but yields — down to the shared column
+   * minimum — before the table outgrows its viewport. The candidate width is
+   * applied first so the browser itself reports the overflow it would cause;
+   * that keeps menu/selection columns, paddings, and borders accounted for
+   * without duplicating layout math. Any overflow that remains at the minimum
+   * width comes from content-sized columns, and then the scrollbar is honest.
+   */
+  private capFirstColumnWidthToViewport(columnId: string, width: number): number {
+    const viewport = this.tableElement?.nativeElement.parentElement;
+    if (!viewport) {
+      return width;
+    }
+    this.applyColumnWidthToDom(columnId, width);
+    const overflow = viewport.scrollWidth - viewport.clientWidth;
+    if (overflow <= 0) {
+      return width;
+    }
+    const fitted = this.clampColumnWidth(width - overflow);
+    if (fitted !== width) {
+      this.applyColumnWidthToDom(columnId, fitted);
+    }
+    return fitted;
   }
 
   private updateColumnWidth(columnId: string, width: number): void {
@@ -1567,9 +1597,20 @@ export class CxTableComponent implements OnDestroy {
 
     this.tableViewportResizeObserver?.disconnect();
     this.observedTableViewport = viewport;
+    this.lastViewportWidth = viewport.clientWidth;
     this.tableViewportResizeObserver = new ResizeObserver(() => {
-      if (!this.destroyed) {
-        this.syncPinnedColumnOffsets();
+      if (this.destroyed) {
+        return;
+      }
+      this.syncPinnedColumnOffsets();
+      // Width changes move the auto-fit ceiling, so the key column re-fits:
+      // narrower windows squeeze it before a scrollbar appears, wider ones
+      // give the room back. Guarded to width so height-only changes (row
+      // wrap, virtualization) cannot ping-pong the observer.
+      const currentWidth = viewport.clientWidth;
+      if (currentWidth !== this.lastViewportWidth) {
+        this.lastViewportWidth = currentWidth;
+        this.scheduleFirstColumnAutoFit();
       }
     });
     this.tableViewportResizeObserver.observe(viewport);

@@ -37,6 +37,8 @@ const CX_DROPDOWN_POPOVER_MAX_WIDTH = 360;
 const CX_DROPDOWN_POPOVER_MAX_HEIGHT = 360;
 const CX_DROPDOWN_POPOVER_FRAME_HEIGHT = 8;
 const CX_DROPDOWN_TYPEAHEAD_RESET_MS = 700;
+const CX_DROPDOWN_OPTION_FOCUS_RETRIES = 12;
+const CX_DROPDOWN_OPTION_FOCUS_RETRY_MS = 16;
 const CX_DROPDOWN_OPTION_HEIGHT = 32;
 const CX_DROPDOWN_VIRTUALIZATION_THRESHOLD = 80;
 const CX_DROPDOWN_VIRTUAL_BUFFER = 4;
@@ -159,6 +161,8 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private openFocusTimer?: number;
   private typeaheadTimer?: number;
   private typeaheadBuffer = '';
+  private optionFocusRetryTimer?: number;
+  private pendingOptionFocusIndex?: number;
   private selectionMeasureFrame?: number;
   private optionMeasureFrame?: number;
   private loadMoreRequested = false;
@@ -517,6 +521,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     if (typeof window !== 'undefined' && this.typeaheadTimer) {
       window.clearTimeout(this.typeaheadTimer);
     }
+    this.clearOptionFocusRetry();
   }
 
   protected toggleOpen(field?: HTMLElement): void {
@@ -588,6 +593,12 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     }
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
+      // Typeahead can leave the popover open with a pending active option
+      // while DOM focus is still on the field (the virtualized target had not
+      // mounted yet); committing that choice beats silently discarding it.
+      if (this.openState() && !this.isMultiple$() && this.commitActiveOption()) {
+        return;
+      }
       this.toggleOpen(field);
       return;
     }
@@ -1043,9 +1054,27 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     }
     this.activeOptionIdState.set(option.id);
     this.activeCreateState.set(false);
+    this.parkFocusForVirtualJump(index);
     this.scrollOptionIntoView(index);
     this.scheduleOptionFocus(index);
     return true;
+  }
+
+  /**
+   * A far jump in a virtualized list unmounts the currently focused option
+   * before the target renders; without a waypoint the browser drops focus to
+   * <body> and every further key (typeahead, Enter) is lost. Parking on the
+   * field keeps the keyboard conversation alive until the target mounts.
+   */
+  private parkFocusForVirtualJump(index: number): void {
+    if (typeof document === 'undefined' || this.optionHostAtIndex(index)) {
+      return;
+    }
+    if (this.currentFocusedOptionIndex() < 0) {
+      return;
+    }
+    const field = this.overlay.trigger ?? this.fieldButtonRef?.nativeElement;
+    field?.focus();
   }
 
   private scrollOpenTargetIntoView(focusTarget: CxDropdownFocusTarget): void {
@@ -1089,16 +1118,58 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   }
 
   private scheduleOptionFocus(index: number): void {
-    const focus = () => {
-      this.optionComponentAtIndex(index)?.focus();
+    this.pendingOptionFocusIndex = index;
+    this.clearOptionFocusRetry();
+    const tryFocus = (): boolean => {
+      // preventScroll: the component owns scroll position. A browser
+      // scroll-into-view here races the virtual window's offset update and
+      // corrupts scrollTop, which re-renders the window and unmounts the
+      // freshly focused option.
+      this.optionComponentAtIndex(index)?.focus({ preventScroll: true });
+      const optionHost = this.optionHostAtIndex(index);
+      return Boolean(
+        optionHost && typeof document !== 'undefined' && optionHost.contains(document.activeElement),
+      );
     };
     queueMicrotask(() => {
-      focus();
-      const optionHost = this.optionHostAtIndex(index);
-      if (typeof window !== 'undefined' && optionHost && !optionHost.contains(document.activeElement)) {
-        window.setTimeout(focus);
+      if (this.pendingOptionFocusIndex !== index) {
+        return;
       }
+      if (tryFocus() || typeof window === 'undefined') {
+        this.pendingOptionFocusIndex = undefined;
+        return;
+      }
+      // A virtualized target may take a couple of change-detection passes to
+      // mount — and on a cold popover the scroller itself may not exist yet,
+      // dropping the scroll silently. Re-issue the scroll and retry briefly
+      // instead of abandoning keyboard focus.
+      let attempts = 0;
+      const retry = () => {
+        this.optionFocusRetryTimer = undefined;
+        if (this.pendingOptionFocusIndex !== index || !this.openState()) {
+          return;
+        }
+        if (!this.optionHostAtIndex(index)) {
+          this.scrollOptionIntoView(index);
+        }
+        if (tryFocus()) {
+          this.pendingOptionFocusIndex = undefined;
+          return;
+        }
+        attempts += 1;
+        if (attempts < CX_DROPDOWN_OPTION_FOCUS_RETRIES) {
+          this.optionFocusRetryTimer = window.setTimeout(retry, CX_DROPDOWN_OPTION_FOCUS_RETRY_MS);
+        }
+      };
+      this.optionFocusRetryTimer = window.setTimeout(retry);
     });
+  }
+
+  private clearOptionFocusRetry(): void {
+    if (typeof window !== 'undefined' && this.optionFocusRetryTimer !== undefined) {
+      window.clearTimeout(this.optionFocusRetryTimer);
+      this.optionFocusRetryTimer = undefined;
+    }
   }
 
   private optionHostAtIndex(index: number): HTMLElement | undefined {
@@ -1206,6 +1277,19 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     }
     this.focusSearchInput();
     this.onSearchChange(this.searchQueryState() + event.key);
+    return true;
+  }
+
+  private commitActiveOption(): boolean {
+    const activeId = this.activeOptionIdState();
+    if (activeId === undefined || activeId === this.selectedValueState()) {
+      return false;
+    }
+    const option = this.filteredOptions$().find(candidate => candidate.id === activeId);
+    if (!option || this.isOptionDisabled(option)) {
+      return false;
+    }
+    this.selectOption(option, true);
     return true;
   }
 

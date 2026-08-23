@@ -2,7 +2,7 @@
   <div class="cx-log-step__line"></div>
   @if (step.icon; as iconName) {
     <div class="cx-log-step__icon-marker">
-      <cx-icon [name]="iconName" size="auto" shape="circle-outline" [mood]="step.mood" />
+      <cx-icon [icon]="iconName" size="auto" shape="circle-outline" [mood]="step.mood" />
     </div>
   } @else {
     <div class="cx-log-step__circle">

@@ -33,7 +33,7 @@
             >
               {{ item.label }}
             </span>
-            <cx-icon class="cx-breadcrumbs__menu-icon" name="chevron-down" [size]="16" aria-hidden="true" />
+            <cx-icon class="cx-breadcrumbs__menu-icon" icon="chevron-down" [size]="16" aria-hidden="true" />
           </button>
         </cx-menu>
       } @else if (isCurrent(item.id)) {
@@ -106,7 +106,7 @@
 
       @if (!last) {
         <span class="cx-breadcrumbs__separator" aria-hidden="true">
-          <cx-icon name="chevron-right" [size]="16" />
+          <cx-icon icon="chevron-right" [size]="16" />
         </span>
       }
     </li>
@@ -142,7 +142,7 @@
         </cx-menu>
 
         <span class="cx-breadcrumbs__separator" aria-hidden="true">
-          <cx-icon name="chevron-right" [size]="16" />
+          <cx-icon icon="chevron-right" [size]="16" />
         </span>
       </li>
 
@@ -167,11 +167,11 @@
       <li class="cx-breadcrumbs__item">
         <span class="cx-breadcrumbs__measure-label">{{ item.label }}</span>
         @if (hasOptions(item)) {
-          <cx-icon class="cx-breadcrumbs__menu-icon" name="chevron-down" [size]="16" aria-hidden="true" />
+          <cx-icon class="cx-breadcrumbs__menu-icon" icon="chevron-down" [size]="16" aria-hidden="true" />
         }
         @if (!last) {
           <span class="cx-breadcrumbs__separator" aria-hidden="true">
-            <cx-icon name="chevron-right" [size]="16" />
+            <cx-icon icon="chevron-right" [size]="16" />
           </span>
         }
       </li>

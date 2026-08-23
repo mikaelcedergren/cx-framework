@@ -19,6 +19,30 @@
   text-align: left;
   cursor: pointer;
   box-sizing: border-box;
+  overflow: hidden;
+  transition: padding var(--motion-slow) var(--ease-out-strong);
+}
+
+/* Rail presentation: the avatar carries the control alone. The tighter inline
+   padding centres a 24px avatar in a 32px-wide rail; username and chevron only
+   fade — out immediately on collapse, back in slightly late on expand, in step
+   with cx-side-nav's own choreography. */
+.cx-account-control--collapsed {
+  padding: 0 var(--space-xs);
+}
+
+.cx-account-control--collapsed .cx-account-control__label,
+.cx-account-control--collapsed .cx-account-control__icon {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-account-control,
+  .cx-account-control__label,
+  .cx-account-control__icon {
+    transition: none;
+  }
 }
 
 .cx-account-control:hover,
@@ -70,10 +94,11 @@
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: 1.2;
+  transition: opacity var(--motion-base) ease var(--motion-fast);
 }
 
 .cx-account-control__icon {
   flex: 0 0 auto;
   color: var(--opacity-mid);
-  transition: color var(--motion-fast) ease;
+  transition: color var(--motion-fast) ease, opacity var(--motion-base) ease var(--motion-fast);
 }

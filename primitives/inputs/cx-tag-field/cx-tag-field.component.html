@@ -39,7 +39,7 @@
             (keydown)="onSelectedTagKeydown($event, tag, index)"
             (click)="removeTagFromPointer($event, tag)"
           >
-            <cx-icon name="remove" [size]="12" />
+            <cx-icon icon="remove" [size]="12" />
           </button>
         </span>
       }
@@ -95,7 +95,7 @@
       }
       <cx-icon
         class="cx-tag-field__chevron"
-        name="chevron-down"
+        icon="chevron-down"
         [size]="size === 'small' ? 12 : 16"
         aria-hidden="true"
       />

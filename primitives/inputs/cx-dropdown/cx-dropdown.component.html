@@ -66,7 +66,7 @@
           <cx-spinner size="small" mood="default" />
         </span>
       }
-      <cx-icon class="cx-dropdown__chevron" name="chevron-down" [size]="size === 'small' ? 12 : 16" />
+      <cx-icon class="cx-dropdown__chevron" icon="chevron-down" [size]="size === 'small' ? 12 : 16" />
     </span>
   </div>
 
@@ -181,13 +181,13 @@
           } @else {
             @if (showSearchEmptyState$()) {
               <div class="cx-dropdown__empty cx-dropdown__empty--state" role="status" aria-live="polite">
-                <cx-icon name="search" mood="primary" shape="square-subtle" size="32" />
+                <cx-icon icon="search" mood="primary" shape="square-subtle" size="32" />
                 <div class="cx-dropdown__empty-heading">{{ noResultsText$() }}</div>
                 <div class="cx-dropdown__empty-text">{{ emptyDescription$() }}</div>
               </div>
             } @else {
               <div class="cx-dropdown__empty cx-dropdown__empty--state" role="status" aria-live="polite">
-                <cx-icon name="info" mood="primary" shape="square-subtle" size="32" />
+                <cx-icon icon="info" mood="primary" shape="square-subtle" size="32" />
                 <div class="cx-dropdown__empty-heading">{{ noOptionsText$() }}</div>
                 <div class="cx-dropdown__empty-text">{{ noOptionsDescriptionText$() }}</div>
               </div>

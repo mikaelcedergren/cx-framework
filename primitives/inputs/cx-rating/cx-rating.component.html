@@ -18,9 +18,9 @@
       (mouseenter)="onStarEnter(star)"
       (click)="onStarClick(star)"
     >
-      <cx-icon class="cx-rating__glyph cx-rating__glyph--empty" [name]="icon" [size]="iconSize" />
+      <cx-icon class="cx-rating__glyph cx-rating__glyph--empty" [icon]="icon" [size]="iconSize" />
       <span class="cx-rating__fill" [style.width.%]="fillPercent(star)">
-        <cx-icon class="cx-rating__glyph cx-rating__glyph--full" [name]="icon" [size]="iconSize" />
+        <cx-icon class="cx-rating__glyph cx-rating__glyph--full" [icon]="icon" [size]="iconSize" />
       </span>
     </span>
   }

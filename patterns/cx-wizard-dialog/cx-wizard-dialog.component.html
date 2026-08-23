@@ -40,7 +40,7 @@
                 >
                   <span class="cx-wizard-dialog__step-marker">
                     @if (isCompletedStep(step, index)) {
-                      <cx-icon name="check" [size]="12" />
+                      <cx-icon icon="check" [size]="12" />
                     } @else {
                       {{ index + 1 }}
                     }
@@ -127,7 +127,7 @@
 
           <div class="cx-wizard-dialog__sidebar-content">
             @if (currentStep$()?.icon; as sidebarIcon) {
-              <cx-icon class="cx-wizard-dialog__sidebar-icon" [name]="sidebarIcon" [size]="32" />
+              <cx-icon class="cx-wizard-dialog__sidebar-icon" [icon]="sidebarIcon" [size]="32" />
             }
 
             <div #stepInfoContent class="cx-wizard-dialog__sidebar-copy">

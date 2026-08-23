@@ -29,7 +29,7 @@
       [attr.aria-hidden]="showSpinner$() ? 'true' : null"
     >
       @if (icon; as iconName) {
-        <cx-icon class="cx-split-button__icon" [name]="iconName" [size]="iconSize" />
+        <cx-icon class="cx-split-button__icon" [icon]="iconName" [size]="iconSize" />
       }
       @if (visibleText) {
         <span class="cx-split-button__label">{{ visibleText }}</span>
@@ -60,7 +60,7 @@
       class="cx-split-button__trigger"
       [attr.aria-label]="resolvedMenuAriaLabel"
     >
-      <cx-icon class="cx-split-button__chevron" name="chevron-down" [size]="iconSize" />
+      <cx-icon class="cx-split-button__chevron" icon="chevron-down" [size]="iconSize" />
     </button>
   </cx-menu>
 </span>

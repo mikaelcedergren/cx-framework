@@ -35,7 +35,7 @@
       (click)="toggleOpen(fieldButton)"
       (keydown)="onFieldKeydown($event, fieldButton)"
     >
-      <cx-icon class="cx-date-span-picker__field-icon" name="calendar" size="16" />
+      <cx-icon class="cx-date-span-picker__field-icon" icon="calendar" size="16" />
       <span
         class="cx-date-span-picker__field-text"
         [class.cx-date-span-picker__field-text--placeholder]="showPlaceholder$()"
@@ -47,7 +47,7 @@
 
     @if (hasClear$()) {
       <button type="button" class="cx-date-span-picker__clear" aria-label="Clear date span" (click)="onClear($event)">
-        <cx-icon name="remove" size="16" />
+        <cx-icon icon="remove" size="16" />
       </button>
     }
   </div>

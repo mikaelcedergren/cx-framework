@@ -22,19 +22,30 @@ import { CxOptionComponent } from '../cx-option';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
 import { CxHostVisibilityObserver, isHostVisible } from '../../shared/host-visibility';
-import {
-  measureCxFloatingSurface,
-  type CxFloatingSurfacePlacement,
-} from '../floating-surface';
+import { measureCxFloatingSurface } from '../floating-surface';
 import { CxMenuTriggerDirective } from './cx-menu-trigger.directive';
 
 export type CxMenuLayout = 'inline' | 'fill';
 export type CxMenuSelection = 'single' | 'multiple';
 export type CxMenuItemType = 'action' | 'choice';
+/**
+ * Which side of the anchor the surface opens on. `auto` keeps the classic
+ * drop behavior — below the anchor, above when space runs out. An explicit
+ * side is honored and viewport-clamped; `left`/`right` fall back to the
+ * opposite side only when the requested one has no room at all.
+ */
+export type CxMenuPlacement = 'auto' | 'top' | 'right' | 'bottom' | 'left';
+type CxMenuSurfaceSide = 'top' | 'right' | 'bottom' | 'left';
 export type CxMenuPresentation =
   | { kind: 'trigger' }
   | { kind: 'inline' }
-  | { kind: 'context'; left: number; top: number };
+  /**
+   * Anchored to a point (e.g. a right-click). An `owner` names the element
+   * that opened the menu: tooltips on it stand down while the menu is open,
+   * focus returns to it on close, and a side `placement` hugs its rect
+   * instead of the bare point.
+   */
+  | { kind: 'context'; left: number; top: number; owner?: HTMLElement };
 
 export type CxMenuItem = {
   id: string;
@@ -216,23 +227,39 @@ function buildItemPath(parentPath: string, itemId: string): string {
   return parentPath ? `${parentPath}/${itemId}` : itemId;
 }
 
-function measureCxSubmenuSurface(input: {
+/**
+ * Places a surface beside its anchor — the geometry submenus have always used,
+ * generalized so a root surface with `placement` left/right shares it. The
+ * requested side wins whenever it fits the width or offers at least as much
+ * room as the other side; `lockedSide` keeps an open surface where it is.
+ */
+function measureCxMenuSideSurface(input: {
   triggerRect: Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>;
   viewportWidth: number;
   viewportHeight: number;
   width: number;
   estimatedHeight: number;
+  prefer: 'left' | 'right';
+  lockedSide?: 'left' | 'right';
   viewportPadding?: number;
   gap?: number;
-}): Pick<CxMenuSubmenuSurface, 'left' | 'top' | 'maxHeight'> {
+}): Pick<CxMenuSubmenuSurface, 'left' | 'top' | 'maxHeight'> & { side: 'left' | 'right' } {
   const viewportPadding = input.viewportPadding ?? 8;
   const gap = input.gap ?? 8;
   const maxViewportWidth = Math.max(input.viewportWidth - viewportPadding * 2, 0);
   const width = Math.floor(clamp(input.width, 160, maxViewportWidth));
   const spaceRight = input.viewportWidth - input.triggerRect.right - viewportPadding - gap;
   const spaceLeft = input.triggerRect.left - viewportPadding - gap;
-  const openToRight = spaceRight >= width || spaceRight >= spaceLeft;
-  const leftBase = openToRight ? input.triggerRect.right + gap : input.triggerRect.left - width - gap;
+  const side =
+    input.lockedSide ??
+    (input.prefer === 'right'
+      ? spaceRight >= width || spaceRight >= spaceLeft
+        ? 'right'
+        : 'left'
+      : spaceLeft >= width || spaceLeft >= spaceRight
+        ? 'left'
+        : 'right');
+  const leftBase = side === 'right' ? input.triggerRect.right + gap : input.triggerRect.left - width - gap;
   const left = Math.floor(clamp(leftBase, viewportPadding, input.viewportWidth - width - viewportPadding));
   const maxTop = Math.max(
     input.viewportHeight -
@@ -243,7 +270,7 @@ function measureCxSubmenuSurface(input: {
   const top = Math.floor(clamp(input.triggerRect.top, viewportPadding, maxTop));
   const maxHeight = Math.max(input.viewportHeight - top - viewportPadding, 0);
 
-  return { left, top, maxHeight };
+  return { left, top, maxHeight, side };
 }
 
 @Component({
@@ -276,19 +303,25 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   });
   private readonly submenuSurfacesState = signal<CxMenuSubmenuSurface[]>([]);
   private readonly alignState = signal<'start' | 'end'>('end');
+  private readonly placementState = signal<CxMenuPlacement>('auto');
   private readonly layoutState = signal<CxMenuLayout>('inline');
   private readonly widthState = signal(240);
   private readonly surfaceTopState = signal<number | undefined>(undefined);
   private readonly surfaceBottomState = signal<number | undefined>(undefined);
   private readonly surfaceLeftState = signal<number | undefined>(undefined);
   private readonly surfaceMaxHeightState = signal<number | undefined>(undefined);
+  private readonly surfacePlacementState = signal<CxMenuSurfaceSide>('bottom');
   // Placement is decided once per open; re-syncs while open keep the side so
   // the surface never flips mid-interaction.
-  private surfaceLockedPlacement?: CxFloatingSurfacePlacement;
+  private surfaceLockedPlacement?: CxMenuSurfaceSide;
   private triggerElement?: HTMLElement;
   private triggerButton?: HTMLButtonElement;
 
   protected get rootPopoverOwner(): HTMLElement | undefined {
+    const presentation = this.presentationState();
+    if (presentation.kind === 'context') {
+      return presentation.owner;
+    }
     return this.triggerElement;
   }
   private triggerOriginalState?: {
@@ -410,6 +443,21 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   }
 
   @Input()
+  public set placement(value: CxMenuPlacement | undefined) {
+    const placement: CxMenuPlacement =
+      value === 'top' || value === 'right' || value === 'bottom' || value === 'left' ? value : 'auto';
+    if (this.placementState() === placement) {
+      return;
+    }
+    this.placementState.set(placement);
+    if (this.openState()) {
+      // A new placement is a new session for the open surface: re-pick the side.
+      this.surfaceLockedPlacement = undefined;
+      this.syncSurfaceMetrics();
+    }
+  }
+
+  @Input()
   public set layout(value: CxMenuLayout | undefined) {
     this.layoutState.set(value === 'fill' ? 'fill' : 'inline');
   }
@@ -433,6 +481,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   protected readonly surfaceLeft$ = this.surfaceLeftState.asReadonly();
   protected readonly surfaceWidth$ = this.widthState.asReadonly();
   protected readonly surfaceMaxHeight$ = this.surfaceMaxHeightState.asReadonly();
+  protected readonly surfacePlacement$ = this.surfacePlacementState.asReadonly();
   protected readonly submenuSurfaces$ = this.submenuSurfacesState.asReadonly();
   protected readonly normalizedItems$ = computed(() => resolveMenuItems(this.itemsState()));
   protected readonly normalizedGroups$ = computed<CxResolvedMenuGroup[]>(() => {
@@ -719,18 +768,54 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
 
     const presentation = this.presentationState();
+    const requestedPlacement = this.placementState();
+    const sideRequested = requestedPlacement === 'left' || requestedPlacement === 'right';
     const rect =
       presentation.kind === 'context'
-        ? {
-            left: presentation.left,
-            right: presentation.left,
-            top: presentation.top,
-            bottom: presentation.top,
-          }
+        ? // A side placement hugs the owner element when one is named; the bare
+          // context point stays the anchor for classic drop placement.
+          sideRequested && presentation.owner
+          ? presentation.owner.getBoundingClientRect()
+          : {
+              left: presentation.left,
+              right: presentation.left,
+              top: presentation.top,
+              bottom: presentation.top,
+            }
         : this.triggerElement?.getBoundingClientRect();
     if (!rect) {
       return;
     }
+
+    if (sideRequested) {
+      const lockedSide =
+        this.surfaceLockedPlacement === 'left' || this.surfaceLockedPlacement === 'right'
+          ? this.surfaceLockedPlacement
+          : undefined;
+      const surface = measureCxMenuSideSurface({
+        triggerRect: rect,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        width: this.widthState(),
+        estimatedHeight: estimateMenuSurfaceHeight(this.rootItems()),
+        prefer: requestedPlacement,
+        lockedSide,
+      });
+      this.surfaceLockedPlacement = surface.side;
+      this.surfacePlacementState.set(surface.side);
+
+      this.surfaceLeftState.set(surface.left);
+      this.surfaceTopState.set(surface.top);
+      this.surfaceBottomState.set(undefined);
+      this.surfaceMaxHeightState.set(surface.maxHeight);
+      this.syncSubmenuSurfaceMetrics();
+      return;
+    }
+
+    const lockedDrop =
+      this.surfaceLockedPlacement === 'top' || this.surfaceLockedPlacement === 'bottom'
+        ? this.surfaceLockedPlacement
+        : undefined;
     const surface = measureCxFloatingSurface({
       triggerRect: rect,
       viewportWidth: window.innerWidth,
@@ -739,9 +824,12 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       estimatedHeight: estimateMenuSurfaceHeight(this.rootItems()),
       align: presentation.kind === 'context' ? 'start' : this.alignState(),
       gap: presentation.kind === 'context' ? 0 : undefined,
-      lockedPlacement: this.surfaceLockedPlacement,
+      // An explicit top/bottom is honored outright — the surface scrolls
+      // within that side's room rather than flipping away from the request.
+      lockedPlacement: lockedDrop ?? (requestedPlacement === 'auto' ? undefined : requestedPlacement),
     });
     this.surfaceLockedPlacement = surface.placement;
+    this.surfacePlacementState.set(surface.placement);
 
     this.surfaceLeftState.set(surface.left);
     this.surfaceTopState.set(surface.top);
@@ -757,12 +845,13 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
 
     const rect = anchorElement.getBoundingClientRect();
-    const surface = measureCxSubmenuSurface({
+    const surface = measureCxMenuSideSurface({
       triggerRect: rect,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       width: this.widthState(),
       estimatedHeight: estimateMenuSurfaceHeight(item.items),
+      prefer: 'right',
     });
 
     const nextSurface: CxMenuSubmenuSurface = {
@@ -858,12 +947,13 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
         continue;
       }
       const rect = anchorElement.getBoundingClientRect();
-      const nextMetrics = measureCxSubmenuSurface({
+      const nextMetrics = measureCxMenuSideSurface({
         triggerRect: rect,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight,
         width: this.widthState(),
         estimatedHeight: estimateMenuSurfaceHeight(surface.items),
+        prefer: 'right',
       });
       refreshedSurfaces.push({
         ...surface,
@@ -1118,7 +1208,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return value;
     }
     if (value?.kind === 'context' && Number.isFinite(value.left) && Number.isFinite(value.top)) {
-      return { kind: 'context', left: value.left, top: value.top };
+      return value.owner instanceof HTMLElement
+        ? { kind: 'context', left: value.left, top: value.top, owner: value.owner }
+        : { kind: 'context', left: value.left, top: value.top };
     }
     throw new Error('[cx-menu] presentation must be trigger, inline, or a finite context point.');
   }
@@ -1130,7 +1222,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     if (current.kind !== 'context' || next.kind !== 'context') {
       return true;
     }
-    return current.left === next.left && current.top === next.top;
+    return current.left === next.left && current.top === next.top && current.owner === next.owner;
   }
 
   private rootItems(): readonly CxMenuItem[] {

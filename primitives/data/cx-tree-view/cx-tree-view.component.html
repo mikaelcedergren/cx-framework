@@ -19,7 +19,7 @@
               [attr.aria-label]="isExpanded(item) ? 'Collapse' : 'Expand'"
               (click)="onToggle(item)"
             >
-              <cx-icon [name]="isExpanded(item) ? 'chevron-down' : 'chevron-right'" [size]="14" />
+              <cx-icon [icon]="isExpanded(item) ? 'chevron-down' : 'chevron-right'" [size]="14" />
             </button>
           } @else {
             <span class="cx-tree-view__expander-space"></span>
@@ -35,7 +35,7 @@
             (click)="onSelect(item)"
           >
             @if (showIcons$() && item.icon) {
-              <cx-icon class="cx-tree-view__icon" [name]="item.icon" [size]="16" />
+              <cx-icon class="cx-tree-view__icon" [icon]="item.icon" [size]="16" />
             }
             <span class="cx-tree-view__label" data-cx-tooltip-overflow>{{ item.label }}</span>
           </button>

@@ -37,7 +37,7 @@
     (focus)="onFieldFocus(true)"
     (blur)="onFieldFocus(false)"
   >
-    <cx-icon class="cx-date-picker__field-icon" name="calendar" size="16" />
+    <cx-icon class="cx-date-picker__field-icon" icon="calendar" size="16" />
     <span
       class="cx-date-picker__field-text"
       [class.cx-date-picker__field-text--placeholder]="showPlaceholder$()"
@@ -47,7 +47,7 @@
     </span>
     @if (hasClear$()) {
       <button type="button" class="cx-date-picker__clear" aria-label="Clear" (click)="onClear($event)">
-        <cx-icon name="remove" size="16" />
+        <cx-icon icon="remove" size="16" />
       </button>
     }
   </div>

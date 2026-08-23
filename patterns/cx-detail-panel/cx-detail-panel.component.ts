@@ -1,5 +1,6 @@
 import {
   AfterViewChecked,
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   ContentChildren,
@@ -17,8 +18,9 @@ import {
 } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
-import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { CxIconComponent, type CxIconMood } from '../../primitives/media/cx-icon';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { CxTabsComponent, type CxTabItem } from '../../primitives/navigation/cx-tabs';
@@ -26,8 +28,11 @@ import { isHostVisible } from '../../primitives/shared/host-visibility';
 import { CxDetailPanelSectionComponent } from './cx-detail-panel-section.component';
 
 const DETAIL_PANEL_DISMISS_FALLBACK_BUFFER_MS = 50;
+const DETAIL_PANEL_RESIZE_STEP = 8;
+const DETAIL_PANEL_RESIZE_LARGE_STEP = 32;
 
 export type CxDetailPanelVariant = 'floating' | 'fixed';
+export type CxDetailPanelMood = CxIconMood;
 
 @Component({
   selector: 'cx-detail-panel',
@@ -37,6 +42,7 @@ export type CxDetailPanelVariant = 'floating' | 'fixed';
     CxMenuComponent,
     CxMenuTriggerDirective,
     CxTabsComponent,
+    CxTooltipDirective,
   ],
   templateUrl: './cx-detail-panel.component.html',
   styleUrl: './cx-detail-panel.component.scss',
@@ -67,6 +73,8 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   private readonly panelSurface?: ElementRef<HTMLElement>;
 
   @Input() icon: CxIconName | undefined;
+  /** Colors the header icon; every other part of the header stays ink. */
+  @Input() mood: CxDetailPanelMood = 'default';
   @Input() heading = '';
   @Input() variant: CxDetailPanelVariant = 'floating';
   @Input()
@@ -86,8 +94,25 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
   @Input() tabsAriaLabel: string | undefined;
   /** Optional width / min-width overrides (any CSS length) for the panel host. */
-  @Input() width: string | null = null;
+  @Input()
+  public set width(value: string | null) {
+    this.widthValue = value;
+    // A programmatic width supersedes any user drag that came before it.
+    this.resizedWidth$.set(null);
+  }
+  public get width(): string | null {
+    return this.widthValue;
+  }
+  private widthValue: string | null = null;
   @Input() minWidth: string | null = null;
+  /** Lets the user drag the panel's start edge to change its width. */
+  @Input({ transform: booleanAttribute }) resizable = true;
+  /**
+   * Renders the footer bar and its close button. Turning it off removes the
+   * panel's only pointer-reachable exit; Escape and an enabled outside click
+   * remain the dismissal paths.
+   */
+  @Input({ transform: booleanAttribute }) footer = true;
   /**
    * Also dismiss on a click outside the panel after any owned overlay closes.
    * A successful dismissal lets that pointer action continue to its outside
@@ -100,8 +125,19 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly menuItemSelect = new EventEmitter<string>();
   @Output() readonly selectedTabIdChange = new EventEmitter<string>();
+  /** Emits the rendered width as a px length after a user resize settles. */
+  @Output() readonly widthChange = new EventEmitter<string>();
 
   protected readonly closing$ = signal(false);
+  protected readonly resizing$ = signal(false);
+  private readonly resizedWidth$ = signal<string | null>(null);
+  private activeResizeSession?: {
+    pointerId: number;
+    handle: HTMLElement;
+    startX: number;
+    startWidth: number;
+    rtl: boolean;
+  };
   protected readonly headingId = `cx-detail-panel-heading-${this.instanceId}`;
   protected readonly tabPanelId = `cx-detail-panel-tab-panel-${this.instanceId}`;
 
@@ -139,7 +175,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   // Exposed as custom properties so the responsive width rules can replace
   // them cleanly without competing with inline width declarations.
   @HostBinding('style.--cx-detail-panel-width') get widthVar(): string | null {
-    return this.width;
+    return this.resizedWidth$() ?? this.width;
   }
 
   @HostBinding('style.--cx-detail-panel-min-width') get minWidthVar(): string | null {
@@ -187,6 +223,129 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     return this.normalizedHeading ? `Close ${this.normalizedHeading}` : 'Close detail panel';
   }
 
+  protected get resolvedResizeAriaLabel(): string {
+    return this.normalizedHeading ? `Resize ${this.normalizedHeading}` : 'Resize detail panel';
+  }
+
+  protected get renderedWidthPx(): number {
+    return Math.round(this.host.nativeElement.getBoundingClientRect().width);
+  }
+
+  protected onResizePointerDown(event: PointerEvent): void {
+    if (!this.resizable || !event.isPrimary || event.button !== 0 || this.closing$()) {
+      return;
+    }
+    event.preventDefault();
+    const handle = event.currentTarget as HTMLElement;
+    this.stopResizeSession();
+    this.activeResizeSession = {
+      pointerId: event.pointerId,
+      handle,
+      startX: event.clientX,
+      startWidth: this.host.nativeElement.getBoundingClientRect().width,
+      rtl: window.getComputedStyle(this.host.nativeElement).direction === 'rtl',
+    };
+    this.resizing$.set(true);
+    handle.setPointerCapture(event.pointerId);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }
+
+  protected onResizePointerMove(event: PointerEvent): void {
+    const session = this.activeResizeSession;
+    if (!session || event.pointerId !== session.pointerId) {
+      return;
+    }
+    // The panel's end edge is anchored, so dragging the start edge outward
+    // widens it. CSS clamps the raw value between the min-width floor and the
+    // available frame.
+    const delta = (session.startX - event.clientX) * (session.rtl ? -1 : 1);
+    this.resizedWidth$.set(`${Math.round(session.startWidth + delta)}px`);
+  }
+
+  protected onResizePointerUp(event: PointerEvent): void {
+    if (this.activeResizeSession?.pointerId === event.pointerId) {
+      this.finishResizeSession();
+    }
+  }
+
+  protected onResizePointerCancel(event: PointerEvent): void {
+    if (this.activeResizeSession?.pointerId === event.pointerId) {
+      this.finishResizeSession();
+    }
+  }
+
+  protected onResizeLostPointerCapture(event: PointerEvent): void {
+    if (this.activeResizeSession?.pointerId === event.pointerId) {
+      this.finishResizeSession();
+    }
+  }
+
+  protected onResizeKeydown(event: KeyboardEvent): void {
+    if (!this.resizable) {
+      return;
+    }
+    const rtl = window.getComputedStyle(this.host.nativeElement).direction === 'rtl';
+    const step = event.shiftKey ? DETAIL_PANEL_RESIZE_LARGE_STEP : DETAIL_PANEL_RESIZE_STEP;
+    const current = this.host.nativeElement.getBoundingClientRect().width;
+    const outwardKey = rtl ? 'ArrowRight' : 'ArrowLeft';
+    const inwardKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    let next: number;
+
+    switch (event.key) {
+      case outwardKey:
+        next = current + step;
+        break;
+      case inwardKey:
+        next = current - step;
+        break;
+      case 'Home':
+        next = 0;
+        break;
+      case 'End':
+        next = Number.MAX_SAFE_INTEGER;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.resizedWidth$.set(`${Math.min(Math.max(Math.round(next), 0), 100000)}px`);
+    this.emitRenderedWidthAfterLayout();
+  }
+
+  protected onResizeDoubleClick(event: MouseEvent): void {
+    if (!this.resizable) {
+      return;
+    }
+    event.preventDefault();
+    this.stopResizeSession();
+    this.resizedWidth$.set(null);
+    this.emitRenderedWidthAfterLayout();
+  }
+
+  private finishResizeSession(): void {
+    this.stopResizeSession();
+    this.widthChange.emit(`${this.renderedWidthPx}px`);
+  }
+
+  private stopResizeSession(): void {
+    const session = this.activeResizeSession;
+    this.activeResizeSession = undefined;
+    if (session && session.handle.hasPointerCapture(session.pointerId)) {
+      session.handle.releasePointerCapture(session.pointerId);
+    }
+    this.resizing$.set(false);
+    document.body.style.removeProperty('cursor');
+    document.body.style.removeProperty('user-select');
+  }
+
+  private emitRenderedWidthAfterLayout(): void {
+    // The new width lands on the host during the next change detection pass,
+    // so measuring is deferred one macrotask.
+    window.setTimeout(() => this.widthChange.emit(`${this.renderedWidthPx}px`));
+  }
+
   protected get selectedTabButtonId(): string | null {
     const normalizedTabs = this.tabs.filter(tab => tab.id?.trim());
     const selectedIndex = normalizedTabs.findIndex(tab => tab.id.trim() === this.selectedTabId && !tab.disabled);
@@ -226,6 +385,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
       activeElement.blur();
     }
     this.restoreFocusOnDismiss = restoreFocus;
+    this.stopResizeSession();
     this.closing$.set(true);
     this.scheduleDismissFallback();
     return true;
@@ -238,6 +398,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.stopResizeSession();
     this.clearDismissSchedule();
     this.overlayState.release(this.overlayHandle);
     this.overlayHandle = undefined;
