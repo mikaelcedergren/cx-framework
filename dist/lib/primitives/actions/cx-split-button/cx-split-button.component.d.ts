@@ -1,0 +1,43 @@
+import { EventEmitter, OnDestroy } from '@angular/core';
+import { type CxIconName } from '../../../icons/manifest';
+import { type CxMenuItem } from '../../overlay/cx-menu';
+import { type CxButtonMood, type CxButtonSize, type CxButtonType } from '../cx-button';
+import * as i0 from "@angular/core";
+export declare class CxSplitButtonComponent implements OnDestroy {
+    private readonly delayedLoading;
+    private readonly openState;
+    private readonly itemsState;
+    text: string;
+    icon: CxIconName | undefined;
+    ariaLabel: string | undefined;
+    type: CxButtonType;
+    set items(value: readonly CxMenuItem[] | undefined);
+    menuAriaLabel: string | undefined;
+    mood: CxButtonMood;
+    size: CxButtonSize;
+    transparent: boolean;
+    rounded: boolean;
+    disabled: boolean;
+    set loading(value: boolean);
+    set open(value: boolean);
+    readonly pressed: EventEmitter<void>;
+    readonly itemSelect: EventEmitter<string>;
+    readonly openChange: EventEmitter<boolean>;
+    protected readonly loading$: import("@angular/core").Signal<boolean>;
+    protected readonly showSpinner$: import("@angular/core").Signal<boolean>;
+    protected readonly open$: import("@angular/core").Signal<boolean>;
+    protected readonly items$: import("@angular/core").Signal<readonly CxMenuItem[]>;
+    protected get visibleText(): string;
+    protected get nativeType(): CxButtonType;
+    protected get mainAriaLabel(): string | null;
+    protected get resolvedMenuAriaLabel(): string;
+    protected get isDisabled(): boolean;
+    protected get iconSize(): 12 | 16 | 18;
+    protected onMainPressed(): void;
+    protected onOpenChange(open: boolean): void;
+    protected onItemSelect(itemId: string): void;
+    ngOnDestroy(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxSplitButtonComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxSplitButtonComponent, "cx-split-button", never, { "text": { "alias": "text"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "type": { "alias": "type"; "required": false; }; "items": { "alias": "items"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "size": { "alias": "size"; "required": false; }; "transparent": { "alias": "transparent"; "required": false; }; "rounded": { "alias": "rounded"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "open": { "alias": "open"; "required": false; }; }, { "pressed": "pressed"; "itemSelect": "itemSelect"; "openChange": "openChange"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-split-button.component.d.ts.map

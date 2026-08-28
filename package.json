@@ -1,11 +1,16 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.8.7",
-  "description": "Personal Angular UI framework and AI design package.",
+  "version": "0.9.5",
+  "description": "Portable product framework for Angular UI, AI working rules, and Node web runtime.",
   "type": "module",
-  "packageManager": "pnpm@10.7.1",
+  "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
+  "engines": {
+    "node": ">=26 <27"
+  },
   "bin": {
-    "cx-framework-skills": "./scripts/install-ai-skills.mjs"
+    "cx-framework-skills": "./scripts/install-ai-skills.mjs",
+    "cx-platform-check": "./scripts/check-product.mjs",
+    "cx-server-artifact": "./scripts/cx-server-artifact.mjs"
   },
   "main": "./dist/lib/public-api.js",
   "module": "./dist/lib/public-api.js",
@@ -22,11 +27,257 @@
     "./ai/*": "./ai/*",
     "./fonts/*": "./fonts/*",
     "./icons/*": "./icons/*",
-    "./scripts/*": "./scripts/*",
+    "./platform/README.md": "./platform/README.md",
+    "./platform/cx-product.schema.json": "./platform/cx-product.schema.json",
+    "./platform/web-standard.json": "./platform/web-standard.json",
+    "./platform/e2e-contract": {
+      "node": {
+        "import": {
+          "types": "./platform/e2e-contract.d.mts",
+          "default": "./platform/e2e-contract.mjs"
+        }
+      }
+    },
+    "./platform/e2e-contract.mjs": null,
+    "./platform/e2e-contract.d.mts": null,
+    "./platform/e2e-runner": {
+      "node": {
+        "import": {
+          "types": "./platform/e2e-runner.d.mts",
+          "default": "./platform/e2e-runner-public.mjs"
+        }
+      }
+    },
+    "./platform/e2e-runner.mjs": null,
+    "./platform/e2e-runner-public.mjs": null,
+    "./platform/e2e-runner.d.mts": null,
+    "./platform/e2e-health-probe.mjs": null,
+    "./platform/e2e-network-guard.mjs": null,
+    "./platform/e2e-network-orchestration-internal.mjs": null,
+    "./platform/e2e-process-ownership-internal.mjs": null,
+    "./platform/e2e-runtime-ownership-internal.mjs": null,
+    "./platform/e2e-source-policy-internal.mjs": null,
+    "./server": {
+      "node": {
+        "import": {
+          "types": "./dist/server/index.d.ts",
+          "default": "./dist/server/index.js"
+        }
+      }
+    },
+    "./server/bounded-response": {
+      "node": {
+        "import": {
+          "types": "./dist/server/bounded-response.d.ts",
+          "default": "./dist/server/bounded-response.js"
+        }
+      }
+    },
+    "./server/browser-releases": {
+      "node": {
+        "import": {
+          "types": "./dist/server/browser-releases.d.ts",
+          "default": "./dist/server/browser-releases.js"
+        }
+      }
+    },
+    "./server/configuration": {
+      "node": {
+        "import": {
+          "types": "./dist/server/configuration.d.ts",
+          "default": "./dist/server/configuration.js"
+        }
+      }
+    },
+    "./server/cookies": {
+      "node": {
+        "import": {
+          "types": "./dist/server/cookies.d.ts",
+          "default": "./dist/server/cookies.js"
+        }
+      }
+    },
+    "./server/errors": {
+      "node": {
+        "import": {
+          "types": "./dist/server/errors.d.ts",
+          "default": "./dist/server/errors.js"
+        }
+      }
+    },
+    "./server/gate": {
+      "node": {
+        "import": {
+          "types": "./dist/server/gate.d.ts",
+          "default": "./dist/server/gate.js"
+        }
+      }
+    },
+    "./server/health": {
+      "node": {
+        "import": {
+          "types": "./dist/server/health.d.ts",
+          "default": "./dist/server/health.js"
+        }
+      }
+    },
+    "./server/jobs": {
+      "node": {
+        "import": {
+          "types": "./dist/server/jobs.d.ts",
+          "default": "./dist/server/jobs.js"
+        }
+      }
+    },
+    "./server/listen": {
+      "node": {
+        "import": {
+          "types": "./dist/server/listen.d.ts",
+          "default": "./dist/server/listen.js"
+        }
+      }
+    },
+    "./server/origin": {
+      "node": {
+        "import": {
+          "types": "./dist/server/origin.d.ts",
+          "default": "./dist/server/origin.js"
+        }
+      }
+    },
+    "./server/private-environment": {
+      "node": {
+        "import": {
+          "types": "./dist/server/private-environment.d.ts",
+          "default": "./dist/server/private-environment.js"
+        }
+      }
+    },
+    "./server/product-manifest": {
+      "node": {
+        "import": {
+          "types": "./dist/server/product-manifest.d.ts",
+          "default": "./dist/server/product-manifest.js"
+        }
+      }
+    },
+    "./server/process-role": {
+      "node": {
+        "import": {
+          "types": "./dist/server/process-role.d.ts",
+          "default": "./dist/server/process-role.js"
+        }
+      }
+    },
+    "./server/rate-limit": {
+      "node": {
+        "import": {
+          "types": "./dist/server/rate-limit.d.ts",
+          "default": "./dist/server/rate-limit.js"
+        }
+      }
+    },
+    "./server/release-modes": {
+      "node": {
+        "import": {
+          "types": "./dist/server/release-modes.d.ts",
+          "default": "./dist/server/release-modes.js"
+        }
+      }
+    },
+    "./server/request-id": {
+      "node": {
+        "import": {
+          "types": "./dist/server/request-id.d.ts",
+          "default": "./dist/server/request-id.js"
+        }
+      }
+    },
+    "./server/security": {
+      "node": {
+        "import": {
+          "types": "./dist/server/security.d.ts",
+          "default": "./dist/server/security.js"
+        }
+      }
+    },
+    "./server/server-identity": {
+      "node": {
+        "import": {
+          "types": "./dist/server/server-identity.d.ts",
+          "default": "./dist/server/server-identity.js"
+        }
+      }
+    },
+    "./server/session": {
+      "node": {
+        "import": {
+          "types": "./dist/server/session.d.ts",
+          "default": "./dist/server/session.js"
+        }
+      }
+    },
+    "./server/signing": {
+      "node": {
+        "import": {
+          "types": "./dist/server/signing.d.ts",
+          "default": "./dist/server/signing.js"
+        }
+      }
+    },
+    "./server/sqlite": {
+      "node": {
+        "import": {
+          "types": "./dist/server/sqlite.d.ts",
+          "default": "./dist/server/sqlite.js"
+        }
+      }
+    },
+    "./server/static-files": {
+      "node": {
+        "import": {
+          "types": "./dist/server/static-files.d.ts",
+          "default": "./dist/server/static-files.js"
+        }
+      }
+    },
+    "./server/static-site": {
+      "node": {
+        "import": {
+          "types": "./dist/server/static-site.d.ts",
+          "default": "./dist/server/static-site.js"
+        }
+      }
+    },
+    "./server/shutdown": {
+      "node": {
+        "import": {
+          "types": "./dist/server/shutdown.d.ts",
+          "default": "./dist/server/shutdown.js"
+        }
+      }
+    },
+    "./server/testing": {
+      "node": {
+        "import": {
+          "types": "./dist/server/testing.d.ts",
+          "default": "./dist/server/testing.js"
+        }
+      }
+    },
+    "./server/worker-readiness": {
+      "node": {
+        "import": {
+          "types": "./dist/server/worker-readiness.d.ts",
+          "default": "./dist/server/worker-readiness.js"
+        }
+      }
+    },
     "./styles/*": {
       "sass": "./styles/_*.scss",
       "default": "./styles/_*.scss"
     },
+    "./support/components/authority.json": "./support/components/authority.json",
     "./support/*": "./support/*",
     "./tokens": {
       "sass": "./tokens/index.scss",
@@ -41,30 +292,36 @@
     "README.md",
     "PACKAGING.md",
     "dist/",
-    "AGENTS.md",
     "ai/",
     "fonts/",
     "icons/",
-    "patterns/",
-    "primitives/",
-    "public-api.ts",
-    "scripts/",
+    "platform/",
     "styles/",
     "support/",
-    "theme.ts",
     "tokens/",
-    "tooling/",
-    "tsconfig.lib.json",
-    "typeface.ts"
+    "scripts/check-product.mjs",
+    "scripts/cx-server-artifact.mjs",
+    "scripts/install-ai-skills.mjs",
+    "scripts/workspace-contract.mjs"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
+    "components:authority": "node scripts/generate-component-authority.mjs",
+    "components:authority:check": "node scripts/generate-component-authority.mjs --check",
+    "typecheck": "ngc -p tsconfig.lib.json --noEmit --sourceMap false --inlineSources false && tsc -p tsconfig.server.json --noEmit",
     "icons": "node scripts/generate-icon-manifest.mjs",
     "icons:check": "node scripts/generate-icon-index.mjs --check",
     "icons:index": "node scripts/generate-icon-index.mjs",
-    "prepare": "node scripts/build.mjs"
+    "check": "pnpm components:authority:check && pnpm dist:check && pnpm icons:check && pnpm typecheck && pnpm dist:rebuild-check",
+    "dist:check": "node scripts/check-built-dist.mjs",
+    "dist:git": "node scripts/check-built-dist.mjs --git",
+    "dist:rebuild-check": "node scripts/check-built-dist.mjs --rebuild"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/router": "^22.0.0",
     "ag-charts-community": "^13.3.1",
     "marked": "^18.0.7",
     "prosemirror-commands": "^1.7.2",
@@ -77,14 +334,64 @@
     "prosemirror-state": "^1.4.4",
     "prosemirror-transform": "^1.12.0",
     "prosemirror-view": "^1.42.2",
+    "rxjs": "^7.8.0",
     "tslib": "^2.8.1"
   },
-  "peerDependencies": {
-    "@angular/cdk": "^22.0.0",
-    "@angular/common": "^22.0.0",
-    "@angular/core": "^22.0.0",
-    "@angular/router": "^22.0.0",
-    "rxjs": "^7.8.0"
+  "peerDependenciesMeta": {
+    "@angular/cdk": {
+      "optional": true
+    },
+    "@angular/common": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/router": {
+      "optional": true
+    },
+    "ag-charts-community": {
+      "optional": true
+    },
+    "marked": {
+      "optional": true
+    },
+    "prosemirror-commands": {
+      "optional": true
+    },
+    "prosemirror-history": {
+      "optional": true
+    },
+    "prosemirror-inputrules": {
+      "optional": true
+    },
+    "prosemirror-keymap": {
+      "optional": true
+    },
+    "prosemirror-markdown": {
+      "optional": true
+    },
+    "prosemirror-model": {
+      "optional": true
+    },
+    "prosemirror-schema-list": {
+      "optional": true
+    },
+    "prosemirror-state": {
+      "optional": true
+    },
+    "prosemirror-transform": {
+      "optional": true
+    },
+    "prosemirror-view": {
+      "optional": true
+    },
+    "rxjs": {
+      "optional": true
+    },
+    "tslib": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@angular/cdk": "^22.0.6",
@@ -94,10 +401,25 @@
     "@angular/core": "^22.0.8",
     "@angular/platform-browser": "^22.0.8",
     "@angular/router": "^22.0.8",
+    "@types/node": "^26.0.0",
+    "ag-charts-community": "^13.3.1",
+    "marked": "^18.0.7",
     "ng-packagr": "^22.0.2",
+    "prosemirror-commands": "^1.7.2",
+    "prosemirror-history": "^1.5.0",
+    "prosemirror-inputrules": "^1.5.1",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-markdown": "^1.13.5",
+    "prosemirror-model": "^1.25.11",
+    "prosemirror-schema-list": "^1.5.1",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-transform": "^1.12.0",
+    "prosemirror-view": "^1.42.2",
     "rxjs": "^7.8.2",
     "sass": "^1.102.0",
-    "typescript": "~6.0.3"
+    "tslib": "^2.8.1",
+    "typescript": "~6.0.3",
+    "zone.js": "~0.16.2"
   },
   "repository": {
     "type": "git",

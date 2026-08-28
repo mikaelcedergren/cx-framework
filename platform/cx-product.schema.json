@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mikaelcedergren.github.io/cx-framework/platform/cx-product.schema.json",
+  "title": "Cortex web product manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "id",
+    "family",
+    "profile",
+    "deployment",
+    "frontend",
+    "capabilities"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "family": {
+      "const": "web"
+    },
+    "profile": {
+      "enum": ["static-site", "hybrid-site", "web-app"]
+    },
+    "deployment": {
+      "enum": ["mac-mini", "work-mac"]
+    },
+    "frontend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["framework", "rendering", "designSystem", "visualSystem"],
+      "properties": {
+        "framework": {
+          "const": "angular"
+        },
+        "rendering": {
+          "enum": ["ssg", "csr"]
+        },
+        "designSystem": {
+          "enum": ["cx-framework", "cx-framework-source"]
+        },
+        "visualSystem": {
+          "enum": ["framework", "product-skin"]
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authentication",
+        "persistentData",
+        "backgroundWork",
+        "externalEffects"
+      ],
+      "properties": {
+        "authentication": {
+          "enum": ["none", "gate", "owner", "accounts"]
+        },
+        "persistentData": {
+          "enum": [
+            "none",
+            "structured-records",
+            "human-files",
+            "human-files-with-index"
+          ]
+        },
+        "backgroundWork": {
+          "enum": ["none", "build-time", "durable"]
+        },
+        "externalEffects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ai",
+              "email",
+              "network-fetch",
+              "notifications",
+              "payments"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

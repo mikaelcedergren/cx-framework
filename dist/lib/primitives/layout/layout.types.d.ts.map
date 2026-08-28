@@ -1,0 +1,1 @@
+{"version":3,"file":"layout.types.d.ts","sourceRoot":"","sources":["../../../../primitives/layout/layout.types.ts"],"names":[],"mappings":"AAAA,MAAM,MAAM,WAAW,GAAG,KAAK,GAAG,IAAI,GAAG,IAAI,GAAG,IAAI,GAAG,IAAI,GAAG,IAAI,GAAG,KAAK,CAAC;AAC3E,MAAM,MAAM,aAAa,GAAG,OAAO,GAAG,QAAQ,GAAG,KAAK,GAAG,SAAS,CAAC;AACnE,MAAM,MAAM,eAAe,GAAG,OAAO,GAAG,QAAQ,GAAG,KAAK,GAAG,SAAS,CAAC"}

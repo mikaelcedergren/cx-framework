@@ -1,0 +1,62 @@
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal, } from '@angular/core';
+import { CxIconComponent } from '../../media/cx-icon/index.js';
+import * as i0 from "@angular/core";
+export class CxBigCheckboxComponent {
+    selectedState = signal(false, /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "selectedState" }] : /* istanbul ignore next */ []));
+    choiceContentRef;
+    heading = '';
+    description = '';
+    icon;
+    iconMood = 'default';
+    disabled = false;
+    set selected(selected) {
+        this.selectedState.set(selected);
+    }
+    selectedChange = new EventEmitter();
+    focusChange = new EventEmitter();
+    selected$ = this.selectedState.asReadonly();
+    visibleHeading$() {
+        return this.heading.trim();
+    }
+    visibleDescription$() {
+        return this.description.trim();
+    }
+    onNativeChange(event) {
+        if (this.disabled) {
+            return;
+        }
+        const target = event.target;
+        const selected = target instanceof HTMLInputElement ? target.checked : !this.selectedState();
+        this.selectedState.set(selected);
+        this.selectedChange.emit(selected);
+    }
+    onFocus(focused) {
+        this.focusChange.emit(focused);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxBigCheckboxComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "22.0.8", type: CxBigCheckboxComponent, isStandalone: true, selector: "cx-big-checkbox", inputs: { heading: "heading", description: "description", icon: "icon", iconMood: "iconMood", disabled: "disabled", selected: "selected" }, outputs: { selectedChange: "selectedChange", focusChange: "focusChange" }, viewQueries: [{ propertyName: "choiceContentRef", first: true, predicate: ["choiceContent"], descendants: true, read: ElementRef }], ngImport: i0, template: "<label\n  class=\"cx-big-checkbox\"\n  [class.cx-big-checkbox--checked]=\"selected$()\"\n  [class.cx-big-checkbox--disabled]=\"disabled\"\n  [class.cx-big-checkbox--has-icon]=\"!!icon\"\n>\n  <input\n    class=\"cx-big-checkbox__input\"\n    type=\"checkbox\"\n    [checked]=\"selected$()\"\n    [disabled]=\"disabled\"\n    [attr.aria-label]=\"heading || description || null\"\n    (change)=\"onNativeChange($event)\"\n    (focus)=\"onFocus(true)\"\n    (blur)=\"onFocus(false)\"\n  />\n\n  <div class=\"cx-big-checkbox__indicator\" aria-hidden=\"true\">\n    <span\n      class=\"cx-big-checkbox__control\"\n      [class.cx-big-checkbox__control--checked]=\"selected$()\"\n    >\n      @if (selected$()) {\n        <span class=\"cx-big-checkbox__check\"></span>\n      }\n    </span>\n  </div>\n  <div #choiceContent class=\"cx-big-checkbox__content\">\n      @if (visibleHeading$()) {\n        <div class=\"cx-big-checkbox__label\">{{ visibleHeading$() }}</div>\n      }\n      @if (visibleDescription$()) {\n        <div class=\"cx-big-checkbox__description\">{{ visibleDescription$() }}</div>\n      }\n      <ng-content />\n  </div>\n  @if (icon; as iconName) {\n    <cx-icon\n      class=\"cx-big-checkbox__icon\"\n      [icon]=\"iconName\"\n      [mood]=\"iconMood\"\n      size=\"24\"\n      shape=\"square-subtle\"\n      aria-hidden=\"true\"\n    />\n  }\n</label>\n", styles: [":host{display:block}.cx-big-checkbox{display:grid;grid-template-columns:var(--choice-control-size) minmax(0, 1fr);width:100%;box-sizing:border-box;align-items:start;column-gap:var(--space-md);padding:var(--space-md);border:none;border-radius:var(--radius-xl);background-color:var(--opacity-low);color:var(--opacity-high);cursor:pointer;outline:none;transition:background-color var(--motion-base) var(--ease-out),box-shadow var(--motion-fast) ease,color var(--motion-fast) ease}.cx-big-checkbox--empty,.cx-big-checkbox__content:empty{display:none}.cx-big-checkbox--checked{background:var(--surface);box-shadow:var(--shadow-low);color:var(--ink)}.cx-big-checkbox--checked:hover:not(.cx-big-checkbox--disabled),.cx-big-checkbox--checked.cx-big-checkbox--hover:not(.cx-big-checkbox--disabled){background:var(--surface);box-shadow:var(--shadow-low)}.cx-big-checkbox--has-icon{grid-template-columns:var(--choice-control-size) minmax(0, 1fr) auto}.cx-big-checkbox--disabled{opacity:.4;cursor:default;pointer-events:none;user-select:none}.cx-big-checkbox__input{grid-column:1;grid-row:1;align-self:start;justify-self:center;width:var(--choice-control-size);height:var(--choice-control-size);padding:0;border:0;margin:0;margin-top:var(--space-2xs);appearance:none;cursor:inherit;opacity:0}.cx-big-checkbox:has(.cx-big-checkbox__input:focus-visible){outline:var(--outline-tab);outline-offset:var(--outline-tab-offset)}.cx-big-checkbox__indicator{grid-column:1;grid-row:1;display:inline-flex;align-items:center;justify-content:center;padding-top:var(--space-2xs);pointer-events:none}.cx-big-checkbox__control{position:relative;display:inline-flex;width:var(--choice-control-size);height:var(--choice-control-size);align-items:center;justify-content:center;border:var(--line);border-radius:var(--radius-sm);background:var(--opacity-low);color:var(--on-choice-control);transition:border-color var(--motion-base) var(--ease-out),background-color var(--motion-base) var(--ease-out)}.cx-big-checkbox:hover:not(.cx-big-checkbox--checked):not(.cx-big-checkbox--disabled) .cx-big-checkbox__control,.cx-big-checkbox--hover:not(.cx-big-checkbox--checked):not(.cx-big-checkbox--disabled) .cx-big-checkbox__control{border-color:var(--opacity-mid);background:var(--opacity-mid)}.cx-big-checkbox__control--checked{border-color:var(--choice-control-selected);background:var(--choice-control-selected)}.cx-big-checkbox__check{position:absolute;top:50%;left:50%;opacity:1;transform:translate(-1.3px, 3.6px) rotate(-135deg) scale(1)}.cx-big-checkbox__check::before,.cx-big-checkbox__check::after{position:absolute;top:50%;left:50%;display:block;border-radius:var(--radius-xs);background:var(--on-choice-control);content:\"\"}.cx-big-checkbox__check::before{width:1.5px;height:8.5px}.cx-big-checkbox__check::after{width:5px;height:1.5px}.cx-big-checkbox__content{grid-column:2;grid-row:1;display:flex;min-width:0;flex-direction:column;gap:var(--space-sm)}.cx-big-checkbox__icon{grid-column:3;grid-row:1;align-self:start;justify-self:end}.cx-big-checkbox__label{color:var(--ink);font-size:var(--font-size-body);font-weight:var(--font-weight-bold);line-height:var(--line-height-body)}.cx-big-checkbox__description{color:var(--opacity-high);font-size:var(--font-size-body-sm);font-weight:var(--font-weight-regular);line-height:var(--line-height-small)}"], dependencies: [{ kind: "component", type: CxIconComponent, selector: "cx-icon", inputs: ["icon", "size", "mood", "shape"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxBigCheckboxComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'cx-big-checkbox', imports: [CxIconComponent], changeDetection: ChangeDetectionStrategy.OnPush, template: "<label\n  class=\"cx-big-checkbox\"\n  [class.cx-big-checkbox--checked]=\"selected$()\"\n  [class.cx-big-checkbox--disabled]=\"disabled\"\n  [class.cx-big-checkbox--has-icon]=\"!!icon\"\n>\n  <input\n    class=\"cx-big-checkbox__input\"\n    type=\"checkbox\"\n    [checked]=\"selected$()\"\n    [disabled]=\"disabled\"\n    [attr.aria-label]=\"heading || description || null\"\n    (change)=\"onNativeChange($event)\"\n    (focus)=\"onFocus(true)\"\n    (blur)=\"onFocus(false)\"\n  />\n\n  <div class=\"cx-big-checkbox__indicator\" aria-hidden=\"true\">\n    <span\n      class=\"cx-big-checkbox__control\"\n      [class.cx-big-checkbox__control--checked]=\"selected$()\"\n    >\n      @if (selected$()) {\n        <span class=\"cx-big-checkbox__check\"></span>\n      }\n    </span>\n  </div>\n  <div #choiceContent class=\"cx-big-checkbox__content\">\n      @if (visibleHeading$()) {\n        <div class=\"cx-big-checkbox__label\">{{ visibleHeading$() }}</div>\n      }\n      @if (visibleDescription$()) {\n        <div class=\"cx-big-checkbox__description\">{{ visibleDescription$() }}</div>\n      }\n      <ng-content />\n  </div>\n  @if (icon; as iconName) {\n    <cx-icon\n      class=\"cx-big-checkbox__icon\"\n      [icon]=\"iconName\"\n      [mood]=\"iconMood\"\n      size=\"24\"\n      shape=\"square-subtle\"\n      aria-hidden=\"true\"\n    />\n  }\n</label>\n", styles: [":host{display:block}.cx-big-checkbox{display:grid;grid-template-columns:var(--choice-control-size) minmax(0, 1fr);width:100%;box-sizing:border-box;align-items:start;column-gap:var(--space-md);padding:var(--space-md);border:none;border-radius:var(--radius-xl);background-color:var(--opacity-low);color:var(--opacity-high);cursor:pointer;outline:none;transition:background-color var(--motion-base) var(--ease-out),box-shadow var(--motion-fast) ease,color var(--motion-fast) ease}.cx-big-checkbox--empty,.cx-big-checkbox__content:empty{display:none}.cx-big-checkbox--checked{background:var(--surface);box-shadow:var(--shadow-low);color:var(--ink)}.cx-big-checkbox--checked:hover:not(.cx-big-checkbox--disabled),.cx-big-checkbox--checked.cx-big-checkbox--hover:not(.cx-big-checkbox--disabled){background:var(--surface);box-shadow:var(--shadow-low)}.cx-big-checkbox--has-icon{grid-template-columns:var(--choice-control-size) minmax(0, 1fr) auto}.cx-big-checkbox--disabled{opacity:.4;cursor:default;pointer-events:none;user-select:none}.cx-big-checkbox__input{grid-column:1;grid-row:1;align-self:start;justify-self:center;width:var(--choice-control-size);height:var(--choice-control-size);padding:0;border:0;margin:0;margin-top:var(--space-2xs);appearance:none;cursor:inherit;opacity:0}.cx-big-checkbox:has(.cx-big-checkbox__input:focus-visible){outline:var(--outline-tab);outline-offset:var(--outline-tab-offset)}.cx-big-checkbox__indicator{grid-column:1;grid-row:1;display:inline-flex;align-items:center;justify-content:center;padding-top:var(--space-2xs);pointer-events:none}.cx-big-checkbox__control{position:relative;display:inline-flex;width:var(--choice-control-size);height:var(--choice-control-size);align-items:center;justify-content:center;border:var(--line);border-radius:var(--radius-sm);background:var(--opacity-low);color:var(--on-choice-control);transition:border-color var(--motion-base) var(--ease-out),background-color var(--motion-base) var(--ease-out)}.cx-big-checkbox:hover:not(.cx-big-checkbox--checked):not(.cx-big-checkbox--disabled) .cx-big-checkbox__control,.cx-big-checkbox--hover:not(.cx-big-checkbox--checked):not(.cx-big-checkbox--disabled) .cx-big-checkbox__control{border-color:var(--opacity-mid);background:var(--opacity-mid)}.cx-big-checkbox__control--checked{border-color:var(--choice-control-selected);background:var(--choice-control-selected)}.cx-big-checkbox__check{position:absolute;top:50%;left:50%;opacity:1;transform:translate(-1.3px, 3.6px) rotate(-135deg) scale(1)}.cx-big-checkbox__check::before,.cx-big-checkbox__check::after{position:absolute;top:50%;left:50%;display:block;border-radius:var(--radius-xs);background:var(--on-choice-control);content:\"\"}.cx-big-checkbox__check::before{width:1.5px;height:8.5px}.cx-big-checkbox__check::after{width:5px;height:1.5px}.cx-big-checkbox__content{grid-column:2;grid-row:1;display:flex;min-width:0;flex-direction:column;gap:var(--space-sm)}.cx-big-checkbox__icon{grid-column:3;grid-row:1;align-self:start;justify-self:end}.cx-big-checkbox__label{color:var(--ink);font-size:var(--font-size-body);font-weight:var(--font-weight-bold);line-height:var(--line-height-body)}.cx-big-checkbox__description{color:var(--opacity-high);font-size:var(--font-size-body-sm);font-weight:var(--font-weight-regular);line-height:var(--line-height-small)}"] }]
+        }], propDecorators: { choiceContentRef: [{
+                type: ViewChild,
+                args: ['choiceContent', { read: ElementRef }]
+            }], heading: [{
+                type: Input
+            }], description: [{
+                type: Input
+            }], icon: [{
+                type: Input
+            }], iconMood: [{
+                type: Input
+            }], disabled: [{
+                type: Input
+            }], selected: [{
+                type: Input
+            }], selectedChange: [{
+                type: Output
+            }], focusChange: [{
+                type: Output
+            }] } });

@@ -6,13 +6,339 @@ the product currently has and the one it is moving to.
 
 Scope: public component APIs, defaults, required markup, and behaviour a consumer can
 observe or must adapt to. Not internals, not visual refinement, not source-side tooling.
-`components/guidance.json` remains the authority for how to use a component *now*; this
+`components/guidance.json` remains the authority for how to use a component _now_; this
 file only explains what moved and what to do about it.
 
 Entries name the component, state the change, and give the action to take. Every shipped
 version has a section, including one that only says nothing changed for consumers: a
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
+
+## 0.9.5
+
+- Typography authority — breaking: the obsolete `--font-family-fancy` compatibility alias is
+  removed. Use `--font-family-heading`; all current framework consumers already use that semantic
+  token, so only an older external consumer requires a text-only migration.
+- Static-site startup — breaking and required: pass `entrypointUrl: import.meta.url` to
+  `createStaticSiteApplication()` or `createStaticSiteServer()`. Ordinary production and
+  `CX_RELEASE_VALIDATION=1` now require the exact selected server release identity and prove that
+  the executing module is its declared web entrypoint before browser resources, Express
+  construction, or listener startup. Ordinary production also requires a complete validated
+  browser snapshot; release validation remains browserless. Do not substitute a working-directory
+  path or a parsed identity object.
+- Runtime modes — tightened: all shared web and worker startup policy now treats an absent
+  `NODE_ENV` as `development` and otherwise accepts only exact `development`, `test`, or
+  `production`. Empty, padded, case-changed, and invented values fail before private-file,
+  production, release-validation, browser, or worker-readiness branches. Use exact
+  `NODE_ENV=production` with exact `CX_RELEASE_VALIDATION=1`; remove product-local NODE_ENV
+  normalizers and consume `nodeEnvironmentValue()` from `server/configuration`.
+- Private role environment authority — breaking and required: pass the exact mode returned by
+  `privateEnvironmentFileStartupMode()` to `loadPrivateEnvironmentFile()`. Ordinary production now
+  requires the role-owned mode-0600 file and makes its complete allowlist authoritative: ambient
+  allowed keys are replaced, and an ambient key omitted by the file is removed. A production
+  `*_LOAD_ENV_FILE=false` bypass and malformed bypass values fail closed. Development retains the
+  optional ambient-precedence workflow, exact test startup skips file I/O, and
+  `CX_RELEASE_VALIDATION=1` must remove both owned and foreign private keys without reading a file.
+- SQLite owning-open boundary — breaking and required for every long-lived file-backed product
+  runtime authority:
+  replace product-local directory creation, `DatabaseSync` opening, SQLite configuration, and
+  filesystem ownership checks with `openOwnedSqliteDatabase()` from `server/sqlite`. Pass the
+  explicit canonical operational root, the normalized absolute database path contained by that
+  root, and WAL configuration; use the returned database and aggregate-safe close handle for the
+  connection lifetime. Web and worker roles that share one database pass the same operational
+  root and may open it concurrently. A caller that must verify a sealed pre-existing authority
+  before any write sets `requireExisting: true` and supplies the synchronous read-only
+  `beforeWrite` callback; the callback runs on the exact connection that later remains writable.
+  SQLite `query_only` plus a native fail-closed authorizer enforce that read phase, and its scoped
+  query surface expires immediately when the callback returns or throws. Do not retain the callback
+  database or its methods for later use.
+  Keep product schemas, migrations, capacity settings, and data policy in the product. A bounded
+  one-shot cutover tool may retain a specialized read-only or staged rollback-journal connection
+  only when its atomic publication proof cannot use the long-lived WAL lifecycle; document and test
+  that migration-only exception, keep it unreachable from ordinary web or worker startup, and close
+  it before activation. A deliberate `:memory:` test or schema fixture may continue to use an
+  in-memory driver. No long-lived file-backed runtime path may bypass this boundary.
+- E2E isolation — required: every browser product now launches Playwright through the canonical
+  `node scripts/run-e2e.mjs` entrypoint and the Node-only
+  `@mikaelcedergren/cx-framework/platform/e2e-runner` contract. Configure a repository-owned
+  controller and let the runner select both dynamic listener ports; do not launch Playwright directly, allocate runtime
+  roots from its config, inherit the operator shell, or use a host-wide loopback allowance. The
+  runner owns exact-environment Playwright/controller process groups, an exact-origin allow-proxy,
+  fixed `/healthz` readiness, bounded teardown, port-closure proof, and private runtime-root
+  cleanup. Product configuration is synchronous, build subprocesses pin package-manager config to
+  `/dev/null`, and fixed product E2E ports are rejected. Automatically selected app and proxy listeners stay within the
+  lightweight `platform/e2e-contract` entrypoint's inclusive `49152..65535` E2E range, which the
+  operating-layer port registry keeps free of active and prepared services. Configure Playwright
+  through `createHermeticPlaywrightUse()`, declare the exact `testDirectory` in the product runner,
+  and use the shared manual browser/API-context helpers when a fixture cannot provide the context.
+  The runner pins the browser launch and context proxy, disables QUIC and non-proxied WebRTC UDP,
+  blocks service workers, and rejects source-level network-control overrides before launch.
+  Browser transport is forced through the exact-origin proxy, and Node test-process fetch, TCP,
+  TLS, DNS, Unix-socket, and datagram transport fail closed outside the exact owned HTTP origin.
+  The proxy accepts HTTP `CONNECT` only to that same owned authority for managed Playwright API
+  requests. Dependency-created Angular build workers retain the guard while admitting only
+  Angular's packaged render hook, the localhost host fence, source maps, and a Node compile-cache
+  directory contained inside the private per-run runtime root; arbitrary worker environment and
+  Node flag overrides remain blocked.
+  This is a trusted-repository-source harness, not an operating-system sandbox: a deliberately
+  malicious same-user process or a native non-Node subprocess can bypass JavaScript guards. The
+  prelaunch source audit therefore rejects test-owned process/worker creation, while the thin
+  repository controller remains reviewed trusted source. The root package that owns
+  `scripts/run-e2e.mjs` must declare cx-framework directly, even when browser and server child
+  workspaces already declare it; the runner supplies nested package scripts with a private
+  per-run `pnpm` launcher bound to the integrity-pinned CLI rather than an ambient `PATH` command.
+- pnpm workspace execution — breaking and required: set the exact root
+  `pnpm-workspace.yaml` values `enableGlobalVirtualStore: false` and
+  `verifyDepsBeforeRun: error`. The first keeps each product's dependency projection
+  repository-owned; the second stops a stale or missing install before any package script instead
+  of letting pnpm install implicitly. CI must assert both effective values before dependency
+  installation. The hermetic E2E runner also pins the exact lowercase
+  `pnpm_config_verify_deps_before_run=error` value in framework-owned child environments; remove
+  product-owned pnpm/npm configuration from E2E subprocess environments, apart from the two exact
+  `/dev/null` `NPM_CONFIG_*CONFIG` fences used by a reviewed nested build.
+- Server artifacts — defense in depth: `cx-server-artifact` now accepts only the declared
+  installed cx-framework package surface beneath direct and pnpm virtual-store dependency trees.
+  It rejects raw framework source, build controls, unapproved scripts, lookalike package paths,
+  and escaping or ambiguously targeted direct-package links even if a future package transport
+  were to expose them. Products keep using the same release-artifact command; no source migration
+  is required.
+- Platform package boundary — no change for conforming consumers: the broad `platform/*` export is
+  removed. Public platform resources are now exactly `README.md`, `cx-product.schema.json`, and
+  `web-standard.json`, alongside the named `platform/e2e-contract` and `platform/e2e-runner`
+  entrypoints. This prevents encoded or query-suffixed package paths from exposing runner internals;
+  consumers already using the named entrypoints require no change.
+- Component authority — additive: packed installs now expose the generated, self-contained
+  `support/components/authority.json` resource through
+  `@mikaelcedergren/cx-framework/support/components/authority.json`. Tooling that needs exact
+  selector, public input/output, projection-slot, default/transform, or source-evidence facts should
+  consume this path-free, schema-bounded catalog instead of reaching into raw component source;
+  those raw source trees remain excluded from installs. No component-template migration is
+  required.
+- Angular component runtime APIs, icons, styles, and visual defaults are otherwise unchanged in
+  this version.
+
+## 0.9.4
+
+- Continuous integration — required: add or align `.github/workflows/ci.yml` with the canonical
+  action identities in `platform/web-standard.json`. Reference every external GitHub Action by an
+  immutable 40-character commit, use the exact standard-owned `actions/checkout` and
+  `actions/setup-node` revisions, and set `persist-credentials: false` on every checkout step.
+  `cx-platform-check` now rejects missing workflows, mutable external action refs, non-canonical
+  checkout/setup-node revisions, and persisted checkout credentials.
+- Angular components, tokens, icons, styles, server-runtime entrypoints, and visual defaults are
+  unchanged in this version.
+
+## 0.9.3
+
+- Private role environment files — additive: replace product-local dotenv filesystem loaders with
+  `loadPrivateEnvironmentFile()` from `server/private-environment`. Pass one absolute role-owned
+  filename, that role's non-empty allowed-key set, and its startup environment. Only an initial
+  `ENOENT` is optional; every other unsafe file condition fails closed. The shared primitive
+  requires an owner-owned single-link mode-0600 regular non-symlink file, performs a bounded
+  race-checked fatal-UTF-8 read, rejects NUL, `NODE_OPTIONS`, and unsupported keys before merging,
+  and preserves ambient-value precedence. Keep role filename selection, cross-role ambient-secret
+  removal, and product configuration outside the framework helper.
+- Production worker readiness — additive: after an ordinary production worker has completed inert
+  composition and bound shutdown signals, but before it starts recovery, maintenance, scheduling,
+  claiming, or provider work, call `acquireServerWorkerReadinessLease()` with the exact release
+  identity object returned by startup loading and the worker's declared key. Retain the returned lease for
+  the worker lifetime and close it before runtime teardown. The lease reopens and verifies the
+  configured immutable identity file, then keeps its descriptor open so shared operations can
+  prove the listener-free process still runs the current release. Development acquires no lease;
+  isolated `CX_RELEASE_VALIDATION=1` startup remains IPC-only. A parsed copy or identity loaded from
+  another file is deliberately rejected.
+- Angular components, tokens, icons, styles, and visual defaults are unchanged in this version.
+
+## 0.9.2
+
+- Site gate presentation — additive: use `createSiteGatePresentation()` with exactly one
+  `SITE_GATE_FORM_SLOT` when a product needs a branded login shell. Pass the returned frozen value
+  to `createSiteGate`; do not render from the request or fork the authentication flow. The
+  framework inserts and escapes the only password form, pre-renders initial/error states, and keeps
+  ownership of methods, cookies, rate limits, redirects, no-store/noindex, and CSP. Unlocked
+  protected documents now remain `no-store`; shared static delivery preserves that stronger policy
+  while cacheable assets retain their normal cache contract. Templates are
+  bounded passive HTML: scripts, inline styles/handlers, embedded content, extra form controls,
+  raw-text/RCDATA/table parsing contexts, malformed slot/document structure, external asset URLs,
+  and URL character references fail at startup. List every exact same-origin
+  stylesheet/image/font path needed while locked in `publicPaths`; presentation assets never
+  become public implicitly.
+- Server HTTP typing — fixed: framework middleware now remains directly assignable to Express 5
+  under `exactOptionalPropertyTypes`; products should compose the published middleware without
+  casts or local adapter wrappers.
+- Worker validation lifecycle — fixed: `signalServerWorkerReadiness()` now references its validation
+  IPC channel before publishing readiness, so a worker with no validation-time scheduler or other
+  active handle cannot race from a valid receipt into natural process teardown before the
+  validator's `SIGTERM`. Install graceful signal handlers before calling the helper and exit or
+  disconnect cleanly from that handler. Ordinary development/production workers remain unchanged,
+  and a failed IPC send releases the lifecycle reference before rejecting.
+- Server testing — additive: clean-checkout tests that exercise browser-release switching may use
+  `activateSyntheticBrowserReleaseFixture()` from `server/testing`. It creates one immutable,
+  reader-valid release inside a caller-owned disposable repository and activates it without an
+  operational `server-ops` checkout. Supply only safe relative fixture files and a new release ID
+  for each switch; the helper refuses release reuse, unsafe filesystem layouts, traversal, and
+  framework-owned metadata files. It is a test fixture, not a production publisher.
+- Durable jobs — append-only replacement guard: append
+  `durable_job_replacement_guard` after the three previously issued durable-job schema entries.
+  It rejects insert and update conflicts on the job ID, type/idempotency pair, non-null lease
+  token, and SQLite row ID before `OR REPLACE` can delete queued, running, or terminal history.
+  It deliberately does not depend on recursive triggers. SQLite row IDs become framework-owned:
+  retained rows must have positive row IDs, new inserts must leave numeric allocation to SQLite,
+  and no `rowid`, `_rowid_`, or `oid` alias may change after enqueue. During upgrade it validates
+  that rule and all retained recovery reserves against their job class and status without updating
+  job rows or activating product update triggers; any pre-existing inconsistency aborts without
+  repair or deletion.
+- Angular components, tokens, icons, styles, and visual defaults are unchanged in this version.
+
+## 0.9.1
+
+- Runtime product manifest — additive: web and worker startup should load the sealed absolute
+  `cx-product.json` through `server/product-manifest`. The strict bounded loader rejects duplicate
+  or unknown fields, invalid UTF-8, symlinks, and incompatible profile/capability combinations,
+  then returns one deeply frozen typed snapshot. Delete product-local manifest parsers; keep the
+  immutable artifact path separate from mutable operational data paths.
+- Server process roles and worker readiness — additive: versioned web and worker entrypoints should
+  use `server/process-role` to prove the executing module matches the exact role declared by the
+  sealed release identity. Declared workers should use `server/worker-readiness` to emit the exact
+  identity-bound IPC readiness receipt after real initialization when
+  `CX_RELEASE_VALIDATION=1`. Normal development and production startup do not require an IPC parent
+  or a mutable environment role label.
+- Durable jobs — additive transaction surface: use the new synchronous
+  `store.withTransaction()` callback when a product write and its required durable enqueue must
+  commit or roll back together. Perform product writes through the same injected database adapter
+  and enqueue only through the callback-scoped transaction surface; asynchronous callbacks are
+  rejected.
+- Durable jobs — additive job-local delay: return the `delay` disposition when a leased job is
+  waiting on its own prerequisite and unrelated work may continue. The store restores the consumed
+  attempt, persists the retry time and safe reason, and returns the job to ordinary queued state.
+  Continue to use `defer` only for queue-wide resource barriers where later work must not overtake
+  the blocked job.
+- Durable jobs — append-only schema history and bounded barrier recovery: replace use of the former
+  current-schema statement list with `DURABLE_JOB_SCHEMA_MIGRATIONS`. Keep the initial entry in the
+  product migration where it was first adopted, then add each later framework entry as a new
+  product-owned migration without changing any applied name, version, or statements.
+  The current suffix seals the enqueued job ID, type, payload, idempotency key, execution class,
+  attempt ceiling, original schedule, and creation time against direct SQL mutation, and prevents
+  deletion of active obligations while continuing to allow bounded terminal pruning. Apply this
+  suffix before using the current job store; do not recreate its triggers locally.
+  `executionClass: 'barrier-recovery'` is an explicit exception for an obligation that can release
+  a waiting queue-wide capacity barrier; enqueue it only in the same transaction that materializes
+  bounded product state and product-owned recovery reserves. The framework reserve is rearmed on
+  every nonterminal transition and cleared on terminal transition. All ordinary jobs remain
+  `standard` and cannot pass a barrier.
+- SQLite verified cutovers — additive: use `applySqliteMigrationsAtomically()` when a pending
+  migration suffix transfers ownership of copied product data. Its required `captureState`
+  callback records caller-owned evidence under one `BEGIN IMMEDIATE` lock before the first pending
+  statement, and `verifyFinalState` may complete the caller-owned copy and sealing writes before it
+  proves the complete result. A failed or asynchronous proof rolls back those writes, the entire
+  pending suffix, and its ledger rows. Keep `captureState` read-only; keep both callbacks
+  synchronous and deterministic so every process proves the same cutover before startup.
+- HTTP rate limiting — additive: `server/rate-limit` now includes framework-owned Express-compatible
+  middleware on top of the bounded limiter. Products should supply the request-key policy and use
+  the shared JSON error contract instead of adding a separate rate-limit package.
+- Dynamic health readiness — additive: products with an essential local dependency may pass a
+  synchronous, side-effect-free readiness probe as the third argument to `healthMiddleware`.
+  Exactly `true` preserves the standard successful payload; `false` or a thrown probe error returns
+  the fixed no-store `503 { ok: false }` response. Keep remote, paid, asynchronous, and mutating
+  work out of this probe.
+- External provider responses — additive: use `server/bounded-response` to stream every untrusted
+  Fetch body through an explicit byte ceiling before text or JSON decoding. Pass the active effect
+  abort signal, then validate bounded domain fields and record counts in the product before writing
+  them. Overflow, abort, invalid Content-Length, malformed UTF-8, malformed JSON, and stream errors
+  fail with stable `BoundedResponseError` codes and cancel the upstream body.
+- Angular components, tokens, icons, styles, and visual defaults are unchanged in this version.
+
+## 0.9.0
+
+- Package delivery — breaking install-contract change: the generated GitHub package now commits
+  verified `dist/lib` and `dist/server` output and runs no install, postinstall, pack, or prepare
+  lifecycle build. Under pnpm 11, remove the legacy `package.json#pnpm` build configuration, move
+  the real dependency build permissions into the root `pnpm-workspace.yaml` `allowBuilds` map, and
+  keep every exact, versioned, Git/tarball, and glob form of `@mikaelcedergren/cx-framework` absent
+  from that map. Keep `strictDepBuilds`, `strictStorePkgContentCheck`, and `verifyStoreIntegrity`
+  true; never enable `dangerouslyAllowAllBuilds`. Refresh the GitHub dependency lock and keep
+  lifecycle scripts disabled in clean-install verification. Generated-package CI proves the
+  checked-in output is usable before build, byte-identical after a fresh rebuild, and tracked
+  without Git drift. The
+  generated repository retains raw source for that CI proof, while packed and Git dependency
+  installs now contain only immutable output, public resources, and runtime commands; do not import
+  or inspect framework TypeScript through `node_modules`.
+- Browser runtime ownership — breaking dependency-contract change: every Angular browser workspace
+  must declare the complete cx-framework peer set directly in production dependencies: Angular
+  CDK, Angular common/core/router, `ag-charts-community`, `marked`, all published `prosemirror-*`
+  peers, RxJS, and `tslib`. The package keeps these peers optional at install time so a Node-only
+  workspace declares none of them and receives no UI dependency closure. Do not reduce the browser
+  list based on current component use: the single public Angular entrypoint re-exports the complete
+  surface, and `cx-platform-check` enforces compatible majors. `cx-qr-code` uses its built-in
+  encoder, so `qrcode` is not a framework peer; retain it only where product code imports it.
+- Node web runtime — additive: the package now publishes strict Node 26 ESM entrypoints under
+  `@mikaelcedergren/cx-framework/server/*` for configuration, health, security and caching,
+  request IDs, safe JSON errors, cookies, origins, bounded rate limiting, full pre-launch gate,
+  gate policy, graceful shutdown, cryptographic signing, opaque sessions, SQLite migrations,
+  durable jobs, atomic
+  browser-release reads, static files, static sites, and isolated server probes. These subpaths
+  deliberately do not resolve through CommonJS or browser-oriented TypeScript resolution. Server
+  code should import the smallest owning subpath, compile with NodeNext plus Node 26 types, and
+  keep product routes, identity policy, data schemas, secrets, and external effects local.
+  The complete browser peer set described above is optional at package-install time, so Node-only
+  operational consumers install none of it; Angular products must still declare the full set
+  directly, as the product contract requires.
+- HTTP listener — additive: dynamic Express 5 entrypoints should await
+  `listenHttpApplication()` from `server/listen` before announcing readiness or starting work that
+  assumes the process is reachable. The promise rejects both a synchronous listen failure and an
+  asynchronous bind error delivered through Express's callback. Close any product-owned resources
+  opened before the await when it rejects.
+- Private API caching — additive: mount `noStoreHeader()` from `server/security` before a sensitive
+  API router so its success and error responses carry `private, no-store`. Do not apply static asset
+  caching policy to dynamic user or product data. The site gate preserves an upstream header that
+  already contains `no-store`, including `private, no-store` on a locked API response.
+- SQLite legacy-ledger adoption — additive: existing SQLite products must call
+  `adoptSqliteMigrationLedger` exactly once before their first `applySqliteMigrations` run. Supply
+  the complete current migration definitions plus a synchronous `verifyLegacyState` callback that
+  verifies the product-owned legacy schema, data, record counts or canonical hashes, and legacy
+  ledger before returning its contiguous applied-version prefix. Verification and canonical-ledger
+  insertion share one immediate transaction; the framework copies safe legacy timestamps when
+  supplied, writes canonical names and fingerprints from the current definitions, never reruns
+  adopted SQL, and refuses any existing canonical ledger. The callback is read-only; put every
+  legacy schema or data copy in a subsequent append-only migration. Do not replace product-specific
+  verification with a version-only copy.
+- Durable jobs — breaking configuration and additive runtime change: every
+  `createDurableJobStore` call must now set the database-wide `maxConcurrentJobs`. Use `1` when
+  strict queue order or an attempt-neutral resource-capacity barrier is required, and configure the
+  same value in every claim-capable store sharing `cx_jobs`. The new `blocked` status and `defer`
+  disposition persist that barrier across restart without charging an attempt; later claims remain
+  stopped until the blocked job succeeds or terminally fails. Retryable failures and expired leases
+  preserve the barrier while charging the real failed attempt; repeated explicit deferrals remain
+  attempt-neutral. `createDurableWorker` now schedules lease heartbeats automatically, aborts the
+  active handler when ownership is lost, and propagates that loss without letting a stale attempt
+  complete or fail the current claim. Products still own deterministic schedule keys and
+  idempotency for email, payment, or other external effects.
+- Static-site server — new shared entrypoint: `server/static-site` reads and validates an explicitly
+  selected `cx-product.json`, requires the `static-site` capability profile, binds locally, injects
+  the consumer's existing Express/compression implementations, serves one immutable browser-release
+  snapshot per request, retains safe hash-addressed assets, owns standard health/security/cache/
+  404 behavior, and installs removable graceful-shutdown signal bindings. Static consumers should
+  replace sibling `server-ops/lib/site-server.mjs` imports with this published entrypoint after
+  upgrading. Pass a required absolute `manifestFile` derived from the compiled entrypoint's
+  `import.meta.url` (`server/dist/index.js` uses `../../cx-product.json`) so it selects the manifest
+  sealed in the server artifact; keep `repoRoot: process.cwd()` separate for operational browser
+  releases. There is no working-directory compatibility fallback.
+- Server release identity — additive: `server/server-identity` strictly validates and pins one
+  versioned server artifact at process startup. Configure its absolute metadata path once through
+  `CX_SERVER_RELEASE_IDENTITY_FILE` (or the explicit static-site option); the static-site server
+  then exposes the pinned identity as no-store JSON at `/cx-server.json`. A changed deployment
+  pointer does not make an old process claim to be the new release: the endpoint changes only
+  after the replacement process starts from and validates the selected artifact.
+- Product contract — additive: `platform/cx-product.schema.json` and the dependency-free
+  `cx-platform-check` command define the shared Node 26, integrity-qualified pnpm 11.23.0, Angular
+  22, TypeScript 6.0.3, Playwright 1.60, canonical-command, and capability/profile contract. The
+  complete Corepack identity must match exactly. Move non-auth pnpm settings from `.npmrc` and all
+  `package.json#pnpm` settings into `pnpm-workspace.yaml`; replace the removed dependency-build
+  settings with one explicit `allowBuilds` map. Keep `strictDepBuilds`,
+  `strictStorePkgContentCheck`, and `verifyStoreIntegrity` true, and never enable
+  `dangerouslyAllowAllBuilds`. Every web repo should keep its product choices in `cx-product.json`
+  and run `cx-platform-check` through its canonical `check` command.
+- Angular components, tokens, icons, styles, and visual defaults are unchanged in this version.
 
 ## 0.8.7
 
@@ -55,7 +381,7 @@ apply a version whose section is missing.
   moves the username into an instant tooltip on the right; the menu keeps working from
   the avatar. Bind it to the surrounding navigation's collapsed state.
 - `cx-menu` and `cx-popover` — additive: `placement` (`'auto' | 'top' | 'right' |
-  'bottom' | 'left'`, default `auto`) chooses which side of the anchor a menu surface
+  `'bottom' | 'left'`, default `auto`) chooses which side of the anchor a menu surface
   opens on; explicit sides are honored and viewport-clamped, with `left`/`right` falling
   back to the opposite side only when the requested one has no room. A context
   presentation may now carry an `owner` element: tooltips on it stand down while the

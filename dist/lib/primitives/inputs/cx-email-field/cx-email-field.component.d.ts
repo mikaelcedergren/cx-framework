@@ -1,0 +1,43 @@
+import { EventEmitter } from '@angular/core';
+import { type CxFieldValidation, type CxFieldSize } from '../shared/field.types';
+import * as i0 from "@angular/core";
+export declare class CxEmailFieldComponent {
+    private static nextId;
+    private readonly valueState;
+    private readonly focusedState;
+    private readonly validationState;
+    protected readonly labelId: string;
+    protected readonly messagesId: string;
+    private readonly fieldRef?;
+    label: string;
+    ariaLabel: string | undefined;
+    optional: boolean;
+    disabled: boolean;
+    size: CxFieldSize;
+    loading: boolean;
+    clearable: boolean;
+    hint: string | undefined;
+    set validation(value: CxFieldValidation | null | undefined);
+    set value(value: string | undefined);
+    readonly valueChange: EventEmitter<string>;
+    readonly focusChange: EventEmitter<boolean>;
+    readonly clear: EventEmitter<void>;
+    protected readonly value$: import("@angular/core").Signal<string>;
+    protected readonly isFocused$: import("@angular/core").Signal<boolean>;
+    protected readonly validationMessages$: () => readonly import("../shared/field.types").CxRenderedValidationMessage[];
+    protected readonly hasError$: () => boolean;
+    protected readonly showHint$: () => boolean;
+    protected readonly hasClear$: () => boolean;
+    protected get resolvedAriaDescribedBy(): string | undefined;
+    protected get resolvedAriaLabel(): string | undefined;
+    protected get resolvedAriaLabelledBy(): string | undefined;
+    focus(): void;
+    protected onInput(event: Event): void;
+    protected onFocus(): void;
+    protected onBlur(): void;
+    protected onEscapeKey(): void;
+    protected onClear(event: MouseEvent): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxEmailFieldComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxEmailFieldComponent, "cx-email-field", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "clearable": { "alias": "clearable"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "focusChange": "focusChange"; "clear": "clear"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-email-field.component.d.ts.map

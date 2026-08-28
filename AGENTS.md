@@ -1,14 +1,14 @@
 # cx-framework — packaged output, do not author here
 
-This repository is generated. It is the published output of the Cortex design system, exported by `pnpm framework:package` from the Cortex repo, and consumed by other apps as `@mikaelcedergren/cx-framework` (`github:mikaelcedergren/cx-framework#main`).
+This repository is generated. It is the published output of the Cortex product framework, exported by `pnpm framework:package` from the Cortex repo, and consumed by other apps as `@mikaelcedergren/cx-framework` (`github:mikaelcedergren/cx-framework#main`).
 
-**Do not make design or code changes here.** Anything edited directly in this repo is overwritten on the next export. Make component and AI design-guidance changes in the source framework in Cortex, then re-run the packaging command.
+**Do not make design or code changes here.** Anything edited directly in this repo is overwritten on the next export. Make UI, portable AI-guidance, and Node runtime changes in the source framework in Cortex, then re-run the packaging command.
 
 ## Role in the Cortex -> cx-framework -> projects loop
 
-Cortex is the source layer for components, tokens, AI skills, guidelines, and design-system decisions. This repo is only the packaged delivery layer. The `ai/` tree is a platform-neutral design and working-method contract: component-family words describe semantic roles, and agents resolve those roles through the consuming product's own design system. Concrete `cx-*` selectors and APIs belong to this package's technical component source and `support/` metadata, not to the portable AI contract.
+Cortex is the source layer for components, tokens, AI skills, guidelines, design-system decisions, and portable Node runtime primitives. This repo is only the packaged delivery layer. The `ai/` tree is a platform-neutral design and working-method contract: component-family words describe semantic roles, and agents resolve those roles through the consuming product's own design system. Concrete `cx-*` selectors and APIs belong to this package's technical component source and `support/` metadata, not to the portable AI contract. Explicit `server/*` subpaths are Node-only and remain separate from browser entrypoints.
 
-Every product using the shared UI consumes this repo as `@mikaelcedergren/cx-framework` from GitHub `main`. Content and operations repos stay independent, and no downstream repo depends on Cortex directly through app imports, package dependencies, local `file:` links, scripts, styles, or copied source.
+Repositories consume only the shared UI, portable AI guidance, Node runtime, or platform-check entrypoints their role requires from this repo as `@mikaelcedergren/cx-framework` on GitHub `main`. Each repository retains its own ownership and release boundary, and no downstream repo depends on Cortex directly through app imports, package dependencies, local `file:` links, scripts, styles, or copied source.
 
 If a consuming project needs a framework upgrade, make the source fix in Cortex, export this repo again, obtain the user's explicit push authorisation under the shared Git policy, push it to GitHub, then reinstall/rebuild the consumer from this package. That is how one small fix becomes a benefit for every project.
 
@@ -17,5 +17,10 @@ Rules that still apply:
 - Follow the shared Git policy in the development-root `AGENTS.md`: work on the current branch, never create a branch, pull when relevant, and push only after the user's specific current authorisation. Only after the package is pushed to GitHub `main` do consuming apps reinstall.
 - Cortex and this current package have authority over consumers. When the contract changes, migrate every consumer forward; never add compatibility shims, legacy aliases, deprecated props, or restored behavior for stale downstream code.
 - `README.md` and `package.json` are generated; the folder contents (`tokens/`, `primitives/`, `patterns/`, `ai/`, …) are copied from Cortex source.
+- `.cx-framework-export.json` is the exporter ownership record. Re-export resets only declared generated roots, preserves Git/install/lockfile controls, and rejects unknown top-level data instead of deleting it.
+- `dist/` is immutable built output produced and verified in Cortex, exported with this package, and committed here. Never edit it directly. Package installation runs no build lifecycle; CI proves the checked-in output is usable before rebuilding and byte-identical afterward.
+- The generated repository retains raw source for that rebuild proof. The installed dependency is narrower: `package.json.files` includes immutable output, public resources, and runtime commands, never raw Angular/Node TypeScript, workbench source, build scripts, or tsconfigs.
+- Every Angular browser workspace owns the package's complete optional UI peer contract directly. Node-only workspaces declare none of those peers, so server artifacts do not inherit the browser dependency graph.
+- Portable Node entrypoints live under explicit `server/*` subpaths and stay dependency-injected and browser-free. The source framework owns the product-artifact contract; host activation, launchd, nginx, backup, and retention remain outside this package.
 - AI agents start at `ai/design/00-start-here.md`, also exposed by the package subpath `@mikaelcedergren/cx-framework/ai`. They inspect the consuming product's local components and public APIs instead of assuming this Angular library is installed or mapping semantic component roles to `cx-*` names.
 - Installed dependencies are not Codex skill-discovery roots. From a consuming repository root, run `pnpm exec cx-framework-skills` to create non-copying `.agents/skills` bridges into this package.

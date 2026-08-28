@@ -1,0 +1,73 @@
+import { EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { type CxValidationMessage } from '../shared/field.types';
+import { type CxIconName } from '../../../icons/manifest';
+import * as i0 from "@angular/core";
+export type CxFileUploadVariant = 'button' | 'zone';
+export type CxFileUploadValue = {
+    name: string;
+    size?: number;
+    type?: string;
+    lastModified?: number;
+    file?: File;
+};
+export type CxFileUpload = {
+    buttonText: string;
+    buttonIcon: CxIconName | undefined;
+    files: readonly CxFileUploadValue[];
+    disabled: boolean;
+};
+export declare class CxFileUploadComponent implements OnChanges {
+    private readonly filesState;
+    private readonly noticeState;
+    private readonly draggingState;
+    private dragDepth;
+    private nativeInputRef?;
+    variant: CxFileUploadVariant;
+    buttonText: string;
+    buttonIcon: CxIconName | undefined;
+    icon: CxIconName | undefined;
+    heading: string;
+    hint: string | undefined;
+    accept: string | undefined;
+    maxSize: number | undefined;
+    multiple: boolean;
+    disabled: boolean;
+    files: ReadonlyArray<CxFileUploadValue | File> | null | undefined;
+    readonly fileUpload: EventEmitter<CxFileUpload>;
+    ngOnChanges(changes: SimpleChanges): void;
+    protected readonly files$: import("@angular/core").Signal<readonly CxFileUploadValue[]>;
+    protected readonly dragging$: import("@angular/core").Signal<boolean>;
+    protected readonly visibleButtonText$: import("@angular/core").Signal<string>;
+    protected readonly errorMessages$: import("@angular/core").Signal<readonly CxValidationMessage[]>;
+    /** Files shown and reported. A single-file control owns an array of zero or one item. */
+    protected get visibleFiles(): readonly CxFileUploadValue[];
+    protected get hasFiles(): boolean;
+    protected get firstFileName(): string;
+    protected get resolvedHeading(): string;
+    protected get hasHint(): boolean;
+    protected get clearAriaLabel(): string;
+    protected removeAriaLabel(file: CxFileUploadValue): string;
+    protected formatSize(size: number | undefined): string;
+    protected onZoneClick(): void;
+    protected openNativePicker(): void;
+    protected onNativeInputChange(event: Event): void;
+    protected onDragEnter(event: DragEvent): void;
+    protected onDragOver(event: DragEvent): void;
+    protected onDragLeave(): void;
+    protected onDrop(event: DragEvent): void;
+    private resetDrag;
+    protected removeFile(target: CxFileUploadValue): void;
+    protected clearFile(): void;
+    private ingestFiles;
+    private mergeFiles;
+    private limitFiles;
+    private matchesAccept;
+    private exceedsMaxSize;
+    private hasFilePayload;
+    private normalizeFile;
+    private resetNativeInput;
+    private snapshot;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxFileUploadComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxFileUploadComponent, "cx-file-upload", never, { "variant": { "alias": "variant"; "required": false; }; "buttonText": { "alias": "buttonText"; "required": false; }; "buttonIcon": { "alias": "buttonIcon"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "accept": { "alias": "accept"; "required": false; }; "maxSize": { "alias": "maxSize"; "required": false; }; "multiple": { "alias": "multiple"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "files": { "alias": "files"; "required": false; }; }, { "fileUpload": "fileUpload"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-file-upload.component.d.ts.map

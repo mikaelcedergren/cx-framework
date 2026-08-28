@@ -1,0 +1,1358 @@
+import { createHash, timingSafeEqual } from "node:crypto";
+
+import { readCookie, serializeCookie, validateCookieName } from "./cookies.js";
+import { errorEnvelope, HttpError } from "./errors.js";
+import type { HttpRequest, HttpResponse, Middleware } from "./http.js";
+import { createBoundedRateLimiter } from "./rate-limit.js";
+import { hasNoStoreCacheDirective, isAssetRequestPath } from "./security.js";
+import {
+  createHmacTokenCodec,
+  randomBase64UrlIdentifier,
+  sha256Hex,
+} from "./signing.js";
+
+export const DEFAULT_SITE_GATE_PUBLIC_PATHS = Object.freeze([
+  "/healthz",
+  "/cx-build.json",
+  "/cx-server.json",
+  "/robots.txt",
+  "/favicon.ico",
+  "/favicon.svg",
+]);
+
+export type SiteGateRequestClass = "api" | "gate" | "protected-page" | "public";
+
+export interface SiteGatePolicyOptions {
+  apiPathPrefixes?: readonly string[];
+  gatePath?: string;
+  /** Additional exact paths that remain reachable while the gate is locked. */
+  publicPaths?: readonly string[];
+}
+
+export interface SiteGatePolicy {
+  readonly apiPathPrefixes: readonly string[];
+  readonly gatePath: string;
+  readonly publicPaths: readonly string[];
+}
+
+export interface SiteGateFormPresentationOptions {
+  errorClassName?: string;
+  errorMessage?: string;
+  formClassName?: string;
+  inputClassName?: string;
+  labelClassName?: string;
+  passwordLabel?: string;
+  submitClassName?: string;
+  submitLabel?: string;
+}
+
+export interface SiteGatePresentationOptions {
+  form?: SiteGateFormPresentationOptions;
+  template: string;
+}
+
+export interface SiteGateFormPresentation {
+  readonly errorClassName: string;
+  readonly errorMessage: string;
+  readonly formClassName: string;
+  readonly inputClassName: string;
+  readonly labelClassName: string;
+  readonly passwordLabel: string;
+  readonly submitClassName: string;
+  readonly submitLabel: string;
+}
+
+const siteGatePresentationBrand: unique symbol = Symbol(
+  "cx-framework.site-gate-presentation",
+);
+
+/**
+ * A startup-validated, request-independent gate page shell.
+ *
+ * Construct this value only through `createSiteGatePresentation()`. The private brand prevents a
+ * mutable or unvalidated structural lookalike from entering the request path.
+ */
+export interface SiteGatePresentation {
+  readonly [siteGatePresentationBrand]: true;
+  readonly form: SiteGateFormPresentation;
+  readonly template: string;
+}
+
+export interface SiteGateOptions extends SiteGatePolicyOptions {
+  cookieName?: string;
+  /** The maximum unlock lifetime. The framework caps this at seven days. */
+  maxAgeSeconds?: number;
+  /** Injectable clock for deterministic tests and controlled runtimes. */
+  now?: () => number;
+  password?: string;
+  presentation?: SiteGatePresentation;
+  secret?: string;
+  siteName?: string;
+}
+
+export interface SiteGate {
+  readonly enabled: boolean;
+  readonly gatePath: string;
+  isUnlocked(request: HttpRequest): boolean;
+  middleware(): Middleware;
+}
+
+const DEFAULT_COOKIE_NAME = "site_gate";
+const DEFAULT_GATE_PATH = "/gate";
+const DEFAULT_MAX_AGE_SECONDS = 12 * 60 * 60;
+export const SITE_GATE_FORM_SLOT = "<!-- cx-site-gate-form -->";
+const MAX_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
+const MIN_PASSWORD_CHARACTERS = 12;
+// Leaves enough room for worst-case URL encoding plus the field name inside the 4 KiB form bound.
+const MAX_PASSWORD_BYTES = 1_024;
+const MIN_SECRET_CHARACTERS = 32;
+const MAX_FORM_BYTES = 4_096;
+const MAX_SITE_NAME_CHARACTERS = 200;
+const ATTEMPT_LIMIT = 20;
+const ATTEMPT_WINDOW_MS = 15 * 60_000;
+const MAX_TRACKED_CLIENTS = 10_000;
+const TOKEN_NONCE_BYTES = 16;
+const TOKEN_NONCE_PATTERN = /^[A-Za-z0-9_-]{22}$/;
+const TOKEN_MAX_PAYLOAD_BYTES = 256;
+const GATE_TOKEN_KEY_ID = "current";
+const NOINDEX_VALUE = "noindex, nofollow";
+const MAX_PRESENTATION_TEMPLATE_BYTES = 128 * 1_024;
+const MAX_PRESENTATION_PAGE_BYTES = 160 * 1_024;
+const MAX_PRESENTATION_TEXT_CHARACTERS = 1_000;
+const MAX_PRESENTATION_CLASS_BYTES = 512;
+const DEFAULT_GATE_CONTENT_SECURITY_POLICY =
+  "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
+const PRESENTED_GATE_CONTENT_SECURITY_POLICY =
+  "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
+const PRESENTATION_FORBIDDEN_ELEMENT =
+  /<\s*\/?\s*(?:applet|audio|base|button|caption|col|colgroup|datalist|embed|fencedframe|form|frame|frameset|iframe|input|math|noembed|noframes|noscript|object|plaintext|portal|script|select|style|svg|table|tbody|td|template|textarea|tfoot|th|thead|tr|video|xmp)(?:\s|\/|>)/iu;
+const PRESENTATION_FORBIDDEN_BODY_ELEMENT = /<\s*\/?\s*title(?:\s|\/|>)/iu;
+const PRESENTATION_FORBIDDEN_ATTRIBUTE =
+  /(?:\s|\/)(?:action|form(?:action|enctype|method|novalidate|target)?|http-equiv|imagesrcset|manifest|on[a-z0-9_.:-]+|ping|srcdoc|srcset|style)\s*=/iu;
+const PRESENTATION_URL_ATTRIBUTE =
+  /(?:^|[\s</])(?:cite|href|poster|src)\s*=/giu;
+const PRESENTATION_QUOTED_URL_ATTRIBUTE =
+  /(?:^|[\s</])(?:cite|href|poster|src)\s*=\s*(["'])([^"']*)\1/giu;
+const PRESENTATION_FORM_OPTION_KEYS = Object.freeze([
+  "errorClassName",
+  "errorMessage",
+  "formClassName",
+  "inputClassName",
+  "labelClassName",
+  "passwordLabel",
+  "submitClassName",
+  "submitLabel",
+]);
+const presentationRegistry = new WeakSet<object>();
+
+interface GateRequestDetails {
+  readonly body?: unknown;
+  readonly ip?: unknown;
+  readonly secure?: unknown;
+  readonly socket?: { readonly remoteAddress?: unknown };
+  on?: (event: string, listener: (...arguments_: unknown[]) => void) => unknown;
+}
+
+interface GateTokenPayload {
+  readonly expiresAt: number;
+  readonly issuedAt: number;
+  readonly nonce: string;
+}
+
+interface SiteGatePages {
+  readonly contentSecurityPolicy: string;
+  readonly failed: string;
+  readonly initial: string;
+}
+
+/**
+ * Validate and freeze one branded page shell before it can be supplied to `createSiteGate()`.
+ *
+ * The shell is static product presentation, not a request renderer. It may reference exact
+ * same-origin assets, but it cannot contain executable content, inline styles, embedded documents,
+ * or form controls. Cortex inserts the sole form at `SITE_GATE_FORM_SLOT`.
+ */
+export function createSiteGatePresentation(
+  options: SiteGatePresentationOptions,
+): SiteGatePresentation {
+  const source = presentationOptionsRecord(options);
+  assertExactPresentationKeys(source, ["form", "template"], "presentation");
+  const template = presentationRequiredString(
+    source,
+    "template",
+    "Site gate presentation template",
+  );
+  validatePresentationTemplate(template);
+
+  const formSource = presentationOptionalRecord(
+    source,
+    "form",
+    "Site gate presentation form",
+  );
+  assertExactPresentationKeys(
+    formSource,
+    PRESENTATION_FORM_OPTION_KEYS,
+    "presentation form",
+  );
+  const form = Object.freeze({
+    errorClassName: presentationClassName(
+      formSource,
+      "errorClassName",
+      "Site gate error class name",
+    ),
+    errorMessage: presentationText(
+      formSource,
+      "errorMessage",
+      "That password did not match.",
+      "Site gate error message",
+    ),
+    formClassName: presentationClassName(
+      formSource,
+      "formClassName",
+      "Site gate form class name",
+    ),
+    inputClassName: presentationClassName(
+      formSource,
+      "inputClassName",
+      "Site gate input class name",
+    ),
+    labelClassName: presentationClassName(
+      formSource,
+      "labelClassName",
+      "Site gate label class name",
+    ),
+    passwordLabel: presentationText(
+      formSource,
+      "passwordLabel",
+      "Password",
+      "Site gate password label",
+    ),
+    submitClassName: presentationClassName(
+      formSource,
+      "submitClassName",
+      "Site gate submit class name",
+    ),
+    submitLabel: presentationText(
+      formSource,
+      "submitLabel",
+      "Unlock",
+      "Site gate submit label",
+    ),
+  });
+  const presentation = Object.freeze({
+    [siteGatePresentationBrand]: true as const,
+    form,
+    template,
+  });
+  presentationRegistry.add(presentation);
+  return presentation;
+}
+
+export function createSiteGatePolicy({
+  apiPathPrefixes = ["/api"],
+  gatePath = DEFAULT_GATE_PATH,
+  publicPaths = [],
+}: SiteGatePolicyOptions = {}): SiteGatePolicy {
+  if (!Array.isArray(publicPaths)) {
+    throw new Error("Public gate paths must be an array.");
+  }
+  const normalizedGatePath = normalizeConfiguredPath(
+    gatePath,
+    "Site gate path",
+  );
+  const normalizedPublicPaths = normalizeConfiguredPaths(
+    [...DEFAULT_SITE_GATE_PUBLIC_PATHS, ...publicPaths],
+    "Public gate path",
+  );
+  const normalizedApiPrefixes = normalizeConfiguredPaths(
+    apiPathPrefixes,
+    "API gate prefix",
+  );
+  if (normalizedPublicPaths.includes(normalizedGatePath)) {
+    throw new Error("The site gate path cannot also be a public bypass path.");
+  }
+
+  return Object.freeze({
+    apiPathPrefixes: Object.freeze(normalizedApiPrefixes),
+    gatePath: normalizedGatePath,
+    publicPaths: Object.freeze(normalizedPublicPaths),
+  });
+}
+
+export function classifySiteGateRequest(
+  policy: SiteGatePolicy,
+  requestPath: string,
+): SiteGateRequestClass {
+  const candidate = requestPathname(requestPath);
+  if (!candidate) return "protected-page";
+
+  if (
+    candidate === policy.gatePath ||
+    stripTrailingSlash(candidate) === policy.gatePath
+  ) {
+    return "gate";
+  }
+  if (policy.publicPaths.includes(candidate)) return "public";
+  if (matchesPrefix(candidate, policy.apiPathPrefixes)) return "api";
+  return "protected-page";
+}
+
+/**
+ * Build a dependency-free pre-launch gate for an Express-compatible Node server.
+ *
+ * Empty passwords deliberately make the middleware inert for local development, but every path,
+ * cookie, lifetime, label, and clock option is still validated before that decision. Products
+ * whose launch policy requires a gate must enforce the non-empty password in product-owned startup
+ * configuration. When enabled, unlock state is a bounded, purpose-bound signed cookie; it contains
+ * no password or product data.
+ */
+export function createSiteGate({
+  apiPathPrefixes = ["/api"],
+  cookieName = DEFAULT_COOKIE_NAME,
+  gatePath = DEFAULT_GATE_PATH,
+  maxAgeSeconds = DEFAULT_MAX_AGE_SECONDS,
+  now = Date.now,
+  password = "",
+  presentation,
+  publicPaths = [],
+  secret = "",
+  siteName = "This site",
+}: SiteGateOptions = {}): SiteGate {
+  const policy = createSiteGatePolicy({
+    apiPathPrefixes,
+    gatePath,
+    publicPaths,
+  });
+  const safeCookieName = validateCookieName(cookieName);
+  const safeMaxAgeSeconds = validateMaxAgeSeconds(maxAgeSeconds);
+  const safeSiteName = validateSiteName(siteName);
+  const pages = createSiteGatePages({
+    gatePath: policy.gatePath,
+    presentation,
+    siteName: safeSiteName,
+  });
+  if (typeof now !== "function") {
+    throw new Error("A site gate clock must be a function.");
+  }
+  if (typeof password !== "string") {
+    throw new Error("A site gate password must be a string.");
+  }
+
+  if (password === "") {
+    const passThrough: Middleware = (_request, _response, next) => next();
+    return Object.freeze({
+      enabled: false,
+      gatePath: policy.gatePath,
+      isUnlocked: () => true,
+      middleware: () => passThrough,
+    });
+  }
+
+  validatePassword(password);
+  validateSecret(secret);
+  const maxAgeMilliseconds = safeMaxAgeSeconds * 1_000;
+  const tokenCodec = createHmacTokenCodec({
+    activeKeyId: GATE_TOKEN_KEY_ID,
+    keys: [{ id: GATE_TOKEN_KEY_ID, secret }],
+    maxPayloadBytes: TOKEN_MAX_PAYLOAD_BYTES,
+    purpose: `site-gate:v1:${sha256Hex(
+      JSON.stringify([safeSiteName, safeCookieName, policy.gatePath]),
+    )}`,
+  });
+  const attempts = createBoundedRateLimiter({
+    limit: ATTEMPT_LIMIT,
+    maxKeys: MAX_TRACKED_CLIENTS,
+    now,
+    windowMs: ATTEMPT_WINDOW_MS,
+  });
+
+  function clock(): number {
+    const timestamp = now();
+    if (!Number.isSafeInteger(timestamp) || timestamp < 0) {
+      throw new Error(
+        "The site gate clock must return non-negative epoch milliseconds.",
+      );
+    }
+    return timestamp;
+  }
+
+  function isUnlocked(request: HttpRequest): boolean {
+    const token = readCookie(requestHeader(request, "cookie"), safeCookieName);
+    if (!token) return false;
+    const verified = tokenCodec.verifyUtf8(token);
+    if (!verified) return false;
+    const payload = parseTokenPayload(verified.payload, maxAgeMilliseconds);
+    if (!payload) return false;
+    const timestamp = clock();
+    return timestamp >= payload.issuedAt && timestamp < payload.expiresAt;
+  }
+
+  function issueToken(): string {
+    const issuedAt = clock();
+    const expiresAt = issuedAt + maxAgeMilliseconds;
+    if (!Number.isSafeInteger(expiresAt)) {
+      throw new Error("The site gate cookie expiry exceeds the safe range.");
+    }
+    return tokenCodec.signUtf8(
+      JSON.stringify({
+        expiresAt,
+        issuedAt,
+        nonce: randomBase64UrlIdentifier(TOKEN_NONCE_BYTES),
+      } satisfies GateTokenPayload),
+    );
+  }
+
+  async function handleUnlock(
+    request: HttpRequest,
+    response: HttpResponse,
+  ): Promise<void> {
+    const clientKey = clientKeyOf(request);
+    const decision = attempts.consume(clientKey);
+    if (!decision.allowed) {
+      response.setHeader(
+        "Retry-After",
+        Math.max(1, Math.ceil((decision.resetAt - clock()) / 1_000)),
+      );
+      sendGateError(
+        response,
+        new HttpError({
+          code: "gate_rate_limited",
+          message: "Too many attempts. Try again in a few minutes.",
+          status: 429,
+        }),
+      );
+      return;
+    }
+
+    let submitted: string;
+    try {
+      submitted = await readSubmittedPassword(request);
+    } catch (error) {
+      sendGateError(response, normalizeGateSubmissionError(error));
+      return;
+    }
+
+    if (!constantTimeEqual(submitted, password)) {
+      sendRedirect(response, `${policy.gatePath}?error=1`);
+      return;
+    }
+
+    attempts.clear(clientKey);
+    response.setHeader(
+      "Set-Cookie",
+      serializeCookie(safeCookieName, issueToken(), {
+        maxAgeSeconds: safeMaxAgeSeconds,
+        secure: requestIsSecure(request),
+      }),
+    );
+    sendRedirect(response, "/");
+  }
+
+  async function handleGateRequest(
+    request: HttpRequest,
+    response: HttpResponse,
+  ): Promise<void> {
+    const method = String(request.method ?? "").toUpperCase();
+    if (!["GET", "HEAD", "POST"].includes(method)) {
+      response.setHeader("Allow", "GET, HEAD, POST");
+      sendGateError(
+        response,
+        new HttpError({
+          code: "method_not_allowed",
+          message: "Method not allowed.",
+          status: 405,
+        }),
+        method === "HEAD",
+      );
+      return;
+    }
+    if (method === "POST") {
+      await handleUnlock(request, response);
+      return;
+    }
+    if (isUnlocked(request)) {
+      sendRedirect(response, "/", method === "HEAD");
+      return;
+    }
+
+    const body = gateRequestFailed(request) ? pages.failed : pages.initial;
+    applyGatePageHeaders(response, pages.contentSecurityPolicy);
+    response.status(200).type("text/html; charset=utf-8");
+    if (method === "HEAD") {
+      response.setHeader("Content-Length", Buffer.byteLength(body));
+      response.send();
+      return;
+    }
+    response.send(body);
+  }
+
+  const gateMiddleware: Middleware = async (request, response, next) => {
+    const requestClass = classifySiteGateRequest(
+      policy,
+      request.path ?? request.url ?? request.originalUrl ?? "/",
+    );
+    if (requestClass === "public") {
+      next();
+      return;
+    }
+
+    response.setHeader("X-Robots-Tag", NOINDEX_VALUE);
+    if (requestClass === "gate") {
+      noStore(response);
+      await handleGateRequest(request, response);
+      return;
+    }
+    if (isUnlocked(request)) {
+      if (
+        requestClass === "protected-page" &&
+        !isAssetRequestPath(
+          request.path ?? request.url ?? request.originalUrl ?? "/",
+        )
+      ) {
+        noStore(response);
+      }
+      next();
+      return;
+    }
+
+    noStore(response);
+    if (requestClass === "api") {
+      sendApiError(
+        request,
+        response,
+        new HttpError({
+          code: "gate_locked",
+          message: `${safeSiteName} is not open yet.`,
+          status: 401,
+        }),
+      );
+      return;
+    }
+    sendRedirect(response, policy.gatePath);
+  };
+
+  return Object.freeze({
+    enabled: true,
+    gatePath: policy.gatePath,
+    isUnlocked,
+    middleware: () => gateMiddleware,
+  });
+}
+
+function createSiteGatePages({
+  gatePath,
+  presentation,
+  siteName,
+}: {
+  gatePath: string;
+  presentation: SiteGatePresentation | undefined;
+  siteName: string;
+}): SiteGatePages {
+  if (presentation === undefined) {
+    return Object.freeze({
+      contentSecurityPolicy: DEFAULT_GATE_CONTENT_SECURITY_POLICY,
+      failed: renderGatePage({ failed: true, gatePath, siteName }),
+      initial: renderGatePage({ failed: false, gatePath, siteName }),
+    });
+  }
+  if (!presentationRegistry.has(presentation)) {
+    throw new Error(
+      "A site gate presentation must be created by createSiteGatePresentation().",
+    );
+  }
+
+  return Object.freeze({
+    contentSecurityPolicy: PRESENTED_GATE_CONTENT_SECURITY_POLICY,
+    failed: renderPresentedGatePage(presentation, gatePath, true),
+    initial: renderPresentedGatePage(presentation, gatePath, false),
+  });
+}
+
+function renderPresentedGatePage(
+  presentation: SiteGatePresentation,
+  gatePath: string,
+  failed: boolean,
+): string {
+  const form = renderPresentedGateForm(presentation.form, gatePath, failed);
+  const body = presentation.template.replace(SITE_GATE_FORM_SLOT, () => form);
+  if (Buffer.byteLength(body, "utf8") > MAX_PRESENTATION_PAGE_BYTES) {
+    throw new Error(
+      `A rendered site gate presentation must not exceed ${MAX_PRESENTATION_PAGE_BYTES} UTF-8 bytes.`,
+    );
+  }
+  return body;
+}
+
+function renderPresentedGateForm(
+  form: SiteGateFormPresentation,
+  gatePath: string,
+  failed: boolean,
+): string {
+  const error = failed
+    ? `\n  <p${classAttribute(form.errorClassName)} role="alert">${escapeHtml(form.errorMessage)}</p>`
+    : "";
+  return `<form${classAttribute(form.formClassName)} method="post" action="${escapeHtml(gatePath)}">
+  <label${classAttribute(form.labelClassName)} for="cx-site-gate-password">${escapeHtml(form.passwordLabel)}</label>
+  <input${classAttribute(form.inputClassName)} id="cx-site-gate-password" name="password" type="password" autocomplete="current-password" required autofocus>${error}
+  <button${classAttribute(form.submitClassName)} type="submit">${escapeHtml(form.submitLabel)}</button>
+</form>`;
+}
+
+function classAttribute(value: string): string {
+  return value ? ` class="${escapeHtml(value)}"` : "";
+}
+
+function presentationOptionsRecord(value: unknown): Record<string, unknown> {
+  return validatePresentationRecord(value, "Site gate presentation");
+}
+
+function presentationOptionalRecord(
+  source: Record<string, unknown>,
+  key: string,
+  label: string,
+): Record<string, unknown> {
+  const descriptor = Object.getOwnPropertyDescriptor(source, key);
+  if (
+    !descriptor ||
+    ("value" in descriptor && descriptor.value === undefined)
+  ) {
+    return {};
+  }
+  if (!("value" in descriptor)) {
+    throw new Error(`${label} must be a plain data object.`);
+  }
+  return validatePresentationRecord(descriptor.value, label);
+}
+
+function validatePresentationRecord(
+  value: unknown,
+  label: string,
+): Record<string, unknown> {
+  if (!isPlainRecord(value)) {
+    throw new Error(`${label} must be a plain data object.`);
+  }
+  for (const key of Reflect.ownKeys(value)) {
+    if (typeof key !== "string") {
+      throw new Error(`${label} must use string data properties only.`);
+    }
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor || !("value" in descriptor)) {
+      throw new Error(`${label} must use plain data properties only.`);
+    }
+  }
+  return value;
+}
+
+function assertExactPresentationKeys(
+  source: Record<string, unknown>,
+  allowedKeys: readonly string[],
+  label: string,
+): void {
+  const allowed = new Set(allowedKeys);
+  const unknown = Reflect.ownKeys(source).filter(
+    (key): key is string => typeof key === "string" && !allowed.has(key),
+  );
+  if (unknown.length > 0) {
+    throw new Error(
+      `Unknown site gate ${label} option: ${unknown.sort().join(", ")}.`,
+    );
+  }
+}
+
+function presentationRequiredString(
+  source: Record<string, unknown>,
+  key: string,
+  label: string,
+): string {
+  const descriptor = Object.getOwnPropertyDescriptor(source, key);
+  if (
+    !descriptor ||
+    !("value" in descriptor) ||
+    typeof descriptor.value !== "string"
+  ) {
+    throw new Error(`${label} must be a string.`);
+  }
+  return descriptor.value;
+}
+
+function presentationText(
+  source: Record<string, unknown>,
+  key: string,
+  fallback: string,
+  label: string,
+): string {
+  const descriptor = Object.getOwnPropertyDescriptor(source, key);
+  const value =
+    !descriptor || ("value" in descriptor && descriptor.value === undefined)
+      ? fallback
+      : "value" in descriptor
+        ? descriptor.value
+        : undefined;
+  if (
+    typeof value !== "string" ||
+    !value ||
+    value !== value.trim() ||
+    [...value].length > MAX_PRESENTATION_TEXT_CHARACTERS ||
+    !isWellFormedUtf16(value) ||
+    /[\u0000-\u001f\u007f-\u009f]/.test(value)
+  ) {
+    throw new Error(
+      `${label} must contain between 1 and ${MAX_PRESENTATION_TEXT_CHARACTERS} safe characters.`,
+    );
+  }
+  return value;
+}
+
+function presentationClassName(
+  source: Record<string, unknown>,
+  key: string,
+  label: string,
+): string {
+  const descriptor = Object.getOwnPropertyDescriptor(source, key);
+  const value =
+    !descriptor || ("value" in descriptor && descriptor.value === undefined)
+      ? ""
+      : "value" in descriptor
+        ? descriptor.value
+        : undefined;
+  if (typeof value !== "string") {
+    throw new Error(`${label} must be a string.`);
+  }
+  if (value === "") return value;
+  if (
+    value !== value.trim() ||
+    value.split(/\s+/u).join(" ") !== value ||
+    Buffer.byteLength(value, "utf8") > MAX_PRESENTATION_CLASS_BYTES ||
+    !isWellFormedUtf16(value) ||
+    /[&<>"'\u0000-\u001f\u007f-\u009f]/.test(value)
+  ) {
+    throw new Error(
+      `${label} must be a single-space-separated class list no larger than ${MAX_PRESENTATION_CLASS_BYTES} UTF-8 bytes.`,
+    );
+  }
+  return value;
+}
+
+function validatePresentationTemplate(template: string): void {
+  if (
+    !template ||
+    !isWellFormedUtf16(template) ||
+    /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(template)
+  ) {
+    throw new Error(
+      "A site gate presentation template must be non-empty, well-formed UTF-16 HTML without unsafe control characters.",
+    );
+  }
+  if (Buffer.byteLength(template, "utf8") > MAX_PRESENTATION_TEMPLATE_BYTES) {
+    throw new Error(
+      `A site gate presentation template must not exceed ${MAX_PRESENTATION_TEMPLATE_BYTES} UTF-8 bytes.`,
+    );
+  }
+  if (!template.toLowerCase().startsWith("<!doctype html>")) {
+    throw new Error(
+      "A site gate presentation template must start with <!doctype html>.",
+    );
+  }
+
+  const slotIndex = template.indexOf(SITE_GATE_FORM_SLOT);
+  const templateWithoutSlot = template.replace(SITE_GATE_FORM_SLOT, "");
+  const documentOrder = [
+    /<html(?:\s[^<>]*)?>/iu,
+    /<head(?:\s[^<>]*)?>/iu,
+    /<\/head\s*>/iu,
+    /<body(?:\s[^<>]*)?>/iu,
+    /<\/body\s*>/iu,
+    /<\/html\s*>/iu,
+  ].map((pattern) => pattern.exec(template)?.index ?? -1);
+  const hasOneDocumentStructure = [
+    /<!doctype html>/giu,
+    /<html(?:\s[^<>]*)?>/giu,
+    /<head(?:\s[^<>]*)?>/giu,
+    /<\/head\s*>/giu,
+    /<body(?:\s[^<>]*)?>/giu,
+    /<\/body\s*>/giu,
+    /<\/html\s*>/giu,
+  ].every((pattern) => [...template.matchAll(pattern)].length === 1);
+  const closingHtml = /<\/html\s*>/iu.exec(template);
+  if (
+    slotIndex < 0 ||
+    slotIndex !== template.lastIndexOf(SITE_GATE_FORM_SLOT) ||
+    !hasOneDocumentStructure ||
+    !closingHtml ||
+    template.slice(closingHtml.index + closingHtml[0].length).trim() !== "" ||
+    documentOrder.some((index) => index < 0) ||
+    !documentOrder.every(
+      (index, position) =>
+        position === 0 || index > documentOrder[position - 1]!,
+    ) ||
+    slotIndex <= documentOrder[3]! ||
+    slotIndex >= documentOrder[4]! ||
+    !hasWellDelimitedPresentationMarkup(template, slotIndex) ||
+    templateWithoutSlot.includes("<!--") ||
+    templateWithoutSlot.includes("-->")
+  ) {
+    throw new Error(
+      "A site gate presentation template must contain one ordered html/head/body document and one body-level framework form slot.",
+    );
+  }
+  if (
+    PRESENTATION_FORBIDDEN_ELEMENT.test(templateWithoutSlot) ||
+    PRESENTATION_FORBIDDEN_BODY_ELEMENT.test(
+      template.slice(documentOrder[3], documentOrder[4]),
+    ) ||
+    PRESENTATION_FORBIDDEN_ATTRIBUTE.test(templateWithoutSlot)
+  ) {
+    throw new Error(
+      "A site gate presentation template cannot contain executable, embedded, inline-style, or form-owned markup.",
+    );
+  }
+
+  const declarations = [
+    ...templateWithoutSlot.matchAll(PRESENTATION_URL_ATTRIBUTE),
+  ];
+  const quoted = [
+    ...templateWithoutSlot.matchAll(PRESENTATION_QUOTED_URL_ATTRIBUTE),
+  ];
+  if (declarations.length !== quoted.length) {
+    throw new Error(
+      "Site gate presentation URL attributes must be quoted same-origin paths.",
+    );
+  }
+  for (const match of quoted) {
+    const value = match[2] ?? "";
+    if (
+      (!value.startsWith("#") &&
+        (!value.startsWith("/") || value.startsWith("//"))) ||
+      /[&\\\u0000-\u0020\u007f<>]/.test(value)
+    ) {
+      throw new Error(
+        "Site gate presentation URL attributes must use same-origin absolute paths or fragments.",
+      );
+    }
+  }
+}
+
+function hasWellDelimitedPresentationMarkup(
+  template: string,
+  slotIndex: number,
+): boolean {
+  let insideTag = false;
+  let quote: '"' | "'" | undefined;
+
+  for (let index = 0; index < template.length; index += 1) {
+    if (index === slotIndex) {
+      if (insideTag) return false;
+      index += SITE_GATE_FORM_SLOT.length - 1;
+      continue;
+    }
+
+    const character = template[index];
+    if (!insideTag) {
+      if (character === "<") insideTag = true;
+      continue;
+    }
+    if (quote) {
+      if (character === quote) quote = undefined;
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+      continue;
+    }
+    if (character === ">") insideTag = false;
+  }
+
+  return !insideTag && quote === undefined;
+}
+
+function normalizeConfiguredPaths(
+  paths: readonly string[],
+  label: string,
+): string[] {
+  if (!Array.isArray(paths)) throw new Error(`${label}s must be an array.`);
+  const normalized = paths.map((path) => normalizeConfiguredPath(path, label));
+  if (new Set(normalized).size !== normalized.length) {
+    throw new Error(`${label}s must not contain duplicates.`);
+  }
+  return normalized;
+}
+
+function normalizeConfiguredPath(value: string, label: string): string {
+  if (
+    typeof value !== "string" ||
+    !value ||
+    value !== value.trim() ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    /[\u0000-\u0020\u007f\\?#]/.test(value)
+  ) {
+    throw new Error(
+      `${label} must be a safe same-origin absolute path: ${String(value)}`,
+    );
+  }
+  const normalized = stripTrailingSlash(value).toLowerCase();
+  if (normalized === "/") {
+    throw new Error(`${label} cannot expose the entire site.`);
+  }
+  return normalized;
+}
+
+function requestPathname(value: string): string | null {
+  if (typeof value !== "string") return null;
+  const pathname = value.split(/[?#]/, 1)[0]?.toLowerCase() ?? "";
+  if (
+    !pathname.startsWith("/") ||
+    pathname.startsWith("//") ||
+    /[\u0000-\u0020\u007f\\]/.test(pathname)
+  ) {
+    return null;
+  }
+  return pathname;
+}
+
+function matchesPrefix(
+  candidate: string,
+  prefixes: readonly string[],
+): boolean {
+  return prefixes.some(
+    (prefix) => candidate === prefix || candidate.startsWith(`${prefix}/`),
+  );
+}
+
+function stripTrailingSlash(value: string): string {
+  return value.length > 1 ? value.replace(/\/+$/, "") || "/" : value;
+}
+
+function validatePassword(value: string): void {
+  const byteLength = Buffer.byteLength(value, "utf8");
+  const characterCount = [...value].length;
+  if (
+    characterCount < MIN_PASSWORD_CHARACTERS ||
+    byteLength > MAX_PASSWORD_BYTES ||
+    !isWellFormedUtf16(value)
+  ) {
+    throw new Error(
+      `A site gate password must contain at least ${MIN_PASSWORD_CHARACTERS} characters and at most ${MAX_PASSWORD_BYTES} UTF-8 bytes.`,
+    );
+  }
+}
+
+function validateSecret(value: string): void {
+  if (typeof value !== "string" || value.length < MIN_SECRET_CHARACTERS) {
+    throw new Error(
+      `A site gate secret must contain at least ${MIN_SECRET_CHARACTERS} characters.`,
+    );
+  }
+}
+
+function validateMaxAgeSeconds(value: number): number {
+  if (
+    !Number.isSafeInteger(value) ||
+    value < 1 ||
+    value > MAX_MAX_AGE_SECONDS
+  ) {
+    throw new Error(
+      `A site gate cookie lifetime must be between 1 and ${MAX_MAX_AGE_SECONDS} whole seconds.`,
+    );
+  }
+  return value;
+}
+
+function validateSiteName(value: string): string {
+  if (
+    typeof value !== "string" ||
+    !value ||
+    value !== value.trim() ||
+    value.length > MAX_SITE_NAME_CHARACTERS ||
+    !isWellFormedUtf16(value) ||
+    /[\u0000-\u001f\u007f]/.test(value)
+  ) {
+    throw new Error(
+      `A site gate name must contain between 1 and ${MAX_SITE_NAME_CHARACTERS} safe characters.`,
+    );
+  }
+  return value;
+}
+
+function isWellFormedUtf16(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const codeUnit = value.charCodeAt(index);
+    if (codeUnit >= 0xd800 && codeUnit <= 0xdbff) {
+      const nextCodeUnit = value.charCodeAt(index + 1);
+      if (
+        index + 1 >= value.length ||
+        nextCodeUnit < 0xdc00 ||
+        nextCodeUnit > 0xdfff
+      ) {
+        return false;
+      }
+      index += 1;
+      continue;
+    }
+    if (codeUnit >= 0xdc00 && codeUnit <= 0xdfff) return false;
+  }
+  return true;
+}
+
+function parseTokenPayload(
+  source: string,
+  maxAgeMilliseconds: number,
+): GateTokenPayload | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(source);
+  } catch {
+    return null;
+  }
+  if (!isPlainRecord(parsed)) return null;
+  const keys = Object.keys(parsed).sort();
+  if (keys.join(",") !== "expiresAt,issuedAt,nonce") return null;
+
+  const expiresAt = parsed["expiresAt"];
+  const issuedAt = parsed["issuedAt"];
+  const nonce = parsed["nonce"];
+  if (
+    !Number.isSafeInteger(expiresAt) ||
+    !Number.isSafeInteger(issuedAt) ||
+    typeof expiresAt !== "number" ||
+    typeof issuedAt !== "number" ||
+    issuedAt < 0 ||
+    expiresAt - issuedAt !== maxAgeMilliseconds ||
+    typeof nonce !== "string" ||
+    !TOKEN_NONCE_PATTERN.test(nonce)
+  ) {
+    return null;
+  }
+  return { expiresAt, issuedAt, nonce };
+}
+
+async function readSubmittedPassword(request: HttpRequest): Promise<string> {
+  const details = request as HttpRequest & GateRequestDetails;
+  if (details.body !== undefined) {
+    return passwordFromParsedBody(details.body);
+  }
+
+  const mediaType = singleHeaderValue(request, "content-type")
+    ?.split(";", 1)[0]
+    ?.trim()
+    .toLowerCase();
+  if (
+    mediaType !== "application/json" &&
+    mediaType !== "application/x-www-form-urlencoded"
+  ) {
+    throw new HttpError({
+      code: "unsupported_media_type",
+      message: "Use the gate form to submit the password.",
+      status: 415,
+    });
+  }
+
+  const raw = await readBoundedBody(details);
+  if (mediaType === "application/json") {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      throw new HttpError({
+        cause: error,
+        code: "invalid_gate_request",
+        message: "The unlock request is not valid JSON.",
+        status: 400,
+      });
+    }
+    return passwordFromParsedBody(parsed);
+  }
+
+  const fields = [...new URLSearchParams(raw)];
+  const field = fields[0];
+  if (
+    fields.length !== 1 ||
+    !field ||
+    field[0] !== "password" ||
+    field[1].length > MAX_FORM_BYTES
+  ) {
+    throw invalidGateRequest();
+  }
+  return field[1];
+}
+
+function passwordFromParsedBody(body: unknown): string {
+  if (!isPlainRecord(body)) throw invalidGateRequest();
+  const ownKeys = Reflect.ownKeys(body);
+  if (ownKeys.length !== 1 || ownKeys[0] !== "password") {
+    throw invalidGateRequest();
+  }
+  const descriptor = Object.getOwnPropertyDescriptor(body, "password");
+  if (
+    !descriptor ||
+    !("value" in descriptor) ||
+    typeof descriptor.value !== "string"
+  ) {
+    throw invalidGateRequest();
+  }
+  if (Buffer.byteLength(descriptor.value, "utf8") > MAX_FORM_BYTES) {
+    throw requestTooLarge();
+  }
+  return descriptor.value;
+}
+
+function readBoundedBody(request: GateRequestDetails): Promise<string> {
+  if (typeof request.on !== "function") {
+    return Promise.reject(invalidGateRequest());
+  }
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let size = 0;
+    const chunks: Buffer[] = [];
+
+    function fail(error: unknown): void {
+      if (settled) return;
+      settled = true;
+      chunks.length = 0;
+      reject(error);
+    }
+
+    request.on?.("data", (chunk) => {
+      if (settled) return;
+      let bytes: Buffer;
+      if (typeof chunk === "string") {
+        bytes = Buffer.from(chunk);
+      } else if (chunk instanceof Uint8Array) {
+        bytes = Buffer.from(chunk);
+      } else {
+        fail(invalidGateRequest());
+        return;
+      }
+      size += bytes.length;
+      if (size > MAX_FORM_BYTES) {
+        fail(requestTooLarge());
+        return;
+      }
+      chunks.push(bytes);
+    });
+    request.on?.("end", () => {
+      if (settled) return;
+      settled = true;
+      resolve(Buffer.concat(chunks, size).toString("utf8"));
+    });
+    request.on?.("error", (error) => {
+      fail(
+        new HttpError({
+          cause: error,
+          code: "invalid_gate_request",
+          message: "The unlock request could not be read.",
+          status: 400,
+        }),
+      );
+    });
+    request.on?.("aborted", () => {
+      fail(invalidGateRequest());
+    });
+  });
+}
+
+function normalizeGateSubmissionError(error: unknown): HttpError {
+  return error instanceof HttpError ? error : invalidGateRequest(error);
+}
+
+function invalidGateRequest(cause?: unknown): HttpError {
+  return new HttpError({
+    cause,
+    code: "invalid_gate_request",
+    message: "The unlock request could not be read.",
+    status: 400,
+  });
+}
+
+function requestTooLarge(): HttpError {
+  return new HttpError({
+    code: "request_too_large",
+    message: "The unlock request body is too large.",
+    status: 413,
+  });
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object") return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function constantTimeEqual(left: string, right: string): boolean {
+  const leftHash = createHash("sha256").update(left, "utf8").digest();
+  const rightHash = createHash("sha256").update(right, "utf8").digest();
+  return timingSafeEqual(leftHash, rightHash);
+}
+
+function clientKeyOf(request: HttpRequest): string {
+  const details = request as HttpRequest & GateRequestDetails;
+  for (const candidate of [details.ip, details.socket?.remoteAddress]) {
+    if (
+      typeof candidate === "string" &&
+      candidate.length >= 1 &&
+      candidate.length <= 512
+    ) {
+      return candidate;
+    }
+  }
+  return "unknown";
+}
+
+function requestIsSecure(request: HttpRequest): boolean {
+  const details = request as HttpRequest & GateRequestDetails;
+  return (
+    details.secure === true ||
+    singleHeaderValue(request, "x-forwarded-proto")?.toLowerCase() === "https"
+  );
+}
+
+function requestHeader(
+  request: HttpRequest,
+  name: string,
+): string | readonly string[] | undefined {
+  const matches: string[] = [];
+  for (const [candidateName, candidateValue] of Object.entries(
+    request.headers ?? {},
+  )) {
+    if (candidateName.toLowerCase() !== name) continue;
+    if (typeof candidateValue === "string") matches.push(candidateValue);
+    else if (Array.isArray(candidateValue)) {
+      for (const value of candidateValue) {
+        if (typeof value === "string") matches.push(value);
+      }
+    }
+  }
+  if (matches.length === 0) return undefined;
+  return matches.length === 1 ? matches[0] : matches;
+}
+
+function singleHeaderValue(
+  request: HttpRequest,
+  name: string,
+): string | undefined {
+  const value = requestHeader(request, name);
+  return typeof value === "string" ? value : undefined;
+}
+
+function gateRequestFailed(request: HttpRequest): boolean {
+  const source = request.originalUrl ?? request.url ?? "";
+  const separator = source.indexOf("?");
+  if (separator < 0) return false;
+  return new URLSearchParams(source.slice(separator + 1)).get("error") === "1";
+}
+
+function sendApiError(
+  request: HttpRequest,
+  response: HttpResponse,
+  error: HttpError,
+): void {
+  const result = errorEnvelope(error, request.requestId);
+  response.status(result.status).type("application/json").json(result.body);
+}
+
+function sendGateError(
+  response: HttpResponse,
+  error: HttpError,
+  head = false,
+): void {
+  response.status(error.status).type("text/plain; charset=utf-8");
+  response.send(head ? undefined : error.message);
+}
+
+function sendRedirect(
+  response: HttpResponse,
+  location: string,
+  head = false,
+): void {
+  response.setHeader("Location", location);
+  response.status(302).type("text/plain; charset=utf-8");
+  response.send(head ? undefined : "Found.");
+}
+
+function noStore(response: HttpResponse): void {
+  if (hasNoStoreCacheDirective(response.getHeader?.("Cache-Control"))) return;
+  response.setHeader("Cache-Control", "no-store");
+}
+
+function applyGatePageHeaders(
+  response: HttpResponse,
+  contentSecurityPolicy: string,
+): void {
+  response.setHeader("Content-Security-Policy", contentSecurityPolicy);
+  response.setHeader("X-Content-Type-Options", "nosniff");
+  response.setHeader("X-Frame-Options", "DENY");
+  response.setHeader("Referrer-Policy", "no-referrer");
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        '"': "&quot;",
+        "&": "&amp;",
+        "'": "&#39;",
+        "<": "&lt;",
+        ">": "&gt;",
+      })[character] ?? "",
+  );
+}
+
+function renderGatePage({
+  failed,
+  gatePath,
+  siteName,
+}: {
+  failed: boolean;
+  gatePath: string;
+  siteName: string;
+}): string {
+  const name = escapeHtml(siteName);
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>${name}</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    background: #0b0c0e; color: #e9eaec;
+    font: 16px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { width: 100%; max-width: 22rem; }
+  h1 { margin: 0 0 8px; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  p { margin: 0 0 24px; color: #9aa0a6; font-size: 0.9375rem; }
+  label { display: block; margin-bottom: 8px; font-size: 0.8125rem; color: #9aa0a6; }
+  input, button { width: 100%; font: inherit; border-radius: 8px; }
+  input {
+    padding: 10px 12px; color: #e9eaec; background: #141619;
+    border: 1px solid #2a2d33;
+  }
+  input:focus-visible { outline: 2px solid #5b8def; outline-offset: 1px; border-color: transparent; }
+  button {
+    margin-top: 16px; padding: 10px 12px; font-weight: 550; cursor: pointer;
+    color: #0b0c0e; background: #e9eaec; border: 1px solid transparent;
+  }
+  button:hover { background: #ffffff; }
+  .error { margin: 0 0 16px; color: #f2857f; font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>${name} is not open yet</h1>
+  <p>This site is closed while it is being finished. Enter the access password to continue.</p>
+  ${failed ? '<p class="error">That password did not match.</p>' : ""}
+  <form method="post" action="${escapeHtml(gatePath)}">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" autofocus required>
+    <button type="submit">Unlock</button>
+  </form>
+</main>
+</body>
+</html>
+`;
+}

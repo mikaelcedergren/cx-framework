@@ -1,0 +1,91 @@
+import { AfterContentChecked, EventEmitter, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { type CxIconName } from '../../icons/manifest';
+import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
+import * as i0 from "@angular/core";
+export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss';
+export type CxWizardDialogSize = 'default' | 'large';
+export type CxWizardDialogStepStatus = 'default' | 'success';
+export interface CxWizardDialogStep {
+    id: string;
+    name: string;
+    heading: string;
+    infoHeading: string;
+    infoDescription: string;
+    icon?: CxIconName;
+    infoCustom?: boolean;
+    status?: CxWizardDialogStepStatus;
+}
+export interface CxWizardDialogData {
+    steps: readonly CxWizardDialogStep[];
+    index?: number;
+    size?: CxWizardDialogSize;
+    loadingActionId?: CxWizardDialogAction | string;
+    feedbackVisible?: boolean;
+    dismissible?: boolean;
+}
+export declare class CxWizardDialogComponent implements AfterContentChecked, OnChanges, OnDestroy {
+    private readonly document;
+    private readonly injector;
+    private readonly overlayState;
+    private readonly openState;
+    private readonly wizardState;
+    private readonly stepTemplates;
+    private overlayHandle?;
+    private requestedOpen;
+    private readonly feedbackContent?;
+    private readonly dialogBackdrop?;
+    private readonly stepContent?;
+    private readonly stepInfoContent?;
+    private readonly stepHeading?;
+    protected readonly titleId: string;
+    protected readonly isOpen$: import("@angular/core").Signal<boolean>;
+    protected readonly wizard$: import("@angular/core").Signal<CxWizardDialogData>;
+    protected readonly steps$: import("@angular/core").Signal<readonly CxWizardDialogStep[]>;
+    protected readonly currentStepIndex$: import("@angular/core").Signal<number>;
+    protected readonly currentStep$: import("@angular/core").Signal<CxWizardDialogStep | undefined>;
+    protected readonly activeTemplate$: import("@angular/core").Signal<import("@angular/core").TemplateRef<unknown> | null>;
+    protected readonly loadingActionId$: import("@angular/core").Signal<string | undefined>;
+    protected readonly isLoading$: import("@angular/core").Signal<boolean>;
+    protected readonly isFirstStep$: import("@angular/core").Signal<boolean>;
+    protected readonly isLastStep$: import("@angular/core").Signal<boolean>;
+    protected readonly showFeedback$: import("@angular/core").Signal<boolean>;
+    protected readonly isLarge$: import("@angular/core").Signal<boolean>;
+    protected readonly dismissible$: import("@angular/core").Signal<boolean>;
+    protected readonly primaryLabel$: import("@angular/core").Signal<string>;
+    protected readonly secondaryLabel$: import("@angular/core").Signal<"Cancel" | "Back">;
+    protected readonly currentHeading$: import("@angular/core").Signal<string>;
+    protected readonly currentInfoHeading$: import("@angular/core").Signal<string>;
+    protected readonly currentInfoDescription$: import("@angular/core").Signal<string | undefined>;
+    loading: boolean;
+    confirmLabel: string;
+    set wizard(value: CxWizardDialogData | null | undefined);
+    set open(value: boolean);
+    get open(): boolean;
+    readonly openChange: EventEmitter<boolean>;
+    /** Synchronous request emitted before a user dismissal would close this wizard. */
+    readonly dismissRequest: EventEmitter<CxDismissRequest>;
+    readonly action: EventEmitter<CxWizardDialogAction>;
+    ngOnChanges(_changes: SimpleChanges): void;
+    ngAfterContentChecked(): void;
+    ngOnDestroy(): void;
+    protected isActiveStep(index: number): boolean;
+    protected isCompletedStep(step: CxWizardDialogStep, index: number): boolean;
+    protected isConnectorComplete(index: number): boolean;
+    protected onBackdropClick(event: MouseEvent): void;
+    protected onDialogKeydown(event: KeyboardEvent): void;
+    protected onDismiss(): void;
+    protected onFeedbackClose(): void;
+    protected onSecondaryAction(): void;
+    protected onPrimaryAction(): void;
+    private closeFromUser;
+    private requestDismiss;
+    private syncOpen;
+    private focusStepAfterRender;
+    private releaseOverlay;
+    private assertStepTemplates;
+    private clampIndex;
+    private normalizeWizard;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxWizardDialogComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxWizardDialogComponent, "cx-wizard-dialog", never, { "loading": { "alias": "loading"; "required": false; }; "confirmLabel": { "alias": "confirmLabel"; "required": false; }; "wizard": { "alias": "wizard"; "required": false; }; "open": { "alias": "open"; "required": false; }; }, { "openChange": "openChange"; "dismissRequest": "dismissRequest"; "action": "action"; }, ["stepTemplates"], ["[cxWizardDialogFeedback], [slot=feedback]", "[cxWizardDialogSecondaryAction], [slot=secondary-action]", "[cxWizardDialogInfo], [slot=info]"], true, never>;
+}
+//# sourceMappingURL=cx-wizard-dialog.component.d.ts.map

@@ -1,0 +1,13 @@
+autoInstallPeers: false
+dedupePeerDependents: false
+enableGlobalVirtualStore: false
+resolvePeersFromWorkspaceRoot: false
+strictDepBuilds: true
+strictStorePkgContentCheck: true
+verifyDepsBeforeRun: error
+verifyStoreIntegrity: true
+dangerouslyAllowAllBuilds: false
+
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true

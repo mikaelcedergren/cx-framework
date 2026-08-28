@@ -1,0 +1,46 @@
+import { EventEmitter, OnChanges, OnDestroy } from '@angular/core';
+import { type CxButtonMood } from '../../actions/cx-button';
+import { type CxIconName } from '../../../icons/manifest';
+import { type CxFeedbackAction } from '../cx-feedback-action';
+import * as i0 from "@angular/core";
+export type CxBannerMood = 'default' | 'warning' | 'success' | 'danger';
+export declare class CxBannerComponent implements OnChanges, OnDestroy {
+    private readonly renderedState;
+    private readonly openState;
+    private readonly dismissibleState;
+    private visibleInput;
+    private requestedOpen;
+    private openFrame;
+    mood: CxBannerMood;
+    heading: string;
+    description: string;
+    action: CxFeedbackAction | undefined;
+    secondaryAction: CxFeedbackAction | undefined;
+    dismissAriaLabel: string;
+    set dismissible(value: boolean);
+    set visible(value: boolean);
+    readonly actionSelect: EventEmitter<CxFeedbackAction>;
+    readonly secondaryActionSelect: EventEmitter<CxFeedbackAction>;
+    readonly visibleChange: EventEmitter<boolean>;
+    protected readonly isRendered$: import("@angular/core").Signal<boolean>;
+    protected readonly isOpen$: import("@angular/core").Signal<boolean>;
+    protected readonly isDismissible$: import("@angular/core").Signal<boolean>;
+    protected get resolvedIcon(): CxIconName;
+    protected get resolvedRole(): string;
+    protected actionButtonMood(action: CxFeedbackAction): CxButtonMood;
+    protected get visibleAction(): CxFeedbackAction | undefined;
+    protected get visibleSecondaryAction(): CxFeedbackAction | undefined;
+    protected get hasCopy(): boolean;
+    protected hasActions(): boolean;
+    ngOnChanges(): void;
+    ngOnDestroy(): void;
+    protected onActionSelect(action: CxFeedbackAction): void;
+    protected onSecondaryActionSelect(action: CxFeedbackAction): void;
+    protected onDismissPress(): void;
+    protected onTransitionEnd(event: TransitionEvent): void;
+    private setOpen;
+    private cancelOpenFrame;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxBannerComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxBannerComponent, "cx-banner", never, { "mood": { "alias": "mood"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "action": { "alias": "action"; "required": false; }; "secondaryAction": { "alias": "secondaryAction"; "required": false; }; "dismissAriaLabel": { "alias": "dismissAriaLabel"; "required": false; }; "dismissible": { "alias": "dismissible"; "required": false; }; "visible": { "alias": "visible"; "required": false; }; }, { "actionSelect": "actionSelect"; "secondaryActionSelect": "secondaryActionSelect"; "visibleChange": "visibleChange"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-banner.component.d.ts.map

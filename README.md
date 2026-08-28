@@ -6,7 +6,8 @@ Edit the source framework README or AI folder in the Cortex repo and re-package.
 
 # cx-framework
 
-`cx-framework` combines a concrete Angular UI library with a platform-neutral AI design package for building consistent product interfaces across different codebases.
+`cx-framework` combines a concrete Angular UI library, a platform-neutral AI design package, and a
+strict Node web runtime for building consistent products across different codebases.
 
 Use it for:
 
@@ -14,10 +15,14 @@ Use it for:
 - design tokens, global styles, fonts, icons, and utility styles
 - portable AI design guidance
 - portable agent skills for design, copy, review, and implementation
+- Node 26 primitives for predictable web servers, storage, jobs, sessions, and static delivery
 
 Product-specific runtime rules, domain behavior, routes, data models, secrets, and local safety rules belong in the consuming app, not in this package.
 
-The two packaged surfaces have different scopes. Angular component documentation names the real `cx-*` APIs. The `ai/` surface describes semantic component roles and design behavior without assuming Angular, a selector, an import, or a dedicated component implementation.
+The three packaged surfaces have different scopes. Angular component documentation names the real
+`cx-*` APIs. The `ai/` surface describes semantic component roles and design behavior without
+assuming Angular, a selector, an import, or a dedicated component implementation. The `server/`
+surface owns portable operating behavior while leaving product policy and data with the product.
 
 ## Install
 
@@ -27,26 +32,343 @@ Install the package from GitHub:
 {
   "dependencies": {
     "@mikaelcedergren/cx-framework": "github:mikaelcedergren/cx-framework#main"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@mikaelcedergren/cx-framework"
-    ]
   }
 }
 ```
 
-The GitHub source package builds its `dist/lib` entrypoint during `prepare`, so pnpm consumers must
-explicitly allow that package build. A prepared store entry can otherwise mask a broken clean
-install. The package also expects Angular, Angular CDK, and RxJS peer dependencies from the
-consuming app. Keep the consuming app on the same Angular major as the package.
+The GitHub package carries immutable, checked-in `dist/lib` and `dist/server` entrypoints built in
+Cortex. Installation runs no build lifecycle, so consumers keep this package absent from the pnpm
+11 `allowBuilds` map in `pnpm-workspace.yaml`; a clean install with lifecycle scripts disabled is
+the supported delivery path. Generated-package CI imports that checked-in output before building,
+then proves a fresh rebuild is byte-identical.
+
+The complete Angular runtime is an optional peer contract: Angular, Angular CDK, RxJS, `tslib`,
+`marked`, `ag-charts-community`, and the ProseMirror packages. Every Angular browser workspace
+declares that complete set directly in production dependencies and stays on the same Angular major
+as the package. This is required even when the product currently uses only part of the component
+library, because the single public Angular entrypoint re-exports the complete surface.
+`cx-platform-check` enforces the boundary. A Node-only workspace declares none of those UI peers
+and can install a server subpath without bringing them into its release artifact.
+
+Products that keep a browser application and Node server in one pnpm workspace must also preserve
+all three peer-isolation controls: peer auto-installation, root peer resolution, and peer-dependent
+deduplication are disabled. See
+[Workspace peer isolation](PACKAGING.md#workspace-peer-isolation) for the canonical link and
+package-specific consequence.
+
+Installed dependencies contain immutable compiled output, public resources, three executable
+runtime commands, and their private, non-exported `workspace-contract.mjs` parser helper only. Raw
+Angular/Node TypeScript and package build tooling remain in the generated Git repository for
+byte-identity CI, but `package.json.files` excludes them from packed and Git dependency installs.
+
+## Component authority
+
+Technical tooling and agents that need the exact Angular library contract use
+`@mikaelcedergren/cx-framework/support/components/authority.json`. This generated catalog is the
+packed public evidence for every exported component and directive: discovery name, selector,
+public class symbol, typed input/output bindings, required/default/transform metadata,
+content-projection selectors in template order, and SHA-256 evidence for the owning source,
+template, and styles.
+
+The catalog is self-contained and path-free for contract discovery: it contains neither raw source
+paths nor absolute filesystem paths. Packed installs contain the catalog and compiled `dist/`
+output while excluding raw `patterns/`, `primitives/`, and `tooling/` trees. Usage guidance remains
+in `support/components/guidance.json`, and version-to-version migration instructions remain in
+`support/UPGRADES.md`.
+
+## Node web runtime
+
+Server entrypoints are ESM-only, require Node 26, and resolve only under Node's package conditions.
+Browser-oriented TypeScript resolution and CommonJS reject them, so importing server code cannot
+quietly enlarge a browser bundle. Import the smallest owner for the work:
+
+```ts
+import { createSessionTokenCodec } from "@mikaelcedergren/cx-framework/server/session";
+import { createDurableJobStore } from "@mikaelcedergren/cx-framework/server/jobs";
+import { listenHttpApplication } from "@mikaelcedergren/cx-framework/server/listen";
+import { readBoundedResponseJson } from "@mikaelcedergren/cx-framework/server/bounded-response";
+import { loadPrivateEnvironmentFile } from "@mikaelcedergren/cx-framework/server/private-environment";
+import {
+  adoptSqliteMigrationLedger,
+  applySqliteMigrations,
+  openOwnedSqliteDatabase,
+  type OpenOwnedSqliteDatabaseOptions,
+  type OwnedSqliteDatabase,
+} from "@mikaelcedergren/cx-framework/server/sqlite";
+import { loadProductManifest } from "@mikaelcedergren/cx-framework/server/product-manifest";
+```
+
+Dynamic web entrypoints await `listenHttpApplication()` before reporting readiness, scheduling
+maintenance, or installing work that assumes the HTTP process is reachable. Express 5 reports
+asynchronous bind failures through its listen callback; the helper rejects that error and also
+rejects a synchronous listen failure. A caller that opened product-owned resources before binding
+remains responsible for closing them when the promise rejects.
+
+Sensitive API routers mount `noStoreHeader()` from `server/security` before their handlers. It
+marks every success and error response `private, no-store`; static-file caching remains a separate
+contract. The shared site gate preserves an upstream cache header that already contains
+`no-store`, so a locked API response cannot weaken that private policy.
+
+Every external provider response must be bounded before it is buffered or decoded. The
+`server/bounded-response` readers require an explicit byte ceiling, consume the Fetch body as a
+stream, cancel and unlock it on overflow or abort, and decode UTF-8 and JSON without replacement or
+partial parsing. They never validate a provider's domain shape: the product must still bound and
+validate every decoded field and record before persistence.
+
+Each web or worker process that owns a private environment file loads its explicit absolute path
+with `loadPrivateEnvironmentFile()` from `server/private-environment` and supplies only that role's
+allowed keys plus the exact mode selected by `privateEnvironmentFileStartupMode()`. Development
+uses `optional-ambient`: only an initial `ENOENT` is optional and ambient values retain precedence.
+Production uses `required-authoritative`: absence fails closed, every allowed ambient value is
+cleared, and only verified file values remain. Exact test startup skips the file; exact release
+validation also stays secretless. The POSIX loader rejects links, non-owner or non-0600 entries,
+hard links, path/inode races, growth past 64 KiB, invalid UTF-8, NUL in parsed names or values,
+`NODE_OPTIONS`, and keys outside the allowlist before changing the target environment. Filename
+selection, role-specific error copy, and removal of another role's ambient secrets remain explicit
+product policy.
+
+Both web and worker entrypoints load the sealed product contract with `loadProductManifest` before
+taking their separate process roles. The loader accepts only an absolute regular non-symlink
+`cx-product.json`, reads one bounded race-checked UTF-8 snapshot, rejects duplicate JSON fields,
+and validates the complete exact capability schema and fleet compatibility rules. Its typed result
+and every nested value are frozen. `loadProductManifestFile` additionally returns the canonical
+verified file path for startup composition that must pin both the manifest and its identity.
+
+A versioned server process uses `assertServerProcessRole` from `server/process-role` to prove that
+its executing file is the exact web or named worker entrypoint sealed into the release identity.
+During isolated release validation only, workers create and send a typed IPC receipt with
+`server/worker-readiness`; ordinary workers send nothing. Install the worker's graceful signal
+handlers before sending the receipt. The helper references the validation IPC channel before
+publication and keeps the otherwise-idle worker alive until the validator's termination signal; a
+successful shutdown must still exit or disconnect that channel cleanly. After inert composition
+and shutdown-signal binding, but before recovery, maintenance, scheduling, claiming, or provider
+work, an ordinary production worker calls `acquireServerWorkerReadinessLease()` with the unchanged
+identity object returned by `loadServerReleaseIdentity()`. It reopens the configured release
+identity, proves the exact startup path, inode snapshot, bytes, parsed identity, and worker
+declaration, then retains that read-only descriptor until its idempotent close handle runs first in
+shutdown. Development and release validation never acquire this lease. This keeps web/worker
+ownership explicit without turning mutable environment labels into authority.
+
+`openOwnedSqliteDatabase()` is the opening boundary for every long-lived file-backed SQLite runtime
+authority. Its `OpenOwnedSqliteDatabaseOptions` require an explicit canonical operational root, one normalized
+absolute database path contained by that root, and WAL configuration. Consumers keep the returned
+`OwnedSqliteDatabase` handle for the connection lifetime and close that handle; they do not repeat
+directory creation, driver opening, SQLite configuration, or filesystem proof locally. Same-user
+web and worker roles may open the same WAL authority concurrently. A sealed existing database uses
+`requireExisting: true` with a synchronous read-only `beforeWrite` verifier on the exact connection
+that later remains writable. The framework keeps SQLite `query_only` enabled and installs a native
+fail-closed authorizer for that callback; only reads and the minimum integrity/identity PRAGMAs are
+admitted. The callback-scoped query surface expires immediately on return or failure and must not
+be retained. Product schemas, migrations, capacity policy, and data remain product-owned; see
+`support/UPGRADES.md` for the migration contract.
+
+A bounded one-shot cutover tool may instead own a specialized read-only or staged rollback-journal
+connection when its atomic publication proof cannot use the long-lived WAL lifecycle. Keep that
+exception inside documented, tested migration machinery: it must not be selectable by ordinary web
+or worker startup, and it must close before runtime activation. In-memory tests and schema fixtures
+remain outside the file-backed runtime contract.
+
+An existing SQLite product calls `adoptSqliteMigrationLedger` once before its first framework
+migration run. Its required `verifyLegacyState` callback runs synchronously under the same
+`BEGIN IMMEDIATE` transaction and must verify the product-owned legacy schema, data, record counts
+or canonical hashes, and old ledger before returning the known contiguous applied-version prefix.
+Verification is read-only; any schema or data copy belongs in a subsequent append-only migration.
+The framework never infers that product state is correct and never reruns adopted SQL: it only
+validates the returned metadata and writes the current definitions' canonical names and
+fingerprints. Any verification or insertion failure leaves the canonical ledger absent.
+
+When a new append-only migration suffix transfers ownership of copied state, use
+`applySqliteMigrationsAtomically()`. Its read-only `captureState` callback records the old evidence
+before the first pending statement. Its synchronous `verifyFinalState` callback may finish the
+product-owned copy and install its seals, then must prove the complete result before commit. A
+throw from either callback rolls back the copy, seals, schema suffix, and canonical ledger rows as
+one unit.
+
+Durable-job schema definitions are published as the append-only
+`DURABLE_JOB_SCHEMA_MIGRATIONS` history. A product assigns each new framework entry its next
+product-owned migration version; it never points an already-issued product migration at a mutable
+current-schema array. Apply every entry in order, preserve the original product migration name and
+version once fingerprinted, and append a new product migration when the framework history grows.
+
+Once enqueued, a job's database identity and immutable input are sealed by the schema: its ID,
+type, payload, idempotency key, execution class, attempt ceiling, original schedule, and creation
+time cannot be rewritten through direct SQL. Status, attempts, availability, leases, recovery
+reserve, failures, and lifecycle timestamps remain deliberately mutable through the store's
+fenced transitions. Active obligations cannot be deleted; bounded terminal history remains
+prunable through `pruneTerminal()`.
+
+Insert and update conflicts are rejected before SQLite can apply `OR REPLACE` semantics. The seal
+covers the job ID, canonical type/idempotency pair, non-null lease token, and SQLite row ID, so it
+does not depend on connection-local recursive-trigger settings to preserve queued, running, or
+terminal rows. SQLite row IDs are framework-owned: retained rows must already have positive row
+IDs, new inserts must leave numeric allocation to SQLite, and row IDs cannot change after enqueue.
+The upgrade step validates those rules and every retained recovery reserve against the job's class
+and status without updating a job row. Invalid existing state aborts the migration unchanged; it is
+never repaired or discarded silently, and product-owned job-update triggers are never activated by
+validation.
+
+Durable queues require an explicit database-wide `maxConcurrentJobs`; every claim-capable store
+sharing `cx_jobs` must use the same value. Set it to `1` when a resource-capacity deferral must be a
+strict queue barrier: `defer()` releases the owned lease, restores the consumed attempt, persists
+the blocked reason and retry time, and prevents later work from overtaking it across processes or
+restarts. A reclaimed barrier stays a barrier after a retryable failure or expired lease; those
+real attempts remain charged, and the queue is released only when the job succeeds or terminally
+fails. For a job-local prerequisite that must not hold up unrelated work, return the additive
+`delay` disposition instead: `delay()` also releases the lease, restores the consumed attempt, and
+persists the reason and retry time, but returns the job to ordinary queued state without a barrier.
+An explicitly enqueued `barrier-recovery` job is the only work allowed past a waiting barrier. Use
+that class only after atomically materializing the bounded product obligation and its own recovery
+headroom. The queue allocates a bounded reserve at enqueue, releases it on each claim, rearms it on
+delay, retry, or lease recovery, and removes it on terminal completion so recovery remains possible
+without retaining capacity afterward. Standard jobs remain fenced throughout.
+`createDurableWorker` renews each active lease on a bounded interval and aborts the handler if
+heartbeat ownership is lost; a stale handler is never allowed to classify or persist a newer
+attempt's outcome. Schedule occurrence keys and externally visible effect idempotency remain
+deliberate product policy.
+
+When a product record and its follow-up job must either both exist or neither exist, use the
+store's synchronous `withTransaction()` callback. It owns one `BEGIN IMMEDIATE` transaction over
+the injected database and supplies a scoped `transaction.enqueue()` surface, so product writes on
+that same adapter and the durable job commit or roll back together. The scoped surface expires when
+the callback returns and asynchronous callbacks are rejected.
+
+The shared static-site entrypoint uses that same complete manifest loader, then accepts only the
+static-site capability profile. It owns standard security, health, cache, release-snapshot, 404,
+and graceful shutdown behavior, and receives Express and compression from the consumer rather than
+adding them as framework dependencies. The manifest belongs to the immutable server artifact;
+`repoRoot` remains the operational checkout that owns atomic browser releases:
+
+```ts
+import compression from "compression";
+import express from "express";
+import { fileURLToPath } from "node:url";
+import { createStaticSiteServer } from "@mikaelcedergren/cx-framework/server/static-site";
+
+const manifestFile = fileURLToPath(
+  new URL("../../cx-product.json", import.meta.url),
+);
+
+createStaticSiteServer({
+  compression,
+  defaultPort: 3020,
+  entrypointUrl: import.meta.url,
+  express,
+  frameOptions: "DENY",
+  manifestFile,
+  repoRoot: process.cwd(),
+});
+```
+
+With the standard compiled path `server/dist/index.js`, that URL selects the `cx-product.json`
+sealed at the artifact root. `manifestFile` is required, absolute, bounded, and a regular
+non-symlink file; there is deliberately no working-directory fallback. A source-checkout manifest
+can therefore change without changing the identity or capabilities selected by a released server
+artifact, including after a process restart. `entrypointUrl` is also required: ordinary production
+and release validation must load a release identity and prove that the executing module is the
+exact sealed web entrypoint before browser resources, the Express application, or a listener can
+start. Ordinary production additionally proves one complete browser snapshot before application
+construction; release validation remains deliberately browserless.
+
+All shared runtime policy reads `NODE_ENV` through `nodeEnvironmentValue()` from
+`server/configuration`. An absent value means `development`; a configured value must be exactly
+`development`, `test`, or `production`. Case changes, padding, empty strings, and invented modes
+fail before production, release-validation, private-file, browser, or worker-readiness branches.
+
+Clean-checkout server tests that need an active browser release import
+`activateSyntheticBrowserReleaseFixture` from
+`@mikaelcedergren/cx-framework/server/testing`. The helper creates and activates only the bounded
+on-disk shape consumed by `createBrowserServing`, inside a caller-owned disposable repository. It
+refuses existing release IDs, unsafe paths, symlinked layout directories, and attempts to replace
+fixture-owned metadata. It deliberately performs no build, retention, production publication, or
+operational `server-ops` work and must never be used as a deployer.
+
+Versioned server deployments set `CX_SERVER_RELEASE_IDENTITY_FILE` to the absolute
+`server-release.json` inside the selected release. The shared static server validates and pins that
+metadata before listening, then serves the exact pinned payload with `Cache-Control: no-store` at
+`/cx-server.json`. Moving a deployment pointer alone never changes what the running process claims;
+the identity changes only when a new process starts from the selected artifact. Dynamic products
+use `loadServerReleaseIdentity` and `serverReleaseIdentityMiddleware` from
+`@mikaelcedergren/cx-framework/server/server-identity` for the same contract.
+
+Dynamic products assemble the same smaller primitives around their own routes, authentication
+policy, data schema, and external-effect adapters. A product must not put those choices back into
+the framework merely to reduce its local code.
+
+Dynamic products with an essential local dependency pass one synchronous, side-effect-free probe
+to `healthMiddleware(app, port, probe)`. The probe runs for each request: exactly `true` preserves
+the standard `{ app, ok: true, port }` response, while `false` or a thrown local-read error returns
+the fixed no-store `503 { ok: false }` response without exposing dependency details. Paid,
+networked, asynchronous, or mutating work never belongs in a health probe.
+
+Pre-launch products mount `createSiteGate` from
+`@mikaelcedergren/cx-framework/server/gate` before product routes and body parsers. The
+dependency-free middleware keeps `/healthz`, `/cx-build.json`, and `/cx-server.json` reachable for
+operations, returns the shared JSON error envelope for locked APIs, and issues only a bounded,
+purpose-bound signed cookie after unlock. An empty password leaves the reusable middleware inert
+for local development; a product whose launch policy requires the gate must reject an empty
+password in its own startup configuration.
+
+A product may preserve a branded gate page without owning a second authentication implementation.
+Create one request-independent presentation at startup, put the exact framework form slot inside
+its passive HTML shell, and pass the frozen result to `createSiteGate`:
+
+```ts
+import {
+  createSiteGate,
+  createSiteGatePresentation,
+  SITE_GATE_FORM_SLOT,
+} from "@mikaelcedergren/cx-framework/server/gate";
+
+const presentation = createSiteGatePresentation({
+  template: `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Private preview</title>
+<link rel="stylesheet" href="/gate.css">
+</head>
+<body>
+<main>${SITE_GATE_FORM_SLOT}</main>
+</body>
+</html>`,
+  form: {
+    formClassName: "gate-form",
+    passwordLabel: "Access password",
+    submitClassName: "gate-submit",
+    submitLabel: "Enter preview",
+  },
+});
+
+const gate = createSiteGate({
+  password,
+  presentation,
+  publicPaths: ["/gate.css"],
+  secret,
+  siteName: "Private preview",
+});
+```
+
+The framework inserts and escapes the only password form, pre-renders the normal and failed pages,
+and continues to own GET/HEAD/POST handling, cookies, rate limiting, redirects, no-store/noindex,
+and response security headers. After unlock, protected documents remain `no-store` while static
+assets retain the shared cache policy; the shared static middleware and document sender never
+weaken a stronger upstream `no-store` decision. Presentation templates are capped at 128 KiB and fail at startup on
+unknown options, malformed document/slot structure, active or embedded elements, inline styles or
+handlers, extra form controls, raw-text/RCDATA/table parsing contexts, and non-same-origin asset
+URLs. URL attributes cannot contain HTML character references, so browser decoding cannot turn an
+accepted path into a different origin. Presented pages allow same-origin styles, images, and fonts
+under a script-free CSP. Declare every exact stylesheet, image, favicon, or font request that must
+load while locked in `publicPaths`; the presentation never widens gate policy implicitly.
 
 ## Angular components
 
 Import standalone components directly from the package:
 
 ```ts
-import { CxButtonComponent, CxTopBarComponent } from '@mikaelcedergren/cx-framework';
+import {
+  CxButtonComponent,
+  CxTopBarComponent,
+} from "@mikaelcedergren/cx-framework";
 
 @Component({
   standalone: true,
@@ -64,7 +386,7 @@ Use framework components before building local UI. If a shared component is miss
 Install the keyboard-focus provider once in the application config. It keeps the primary focus ring exclusive to Tab navigation, while pointer-focused controls retain their quieter active state:
 
 ```ts
-import { provideCxKeyboardFocus } from '@mikaelcedergren/cx-framework';
+import { provideCxKeyboardFocus } from "@mikaelcedergren/cx-framework";
 
 export const appConfig: ApplicationConfig = {
   providers: [provideCxKeyboardFocus()],
@@ -78,7 +400,7 @@ import {
   CxNavigationRecoveryComponent,
   cxNavigationRecoveryHandler,
   provideCxNavigationRecovery,
-} from '@mikaelcedergren/cx-framework';
+} from "@mikaelcedergren/cx-framework";
 
 @Component({
   imports: [CxNavigationRecoveryComponent],
@@ -89,8 +411,8 @@ export class AppComponent {}
 export const appConfig: ApplicationConfig = {
   providers: [
     provideCxNavigationRecovery({
-      diagnosticsEndpoint: '/api/navigation-diagnostics',
-      copy: { staleBuildHeading: 'The product has been updated' },
+      diagnosticsEndpoint: "/api/navigation-diagnostics",
+      copy: { staleBuildHeading: "The product has been updated" },
     }),
     provideRouter(
       routes,
@@ -107,13 +429,13 @@ The release server owns the matching build identity contract: a `cx-build-id` me
 Use package subpaths in global styles:
 
 ```scss
-@use '@mikaelcedergren/cx-framework/tokens';
-@use '@mikaelcedergren/cx-framework/styles/fonts';
-@use '@mikaelcedergren/cx-framework/styles/base';
-@use '@mikaelcedergren/cx-framework/styles/page';
-@use '@mikaelcedergren/cx-framework/styles/article';
-@use '@mikaelcedergren/cx-framework/styles/markdown';
-@use '@mikaelcedergren/cx-framework/styles/utilities';
+@use "@mikaelcedergren/cx-framework/tokens";
+@use "@mikaelcedergren/cx-framework/styles/fonts";
+@use "@mikaelcedergren/cx-framework/styles/base";
+@use "@mikaelcedergren/cx-framework/styles/page";
+@use "@mikaelcedergren/cx-framework/styles/article";
+@use "@mikaelcedergren/cx-framework/styles/markdown";
+@use "@mikaelcedergren/cx-framework/styles/utilities";
 ```
 
 Or add the package folder to Sass include paths:
@@ -129,9 +451,9 @@ Or add the package folder to Sass include paths:
 Then imports can stay short:
 
 ```scss
-@use 'tokens';
-@use 'styles/base';
-@use 'styles/page';
+@use "tokens";
+@use "styles/base";
+@use "styles/page";
 ```
 
 Use semantic tokens by purpose. Do not hardcode token values or rename tokens into local aliases just to make nicer names.
@@ -158,12 +480,14 @@ If the app uses a different public asset path, either copy to `/assets/fonts/` d
 Use `CxIconComponent`, icon-capable components, and exported icon names from the framework:
 
 ```ts
-import { CxButtonComponent, CxIconComponent } from '@mikaelcedergren/cx-framework';
+import {
+  CxButtonComponent,
+  CxIconComponent,
+} from "@mikaelcedergren/cx-framework";
 ```
 
 ```html
-<cx-icon icon="settings" />
-<cx-button text="Export report" icon="export" />
+<cx-icon icon="settings" /> <cx-button text="Export report" icon="export" />
 ```
 
 Do not draw one-off app icons when a framework icon exists. If a reusable icon is missing, add it to the framework icon source and regenerate the manifest.

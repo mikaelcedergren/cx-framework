@@ -27,9 +27,6 @@
   // synthesised by the browser; the other three carry real weight axes.
   --font-family-heading: var(--typeface-editorial);
 
-  // Legacy alias, kept for downstream consumers; prefer --font-family-heading.
-  --font-family-fancy: var(--font-family-heading);
-
   --font-size-display: clamp(40px, 5vw, 72px);
   --font-size-title-1: 24px;
   --font-size-title-2: 20px;

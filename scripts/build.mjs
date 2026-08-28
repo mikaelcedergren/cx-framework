@@ -18,10 +18,10 @@ import {
 } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import * as sass from 'sass';
+import { assertComponentAuthorityCurrent } from './generate-component-authority.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frameworkRoot = path.resolve(scriptDir, '..');
-const outRoot = path.join(frameworkRoot, 'out-tsc');
 const distRoot = path.join(frameworkRoot, 'dist');
 const ngcPath = path.join(
   frameworkRoot,
@@ -33,6 +33,7 @@ const ngcPath = path.join(
   'bin',
   'ngc.js',
 );
+const tscPath = path.join(frameworkRoot, 'node_modules', 'typescript', 'bin', 'tsc');
 const publicationLockRoot = path.join(
   os.tmpdir(),
   `cx-framework-publish-${createHash('sha256').update(frameworkRoot).digest('hex').slice(0, 16)}.lock`,
@@ -270,26 +271,28 @@ async function swapPublishedDirectories(entries) {
 export async function publishBuildOutputs(
   stagedLibRoot,
   {
-    targetOutRoot = outRoot,
+    stagedServerRoot,
     targetDistRoot = distRoot,
-    publicationParent = path.dirname(targetOutRoot),
+    publicationParent = path.dirname(targetDistRoot),
     lockRoot = publicationLockRoot,
     lockTimeoutMs = publicationLockTimeoutMs,
     lockPollMs = publicationLockPollMs,
   } = {},
 ) {
+  if (!stagedServerRoot) {
+    throw new Error('Framework publication requires the staged Node runtime output.');
+  }
   const publicationRoot = await mkdtemp(
     path.join(publicationParent, publicationPrefix),
   );
-  const preparedOutRoot = path.join(publicationRoot, 'out-tsc');
   const preparedDistRoot = path.join(publicationRoot, 'dist');
   let publicationLock;
   let preservePublicationArtifacts = false;
   try {
-    await cp(stagedLibRoot, path.join(preparedOutRoot, 'lib'), {
+    await cp(stagedLibRoot, path.join(preparedDistRoot, 'lib'), {
       recursive: true,
     });
-    await cp(stagedLibRoot, path.join(preparedDistRoot, 'lib'), {
+    await cp(stagedServerRoot, path.join(preparedDistRoot, 'server'), {
       recursive: true,
     });
 
@@ -299,11 +302,6 @@ export async function publishBuildOutputs(
       lockPollMs,
     );
     await swapPublishedDirectories([
-      {
-        nextRoot: preparedOutRoot,
-        targetRoot: targetOutRoot,
-        backupRoot: path.join(publicationRoot, 'previous-out-tsc'),
-      },
       {
         nextRoot: preparedDistRoot,
         targetRoot: targetDistRoot,
@@ -332,7 +330,9 @@ export async function publishBuildOutputs(
 }
 
 async function buildFramework() {
+  await assertComponentAuthorityCurrent({ frameworkRoot });
   await access(ngcPath);
+  await access(tscPath);
   await withStagingFramework(async (stagingRoot) => {
     await compileComponentStyles(stagingRoot);
     await run(
@@ -348,9 +348,12 @@ async function buildFramework() {
       ],
       stagingRoot,
     );
+    await run('node', [tscPath, '-p', 'tsconfig.server.json'], stagingRoot);
     const stagedLibRoot = path.join(stagingRoot, 'out-tsc', 'lib');
+    const stagedServerRoot = path.join(stagingRoot, 'out-tsc', 'server');
     await rewriteJsModuleSpecifiers(stagedLibRoot);
-    await publishBuildOutputs(stagedLibRoot);
+    await rewriteJsModuleSpecifiers(stagedServerRoot);
+    await publishBuildOutputs(stagedLibRoot, { stagedServerRoot });
   });
 }
 
@@ -419,10 +422,7 @@ function fileExistsSync(filePath) {
   return existsSync(filePath);
 }
 
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-) {
+if (import.meta.main) {
   buildFramework().catch((error) => {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;

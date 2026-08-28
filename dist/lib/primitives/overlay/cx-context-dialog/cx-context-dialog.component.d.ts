@@ -1,0 +1,41 @@
+import { EventEmitter, OnDestroy } from '@angular/core';
+import { type CxButtonMood } from '../../actions/cx-button';
+import * as i0 from "@angular/core";
+export type CxContextDialogMood = Extract<CxButtonMood, 'default' | 'warning' | 'danger'>;
+export type CxContextDialogAlign = 'bottomLeft' | 'topLeft';
+export declare class CxContextDialogComponent implements OnDestroy {
+    private readonly host;
+    private readonly overlayState;
+    private readonly instanceId;
+    private overlayHandle?;
+    private destroying;
+    constructor();
+    ngOnDestroy(): void;
+    heading: string;
+    description: string;
+    confirmText: string;
+    cancelText: string;
+    mood: CxContextDialogMood;
+    align: CxContextDialogAlign;
+    dismissible: boolean;
+    readonly confirm: EventEmitter<void>;
+    readonly cancel: EventEmitter<void>;
+    protected readonly headingId: string;
+    protected readonly descriptionId: string;
+    protected get hasHeading(): boolean;
+    protected get hasDescription(): boolean;
+    protected get hasConfirmAction(): boolean;
+    protected get hasCancelAction(): boolean;
+    protected get hasActions(): boolean;
+    protected get actionOnlyAccessibleName(): string | null;
+    protected onCancel(): void;
+    protected onConfirm(): void;
+    private get meaningfulConfirmText();
+    private get meaningfulCancelText();
+    private surfaceElement;
+    private prepareFocusRestoration;
+    protected onDocumentClick(event: MouseEvent): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxContextDialogComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxContextDialogComponent, "cx-context-dialog", never, { "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "confirmText": { "alias": "confirmText"; "required": false; }; "cancelText": { "alias": "cancelText"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "align": { "alias": "align"; "required": false; }; "dismissible": { "alias": "dismissible"; "required": false; }; }, { "confirm": "confirm"; "cancel": "cancel"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-context-dialog.component.d.ts.map

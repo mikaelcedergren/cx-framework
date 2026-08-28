@@ -1,0 +1,22 @@
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import * as i0 from "@angular/core";
+export class CxPlaceholderComponent {
+    text = 'Design placeholder';
+    size = 'default';
+    visibleText$() {
+        return this.text.trim();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxPlaceholderComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "22.0.8", type: CxPlaceholderComponent, isStandalone: true, selector: "cx-placeholder", inputs: { text: "text", size: "size" }, host: { properties: { "class.cx-placeholder-host--small": "size === \"small\"", "class.cx-placeholder-host--large": "size === \"large\"" } }, ngImport: i0, template: "  <div class=\"cx-placeholder\">\n    <div class=\"cx-placeholder__content\">\n      <div class=\"cx-placeholder__text\">{{ visibleText$() }}</div>\n    </div>\n  </div>\n", styles: [":host{display:block;width:100%}.cx-placeholder{position:relative;display:flex;min-height:160px;align-items:center;justify-content:center;padding:var(--space-lg);border:1px dashed var(--placeholder);border-radius:var(--radius-md);background:repeating-linear-gradient(135deg, transparent 0, transparent 12px, color-mix(in srgb, var(--placeholder) 6%, transparent) 12px, color-mix(in srgb, var(--placeholder) 6%, transparent) 13px),color-mix(in srgb, var(--surface-alt) 96%, var(--placeholder) 4%);box-sizing:border-box;color:var(--ink);overflow:hidden}.cx-placeholder::before{content:\"\";position:absolute;inset:var(--space-sm);border:1px dashed color-mix(in srgb, var(--placeholder) 48%, transparent);border-radius:var(--radius-sm);pointer-events:none}.cx-placeholder__content{position:relative;display:flex;max-width:min(100%,420px);flex-direction:column;align-items:center;gap:var(--space-sm);text-align:center}.cx-placeholder__text{color:var(--opacity-mid);font-size:var(--font-size-body);font-weight:var(--font-weight-regular);line-height:var(--line-height-body-relaxed);overflow-wrap:anywhere}:host(.cx-placeholder-host--small) .cx-placeholder{min-height:96px;padding:var(--space-md)}:host(.cx-placeholder-host--large) .cx-placeholder{min-height:260px;padding:var(--space-xl)}"], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxPlaceholderComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'cx-placeholder', host: {
+                        '[class.cx-placeholder-host--small]': 'size === "small"',
+                        '[class.cx-placeholder-host--large]': 'size === "large"',
+                    }, changeDetection: ChangeDetectionStrategy.OnPush, template: "  <div class=\"cx-placeholder\">\n    <div class=\"cx-placeholder__content\">\n      <div class=\"cx-placeholder__text\">{{ visibleText$() }}</div>\n    </div>\n  </div>\n", styles: [":host{display:block;width:100%}.cx-placeholder{position:relative;display:flex;min-height:160px;align-items:center;justify-content:center;padding:var(--space-lg);border:1px dashed var(--placeholder);border-radius:var(--radius-md);background:repeating-linear-gradient(135deg, transparent 0, transparent 12px, color-mix(in srgb, var(--placeholder) 6%, transparent) 12px, color-mix(in srgb, var(--placeholder) 6%, transparent) 13px),color-mix(in srgb, var(--surface-alt) 96%, var(--placeholder) 4%);box-sizing:border-box;color:var(--ink);overflow:hidden}.cx-placeholder::before{content:\"\";position:absolute;inset:var(--space-sm);border:1px dashed color-mix(in srgb, var(--placeholder) 48%, transparent);border-radius:var(--radius-sm);pointer-events:none}.cx-placeholder__content{position:relative;display:flex;max-width:min(100%,420px);flex-direction:column;align-items:center;gap:var(--space-sm);text-align:center}.cx-placeholder__text{color:var(--opacity-mid);font-size:var(--font-size-body);font-weight:var(--font-weight-regular);line-height:var(--line-height-body-relaxed);overflow-wrap:anywhere}:host(.cx-placeholder-host--small) .cx-placeholder{min-height:96px;padding:var(--space-md)}:host(.cx-placeholder-host--large) .cx-placeholder{min-height:260px;padding:var(--space-xl)}"] }]
+        }], propDecorators: { text: [{
+                type: Input
+            }], size: [{
+                type: Input
+            }] } });

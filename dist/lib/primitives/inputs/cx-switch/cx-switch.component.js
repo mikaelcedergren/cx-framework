@@ -1,0 +1,76 @@
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import { CxValidationMessageComponent } from '../../feedback/cx-validation-message/index.js';
+import { normalizeCxValidation, } from '../shared/field.types.js';
+import * as i0 from "@angular/core";
+export class CxSwitchComponent {
+    static nextId = 0;
+    selectedState = signal(false, /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "selectedState" }] : /* istanbul ignore next */ []));
+    validationState = signal(undefined, /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "validationState" }] : /* istanbul ignore next */ []));
+    hintId = `cx-switch-${++CxSwitchComponent.nextId}-hint`;
+    messagesId = `cx-switch-${CxSwitchComponent.nextId}-messages`;
+    text = '';
+    ariaLabel;
+    hint;
+    size = 'default';
+    disabled = false;
+    set validation(value) {
+        this.validationState.set(value ?? undefined);
+    }
+    set selected(value) {
+        this.selectedState.set(value);
+    }
+    selectedChange = new EventEmitter();
+    focusChange = new EventEmitter();
+    selected$ = this.selectedState.asReadonly();
+    validationMessages$ = () => this.disabled
+        ? []
+        : normalizeCxValidation(this.validationState());
+    hasError$ = () => this.validationMessages$().some(message => message.type === 'error');
+    showHint$ = () => !!this.hint?.trim() && this.validationMessages$().length === 0;
+    describedByIds$ = computed(() => {
+        const ids = [
+            this.showHint$() ? this.hintId : undefined,
+            this.validationMessages$().length > 0 ? this.messagesId : undefined,
+        ].filter((id) => !!id);
+        return ids.length > 0 ? ids.join(' ') : undefined;
+    }, /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "describedByIds$" }] : /* istanbul ignore next */ []));
+    onNativeChange(event) {
+        if (this.disabled) {
+            return;
+        }
+        const target = event.target;
+        const checked = target instanceof HTMLInputElement ? target.checked : !this.selectedState();
+        this.selectedState.set(checked);
+        this.selectedChange.emit(this.selectedState());
+    }
+    onFocusChange(focused) {
+        this.focusChange.emit(focused);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxSwitchComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "22.0.8", type: CxSwitchComponent, isStandalone: true, selector: "cx-switch", inputs: { text: "text", ariaLabel: "ariaLabel", hint: "hint", size: "size", disabled: "disabled", validation: "validation", selected: "selected" }, outputs: { selectedChange: "selectedChange", focusChange: "focusChange" }, ngImport: i0, template: "<div class=\"cx-switch-field\" [class.cx-switch-field--small]=\"size === 'small'\">\n  <label\n    class=\"cx-switch\"\n    [class.cx-switch--selected]=\"selected$()\"\n    [class.cx-switch--small]=\"size === 'small'\"\n    [class.cx-switch--disabled]=\"disabled\"\n    [class.cx-switch--error]=\"hasError$()\"\n    data-shortcut-ignore=\" \"\n  >\n    <input\n      class=\"cx-switch__input\"\n      type=\"checkbox\"\n      role=\"switch\"\n      [checked]=\"selected$()\"\n      [disabled]=\"disabled\"\n      [attr.aria-label]=\"ariaLabel || null\"\n      [attr.aria-invalid]=\"hasError$() ? 'true' : null\"\n      [attr.aria-describedby]=\"describedByIds$() ?? null\"\n      (change)=\"onNativeChange($event)\"\n      (focus)=\"onFocusChange(true)\"\n      (blur)=\"onFocusChange(false)\"\n    />\n\n    <span class=\"cx-switch__track\" aria-hidden=\"true\">\n      <span class=\"cx-switch__thumb\"></span>\n    </span>\n    @if (text.trim()) {\n      <span class=\"cx-switch__content\">\n        <span class=\"cx-switch__label\">\n          {{ text }}\n          @if (showHint$()) {\n            <span class=\"cx-switch__hint\" [id]=\"hintId\">{{ hint!.trim() }}</span>\n          }\n        </span>\n      </span>\n    }\n  </label>\n\n  @if (validationMessages$().length > 0) {\n    <cx-validation-message\n      class=\"cx-switch-field__error\"\n      [id]=\"messagesId\"\n      [messages]=\"validationMessages$()\"\n    />\n  }\n</div>\n", styles: [":host{display:inline-flex;width:auto;vertical-align:top}.cx-switch-field{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-xs);line-height:normal}.cx-switch{--cx-switch-track-width: var(--controller-size);--cx-switch-track-height: calc(var(--space-md) + var(--space-xs));--cx-switch-thumb-size: calc(var(--space-sm) + var(--space-xs));--cx-switch-thumb-inset: 3px;--cx-switch-thumb-hover-x: var(--space-2xs);display:inline-grid;grid-template-columns:var(--cx-switch-track-width) minmax(0, auto);box-sizing:border-box;align-items:start;column-gap:var(--space-sm);border:0;background:rgba(0,0,0,0);color:var(--ink);cursor:pointer;font:inherit;line-height:1;margin:0;outline:none;padding:0;text-align:left}.cx-switch--disabled{opacity:var(--opacity-disabled);cursor:default;pointer-events:none;user-select:none}.cx-switch__input{grid-column:1;grid-row:1;width:var(--cx-switch-track-width);height:var(--cx-switch-track-height);padding:0;border:0;margin:0;appearance:none;cursor:inherit;opacity:0}.cx-switch__track{display:flex;grid-column:1;grid-row:1;box-sizing:border-box;align-items:center;justify-content:flex-start;width:var(--cx-switch-track-width);min-width:var(--cx-switch-track-width);height:var(--cx-switch-track-height);padding:0 var(--cx-switch-thumb-inset);flex:0 0 auto;border-radius:var(--radius-sm);background:var(--opacity-mid);border:var(--line-discreet);border-color:rgba(0,0,0,0);line-height:0;overflow:hidden;pointer-events:none;transition:background var(--motion-fast) var(--ease-out-in),border var(--motion-fast) var(--ease-out-in)}.cx-switch:hover:not(.cx-switch--selected) .cx-switch__track{background:var(--opacity-mid)}.cx-switch:hover:not(.cx-switch--selected) .cx-switch__thumb{transform:translateX(var(--cx-switch-thumb-hover-x))}.cx-switch--selected .cx-switch__track{background:var(--choice-control-selected)}.cx-switch--error .cx-switch__track,.cx-switch--error:hover:not(.cx-switch--selected) .cx-switch__track{border-color:var(--danger)}.cx-switch__input:focus-visible+.cx-switch__track{outline:var(--outline-tab);outline-offset:var(--outline-tab-offset)}.cx-switch:active:not(.cx-switch--disabled) .cx-switch__track{outline:var(--outline-active);outline-offset:var(--outline-active-offset)}.cx-switch__thumb{position:relative;width:var(--cx-switch-thumb-size);height:var(--cx-switch-thumb-size);border-radius:var(--radius-xs);background:var(--on-choice-control);transition:transform var(--motion-fast) var(--ease-out-in),background var(--motion-fast) var(--ease-out-in)}.cx-switch--selected .cx-switch__thumb{transform:translateX(calc(var(--cx-switch-track-width) - var(--cx-switch-thumb-inset) * 2 - var(--cx-switch-thumb-size) - var(--cx-switch-thumb-hover-x)))}.cx-switch--selected:hover:not(.cx-switch--disabled) .cx-switch__thumb{transform:translateX(calc(var(--cx-switch-track-width) - var(--cx-switch-thumb-inset) * 2 - var(--cx-switch-thumb-size) - var(--cx-switch-thumb-hover-x) * 2))}.cx-switch__label{display:block;color:currentColor;font-size:var(--font-size-body);font-weight:var(--font-weight-regular);line-height:var(--line-height-body);padding-top:var(--space-2xs)}.cx-switch__content{display:flex;grid-column:2;grid-row:1;min-width:0;flex-direction:column;gap:var(--space-2xs)}.cx-switch__hint{display:block;color:var(--opacity-high);font-size:var(--font-size-body-sm);font-weight:var(--font-weight-regular);line-height:var(--line-height-small)}.cx-switch-field__error{padding-left:calc(var(--controller-size) + var(--space-sm))}.cx-switch--small{--cx-switch-track-width: var(--space-lg);--cx-switch-track-height: var(--space-md);--cx-switch-thumb-size: calc(var(--space-sm) + var(--space-2xs));--cx-switch-thumb-inset: var(--space-2xs);--cx-switch-thumb-hover-x: var(--space-2xs);column-gap:var(--space-xs)}.cx-switch--small .cx-switch__label{font-size:var(--font-size-body-sm);line-height:var(--line-height-small);padding-top:0}.cx-switch-field--small .cx-switch-field__error{padding-left:calc(var(--space-lg) + var(--space-xs))}"], dependencies: [{ kind: "component", type: CxValidationMessageComponent, selector: "cx-validation-message", inputs: ["type", "showAll", "messages"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxSwitchComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'cx-switch', imports: [CxValidationMessageComponent], changeDetection: ChangeDetectionStrategy.OnPush, template: "<div class=\"cx-switch-field\" [class.cx-switch-field--small]=\"size === 'small'\">\n  <label\n    class=\"cx-switch\"\n    [class.cx-switch--selected]=\"selected$()\"\n    [class.cx-switch--small]=\"size === 'small'\"\n    [class.cx-switch--disabled]=\"disabled\"\n    [class.cx-switch--error]=\"hasError$()\"\n    data-shortcut-ignore=\" \"\n  >\n    <input\n      class=\"cx-switch__input\"\n      type=\"checkbox\"\n      role=\"switch\"\n      [checked]=\"selected$()\"\n      [disabled]=\"disabled\"\n      [attr.aria-label]=\"ariaLabel || null\"\n      [attr.aria-invalid]=\"hasError$() ? 'true' : null\"\n      [attr.aria-describedby]=\"describedByIds$() ?? null\"\n      (change)=\"onNativeChange($event)\"\n      (focus)=\"onFocusChange(true)\"\n      (blur)=\"onFocusChange(false)\"\n    />\n\n    <span class=\"cx-switch__track\" aria-hidden=\"true\">\n      <span class=\"cx-switch__thumb\"></span>\n    </span>\n    @if (text.trim()) {\n      <span class=\"cx-switch__content\">\n        <span class=\"cx-switch__label\">\n          {{ text }}\n          @if (showHint$()) {\n            <span class=\"cx-switch__hint\" [id]=\"hintId\">{{ hint!.trim() }}</span>\n          }\n        </span>\n      </span>\n    }\n  </label>\n\n  @if (validationMessages$().length > 0) {\n    <cx-validation-message\n      class=\"cx-switch-field__error\"\n      [id]=\"messagesId\"\n      [messages]=\"validationMessages$()\"\n    />\n  }\n</div>\n", styles: [":host{display:inline-flex;width:auto;vertical-align:top}.cx-switch-field{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-xs);line-height:normal}.cx-switch{--cx-switch-track-width: var(--controller-size);--cx-switch-track-height: calc(var(--space-md) + var(--space-xs));--cx-switch-thumb-size: calc(var(--space-sm) + var(--space-xs));--cx-switch-thumb-inset: 3px;--cx-switch-thumb-hover-x: var(--space-2xs);display:inline-grid;grid-template-columns:var(--cx-switch-track-width) minmax(0, auto);box-sizing:border-box;align-items:start;column-gap:var(--space-sm);border:0;background:rgba(0,0,0,0);color:var(--ink);cursor:pointer;font:inherit;line-height:1;margin:0;outline:none;padding:0;text-align:left}.cx-switch--disabled{opacity:var(--opacity-disabled);cursor:default;pointer-events:none;user-select:none}.cx-switch__input{grid-column:1;grid-row:1;width:var(--cx-switch-track-width);height:var(--cx-switch-track-height);padding:0;border:0;margin:0;appearance:none;cursor:inherit;opacity:0}.cx-switch__track{display:flex;grid-column:1;grid-row:1;box-sizing:border-box;align-items:center;justify-content:flex-start;width:var(--cx-switch-track-width);min-width:var(--cx-switch-track-width);height:var(--cx-switch-track-height);padding:0 var(--cx-switch-thumb-inset);flex:0 0 auto;border-radius:var(--radius-sm);background:var(--opacity-mid);border:var(--line-discreet);border-color:rgba(0,0,0,0);line-height:0;overflow:hidden;pointer-events:none;transition:background var(--motion-fast) var(--ease-out-in),border var(--motion-fast) var(--ease-out-in)}.cx-switch:hover:not(.cx-switch--selected) .cx-switch__track{background:var(--opacity-mid)}.cx-switch:hover:not(.cx-switch--selected) .cx-switch__thumb{transform:translateX(var(--cx-switch-thumb-hover-x))}.cx-switch--selected .cx-switch__track{background:var(--choice-control-selected)}.cx-switch--error .cx-switch__track,.cx-switch--error:hover:not(.cx-switch--selected) .cx-switch__track{border-color:var(--danger)}.cx-switch__input:focus-visible+.cx-switch__track{outline:var(--outline-tab);outline-offset:var(--outline-tab-offset)}.cx-switch:active:not(.cx-switch--disabled) .cx-switch__track{outline:var(--outline-active);outline-offset:var(--outline-active-offset)}.cx-switch__thumb{position:relative;width:var(--cx-switch-thumb-size);height:var(--cx-switch-thumb-size);border-radius:var(--radius-xs);background:var(--on-choice-control);transition:transform var(--motion-fast) var(--ease-out-in),background var(--motion-fast) var(--ease-out-in)}.cx-switch--selected .cx-switch__thumb{transform:translateX(calc(var(--cx-switch-track-width) - var(--cx-switch-thumb-inset) * 2 - var(--cx-switch-thumb-size) - var(--cx-switch-thumb-hover-x)))}.cx-switch--selected:hover:not(.cx-switch--disabled) .cx-switch__thumb{transform:translateX(calc(var(--cx-switch-track-width) - var(--cx-switch-thumb-inset) * 2 - var(--cx-switch-thumb-size) - var(--cx-switch-thumb-hover-x) * 2))}.cx-switch__label{display:block;color:currentColor;font-size:var(--font-size-body);font-weight:var(--font-weight-regular);line-height:var(--line-height-body);padding-top:var(--space-2xs)}.cx-switch__content{display:flex;grid-column:2;grid-row:1;min-width:0;flex-direction:column;gap:var(--space-2xs)}.cx-switch__hint{display:block;color:var(--opacity-high);font-size:var(--font-size-body-sm);font-weight:var(--font-weight-regular);line-height:var(--line-height-small)}.cx-switch-field__error{padding-left:calc(var(--controller-size) + var(--space-sm))}.cx-switch--small{--cx-switch-track-width: var(--space-lg);--cx-switch-track-height: var(--space-md);--cx-switch-thumb-size: calc(var(--space-sm) + var(--space-2xs));--cx-switch-thumb-inset: var(--space-2xs);--cx-switch-thumb-hover-x: var(--space-2xs);column-gap:var(--space-xs)}.cx-switch--small .cx-switch__label{font-size:var(--font-size-body-sm);line-height:var(--line-height-small);padding-top:0}.cx-switch-field--small .cx-switch-field__error{padding-left:calc(var(--space-lg) + var(--space-xs))}"] }]
+        }], propDecorators: { text: [{
+                type: Input
+            }], ariaLabel: [{
+                type: Input
+            }], hint: [{
+                type: Input
+            }], size: [{
+                type: Input
+            }], disabled: [{
+                type: Input
+            }], validation: [{
+                type: Input
+            }], selected: [{
+                type: Input
+            }], selectedChange: [{
+                type: Output
+            }], focusChange: [{
+                type: Output
+            }] } });

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cx-framework-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+      - run: npm install --global corepack@0.35.0
+      - run: corepack enable
+      - run: corepack install
+      - run: test "$(corepack pnpm --version)" = "11.23.0"
+      - name: Verify pnpm security contract
+        run: |
+          test "$(corepack pnpm config get autoInstallPeers)" = "false"
+          test "$(corepack pnpm config get dedupePeerDependents)" = "false"
+          test "$(corepack pnpm config get enableGlobalVirtualStore)" = "false"
+          test "$(corepack pnpm config get resolvePeersFromWorkspaceRoot)" = "false"
+          test "$(corepack pnpm config get strictDepBuilds)" = "true"
+          test "$(corepack pnpm config get strictStorePkgContentCheck)" = "true"
+          test "$(corepack pnpm config get verifyDepsBeforeRun)" = "error"
+          test "$(corepack pnpm config get verifyStoreIntegrity)" = "true"
+          test "$(corepack pnpm config get dangerouslyAllowAllBuilds)" = "false"
+          test "$(corepack pnpm config get allowBuilds --json | tr -d '[:space:]')" = '{"@parcel/watcher":true,"esbuild":true}'
+      - run: corepack pnpm install --frozen-lockfile --ignore-scripts
+      - run: corepack pnpm dist:git
+      - run: corepack pnpm check
+      - run: corepack pnpm dist:git
+      - run: npm pack --dry-run --ignore-scripts --silent

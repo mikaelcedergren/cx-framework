@@ -1,0 +1,56 @@
+import { EventEmitter } from '@angular/core';
+import { type CxFieldValidation, type CxFieldSize } from '../shared/field.types';
+import * as i0 from "@angular/core";
+export type CxPhoneCountryCodeOption = {
+    code: string;
+    label: string;
+    country: string;
+};
+export declare const CX_PHONE_COUNTRY_CODE_OPTIONS: readonly CxPhoneCountryCodeOption[];
+export declare class CxPhoneFieldComponent {
+    private static nextId;
+    private readonly valueState;
+    private readonly countryCodeState;
+    private readonly focusedState;
+    private readonly validationState;
+    protected readonly labelId: string;
+    protected readonly messagesId: string;
+    private readonly fieldRef?;
+    label: string;
+    ariaLabel: string | undefined;
+    optional: boolean;
+    disabled: boolean;
+    size: CxFieldSize;
+    loading: boolean;
+    clearable: boolean;
+    hint: string | undefined;
+    set countryCode(value: string | undefined);
+    set validation(value: CxFieldValidation | null | undefined);
+    set value(value: string | undefined);
+    readonly valueChange: EventEmitter<string>;
+    readonly countryCodeChange: EventEmitter<string>;
+    readonly focusChange: EventEmitter<boolean>;
+    readonly clear: EventEmitter<void>;
+    protected readonly value$: import("@angular/core").Signal<string>;
+    protected readonly countryCode$: import("@angular/core").Signal<string>;
+    protected readonly isFocused$: import("@angular/core").Signal<boolean>;
+    protected readonly countryCodeOptions$: import("@angular/core").Signal<readonly CxPhoneCountryCodeOption[]>;
+    protected readonly validationMessages$: () => readonly import("../shared/field.types").CxRenderedValidationMessage[];
+    protected readonly hasError$: () => boolean;
+    protected readonly showHint$: () => boolean;
+    protected readonly hasClear$: () => boolean;
+    protected get resolvedAriaDescribedBy(): string | undefined;
+    protected get resolvedAriaLabel(): string | undefined;
+    protected get resolvedAriaLabelledBy(): string | undefined;
+    focus(): void;
+    protected onInput(event: Event): void;
+    protected onCountryCodeChange(event: Event): void;
+    protected onFocusIn(): void;
+    protected onFocusOut(event: FocusEvent): void;
+    protected onEscapeKey(): void;
+    protected onClear(event: MouseEvent): void;
+    private normalizeCountryCode;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxPhoneFieldComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxPhoneFieldComponent, "cx-phone-field", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "clearable": { "alias": "clearable"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "countryCode": { "alias": "countryCode"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "countryCodeChange": "countryCodeChange"; "focusChange": "focusChange"; "clear": "clear"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-phone-field.component.d.ts.map

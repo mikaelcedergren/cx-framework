@@ -20,7 +20,7 @@ if (args.includes("--help") || args.includes("-h")) {
 Generates icons/index.html from icons/svg.
 
 Options:
-  --check  Exit with a non-zero status when any icon check fails.
+  --check  Verify icon rules and the generated index without writing files.
   --help   Show this help text.
 `);
   process.exit(0);
@@ -1480,11 +1480,27 @@ const html = `<!doctype html>
 </html>
 `;
 
-writeFileSync(outputPath, html);
-console.log(`Wrote ${relative(repoRoot, outputPath)} with ${icons.length} icons.`);
-
 if (isCheckMode) {
+  let indexState = "current";
+  try {
+    if (readFileSync(outputPath, "utf8") !== html) {
+      indexState = "stale";
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      throw error;
+    }
+    indexState = "missing";
+  }
+
   const iconsWithChecks = icons.filter((icon) => icon.checks.length > 0);
+
+  if (indexState !== "current") {
+    console.error(
+      `Icon index is ${indexState}. Run \`pnpm icons:index\` and commit ${relative(repoRoot, outputPath)}.`,
+    );
+    process.exitCode = 1;
+  }
 
   if (iconsWithChecks.length > 0) {
     console.error(`Icon checks failed: ${iconsWithChecks.length} of ${icons.length} icons have issues.`);
@@ -1494,7 +1510,10 @@ if (isCheckMode) {
     }
 
     process.exitCode = 1;
-  } else {
+  } else if (indexState === "current") {
     console.log(`Icon checks passed: ${icons.length} icons, 0 issues.`);
   }
+} else {
+  writeFileSync(outputPath, html);
+  console.log(`Wrote ${relative(repoRoot, outputPath)} with ${icons.length} icons.`);
 }

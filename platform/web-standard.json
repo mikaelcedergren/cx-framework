@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "toolchain": {
+    "nodeMajor": 26,
+    "nodeEngine": ">=26 <27",
+    "nodeTypes": "^26.0.0",
+    "corepackVersion": "0.35.0",
+    "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
+    "angularMajor": 22,
+    "typescript": "~6.0.3",
+    "playwright": "1.60.0"
+  },
+  "continuousIntegration": {
+    "checkoutAction": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+    "setupNodeAction": "actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "profiles": {
+      "web-product": {
+        "requiredCommands": ["check", "e2e"]
+      },
+      "framework-package": {
+        "requiredCommands": ["check"]
+      }
+    }
+  },
+  "pnpmWorkspace": {
+    "autoInstallPeers": false,
+    "dedupePeerDependents": false,
+    "enableGlobalVirtualStore": false,
+    "resolvePeersFromWorkspaceRoot": false,
+    "strictDepBuilds": true,
+    "strictStorePkgContentCheck": true,
+    "verifyDepsBeforeRun": "error",
+    "verifyStoreIntegrity": true,
+    "dangerouslyAllowAllBuilds": false
+  },
+  "requiredScripts": [
+    "dev",
+    "build",
+    "start",
+    "typecheck",
+    "test",
+    "e2e",
+    "format:check",
+    "check"
+  ]
+}
