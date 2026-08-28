@@ -14,6 +14,21 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.7
+
+- Site gate presentation — validation tightened: `createSiteGatePresentation()` now parses the
+  complete shell as a bounded, strictly nested passive HTML document before accepting it. Custom
+  shells must keep the one form slot inside ordinary visible flow containers, use quoted
+  attributes and unique non-framework IDs, and avoid inert/hidden/popover ancestry, browser
+  reparsing contexts, comments, active attributes, and character-reference URL or ID aliases.
+  Conforming default and branded gate presentations require no source change; rendered form markup,
+  headers, and authentication behavior are unchanged.
+- Site gate verification — additive: Node operations tooling may consume the frozen
+  `SITE_GATE_CONTENT_SECURITY_POLICIES` and `SITE_GATE_SECURITY_HEADERS` exports from
+  `server/gate` instead of duplicating the framework's exact default/presented content-security and
+  shared security/noindex response-header values. Product runtimes require no change;
+  `createSiteGate()` now uses these same exported values as their single source.
+
 ## 0.9.6
 
 - SQLite exclusive first allocation — additive: a product-owned first-selection initializer that

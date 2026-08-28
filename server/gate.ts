@@ -115,24 +115,177 @@ const TOKEN_NONCE_BYTES = 16;
 const TOKEN_NONCE_PATTERN = /^[A-Za-z0-9_-]{22}$/;
 const TOKEN_MAX_PAYLOAD_BYTES = 256;
 const GATE_TOKEN_KEY_ID = "current";
-const NOINDEX_VALUE = "noindex, nofollow";
 const MAX_PRESENTATION_TEMPLATE_BYTES = 128 * 1_024;
 const MAX_PRESENTATION_PAGE_BYTES = 160 * 1_024;
+const MAX_PRESENTATION_NESTING_DEPTH = 128;
 const MAX_PRESENTATION_TEXT_CHARACTERS = 1_000;
 const MAX_PRESENTATION_CLASS_BYTES = 512;
-const DEFAULT_GATE_CONTENT_SECURITY_POLICY =
-  "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
-const PRESENTED_GATE_CONTENT_SECURITY_POLICY =
-  "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
-const PRESENTATION_FORBIDDEN_ELEMENT =
-  /<\s*\/?\s*(?:applet|audio|base|button|caption|col|colgroup|datalist|embed|fencedframe|form|frame|frameset|iframe|input|math|noembed|noframes|noscript|object|plaintext|portal|script|select|style|svg|table|tbody|td|template|textarea|tfoot|th|thead|tr|video|xmp)(?:\s|\/|>)/iu;
-const PRESENTATION_FORBIDDEN_BODY_ELEMENT = /<\s*\/?\s*title(?:\s|\/|>)/iu;
-const PRESENTATION_FORBIDDEN_ATTRIBUTE =
-  /(?:\s|\/)(?:action|form(?:action|enctype|method|novalidate|target)?|http-equiv|imagesrcset|manifest|on[a-z0-9_.:-]+|ping|srcdoc|srcset|style)\s*=/iu;
-const PRESENTATION_URL_ATTRIBUTE =
-  /(?:^|[\s</])(?:cite|href|poster|src)\s*=/giu;
-const PRESENTATION_QUOTED_URL_ATTRIBUTE =
-  /(?:^|[\s</])(?:cite|href|poster|src)\s*=\s*(["'])([^"']*)\1/giu;
+export const SITE_GATE_CONTENT_SECURITY_POLICIES = Object.freeze({
+  default:
+    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+  presented:
+    "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+} as const);
+export const SITE_GATE_SECURITY_HEADERS = Object.freeze({
+  "referrer-policy": "no-referrer",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "x-robots-tag": "noindex, nofollow",
+} as const);
+const PRESENTATION_VOID_ELEMENTS = new Set([
+  "br",
+  "hr",
+  "img",
+  "link",
+  "meta",
+  "wbr",
+]);
+const PRESENTATION_HEAD_ELEMENTS = new Set(["link", "meta", "title"]);
+const PRESENTATION_HEADING_ELEMENTS = new Set([
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+]);
+const PRESENTATION_BODY_ELEMENTS = new Set([
+  "a",
+  "abbr",
+  "address",
+  "article",
+  "aside",
+  "b",
+  "blockquote",
+  "br",
+  "code",
+  "dd",
+  "del",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "figcaption",
+  "figure",
+  "footer",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "hr",
+  "i",
+  "img",
+  "li",
+  "main",
+  "nav",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "u",
+  "ul",
+  "wbr",
+]);
+const PRESENTATION_PHRASING_ELEMENTS = new Set([
+  "a",
+  "abbr",
+  "b",
+  "br",
+  "code",
+  "del",
+  "em",
+  "i",
+  "img",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "u",
+  "wbr",
+]);
+const PRESENTATION_SAFE_SLOT_ANCESTORS = new Set([
+  "article",
+  "aside",
+  "body",
+  "div",
+  "footer",
+  "header",
+  "main",
+  "nav",
+  "section",
+]);
+const PRESENTATION_GLOBAL_ATTRIBUTES = new Set([
+  "class",
+  "dir",
+  "id",
+  "lang",
+  "role",
+  "title",
+]);
+const PRESENTATION_ELEMENT_ATTRIBUTES = new Map<string, ReadonlySet<string>>([
+  ["a", new Set(["href", "rel", "target"])],
+  ["blockquote", new Set(["cite"])],
+  [
+    "img",
+    new Set([
+      "alt",
+      "decoding",
+      "fetchpriority",
+      "height",
+      "loading",
+      "src",
+      "width",
+    ]),
+  ],
+  ["li", new Set(["value"])],
+  ["link", new Set(["as", "href", "media", "rel", "sizes", "type"])],
+  ["meta", new Set(["charset", "content", "name"])],
+  ["ol", new Set(["start", "type"])],
+]);
+const PRESENTATION_FORBIDDEN_ATTRIBUTES = new Set([
+  "action",
+  "aria-disabled",
+  "aria-hidden",
+  "contenteditable",
+  "disabled",
+  "form",
+  "formaction",
+  "formenctype",
+  "formmethod",
+  "formnovalidate",
+  "formtarget",
+  "hidden",
+  "http-equiv",
+  "imagesrcset",
+  "inert",
+  "manifest",
+  "ping",
+  "popover",
+  "popovertarget",
+  "popovertargetaction",
+  "readonly",
+  "srcdoc",
+  "srcset",
+  "style",
+]);
+const PRESENTATION_URL_ATTRIBUTES = new Set(["cite", "href", "poster", "src"]);
+const PRESENTATION_RESERVED_IDS = new Set(["cx-site-gate-password"]);
+const PRESENTATION_CHARACTER_REFERENCES = new Map([
+  ["amp", "&"],
+  ["apos", "'"],
+  ["gt", ">"],
+  ["lt", "<"],
+  ["quot", '"'],
+]);
 const PRESENTATION_FORM_OPTION_KEYS = Object.freeze([
   "errorClassName",
   "errorMessage",
@@ -163,6 +316,36 @@ interface SiteGatePages {
   readonly contentSecurityPolicy: string;
   readonly failed: string;
   readonly initial: string;
+}
+
+interface PresentationAttribute {
+  readonly rawValue: string;
+  readonly value: string;
+}
+
+interface PresentationStartTag {
+  readonly attributes: ReadonlyMap<string, PresentationAttribute>;
+  readonly end: number;
+  readonly name: string;
+  readonly selfClosing: boolean;
+}
+
+interface PresentationEndTag {
+  readonly end: number;
+  readonly name: string;
+}
+
+interface PresentationValidationState {
+  bodyClosed: boolean;
+  bodySeen: boolean;
+  doctypeSeen: boolean;
+  headClosed: boolean;
+  headSeen: boolean;
+  htmlClosed: boolean;
+  htmlSeen: boolean;
+  readonly ids: Set<string>;
+  slotSeen: boolean;
+  readonly stack: string[];
 }
 
 /**
@@ -496,7 +679,10 @@ export function createSiteGate({
       return;
     }
 
-    response.setHeader("X-Robots-Tag", NOINDEX_VALUE);
+    response.setHeader(
+      "X-Robots-Tag",
+      SITE_GATE_SECURITY_HEADERS["x-robots-tag"],
+    );
     if (requestClass === "gate") {
       noStore(response);
       await handleGateRequest(request, response);
@@ -550,7 +736,7 @@ function createSiteGatePages({
 }): SiteGatePages {
   if (presentation === undefined) {
     return Object.freeze({
-      contentSecurityPolicy: DEFAULT_GATE_CONTENT_SECURITY_POLICY,
+      contentSecurityPolicy: SITE_GATE_CONTENT_SECURITY_POLICIES.default,
       failed: renderGatePage({ failed: true, gatePath, siteName }),
       initial: renderGatePage({ failed: false, gatePath, siteName }),
     });
@@ -562,7 +748,7 @@ function createSiteGatePages({
   }
 
   return Object.freeze({
-    contentSecurityPolicy: PRESENTED_GATE_CONTENT_SECURITY_POLICY,
+    contentSecurityPolicy: SITE_GATE_CONTENT_SECURITY_POLICIES.presented,
     failed: renderPresentedGatePage(presentation, gatePath, true),
     initial: renderPresentedGatePage(presentation, gatePath, false),
   });
@@ -748,121 +934,532 @@ function validatePresentationTemplate(template: string): void {
       `A site gate presentation template must not exceed ${MAX_PRESENTATION_TEMPLATE_BYTES} UTF-8 bytes.`,
     );
   }
-  if (!template.toLowerCase().startsWith("<!doctype html>")) {
+  if (template.slice(0, 15).toLowerCase() !== "<!doctype html>") {
     throw new Error(
       "A site gate presentation template must start with <!doctype html>.",
     );
   }
 
-  const slotIndex = template.indexOf(SITE_GATE_FORM_SLOT);
-  const templateWithoutSlot = template.replace(SITE_GATE_FORM_SLOT, "");
-  const documentOrder = [
-    /<html(?:\s[^<>]*)?>/iu,
-    /<head(?:\s[^<>]*)?>/iu,
-    /<\/head\s*>/iu,
-    /<body(?:\s[^<>]*)?>/iu,
-    /<\/body\s*>/iu,
-    /<\/html\s*>/iu,
-  ].map((pattern) => pattern.exec(template)?.index ?? -1);
-  const hasOneDocumentStructure = [
-    /<!doctype html>/giu,
-    /<html(?:\s[^<>]*)?>/giu,
-    /<head(?:\s[^<>]*)?>/giu,
-    /<\/head\s*>/giu,
-    /<body(?:\s[^<>]*)?>/giu,
-    /<\/body\s*>/giu,
-    /<\/html\s*>/giu,
-  ].every((pattern) => [...template.matchAll(pattern)].length === 1);
-  const closingHtml = /<\/html\s*>/iu.exec(template);
-  if (
-    slotIndex < 0 ||
-    slotIndex !== template.lastIndexOf(SITE_GATE_FORM_SLOT) ||
-    !hasOneDocumentStructure ||
-    !closingHtml ||
-    template.slice(closingHtml.index + closingHtml[0].length).trim() !== "" ||
-    documentOrder.some((index) => index < 0) ||
-    !documentOrder.every(
-      (index, position) =>
-        position === 0 || index > documentOrder[position - 1]!,
-    ) ||
-    slotIndex <= documentOrder[3]! ||
-    slotIndex >= documentOrder[4]! ||
-    !hasWellDelimitedPresentationMarkup(template, slotIndex) ||
-    templateWithoutSlot.includes("<!--") ||
-    templateWithoutSlot.includes("-->")
-  ) {
-    throw new Error(
-      "A site gate presentation template must contain one ordered html/head/body document and one body-level framework form slot.",
-    );
-  }
-  if (
-    PRESENTATION_FORBIDDEN_ELEMENT.test(templateWithoutSlot) ||
-    PRESENTATION_FORBIDDEN_BODY_ELEMENT.test(
-      template.slice(documentOrder[3], documentOrder[4]),
-    ) ||
-    PRESENTATION_FORBIDDEN_ATTRIBUTE.test(templateWithoutSlot)
-  ) {
-    throw new Error(
-      "A site gate presentation template cannot contain executable, embedded, inline-style, or form-owned markup.",
-    );
-  }
-
-  const declarations = [
-    ...templateWithoutSlot.matchAll(PRESENTATION_URL_ATTRIBUTE),
-  ];
-  const quoted = [
-    ...templateWithoutSlot.matchAll(PRESENTATION_QUOTED_URL_ATTRIBUTE),
-  ];
-  if (declarations.length !== quoted.length) {
-    throw new Error(
-      "Site gate presentation URL attributes must be quoted same-origin paths.",
-    );
-  }
-  for (const match of quoted) {
-    const value = match[2] ?? "";
-    if (
-      (!value.startsWith("#") &&
-        (!value.startsWith("/") || value.startsWith("//"))) ||
-      /[&\\\u0000-\u0020\u007f<>]/.test(value)
-    ) {
-      throw new Error(
-        "Site gate presentation URL attributes must use same-origin absolute paths or fragments.",
+  const state: PresentationValidationState = {
+    bodyClosed: false,
+    bodySeen: false,
+    doctypeSeen: true,
+    headClosed: false,
+    headSeen: false,
+    htmlClosed: false,
+    htmlSeen: false,
+    ids: new Set(),
+    slotSeen: false,
+    stack: [],
+  };
+  let offset = 15;
+  while (offset < template.length) {
+    if (template.startsWith(SITE_GATE_FORM_SLOT, offset)) {
+      placePresentationSlot(state);
+      offset += SITE_GATE_FORM_SLOT.length;
+      continue;
+    }
+    if (template[offset] !== "<") {
+      const nextMarkup = template.indexOf("<", offset);
+      const end = nextMarkup < 0 ? template.length : nextMarkup;
+      assertPresentationText(template.slice(offset, end), state);
+      offset = end;
+      continue;
+    }
+    if (template.startsWith("<!--", offset)) {
+      throw presentationTemplateError(
+        "comments are forbidden except for the exact framework form slot",
       );
     }
+    if (template.startsWith("</", offset)) {
+      const token = readPresentationEndTag(template, offset);
+      closePresentationElement(token, state);
+      offset = token.end;
+      continue;
+    }
+    if (
+      template.startsWith("<!", offset) ||
+      template.startsWith("<?", offset)
+    ) {
+      throw presentationTemplateError("ambiguous markup is forbidden");
+    }
+    const token = readPresentationStartTag(template, offset);
+    openPresentationElement(token, state);
+    offset = token.end;
+  }
+
+  if (
+    state.stack.length !== 0 ||
+    !state.doctypeSeen ||
+    !state.htmlSeen ||
+    !state.htmlClosed ||
+    !state.headSeen ||
+    !state.headClosed ||
+    !state.bodySeen ||
+    !state.bodyClosed ||
+    !state.slotSeen
+  ) {
+    throw new Error(
+      "A site gate presentation template must contain one complete, strictly nested html/head/body document and one safe body-level framework form slot.",
+    );
   }
 }
 
-function hasWellDelimitedPresentationMarkup(
+function readPresentationStartTag(
   template: string,
-  slotIndex: number,
-): boolean {
-  let insideTag = false;
-  let quote: '"' | "'" | undefined;
+  offset: number,
+): PresentationStartTag {
+  let cursor = offset + 1;
+  const nameStart = cursor;
+  if (!isPresentationNameStart(template[cursor])) {
+    throw presentationTemplateError("a start tag has an invalid name");
+  }
+  cursor += 1;
+  while (isPresentationNameCharacter(template[cursor])) cursor += 1;
+  const name = template.slice(nameStart, cursor).toLowerCase();
+  const attributes = new Map<string, PresentationAttribute>();
 
-  for (let index = 0; index < template.length; index += 1) {
-    if (index === slotIndex) {
-      if (insideTag) return false;
-      index += SITE_GATE_FORM_SLOT.length - 1;
-      continue;
+  while (cursor < template.length) {
+    const separatorStart = cursor;
+    while (isPresentationWhitespace(template[cursor])) cursor += 1;
+    if (template[cursor] === ">") {
+      return {
+        attributes,
+        end: cursor + 1,
+        name,
+        selfClosing: false,
+      };
+    }
+    if (template[cursor] === "/" && template[cursor + 1] === ">") {
+      return {
+        attributes,
+        end: cursor + 2,
+        name,
+        selfClosing: true,
+      };
+    }
+    if (cursor === separatorStart) {
+      throw presentationTemplateError(
+        `the <${name}> tag has an ambiguous attribute boundary`,
+      );
     }
 
-    const character = template[index];
-    if (!insideTag) {
-      if (character === "<") insideTag = true;
-      continue;
+    const attributeStart = cursor;
+    if (!isPresentationNameStart(template[cursor])) {
+      throw presentationTemplateError("an attribute has an invalid name");
     }
-    if (quote) {
-      if (character === quote) quote = undefined;
-      continue;
+    cursor += 1;
+    while (isPresentationAttributeNameCharacter(template[cursor])) cursor += 1;
+    const attribute = template.slice(attributeStart, cursor).toLowerCase();
+    if (attributes.has(attribute)) {
+      throw presentationTemplateError(
+        `the <${name}> tag contains a duplicate ${attribute} attribute`,
+      );
     }
-    if (character === '"' || character === "'") {
-      quote = character;
-      continue;
+    while (isPresentationWhitespace(template[cursor])) cursor += 1;
+    if (template[cursor] !== "=") {
+      throw presentationTemplateError(
+        `the ${attribute} attribute on <${name}> must have a quoted value`,
+      );
     }
-    if (character === ">") insideTag = false;
+    cursor += 1;
+    while (isPresentationWhitespace(template[cursor])) cursor += 1;
+    const quote = template[cursor];
+    if (quote !== '"' && quote !== "'") {
+      throw presentationTemplateError(
+        `the ${attribute} attribute on <${name}> must have a quoted value`,
+      );
+    }
+    cursor += 1;
+    const valueStart = cursor;
+    while (cursor < template.length && template[cursor] !== quote) {
+      const character = template[cursor]!;
+      if (
+        character === "<" ||
+        /[\u0000-\u001f\u007f-\u009f]/u.test(character)
+      ) {
+        throw presentationTemplateError(
+          `the ${attribute} attribute on <${name}> contains ambiguous markup`,
+        );
+      }
+      cursor += 1;
+    }
+    if (template[cursor] !== quote) {
+      throw presentationTemplateError(
+        `the ${attribute} attribute on <${name}> is unterminated`,
+      );
+    }
+    const rawValue = template.slice(valueStart, cursor);
+    if (rawValue.includes("-->")) {
+      throw presentationTemplateError("comment-like markup is forbidden");
+    }
+    attributes.set(attribute, {
+      rawValue,
+      value: decodePresentationAttributeValue(rawValue, attribute),
+    });
+    cursor += 1;
+  }
+  throw presentationTemplateError(`the <${name}> tag is unterminated`);
+}
+
+function readPresentationEndTag(
+  template: string,
+  offset: number,
+): PresentationEndTag {
+  let cursor = offset + 2;
+  const nameStart = cursor;
+  if (!isPresentationNameStart(template[cursor])) {
+    throw presentationTemplateError("an end tag has an invalid name");
+  }
+  cursor += 1;
+  while (isPresentationNameCharacter(template[cursor])) cursor += 1;
+  const name = template.slice(nameStart, cursor).toLowerCase();
+  while (isPresentationWhitespace(template[cursor])) cursor += 1;
+  if (template[cursor] !== ">") {
+    throw presentationTemplateError(`the </${name}> tag is ambiguous`);
+  }
+  return { end: cursor + 1, name };
+}
+
+function openPresentationElement(
+  token: PresentationStartTag,
+  state: PresentationValidationState,
+): void {
+  const { attributes, name, selfClosing } = token;
+  const parent = state.stack.at(-1);
+  if (state.stack.length >= MAX_PRESENTATION_NESTING_DEPTH) {
+    throw presentationTemplateError(
+      `markup nesting exceeds ${MAX_PRESENTATION_NESTING_DEPTH} elements`,
+    );
   }
 
-  return !insideTag && quote === undefined;
+  if (name === "html") {
+    if (
+      !state.doctypeSeen ||
+      state.htmlSeen ||
+      state.htmlClosed ||
+      parent !== undefined ||
+      selfClosing
+    ) {
+      throw presentationTemplateError("the html root is invalid");
+    }
+    state.htmlSeen = true;
+  } else if (name === "head") {
+    if (parent !== "html" || state.headSeen || state.bodySeen || selfClosing) {
+      throw presentationTemplateError("the head section is invalid");
+    }
+    state.headSeen = true;
+  } else if (name === "body") {
+    if (
+      parent !== "html" ||
+      !state.headClosed ||
+      state.bodySeen ||
+      selfClosing
+    ) {
+      throw presentationTemplateError("the body section is invalid");
+    }
+    state.bodySeen = true;
+  } else if (state.stack.includes("head")) {
+    if (!PRESENTATION_HEAD_ELEMENTS.has(name) || parent !== "head") {
+      throw presentationTemplateError(
+        `unsupported or misplaced <${name}> markup is forbidden in the head`,
+      );
+    }
+  } else if (state.stack.includes("body")) {
+    if (!PRESENTATION_BODY_ELEMENTS.has(name)) {
+      throw presentationTemplateError(
+        `executable, embedded, form-owned, or unsupported <${name}> markup is forbidden`,
+      );
+    }
+  } else {
+    throw presentationTemplateError(
+      `<${name}> markup appears outside the head or body`,
+    );
+  }
+
+  if (
+    state.stack.some((ancestor) => ancestor === "p" || ancestor === "pre") &&
+    !PRESENTATION_PHRASING_ELEMENTS.has(name)
+  ) {
+    throw presentationTemplateError(
+      `<${name}> markup would be reparsed outside an open paragraph or preformatted element`,
+    );
+  }
+  if (name === "a" && state.stack.includes("a")) {
+    throw presentationTemplateError("nested anchor markup is ambiguous");
+  }
+  if (
+    name === "li" &&
+    state.stack.lastIndexOf("li") >
+      Math.max(state.stack.lastIndexOf("ul"), state.stack.lastIndexOf("ol"))
+  ) {
+    throw presentationTemplateError(
+      "an open list item must close before another list item begins",
+    );
+  }
+  if (
+    (name === "dt" || name === "dd") &&
+    Math.max(state.stack.lastIndexOf("dt"), state.stack.lastIndexOf("dd")) >
+      state.stack.lastIndexOf("dl")
+  ) {
+    throw presentationTemplateError(
+      "an open definition item must close before another definition item begins",
+    );
+  }
+  if (
+    PRESENTATION_HEADING_ELEMENTS.has(name) &&
+    parent !== undefined &&
+    PRESENTATION_HEADING_ELEMENTS.has(parent)
+  ) {
+    throw presentationTemplateError(
+      "an open heading must close before another heading begins",
+    );
+  }
+
+  assertPresentationAttributes(name, attributes, state);
+  const isVoid = PRESENTATION_VOID_ELEMENTS.has(name);
+  if (selfClosing && !isVoid) {
+    throw presentationTemplateError(
+      `non-void <${name}> markup cannot be self-closing`,
+    );
+  }
+  if (!isVoid) state.stack.push(name);
+}
+
+function closePresentationElement(
+  token: PresentationEndTag,
+  state: PresentationValidationState,
+): void {
+  if (PRESENTATION_VOID_ELEMENTS.has(token.name)) {
+    throw presentationTemplateError(
+      `void <${token.name}> markup cannot have an end tag`,
+    );
+  }
+  const current = state.stack.at(-1);
+  if (current !== token.name) {
+    throw presentationTemplateError(
+      `markup is not strictly nested at </${token.name}>`,
+    );
+  }
+  state.stack.pop();
+  if (token.name === "head") state.headClosed = true;
+  if (token.name === "body") state.bodyClosed = true;
+  if (token.name === "html") state.htmlClosed = true;
+}
+
+function placePresentationSlot(state: PresentationValidationState): void {
+  const bodyIndex = state.stack.indexOf("body");
+  if (
+    state.slotSeen ||
+    bodyIndex < 0 ||
+    state.bodyClosed ||
+    !state.stack
+      .slice(bodyIndex)
+      .every((ancestor) => PRESENTATION_SAFE_SLOT_ANCESTORS.has(ancestor))
+  ) {
+    throw new Error(
+      "A site gate presentation template must place its one framework form slot inside safe body flow containers.",
+    );
+  }
+  state.slotSeen = true;
+}
+
+function assertPresentationText(
+  value: string,
+  state: PresentationValidationState,
+): void {
+  if (value.includes("-->")) {
+    throw presentationTemplateError("comment-like markup is forbidden");
+  }
+  const current = state.stack.at(-1);
+  if (
+    (state.stack.length === 0 || current === "html" || current === "head") &&
+    !isPresentationWhitespaceOnly(value)
+  ) {
+    throw presentationTemplateError("text appears outside a content element");
+  }
+}
+
+function assertPresentationAttributes(
+  element: string,
+  attributes: ReadonlyMap<string, PresentationAttribute>,
+  state: PresentationValidationState,
+): void {
+  const elementAttributes = PRESENTATION_ELEMENT_ATTRIBUTES.get(element);
+  for (const [attribute, { rawValue, value }] of attributes) {
+    if (
+      attribute.startsWith("on") ||
+      PRESENTATION_FORBIDDEN_ATTRIBUTES.has(attribute)
+    ) {
+      throw presentationTemplateError(
+        `executable, hidden, or form-owned ${attribute} behavior is forbidden`,
+      );
+    }
+    const isAriaAttribute = /^aria-[a-z0-9-]+$/u.test(attribute);
+    const isDataAttribute = /^data-[a-z0-9._-]+$/u.test(attribute);
+    if (
+      !PRESENTATION_GLOBAL_ATTRIBUTES.has(attribute) &&
+      !elementAttributes?.has(attribute) &&
+      !isAriaAttribute &&
+      !isDataAttribute
+    ) {
+      throw presentationTemplateError(
+        `the ${attribute} attribute is unsupported on <${element}>`,
+      );
+    }
+    if (attribute === "id") {
+      if (
+        rawValue.includes("&") ||
+        !value ||
+        /[\s&<>"'\u0000-\u001f\u007f-\u009f]/u.test(value)
+      ) {
+        throw presentationTemplateError("an id attribute is ambiguous");
+      }
+      if (PRESENTATION_RESERVED_IDS.has(value)) {
+        throw presentationTemplateError(
+          `the reserved ${value} id belongs to the framework form`,
+        );
+      }
+      if (state.ids.has(value)) {
+        throw presentationTemplateError(`the ${value} id is duplicated`);
+      }
+      state.ids.add(value);
+    }
+    if (PRESENTATION_URL_ATTRIBUTES.has(attribute)) {
+      if (
+        rawValue.includes("&") ||
+        (!value.startsWith("#") &&
+          (!value.startsWith("/") || value.startsWith("//"))) ||
+        /[\\\u0000-\u0020\u007f<>]/u.test(value)
+      ) {
+        throw new Error(
+          "Site gate presentation URL attributes must use quoted same-origin absolute paths or fragments without character references.",
+        );
+      }
+    }
+  }
+  if (
+    element === "meta" &&
+    presentationAsciiTrim(attributes.get("name")?.value ?? "").toLowerCase() ===
+      "referrer"
+  ) {
+    throw presentationTemplateError(
+      "a meta referrer directive cannot override framework response policy",
+    );
+  }
+}
+
+function decodePresentationAttributeValue(
+  rawValue: string,
+  attribute: string,
+): string {
+  let decoded = "";
+  for (let offset = 0; offset < rawValue.length;) {
+    if (rawValue[offset] !== "&") {
+      decoded += rawValue[offset];
+      offset += 1;
+      continue;
+    }
+    const semicolon = rawValue.indexOf(";", offset + 1);
+    if (semicolon < 0 || semicolon - offset > 32) {
+      throw presentationTemplateError(
+        `the ${attribute} attribute contains an ambiguous character reference`,
+      );
+    }
+    const reference = rawValue.slice(offset + 1, semicolon);
+    let character: string | undefined;
+    if (/^#[0-9]+$/u.test(reference)) {
+      character = presentationCodePoint(
+        Number.parseInt(reference.slice(1), 10),
+        attribute,
+      );
+    } else if (/^#x[0-9a-f]+$/iu.test(reference)) {
+      character = presentationCodePoint(
+        Number.parseInt(reference.slice(2), 16),
+        attribute,
+      );
+    } else {
+      character = PRESENTATION_CHARACTER_REFERENCES.get(reference);
+    }
+    if (character === undefined) {
+      throw presentationTemplateError(
+        `the ${attribute} attribute contains an unsupported character reference`,
+      );
+    }
+    decoded += character;
+    offset = semicolon + 1;
+  }
+  if (/\u0000|[\u0001-\u001f\u007f-\u009f]/u.test(decoded)) {
+    throw presentationTemplateError(
+      `the ${attribute} attribute contains unsafe characters`,
+    );
+  }
+  return decoded;
+}
+
+function presentationCodePoint(value: number, attribute: string): string {
+  if (
+    !Number.isSafeInteger(value) ||
+    value <= 0 ||
+    value > 0x10ffff ||
+    (value >= 0xd800 && value <= 0xdfff)
+  ) {
+    throw presentationTemplateError(
+      `the ${attribute} attribute contains an invalid character reference`,
+    );
+  }
+  return String.fromCodePoint(value);
+}
+
+function isPresentationNameStart(value: string | undefined): boolean {
+  if (!value) return false;
+  const code = value.charCodeAt(0);
+  return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+}
+
+function isPresentationNameCharacter(value: string | undefined): boolean {
+  if (!value) return false;
+  const code = value.charCodeAt(0);
+  return (
+    isPresentationNameStart(value) ||
+    (code >= 48 && code <= 57) ||
+    value === "-"
+  );
+}
+
+function isPresentationAttributeNameCharacter(
+  value: string | undefined,
+): boolean {
+  return isPresentationNameCharacter(value) || value === "." || value === "_";
+}
+
+function isPresentationWhitespace(value: string | undefined): boolean {
+  return (
+    value === "\t" ||
+    value === "\n" ||
+    value === "\f" ||
+    value === "\r" ||
+    value === " "
+  );
+}
+
+function isPresentationWhitespaceOnly(value: string): boolean {
+  for (const character of value) {
+    if (!isPresentationWhitespace(character)) return false;
+  }
+  return true;
+}
+
+function presentationAsciiTrim(value: string): string {
+  let start = 0;
+  let end = value.length;
+  while (start < end && isPresentationWhitespace(value[start])) start += 1;
+  while (end > start && isPresentationWhitespace(value[end - 1])) end -= 1;
+  return value.slice(start, end);
+}
+
+function presentationTemplateError(detail: string): Error {
+  return new Error(`A site gate presentation template is invalid: ${detail}.`);
 }
 
 function normalizeConfiguredPaths(
@@ -1279,9 +1876,18 @@ function applyGatePageHeaders(
   contentSecurityPolicy: string,
 ): void {
   response.setHeader("Content-Security-Policy", contentSecurityPolicy);
-  response.setHeader("X-Content-Type-Options", "nosniff");
-  response.setHeader("X-Frame-Options", "DENY");
-  response.setHeader("Referrer-Policy", "no-referrer");
+  response.setHeader(
+    "X-Content-Type-Options",
+    SITE_GATE_SECURITY_HEADERS["x-content-type-options"],
+  );
+  response.setHeader(
+    "X-Frame-Options",
+    SITE_GATE_SECURITY_HEADERS["x-frame-options"],
+  );
+  response.setHeader(
+    "Referrer-Policy",
+    SITE_GATE_SECURITY_HEADERS["referrer-policy"],
+  );
 }
 
 function escapeHtml(value: string): string {

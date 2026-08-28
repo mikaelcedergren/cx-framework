@@ -66,6 +66,16 @@ export interface SiteGate {
     middleware(): Middleware;
 }
 export declare const SITE_GATE_FORM_SLOT = "<!-- cx-site-gate-form -->";
+export declare const SITE_GATE_CONTENT_SECURITY_POLICIES: Readonly<{
+    readonly default: "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
+    readonly presented: "default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'";
+}>;
+export declare const SITE_GATE_SECURITY_HEADERS: Readonly<{
+    readonly "referrer-policy": "no-referrer";
+    readonly "x-content-type-options": "nosniff";
+    readonly "x-frame-options": "DENY";
+    readonly "x-robots-tag": "noindex, nofollow";
+}>;
 /**
  * Validate and freeze one branded page shell before it can be supplied to `createSiteGate()`.
  *
