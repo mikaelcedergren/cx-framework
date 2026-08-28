@@ -150,11 +150,15 @@ shutdown. Development and release validation never acquire this lease. This keep
 ownership explicit without turning mutable environment labels into authority.
 
 `openOwnedSqliteDatabase()` is the opening boundary for every long-lived file-backed SQLite runtime
-authority. Its `OpenOwnedSqliteDatabaseOptions` require an explicit canonical operational root, one normalized
-absolute database path contained by that root, and WAL configuration. Consumers keep the returned
+authority. Its `OpenOwnedSqliteDatabaseOptions` require an explicit canonical operational root, one
+normalized absolute database path contained by that root, and WAL configuration. Consumers keep the returned
 `OwnedSqliteDatabase` handle for the connection lifetime and close that handle; they do not repeat
 directory creation, driver opening, SQLite configuration, or filesystem proof locally. Same-user
-web and worker roles may open the same WAL authority concurrently. A sealed existing database uses
+web and worker roles may open the same WAL authority concurrently. A product-owned first allocator
+uses `requireAbsent: true`: the framework proves the main, rollback-journal, WAL, and shared-memory
+family absent, allocates each required member with `O_EXCL`, and refuses rather than adopts any
+same-owner entry raced after that proof. This mode is for explicit initialization, never ordinary
+startup. A sealed existing database uses
 `requireExisting: true` with a synchronous read-only `beforeWrite` verifier on the exact connection
 that later remains writable. The framework keeps SQLite `query_only` enabled and installs a native
 fail-closed authorizer for that callback; only reads and the minimum integrity/identity PRAGMAs are

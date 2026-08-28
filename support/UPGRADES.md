@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.6
+
+- SQLite exclusive first allocation — additive: a product-owned first-selection initializer that
+  must create a wholly absent database family may pass `requireAbsent: true` to
+  `openOwnedSqliteDatabase()`. The framework proves the main, rollback-journal, WAL, and
+  shared-memory paths absent, then allocates each exclusively; a path that appears during that
+  allocation is rejected rather than adopted. Existing web and worker runtimes require no change:
+  keep `requireExisting: true` for an established authority, and do not use `requireAbsent` for
+  ordinary multi-role startup or disposable release validation.
+
 ## 0.9.5
 
 - Typography authority — breaking: the obsolete `--font-family-fancy` compatibility alias is

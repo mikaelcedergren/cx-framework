@@ -50,7 +50,7 @@ export interface ReadonlySyncSqliteDatabase {
     get<Row extends SqliteRow = SqliteRow>(sql: string, parameters?: readonly SqliteValue[]): Row | undefined;
     all<Row extends SqliteRow = SqliteRow>(sql: string, parameters?: readonly SqliteValue[]): readonly Row[];
 }
-export type OwnedSqliteOpenCheckpoint = "storage_prepared" | "before_writable_open" | "writable_opened" | "before_write_verified" | "configured";
+export type OwnedSqliteOpenCheckpoint = "before_exclusive_allocation" | "storage_prepared" | "before_writable_open" | "writable_opened" | "before_write_verified" | "configured";
 interface OpenOwnedSqliteDatabaseBaseOptions {
     /** A canonical, current-user-owned real directory that contains the database. */
     readonly operationalRoot: string;
@@ -65,9 +65,16 @@ interface OpenOwnedSqliteDatabaseBaseOptions {
     readonly onOpenCheckpoint?: (checkpoint: OwnedSqliteOpenCheckpoint) => void;
 }
 export type OpenOwnedSqliteDatabaseOptions = OpenOwnedSqliteDatabaseBaseOptions & ({
+    /** Allocate a wholly absent database family exclusively; never adopt raced entries. */
+    readonly requireAbsent: true;
+    readonly requireExisting?: never;
+    readonly beforeWrite?: never;
+} | {
+    readonly requireAbsent?: false;
     readonly requireExisting?: false;
     readonly beforeWrite?: never;
 } | {
+    readonly requireAbsent?: never;
     readonly requireExisting: true;
     /**
      * Verify an existing authority through the exact connection that will remain writable.

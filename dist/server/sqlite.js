@@ -153,6 +153,14 @@ export function openOwnedSqliteDatabase(options) {
         typeof options.onOpenCheckpoint !== "function") {
         throw new TypeError("Owned SQLite open checkpoints must use a function.");
     }
+    if (options.requireAbsent !== undefined &&
+        options.requireAbsent !== false &&
+        options.requireAbsent !== true) {
+        throw new TypeError("Owned SQLite requireAbsent must be boolean.");
+    }
+    if (options.requireAbsent === true && options.requireExisting === true) {
+        throw new Error("Owned SQLite cannot require an absent and existing database together.");
+    }
     if (options.requireExisting === true &&
         typeof options.beforeWrite !== "function") {
         throw new TypeError("An existing owned SQLite database requires a beforeWrite verifier.");
@@ -168,8 +176,14 @@ export function openOwnedSqliteDatabase(options) {
         throw new TypeError("Owned SQLite beforeWrite is valid only with requireExisting: true.");
     }
     const storage = prepareOwnedSqliteStorage({
+        ...(options.requireAbsent === true
+            ? {
+                beforeExclusiveAllocation: () => emitOwnedSqliteOpenCheckpoint(options, "before_exclusive_allocation"),
+            }
+            : {}),
         databasePath: options.databasePath,
         operationalRoot: options.operationalRoot,
+        requireAbsent: options.requireAbsent === true,
         requireExisting: options.requireExisting === true,
     });
     let native;
@@ -774,7 +788,7 @@ function assertPositiveSafeInteger(value, label) {
 const OWNED_SQLITE_DIRECTORY_MODE = 0o700;
 const OWNED_SQLITE_FILE_MODE = 0o600;
 const OWNED_SQLITE_SNAPSHOT_ATTEMPTS = 32;
-function prepareOwnedSqliteStorage({ databasePath, operationalRoot, requireExisting, }) {
+function prepareOwnedSqliteStorage({ beforeExclusiveAllocation, databasePath, operationalRoot, requireAbsent, requireExisting, }) {
     const root = normalizedAbsoluteSqlitePath(operationalRoot, "operational root");
     const selectedDatabasePath = normalizedAbsoluteSqlitePath(databasePath, "database path");
     const relativeDatabasePath = path.relative(root, selectedDatabasePath);
@@ -834,13 +848,26 @@ function prepareOwnedSqliteStorage({ databasePath, operationalRoot, requireExist
             }
             assertOwnedDirectoryProofs(directories);
         }
+        const journalPath = `${selectedDatabasePath}-journal`;
+        const writeAheadLogPath = `${selectedDatabasePath}-wal`;
+        const sharedMemoryPath = `${selectedDatabasePath}-shm`;
+        if (requireAbsent) {
+            assertOwnedSqliteFamilyAbsent([
+                [selectedDatabasePath, "database"],
+                [journalPath, "rollback journal"],
+                [writeAheadLogPath, "write-ahead log"],
+                [sharedMemoryPath, "shared-memory file"],
+            ]);
+            beforeExclusiveAllocation?.();
+            assertOwnedDirectoryProofs(directories);
+        }
         const main = pinOwnedFile({
             createMissing: !requireExisting,
             filePath: selectedDatabasePath,
             label: "Owned SQLite database",
+            requireAbsent,
         });
         artifacts.push(main);
-        const journalPath = `${selectedDatabasePath}-journal`;
         let journal;
         if (ownedSqliteMainUsesWal(main)) {
             try {
@@ -860,20 +887,23 @@ function prepareOwnedSqliteStorage({ databasePath, operationalRoot, requireExist
                 createMissing: true,
                 filePath: journalPath,
                 label: "Owned SQLite rollback journal",
+                requireAbsent,
             });
         }
         if (journal)
             artifacts.push(journal);
         const writeAheadLog = pinOwnedFile({
             createMissing: true,
-            filePath: `${selectedDatabasePath}-wal`,
+            filePath: writeAheadLogPath,
             label: "Owned SQLite write-ahead log",
+            requireAbsent,
         });
         artifacts.push(writeAheadLog);
         const sharedMemory = pinOwnedFile({
             createMissing: true,
-            filePath: `${selectedDatabasePath}-shm`,
+            filePath: sharedMemoryPath,
             label: "Owned SQLite shared-memory file",
+            requireAbsent,
         });
         artifacts.push(sharedMemory);
         function assertDirectories() {
@@ -1010,22 +1040,12 @@ function pinOwnedDirectory({ canonicalPath, created = false, directoryPath, labe
         throw error;
     }
 }
-function pinOwnedFile({ createMissing, filePath, label, }) {
+function pinOwnedFile({ createMissing, filePath, label, requireAbsent = false, }) {
     for (let attempt = 0; attempt < OWNED_SQLITE_SNAPSHOT_ATTEMPTS; attempt += 1) {
         let descriptor;
         let created = false;
         try {
-            try {
-                const before = fs.lstatSync(filePath, { bigint: true });
-                assertOwnedFileStats(before, label, 1n);
-                descriptor = fs.openSync(filePath, requiredFsConstant("O_RDONLY") |
-                    requiredFsConstant("O_NOFOLLOW") |
-                    requiredFsConstant("O_NONBLOCK"));
-            }
-            catch (error) {
-                if (!isNodeFilesystemError(error, "ENOENT") || !createMissing) {
-                    throw error;
-                }
+            if (requireAbsent) {
                 try {
                     descriptor = fs.openSync(filePath, requiredFsConstant("O_RDWR") |
                         requiredFsConstant("O_CREAT") |
@@ -1035,9 +1055,39 @@ function pinOwnedFile({ createMissing, filePath, label, }) {
                     created = true;
                 }
                 catch (allocationError) {
-                    if (isNodeFilesystemError(allocationError, "EEXIST"))
-                        continue;
+                    if (isNodeFilesystemError(allocationError, "EEXIST")) {
+                        throw new Error(`${label} must be absent for exclusive creation.`, {
+                            cause: allocationError,
+                        });
+                    }
                     throw allocationError;
+                }
+            }
+            else {
+                try {
+                    const before = fs.lstatSync(filePath, { bigint: true });
+                    assertOwnedFileStats(before, label, 1n);
+                    descriptor = fs.openSync(filePath, requiredFsConstant("O_RDONLY") |
+                        requiredFsConstant("O_NOFOLLOW") |
+                        requiredFsConstant("O_NONBLOCK"));
+                }
+                catch (error) {
+                    if (!isNodeFilesystemError(error, "ENOENT") || !createMissing) {
+                        throw error;
+                    }
+                    try {
+                        descriptor = fs.openSync(filePath, requiredFsConstant("O_RDWR") |
+                            requiredFsConstant("O_CREAT") |
+                            requiredFsConstant("O_EXCL") |
+                            requiredFsConstant("O_NOFOLLOW") |
+                            requiredFsConstant("O_NONBLOCK"), OWNED_SQLITE_FILE_MODE);
+                        created = true;
+                    }
+                    catch (allocationError) {
+                        if (isNodeFilesystemError(allocationError, "EEXIST"))
+                            continue;
+                        throw allocationError;
+                    }
                 }
             }
             if (descriptor === undefined) {
@@ -1213,6 +1263,19 @@ function assertOwnedSqliteArtifactAbsent(artifactPath, label) {
         throw error;
     }
     throw new Error(`Owned SQLite ${label} appeared outside its pinned lifecycle.`);
+}
+function assertOwnedSqliteFamilyAbsent(artifacts) {
+    for (const [artifactPath, label] of artifacts) {
+        try {
+            fs.lstatSync(artifactPath);
+        }
+        catch (error) {
+            if (isNodeFilesystemError(error, "ENOENT"))
+                continue;
+            throw error;
+        }
+        throw new Error(`Owned SQLite ${label} must be absent before exclusive family creation.`);
+    }
 }
 function captureStableLinkedOwnedFile({ descriptor, expectedIdentity, filePath, label, }) {
     for (let attempt = 0; attempt < OWNED_SQLITE_SNAPSHOT_ATTEMPTS; attempt += 1) {
