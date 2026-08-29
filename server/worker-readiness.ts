@@ -1,3 +1,5 @@
+import { MessageChannel } from "node:worker_threads";
+
 import {
   nodeEnvironmentValue,
   releaseValidationEnvironmentValue,
@@ -83,7 +85,8 @@ export function createServerWorkerReadiness({
  * Acquire the ordinary production worker's readiness lease after its real runtime initializes.
  * Development returns no lease, and isolated release validation remains IPC-only. Production
  * reopens the configured release identity, proves it is the exact startup snapshot, and retains
- * that read-only descriptor until the idempotent close handle is invoked.
+ * that read-only descriptor plus a timerless event-loop reference until the idempotent close
+ * handle is invoked. The reference keeps an intentionally idle listener-free worker supervised.
  */
 export function acquireServerWorkerReadinessLease({
   environment = process.env,
@@ -109,18 +112,102 @@ export function acquireServerWorkerReadinessLease({
     environment,
     identity,
   });
+  let lifetimeReference: WorkerLifetimeReference;
+  try {
+    lifetimeReference = createWorkerLifetimeReference();
+  } catch (error) {
+    try {
+      identityLease.close();
+    } catch (closeError) {
+      throw new AggregateError(
+        [error, closeError],
+        "Worker readiness failed and its identity descriptor could not be released.",
+      );
+    }
+    throw error;
+  }
   return Object.freeze({
     get closed(): boolean {
-      return identityLease.closed;
+      return identityLease.closed && lifetimeReference.closed;
     },
     close(): void {
-      identityLease.close();
+      const failures: unknown[] = [];
+      for (const close of [
+        () => identityLease.close(),
+        () => lifetimeReference.close(),
+      ]) {
+        try {
+          close();
+        } catch (error) {
+          failures.push(error);
+        }
+      }
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) {
+        throw new AggregateError(
+          failures,
+          "Worker readiness lease cleanup was incomplete.",
+        );
+      }
     },
     entrypoint: worker.entrypoint,
     identityFile: identityLease.identityFile,
     releaseId: pinnedIdentity.releaseId,
     serverBuildId: pinnedIdentity.serverBuildId,
     workerKey: worker.key,
+  });
+}
+
+interface WorkerLifetimeReference {
+  readonly closed: boolean;
+  close(): void;
+}
+
+function createWorkerLifetimeReference(): WorkerLifetimeReference {
+  const channel = new MessageChannel();
+  let closed = false;
+  try {
+    channel.port1.ref();
+    channel.port2.unref();
+  } catch (error) {
+    const failures: unknown[] = [error];
+    for (const port of [channel.port1, channel.port2]) {
+      try {
+        port.close();
+      } catch (closeError) {
+        failures.push(closeError);
+      }
+    }
+    throw failures.length === 1
+      ? error
+      : new AggregateError(
+          failures,
+          "Worker lifetime setup failed and its message ports could not be released.",
+        );
+  }
+  return Object.freeze({
+    get closed(): boolean {
+      return closed;
+    },
+    close(): void {
+      if (closed) return;
+      const failures: unknown[] = [];
+      for (const port of [channel.port1, channel.port2]) {
+        try {
+          port.close();
+        } catch (error) {
+          failures.push(error);
+        }
+      }
+      closed = true;
+      if (failures.length === 1) throw failures[0];
+      if (failures.length > 1) {
+        throw new AggregateError(
+          failures,
+          "Worker lifetime message-port cleanup was incomplete.",
+        );
+      }
+    },
   });
 }
 

@@ -45,7 +45,8 @@ export declare function createServerWorkerReadiness({ identity, productId, worke
  * Acquire the ordinary production worker's readiness lease after its real runtime initializes.
  * Development returns no lease, and isolated release validation remains IPC-only. Production
  * reopens the configured release identity, proves it is the exact startup snapshot, and retains
- * that read-only descriptor until the idempotent close handle is invoked.
+ * that read-only descriptor plus a timerless event-loop reference until the idempotent close
+ * handle is invoked. The reference keeps an intentionally idle listener-free worker supervised.
  */
 export declare function acquireServerWorkerReadinessLease({ environment, identity, workerKey, }: AcquireServerWorkerReadinessLeaseOptions): ServerWorkerReadinessLease | undefined;
 export declare function parseServerWorkerReadiness(value: unknown): ServerWorkerReadiness;

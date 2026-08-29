@@ -14,6 +14,15 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.8
+
+- Production worker readiness — strengthened without an API change: a retained
+  `acquireServerWorkerReadinessLease()` now keeps an otherwise-idle listener-free production worker
+  on the event loop without a timer or network listener, while continuing to pin the exact release
+  identity descriptor. Existing workers already retaining and closing the lease require no source
+  change; refresh the package and rebuild the server artifact. Development and isolated release
+  validation behavior is unchanged.
+
 ## 0.9.7
 
 - Site gate presentation — validation tightened: `createSiteGatePresentation()` now parses the

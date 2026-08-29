@@ -145,9 +145,11 @@ and shutdown-signal binding, but before recovery, maintenance, scheduling, claim
 work, an ordinary production worker calls `acquireServerWorkerReadinessLease()` with the unchanged
 identity object returned by `loadServerReleaseIdentity()`. It reopens the configured release
 identity, proves the exact startup path, inode snapshot, bytes, parsed identity, and worker
-declaration, then retains that read-only descriptor until its idempotent close handle runs first in
-shutdown. Development and release validation never acquire this lease. This keeps web/worker
-ownership explicit without turning mutable environment labels into authority.
+declaration, then retains that read-only descriptor and a timerless event-loop reference until its
+idempotent close handle runs first in shutdown. The reference keeps an intentionally idle,
+listener-free worker supervised without adding a poll timer or network listener. Development and
+release validation never acquire this lease. This keeps web/worker ownership explicit without
+turning mutable environment labels into authority.
 
 `openOwnedSqliteDatabase()` is the opening boundary for every long-lived file-backed SQLite runtime
 authority. Its `OpenOwnedSqliteDatabaseOptions` require an explicit canonical operational root, one
