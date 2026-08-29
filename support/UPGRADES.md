@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.9
+
+- E2E network isolation — corrected without an API change: the inherited network guard now
+  recognizes Node 26/Undici's own `path: undefined` connection option as the absence of a Unix
+  socket while continuing to reject every non-nullish socket path and every destination outside
+  the exact runner-owned origin. Consumers require no source change; refresh the package and run
+  the canonical hermetic E2E suite through `scripts/run-e2e.mjs`.
+
 ## 0.9.8
 
 - Production worker readiness — strengthened without an API change: a retained

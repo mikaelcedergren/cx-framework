@@ -724,10 +724,14 @@ function allowedSocketArguments(transport, args, depth = 0) {
 }
 
 function sanitizeSocketOptions(transport, options, host, port) {
-  // Node's HTTP Agent carries `path: null` into net.createConnection so net
-  // selects TCP rather than a pipe. Every other own path value remains a
+  // Node's HTTP Agent carries `path: null` and Node 26's native Undici fetch
+  // carries `path: undefined` into net.createConnection so net selects TCP
+  // rather than a pipe. Every non-nullish own path value remains a
   // caller-selected Unix socket and must fail closed.
-  const hasSocketPath = Object.hasOwn(options, "path") && options.path !== null;
+  const hasSocketPath =
+    Object.hasOwn(options, "path") &&
+    options.path !== null &&
+    options.path !== undefined;
   if (
     hasSocketPath ||
     Object.hasOwn(options, "socket") ||
