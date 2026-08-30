@@ -507,6 +507,7 @@ export function openOwnedSqliteDatabase(
       enableForeignKeyConstraints: false,
       readBigInts: false,
       returnArrays: false,
+      timeout: options.configuration.busyTimeoutMs,
     });
     if (native.location("main") !== storage.databasePath) {
       throw new Error(
@@ -591,6 +592,7 @@ const OWNED_SQLITE_READONLY_ACTIONS = new Set<number>([
 ]);
 
 const OWNED_SQLITE_READONLY_PRAGMAS = new Set([
+  "busy_timeout",
   "database_list",
   "foreign_key_check",
   "integrity_check",

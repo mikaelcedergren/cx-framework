@@ -201,6 +201,7 @@ export function openOwnedSqliteDatabase(options) {
             enableForeignKeyConstraints: false,
             readBigInts: false,
             returnArrays: false,
+            timeout: options.configuration.busyTimeoutMs,
         });
         if (native.location("main") !== storage.databasePath) {
             throw new Error("Owned SQLite did not open the exact pinned database filename.");
@@ -278,6 +279,7 @@ const OWNED_SQLITE_READONLY_ACTIONS = new Set([
     sqliteConstants.SQLITE_SELECT,
 ]);
 const OWNED_SQLITE_READONLY_PRAGMAS = new Set([
+    "busy_timeout",
     "database_list",
     "foreign_key_check",
     "integrity_check",
