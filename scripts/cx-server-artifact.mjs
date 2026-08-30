@@ -14,6 +14,7 @@ import {
   readlink,
   realpath,
   rename,
+  rmdir,
   rm,
   writeFile,
 } from "node:fs/promises";
@@ -176,20 +177,41 @@ export async function buildServerArtifact({
   const workspaceFile = path.join(repositoryRoot, WORKSPACE_MANIFEST_NAME);
   const lockfile = path.join(repositoryRoot, LOCKFILE_NAME);
   const manifestFile = path.join(repositoryRoot, PRODUCT_MANIFEST_NAME);
-  const [rootPackage, workspaceSource, lockfileSource, manifestSource] =
+  const [
+    rootPackageSource,
+    workspaceSourceBytes,
+    lockfileSourceBytes,
+    manifestSource,
+  ] =
     await Promise.all([
-      readJsonRecord(rootPackageFile, "Root package manifest", MAX_JSON_BYTES),
-      readStableText(
+      readStableFile(
+        rootPackageFile,
+        "Root package manifest",
+        MAX_JSON_BYTES,
+      ),
+      readStableFile(
         workspaceFile,
         "pnpm workspace manifest",
         MAX_WORKSPACE_BYTES,
       ),
-      readStableText(lockfile, "pnpm lockfile", MAX_LOCKFILE_BYTES),
+      readStableFile(lockfile, "pnpm lockfile", MAX_LOCKFILE_BYTES),
       readStableFile(manifestFile, "Product manifest", MAX_JSON_BYTES),
     ]);
+  const rootPackage = parseJsonRecord(
+    rootPackageSource,
+    "Root package manifest",
+  );
+  const workspaceSource = decodeUtf8(
+    workspaceSourceBytes,
+    "pnpm workspace manifest",
+  );
+  const lockfileSource = decodeUtf8(
+    lockfileSourceBytes,
+    "pnpm lockfile",
+  );
 
   validateRootPackage(rootPackage);
-  const pnpmCli = await resolveLocalPnpmCli(repositoryRoot);
+  assertNoOverrides({ rootPackage, workspaceSource });
   const workspacePackages = parseWorkspaceManifest(workspaceSource);
   if (!workspacePackages.includes(SERVER_WORKSPACE_PATH)) {
     throw new Error(
@@ -197,12 +219,7 @@ export async function buildServerArtifact({
     );
   }
   validateLockfile(lockfileSource, SERVER_WORKSPACE_PATH);
-  const physicalFrameworkOverride = await resolvePhysicalFrameworkOverride({
-    lockfileSource,
-    repositoryRoot,
-    rootPackage,
-    workspaceSource,
-  });
+  const pnpmCli = await resolveLocalPnpmCli(repositoryRoot);
 
   const productManifest = parseJsonRecord(manifestSource, "Product manifest");
   if (
@@ -231,26 +248,57 @@ export async function buildServerArtifact({
       "Server workspace package must stay inside the repository.",
     );
   }
-  const serverPackage = await readJsonRecord(
-    path.join(serverSourceRoot, PACKAGE_MANIFEST_NAME),
+  const serverPackageFile = path.join(
+    serverSourceRoot,
+    PACKAGE_MANIFEST_NAME,
+  );
+  const serverPackageSource = await readStableFile(
+    serverPackageFile,
     "Server package manifest",
     MAX_JSON_BYTES,
   );
+  const serverPackage = parseJsonRecord(
+    serverPackageSource,
+    "Server package manifest",
+  );
   validateServerPackage(serverPackage, packageName);
   const packagedPaths = packageFileDeclarations(serverPackage.files);
+  const sourceSnapshots = Object.freeze([
+    Object.freeze({
+      file: rootPackageFile,
+      label: "Root package manifest",
+      maximumBytes: MAX_JSON_BYTES,
+      source: rootPackageSource,
+    }),
+    Object.freeze({
+      file: workspaceFile,
+      label: "pnpm workspace manifest",
+      maximumBytes: MAX_WORKSPACE_BYTES,
+      source: workspaceSourceBytes,
+    }),
+    Object.freeze({
+      file: lockfile,
+      label: "pnpm lockfile",
+      maximumBytes: MAX_LOCKFILE_BYTES,
+      source: lockfileSourceBytes,
+    }),
+    Object.freeze({
+      file: manifestFile,
+      label: "Product manifest",
+      maximumBytes: MAX_JSON_BYTES,
+      source: manifestSource,
+    }),
+    Object.freeze({
+      file: serverPackageFile,
+      label: "Server package manifest",
+      maximumBytes: MAX_JSON_BYTES,
+      source: serverPackageSource,
+    }),
+  ]);
 
   const serverArtifactRoot = path.join(artifactRoot, SERVER_ARTIFACT_PATH);
-  let deployRoot = serverArtifactRoot;
-  let physicalDeployScratch;
-  if (physicalFrameworkOverride) {
-    physicalDeployScratch = await preparePhysicalFrameworkDeploy({
-      artifactRoot,
-      override: physicalFrameworkOverride,
-    });
-    deployRoot = physicalDeployScratch.deployRoot;
-  } else {
-    await mkdir(serverArtifactRoot, { mode: 0o755, recursive: false });
-  }
+  let lifecycleGuard;
+  await mkdir(serverArtifactRoot, { mode: 0o755, recursive: false });
   const artifactManifestFile = path.join(artifactRoot, PRODUCT_MANIFEST_NAME);
   try {
     const commandEnvironment = {
@@ -273,47 +321,6 @@ export async function buildServerArtifact({
       );
     }
 
-    if (physicalFrameworkOverride) {
-      // pnpm's shared-lock deploy intentionally removes overrides from the generated deploy
-      // lockfile. Prove the source workspace and lock agree first, then clear only the deploy
-      // subprocess' already-materialized override configuration so its frozen isolated install
-      // compares like-for-like. The exact tarball is copied into owned staging below and its lock
-      // integrity is still verified by that isolated install.
-      await runCommand(
-        process.execPath,
-        [
-          pnpmCli,
-          "--offline",
-          "--frozen-lockfile",
-          "--ignore-scripts",
-          "--lockfile-only",
-          "install",
-        ],
-        {
-          capture: false,
-          cwd: repositoryRoot,
-          environment: commandEnvironment,
-        },
-      );
-      const [workspaceAfterPreflight, lockfileAfterPreflight] =
-        await Promise.all([
-          readStableText(
-            workspaceFile,
-            "pnpm workspace manifest",
-            MAX_WORKSPACE_BYTES,
-          ),
-          readStableText(lockfile, "pnpm lockfile", MAX_LOCKFILE_BYTES),
-        ]);
-      if (
-        workspaceAfterPreflight !== workspaceSource ||
-        lockfileAfterPreflight !== lockfileSource
-      ) {
-        throw new Error(
-          "Physical cx-framework frozen preflight changed the workspace manifest or lockfile.",
-        );
-      }
-    }
-
     await removeServerBuildOutput(serverSourceRoot);
     await runCommand(
       process.execPath,
@@ -334,46 +341,44 @@ export async function buildServerArtifact({
     await validatePackageFiles(serverSourceRoot, packagedPaths);
 
     try {
+      lifecycleGuard = await createLifecycleGuard(artifactRoot);
+      await assertLifecycleShellAbsent(lifecycleGuard.scriptShell);
+      await assertSourceSnapshotsUnchanged(sourceSnapshots);
       const deployArguments = [
         pnpmCli,
         "--offline",
         "--frozen-lockfile",
-        "--ignore-scripts",
+        "--trust-lockfile",
+        "--frozen-store",
+        "--side-effects-cache-readonly",
         "--package-import-method=copy",
         "--config.prefer-symlinked-executables=true",
-        ...(physicalFrameworkOverride ? ["--config.overrides=null"] : []),
+        "--config.shell-emulator=false",
+        `--config.script-shell=${lifecycleGuard.scriptShell}`,
         "--filter",
         `./${SERVER_WORKSPACE_PATH}`,
         "--fail-if-no-match",
         "deploy",
         "--prod",
-        deployRoot,
+        serverArtifactRoot,
       ];
-      await runCommand(process.execPath, deployArguments, {
-        capture: false,
-        cwd: repositoryRoot,
-        environment: commandEnvironment,
-      });
-      if (physicalFrameworkOverride) {
-        assertSamePhysicalTarballSnapshot(
-          physicalFrameworkOverride.sourceSnapshot,
-          await physicalTarballSnapshot(
-            physicalFrameworkOverride.canonicalPath,
-            "Physical cx-framework override",
-          ),
-        );
+      try {
+        await runCommand(process.execPath, deployArguments, {
+          capture: false,
+          cwd: repositoryRoot,
+          environment: commandEnvironment,
+        });
+      } finally {
+        await assertLifecycleShellAbsent(lifecycleGuard.scriptShell);
       }
+      await assertSourceSnapshotsUnchanged(sourceSnapshots);
+      await removeLifecycleGuard(lifecycleGuard);
+      lifecycleGuard = undefined;
     } catch (error) {
       throw new Error(
         `Offline pnpm deploy failed for exact workspace package ./${SERVER_WORKSPACE_PATH}: ${error instanceof Error ? error.message : String(error)}`,
         error instanceof Error ? { cause: error } : undefined,
       );
-    }
-
-    if (physicalDeployScratch) {
-      await rename(physicalDeployScratch.deployRoot, serverArtifactRoot);
-      await rm(physicalDeployScratch.root, { force: true, recursive: true });
-      physicalDeployScratch = undefined;
     }
 
     await stripPnpmReceipts(serverArtifactRoot);
@@ -402,8 +407,8 @@ export async function buildServerArtifact({
       await Promise.all([
         rm(serverArtifactRoot, { force: true, recursive: true }),
         rm(artifactManifestFile, { force: true }),
-        ...(physicalDeployScratch
-          ? [rm(physicalDeployScratch.root, { force: true, recursive: true })]
+        ...(lifecycleGuard
+          ? [rm(lifecycleGuard.root, { force: true, recursive: true })]
           : []),
       ]);
     } catch (cleanupError) {
@@ -449,6 +454,86 @@ async function canonicalDirectory(candidate, label) {
     throw new Error(`${label} must be a real directory: ${resolved}`);
   }
   return realpath(resolved);
+}
+
+async function createLifecycleGuard(artifactRoot) {
+  const root = path.join(
+    artifactRoot,
+    `.cx-server-artifact-lifecycle-${randomUUID()}`,
+  );
+  await mkdir(root, { mode: 0o700, recursive: false });
+  try {
+    const entry = await lstat(root, { bigint: true });
+    if (entry.isSymbolicLink() || !entry.isDirectory()) {
+      throw new Error(
+        "The server artifact lifecycle guard must be one real directory.",
+      );
+    }
+    const scriptShell = path.join(root, "lifecycle-execution-is-forbidden");
+    await assertLifecycleShellAbsent(scriptShell);
+    return Object.freeze({
+      dev: entry.dev,
+      ino: entry.ino,
+      root,
+      scriptShell,
+    });
+  } catch (error) {
+    await rm(root, { force: true, recursive: true });
+    throw error;
+  }
+}
+
+async function assertLifecycleShellAbsent(scriptShell) {
+  try {
+    await lstat(scriptShell);
+  } catch (error) {
+    if (
+      error !== null &&
+      typeof error === "object" &&
+      error.code === "ENOENT"
+    ) {
+      return;
+    }
+    throw error;
+  }
+  throw new Error(
+    "The server artifact lifecycle script shell path appeared during deployment.",
+  );
+}
+
+async function removeLifecycleGuard(guard) {
+  await assertLifecycleShellAbsent(guard.scriptShell);
+  const entry = await lstat(guard.root, { bigint: true });
+  if (
+    entry.isSymbolicLink() ||
+    !entry.isDirectory() ||
+    entry.dev !== guard.dev ||
+    entry.ino !== guard.ino ||
+    (await realpath(guard.root)) !== guard.root
+  ) {
+    throw new Error(
+      "The server artifact lifecycle guard changed during deployment.",
+    );
+  }
+  if ((await readdir(guard.root)).length !== 0) {
+    throw new Error(
+      "The server artifact lifecycle guard gained unexpected content during deployment.",
+    );
+  }
+  await rmdir(guard.root);
+}
+
+async function assertSourceSnapshotsUnchanged(snapshots) {
+  for (const snapshot of snapshots) {
+    const current = await readStableFile(
+      snapshot.file,
+      snapshot.label,
+      snapshot.maximumBytes,
+    );
+    if (!snapshot.source.equals(current)) {
+      throw new Error(`${snapshot.label} changed during offline deployment.`);
+    }
+  }
 }
 
 async function resolveArtifactRoot(environment) {
@@ -722,262 +807,33 @@ export function validateLockfile(source, importer) {
   }
 }
 
-async function resolvePhysicalFrameworkOverride({
-  lockfileSource,
-  repositoryRoot,
-  rootPackage,
-  workspaceSource,
-}) {
+function assertNoOverrides({ rootPackage, workspaceSource }) {
   const rootOverrides = rootPackage.pnpm?.overrides;
   if (
-    isRecord(rootOverrides) &&
-    Object.hasOwn(rootOverrides, FRAMEWORK_PACKAGE_NAME)
+    rootOverrides !== undefined &&
+    (!isRecord(rootOverrides) || Object.keys(rootOverrides).length > 0)
   ) {
     throw new Error(
-      `Physical ${FRAMEWORK_PACKAGE_NAME} validation must declare its override in pnpm-workspace.yaml so pnpm 11 has one workspace-owned configuration source.`,
+      "Server artifacts must not declare pnpm overrides. Use Git or published package dependencies recorded directly in the frozen lockfile; pnpm 11.23.0 cannot safely deploy physical tarball overrides with a read-only store.",
     );
   }
 
-  const entries = workspaceOverrideEntries(workspaceSource);
-  if (entries.length === 0) return undefined;
-  if (entries.length !== 1 || entries[0].name !== FRAMEWORK_PACKAGE_NAME) {
+  if (hasTopLevelWorkspaceOverrides(workspaceSource)) {
     throw new Error(
-      `Server artifact workspaces may use only one temporary override, for ${FRAMEWORK_PACKAGE_NAME}.`,
+      "Server artifacts must not declare pnpm overrides. Use Git or published package dependencies recorded directly in the frozen lockfile; pnpm 11.23.0 cannot safely deploy physical tarball overrides with a read-only store.",
     );
   }
+}
 
-  const configured = entries[0].value;
-  if (!configured.startsWith("file:")) {
-    throw new Error(
-      `The ${FRAMEWORK_PACKAGE_NAME} workspace override must be one physical file: tarball.`,
+function hasTopLevelWorkspaceOverrides(source) {
+  return source.split(/\r?\n/).some((line) => {
+    const candidate = stripYamlComment(line).trimEnd();
+    return (
+      candidate.length > 0 &&
+      !/^\s/.test(candidate) &&
+      /^(?:overrides|["']overrides["'])\s*:/.test(candidate)
     );
-  }
-  const configuredPath = configured.slice("file:".length);
-  if (
-    !path.isAbsolute(configuredPath) ||
-    path.normalize(configuredPath) !== configuredPath ||
-    path.extname(configuredPath).toLowerCase() !== ".tgz"
-  ) {
-    throw new Error(
-      `The ${FRAMEWORK_PACKAGE_NAME} workspace override must use one normalized absolute .tgz path.`,
-    );
-  }
-  const sourceSnapshot = await physicalTarballSnapshot(
-    configuredPath,
-    "Physical cx-framework override",
-  );
-  const canonicalPath = await realpath(configuredPath);
-  if (canonicalPath !== configuredPath) {
-    throw new Error(
-      `The ${FRAMEWORK_PACKAGE_NAME} workspace override path must already be canonical and contain no symbolic-link boundary.`,
-    );
-  }
-
-  const lockPath = lockedFrameworkTarballPath(lockfileSource);
-  const lockResolved = path.resolve(repositoryRoot, ...lockPath.split("/"));
-  if (lockResolved !== canonicalPath) {
-    throw new Error(
-      `pnpm-lock.yaml does not resolve ${FRAMEWORK_PACKAGE_NAME} to the exact workspace override tarball.`,
-    );
-  }
-
-  return Object.freeze({
-    canonicalPath,
-    lockPath,
-    sourceSnapshot,
   });
-}
-
-function workspaceOverrideEntries(source) {
-  const lines = source.split(/\r?\n/);
-  const starts = lines
-    .map((line, index) => ({ index, line: stripYamlComment(line).trimEnd() }))
-    .filter(({ line }) => line === "overrides:");
-  if (starts.length === 0) return [];
-  if (starts.length !== 1) {
-    throw new Error(
-      "pnpm-workspace.yaml must contain at most one overrides block.",
-    );
-  }
-
-  const entries = [];
-  const names = new Set();
-  for (let index = starts[0].index + 1; index < lines.length; index += 1) {
-    const line = stripYamlComment(lines[index]).trimEnd();
-    if (!line.trim()) continue;
-    if (!/^\s/.test(line)) break;
-    const match = line.match(/^  (.+?):\s+(.+)$/);
-    if (!match) {
-      throw new Error(
-        "pnpm-workspace.yaml overrides must be exact two-space-indented scalar mappings.",
-      );
-    }
-    const name = yamlScalar(match[1]);
-    const value = yamlScalar(match[2]);
-    if (names.has(name)) {
-      throw new Error(
-        `pnpm-workspace.yaml contains duplicate override ${name}.`,
-      );
-    }
-    names.add(name);
-    entries.push(Object.freeze({ name, value }));
-  }
-  return entries;
-}
-
-function lockedFrameworkTarballPath(source) {
-  const packageLines = yamlBlock(source.split(/\r?\n/), "packages");
-  const prefix = `${FRAMEWORK_PACKAGE_NAME}@file:`;
-  const candidates = [];
-  for (let index = 0; index < packageLines.length; index += 1) {
-    const header = stripYamlComment(packageLines[index])
-      .trimEnd()
-      .match(/^  (.+):\s*$/);
-    if (!header) continue;
-    const key = yamlScalar(header[1]);
-    if (!key.startsWith(prefix)) continue;
-    let end = index + 1;
-    while (end < packageLines.length) {
-      const next = stripYamlComment(packageLines[end]).trimEnd();
-      if (next.trim() && /^  \S/.test(next)) break;
-      end += 1;
-    }
-    candidates.push({
-      body: packageLines.slice(index + 1, end),
-      lockPath: key.slice(prefix.length),
-    });
-  }
-  if (candidates.length !== 1) {
-    throw new Error(
-      `pnpm-lock.yaml must contain exactly one physical ${FRAMEWORK_PACKAGE_NAME} package snapshot.`,
-    );
-  }
-
-  const [{ body, lockPath }] = candidates;
-  const parts = lockPath.split("/");
-  const parentCount = parts.findIndex((part) => part !== "..");
-  if (
-    path.posix.isAbsolute(lockPath) ||
-    path.posix.normalize(lockPath) !== lockPath ||
-    lockPath.includes("\\") ||
-    parentCount < 1 ||
-    parts
-      .slice(parentCount)
-      .some((part) => !part || part === "." || part === "..") ||
-    path.posix.extname(lockPath).toLowerCase() !== ".tgz"
-  ) {
-    throw new Error(
-      `pnpm-lock.yaml ${FRAMEWORK_PACKAGE_NAME} tarball path must be one external canonical relative .tgz path.`,
-    );
-  }
-  const expected = `tarball: file:${lockPath}`;
-  if (
-    body.filter((line) => stripYamlComment(line).includes(expected)).length !==
-    1
-  ) {
-    throw new Error(
-      `pnpm-lock.yaml ${FRAMEWORK_PACKAGE_NAME} resolution must name its exact physical tarball once.`,
-    );
-  }
-  return lockPath;
-}
-
-async function preparePhysicalFrameworkDeploy({ artifactRoot, override }) {
-  const root = path.join(artifactRoot, `.cx-framework-deploy-${randomUUID()}`);
-  await mkdir(root, { mode: 0o700, recursive: false });
-  try {
-    const parentCount = override.lockPath
-      .split("/")
-      .findIndex((part) => part !== "..");
-    const nesting = Array.from(
-      { length: parentCount + 1 },
-      (_, index) => `level-${index}`,
-    );
-    const deployRoot = path.join(root, "deploy", ...nesting, "server");
-    await mkdir(path.dirname(deployRoot), { mode: 0o700, recursive: true });
-    const stagedTarball = path.resolve(deployRoot, override.lockPath);
-    if (
-      !isInside(root, stagedTarball) ||
-      isInsideOrEqual(deployRoot, stagedTarball)
-    ) {
-      throw new Error(
-        "Physical cx-framework staging path escaped its exact owned deploy scratch directory.",
-      );
-    }
-    await mkdir(path.dirname(stagedTarball), {
-      mode: 0o700,
-      recursive: true,
-    });
-    await copyStablePhysicalTarball(override, stagedTarball);
-    return { deployRoot, root };
-  } catch (error) {
-    await rm(root, { force: true, recursive: true });
-    throw error;
-  }
-}
-
-async function physicalTarballSnapshot(file, label) {
-  let snapshot;
-  try {
-    snapshot = await lstat(file, { bigint: true });
-  } catch (error) {
-    throw new Error(`${label} is missing: ${file}`, { cause: error });
-  }
-  if (
-    snapshot.isSymbolicLink() ||
-    !snapshot.isFile() ||
-    snapshot.nlink !== 1n ||
-    snapshot.size < 1n ||
-    snapshot.size > BigInt(MAX_SERVER_RELEASE_ARTIFACT_BYTES)
-  ) {
-    throw new Error(
-      `${label} must be one owned regular non-linked file within the server artifact byte ceiling.`,
-    );
-  }
-  return Object.freeze({
-    dev: snapshot.dev,
-    ino: snapshot.ino,
-    mtimeNs: snapshot.mtimeNs,
-    size: snapshot.size,
-  });
-}
-
-async function copyStablePhysicalTarball(override, destination) {
-  const before = await physicalTarballSnapshot(
-    override.canonicalPath,
-    "Physical cx-framework override",
-  );
-  assertSamePhysicalTarballSnapshot(override.sourceSnapshot, before);
-  await copyFile(override.canonicalPath, destination, constants.COPYFILE_EXCL);
-  const [after, copied] = await Promise.all([
-    physicalTarballSnapshot(
-      override.canonicalPath,
-      "Physical cx-framework override",
-    ),
-    physicalTarballSnapshot(
-      destination,
-      "Staged physical cx-framework tarball",
-    ),
-  ]);
-  assertSamePhysicalTarballSnapshot(before, after);
-  if (copied.size !== before.size) {
-    throw new Error(
-      "Staged physical cx-framework tarball changed size during its owned copy.",
-    );
-  }
-}
-
-function assertSamePhysicalTarballSnapshot(expected, actual) {
-  if (
-    expected.dev !== actual.dev ||
-    expected.ino !== actual.ino ||
-    expected.size !== actual.size ||
-    expected.mtimeNs !== actual.mtimeNs
-  ) {
-    throw new Error(
-      "Physical cx-framework override changed while the server artifact was built.",
-    );
-  }
 }
 
 export function boundedArtifactByteTotal(current, additional) {
@@ -1606,8 +1462,7 @@ function parseJsonRecord(source, label) {
   return parsed;
 }
 
-async function readStableText(file, label, maximumBytes) {
-  const source = await readStableFile(file, label, maximumBytes);
+function decodeUtf8(source, label) {
   try {
     return new TextDecoder("utf-8", { fatal: true }).decode(source);
   } catch (error) {

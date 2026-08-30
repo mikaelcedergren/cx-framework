@@ -14,6 +14,22 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.11
+
+- Server artifacts — deploy hardening with one required local-validation change: refresh the
+  framework package.
+  Products already using a Git or published framework dependency need no source or release-command
+  change. Shared-lock deployment now consumes the existing store without writing side-effects,
+  trusts only pnpm's generated deploy lock projection,
+  makes dependency lifecycle execution fail closed by disabling pnpm's internal shell emulator and
+  using a builder-owned absent external script shell, and rejects byte changes to every canonical
+  package, workspace, lock, and product manifest input.
+  Every dependency deploy freezes the store. Framework overrides now fail before any package
+  command because pnpm 11.23.0 cannot materialize a physical tarball's rewritten path identity
+  without opening the whole dependency graph for writes. Remove any temporary override, use the
+  framework's Git or published package identity directly, and refresh the frozen lockfile. The
+  existing framework-package containment and offline build boundaries remain unchanged.
+
 ## 0.9.10
 
 - Server artifacts — breaking and required: keep using the same release-artifact command and add

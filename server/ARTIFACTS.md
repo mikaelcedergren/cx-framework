@@ -58,10 +58,9 @@ that contained package, requires the CLI to be one regular single-link file, and
 with the current Node executable. It never asks Corepack to resolve pnpm at release time and
 therefore does not depend on a mutable or operator-specific home-directory cache. Corepack remains
 an installation bootstrap outside the artifact build. pnpm 11.23.0 is also the minimum
-artifact-builder version because it
-preserves a local tarball's real package name across repeated shared-lock deployments; older
-versions can poison a warm store with a filename-derived identity and fail an unchanged second
-build. The server package is named
+artifact-builder version because the sealed deploy is pinned to that exact release's generated
+shared-lock projection trust, read-only store enforcement, and read-only side-effects cache
+behavior. The server package is named
 `<cx-product.id>-server`, is ESM, pins the same Node engine, declares one clean `build` script, and
 uses a literal `files` allowlist containing `dist/` plus only the non-data runtime assets it needs.
 Its build must clean `dist/` before compiling so normal and release builds have the same stale-output
@@ -81,10 +80,32 @@ The registered release command calls only the packaged CLI:
 `server-ops` supplies `SERVER_RELEASE_ARTIFACT_DIR`, `SERVER_RELEASE_ENTRYPOINT`, and
 `SERVER_RELEASE_WORKERS`. HTTP and worker entrypoints stay beneath `server/dist/`. The CLI verifies
 the exact server package name before using the unambiguous `./server` workspace filter, builds with
-the pinned local pnpm, and deploys production dependencies offline with lifecycle scripts disabled
-and copy semantics. Network-disabled and pnpm-offline settings remain forced for every subprocess,
-including the local CLI version proof. It copies the root product manifest into the artifact rather
-than reading it from the mutable checkout at runtime.
+the pinned local pnpm, and deploys production dependencies offline with copy semantics. The deploy
+keeps the canonical source lock frozen, and may read but never write pnpm's side-effects cache.
+Every dependency deploy also freezes the existing content-addressed store. pnpm 11 creates a
+target-specific lock projection during a shared-lock deploy; the deploy subprocess alone trusts that
+projection so an isolated build does not consult operator home-directory metadata that is not part
+of the canonical source lock.
+
+Framework overrides are rejected before any package command runs. In particular, pnpm 11.23.0's
+shared-lock conversion rewrites a local tarball's package identity to an absolute `file:///` URL
+while retaining a relative integrity-bearing resolution. It therefore cannot consume the already
+installed package through a read-only store, and allowing the required store write would open the
+entire dependency graph rather than only that tarball. Products use a Git or published framework
+dependency recorded directly in their frozen lockfile instead; the builder does not synthesize
+pnpm-private cache or lock state to make an unsupported local override appear sealed.
+
+Some already-materialized Git dependencies have a built store identity, so changing the deploy to
+`--ignore-scripts` would ask for a different, absent store object. The builder instead pins pnpm's
+deploy-only internal shell emulator off and pins its external script shell to a guaranteed-absent
+path inside a new private builder-owned guard. It proves that path absent before and after deploy
+and rejects any content or identity change to the guard. Cached build products may be read; a
+dependency lifecycle that needs to execute cannot start, and the artifact build fails closed.
+Network-disabled and pnpm-offline settings remain forced for every subprocess, including the local
+CLI version proof. After deploy, the builder also
+rereads and byte-compares the root package manifest, workspace manifest, canonical lockfile,
+product manifest, and server package manifest. It copies the already-proven product manifest into
+the artifact rather than reading it again from the mutable checkout at runtime.
 
 Before returning, the builder removes pnpm path receipts, reduces the deployed package manifest to
 runtime ESM metadata, materialises any pnpm hard-linked files as owned copies, and rejects source or
