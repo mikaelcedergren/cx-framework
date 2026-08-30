@@ -32,6 +32,8 @@ import {
 } from "./workspace-contract.mjs";
 
 const PNPM_VERSION = "11.23.0";
+const PNPM_PACKAGE_NAME = "pnpm";
+const PNPM_CLI_RELATIVE_PATH = "bin/pnpm.mjs";
 const PACKAGE_MANAGER =
   "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af";
 const NODE_ENGINE = ">=26 <27";
@@ -187,6 +189,7 @@ export async function buildServerArtifact({
     ]);
 
   validateRootPackage(rootPackage);
+  const pnpmCli = await resolveLocalPnpmCli(repositoryRoot);
   const workspacePackages = parseWorkspaceManifest(workspaceSource);
   if (!workspacePackages.includes(SERVER_WORKSPACE_PATH)) {
     throw new Error(
@@ -255,14 +258,18 @@ export async function buildServerArtifact({
       COREPACK_ENABLE_NETWORK: "0",
       pnpm_config_offline: "true",
     };
-    const versionResult = await runCommand("corepack", ["pnpm", "--version"], {
-      capture: true,
-      cwd: repositoryRoot,
-      environment: commandEnvironment,
-    });
+    const versionResult = await runCommand(
+      process.execPath,
+      [pnpmCli, "--version"],
+      {
+        capture: true,
+        cwd: repositoryRoot,
+        environment: commandEnvironment,
+      },
+    );
     if (versionResult.stdout.trim() !== PNPM_VERSION) {
       throw new Error(
-        `cx-server-artifact requires pnpm ${PNPM_VERSION}; Corepack resolved ${JSON.stringify(versionResult.stdout.trim())}.`,
+        `cx-server-artifact requires local pnpm ${PNPM_VERSION}; its CLI reported ${JSON.stringify(versionResult.stdout.trim())}.`,
       );
     }
 
@@ -273,9 +280,9 @@ export async function buildServerArtifact({
       // compares like-for-like. The exact tarball is copied into owned staging below and its lock
       // integrity is still verified by that isolated install.
       await runCommand(
-        "corepack",
+        process.execPath,
         [
-          "pnpm",
+          pnpmCli,
           "--offline",
           "--frozen-lockfile",
           "--ignore-scripts",
@@ -309,9 +316,9 @@ export async function buildServerArtifact({
 
     await removeServerBuildOutput(serverSourceRoot);
     await runCommand(
-      "corepack",
+      process.execPath,
       [
-        "pnpm",
+        pnpmCli,
         "--filter",
         `./${SERVER_WORKSPACE_PATH}`,
         "--fail-if-no-match",
@@ -328,7 +335,7 @@ export async function buildServerArtifact({
 
     try {
       const deployArguments = [
-        "pnpm",
+        pnpmCli,
         "--offline",
         "--frozen-lockfile",
         "--ignore-scripts",
@@ -342,7 +349,7 @@ export async function buildServerArtifact({
         "--prod",
         deployRoot,
       ];
-      await runCommand("corepack", deployArguments, {
+      await runCommand(process.execPath, deployArguments, {
         capture: false,
         cwd: repositoryRoot,
         environment: commandEnvironment,
@@ -522,6 +529,75 @@ function validateRootPackage(packageJson) {
   if (packageJson.engines?.node !== NODE_ENGINE) {
     throw new Error(`Root engines.node must be exactly ${NODE_ENGINE}.`);
   }
+  if (packageJson.devDependencies?.pnpm !== PNPM_VERSION) {
+    throw new Error(
+      `Root devDependencies.pnpm must be exactly ${PNPM_VERSION}.`,
+    );
+  }
+}
+
+async function resolveLocalPnpmCli(repositoryRoot) {
+  const nodeModulesRoot = await canonicalDirectory(
+    path.join(repositoryRoot, "node_modules"),
+    "Root node_modules",
+  );
+  if (!isInside(repositoryRoot, nodeModulesRoot)) {
+    throw new Error("Root node_modules must stay inside the repository.");
+  }
+
+  const packageEntry = path.join(nodeModulesRoot, PNPM_PACKAGE_NAME);
+  let packageRoot;
+  try {
+    packageRoot = await realpath(packageEntry);
+  } catch (error) {
+    throw new Error(
+      `cx-server-artifact requires local ${PNPM_PACKAGE_NAME} ${PNPM_VERSION} at node_modules/${PNPM_PACKAGE_NAME}.`,
+      { cause: error },
+    );
+  }
+  if (!isInside(nodeModulesRoot, packageRoot)) {
+    throw new Error("The local pnpm package must stay inside root node_modules.");
+  }
+  const packageMetadata = await lstat(packageRoot);
+  if (packageMetadata.isSymbolicLink() || !packageMetadata.isDirectory()) {
+    throw new Error("The resolved local pnpm package must be a real directory.");
+  }
+
+  const packageJson = await readJsonRecord(
+    path.join(packageRoot, PACKAGE_MANIFEST_NAME),
+    "Local pnpm package manifest",
+    MAX_JSON_BYTES,
+  );
+  if (
+    packageJson.name !== PNPM_PACKAGE_NAME ||
+    packageJson.version !== PNPM_VERSION ||
+    packageJson.type !== "module" ||
+    packageJson.main !== PNPM_CLI_RELATIVE_PATH ||
+    packageJson.bin?.pnpm !== PNPM_CLI_RELATIVE_PATH
+  ) {
+    throw new Error(
+      `node_modules/pnpm must be the exact local pnpm ${PNPM_VERSION} package with its canonical CLI.`,
+    );
+  }
+
+  const cli = path.join(packageRoot, ...PNPM_CLI_RELATIVE_PATH.split("/"));
+  let canonicalCli;
+  try {
+    canonicalCli = await realpath(cli);
+  } catch (error) {
+    throw new Error("The exact local pnpm CLI is missing.", { cause: error });
+  }
+  if (canonicalCli !== cli || !isInside(packageRoot, canonicalCli)) {
+    throw new Error(
+      "The exact local pnpm CLI must be a contained non-symlink package file.",
+    );
+  }
+  const cliMetadata = await lstat(cli);
+  if (!cliMetadata.isFile() || cliMetadata.nlink !== 1) {
+    throw new Error("The exact local pnpm CLI must be one single-link file.");
+  }
+  await readStableFile(cli, "Local pnpm CLI", MAX_JSON_BYTES);
+  return cli;
 }
 
 function validateServerPackage(packageJson, packageName) {

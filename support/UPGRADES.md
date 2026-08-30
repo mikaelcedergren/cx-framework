@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.10
+
+- Server artifacts — breaking and required: keep using the same release-artifact command and add
+  exact `pnpm: 11.23.0` to the product root's development dependencies. `cx-server-artifact`
+  validates and runs that contained local CLI directly, so an isolated release build never depends
+  on a Corepack home-directory cache. The existing framework-package containment and offline build
+  boundaries remain unchanged.
+
 ## 0.9.9
 
 - E2E network isolation — corrected without an API change: the inherited network guard now

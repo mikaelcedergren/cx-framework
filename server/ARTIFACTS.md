@@ -51,7 +51,14 @@ is already running.
 
 The root pins Node `>=26 <27` and the exact integrity-qualified pnpm `11.23.0` package-manager
 identity declared by `platform/web-standard.json`. The integrity suffix is part of the contract,
-not optional metadata. pnpm 11.23.0 is also the minimum artifact-builder version because it
+not optional metadata. A web product that builds server artifacts also declares exact
+`pnpm: 11.23.0` as a root development dependency, so its installed package and canonical
+`bin/pnpm.mjs` exist beneath the repository's own `node_modules/`. The artifact builder validates
+that contained package, requires the CLI to be one regular single-link file, and invokes it directly
+with the current Node executable. It never asks Corepack to resolve pnpm at release time and
+therefore does not depend on a mutable or operator-specific home-directory cache. Corepack remains
+an installation bootstrap outside the artifact build. pnpm 11.23.0 is also the minimum
+artifact-builder version because it
 preserves a local tarball's real package name across repeated shared-lock deployments; older
 versions can poison a warm store with a filename-derived identity and fail an unchanged second
 build. The server package is named
@@ -75,8 +82,9 @@ The registered release command calls only the packaged CLI:
 `SERVER_RELEASE_WORKERS`. HTTP and worker entrypoints stay beneath `server/dist/`. The CLI verifies
 the exact server package name before using the unambiguous `./server` workspace filter, builds with
 the pinned local pnpm, and deploys production dependencies offline with lifecycle scripts disabled
-and copy semantics. It copies the root product manifest into the artifact rather than reading it
-from the mutable checkout at runtime.
+and copy semantics. Network-disabled and pnpm-offline settings remain forced for every subprocess,
+including the local CLI version proof. It copies the root product manifest into the artifact rather
+than reading it from the mutable checkout at runtime.
 
 Before returning, the builder removes pnpm path receipts, reduces the deployed package manifest to
 runtime ESM metadata, materialises any pnpm hard-linked files as owned copies, and rejects source or
