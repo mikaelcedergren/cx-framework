@@ -120,10 +120,7 @@ export interface SqliteMigrationResult {
     readonly appliedVersions: readonly number[];
     readonly currentVersion: number;
 }
-/**
- * Existing products adopt this ledger with a verified one-time copy from any legacy ledger.
- * Pointing the runner at a differently shaped legacy table would hide migration history drift.
- */
+/** Canonical immutable migration history owned by every current product database. */
 export declare const SQLITE_MIGRATION_LEDGER_TABLE = "cx_schema_migrations";
 export declare function createSyncSqliteAdapter(source: SyncSqliteAdapterSource): SyncSqliteDatabase;
 export declare function createPreparedSyncSqliteAdapter(source: PreparedSyncSqliteSource): SyncSqliteDatabase;

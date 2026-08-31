@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.18
+
+- Current architecture wording — documentation-only: the SQLite ledger and durable-job contracts
+  now describe their ongoing ownership directly, without completed-adoption terminology. No
+  consumer source change is required.
+
 ## 0.9.17
 
 - SQLite migration ledgers — breaking cleanup: removed the unused one-time

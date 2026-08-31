@@ -163,10 +163,7 @@ export interface DurableWorkerOptions {
     readonly scheduleTimeout?: (timeoutMs: number, onTimeout: () => void) => () => void;
     readonly store: DurableJobStore;
 }
-/**
- * Existing products copy verified legacy job rows into this canonical table in a new migration.
- * The shared store never assumes that a product's differently shaped `jobs` table is compatible.
- */
+/** Canonical durable-job table owned through each product's append-only migration history. */
 export declare const DURABLE_JOB_TABLE = "cx_jobs";
 /**
  * Immutable durable-job schema history for product-owned migration ledgers.

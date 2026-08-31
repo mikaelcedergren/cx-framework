@@ -3,10 +3,7 @@ import * as path from "node:path";
 import { DatabaseSync, constants as sqliteConstants } from "node:sqlite";
 const MIGRATION_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
-/**
- * Existing products adopt this ledger with a verified one-time copy from any legacy ledger.
- * Pointing the runner at a differently shaped legacy table would hide migration history drift.
- */
+/** Canonical immutable migration history owned by every current product database. */
 export const SQLITE_MIGRATION_LEDGER_TABLE = "cx_schema_migrations";
 const TRANSACTION_CONTROL_PATTERN = /^\s*(?:;\s*)*(?:BEGIN\b|COMMIT\b|END\b|ROLLBACK\b|SAVEPOINT\b|RELEASE\b)/i;
 const MIGRATION_LEDGER_SQL = `
