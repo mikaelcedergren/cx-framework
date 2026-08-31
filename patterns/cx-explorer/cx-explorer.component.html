@@ -33,7 +33,7 @@
                 type="button"
                 [attr.aria-expanded]="isFolderExpanded(folder)"
                 (click)="toggleFolder(folder)"
-                (dblclick)="beginRename('folder', folder.id)"
+                (dblclick)="editable && beginRename('folder', folder.id)"
               >
                 <span class="cx-explorer__row-icon" aria-hidden="true">
                   <cx-icon icon="folder" [size]="16" />
@@ -51,28 +51,32 @@
                 />
               </button>
               <div class="cx-explorer__row-actions">
-                <cx-icon-button
-                  icon="plus"
-                  size="small"
-                  variant="transparent"
-                  [ariaLabel]="createItemText"
-                  [cxTooltip]="createItemText"
-                  (pressed)="onCreateItem(folder)"
-                />
-                <cx-menu
-                  [presentation]="{ kind: 'trigger' }"
-                  [items]="folderMenu()"
-                  ariaLabel="Folder actions"
-                  (itemSelect)="onFolderMenuSelect(folder, $event)"
-                >
+                @if (editable) {
                   <cx-icon-button
-                    cxMenuTrigger
-                    icon="menu-horizontal"
+                    icon="plus"
                     size="small"
                     variant="transparent"
-                    ariaLabel="Folder actions"
+                    [ariaLabel]="createItemText"
+                    [cxTooltip]="createItemText"
+                    (pressed)="onCreateItem(folder)"
                   />
-                </cx-menu>
+                }
+                @if (hasFolderMenu()) {
+                  <cx-menu
+                    [presentation]="{ kind: 'trigger' }"
+                    [items]="folderMenu()"
+                    ariaLabel="Folder actions"
+                    (itemSelect)="onFolderMenuSelect(folder, $event)"
+                  >
+                    <cx-icon-button
+                      cxMenuTrigger
+                      icon="menu-horizontal"
+                      size="small"
+                      variant="transparent"
+                      ariaLabel="Folder actions"
+                    />
+                  </cx-menu>
+                }
               </div>
             }
           </div>
@@ -109,7 +113,7 @@
                         [class.cx-explorer__row-main--selected]="isSelected(item)"
                         [attr.aria-current]="isSelected(item) ? 'true' : null"
                         (click)="onItemPressed(item)"
-                        (dblclick)="beginRename('item', item.id)"
+                        (dblclick)="editable && beginRename('item', item.id)"
                       >
                         <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
                           <cx-icon [icon]="itemIcon(item)" [size]="16" />
@@ -122,20 +126,22 @@
                         >{{ item.name }}</span>
                       </button>
                       <div class="cx-explorer__row-actions">
-                        <cx-menu
-                          [presentation]="{ kind: 'trigger' }"
-                          [items]="itemMenu()"
-                          ariaLabel="Page actions"
-                          (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
-                        >
-                          <cx-icon-button
-                            cxMenuTrigger
-                            icon="menu-horizontal"
-                            size="small"
-                            variant="transparent"
+                        @if (hasItemMenu()) {
+                          <cx-menu
+                            [presentation]="{ kind: 'trigger' }"
+                            [items]="itemMenu()"
                             ariaLabel="Page actions"
-                          />
-                        </cx-menu>
+                            (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
+                          >
+                            <cx-icon-button
+                              cxMenuTrigger
+                              icon="menu-horizontal"
+                              size="small"
+                              variant="transparent"
+                              ariaLabel="Page actions"
+                            />
+                          </cx-menu>
+                        }
                       </div>
                     }
                   </li>
@@ -149,13 +155,15 @@
   }
 
   <div class="cx-explorer__footer">
-    <cx-button
-      class="cx-explorer__new-folder"
-      text="New folder"
-      icon="plus"
-      [transparent]="true"
-      (pressed)="folderCreate.emit()"
-    />
+    @if (editable) {
+      <cx-button
+        class="cx-explorer__new-folder"
+        text="New folder"
+        icon="plus"
+        [transparent]="true"
+        (pressed)="folderCreate.emit()"
+      />
+    }
   </div>
 </aside>
 

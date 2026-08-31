@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.14
+
+- `cx-explorer` browse mode — added the `editable` input (default `true`). Set it to `false`
+  when the explorer is a read-only category browser; built-in create, rename, style, and delete
+  controls disappear while selection, collapse, and consumer-supplied menus remain available.
+
 ## 0.9.13
 
 - `cx-dropdown` typeahead — corrected: while a multi-character query is being extended, the

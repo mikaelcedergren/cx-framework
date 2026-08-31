@@ -41,10 +41,9 @@ type CxExplorerRenameTarget = {
 };
 /**
  * Content rail for browsing and managing one-level collections of user
- * content: folders hold items, rows are created, renamed, restyled, and
- * deleted in place. Unlike `cx-side-nav` it navigates nothing — it owns the
- * management interactions and emits intents; the consumer owns the data and
- * every destructive confirmation.
+ * content: folders hold items. Editable explorers expose mutation controls;
+ * browse-only explorers preserve hierarchy and selection without them. Unlike
+ * `cx-side-nav` it navigates nothing — the consumer owns persisted effects.
  */
 export declare class CxExplorerComponent implements OnDestroy {
     private readonly host;
@@ -68,6 +67,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     set folders(value: readonly CxExplorerFolder[] | null | undefined);
     set selectedItemId(value: string | undefined);
     loading: boolean;
+    /** Enables the built-in create, rename, restyle, and delete controls. */
+    editable: boolean;
     /** Accessible name of the rail region. Name it after the content it manages. */
     ariaLabel: string;
     /** Label for the per-folder create action; also its tooltip. */
@@ -109,6 +110,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected swatchAccent(color: CxTagColor): string;
     protected folderMenu(): readonly CxMenuItem[];
     protected itemMenu(): readonly CxMenuItem[];
+    protected hasFolderMenu(): boolean;
+    protected hasItemMenu(): boolean;
     protected onFolderMenuSelect(folder: CxExplorerFolder, actionId: string): void;
     protected onItemMenuSelect(item: CxExplorerItem, actionId: string, row: HTMLElement): void;
     protected isRenaming(kind: 'folder' | 'item', id: string): boolean;
@@ -129,7 +132,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     /** Selection always lands visible: clear an explicit close on its folder. */
     private revealItem;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxExplorerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "folders": { "alias": "folders"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "folders": { "alias": "folders"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
+    static ngAcceptInputType_editable: unknown;
 }
 export {};
 //# sourceMappingURL=cx-explorer.component.d.ts.map

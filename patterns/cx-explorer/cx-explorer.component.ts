@@ -1,4 +1,5 @@
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -107,10 +108,9 @@ type CxExplorerRenameTarget = { kind: 'folder' | 'item'; id: string };
 
 /**
  * Content rail for browsing and managing one-level collections of user
- * content: folders hold items, rows are created, renamed, restyled, and
- * deleted in place. Unlike `cx-side-nav` it navigates nothing — it owns the
- * management interactions and emits intents; the consumer owns the data and
- * every destructive confirmation.
+ * content: folders hold items. Editable explorers expose mutation controls;
+ * browse-only explorers preserve hierarchy and selection without them. Unlike
+ * `cx-side-nav` it navigates nothing — the consumer owns persisted effects.
  */
 @Component({
   selector: 'cx-explorer',
@@ -171,6 +171,9 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   @Input() loading = false;
+
+  /** Enables the built-in create, rename, restyle, and delete controls. */
+  @Input({ transform: booleanAttribute }) editable = true;
 
   /** Accessible name of the rail region. Name it after the content it manages. */
   @Input() ariaLabel = 'Explorer';
@@ -274,6 +277,7 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected folderMenu(): readonly CxMenuItem[] {
+    if (!this.editable) return this.folderMenuItemsState();
     return [
       { id: MENU_RENAME, label: 'Rename', prependIcon: 'edit' },
       ...this.folderMenuItemsState(),
@@ -282,12 +286,21 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected itemMenu(): readonly CxMenuItem[] {
+    if (!this.editable) return this.itemMenuItemsState();
     return [
       { id: MENU_RENAME, label: 'Rename', prependIcon: 'edit' },
       { id: MENU_STYLE, label: 'Icon & color', prependIcon: 'squares-rotated' },
       ...this.itemMenuItemsState(),
       { id: MENU_DELETE, label: 'Delete', prependIcon: 'delete', danger: true, dividerBefore: true },
     ];
+  }
+
+  protected hasFolderMenu(): boolean {
+    return this.folderMenu().length > 0;
+  }
+
+  protected hasItemMenu(): boolean {
+    return this.itemMenu().length > 0;
   }
 
   protected onFolderMenuSelect(folder: CxExplorerFolder, actionId: string): void {
@@ -324,6 +337,7 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected beginRename(kind: 'folder' | 'item', id: string): void {
+    if (!this.editable) return;
     this.closePicker();
     this.renaming.set({ kind, id });
     // The input exists only after the next render pass; select-all so typing
@@ -399,6 +413,7 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected onCreateItem(folder: CxExplorerFolder): void {
+    if (!this.editable) return;
     // Creating into a closed folder must land somewhere visible.
     this.collapsedFolders.update(collapsed => ({ ...collapsed, [folder.id]: false }));
     this.itemCreate.emit(folder.id);
