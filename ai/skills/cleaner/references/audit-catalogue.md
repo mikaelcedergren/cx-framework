@@ -36,6 +36,8 @@ Prefer the stable, consistent toolchain over marginal build speed.
 ## 4. Configuration, automation, and operations
 
 - stale routes, redirects, aliases, environment flags, schedulers, workflows, jobs, and deployment paths
+- completed migration, import, adoption, cutover, or backfill operators that remain executable
+- release selectors, installed definitions, receipts, or artifacts that can restore superseded code
 - duplicated configuration and facts copied from a canonical owner
 - obsolete build steps, generators, post-processing, and compatibility transforms
 - services exposed too broadly, unreliable restart behavior, invisible health state, or unmanaged runtime noise
@@ -79,6 +81,7 @@ Treat uncertain data and external-contract cleanup as high risk. Stop when autho
 - duplicate, conflicting, misleading, obsolete, or ownerless documentation
 - copied shared facts that should link to their canonical owner
 - stale examples, setup steps, commands, paths, screenshots, and architectural diagrams
+- historical plans or reports retained in the active tree when Git history is the truthful owner
 - generated artifacts, caches, archives, logs, temporary files, and abandoned assets
 - inconsistent ignore rules and accidental tracked output
 

@@ -14,6 +14,22 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.16
+
+- Browser serving — breaking and required: `resolveBrowserDirectory()` and
+  `createBrowserServing()` now take `defaultBrowserDir` instead of the retired
+  `legacyBrowserDir` name, and the corresponding selection mode is `default` instead of `legacy`.
+  Rename the option and any explicit mode checks; there is deliberately no compatibility alias.
+
+## 0.9.15
+
+- Cleaner working method — completed migrations and replacements now require forward-only closure:
+  remove proven superseded implementations, compatibility surfaces, one-time operators, stale
+  instructions, jobs, generated artifacts, and rollback targets, while retaining authoritative
+  data, required schema history, current-architecture backups, and current recovery safeguards.
+  Cleaner also performs a fresh purpose-and-ownership anti-drift audit after its planned work.
+  Refresh the package so repository agents receive the current portable skill.
+
 ## 0.9.14
 
 - `cx-explorer` browse mode — added the `editable` input (default `true`). Set it to `false`
@@ -473,12 +489,11 @@ apply a version whose section is missing.
   moves the username into an instant tooltip on the right; the menu keeps working from
   the avatar. Bind it to the surrounding navigation's collapsed state.
 - `cx-menu` and `cx-popover` — additive: `placement` (`'auto' | 'top' | 'right' |
-  `'bottom' | 'left'`, default `auto`) chooses which side of the anchor a menu surface
-  opens on; explicit sides are honored and viewport-clamped, with `left`/`right` falling
-  back to the opposite side only when the requested one has no room. A context
-  presentation may now carry an `owner` element: tooltips on it stand down while the
-  menu is open, focus returns to it on close, and a side placement hugs its rect.
-  `cx-popover` accepts `left`/`right` in its `placement` input and animates the surface
+`'bottom' | 'left'`, default `auto`) chooses which side of the anchor a menu surface
+opens on; explicit sides are honored and viewport-clamped, with `left`/`right`falling
+back to the opposite side only when the requested one has no room. A context
+presentation may now carry an`owner`element: tooltips on it stand down while the
+menu is open, focus returns to it on close, and a side placement hugs its rect.`cx-popover`accepts`left`/`right`in its`placement` input and animates the surface
   in along the matching axis. Menus that pass no placement keep their exact previous
   behavior; the root surface merely gained the same entry-origin treatment submenus
   always had.

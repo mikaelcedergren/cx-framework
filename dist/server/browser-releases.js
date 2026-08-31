@@ -211,9 +211,9 @@ export function browserReleasePaths(repoRoot) {
         root,
     });
 }
-export function resolveBrowserDirectory({ repoRoot, legacyBrowserDir, browserDirOverride, }) {
+export function resolveBrowserDirectory({ repoRoot, defaultBrowserDir, browserDirOverride, }) {
     const paths = browserReleasePaths(repoRoot);
-    const legacy = safeAbsolutePath(legacyBrowserDir, "Legacy browser directory");
+    const defaultDirectory = safeAbsolutePath(defaultBrowserDir, "Default browser directory");
     if (browserDirOverride !== undefined) {
         const override = configuredBrowserOverride(paths.repoRoot, browserDirOverride);
         return Object.freeze({
@@ -234,12 +234,12 @@ export function resolveBrowserDirectory({ repoRoot, legacyBrowserDir, browserDir
         });
     }
     if (lstatIfPresent(paths.activation)) {
-        throw new Error(`This site has migrated to versioned releases, but its active browser link is missing: ${paths.currentBrowser}`);
+        throw new Error(`This site selected versioned releases, but its active browser link is missing: ${paths.currentBrowser}`);
     }
     try {
         return Object.freeze({
-            browserDir: validateBrowserDirectory(legacy),
-            mode: "legacy",
+            browserDir: validateBrowserDirectory(defaultDirectory),
+            mode: "default",
             repoRoot: paths.repoRoot,
             useReleaseHistory: false,
         });
@@ -249,7 +249,7 @@ export function resolveBrowserDirectory({ repoRoot, legacyBrowserDir, browserDir
             throw error;
     }
     return Object.freeze({
-        browserDir: legacy,
+        browserDir: defaultDirectory,
         mode: "missing",
         repoRoot: paths.repoRoot,
         useReleaseHistory: false,

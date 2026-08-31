@@ -27,6 +27,25 @@ Do not use “architecture” to justify crossing an explicit scope boundary. Su
 - Treat breakage as information, but account for its real impact.
 - Use evidence over assumptions. Report uncertainty instead of inventing confidence.
 
+## Forward-only transition closure
+
+A completed migration or replacement has one current architecture. Close it by removing the old
+implementation and every active mechanism that teaches, selects, generates, installs, validates,
+or restores it. This includes compatibility aliases, one-time import/adoption commands, feature
+gates whose decision is already permanent, historical runbooks, stale tests, old service
+definitions, obsolete generated output, and retained release targets containing superseded code.
+
+Do not confuse safety with reversibility to an obsolete design:
+
+- keep authoritative data and schema history required to open it
+- keep backups and recovery built from the current architecture
+- keep current transactional deployment safeguards
+- remove source and artifacts whose only purpose is returning to the replaced architecture
+
+Use Git history for historical investigation. Current source and documentation must describe one
+truthful system. When another agent searches the checkout, it should find only the present path and
+an explicit current owner.
+
 ## Ownership model
 
 Classify repositories and important subsystems before editing:

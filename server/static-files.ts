@@ -183,12 +183,12 @@ export function resolvePrerenderedEntry(
 export function createBrowserServing({
   express,
   repoRoot,
-  legacyBrowserDir,
+  defaultBrowserDir,
   browserDirOverride,
 }: {
   express: StaticFileFactory;
   repoRoot: string;
-  legacyBrowserDir: string;
+  defaultBrowserDir: string;
   browserDirOverride?: string;
 }): BrowserServing {
   if (!express || typeof express.static !== "function") {
@@ -198,7 +198,7 @@ export function createBrowserServing({
   }
   const selection = resolveBrowserDirectory({
     repoRoot,
-    legacyBrowserDir,
+    defaultBrowserDir,
     ...(browserDirOverride === undefined ? {} : { browserDirOverride }),
   });
   const requestSnapshots = new WeakMap<object, string>();

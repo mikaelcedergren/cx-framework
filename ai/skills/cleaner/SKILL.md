@@ -95,6 +95,23 @@ When resolution reaches a repeatable need in an in-scope, editable shared owner,
 
 Maintain one canonical implementation. Add a shared abstraction only when it simplifies the current system now.
 
+### Close completed transitions completely
+
+When a migration, replacement, consolidation, or architectural transition is already complete,
+the cleanup is not finished while the old route still exists in the current checkout. Prove and
+remove every superseded implementation, compatibility surface, one-time operator, source gate,
+configuration entry, scheduled job, generated artifact, test fixture, runbook, and rollback target
+that can return the system to the replaced design.
+
+Git history is historical evidence, not current authority. Do not keep executable or instructional
+remnants “just in case.” Preserve user data, legally required records, external contracts, schema
+migrations needed to open current data, current-architecture backups, and current-architecture
+recovery. Distinguish those protections explicitly from a fallback to superseded code.
+
+After deleting a completed transition, search the complete active scope for its old names, paths,
+commands, labels, flags, terminology, copied guidance, and retained artifacts. A passing build does
+not prove closure if another agent can still discover and follow the old route.
+
 ## 5. Protect deliberate product truth
 
 Compatibility is not a goal for stale internal implementation. External contracts, user data, migrations, security boundaries, public URLs, SEO behavior, integrations, and deliberate UX require evidence and explicit impact accounting before breakage.
@@ -111,6 +128,14 @@ Use the repository's pinned toolchain and canonical commands. Match verification
 - rendered browser checks for uncertain UI, interaction, responsive, or accessibility changes
 - frozen or equivalent dependency installs when manifests or lockfiles changed
 - final Git diffs and status for unintended files or generated drift
+
+Then perform one independent anti-drift pass after every planned item is complete:
+
+1. Re-read the scope's purpose and canonical ownership map.
+2. Ignore the implementation sequence and inspect the result as a fresh system.
+3. Search for competing implementations, duplicated truth, superseded terminology, compatibility
+   escape hatches, completed transition machinery, and paths that can restore deleted behavior.
+4. Add and resolve every new supported finding before calling the cleanup complete.
 
 Do not silence, skip, downgrade, or route around failures. Fix verified in-scope causes. Record pre-existing failures and real external blockers honestly.
 

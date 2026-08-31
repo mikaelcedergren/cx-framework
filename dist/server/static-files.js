@@ -75,13 +75,13 @@ export function resolvePrerenderedEntry(browserDir, requestPath) {
         : resolve(browserRoot, ...segments, "index.html");
     return isContainedPath(browserRoot, candidate) ? candidate : undefined;
 }
-export function createBrowserServing({ express, repoRoot, legacyBrowserDir, browserDirOverride, }) {
+export function createBrowserServing({ express, repoRoot, defaultBrowserDir, browserDirOverride, }) {
     if (!express || typeof express.static !== "function") {
         throw new Error("createBrowserServing requires an Express-compatible static-file factory.");
     }
     const selection = resolveBrowserDirectory({
         repoRoot,
-        legacyBrowserDir,
+        defaultBrowserDir,
         ...(browserDirOverride === undefined ? {} : { browserDirOverride }),
     });
     const requestSnapshots = new WeakMap();

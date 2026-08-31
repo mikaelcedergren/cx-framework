@@ -15,7 +15,7 @@ export interface BrowserRelease {
     readonly createdAtMs: number;
     readonly releaseId: string;
 }
-export type BrowserDirectoryMode = "active-release" | "legacy" | "missing" | "override";
+export type BrowserDirectoryMode = "active-release" | "default" | "missing" | "override";
 export interface BrowserDirectorySelection {
     readonly browserDir: string;
     readonly mode: BrowserDirectoryMode;
@@ -61,9 +61,9 @@ export interface ValidateBrowserArtifactOptions {
  */
 export declare function validateBrowserArtifact(browserDir: string, { expectedBuildId, maxArtifactBytes, maxEntries, maxDepth, maxFileBytes, }?: ValidateBrowserArtifactOptions): BrowserArtifactValidation;
 export declare function browserReleasePaths(repoRoot: string): BrowserReleasePaths;
-export declare function resolveBrowserDirectory({ repoRoot, legacyBrowserDir, browserDirOverride, }: {
+export declare function resolveBrowserDirectory({ repoRoot, defaultBrowserDir, browserDirOverride, }: {
     repoRoot: string;
-    legacyBrowserDir: string;
+    defaultBrowserDir: string;
     browserDirOverride?: string;
 }): BrowserDirectorySelection;
 export declare function browserDirectoryForSnapshot(selection: BrowserDirectorySelection): string;

@@ -43,10 +43,10 @@ export declare function resolveBrowserDirectoryOverride({ browserDirOverride, en
 }): string | undefined;
 export declare function staticFileOptions(overrides?: Readonly<Record<string, unknown>>): StaticFileOptions;
 export declare function resolvePrerenderedEntry(browserDir: string, requestPath: string): string | undefined;
-export declare function createBrowserServing({ express, repoRoot, legacyBrowserDir, browserDirOverride, }: {
+export declare function createBrowserServing({ express, repoRoot, defaultBrowserDir, browserDirOverride, }: {
     express: StaticFileFactory;
     repoRoot: string;
-    legacyBrowserDir: string;
+    defaultBrowserDir: string;
     browserDirOverride?: string;
 }): BrowserServing;
 export declare function retainedReleaseAssetMiddleware({ repoRoot, }: {

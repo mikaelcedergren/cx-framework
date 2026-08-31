@@ -53,6 +53,12 @@ Create exactly one `<scope-root>/temp/CLEANUP.md` with this structure:
 
 ## Verification progress
 
+## Independent anti-drift audit
+- Purpose and ownership re-read:
+- Fresh-system findings:
+- Superseded names, paths, commands, labels, artifacts, and copied guidance searched:
+- New findings resolved or reported:
+
 ## Completion state
 - Status: planning | executing | verifying | blocked | complete
 - Blocker or remaining work:
@@ -118,4 +124,7 @@ Lead with what remains wrong, risky, blocked, or uncertain. If nothing remains w
 
 ## Cleanup completion
 
-Delete `temp/CLEANUP.md` after all planned work is verified or explicitly reported and before the final response. If a real blocker prevents completion, keep it for automatic resume and tell the user exactly what is needed.
+Delete `temp/CLEANUP.md` only after all planned work is verified or explicitly reported, the
+independent anti-drift audit is recorded and resolved, and no temporary artifact remains. Delete it
+before the final response. If a real blocker prevents completion, keep it for automatic resume and
+tell the user exactly what is needed.

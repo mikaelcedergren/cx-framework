@@ -43,7 +43,7 @@ export function resolveStaticSiteConfiguration({ appName, browserDir, browserDir
         /[\u0000-\u001f\u007f]/.test(configuredAppName)) {
         throw new Error("Static-site appName must be safe non-empty text.");
     }
-    const legacyBrowserDir = browserDir
+    const defaultBrowserDir = browserDir
         ? resolveConfiguredPath(root, browserDir, "browserDir")
         : join(root, "dist", "browser");
     const selectedOverride = resolveBrowserDirectoryOverride({
@@ -62,7 +62,7 @@ export function resolveStaticSiteConfiguration({ appName, browserDir, browserDir
     });
     return Object.freeze({
         appName: configuredAppName,
-        browserDir: legacyBrowserDir,
+        browserDir: defaultBrowserDir,
         ...(selectedOverride === undefined
             ? {}
             : { browserDirOverride: selectedOverride }),
@@ -104,7 +104,7 @@ export function createStaticSiteApplication(options) {
     const browserServing = createBrowserServing({
         express: options.express,
         repoRoot: configuration.repoRoot,
-        legacyBrowserDir: configuration.browserDir,
+        defaultBrowserDir: configuration.browserDir,
         ...(configuration.browserDirOverride === undefined
             ? {}
             : { browserDirOverride: configuration.browserDirOverride }),
