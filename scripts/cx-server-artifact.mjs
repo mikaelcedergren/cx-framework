@@ -182,21 +182,16 @@ export async function buildServerArtifact({
     workspaceSourceBytes,
     lockfileSourceBytes,
     manifestSource,
-  ] =
-    await Promise.all([
-      readStableFile(
-        rootPackageFile,
-        "Root package manifest",
-        MAX_JSON_BYTES,
-      ),
-      readStableFile(
-        workspaceFile,
-        "pnpm workspace manifest",
-        MAX_WORKSPACE_BYTES,
-      ),
-      readStableFile(lockfile, "pnpm lockfile", MAX_LOCKFILE_BYTES),
-      readStableFile(manifestFile, "Product manifest", MAX_JSON_BYTES),
-    ]);
+  ] = await Promise.all([
+    readStableFile(rootPackageFile, "Root package manifest", MAX_JSON_BYTES),
+    readStableFile(
+      workspaceFile,
+      "pnpm workspace manifest",
+      MAX_WORKSPACE_BYTES,
+    ),
+    readStableFile(lockfile, "pnpm lockfile", MAX_LOCKFILE_BYTES),
+    readStableFile(manifestFile, "Product manifest", MAX_JSON_BYTES),
+  ]);
   const rootPackage = parseJsonRecord(
     rootPackageSource,
     "Root package manifest",
@@ -205,10 +200,7 @@ export async function buildServerArtifact({
     workspaceSourceBytes,
     "pnpm workspace manifest",
   );
-  const lockfileSource = decodeUtf8(
-    lockfileSourceBytes,
-    "pnpm lockfile",
-  );
+  const lockfileSource = decodeUtf8(lockfileSourceBytes, "pnpm lockfile");
 
   validateRootPackage(rootPackage);
   assertNoOverrides({ rootPackage, workspaceSource });
@@ -248,10 +240,7 @@ export async function buildServerArtifact({
       "Server workspace package must stay inside the repository.",
     );
   }
-  const serverPackageFile = path.join(
-    serverSourceRoot,
-    PACKAGE_MANIFEST_NAME,
-  );
+  const serverPackageFile = path.join(serverSourceRoot, PACKAGE_MANIFEST_NAME);
   const serverPackageSource = await readStableFile(
     serverPackageFile,
     "Server package manifest",
@@ -641,11 +630,15 @@ async function resolveLocalPnpmCli(repositoryRoot) {
     );
   }
   if (!isInside(nodeModulesRoot, packageRoot)) {
-    throw new Error("The local pnpm package must stay inside root node_modules.");
+    throw new Error(
+      "The local pnpm package must stay inside root node_modules.",
+    );
   }
   const packageMetadata = await lstat(packageRoot);
   if (packageMetadata.isSymbolicLink() || !packageMetadata.isDirectory()) {
-    throw new Error("The resolved local pnpm package must be a real directory.");
+    throw new Error(
+      "The resolved local pnpm package must be a real directory.",
+    );
   }
 
   const packageJson = await readJsonRecord(

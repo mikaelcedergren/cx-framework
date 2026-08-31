@@ -1311,6 +1311,19 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   }
 
   private focusTypeaheadMatch(lastKey: string): void {
+    // Extending a multi-character query must keep the option that already
+    // matches it. Starting after that option would cycle to a longer sibling
+    // (for example `check-square` after `check`) on the final keystroke.
+    const activeOption = this.filteredOptions$().find(
+      option => option.id === this.activeOptionIdState(),
+    );
+    if (
+      this.typeaheadBuffer.length > 1 &&
+      activeOption &&
+      activeOption.label.toLocaleLowerCase().startsWith(this.typeaheadBuffer)
+    ) {
+      return;
+    }
     if (this.focusMatchingOption(this.typeaheadBuffer)) {
       return;
     }

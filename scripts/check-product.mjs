@@ -815,6 +815,19 @@ function validateToolchain({
       "package.json must define the canonical build:server:release script.",
     );
   }
+  const localPnpmVersion =
+    typeof toolchain.packageManager === "string"
+      ? toolchain.packageManager.match(/^pnpm@([^+]+)\+sha512\./u)?.[1]
+      : undefined;
+  if (!localPnpmVersion) {
+    issues.push(
+      "The web standard packageManager must be an integrity-qualified pnpm locator.",
+    );
+  } else if (packageJson.devDependencies?.pnpm !== localPnpmVersion) {
+    issues.push(
+      `Root devDependencies.pnpm must be exactly ${localPnpmVersion} so server artifacts use the repository-contained package-manager CLI.`,
+    );
+  }
 
   const dependencyDeclarations = packageJsons.flatMap(
     ({ relativePath, value }) =>

@@ -14,6 +14,26 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.13
+
+- `cx-dropdown` typeahead — corrected: while a multi-character query is being extended, the
+  currently focused matching option remains active instead of cycling to a longer sibling that
+  shares the same prefix. Rebuild browser consumers; no markup or input change is required.
+- Web-platform checks — required toolchain declaration: the root must declare exact `pnpm`
+  `11.23.0` in `devDependencies`, matching the integrity-qualified `packageManager` locator. This
+  gives sealed server-artifact builds a repository-contained pnpm CLI. Add the dependency, refresh
+  the lockfile, and run the canonical check.
+- Other Angular components, tokens, icons, styles, and server-runtime behavior are unchanged.
+
+## 0.9.12
+
+- Owned SQLite startup — corrected without an API change: the configured busy timeout now applies
+  to the native database connection before an established database runs its read-only pre-write
+  verification. This prevents legitimate lock contention from bypassing the product's declared
+  wait policy during startup. Refresh the framework package and rebuild the server artifact;
+  product source and migration definitions require no change.
+- Angular components, tokens, icons, styles, and visual defaults are unchanged in this version.
+
 ## 0.9.11
 
 - Server artifacts — deploy hardening with one required local-validation change: refresh the
