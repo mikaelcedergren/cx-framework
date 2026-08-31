@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.17
+
+- SQLite migration ledgers — breaking cleanup: removed the unused one-time
+  `adoptSqliteMigrationLedger` API and its adoption types. Every current product already owns a
+  canonical framework ledger. Keep applying immutable append-only definitions through
+  `applySqliteMigrations()` or `applySqliteMigrationsAtomically()`; do not recreate an adoption or
+  compatibility path.
+
 ## 0.9.16
 
 - Browser serving — breaking and required: `resolveBrowserDirectory()` and
@@ -400,16 +408,6 @@ apply a version whose section is missing.
   API router so its success and error responses carry `private, no-store`. Do not apply static asset
   caching policy to dynamic user or product data. The site gate preserves an upstream header that
   already contains `no-store`, including `private, no-store` on a locked API response.
-- SQLite legacy-ledger adoption — additive: existing SQLite products must call
-  `adoptSqliteMigrationLedger` exactly once before their first `applySqliteMigrations` run. Supply
-  the complete current migration definitions plus a synchronous `verifyLegacyState` callback that
-  verifies the product-owned legacy schema, data, record counts or canonical hashes, and legacy
-  ledger before returning its contiguous applied-version prefix. Verification and canonical-ledger
-  insertion share one immediate transaction; the framework copies safe legacy timestamps when
-  supplied, writes canonical names and fingerprints from the current definitions, never reruns
-  adopted SQL, and refuses any existing canonical ledger. The callback is read-only; put every
-  legacy schema or data copy in a subsequent append-only migration. Do not replace product-specific
-  verification with a version-only copy.
 - Durable jobs — breaking configuration and additive runtime change: every
   `createDurableJobStore` call must now set the database-wide `maxConcurrentJobs`. Use `1` when
   strict queue order or an attempt-neutral resource-capacity barrier is required, and configure the

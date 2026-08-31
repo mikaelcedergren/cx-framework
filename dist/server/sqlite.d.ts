@@ -120,23 +120,6 @@ export interface SqliteMigrationResult {
     readonly appliedVersions: readonly number[];
     readonly currentVersion: number;
 }
-export interface VerifiedLegacySqliteMigration {
-    readonly version: number;
-    readonly appliedAt?: string;
-}
-export interface SqliteMigrationLedgerAdoptionOptions extends SqliteMigrationOptions {
-    /**
-     * Verify the product-owned legacy schema, data, and migration ledger, then return the
-     * contiguous applied prefix. This callback runs synchronously inside the adoption's
-     * `BEGIN IMMEDIATE` transaction so its evidence cannot change before the canonical ledger
-     * is written. It must not mutate the database.
-     */
-    readonly verifyLegacyState: (database: SyncSqliteDatabase) => readonly VerifiedLegacySqliteMigration[];
-}
-export interface SqliteMigrationLedgerAdoptionResult {
-    readonly adoptedVersions: readonly number[];
-    readonly currentVersion: number;
-}
 /**
  * Existing products adopt this ledger with a verified one-time copy from any legacy ledger.
  * Pointing the runner at a differently shaped legacy table would hide migration history drift.
@@ -166,16 +149,6 @@ export declare function applySqliteMigrations(database: SyncSqliteDatabase, migr
  * the new ledger.
  */
 export declare function applySqliteMigrationsAtomically<Evidence>(database: SyncSqliteDatabase, migrations: readonly SqliteMigration[], options: AtomicSqliteMigrationOptions<Evidence>): SqliteMigrationResult;
-/**
- * Adopt a verified legacy migration history without re-running its migration SQL.
- *
- * The framework can validate versions and write the current migration definitions' canonical
- * names and fingerprints, but it cannot infer whether a product's legacy schema and data match
- * those definitions. The caller must prove that inside `verifyLegacyState`, including any
- * product-specific record-count or canonical-hash checks, before returning the applied prefix.
- * Any verification or insertion failure rolls the entire adoption back.
- */
-export declare function adoptSqliteMigrationLedger(database: SyncSqliteDatabase, migrations: readonly SqliteMigration[], options: SqliteMigrationLedgerAdoptionOptions): SqliteMigrationLedgerAdoptionResult;
 export declare function verifySqliteIntegrity(database: ReadonlySyncSqliteDatabase): void;
 export {};
 //# sourceMappingURL=sqlite.d.ts.map

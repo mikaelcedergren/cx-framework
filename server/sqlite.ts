@@ -173,47 +173,15 @@ export interface SqliteMigrationResult {
   readonly currentVersion: number;
 }
 
-export interface VerifiedLegacySqliteMigration {
-  readonly version: number;
-  readonly appliedAt?: string;
-}
-
-export interface SqliteMigrationLedgerAdoptionOptions extends SqliteMigrationOptions {
-  /**
-   * Verify the product-owned legacy schema, data, and migration ledger, then return the
-   * contiguous applied prefix. This callback runs synchronously inside the adoption's
-   * `BEGIN IMMEDIATE` transaction so its evidence cannot change before the canonical ledger
-   * is written. It must not mutate the database.
-   */
-  readonly verifyLegacyState: (
-    database: SyncSqliteDatabase,
-  ) => readonly VerifiedLegacySqliteMigration[];
-}
-
-export interface SqliteMigrationLedgerAdoptionResult {
-  readonly adoptedVersions: readonly number[];
-  readonly currentVersion: number;
-}
-
 interface PreparedMigration {
   readonly fingerprint: string;
   readonly migration: SqliteMigration;
-}
-
-interface PreparedMigrationLedgerAdoption {
-  readonly appliedAt: string;
-  readonly definition: PreparedMigration;
 }
 
 interface MigrationLedgerRow extends SqliteRow {
   readonly version: number;
   readonly name: string;
   readonly fingerprint: string;
-}
-
-interface MigrationLedgerObjectRow extends SqliteRow {
-  readonly schema_name: string;
-  readonly type: string;
 }
 
 const MIGRATION_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
@@ -818,72 +786,6 @@ export function applySqliteMigrationsAtomically<Evidence>(
   });
 }
 
-/**
- * Adopt a verified legacy migration history without re-running its migration SQL.
- *
- * The framework can validate versions and write the current migration definitions' canonical
- * names and fingerprints, but it cannot infer whether a product's legacy schema and data match
- * those definitions. The caller must prove that inside `verifyLegacyState`, including any
- * product-specific record-count or canonical-hash checks, before returning the applied prefix.
- * Any verification or insertion failure rolls the entire adoption back.
- */
-export function adoptSqliteMigrationLedger(
-  database: SyncSqliteDatabase,
-  migrations: readonly SqliteMigration[],
-  options: SqliteMigrationLedgerAdoptionOptions,
-): SqliteMigrationLedgerAdoptionResult {
-  if (typeof options.fingerprint !== "function") {
-    throw new Error(
-      "SQLite migration-ledger adoption requires a fingerprint function.",
-    );
-  }
-  if (typeof options.now !== "function") {
-    throw new Error("SQLite migration-ledger adoption requires a clock.");
-  }
-  if (typeof options.verifyLegacyState !== "function") {
-    throw new Error(
-      "SQLite migration-ledger adoption requires caller-side legacy state verification.",
-    );
-  }
-  const prepared = prepareMigrations(migrations, options.fingerprint);
-
-  return withImmediateTransaction(database, () => {
-    assertMigrationLedgerAbsent(database);
-    const verifiedLegacyMigrations = options.verifyLegacyState(database);
-    if (isPromiseLike(verifiedLegacyMigrations)) {
-      throw new Error(
-        "SQLite legacy state verification must be synchronous inside the adoption transaction.",
-      );
-    }
-    const adoptions = prepareMigrationLedgerAdoptions(
-      verifiedLegacyMigrations,
-      prepared,
-      options.now,
-    );
-
-    // The verifier is product-owned code. Recheck the reserved name so it cannot accidentally
-    // create or shadow the canonical ledger between the initial guard and framework ownership.
-    assertMigrationLedgerAbsent(database);
-    database.execute(MIGRATION_LEDGER_SQL);
-    for (const adoption of adoptions) {
-      insertMigrationLedgerEntry(
-        database,
-        adoption.definition,
-        adoption.appliedAt,
-      );
-    }
-    assertMigrationLedger(database, prepared);
-
-    const adoptedVersions = adoptions.map(
-      ({ definition }) => definition.migration.version,
-    );
-    return Object.freeze({
-      adoptedVersions: Object.freeze(adoptedVersions),
-      currentVersion: adoptedVersions.at(-1) ?? 0,
-    });
-  });
-}
-
 export function verifySqliteIntegrity(
   database: ReadonlySyncSqliteDatabase,
 ): void {
@@ -953,87 +855,6 @@ function canonicalMigrationSource(migration: SqliteMigration): string {
     statements: migration.statements,
     version: migration.version,
   });
-}
-
-function prepareMigrationLedgerAdoptions(
-  legacyMigrations: unknown,
-  migrations: readonly PreparedMigration[],
-  now: () => string,
-): readonly PreparedMigrationLedgerAdoption[] {
-  if (!Array.isArray(legacyMigrations) || legacyMigrations.length < 1) {
-    throw new Error(
-      "Verified legacy SQLite migrations must be a non-empty array.",
-    );
-  }
-
-  const versions = new Set<number>();
-  return legacyMigrations.map((value, index) => {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      throw new Error(
-        `Verified legacy SQLite migration at index ${index} must be a record.`,
-      );
-    }
-    const legacy = value as Readonly<Record<string, unknown>>;
-    const version = legacy["version"];
-    if (
-      typeof version !== "number" ||
-      !Number.isSafeInteger(version) ||
-      version < 1
-    ) {
-      throw new Error(
-        `Verified legacy SQLite migration at index ${index} must have a positive safe-integer version.`,
-      );
-    }
-    if (versions.has(version)) {
-      throw new Error(`Duplicate legacy SQLite migration version ${version}.`);
-    }
-    versions.add(version);
-
-    const definition = migrations[version - 1];
-    if (!definition) {
-      throw new Error(
-        `Legacy SQLite ledger contains unknown migration version ${version}.`,
-      );
-    }
-    const expectedVersion = index + 1;
-    if (version !== expectedVersion) {
-      throw new Error(
-        `Legacy SQLite migration versions must be contiguous from 1; expected ${expectedVersion}, received ${version}.`,
-      );
-    }
-
-    const appliedAtValue = legacy["appliedAt"];
-    const appliedAt =
-      appliedAtValue === undefined
-        ? migrationTimestamp(now)
-        : validateMigrationTimestamp(
-            appliedAtValue,
-            `Legacy SQLite migration ${version} appliedAt`,
-          );
-    return Object.freeze({ appliedAt, definition });
-  });
-}
-
-function assertMigrationLedgerAbsent(database: SyncSqliteDatabase): void {
-  const existing = database.get<MigrationLedgerObjectRow>(
-    `SELECT schema_name, type
-     FROM (
-       SELECT 'main' AS schema_name, type, name FROM sqlite_schema
-       UNION ALL
-       SELECT 'temp' AS schema_name, type, name FROM sqlite_temp_schema
-     )
-     WHERE name = ?
-     ORDER BY schema_name
-     LIMIT 1`,
-    [SQLITE_MIGRATION_LEDGER_TABLE],
-  );
-  if (!existing) return;
-
-  const schema = stringColumn(existing, "schema_name");
-  const type = stringColumn(existing, "type");
-  throw new Error(
-    `Cannot adopt the SQLite migration ledger because ${schema}.${SQLITE_MIGRATION_LEDGER_TABLE} already exists as ${type}.`,
-  );
 }
 
 function insertMigrationLedgerEntry(

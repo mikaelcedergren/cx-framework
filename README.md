@@ -89,7 +89,6 @@ import { listenHttpApplication } from "@mikaelcedergren/cx-framework/server/list
 import { readBoundedResponseJson } from "@mikaelcedergren/cx-framework/server/bounded-response";
 import { loadPrivateEnvironmentFile } from "@mikaelcedergren/cx-framework/server/private-environment";
 import {
-  adoptSqliteMigrationLedger,
   applySqliteMigrations,
   openOwnedSqliteDatabase,
   type OpenOwnedSqliteDatabaseOptions,
@@ -173,15 +172,6 @@ connection when its atomic publication proof cannot use the long-lived WAL lifec
 exception inside documented, tested migration machinery: it must not be selectable by ordinary web
 or worker startup, and it must close before runtime activation. In-memory tests and schema fixtures
 remain outside the file-backed runtime contract.
-
-An existing SQLite product calls `adoptSqliteMigrationLedger` once before its first framework
-migration run. Its required `verifyLegacyState` callback runs synchronously under the same
-`BEGIN IMMEDIATE` transaction and must verify the product-owned legacy schema, data, record counts
-or canonical hashes, and old ledger before returning the known contiguous applied-version prefix.
-Verification is read-only; any schema or data copy belongs in a subsequent append-only migration.
-The framework never infers that product state is correct and never reruns adopted SQL: it only
-validates the returned metadata and writes the current definitions' canonical names and
-fingerprints. Any verification or insertion failure leaves the canonical ledger absent.
 
 When a new append-only migration suffix transfers ownership of copied state, use
 `applySqliteMigrationsAtomically()`. Its read-only `captureState` callback records the old evidence
