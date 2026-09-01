@@ -9,147 +9,180 @@
         <span class="cx-explorer__skeleton-row"></span>
       }
     </div>
-  } @else if (hasFolders()) {
-    <div class="cx-explorer__folders">
-      @for (folder of folders$(); track folder.id) {
-        <section class="cx-explorer__folder">
-          <div class="cx-explorer__row cx-explorer__row--folder">
-            @if (isRenaming('folder', folder.id)) {
-              <span class="cx-explorer__row-icon" aria-hidden="true">
-                <cx-icon icon="folder" [size]="16" />
-              </span>
-              <input
-                class="cx-explorer__rename-input"
-                type="text"
-                aria-label="Folder name"
-                [value]="folder.name"
-                (blur)="commitRename($event, 'folder', folder)"
-                (keydown.enter)="onRenameEnter($event)"
-                (keydown.escape)="cancelRename($event)"
-              />
-            } @else {
+  } @else if (hasContent()) {
+    <div class="cx-explorer__content">
+      @if (rootItems$().length > 0) {
+        <ul class="cx-explorer__root-items">
+          @for (item of rootItems$(); track item.id) {
+            <li
+              class="cx-explorer__row cx-explorer__row--root"
+              [style.--cx-explorer-accent]="itemAccent(item)"
+            >
               <button
                 class="cx-explorer__row-main"
                 type="button"
-                [attr.aria-expanded]="isFolderExpanded(folder)"
-                (click)="toggleFolder(folder)"
-                (dblclick)="editable && beginRename('folder', folder.id)"
+                [class.cx-explorer__row-main--selected]="isSelected(item)"
+                [attr.aria-current]="isSelected(item) ? 'true' : null"
+                (click)="onItemPressed(item)"
               >
-                <span class="cx-explorer__row-icon" aria-hidden="true">
-                  <cx-icon icon="folder" [size]="16" />
+                <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                  <cx-icon [icon]="itemIcon(item)" [size]="16" />
                 </span>
                 <span
-                  class="cx-explorer__row-label cx-explorer__row-label--folder"
+                  class="cx-explorer__row-label cx-explorer__row-label--root"
                   data-cx-tooltip-overflow
-                  [cxTooltip]="folder.name"
+                  [cxTooltip]="item.name"
                   [cxTooltipOverflow]="true"
-                >{{ folder.name }}</span>
-                <cx-icon
-                  class="cx-explorer__chevron"
-                  [icon]="isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'"
-                  [size]="16"
-                />
+                >{{ item.name }}</span>
               </button>
-              <div class="cx-explorer__row-actions">
-                @if (editable) {
-                  <cx-icon-button
-                    icon="plus"
-                    size="small"
-                    variant="transparent"
-                    [ariaLabel]="createItemText"
-                    [cxTooltip]="createItemText"
-                    (pressed)="onCreateItem(folder)"
+            </li>
+          }
+        </ul>
+      }
+
+      @if (hasFolders()) {
+        <div class="cx-explorer__folders">
+          @for (folder of folders$(); track folder.id) {
+            <section class="cx-explorer__folder">
+              <div class="cx-explorer__row cx-explorer__row--folder">
+                @if (isRenaming('folder', folder.id)) {
+                  <span class="cx-explorer__row-icon" aria-hidden="true">
+                    <cx-icon icon="folder" [size]="16" />
+                  </span>
+                  <input
+                    class="cx-explorer__rename-input"
+                    type="text"
+                    aria-label="Folder name"
+                    [value]="folder.name"
+                    (blur)="commitRename($event, 'folder', folder)"
+                    (keydown.enter)="onRenameEnter($event)"
+                    (keydown.escape)="cancelRename($event)"
                   />
-                }
-                @if (hasFolderMenu()) {
-                  <cx-menu
-                    [presentation]="{ kind: 'trigger' }"
-                    [items]="folderMenu()"
-                    ariaLabel="Folder actions"
-                    (itemSelect)="onFolderMenuSelect(folder, $event)"
+                } @else {
+                  <button
+                    class="cx-explorer__row-main"
+                    type="button"
+                    [attr.aria-expanded]="isFolderExpanded(folder)"
+                    (click)="toggleFolder(folder)"
+                    (dblclick)="editable && beginRename('folder', folder.id)"
                   >
-                    <cx-icon-button
-                      cxMenuTrigger
-                      icon="menu-horizontal"
-                      size="small"
-                      variant="transparent"
-                      ariaLabel="Folder actions"
+                    <span class="cx-explorer__row-icon" aria-hidden="true">
+                      <cx-icon icon="folder" [size]="16" />
+                    </span>
+                    <span
+                      class="cx-explorer__row-label cx-explorer__row-label--folder"
+                      data-cx-tooltip-overflow
+                      [cxTooltip]="folder.name"
+                      [cxTooltipOverflow]="true"
+                    >{{ folder.name }}</span>
+                    <cx-icon
+                      class="cx-explorer__chevron"
+                      [icon]="isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'"
+                      [size]="16"
                     />
-                  </cx-menu>
+                  </button>
+                  <div class="cx-explorer__row-actions">
+                    @if (editable) {
+                      <cx-icon-button
+                        icon="plus"
+                        size="small"
+                        variant="transparent"
+                        [ariaLabel]="createItemText"
+                        [cxTooltip]="createItemText"
+                        (pressed)="onCreateItem(folder)"
+                      />
+                    }
+                    @if (hasFolderMenu()) {
+                      <cx-menu
+                        [presentation]="{ kind: 'trigger' }"
+                        [items]="folderMenu()"
+                        ariaLabel="Folder actions"
+                        (itemSelect)="onFolderMenuSelect(folder, $event)"
+                      >
+                        <cx-icon-button
+                          cxMenuTrigger
+                          icon="menu-horizontal"
+                          size="small"
+                          variant="transparent"
+                          ariaLabel="Folder actions"
+                        />
+                      </cx-menu>
+                    }
+                  </div>
                 }
               </div>
-            }
-          </div>
 
-          @if (folder.items.length > 0) {
-            <div
-              class="cx-explorer__items"
-              [class.cx-explorer__items--expanded]="isFolderExpanded(folder)"
-            >
-              <ul class="cx-explorer__items-inner">
-                @for (item of folder.items; track item.id) {
-                  <li
-                    class="cx-explorer__row cx-explorer__row--item"
-                    #itemRow
-                    [style.--cx-explorer-accent]="itemAccent(item)"
-                  >
-                    @if (isRenaming('item', item.id)) {
-                      <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
-                        <cx-icon [icon]="itemIcon(item)" [size]="16" />
-                      </span>
-                      <input
-                        class="cx-explorer__rename-input"
-                        type="text"
-                        aria-label="Page name"
-                        [value]="item.name"
-                        (blur)="commitRename($event, 'item', item)"
-                        (keydown.enter)="onRenameEnter($event)"
-                        (keydown.escape)="cancelRename($event)"
-                      />
-                    } @else {
-                      <button
-                        class="cx-explorer__row-main"
-                        type="button"
-                        [class.cx-explorer__row-main--selected]="isSelected(item)"
-                        [attr.aria-current]="isSelected(item) ? 'true' : null"
-                        (click)="onItemPressed(item)"
-                        (dblclick)="editable && beginRename('item', item.id)"
+              @if (folder.items.length > 0) {
+                <div
+                  class="cx-explorer__items"
+                  [class.cx-explorer__items--expanded]="isFolderExpanded(folder)"
+                >
+                  <ul class="cx-explorer__items-inner">
+                    @for (item of folder.items; track item.id) {
+                      <li
+                        class="cx-explorer__row cx-explorer__row--item"
+                        #itemRow
+                        [style.--cx-explorer-accent]="itemAccent(item)"
                       >
-                        <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
-                          <cx-icon [icon]="itemIcon(item)" [size]="16" />
-                        </span>
-                        <span
-                          class="cx-explorer__row-label"
-                          data-cx-tooltip-overflow
-                          [cxTooltip]="item.name"
-                          [cxTooltipOverflow]="true"
-                        >{{ item.name }}</span>
-                      </button>
-                      <div class="cx-explorer__row-actions">
-                        @if (hasItemMenu()) {
-                          <cx-menu
-                            [presentation]="{ kind: 'trigger' }"
-                            [items]="itemMenu()"
-                            ariaLabel="Page actions"
-                            (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
+                        @if (isRenaming('item', item.id)) {
+                          <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                            <cx-icon [icon]="itemIcon(item)" [size]="16" />
+                          </span>
+                          <input
+                            class="cx-explorer__rename-input"
+                            type="text"
+                            aria-label="Page name"
+                            [value]="item.name"
+                            (blur)="commitRename($event, 'item', item)"
+                            (keydown.enter)="onRenameEnter($event)"
+                            (keydown.escape)="cancelRename($event)"
+                          />
+                        } @else {
+                          <button
+                            class="cx-explorer__row-main"
+                            type="button"
+                            [class.cx-explorer__row-main--selected]="isSelected(item)"
+                            [attr.aria-current]="isSelected(item) ? 'true' : null"
+                            (click)="onItemPressed(item)"
+                            (dblclick)="editable && beginRename('item', item.id)"
                           >
-                            <cx-icon-button
-                              cxMenuTrigger
-                              icon="menu-horizontal"
-                              size="small"
-                              variant="transparent"
-                              ariaLabel="Page actions"
-                            />
-                          </cx-menu>
+                            <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                              <cx-icon [icon]="itemIcon(item)" [size]="16" />
+                            </span>
+                            <span
+                              class="cx-explorer__row-label"
+                              data-cx-tooltip-overflow
+                              [cxTooltip]="item.name"
+                              [cxTooltipOverflow]="true"
+                            >{{ item.name }}</span>
+                          </button>
+                          <div class="cx-explorer__row-actions">
+                            @if (hasItemMenu()) {
+                              <cx-menu
+                                [presentation]="{ kind: 'trigger' }"
+                                [items]="itemMenu()"
+                                ariaLabel="Page actions"
+                                (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
+                              >
+                                <cx-icon-button
+                                  cxMenuTrigger
+                                  icon="menu-horizontal"
+                                  size="small"
+                                  variant="transparent"
+                                  ariaLabel="Page actions"
+                                />
+                              </cx-menu>
+                            }
+                          </div>
                         }
-                      </div>
+                      </li>
                     }
-                  </li>
-                }
-              </ul>
-            </div>
+                  </ul>
+                </div>
+              }
+            </section>
           }
-        </section>
+        </div>
       }
     </div>
   }

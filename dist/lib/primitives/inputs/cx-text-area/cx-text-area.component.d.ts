@@ -51,6 +51,7 @@ export declare class CxTextAreaComponent {
     private readonly disabledState;
     private readonly sizeState;
     private readonly sizingState;
+    private readonly layoutState;
     private readonly minLinesState;
     private readonly maxLinesState;
     private readonly maxLengthState;
@@ -67,8 +68,8 @@ export declare class CxTextAreaComponent {
     monospace: boolean;
     variant: CxTextAreaVariant;
     focusVariant: CxTextAreaFocusVariant;
-    layout: CxTextAreaLayout;
     presentation: CxTextAreaPresentation;
+    set layout(value: CxTextAreaLayout | undefined);
     set markdown(value: boolean);
     set disabled(value: boolean);
     set size(value: CxTextAreaSize | undefined);
@@ -91,6 +92,7 @@ export declare class CxTextAreaComponent {
     protected readonly disabled$: import("@angular/core").Signal<boolean>;
     protected readonly size$: import("@angular/core").Signal<CxTextAreaSize>;
     protected readonly sizing$: import("@angular/core").Signal<CxTextAreaSizing>;
+    protected readonly layout$: import("@angular/core").Signal<CxTextAreaLayout>;
     protected readonly minLines$: import("@angular/core").Signal<number>;
     protected readonly maxLines$: import("@angular/core").Signal<number | undefined>;
     protected readonly maxLength$: import("@angular/core").Signal<number | undefined>;
@@ -136,7 +138,7 @@ export declare class CxTextAreaComponent {
     private heightForLines;
     private parsePixelValue;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxTextAreaComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxTextAreaComponent, "cx-text-area", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "monospace": { "alias": "monospace"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "focusVariant": { "alias": "focusVariant"; "required": false; }; "layout": { "alias": "layout"; "required": false; }; "presentation": { "alias": "presentation"; "required": false; }; "markdown": { "alias": "markdown"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "sizing": { "alias": "sizing"; "required": false; }; "minLines": { "alias": "minLines"; "required": false; }; "maxLines": { "alias": "maxLines"; "required": false; }; "maxLength": { "alias": "maxLength"; "required": false; }; "lineNumbers": { "alias": "lineNumbers"; "required": false; }; "annotations": { "alias": "annotations"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "focusChange": "focusChange"; "blurred": "blurred"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxTextAreaComponent, "cx-text-area", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "monospace": { "alias": "monospace"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "focusVariant": { "alias": "focusVariant"; "required": false; }; "presentation": { "alias": "presentation"; "required": false; }; "layout": { "alias": "layout"; "required": false; }; "markdown": { "alias": "markdown"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "sizing": { "alias": "sizing"; "required": false; }; "minLines": { "alias": "minLines"; "required": false; }; "maxLines": { "alias": "maxLines"; "required": false; }; "maxLength": { "alias": "maxLength"; "required": false; }; "lineNumbers": { "alias": "lineNumbers"; "required": false; }; "annotations": { "alias": "annotations"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "focusChange": "focusChange"; "blurred": "blurred"; }, never, never, true, never>;
 }
 export {};
 //# sourceMappingURL=cx-text-area.component.d.ts.map

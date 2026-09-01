@@ -4,7 +4,7 @@ import { type CxTagColor } from '../../primitives/display/cx-tag';
 import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
 import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
 import * as i0 from "@angular/core";
-/** A content entry inside a folder. Icon and color are its visual identity. */
+/** A selectable content entry. Icon and color are its visual identity. */
 export interface CxExplorerItem {
     id: string;
     name: string;
@@ -41,12 +41,14 @@ type CxExplorerRenameTarget = {
 };
 /**
  * Content rail for browsing and managing one-level collections of user
- * content: folders hold items. Editable explorers expose mutation controls;
- * browse-only explorers preserve hierarchy and selection without them. Unlike
- * `cx-side-nav` it navigates nothing — the consumer owns persisted effects.
+ * content: persistent root items can sit above folders, and folders hold
+ * nested items. Editable explorers expose mutation controls for folders and
+ * nested items; root items stay browse-only. Unlike `cx-side-nav` it navigates
+ * nothing — the consumer owns persisted effects.
  */
 export declare class CxExplorerComponent implements OnDestroy {
     private readonly host;
+    private readonly rootItemsState;
     private readonly foldersState;
     private readonly selectedItemIdState;
     private readonly itemIconsState;
@@ -65,6 +67,8 @@ export declare class CxExplorerComponent implements OnDestroy {
      */
     protected readonly pickerOverlay: CxFloatingSurfaceController;
     set folders(value: readonly CxExplorerFolder[] | null | undefined);
+    /** Persistent, browse-only selections rendered above the folder hierarchy. */
+    set rootItems(value: readonly CxExplorerItem[] | null | undefined);
     set selectedItemId(value: string | undefined);
     loading: boolean;
     /** Enables the built-in create, rename, restyle, and delete controls. */
@@ -90,12 +94,14 @@ export declare class CxExplorerComponent implements OnDestroy {
     /** Delete intent only — the consumer owns confirmation and the actual removal. */
     readonly itemDelete: EventEmitter<string>;
     readonly menuAction: EventEmitter<CxExplorerMenuAction>;
+    protected readonly rootItems$: import("@angular/core").Signal<readonly CxExplorerItem[]>;
     protected readonly folders$: import("@angular/core").Signal<readonly CxExplorerFolder[]>;
     protected readonly selectedItemId$: import("@angular/core").Signal<string | undefined>;
     protected readonly itemIcons$: import("@angular/core").Signal<readonly CxIconName[]>;
     /** The item the icon & color editor is open for; closes when the item disappears. */
     protected readonly pickerItem: import("@angular/core").Signal<CxExplorerItem | null>;
     ngOnDestroy(): void;
+    protected hasContent(): boolean;
     protected hasFolders(): boolean;
     protected isFolderExpanded(folder: CxExplorerFolder): boolean;
     protected toggleFolder(folder: CxExplorerFolder): void;
@@ -132,7 +138,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     /** Selection always lands visible: clear an explicit close on its folder. */
     private revealItem;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxExplorerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "folders": { "alias": "folders"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "folders": { "alias": "folders"; "required": false; }; "rootItems": { "alias": "rootItems"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
     static ngAcceptInputType_editable: unknown;
 }
 export {};

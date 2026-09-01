@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, afterRenderEffect, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  afterRenderEffect,
+  computed,
+  signal,
+} from '@angular/core';
 import { marked } from 'marked';
 import { CxValidationMessageComponent } from '../../feedback/cx-validation-message';
 import { CxIconComponent } from '../../media/cx-icon';
@@ -63,6 +74,9 @@ type CxTextAreaRenderedLine = {
   imports: [CxIconComponent, CxValidationMessageComponent],
   templateUrl: './cx-text-area.component.html',
   styleUrl: './cx-text-area.component.scss',
+  host: {
+    '[class.cx-text-area-host--fill]': "layout$() === 'fill'",
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxTextAreaComponent {
@@ -74,6 +88,7 @@ export class CxTextAreaComponent {
   private readonly disabledState = signal(false);
   private readonly sizeState = signal<CxTextAreaSize>('default');
   private readonly sizingState = signal<CxTextAreaSizing>('resizable');
+  private readonly layoutState = signal<CxTextAreaLayout>('default');
   private readonly minLinesState = signal(3);
   private readonly maxLinesState = signal<number | undefined>(undefined);
   private readonly maxLengthState = signal<number | undefined>(undefined);
@@ -93,8 +108,12 @@ export class CxTextAreaComponent {
   @Input() monospace = false;
   @Input() variant: CxTextAreaVariant = 'default';
   @Input() focusVariant: CxTextAreaFocusVariant = 'default';
-  @Input() layout: CxTextAreaLayout = 'default';
   @Input() presentation: CxTextAreaPresentation = 'default';
+
+  @Input()
+  public set layout(value: CxTextAreaLayout | undefined) {
+    this.layoutState.set(value === 'fill' ? 'fill' : 'default');
+  }
 
   @Input()
   public set markdown(value: boolean) {
@@ -179,6 +198,7 @@ export class CxTextAreaComponent {
   protected readonly disabled$ = this.disabledState.asReadonly();
   protected readonly size$ = this.sizeState.asReadonly();
   protected readonly sizing$ = this.sizingState.asReadonly();
+  protected readonly layout$ = this.layoutState.asReadonly();
   protected readonly minLines$ = this.minLinesState.asReadonly();
   protected readonly maxLines$ = computed(() => {
     const maxLines = this.maxLinesState();
@@ -347,13 +367,18 @@ export class CxTextAreaComponent {
   }
 
   constructor() {
-    afterRenderEffect(() => {
+    afterRenderEffect((onCleanup) => {
       this.valueState();
       this.sizingState();
       this.minLinesState();
       this.maxLines$();
       this.sizeState();
-      this.resizeField();
+      this.layoutState();
+
+      // Layout classes are written during the same render. Measure on the next
+      // frame so a transition out of fill cannot inherit its stretched height.
+      const frame = requestAnimationFrame(() => this.resizeField());
+      onCleanup(() => cancelAnimationFrame(frame));
     });
   }
 
@@ -529,7 +554,15 @@ export class CxTextAreaComponent {
 
   private resizeField(): void {
     const el = this.fieldRef?.nativeElement;
-    if (!el || this.layout === 'fill') {
+    if (!el) {
+      return;
+    }
+
+    if (this.layoutState() === 'fill') {
+      el.style.minHeight = '';
+      el.style.maxHeight = '';
+      el.style.height = '';
+      el.style.overflowY = '';
       return;
     }
 
@@ -537,19 +570,25 @@ export class CxTextAreaComponent {
     const maxLines = this.maxLines$();
     const maxHeight = maxLines === undefined ? undefined : this.heightForLines(el, maxLines);
 
-    el.style.minHeight = `${minHeight}px`;
-    el.style.maxHeight = maxHeight === undefined ? '' : `${maxHeight}px`;
-
     if (this.sizingState() !== 'auto') {
+      el.style.minHeight = `${minHeight}px`;
+      el.style.maxHeight = maxHeight === undefined ? '' : `${maxHeight}px`;
       el.style.height = '';
       el.style.overflowY = '';
       return;
     }
 
-    el.style.height = 'auto';
-    const nextHeight = Math.max(minHeight, maxHeight === undefined ? el.scrollHeight : Math.min(el.scrollHeight, maxHeight));
+    // Remove every height constraint before measuring so scrollHeight cannot
+    // retain a previously stretched textarea when content or layout shrinks.
+    el.style.minHeight = '0px';
+    el.style.maxHeight = '0px';
+    el.style.height = '0px';
+    const contentHeight = el.scrollHeight;
+    const nextHeight = Math.max(minHeight, maxHeight === undefined ? contentHeight : Math.min(contentHeight, maxHeight));
+    el.style.minHeight = `${minHeight}px`;
+    el.style.maxHeight = maxHeight === undefined ? '' : `${maxHeight}px`;
     el.style.height = `${nextHeight}px`;
-    el.style.overflowY = maxHeight !== undefined && el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    el.style.overflowY = maxHeight !== undefined && contentHeight > maxHeight ? 'auto' : 'hidden';
   }
 
   private heightForLines(el: HTMLTextAreaElement, lines: number): number {

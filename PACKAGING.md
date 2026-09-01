@@ -46,7 +46,7 @@ transport works without gaining another destination. Angular dependency workers 
 with only the packaged render hook, localhost host fence, source maps, and an owned runtime-root
 Node compile cache admitted through their worker options. Its
 containment boundary assumes trusted repository source and ordinary dependencies; it does not claim
-to sandbox deliberately malicious same-user/in-process code or native non-Node subprocesses. The three
+to sandbox deliberately malicious same-user/in-process code or native non-Node subprocesses. The four
 installed executable scripts are package commands, and
 `scripts/workspace-contract.mjs` is their private shared parser helper. None is an importable public
 package subpath.
@@ -194,7 +194,8 @@ check:
 
 The installed dependency is deliberately narrower. Its `files` allowlist carries immutable
 `dist/`, public AI/assets/styles/tokens/support/platform resources, including the self-contained component authority, the two package documents, and
-the three runtime commands (`cx-framework-skills`, `cx-platform-check`, and `cx-server-artifact`)
+the four package commands (`cx-development-favicon`, `cx-framework-skills`, `cx-platform-check`, and
+`cx-server-artifact`)
 plus their private, non-exported `workspace-contract.mjs` parser helper. Raw Angular and Node
 TypeScript, workbench source, root TypeScript entry files, build scripts, and tsconfigs remain in
 the generated repository for CI but never enter a consumer or server artifact. This distinction

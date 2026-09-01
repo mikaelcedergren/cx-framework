@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 128,
-  "catalogSha256": "e1ec39a2141d848f8d28bd0c8e57582079626bdff323195e6f70cd1a99a2f41d",
+  "catalogSha256": "eb5adcef0feaf88bcf317dab0d76eb91194df47f8ce54d92449e965787472ad5",
   "components": [
     {
       "name": "cx-account-control",
@@ -4326,6 +4326,15 @@
             "source": "decorator"
           },
           {
+            "binding": "rootItems",
+            "member": "rootItems",
+            "type": "readonly CxExplorerItem[] | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "selectedItemId",
             "member": "selectedItemId",
             "type": "string | undefined",
@@ -4394,17 +4403,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "391208effb396394e6a44155b827d91253815c5632d7626e20f9fd45741ce754"
+          "sha256": "f8d38016516ebe3e0a8a971059333649e6b411af27d1f7065335b6f715c5b329"
         },
         "template": {
           "kind": "external",
-          "sha256": "e03e4082f3b7798f45cb8ad28ed9e7a91668561a62116601efafeeb3680758b7"
+          "sha256": "3dd0c9782fed862e9f24e7d515fc3cf95046217a8512690bb9a80192775c6209"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "cde107dabf4d914bba36d7aa5919057ae4d80fa531ca78ee01c8443d9491dd80"
+            "sha256": "959b7b6c4b80f30fde88b4bc62d0e302facca0d1df107ecc4dcf7e6469b9c5b8"
           }
         ]
       }
@@ -12516,10 +12525,10 @@
           {
             "binding": "layout",
             "member": "layout",
-            "type": "CxTextAreaLayout",
+            "type": "CxTextAreaLayout | undefined",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -12673,17 +12682,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "fcb7d34f52d0edfdd851e446abfd06662cd5252656bfd0ec91dfb8843fb3ef77"
+          "sha256": "5d7a2baf41840094b92e1282bc099c26ed7b6a593686acff92afa4b0c273927c"
         },
         "template": {
           "kind": "external",
-          "sha256": "1b22e13308d192d0640c56a8d82e1c1d23b69d71c9db63b1e1a81e47123e6fe2"
+          "sha256": "5adc61e63036fa06b7b290f5816aa665d10329fb2481dc82ca563fdc29602519"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "4e8d220c86819e1f000bbbbd58859de7d5ac030f8db871498550d7f77f1b51bc"
+            "sha256": "3ca5683a4f4b587bf50ad187c95b150b36046e0e9e00da35386bc662ff15d2fb"
           }
         ]
       }

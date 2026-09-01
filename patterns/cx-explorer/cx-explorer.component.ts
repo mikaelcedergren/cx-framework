@@ -25,7 +25,7 @@ import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
 import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
 
-/** A content entry inside a folder. Icon and color are its visual identity. */
+/** A selectable content entry. Icon and color are its visual identity. */
 export interface CxExplorerItem {
   id: string;
   name: string;
@@ -108,9 +108,10 @@ type CxExplorerRenameTarget = { kind: 'folder' | 'item'; id: string };
 
 /**
  * Content rail for browsing and managing one-level collections of user
- * content: folders hold items. Editable explorers expose mutation controls;
- * browse-only explorers preserve hierarchy and selection without them. Unlike
- * `cx-side-nav` it navigates nothing — the consumer owns persisted effects.
+ * content: persistent root items can sit above folders, and folders hold
+ * nested items. Editable explorers expose mutation controls for folders and
+ * nested items; root items stay browse-only. Unlike `cx-side-nav` it navigates
+ * nothing — the consumer owns persisted effects.
  */
 @Component({
   selector: 'cx-explorer',
@@ -130,6 +131,7 @@ type CxExplorerRenameTarget = { kind: 'folder' | 'item'; id: string };
 export class CxExplorerComponent implements OnDestroy {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
+  private readonly rootItemsState = signal<readonly CxExplorerItem[]>([]);
   private readonly foldersState = signal<readonly CxExplorerFolder[]>([]);
   private readonly selectedItemIdState = signal<string | undefined>(undefined);
   private readonly itemIconsState = signal<readonly CxIconName[]>(CX_EXPLORER_DEFAULT_ITEM_ICONS);
@@ -158,7 +160,17 @@ export class CxExplorerComponent implements OnDestroy {
 
   @Input()
   public set folders(value: readonly CxExplorerFolder[] | null | undefined) {
-    this.foldersState.set(validateExplorerFolders(value ?? []));
+    const folders = validateExplorerFolders(value ?? []);
+    assertUniqueExplorerItemIds(this.rootItemsState(), folders);
+    this.foldersState.set(folders);
+  }
+
+  /** Persistent, browse-only selections rendered above the folder hierarchy. */
+  @Input()
+  public set rootItems(value: readonly CxExplorerItem[] | null | undefined) {
+    const rootItems = validateExplorerItems(value ?? [], 'rootItems');
+    assertUniqueExplorerItemIds(rootItems, this.foldersState());
+    this.rootItemsState.set(rootItems);
   }
 
   @Input()
@@ -215,6 +227,7 @@ export class CxExplorerComponent implements OnDestroy {
   @Output() readonly itemDelete = new EventEmitter<string>();
   @Output() readonly menuAction = new EventEmitter<CxExplorerMenuAction>();
 
+  protected readonly rootItems$ = this.rootItemsState.asReadonly();
   protected readonly folders$ = this.foldersState.asReadonly();
   protected readonly selectedItemId$ = this.selectedItemIdState.asReadonly();
   protected readonly itemIcons$ = this.itemIconsState.asReadonly();
@@ -232,6 +245,10 @@ export class CxExplorerComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.pickerOverlay.destroy();
+  }
+
+  protected hasContent(): boolean {
+    return this.rootItemsState().length > 0 || this.foldersState().length > 0;
   }
 
   protected hasFolders(): boolean {
@@ -484,6 +501,47 @@ function validateExplorerFolders(value: readonly CxExplorerFolder[]): readonly C
     });
     return { ...folder, id, items };
   });
+}
+
+function validateExplorerItems(
+  value: readonly CxExplorerItem[],
+  inputName: string,
+): readonly CxExplorerItem[] {
+  if (!Array.isArray(value)) {
+    throw new Error(`[cx-explorer] ${inputName} must be an array.`);
+  }
+  const itemIds = new Set<string>();
+  return value.map((item, index) => {
+    const path = `${inputName}[${index}]`;
+    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    if (!id) {
+      throw new Error(`[cx-explorer] ${path} requires a non-empty id.`);
+    }
+    if (itemIds.has(id)) {
+      throw new Error(`[cx-explorer] item id "${id}" must be unique within ${inputName}.`);
+    }
+    itemIds.add(id);
+    if (typeof item.name !== 'string') {
+      throw new Error(`[cx-explorer] ${path}.name must be a string.`);
+    }
+    return { ...item, id };
+  });
+}
+
+function assertUniqueExplorerItemIds(
+  rootItems: readonly CxExplorerItem[],
+  folders: readonly CxExplorerFolder[],
+): void {
+  const rootIds = new Set(rootItems.map(item => item.id));
+  for (const folder of folders) {
+    for (const item of folder.items) {
+      if (rootIds.has(item.id)) {
+        throw new Error(
+          `[cx-explorer] item id "${item.id}" must be unique across rootItems and folders.`,
+        );
+      }
+    }
+  }
 }
 
 function validateExplorerMenuItems(

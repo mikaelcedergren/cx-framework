@@ -3,7 +3,7 @@
   [class.cx-text-area--small]="size$() === 'small'"
   [class.cx-text-area--large]="size$() === 'large'"
   [class.cx-text-area--title]="variant === 'title'"
-  [class.cx-text-area--fill]="layout === 'fill'"
+  [class.cx-text-area--fill]="layout$() === 'fill'"
   [class.cx-text-area--document]="presentation === 'document'"
 >
   @if (label.trim()) {

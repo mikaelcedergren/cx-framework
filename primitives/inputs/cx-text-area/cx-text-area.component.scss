@@ -5,6 +5,12 @@
   width: 100%;
 }
 
+:host(.cx-text-area-host--fill) {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 0;
+}
+
 .cx-text-area {
   --cx-text-area-font-size: var(--font-size-body);
   --cx-text-area-line-height: var(--line-height-body);
@@ -320,8 +326,8 @@
   line-height: 1.2;
 }
 
-// layout="fill": grow the editor (and markdown preview) to fill a flex-column
-// parent. The host element must be a growing flex item for this to take effect.
+// layout="fill": claim the remaining space in a bounded flex-column parent,
+// then stretch the editor and markdown preview through that assigned height.
 .cx-text-area--fill {
   height: 100%;
   display: flex;
@@ -356,6 +362,7 @@
 
   .cx-text-area__field {
     resize: none;
+    overflow-y: auto;
   }
 
   .cx-text-area__markdown {

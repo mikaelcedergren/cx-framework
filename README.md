@@ -488,6 +488,55 @@ import {
 
 Do not draw one-off app icons when a framework icon exists. If a reusable icon is missing, add it to the framework icon source and regenerate the manifest.
 
+## Development favicons
+
+Use `cx-development-favicon` when a product needs its development tabs to remain visibly distinct
+from published tabs in Safari and Chromium browsers. The command owns one fixed visual language:
+the product mark becomes `#ff980a`, moves away from the top-right corner, and receives the shared
+notched-corner shape. Products may choose only how their existing mark is extracted; they cannot
+customise the environment colour, geometry, or placement.
+
+Create `cx-development-favicon.json` at the consuming repository root:
+
+```json
+{
+  "mark": {
+    "source": "public/assets/favicon-32.png",
+    "mode": "alpha",
+    "threshold": 64
+  },
+  "index": {
+    "production": "src/index.html",
+    "development": "src/index.development.html"
+  },
+  "favicon": {
+    "file": "public/assets/favicon-development.svg",
+    "href": "/assets/favicon-development.svg"
+  },
+  "maskIcon": {
+    "file": "public/assets/favicon-development-mask.svg",
+    "href": "/assets/favicon-development-mask.svg"
+  }
+}
+```
+
+PNG marks use one explicit extraction mode: `alpha`, `dark`, `light`, or `non-white`, with an
+integer threshold from 1 through 255. A vector mark instead uses a strict SVG containing only
+`currentColor`/`none` self-closing paths and omits `mode` and `threshold`.
+
+Generate the two SVG assets and derived development index explicitly, then keep the read-only check
+in the product's canonical gate:
+
+```sh
+pnpm exec cx-development-favicon --apply
+pnpm exec cx-development-favicon
+```
+
+The generated development index replaces only ordinary favicon and Safari mask links. It retains
+the production index's touch icon, manifest, metadata, and application markup byte-for-byte, and
+the production index continues to reference only the published favicon set. Configure the local
+Angular build to use the generated file as `index.html`; production keeps the source index.
+
 ## AI design docs
 
 The canonical AI design package lives in `ai/design/`. Consumers can resolve its entry document through `@mikaelcedergren/cx-framework/ai`. Read `00-start-here.md` for precedence and task-local retrieval, then search only the relevant owner:

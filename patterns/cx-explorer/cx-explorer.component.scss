@@ -62,7 +62,7 @@
   animation: cx-explorer-skeleton 1.2s ease-in-out infinite;
 }
 
-.cx-explorer__folders {
+.cx-explorer__content {
   display: flex;
   min-height: 0;
   flex: 1 1 auto;
@@ -72,6 +72,24 @@
   overflow: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
+}
+
+.cx-explorer__root-items,
+.cx-explorer__folders {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+}
+
+.cx-explorer__root-items {
+  gap: var(--cx-explorer-row-gap);
+  list-style: none;
+}
+
+.cx-explorer__folders {
+  gap: var(--space-sm);
 }
 
 .cx-explorer__folder {
@@ -128,6 +146,7 @@
   font-weight: var(--font-weight-medium);
 }
 
+.cx-explorer__row--root,
 .cx-explorer__row--item {
   list-style: none;
 }
@@ -170,6 +189,10 @@
 }
 
 .cx-explorer__row-label--folder {
+  font-weight: var(--font-weight-medium);
+}
+
+.cx-explorer__row-label--root {
   font-weight: var(--font-weight-medium);
 }
 

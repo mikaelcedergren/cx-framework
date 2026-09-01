@@ -4,6 +4,8 @@ This folder is the **portable design spec** for products on any implementation p
 
 ## Normative language
 
+[MUST] Treat these rules as the default design judgment within their scope. Let a consuming product's own constraints, or an explicit decision from the user or accountable product owner, take precedence over them. Apply that decision only to the context it addresses, preserve every unaffected rule, and briefly surface any material consequence without continuing to argue against it.
+
 The portable design spec uses four explicit levels:
 
 - `[MUST]` is mandatory inside its stated scope. If compliance is impossible or conflicts with another `[MUST]` at the same authority, surface the conflict instead of improvising.

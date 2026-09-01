@@ -14,6 +14,24 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.22
+
+- Development favicons — added the dependency-free `cx-development-favicon` command. Public
+  websites can now generate one fixed amber, notched development favicon plus an identical Safari
+  mask and a development-only index derived from the production index. Add
+  `cx-development-favicon.json`, generate the files with `--apply`, select the derived index only in
+  the local Angular configuration, and run the read-only command from the canonical `check` gate.
+- `cx-text-area` fill layout — `layout="fill"` now claims the remaining space in a bounded
+  vertical flex layout, ignores line-based sizing and user resizing, and keeps long text scrollable
+  inside the field. The parent still owns the bounded height and vertical composition.
+- `cx-explorer` persistent selections — added the additive `rootItems` input (default `[]`).
+  Use it for stable, browse-only collection destinations that must remain above the folder
+  hierarchy, such as an inbox or pending list. Root and nested item ids must be unique across the explorer.
+- Portable AI rule precedence — clarified that explicit product-owner decisions override applicable
+  defaults only in the context they address, while every unaffected design rule remains in force.
+- Tokens, ordinary production favicons, styles, and Node runtime behavior are unchanged in this
+  version.
+
 ## 0.9.21
 
 - Heading typefaces — the additive `slab` option resolves to Zilla Slab with real normal weights
