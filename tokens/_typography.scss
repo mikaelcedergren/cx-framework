@@ -10,13 +10,15 @@
   // Exactly one is live per product: an identity here is Inter plus one of
   // these, never two heading faces on the same page.
   //
-  // `condensed` names proportion rather than voice on purpose. Width is the
-  // reason you reach for that face, so it is the honest name; a construction
-  // name like `geometric` would not be, and none belong here.
+  // `condensed` and `slab` name construction rather than voice on purpose.
+  // Width and serif structure are the reasons you reach for those faces, so
+  // those are the honest names; less useful construction labels do not belong
+  // here.
   --typeface-editorial: 'DM Serif Display', serif;
-  --typeface-friendly: 'Rubik', sans-serif;
+  --typeface-friendly: 'Raleway', sans-serif;
   --typeface-elegant: 'Plus Jakarta Sans', sans-serif;
   --typeface-condensed: 'Archivo Narrow', sans-serif;
+  --typeface-slab: 'Zilla Slab', serif;
 
   // The one role that varies — what .cx-article headings and cx-font-serif
   // render in. A consuming product overrides this single token to pick its
@@ -24,7 +26,7 @@
   // font directly, so it inherits whatever that voice resolves to.
   //
   // The default ships a single weight (400), so bold headings on it are
-  // synthesised by the browser; the other three carry real weight axes.
+  // synthesised by the browser; the other four carry real heading weights.
   --font-family-heading: var(--typeface-editorial);
 
   --font-size-display: clamp(40px, 5vw, 72px);

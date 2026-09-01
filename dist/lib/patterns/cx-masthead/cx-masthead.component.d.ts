@@ -1,8 +1,8 @@
-import { EventEmitter } from "@angular/core";
-import { type IsActiveMatchOptions } from "@angular/router";
-import { type CxIconName } from "../../icons/manifest";
+import { EventEmitter } from '@angular/core';
+import { type IsActiveMatchOptions } from '@angular/router';
+import { type CxIconName } from '../../icons/manifest';
 import * as i0 from "@angular/core";
-export type CxMastheadVariant = "default" | "frosted";
+export type CxMastheadVariant = 'default' | 'frosted';
 export type CxMastheadItem = {
     id: string;
     label: string;

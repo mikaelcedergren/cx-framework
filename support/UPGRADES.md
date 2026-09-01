@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.21
+
+- Heading typefaces — the additive `slab` option resolves to Zilla Slab with real normal weights
+  from 300 through 700. Select it with `--typeface-slab` or the public `CxTypeface` value `slab`.
+  The existing `friendly` option now resolves to variable Raleway 100–900 instead of Rubik; products
+  already selecting `friendly` change appearance without source changes. Re-copy the package's
+  `fonts/*.woff2` assets and remove the retired `Rubik.woff2` file.
+- Other Angular components, tokens, icons, styles, portable AI guidance, and Node runtime behavior
+  are unchanged in this version.
+
 ## 0.9.20
 
 - Mastheads — `[sticky]="true"` now pins the `cx-masthead` host, so it remains at the top of its

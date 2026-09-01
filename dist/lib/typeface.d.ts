@@ -4,8 +4,8 @@
  * A product's identity is Inter plus exactly one of these — body and mono never
  * vary, and no page shows two heading faces at once. Everything here is named
  * by voice rather than by font, so replacing the file behind a voice never
- * makes the name lie; `condensed` is the deliberate exception, because width is
- * genuinely the reason that face gets picked.
+ * makes the name lie; `condensed` and `slab` are deliberate exceptions, because
+ * width and serif structure are genuinely why those faces get picked.
  *
  * The values live in `tokens/_typography.scss` as `--typeface-*`. This file is
  * the same menu for code that has to name a face — a Playground project
@@ -19,7 +19,7 @@ export declare const CX_TYPEFACES: readonly [{
 }, {
     readonly id: "friendly";
     readonly label: "Friendly";
-    readonly voice: "Warm, rounded, contemporary";
+    readonly voice: "Open, welcoming, contemporary";
 }, {
     readonly id: "elegant";
     readonly label: "Elegant";
@@ -28,6 +28,10 @@ export declare const CX_TYPEFACES: readonly [{
     readonly id: "condensed";
     readonly label: "Condensed";
     readonly voice: "Dense, journalistic, width-efficient";
+}, {
+    readonly id: "slab";
+    readonly label: "Slab";
+    readonly voice: "Characterful, sturdy, literary";
 }];
 export type CxTypefaceDefinition = (typeof CX_TYPEFACES)[number];
 export type CxTypeface = CxTypefaceDefinition['id'];

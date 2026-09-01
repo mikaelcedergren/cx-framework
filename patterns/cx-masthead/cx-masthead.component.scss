@@ -1,4 +1,4 @@
-@use "../../tokens/breakpoints-scale" as breakpoints;
+@use '../../tokens/breakpoints-scale' as breakpoints;
 
 :host {
   display: block;
@@ -23,9 +23,7 @@
   background: transparent;
 }
 
-@supports (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .cx-masthead--frosted {
     background: color-mix(in srgb, var(--surface) 88%, transparent);
     -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 4));
@@ -115,9 +113,7 @@
   display: none;
 }
 
-.cx-masthead:not(
-  :has(.cx-masthead__brand > *, .cx-masthead__nav, .cx-masthead__actions > *)
-) {
+.cx-masthead:not(:has(.cx-masthead__brand > *, .cx-masthead__nav, .cx-masthead__actions > *)) {
   display: none;
 }
 
