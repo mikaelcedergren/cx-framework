@@ -14,7 +14,7 @@ The portable design guidance and skills under `../ai/` do not read this metadata
 Do not create empty placeholder catalogs. A discovery file must be populated and consumed, or it should not exist. Do not edit `components/authority.json` by hand. Generate it from the public export graph, registry, Angular declarations, and templates:
 
 ```sh
-pnpm --filter @mikaelcedergren/cx-framework components:authority
+pnpm --dir framework components:authority
 ```
 
 The strict `components:authority:check` path compares the expected bytes without writing. It runs before every framework build and through `framework:ai:check`, so a selector, binding, projection slot, template, or owning source change cannot leave stale package evidence behind.

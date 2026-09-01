@@ -1,7 +1,8 @@
-import { EventEmitter } from '@angular/core';
-import { type IsActiveMatchOptions } from '@angular/router';
-import { type CxIconName } from '../../icons/manifest';
+import { EventEmitter } from "@angular/core";
+import { type IsActiveMatchOptions } from "@angular/router";
+import { type CxIconName } from "../../icons/manifest";
 import * as i0 from "@angular/core";
+export type CxMastheadVariant = "default" | "frosted";
 export type CxMastheadItem = {
     id: string;
     label: string;
@@ -51,7 +52,9 @@ export declare class CxMastheadComponent {
     /** Primary navigation links. */
     set items(value: CxMastheadItem[]);
     get items(): CxMastheadItem[];
-    /** Sticks the masthead to the top of its scroll container. */
+    /** Surface treatment. Frosted uses a translucent, theme-aware surface with backdrop blur. */
+    variant: CxMastheadVariant;
+    /** Sticks the component host to the top of its scroll container. */
     sticky: boolean;
     /** Accessible label for the collapsed-navigation toggle. */
     menuAriaLabel: string | undefined;
@@ -68,7 +71,7 @@ export declare class CxMastheadComponent {
     protected closeMenu(): void;
     protected onItemClick(event: MouseEvent, item: CxMastheadItem): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMastheadComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;
     static ngAcceptInputType_sticky: unknown;
 }
 //# sourceMappingURL=cx-masthead.component.d.ts.map

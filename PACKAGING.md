@@ -24,7 +24,7 @@ because a consumer still uses the old contract.
 
 Make framework changes in the source app first. New components, patterns, tokens, icons, AI docs, AI skills, support files, and scripts should live under `framework/`.
 
-Public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting. After any public component source or template change, regenerate `support/components/authority.json` with `pnpm --filter @mikaelcedergren/cx-framework components:authority`; it is derived package evidence and is never edited by hand.
+Public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting. After any public component source or template change, regenerate `support/components/authority.json` from the Cortex root with `pnpm --dir framework components:authority`; it is derived package evidence and is never edited by hand.
 
 Angular code has one package entrypoint: `@mikaelcedergren/cx-framework`. Exact component tooling resolves the packed, self-contained authority through the explicit `@mikaelcedergren/cx-framework/support/components/authority.json` export; it exposes selector/class identity, typed public bindings, projection selectors, defaults/transforms, and path-free source/template/style digests without exposing the source files themselves. Component, pattern,
 tooling, and Node TypeScript remain in the generated repository solely as rebuild-CI input; packed

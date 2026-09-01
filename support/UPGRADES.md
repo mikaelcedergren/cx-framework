@@ -14,6 +14,28 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.20
+
+- Mastheads — `[sticky]="true"` now pins the `cx-masthead` host, so it remains at the top of its
+  scroll container instead of being constrained by its own one-row host. Remove positioning
+  wrappers or CSS overrides added for the old behavior. The additive `variant="frosted"` surface
+  uses theme-aware translucency and backdrop blur with an opaque fallback; the default remains
+  unchanged, including for the collapsed mobile panel.
+- Other Angular components, tokens, icons, styles, portable AI guidance, and Node runtime behavior
+  are unchanged in this version.
+
+## 0.9.19
+
+- Operational roots — new shared `resolveOperationalRoot()` server primitive. Dynamic Node
+  products must replace local `CX_RUNTIME_ROOT`/working-directory resolvers with this function so
+  environment files, databases, browser releases, and logs share one canonical real directory.
+- Single-page browser serving — new `createSinglePageApplicationMiddlewareStack()` server
+  composition. Products with an API plus an SPA fallback must mount this ordered stack instead of
+  hand-composing static files, retained assets, missing-asset handling, and `index.html`. The
+  shared fallback forwards synchronous file errors to the product's error middleware.
+- Other Angular components, tokens, icons, styles, and visual defaults are unchanged in this
+  version.
+
 ## 0.9.18
 
 - Current architecture wording — documentation-only: the SQLite ledger and durable-job contracts

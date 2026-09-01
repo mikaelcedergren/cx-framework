@@ -3,7 +3,7 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { nodeEnvironmentValue, optionalEnvironmentValue, releaseValidationEnvironmentValue, } from "./configuration.js";
 import { createRetainedBrowserAssetResolver, readBrowserReleaseSnapshot, resolveBrowserDirectory, validateBrowserDirectory, } from "./browser-releases.js";
 import { decodeSafeRequestPathname, } from "./http.js";
-import { ONE_YEAR_SECONDS, setStaticCacheHeaders } from "./security.js";
+import { missingAssetMiddleware, ONE_YEAR_SECONDS, setStaticCacheHeaders, } from "./security.js";
 const STATIC_SNAPSHOT_CACHE_LIMIT = 8;
 /** Require a validated browser snapshot only for an ordinary production web process. */
 export function assertBrowserServingForStartup({ browserServing, environment, }) {
@@ -197,6 +197,71 @@ export function createBrowserServing({ express, repoRoot, defaultBrowserDir, bro
         staticMiddleware,
         useReleaseHistory: selection.useReleaseHistory,
     });
+}
+/**
+ * Compose the canonical browser static -> retained asset -> missing asset -> SPA fallback chain.
+ *
+ * Callers mount the returned middleware in order, then mount their JSON error middleware. Every
+ * synchronous browser-resolution or send-file failure is forwarded through `next(error)` so an
+ * Express default HTML error page can never escape a product's API/error contract.
+ */
+export function createSinglePageApplicationMiddlewareStack({ apiPathPrefix = "/api", browserServing, entryFile = "index.html", repoRoot, }) {
+    const excludedPrefix = requireSafePathPrefix(apiPathPrefix, "SPA API path prefix");
+    if (typeof entryFile !== "string" ||
+        !entryFile ||
+        entryFile !== entryFile.trim() ||
+        isAbsolute(entryFile) ||
+        /[\u0000-\u001f\u007f\\?#]/.test(entryFile)) {
+        throw new Error("SPA entry file must be one safe relative path.");
+    }
+    if (!browserServing ||
+        typeof browserServing.staticMiddleware !== "function" ||
+        typeof browserServing.sendFileForRequest !== "function") {
+        throw new Error("SPA middleware requires one BrowserServing contract.");
+    }
+    if (typeof repoRoot !== "string" ||
+        !repoRoot ||
+        !isAbsolute(repoRoot) ||
+        resolve(repoRoot) !== repoRoot) {
+        throw new Error("SPA retained-release root must be one canonical absolute path.");
+    }
+    const stack = [
+        browserServing.staticMiddleware(staticFileOptions()),
+    ];
+    if (browserServing.useReleaseHistory) {
+        stack.push(retainedReleaseAssetMiddleware({ repoRoot }));
+    }
+    stack.push(missingAssetMiddleware());
+    stack.push((request, response, next) => {
+        if (!["GET", "HEAD"].includes(request.method ?? "")) {
+            next();
+            return;
+        }
+        const pathname = decodeSafeRequestPathname(request.path ?? request.url ?? "");
+        if (pathname === undefined) {
+            next(new Error("SPA request path is invalid."));
+            return;
+        }
+        if (pathname === excludedPrefix ||
+            pathname.startsWith(`${excludedPrefix}/`)) {
+            next();
+            return;
+        }
+        try {
+            browserServing.sendFileForRequest(request, response, entryFile);
+        }
+        catch (error) {
+            next(error);
+        }
+    });
+    return Object.freeze(stack);
+}
+function requireSafePathPrefix(value, label) {
+    const normalized = decodeSafeRequestPathname(value);
+    if (normalized === undefined || normalized === "/" || normalized !== value) {
+        throw new Error(`${label} must be one safe absolute path prefix.`);
+    }
+    return normalized;
 }
 function assertBrowserOverrideRuntimePolicy(browserDir, environment, nodeEnvironment = nodeEnvironmentValue(environment), releaseValidation = releaseValidationEnvironmentValue(environment)) {
     if (nodeEnvironment === "production" && !releaseValidation) {

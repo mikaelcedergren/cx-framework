@@ -1,4 +1,7 @@
-<header class="cx-masthead" [class.cx-masthead--sticky]="sticky">
+<header
+  class="cx-masthead"
+  [class.cx-masthead--frosted]="variant === 'frosted'"
+>
   <div class="cx-masthead__inner">
     <div class="cx-masthead__brand">
       <ng-content select="[brand], [cxMastheadBrand]" />
@@ -30,7 +33,10 @@
           <ul class="cx-masthead__links">
             @for (item of items; track item.id) {
               <li class="cx-masthead__links-item">
-                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+                <ng-container
+                  [ngTemplateOutlet]="navLink"
+                  [ngTemplateOutletContext]="{ $implicit: item }"
+                />
               </li>
             }
           </ul>
@@ -50,7 +56,10 @@
           [attr.aria-label]="resolvedMenuAriaLabel()"
           (click)="toggleMenu()"
         >
-          <cx-icon [icon]="menuOpen() ? 'cross-circle' : 'menu-horizontal'" [size]="20" />
+          <cx-icon
+            [icon]="menuOpen() ? 'cross-circle' : 'menu-horizontal'"
+            [size]="20"
+          />
         </button>
       }
     </div>
@@ -67,7 +76,10 @@
           <ul class="cx-masthead__panel-links">
             @for (item of items; track item.id) {
               <li class="cx-masthead__links-item">
-                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+                <ng-container
+                  [ngTemplateOutlet]="navLink"
+                  [ngTemplateOutletContext]="{ $implicit: item }"
+                />
               </li>
             }
           </ul>
@@ -84,7 +96,9 @@
     <cx-icon class="cx-masthead__logo-icon" [icon]="logo" [size]="24" />
   }
   @if (heading) {
-    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{ heading }}</span>
+    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{
+      heading
+    }}</span>
   }
 </ng-template>
 

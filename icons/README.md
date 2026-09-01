@@ -28,9 +28,9 @@ The design source is the owner's design tooling (Figma where applicable); `svg/`
 After adding or changing an icon in `svg/`:
 
 ```sh
-pnpm --filter @mikaelcedergren/cx-framework icons:check   # validate the contract — exits non-zero on any issue
-pnpm --filter @mikaelcedergren/cx-framework icons:index   # rebuild index.html, then open it to review visually
-pnpm --filter @mikaelcedergren/cx-framework icons         # rebuild manifest.ts (the cx-icon lookup)
+pnpm --dir framework icons:check   # validate the contract — exits non-zero on any issue
+pnpm --dir framework icons:index   # rebuild index.html, then open it to review visually
+pnpm --dir framework icons         # rebuild manifest.ts (the cx-icon lookup)
 ```
 
 Record the change in `changelog.md`. A visual refinement keeps the same name; a meaning change needs a new or renamed icon and a changelog note.

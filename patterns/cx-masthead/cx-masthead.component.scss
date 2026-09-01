@@ -1,7 +1,13 @@
-@use '../../tokens/breakpoints-scale' as breakpoints;
+@use "../../tokens/breakpoints-scale" as breakpoints;
 
 :host {
   display: block;
+}
+
+:host(.cx-masthead-host--sticky) {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-sticky);
 }
 
 .cx-masthead {
@@ -13,10 +19,18 @@
   box-sizing: border-box;
 }
 
-.cx-masthead--sticky {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-index-sticky);
+.cx-masthead--frosted .cx-masthead__panel {
+  background: transparent;
+}
+
+@supports (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .cx-masthead--frosted {
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 4));
+    backdrop-filter: blur(calc(var(--frost-softness) * 4));
+  }
 }
 
 .cx-masthead__inner {
@@ -101,7 +115,9 @@
   display: none;
 }
 
-.cx-masthead:not(:has(.cx-masthead__brand > *, .cx-masthead__nav, .cx-masthead__actions > *)) {
+.cx-masthead:not(
+  :has(.cx-masthead__brand > *, .cx-masthead__nav, .cx-masthead__actions > *)
+) {
   display: none;
 }
 

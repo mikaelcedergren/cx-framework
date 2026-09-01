@@ -1,11 +1,25 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
-import { type CxIconName } from '../../icons/manifest';
-import { CxIconComponent } from '../../primitives/media/cx-icon';
-import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
+import { NgTemplateOutlet } from "@angular/common";
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+} from "@angular/core";
+import {
+  RouterLink,
+  RouterLinkActive,
+  type IsActiveMatchOptions,
+} from "@angular/router";
+import { type CxIconName } from "../../icons/manifest";
+import { CxIconComponent } from "../../primitives/media/cx-icon";
+import { CxTooltipDirective } from "../../primitives/overlay/cx-tooltip";
 
 const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
+
+export type CxMastheadVariant = "default" | "frosted";
 
 export type CxMastheadItem = {
   id: string;
@@ -41,17 +55,26 @@ let nextPanelId = 0;
  * sit on any page width without overflowing.
  */
 @Component({
-  selector: 'cx-masthead',
-  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective, RouterLink, RouterLinkActive],
-  templateUrl: './cx-masthead.component.html',
-  styleUrl: './cx-masthead.component.scss',
+  selector: "cx-masthead",
+  imports: [
+    NgTemplateOutlet,
+    CxIconComponent,
+    CxTooltipDirective,
+    RouterLink,
+    RouterLinkActive,
+  ],
+  templateUrl: "./cx-masthead.component.html",
+  styleUrl: "./cx-masthead.component.scss",
+  host: {
+    "[class.cx-masthead-host--sticky]": "sticky",
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxMastheadComponent {
   private itemsValue: CxMastheadItem[] = [];
 
   /** Brand title shown next to the logo, e.g. a name or product wordmark. */
-  @Input() heading = '';
+  @Input() heading = "";
   /** Icon used as the brand mark when no `[brand]` slot or `logoSrc` is provided. */
   @Input() logo: CxIconName | undefined;
   /** Image source for the brand mark; takes precedence over {@link logo}. */
@@ -70,7 +93,9 @@ export class CxMastheadComponent {
   public get items(): CxMastheadItem[] {
     return this.itemsValue;
   }
-  /** Sticks the masthead to the top of its scroll container. */
+  /** Surface treatment. Frosted uses a translucent, theme-aware surface with backdrop blur. */
+  @Input() variant: CxMastheadVariant = "default";
+  /** Sticks the component host to the top of its scroll container. */
   @Input({ transform: booleanAttribute }) sticky = false;
   /** Accessible label for the collapsed-navigation toggle. */
   @Input() menuAriaLabel: string | undefined;
@@ -85,16 +110,18 @@ export class CxMastheadComponent {
     return Boolean(this.heading?.trim() || this.logo || this.logoSrc);
   }
 
-  protected activeOptions(item: CxMastheadItem): { exact: boolean } | IsActiveMatchOptions {
+  protected activeOptions(
+    item: CxMastheadItem,
+  ): { exact: boolean } | IsActiveMatchOptions {
     return item.routerLinkActiveOptions ?? DEFAULT_ACTIVE_OPTIONS;
   }
 
   protected resolvedMenuAriaLabel(): string {
-    return this.menuAriaLabel?.trim() || 'Menu';
+    return this.menuAriaLabel?.trim() || "Menu";
   }
 
   protected toggleMenu(): void {
-    this.menuOpen.update(open => !open);
+    this.menuOpen.update((open) => !open);
   }
 
   protected closeMenu(): void {
@@ -114,22 +141,24 @@ export class CxMastheadComponent {
 
 function validateMastheadItems(value: CxMastheadItem[]): CxMastheadItem[] {
   if (!Array.isArray(value)) {
-    throw new Error('[cx-masthead] items must be an array.');
+    throw new Error("[cx-masthead] items must be an array.");
   }
 
   const ids = new Set<string>();
   const labels = new Set<string>();
   value.forEach((item, index) => {
-    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    const id = typeof item?.id === "string" ? item.id.trim() : "";
     if (!id) {
-      throw new Error(`[cx-masthead] item at index ${index} requires a non-empty id.`);
+      throw new Error(
+        `[cx-masthead] item at index ${index} requires a non-empty id.`,
+      );
     }
     if (ids.has(id)) {
       throw new Error(`[cx-masthead] item id "${id}" must be unique.`);
     }
     ids.add(id);
 
-    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    const label = typeof item?.label === "string" ? item.label.trim() : "";
     const labelKey = label.toLowerCase();
     if (labels.has(labelKey)) {
       throw new Error(`[cx-masthead] item label "${label}" must be unique.`);

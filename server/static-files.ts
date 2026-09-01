@@ -16,11 +16,15 @@ import {
 } from "./browser-releases.js";
 import {
   decodeSafeRequestPathname,
-  type HeaderValue,
   type HttpRequest,
+  type HttpResponse,
   type NextFunction,
 } from "./http.js";
-import { ONE_YEAR_SECONDS, setStaticCacheHeaders } from "./security.js";
+import {
+  missingAssetMiddleware,
+  ONE_YEAR_SECONDS,
+  setStaticCacheHeaders,
+} from "./security.js";
 
 const STATIC_SNAPSHOT_CACHE_LIMIT = 8;
 
@@ -29,9 +33,7 @@ export interface SendFileOptions {
   readonly root: string;
 }
 
-export interface StaticFileResponse {
-  getHeader?(name: string): HeaderValue | undefined;
-  setHeader(name: string, value: HeaderValue): unknown;
+export interface StaticFileResponse extends HttpResponse {
   sendFile(filePath: string, options: SendFileOptions): unknown;
 }
 
@@ -67,6 +69,13 @@ export interface BrowserServing {
     options?: StaticFileOptions,
     subdirectory?: string,
   ): StaticFileMiddleware;
+}
+
+export interface SinglePageApplicationMiddlewareOptions {
+  readonly apiPathPrefix?: string;
+  readonly browserServing: BrowserServing;
+  readonly entryFile?: string;
+  readonly repoRoot: string;
 }
 
 /** Require a validated browser snapshot only for an ordinary production web process. */
@@ -340,6 +349,93 @@ export function createBrowserServing({
     staticMiddleware,
     useReleaseHistory: selection.useReleaseHistory,
   });
+}
+
+/**
+ * Compose the canonical browser static -> retained asset -> missing asset -> SPA fallback chain.
+ *
+ * Callers mount the returned middleware in order, then mount their JSON error middleware. Every
+ * synchronous browser-resolution or send-file failure is forwarded through `next(error)` so an
+ * Express default HTML error page can never escape a product's API/error contract.
+ */
+export function createSinglePageApplicationMiddlewareStack({
+  apiPathPrefix = "/api",
+  browserServing,
+  entryFile = "index.html",
+  repoRoot,
+}: SinglePageApplicationMiddlewareOptions): readonly StaticFileMiddleware[] {
+  const excludedPrefix = requireSafePathPrefix(
+    apiPathPrefix,
+    "SPA API path prefix",
+  );
+  if (
+    typeof entryFile !== "string" ||
+    !entryFile ||
+    entryFile !== entryFile.trim() ||
+    isAbsolute(entryFile) ||
+    /[\u0000-\u001f\u007f\\?#]/.test(entryFile)
+  ) {
+    throw new Error("SPA entry file must be one safe relative path.");
+  }
+  if (
+    !browserServing ||
+    typeof browserServing.staticMiddleware !== "function" ||
+    typeof browserServing.sendFileForRequest !== "function"
+  ) {
+    throw new Error("SPA middleware requires one BrowserServing contract.");
+  }
+  if (
+    typeof repoRoot !== "string" ||
+    !repoRoot ||
+    !isAbsolute(repoRoot) ||
+    resolve(repoRoot) !== repoRoot
+  ) {
+    throw new Error(
+      "SPA retained-release root must be one canonical absolute path.",
+    );
+  }
+
+  const stack: StaticFileMiddleware[] = [
+    browserServing.staticMiddleware(staticFileOptions()),
+  ];
+  if (browserServing.useReleaseHistory) {
+    stack.push(retainedReleaseAssetMiddleware({ repoRoot }));
+  }
+  stack.push(missingAssetMiddleware());
+  stack.push((request, response, next) => {
+    if (!["GET", "HEAD"].includes(request.method ?? "")) {
+      next();
+      return;
+    }
+    const pathname = decodeSafeRequestPathname(
+      request.path ?? request.url ?? "",
+    );
+    if (pathname === undefined) {
+      next(new Error("SPA request path is invalid."));
+      return;
+    }
+    if (
+      pathname === excludedPrefix ||
+      pathname.startsWith(`${excludedPrefix}/`)
+    ) {
+      next();
+      return;
+    }
+    try {
+      browserServing.sendFileForRequest(request, response, entryFile);
+    } catch (error) {
+      next(error);
+    }
+  });
+  return Object.freeze(stack);
+}
+
+function requireSafePathPrefix(value: string, label: string): string {
+  const normalized = decodeSafeRequestPathname(value);
+  if (normalized === undefined || normalized === "/" || normalized !== value) {
+    throw new Error(`${label} must be one safe absolute path prefix.`);
+  }
+  return normalized;
 }
 
 function assertBrowserOverrideRuntimePolicy(

@@ -1,3 +1,5 @@
+import { realpathSync } from "node:fs";
+import { isAbsolute, resolve } from "node:path";
 export class ConfigurationError extends Error {
     constructor(message, options) {
         super(message, options);
@@ -27,6 +29,51 @@ export function releaseValidationEnvironmentValue(environment) {
         throw new ConfigurationError("CX_RELEASE_VALIDATION=1 requires NODE_ENV=production.");
     }
     return true;
+}
+/**
+ * Resolve the one mutable operational root used by a product process.
+ *
+ * Ordinary development uses the process working directory. A synthetic release-validation
+ * process must declare one canonical absolute CX_RUNTIME_ROOT; ordinary processes may not set the
+ * release-only override. The returned path is always the real directory identity so environment
+ * files, databases, browser releases, and logs cannot disagree at a symbolic-link boundary.
+ */
+export function resolveOperationalRoot(environment, { cwd = process.cwd() } = {}) {
+    const releaseValidation = releaseValidationEnvironmentValue(environment);
+    const override = environment["CX_RUNTIME_ROOT"];
+    if (override !== undefined && !releaseValidation) {
+        throw new ConfigurationError("CX_RUNTIME_ROOT is reserved for CX_RELEASE_VALIDATION=1.");
+    }
+    if (releaseValidation && override === undefined) {
+        throw new ConfigurationError("CX_RELEASE_VALIDATION=1 requires an absolute CX_RUNTIME_ROOT.");
+    }
+    if (override !== undefined &&
+        (!override ||
+            override !== override.trim() ||
+            !isAbsolute(override) ||
+            resolve(override) !== override ||
+            /[\u0000-\u001f\u007f]/.test(override))) {
+        throw new ConfigurationError("CX_RUNTIME_ROOT must be one canonical absolute path during release validation.");
+    }
+    if (typeof cwd !== "string" ||
+        !cwd ||
+        cwd !== cwd.trim() ||
+        !isAbsolute(cwd) ||
+        /[\u0000-\u001f\u007f]/.test(cwd)) {
+        throw new ConfigurationError("The operational working directory must be absolute.");
+    }
+    const selected = override ?? cwd;
+    let canonical;
+    try {
+        canonical = realpathSync.native(selected);
+    }
+    catch (error) {
+        throw new ConfigurationError(`The operational root must be an existing real directory: ${selected}.`, { cause: error });
+    }
+    if (override !== undefined && canonical !== override) {
+        throw new ConfigurationError("CX_RUNTIME_ROOT must be one real canonical directory.");
+    }
+    return canonical;
 }
 export function requiredEnvironmentValue(environment, name) {
     const value = environment[name]?.trim();
