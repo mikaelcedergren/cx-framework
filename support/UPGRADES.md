@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.23
+
+- `cx-top-bar` descriptions now use the small body typography role and its matching line height.
+  Consumers using the component inherit the quieter supporting-text hierarchy automatically; no
+  markup or input change is required.
+
 ## 0.9.22
 
 - Development favicons — added the dependency-free `cx-development-favicon` command. Public
@@ -27,9 +33,35 @@ apply a version whose section is missing.
 - `cx-explorer` persistent selections — added the additive `rootItems` input (default `[]`).
   Use it for stable, browse-only collection destinations that must remain above the folder
   hierarchy, such as an inbox or pending list. Root and nested item ids must be unique across the explorer.
+- `cx-explorer` search — added the opt-in `searchable`, `searchValue`, and `searchAriaLabel`
+  inputs plus `searchValueChange`. Enable it instead of projecting a locally assembled search
+  field; apply the emitted query to the consumer-owned view and echo it back through `searchValue`.
+- `cx-explorer` folder creation — a default-size, standard plus icon button now sits at the top right.
+  After `folderCreate`, echo exactly one new folder through `folders`; that row immediately enters
+  rename mode so the user can name it and press Enter.
+- `cx-explorer` folder disclosure and order — folders now start closed. Pass a stable
+  `persistenceKey` to remember the one last-opened folder in browser-local storage. Editable folder
+  rows can be dragged directly without a visible handle; persist `folderOrderChange` and echo the
+  ordered folders back through `folders`.
+- `cx-explorer` width — the rail is resizable from its end edge by default. Use `width`, `minWidth`,
+  and `resizable` to constrain the behavior, and bind `widthChange` when the chosen size should
+  survive recreation. Double-click resets to the supplied width or the 260px default. The resize
+  indicator now sits directly on the rail boundary without adding extra inline content spacing.
+- `cx-explorer` row labels — clipped root, folder, and nested item labels now truncate quietly;
+  Explorer no longer opens overflow tooltips for them.
+- Navigation rail rhythm — `cx-side-nav` and `cx-explorer` now use an exact 32px header followed by
+  16px of space; Explorer search uses the same 16px space below it. Remove vertical padding from
+  projected header content so its contents stay centered within the shared row.
+- `cx-side-nav` active state — active rows no longer carry a resting background. Their stronger
+  label and primary icon mood now communicate location without adding another filled surface.
+  No consumer markup or styling change is required.
+- `cx-detail-panel` motion — opening and closing now use translation only. The panel remains fully
+  opaque throughout both slides.
+- Dark theme surfaces — `--surface-alt` is slightly darker, giving recessed and grouped regions
+  clearer separation from `--surface`. Consumers using the semantic token update automatically.
 - Portable AI rule precedence — clarified that explicit product-owner decisions override applicable
   defaults only in the context they address, while every unaffected design rule remains in force.
-- Tokens, ordinary production favicons, styles, and Node runtime behavior are unchanged in this
+- Ordinary production favicons, styles, and Node runtime behavior are unchanged in this
   version.
 
 ## 0.9.21

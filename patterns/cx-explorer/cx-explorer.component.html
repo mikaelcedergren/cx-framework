@@ -1,7 +1,52 @@
-<aside class="cx-explorer" [attr.aria-label]="ariaLabel">
+<aside
+  #explorerSurface
+  class="cx-explorer"
+  [class.cx-explorer--resizable]="resizable"
+  [attr.aria-label]="ariaLabel"
+>
+  @if (resizable) {
+    <div
+      class="cx-explorer__resize-handle"
+      [class.cx-explorer__resize-handle--active]="resizing()"
+      role="separator"
+      tabindex="0"
+      aria-orientation="vertical"
+      [attr.aria-label]="resolvedResizeAriaLabel"
+      [attr.aria-valuenow]="renderedWidthPx"
+      [attr.aria-valuetext]="renderedWidthPx + ' pixels'"
+      (pointerdown)="onResizePointerDown($event)"
+      (pointermove)="onResizePointerMove($event)"
+      (pointerup)="onResizePointerUp($event)"
+      (pointercancel)="onResizePointerCancel($event)"
+      (lostpointercapture)="onResizeLostPointerCapture($event)"
+      (keydown)="onResizeKeydown($event)"
+      (dblclick)="onResizeDoubleClick($event)"
+    ></div>
+  }
+
   <div class="cx-explorer__header">
     <ng-content select="[header]" />
+    @if (editable) {
+      <cx-icon-button
+        class="cx-explorer__new-folder"
+        icon="plus"
+        ariaLabel="New folder"
+        cxTooltip="New folder"
+        (pressed)="onFolderCreate()"
+      />
+    }
   </div>
+
+  @if (searchable) {
+    <cx-search-field
+      class="cx-explorer__search"
+      label=""
+      [ariaLabel]="searchAriaLabel"
+      [clearable]="true"
+      [value]="searchValue"
+      (valueChange)="searchValueChange.emit($event)"
+    />
+  }
 
   @if (loading) {
     <div class="cx-explorer__skeleton" aria-hidden="true">
@@ -25,15 +70,16 @@
                 [attr.aria-current]="isSelected(item) ? 'true' : null"
                 (click)="onItemPressed(item)"
               >
-                <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                <span
+                  class="cx-explorer__row-icon cx-explorer__row-icon--accent"
+                  aria-hidden="true"
+                >
                   <cx-icon [icon]="itemIcon(item)" [size]="16" />
                 </span>
                 <span
                   class="cx-explorer__row-label cx-explorer__row-label--root"
-                  data-cx-tooltip-overflow
-                  [cxTooltip]="item.name"
-                  [cxTooltipOverflow]="true"
-                >{{ item.name }}</span>
+                  >{{ item.name }}</span
+                >
               </button>
             </li>
           }
@@ -41,11 +87,25 @@
       }
 
       @if (hasFolders()) {
-        <div class="cx-explorer__folders">
+        <div
+          class="cx-explorer__folders"
+          cdkDropList
+          cdkDropListLockAxis="y"
+          [cdkDropListData]="folders$()"
+          (cdkDropListDropped)="onFolderDrop($event)"
+        >
           @for (folder of folders$(); track folder.id) {
-            <section class="cx-explorer__folder">
-              <div class="cx-explorer__row cx-explorer__row--folder">
-                @if (isRenaming('folder', folder.id)) {
+            <section
+              class="cx-explorer__folder"
+              cdkDrag
+              [cdkDragData]="folder"
+              [cdkDragDisabled]="!editable || isRenaming('folder', folder.id)"
+            >
+              <div
+                class="cx-explorer__row cx-explorer__row--folder"
+                cdkDragHandle
+              >
+                @if (isRenaming("folder", folder.id)) {
                   <span class="cx-explorer__row-icon" aria-hidden="true">
                     <cx-icon icon="folder" [size]="16" />
                   </span>
@@ -63,59 +123,70 @@
                     class="cx-explorer__row-main"
                     type="button"
                     [attr.aria-expanded]="isFolderExpanded(folder)"
+                    aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
                     (click)="toggleFolder(folder)"
                     (dblclick)="editable && beginRename('folder', folder.id)"
+                    (keydown.alt.arrowup)="
+                      onFolderMoveByKeyboard($event, folder, -1)
+                    "
+                    (keydown.alt.arrowdown)="
+                      onFolderMoveByKeyboard($event, folder, 1)
+                    "
                   >
                     <span class="cx-explorer__row-icon" aria-hidden="true">
                       <cx-icon icon="folder" [size]="16" />
                     </span>
                     <span
                       class="cx-explorer__row-label cx-explorer__row-label--folder"
-                      data-cx-tooltip-overflow
-                      [cxTooltip]="folder.name"
-                      [cxTooltipOverflow]="true"
-                    >{{ folder.name }}</span>
+                      >{{ folder.name }}</span
+                    >
                     <cx-icon
                       class="cx-explorer__chevron"
-                      [icon]="isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'"
+                      [icon]="
+                        isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'
+                      "
                       [size]="16"
                     />
                   </button>
-                  <div class="cx-explorer__row-actions">
-                    @if (editable) {
-                      <cx-icon-button
-                        icon="plus"
-                        size="small"
-                        variant="transparent"
-                        [ariaLabel]="createItemText"
-                        [cxTooltip]="createItemText"
-                        (pressed)="onCreateItem(folder)"
-                      />
-                    }
-                    @if (hasFolderMenu()) {
-                      <cx-menu
-                        [presentation]="{ kind: 'trigger' }"
-                        [items]="folderMenu()"
-                        ariaLabel="Folder actions"
-                        (itemSelect)="onFolderMenuSelect(folder, $event)"
-                      >
+                  @if (editable || hasFolderMenu()) {
+                    <div class="cx-explorer__row-actions">
+                      @if (editable) {
                         <cx-icon-button
-                          cxMenuTrigger
-                          icon="menu-horizontal"
+                          icon="plus"
                           size="small"
                           variant="transparent"
-                          ariaLabel="Folder actions"
+                          [ariaLabel]="createItemText"
+                          [cxTooltip]="createItemText"
+                          (pressed)="onCreateItem(folder)"
                         />
-                      </cx-menu>
-                    }
-                  </div>
+                      }
+                      @if (hasFolderMenu()) {
+                        <cx-menu
+                          [presentation]="{ kind: 'trigger' }"
+                          [items]="folderMenu()"
+                          ariaLabel="Folder actions"
+                          (itemSelect)="onFolderMenuSelect(folder, $event)"
+                        >
+                          <cx-icon-button
+                            cxMenuTrigger
+                            icon="menu-vertical"
+                            size="small"
+                            variant="transparent"
+                            ariaLabel="Folder actions"
+                          />
+                        </cx-menu>
+                      }
+                    </div>
+                  }
                 }
               </div>
 
               @if (folder.items.length > 0) {
                 <div
                   class="cx-explorer__items"
-                  [class.cx-explorer__items--expanded]="isFolderExpanded(folder)"
+                  [class.cx-explorer__items--expanded]="
+                    isFolderExpanded(folder)
+                  "
                 >
                   <ul class="cx-explorer__items-inner">
                     @for (item of folder.items; track item.id) {
@@ -124,8 +195,11 @@
                         #itemRow
                         [style.--cx-explorer-accent]="itemAccent(item)"
                       >
-                        @if (isRenaming('item', item.id)) {
-                          <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                        @if (isRenaming("item", item.id)) {
+                          <span
+                            class="cx-explorer__row-icon cx-explorer__row-icon--accent"
+                            aria-hidden="true"
+                          >
                             <cx-icon [icon]="itemIcon(item)" [size]="16" />
                           </span>
                           <input
@@ -141,20 +215,27 @@
                           <button
                             class="cx-explorer__row-main"
                             type="button"
-                            [class.cx-explorer__row-main--selected]="isSelected(item)"
-                            [attr.aria-current]="isSelected(item) ? 'true' : null"
+                            [class.cx-explorer__row-main--selected]="
+                              isSelected(item)
+                            "
+                            [attr.aria-current]="
+                              isSelected(item) ? 'true' : null
+                            "
                             (click)="onItemPressed(item)"
-                            (dblclick)="editable && beginRename('item', item.id)"
+                            (dblclick)="
+                              editable && beginRename('item', item.id)
+                            "
                           >
-                            <span class="cx-explorer__row-icon cx-explorer__row-icon--accent" aria-hidden="true">
+                            <span
+                              class="cx-explorer__row-icon cx-explorer__row-icon--accent"
+                              aria-hidden="true"
+                            >
                               <cx-icon [icon]="itemIcon(item)" [size]="16" />
                             </span>
                             <span
                               class="cx-explorer__row-label"
-                              data-cx-tooltip-overflow
-                              [cxTooltip]="item.name"
-                              [cxTooltipOverflow]="true"
-                            >{{ item.name }}</span>
+                              >{{ item.name }}</span
+                            >
                           </button>
                           <div class="cx-explorer__row-actions">
                             @if (hasItemMenu()) {
@@ -162,11 +243,13 @@
                                 [presentation]="{ kind: 'trigger' }"
                                 [items]="itemMenu()"
                                 ariaLabel="Page actions"
-                                (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
+                                (itemSelect)="
+                                  onItemMenuSelect(item, $event, itemRow)
+                                "
                               >
                                 <cx-icon-button
                                   cxMenuTrigger
-                                  icon="menu-horizontal"
+                                  icon="menu-vertical"
                                   size="small"
                                   variant="transparent"
                                   ariaLabel="Page actions"
@@ -186,18 +269,6 @@
       }
     </div>
   }
-
-  <div class="cx-explorer__footer">
-    @if (editable) {
-      <cx-button
-        class="cx-explorer__new-folder"
-        text="New folder"
-        icon="plus"
-        [transparent]="true"
-        (pressed)="folderCreate.emit()"
-      />
-    }
-  </div>
 </aside>
 
 @if (pickerItem(); as item) {
@@ -214,7 +285,10 @@
     ariaLabel="Icon & color"
     (backdropPressed)="closePicker()"
   >
-    <div class="cx-explorer__picker" [style.--cx-explorer-accent]="itemAccent(item)">
+    <div
+      class="cx-explorer__picker"
+      [style.--cx-explorer-accent]="itemAccent(item)"
+    >
       <div class="cx-explorer__picker-swatches" role="group" aria-label="Color">
         <button
           class="cx-explorer__swatch cx-explorer__swatch--none"

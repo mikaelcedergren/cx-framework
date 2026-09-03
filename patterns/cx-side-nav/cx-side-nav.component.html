@@ -53,7 +53,12 @@
                 >
                   @if (level === 0) {
                     @if (item.icon) {
-                      <cx-icon class="cx-side-nav__icon" [icon]="item.icon" [size]="16" />
+                      <cx-icon
+                        class="cx-side-nav__icon"
+                        [icon]="item.icon"
+                        [size]="16"
+                        [mood]="itemContainsActive(item) ? 'primary' : 'default'"
+                      />
                     } @else {
                       <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(item.label) }}</span>
                     }
@@ -161,6 +166,7 @@
                   [queryParamsHandling]="item.disabled ? undefined : item.queryParamsHandling"
                   [fragment]="item.disabled ? undefined : item.fragment"
                   routerLinkActive="cx-side-nav__item--active"
+                  #itemActive="routerLinkActive"
                   [routerLinkActiveOptions]="activeOptions(item)"
                   ariaCurrentWhenActive="page"
                   [attr.aria-disabled]="item.disabled ? 'true' : null"
@@ -173,7 +179,12 @@
                 >
                   @if (level === 0) {
                     @if (item.icon) {
-                      <cx-icon class="cx-side-nav__icon" [icon]="item.icon" [size]="16" />
+                      <cx-icon
+                        class="cx-side-nav__icon"
+                        [icon]="item.icon"
+                        [size]="16"
+                        [mood]="itemActive.isActive ? 'primary' : 'default'"
+                      />
                     } @else {
                       <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(item.label) }}</span>
                     }
@@ -227,7 +238,12 @@
                 (click)="toggleGroup(group, $event)"
               >
                 @if (group.icon) {
-                  <cx-icon class="cx-side-nav__icon" [icon]="group.icon" [size]="16" />
+                  <cx-icon
+                    class="cx-side-nav__icon"
+                    [icon]="group.icon"
+                    [size]="16"
+                    [mood]="groupContainsActive(group) ? 'primary' : 'default'"
+                  />
                 } @else {
                   <span class="cx-side-nav__rail-letter" aria-hidden="true">{{ railInitial(group.label ?? '') }}</span>
                 }

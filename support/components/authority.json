@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 128,
-  "catalogSha256": "eb5adcef0feaf88bcf317dab0d76eb91194df47f8ce54d92449e965787472ad5",
+  "catalogSha256": "d0e7e2dc65275db7dae28faf02e63a4cb8b10a92992f701083dcc682988d6834",
   "components": [
     {
       "name": "cx-account-control",
@@ -3237,7 +3237,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "2438e8bed46e294200b276677dc48d338a18fb45827590d5ff1d7ea574ecc555"
+            "sha256": "831e910af6df7a6508a6d330bc8acae047490ef22d08b93f983716e3092cfdfc"
           }
         ]
       }
@@ -4259,7 +4259,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'Explorer'",
+            "defaultValue": "\"Explorer\"",
             "source": "decorator"
           },
           {
@@ -4268,7 +4268,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'New page'",
+            "defaultValue": "\"New page\"",
             "source": "decorator"
           },
           {
@@ -4326,6 +4326,33 @@
             "source": "decorator"
           },
           {
+            "binding": "minWidth",
+            "member": "minWidth",
+            "type": "string | null",
+            "required": false,
+            "transform": null,
+            "defaultValue": "null",
+            "source": "decorator"
+          },
+          {
+            "binding": "persistenceKey",
+            "member": "persistenceKey",
+            "type": "string | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "resizable",
+            "member": "resizable",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "true",
+            "source": "decorator"
+          },
+          {
             "binding": "rootItems",
             "member": "rootItems",
             "type": "readonly CxExplorerItem[] | null | undefined",
@@ -4335,9 +4362,45 @@
             "source": "decorator"
           },
           {
+            "binding": "searchable",
+            "member": "searchable",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
+            "binding": "searchAriaLabel",
+            "member": "searchAriaLabel",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"Search\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "searchValue",
+            "member": "searchValue",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"\"",
+            "source": "decorator"
+          },
+          {
             "binding": "selectedItemId",
             "member": "selectedItemId",
             "type": "string | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "width",
+            "member": "width",
+            "type": "string | null",
             "required": false,
             "transform": null,
             "defaultValue": null,
@@ -4361,6 +4424,12 @@
             "binding": "folderDelete",
             "member": "folderDelete",
             "type": "string",
+            "source": "decorator"
+          },
+          {
+            "binding": "folderOrderChange",
+            "member": "folderOrderChange",
+            "type": "readonly string[]",
             "source": "decorator"
           },
           {
@@ -4388,8 +4457,20 @@
             "source": "decorator"
           },
           {
+            "binding": "searchValueChange",
+            "member": "searchValueChange",
+            "type": "string",
+            "source": "decorator"
+          },
+          {
             "binding": "selectedItemIdChange",
             "member": "selectedItemIdChange",
+            "type": "string",
+            "source": "decorator"
+          },
+          {
+            "binding": "widthChange",
+            "member": "widthChange",
             "type": "string",
             "source": "decorator"
           }
@@ -4403,17 +4484,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "f8d38016516ebe3e0a8a971059333649e6b411af27d1f7065335b6f715c5b329"
+          "sha256": "d57bf829be6b585cfa3122838c7fd210983e9fc44bc5e9defbae03f84eda1d44"
         },
         "template": {
           "kind": "external",
-          "sha256": "3dd0c9782fed862e9f24e7d515fc3cf95046217a8512690bb9a80192775c6209"
+          "sha256": "2879e162c02d1b5475292dd15931455ecc0ade4e4ae5a45bb597768dd10e36f6"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "959b7b6c4b80f30fde88b4bc62d0e302facca0d1df107ecc4dcf7e6469b9c5b8"
+            "sha256": "6678a60b8bcc7b1c9eff5d08d37364918dec1b13e12bd6d4f33b441ffb9309bc"
           }
         ]
       }
@@ -9995,13 +10076,13 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "f598452a4d953bd5ed15f2ecbd9b13f9d27a207343c1a4da1db25bb3b1c688a0"
+          "sha256": "aa00aff347148de0db22767cb26203f58384ea58456d7f31cfb76c074ae70aba"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d93bf1580f3ff53e66c84e3aff2f890f82b8a90a64b19f526e40c99612d137e8"
+            "sha256": "d0aab6d7e180b496bf5677b9a8f17bd72ee41522be65cf5e4a9b879181225fdc"
           }
         ]
       }
@@ -13796,7 +13877,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "1250b8509f5375a3615d7ac1121bbb58c0784bc196b22e26bc70450ec45ab821"
+            "sha256": "3343689bcbe0294ff4d64673c636e96b349b9eb923f28b5543e468257b3149af"
           }
         ]
       }

@@ -5,29 +5,37 @@
 }
 
 .cx-explorer {
-  --cx-explorer-row-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
-  --cx-explorer-subrow-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
+  --cx-explorer-row-height: calc(
+    var(--controller-size-small) + var(--space-sm) * 2
+  );
+  --cx-explorer-subrow-height: calc(
+    var(--controller-size-small) + var(--space-xs) * 2
+  );
   --cx-explorer-row-gap: 1px;
-  // Item rows indent by the folder icon slot so their labels align under the
-  // folder's label, mirroring the side-nav rail geometry.
-  --cx-explorer-rail: calc(var(--controller-size-small) + var(--space-sm));
+  // Folder grouping carries the hierarchy; rows share one icon rail so nested
+  // content keeps the full useful width.
+  --cx-explorer-rail: 0;
 
   display: flex;
-  width: 260px;
+  position: relative;
+  width: var(--cx-explorer-width, 260px);
+  min-width: min(max(200px, var(--cx-explorer-min-width, 0px)), 100%);
+  max-width: 100%;
   height: 100%;
   min-height: 100%;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-md);
   padding: var(--space-sm);
   border-right: var(--line);
   background: var(--surface-alt);
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cx-explorer__header {
   display: flex;
   width: 100%;
+  height: var(--controller-size);
   min-height: var(--controller-size);
   align-items: center;
   flex: 0 0 auto;
@@ -35,6 +43,57 @@
 
 .cx-explorer__header:empty {
   display: none;
+}
+
+.cx-explorer__new-folder {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+// Same interaction model as the detail panel, on Explorer's free end edge.
+// The 12px target straddles the boundary without stealing space from content;
+// its visible indicator lands directly on the component edge.
+.cx-explorer__resize-handle {
+  position: absolute;
+  top: 0;
+  inset-inline-end: calc(
+    -1 * (var(--space-xs) + var(--border-width))
+  );
+  z-index: 2;
+  width: 12px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.cx-explorer__resize-handle::after {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: var(--space-xs);
+  width: 3px;
+  height: calc(100% - (var(--space-sm) * 2));
+  border-radius: var(--radius-pill);
+  corner-shape: round;
+  background: transparent;
+  content: "";
+  transform: translateY(-50%);
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-explorer__resize-handle:hover::after,
+.cx-explorer__resize-handle:focus-visible::after,
+.cx-explorer__resize-handle--active::after {
+  background: var(--info);
+}
+
+.cx-explorer__resize-handle:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: calc(-1 * var(--outline-tab-offset));
+}
+
+.cx-explorer__search {
+  width: 100%;
+  flex: 0 0 auto;
 }
 
 .cx-explorer__skeleton {
@@ -51,13 +110,12 @@
   display: block;
   height: var(--cx-explorer-row-height);
   border-radius: var(--radius-sm);
-  background:
-    linear-gradient(
-      90deg,
-      var(--opacity-low),
-      var(--opacity-mid),
-      var(--opacity-low)
-    );
+  background: linear-gradient(
+    90deg,
+    var(--opacity-low),
+    var(--opacity-mid),
+    var(--opacity-low)
+  );
   background-size: 180% 100%;
   animation: cx-explorer-skeleton 1.2s ease-in-out infinite;
 }
@@ -68,7 +126,7 @@
   flex: 1 1 auto;
   width: 100%;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 0;
   overflow: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
@@ -89,7 +147,7 @@
 }
 
 .cx-explorer__folders {
-  gap: var(--space-sm);
+  gap: 0;
 }
 
 .cx-explorer__folder {
@@ -97,6 +155,26 @@
   width: 100%;
   flex-direction: column;
   gap: var(--cx-explorer-row-gap);
+}
+
+.cx-explorer__folder.cdk-drag-preview {
+  border-radius: var(--radius-md);
+  background: var(--surface-alt);
+  box-shadow: var(--shadow-mid);
+}
+
+.cx-explorer__folder.cdk-drag-preview .cx-explorer__items {
+  display: none;
+}
+
+.cx-explorer__folder.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cx-explorer__folder.cdk-drag-animating,
+.cx-explorer__folders.cdk-drop-list-dragging
+  .cx-explorer__folder:not(.cdk-drag-placeholder) {
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 // A row is the hover/reveal container: one main button plus the actions that
@@ -141,9 +219,8 @@
 }
 
 .cx-explorer__row-main--selected {
-  background: var(--opacity-low);
   color: var(--ink);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
 }
 
 .cx-explorer__row--root,
@@ -201,6 +278,50 @@
   color: var(--opacity-high);
 }
 
+// Folder controls read from the right edge in disclosure order: chevron,
+// menu, then create. The main disclosure button still owns the full row, while
+// the two mutation controls sit above it in their own interaction layer.
+.cx-explorer__row--folder .cx-explorer__row-main {
+  padding-inline-end: calc(var(--space-xs) + var(--controller-size-small));
+}
+
+.cx-explorer__row--folder:has(.cx-explorer__row-actions)
+  .cx-explorer__row-main {
+  padding-inline-end: calc(
+    var(--space-xs) + var(--controller-size-small) +
+      var(--controller-size-small) + var(--space-2xs)
+  );
+}
+
+.cx-explorer__row--folder:has(.cx-explorer__row-actions > cx-icon-button)
+  .cx-explorer__row-main {
+  padding-inline-end: calc(
+    var(--space-xs) + var(--controller-size-small) +
+      var(--controller-size-small) + var(--controller-size-small) +
+      var(--space-2xs) + var(--space-2xs)
+  );
+}
+
+.cx-explorer__row--folder .cx-explorer__chevron {
+  position: absolute;
+  inset-inline-end: var(--space-xs);
+  display: inline-flex;
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cx-explorer__row--folder .cx-explorer__row-actions {
+  position: absolute;
+  inset-inline-end: calc(
+    var(--space-xs) + var(--controller-size-small) + var(--space-2xs)
+  );
+  z-index: 1;
+  padding-right: 0;
+}
+
 // Actions stay out of the visual field until the row is engaged, but they are
 // always real focusable controls — revealed, not mounted, on demand.
 .cx-explorer__row-actions {
@@ -214,8 +335,8 @@
 }
 
 .cx-explorer__row:hover .cx-explorer__row-actions,
-.cx-explorer__row:focus-within .cx-explorer__row-actions,
-.cx-explorer__row-actions:has([aria-expanded='true']) {
+.cx-explorer__row-actions:focus-within,
+.cx-explorer__row-actions:has([aria-expanded="true"]) {
   opacity: 1;
 }
 
@@ -281,18 +402,6 @@
   transform: translateY(0);
 }
 
-.cx-explorer__footer {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  padding-top: var(--space-xs);
-  border-top: var(--line-discreet);
-  flex: 0 0 auto;
-  box-sizing: border-box;
-}
-
 .cx-explorer__picker {
   display: flex;
   flex-direction: column;
@@ -326,7 +435,7 @@
   border-color: var(--opacity-strong);
 }
 
-.cx-explorer__swatch[aria-pressed='true'] {
+.cx-explorer__swatch[aria-pressed="true"] {
   border-color: var(--ink);
   box-shadow: inset 0 0 0 2px var(--surface);
 }
@@ -360,7 +469,7 @@
   color: var(--ink);
 }
 
-.cx-explorer__picker-icon[aria-pressed='true'] {
+.cx-explorer__picker-icon[aria-pressed="true"] {
   background: var(--opacity-low);
   color: var(--cx-explorer-accent, var(--ink));
 }

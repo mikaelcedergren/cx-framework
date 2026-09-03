@@ -16,34 +16,45 @@
   // cannot straddle it — it has to take the column on one side. It takes the
   // near side: one border-width back, which reads as centred, where the far side
   // reads as a pixel too far right.
-  --cx-side-nav-row-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
+  --cx-side-nav-row-height: calc(
+    var(--controller-size-small) + var(--space-sm) * 2
+  );
   // Nested rows are tighter: they carry only a label, so top-level breathing
   // room reads as airiness one level in.
-  --cx-side-nav-subrow-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
+  --cx-side-nav-subrow-height: calc(
+    var(--controller-size-small) + var(--space-xs) * 2
+  );
   // Separation between rows. The guide has to bridge it, or a 1px line reads as
   // a dashed one.
   --cx-side-nav-row-gap: 1px;
   --cx-side-nav-rail: calc(var(--controller-size-small) + var(--space-sm));
-  --cx-side-nav-guide: calc(var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width));
-  --cx-side-nav-guide-offset: calc(var(--cx-side-nav-guide) - var(--cx-side-nav-rail));
+  --cx-side-nav-guide: calc(
+    var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width)
+  );
+  --cx-side-nav-guide-offset: calc(
+    var(--cx-side-nav-guide) - var(--cx-side-nav-rail)
+  );
   --cx-side-nav-elbow: calc(var(--space-sm) + var(--space-xs));
   // The guide is structure, not decoration: quieter than the labels it belongs
   // to, but it has to survive being 1px wide, which the `--line` tokens do not
   // at this length. Mixed from `--ink` so every theme scales it against its own
   // surface.
-  --cx-side-nav-guide-line: var(--border-width) solid color-mix(in srgb, var(--ink) 18%, transparent);
+  --cx-side-nav-guide-line: var(--border-width) solid
+    color-mix(in srgb, var(--ink) 18%, transparent);
   // Collapsed rail. Derived from the same pieces that place the icon column —
   // aside padding, row padding, icon slot — so the icons keep their exact x in
   // both states: collapsing reads as the right edge sweeping in past pinned
   // icons, never as icons re-centring.
-  --cx-side-nav-rail-width: calc(var(--space-sm) * 2 + var(--space-xs) * 2 + var(--controller-size-small));
+  --cx-side-nav-rail-width: calc(
+    var(--space-sm) * 2 + var(--space-xs) * 2 + var(--controller-size-small)
+  );
 
   display: flex;
   width: 240px;
   height: 100%;
   min-height: 100%;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-md);
   padding: var(--space-sm);
   border-right: var(--line);
   background: var(--surface-alt);
@@ -69,19 +80,30 @@
   display: none;
 }
 
-.cx-side-nav:not(:has(.cx-side-nav__header-slot > *, .cx-side-nav__collapse-toggle, .cx-side-nav__skeleton, .cx-side-nav__items, .cx-side-nav__footer > *)) {
+.cx-side-nav:not(
+  :has(
+    .cx-side-nav__header-slot > *,
+    .cx-side-nav__collapse-toggle,
+    .cx-side-nav__skeleton,
+    .cx-side-nav__items,
+    .cx-side-nav__footer > *
+  )
+) {
   display: none;
 }
 
 .cx-side-nav__header {
   display: flex;
   width: 100%;
+  height: var(--controller-size);
   min-height: var(--controller-size);
   align-items: center;
   flex: 0 0 auto;
 }
 
-.cx-side-nav__header:not(:has(.cx-side-nav__header-slot > *, .cx-side-nav__collapse-toggle)) {
+.cx-side-nav__header:not(
+  :has(.cx-side-nav__header-slot > *, .cx-side-nav__collapse-toggle)
+) {
   display: none;
 }
 
@@ -140,13 +162,12 @@
   display: block;
   height: var(--cx-side-nav-row-height);
   border-radius: var(--radius-sm);
-  background:
-    linear-gradient(
-      90deg,
-      var(--opacity-low),
-      var(--opacity-mid),
-      var(--opacity-low)
-    );
+  background: linear-gradient(
+    90deg,
+    var(--opacity-low),
+    var(--opacity-mid),
+    var(--opacity-low)
+  );
   background-size: 180% 100%;
   animation: cx-side-nav-skeleton 1.2s ease-in-out infinite;
 }
@@ -206,7 +227,8 @@
   grid-template-rows: 1fr;
 }
 
-.cx-side-nav__group-items--expanded.cx-side-nav__group-items--collapsible .cx-side-nav__group-items-inner {
+.cx-side-nav__group-items--expanded.cx-side-nav__group-items--collapsible
+  .cx-side-nav__group-items-inner {
   visibility: visible;
   pointer-events: auto;
   opacity: 1;
@@ -240,7 +262,7 @@
    label. Anchored to the row (not the node) so `50%` is the row's own centre
    however tall the node's sub-tree grows. */
 .cx-side-nav__node--branch > .cx-side-nav__item::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: var(--cx-side-nav-guide-offset);
@@ -256,7 +278,7 @@
    row gap so the line arrives unbroken — each segment is drawn once, so the
    translucent colour stays even where they meet. */
 .cx-side-nav__node--branch > .cx-side-nav__item::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   bottom: calc(-1 * var(--cx-side-nav-row-gap));
@@ -273,7 +295,7 @@
 }
 
 .cx-side-nav__node--branch > .cx-side-nav__children::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: calc(-1 * var(--cx-side-nav-row-gap));
@@ -371,7 +393,6 @@
 }
 
 .cx-side-nav__item--active {
-  background: var(--opacity-low);
   color: var(--ink);
   font-weight: var(--font-weight-medium);
 }
@@ -576,7 +597,7 @@
 }
 
 .cx-side-nav__group-label::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: var(--space-xs);

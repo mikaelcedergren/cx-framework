@@ -19,6 +19,10 @@ Use this shape for new entries:
 
 Keep entries short. The important part is whether an icon's purpose, name, or availability changed.
 
+## 2026-09-01
+
+- Changed `folder.svg` — lifted the artwork by 0.5px for optical vertical alignment; meaning unchanged.
+
 ## 2026-08-16
 
 - Added `aqua-mode.svg` — theme icon for the Aqua appearance, alongside `light-mode`, `dark-mode`, and `night-mode`. A water droplet: the theme is a light theme on green-tinted paper, with blue actions and sea-green emphasis.

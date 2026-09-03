@@ -232,24 +232,20 @@
 @keyframes cx-detail-panel-enter {
   from {
     transform: translateX(calc(100% + var(--space-xs)));
-    opacity: 0;
   }
 
   to {
     transform: translateX(0);
-    opacity: 1;
   }
 }
 
 @keyframes cx-detail-panel-exit {
   from {
     transform: translateX(0);
-    opacity: 1;
   }
 
   to {
     transform: translateX(calc(100% + var(--space-xs)));
-    opacity: 0;
   }
 }
 
