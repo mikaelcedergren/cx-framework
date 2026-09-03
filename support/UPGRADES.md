@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.25
+
+- `cx-server-artifact` now accepts the already-published `cx-development-favicon` command in an
+  installed framework package. Server products that previously stopped while sealing that package
+  should refresh the framework dependency and rebuild; no application change is required.
+
 ## 0.9.24
 
 - `cx-expansion-panel` now animates only its disclosure shell and chevron. Projected content no

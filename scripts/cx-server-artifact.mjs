@@ -63,6 +63,7 @@ const FRAMEWORK_PACKAGE_ROOT_DIRECTORIES = new Set([
 ]);
 const FRAMEWORK_PACKAGE_RUNTIME_SCRIPTS = new Set([
   "check-product.mjs",
+  "cx-development-favicon.mjs",
   "cx-server-artifact.mjs",
   "install-ai-skills.mjs",
   "workspace-contract.mjs",
