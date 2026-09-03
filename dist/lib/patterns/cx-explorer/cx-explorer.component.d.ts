@@ -50,6 +50,7 @@ type CxExplorerRenameTarget = {
 export declare class CxExplorerComponent implements OnDestroy {
     private readonly host;
     private readonly explorerSurface?;
+    private set explorerContent(value);
     private readonly rootItemsState;
     private readonly foldersState;
     private readonly selectedItemIdState;
@@ -58,6 +59,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     private readonly itemMenuItemsState;
     private folderCreateBaseline;
     private folderCreateRenameTimer;
+    private contentResizeObserver?;
     private persistenceStorageKey;
     /** One open folder at most; the untouched default is fully collapsed. */
     private readonly expandedFolderId;

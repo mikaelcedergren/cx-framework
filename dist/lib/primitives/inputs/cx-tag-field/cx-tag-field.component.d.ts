@@ -46,7 +46,6 @@ export declare class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     private inputRef?;
     private popoverRef?;
     private draftNameInputRef?;
-    private selectedTagRemoveRefs?;
     protected readonly overlay: CxFloatingSurfaceController;
     label: string;
     ariaLabel: string | undefined;
@@ -113,9 +112,7 @@ export declare class CxTagFieldComponent implements AfterViewInit, OnDestroy {
      */
     protected onInput(event: Event): void;
     protected onInputKeydown(event: KeyboardEvent): void;
-    protected onSelectedTagFocus(tag: CxTagFieldTag): void;
-    protected onSelectedTagKeydown(event: KeyboardEvent, tag: CxTagFieldTag, index: number): void;
-    protected removeTagFromPointer(event: MouseEvent, tag: CxTagFieldTag): void;
+    protected dismissTag(tag: CxTagFieldTag): void;
     protected onOptionPointerDown(event: PointerEvent): void;
     protected toggleTag(tag: CxTagFieldTag): void;
     protected openCreateDialog(): void;
@@ -139,8 +136,6 @@ export declare class CxTagFieldComponent implements AfterViewInit, OnDestroy {
     private scrollActiveTargetIntoView;
     private refreshPopover;
     private focusInput;
-    private focusSelectedTag;
-    private removeTagAndFocus;
     private removeTag;
     private finishCreateDialog;
     private lockInteractions;

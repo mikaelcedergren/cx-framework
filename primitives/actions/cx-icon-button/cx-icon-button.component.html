@@ -19,8 +19,12 @@
   [class.cx-icon-button--with-dot-badge]="hasBadge() && !hasBadgeCount()"
   [class.cx-icon-button--with-badge-value]="hasBadgeCount()"
   [disabled]="disabled || loading$() || countdownActive$()"
+  [attr.role]="role || null"
   [attr.aria-label]="ariaLabel"
   [attr.aria-pressed]="ariaPressed === undefined ? (selected ? true : null) : ariaPressed"
+  [attr.aria-haspopup]="ariaHasPopup || null"
+  [attr.aria-expanded]="ariaExpanded === undefined ? null : ariaExpanded"
+  [attr.aria-controls]="ariaControls || null"
   [attr.aria-busy]="loading$() ? 'true' : null"
   (click)="onClick()"
 >

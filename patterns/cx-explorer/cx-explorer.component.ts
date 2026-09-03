@@ -158,6 +158,31 @@ export class CxExplorerComponent implements OnDestroy {
   @ViewChild("explorerSurface", { read: ElementRef })
   private readonly explorerSurface?: ElementRef<HTMLElement>;
 
+  @ViewChild("explorerContent", { read: ElementRef })
+  private set explorerContent(contentRef: ElementRef<HTMLElement> | undefined) {
+    this.contentResizeObserver?.disconnect();
+    this.contentResizeObserver = undefined;
+    const content = contentRef?.nativeElement;
+    if (!content) {
+      this.host.nativeElement.style.removeProperty(
+        "--cx-explorer-scrollbar-gutter",
+      );
+      return;
+    }
+    const syncGutter = () => {
+      const gutter = Math.max(0, content.offsetWidth - content.clientWidth);
+      this.host.nativeElement.style.setProperty(
+        "--cx-explorer-scrollbar-gutter",
+        `${gutter}px`,
+      );
+    };
+    syncGutter();
+    if (typeof ResizeObserver !== "undefined") {
+      this.contentResizeObserver = new ResizeObserver(syncGutter);
+      this.contentResizeObserver.observe(content);
+    }
+  }
+
   private readonly rootItemsState = signal<readonly CxExplorerItem[]>([]);
   private readonly foldersState = signal<readonly CxExplorerFolder[]>([]);
   private readonly selectedItemIdState = signal<string | undefined>(undefined);
@@ -168,6 +193,7 @@ export class CxExplorerComponent implements OnDestroy {
   private readonly itemMenuItemsState = signal<readonly CxMenuItem[]>([]);
   private folderCreateBaseline: ReadonlySet<string> | null = null;
   private folderCreateRenameTimer: ReturnType<typeof setTimeout> | undefined;
+  private contentResizeObserver?: ResizeObserver;
   private persistenceStorageKey = "";
   /** One open folder at most; the untouched default is fully collapsed. */
   private readonly expandedFolderId = signal<string | null>(null);
@@ -351,6 +377,7 @@ export class CxExplorerComponent implements OnDestroy {
   });
 
   ngOnDestroy(): void {
+    this.contentResizeObserver?.disconnect();
     this.stopResizeSession();
     this.clearFolderCreateRequest();
     this.pickerOverlay.destroy();

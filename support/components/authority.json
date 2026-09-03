@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 128,
-  "catalogSha256": "d0e7e2dc65275db7dae28faf02e63a4cb8b10a92992f701083dcc682988d6834",
+  "catalogSha256": "cd8986dd44ecabeb2358b96d34739c899277a26bf65aacab4a16cc6b8a242d16",
   "components": [
     {
       "name": "cx-account-control",
@@ -2455,17 +2455,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "180cb8c8de6dfddccc73f74dea74bcc796538af1bb0b22c72fb1375197b604c8"
+          "sha256": "589595d18d498bc301f9d6d7fc32767a7cab58dc25b8914204687345b207719f"
         },
         "template": {
           "kind": "external",
-          "sha256": "1c25e6db6c9f379aa46abecc14cbc732eb9774b2288e618a963e08fb5ded2a0e"
+          "sha256": "95cc93cf57e26bb77954d9ea9e1dc0871e9e4aada0573a8ca5b85e360bd02838"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "7b100aff1ab3730c7a7e5f74d532aa00f9bd386014ed178f886cf3b06baf35e7"
+            "sha256": "0931002807e49eb3cdf47134a94f3cd68ada24c968a02a66d167186532944100"
           }
         ]
       }
@@ -4237,7 +4237,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "c1adb71bc3c001410e917c807ecf30e7a2a3a0f20a1d7faf1fe6e47c02b5b754"
+            "sha256": "a5eda3289b0d950b50e5b13c7c70aee668f0c7ba69d629b35b44ddef11354957"
           }
         ]
       }
@@ -4484,17 +4484,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "d57bf829be6b585cfa3122838c7fd210983e9fc44bc5e9defbae03f84eda1d44"
+          "sha256": "28297c6c01a4da29117e626b7ebac88d46dcbf572441cee7c527f19829f87122"
         },
         "template": {
           "kind": "external",
-          "sha256": "2879e162c02d1b5475292dd15931455ecc0ade4e4ae5a45bb597768dd10e36f6"
+          "sha256": "b24f22292e59ce58a1db93b0ce25f473ac3f7dc6c90c3ded78f07f1340f4de07"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "6678a60b8bcc7b1c9eff5d08d37364918dec1b13e12bd6d4f33b441ffb9309bc"
+            "sha256": "3201df316826e9cfa159b49e3200ee429eb4ff37e6fd7b0e6f1efd58afaef138"
           }
         ]
       }
@@ -4694,6 +4694,15 @@
             "source": "decorator"
           },
           {
+            "binding": "filtersToQueryConditions",
+            "member": "filtersToQueryConditions",
+            "type": "readonly CxQueryFieldCondition[] | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "filterValues",
             "member": "filterValues",
             "type": "CxColumnFilterValueMap | undefined",
@@ -4745,6 +4754,33 @@
             "required": false,
             "transform": null,
             "defaultValue": "'Search query'",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryConditions",
+            "member": "queryConditions",
+            "type": "readonly CxQueryFieldCondition[] | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "queryFields",
+            "member": "queryFields",
+            "type": "readonly CxQueryFieldDefinition[] | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "queryToFilterTranslation",
+            "member": "queryToFilterTranslation",
+            "type": "CxFilterBarQueryTranslation | null | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -4927,9 +4963,27 @@
             "source": "decorator"
           },
           {
+            "binding": "queryConditionsChange",
+            "member": "queryConditionsChange",
+            "type": "readonly CxQueryFieldCondition[]",
+            "source": "decorator"
+          },
+          {
             "binding": "queryValueChange",
             "member": "queryValueChange",
             "type": "string",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryValueRetry",
+            "member": "queryValueRetry",
+            "type": "CxQueryFieldValueRetryEvent",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryValueSearch",
+            "member": "queryValueSearch",
+            "type": "CxQueryFieldValueSearchEvent",
             "source": "decorator"
           },
           {
@@ -4991,17 +5045,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "ff0397c3b74cd047d834bc4788172e63a55e50f1736abb832cc9548d1afb5d9d"
+          "sha256": "15b1e2c90ceff14c4c832a6fd344f51d0969c774e4c1b741d90fd22e8bfa0745"
         },
         "template": {
           "kind": "external",
-          "sha256": "32b64c36a4b2a33dc7aec75045d7bf52e3e28c3ea5cd1fde90c3f47d701a2569"
+          "sha256": "f38a7587adf36aeba17883c537d1e0793b13f300c4f6b09d41d62c4c873b154a"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a64f82eb4d6bbc9a64a7575a7b4a606dc235a7782091b69bc59a1b9dc0098a54"
+            "sha256": "0f3cdfa3a984b3681c642ad705d3a83688691a344cf3f6ea16c8cc68f75ff3bd"
           }
         ]
       }
@@ -5269,6 +5323,33 @@
         "symbol": "CxIconButtonComponent",
         "inputs": [
           {
+            "binding": "ariaControls",
+            "member": "ariaControls",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "ariaExpanded",
+            "member": "ariaExpanded",
+            "type": "boolean",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "ariaHasPopup",
+            "member": "ariaHasPopup",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "ariaLabel",
             "member": "ariaLabel",
             "type": "string",
@@ -5350,6 +5431,15 @@
             "source": "decorator"
           },
           {
+            "binding": "role",
+            "member": "role",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "rounded",
             "member": "rounded",
             "type": "boolean",
@@ -5404,11 +5494,11 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "72376b99aff422ad6ce0896e8edf94710b7d6c6bcc508658826b48e6551acfac"
+          "sha256": "47fce19e50c4e2e921b9d12a027a3ef7bad2b468e0f802dcd4cbaabcf9b49c81"
         },
         "template": {
           "kind": "external",
-          "sha256": "315bf9d2fd14088239b67df50cb8c8517ca399ab90fed30e63e17b35a3ee7fe0"
+          "sha256": "fdf11bd4e223a20b1b3449ac3c78c57535b8801c454f716d0ae2af9ed5d42b88"
         },
         "styles": [
           {
@@ -7110,17 +7200,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "fb9382f285ed02c6e4663a7e2eb0296f3e65d061258e9529a97cdc257b563f06"
+          "sha256": "5e63d9eddb8fd9771431535567ecc55623763ded3b62646cf95ba3e3f2be7998"
         },
         "template": {
           "kind": "external",
-          "sha256": "0dd7fdccd348a12186a90f157c02f86d86b810ba0cbea3b016f90d6cc73cd8e7"
+          "sha256": "64cb0a463cfe86681086aa0dc45181f6f5d95fcbe3159895f95b0a0af8713c44"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "cbc59ef846c8a5a4e516b9a4424486d51530cf1dc6625efc6e959faa52eb483f"
+            "sha256": "1e899904eda6ce04e6aed63171362cdf7f7d99e82161c3055519e4c1b9e0542c"
           }
         ]
       }
@@ -7805,11 +7895,11 @@
       "contentProjection": [
         {
           "ordinal": 1,
-          "selector": "[append]"
+          "selector": "[control]"
         },
         {
           "ordinal": 2,
-          "selector": "[control]"
+          "selector": "[append]"
         }
       ],
       "evidence": {
@@ -7818,13 +7908,13 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "64f2152619840356893c486286be3f1ece2a4b92448d3e877a5e8c1a5e5d3d5b"
+          "sha256": "20a802d3f8f0b76c18bae6986fbe78569a4d3a190fb955214693df62bd4fe901"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "1610d1071a37b2f06c15f3f6388685cd3e8b6de483dad1b84d088c303cabb60b"
+            "sha256": "59e63f02604711994c67b56f06d5b55735ec50ca442a8e615d8e2b55de021066"
           }
         ]
       }
@@ -7888,7 +7978,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "acce98b288cb20934de79102014d99d99ba6a7e99c4a50e041847cf118d1c75c"
+            "sha256": "786e4856e98874556284be40f3ae4ff3a746834d36b2d5c1c9dcd59a147f3453"
           }
         ]
       }
@@ -8520,7 +8610,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d7036fda7ab3ed6aecc328a52d9b8e667ff2b7cbf59e1bb1e40b855294e5fa0c"
+            "sha256": "5fcec3e4beef6d6100130e7cad634c5e939fcd6d1d881fc831d2791d0b6c69e1"
           }
         ]
       }
@@ -9247,7 +9337,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "6b6cbe53a7b873859a781cd7fd0e83b17ca75d280769400149b7d6bd46b53b9b"
+          "sha256": "7b501fb8efb2c6598d2d5e3a33852a2ce13428bef9e773b99d927d30843519ea"
         },
         "template": {
           "kind": "external",
@@ -10894,7 +10984,7 @@
     },
     {
       "name": "cx-state-message",
-      "area": "pattern",
+      "area": "primitive",
       "category": "cx-state-message",
       "kind": "component",
       "selectors": [
@@ -10999,7 +11089,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "5c13b7e9dc6607dc53d3560f13a6a741f451c64d6b92d56c5f1deca7c0c5384b"
+          "sha256": "97d0c7abdd013d1477688926aa4dae168b3d154b259e86ea8c6a4b9d4bf10cf3"
         },
         "template": {
           "kind": "external",
@@ -11244,7 +11334,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "acd5704a74e6758ef901480cfa20bc757295b16af9b08a5e73ac397f8311e863"
+            "sha256": "4ee133ead7fa5b3f37a2db7f0a19730a51671f5eff0a645166b02aeb70230864"
           }
         ]
       }
@@ -11302,16 +11392,25 @@
             "type": "CxTableDensity",
             "required": false,
             "transform": null,
-            "defaultValue": "'compact'",
+            "defaultValue": "'comfortable'",
             "source": "decorator"
           },
           {
-            "binding": "emptyText",
-            "member": "emptyText",
-            "type": "string",
+            "binding": "emptyState",
+            "member": "emptyState",
+            "type": "CxTableStateMessage",
             "required": false,
             "transform": null,
-            "defaultValue": "'No results to display.'",
+            "defaultValue": "{ heading: 'No results to display.', visual: 'none', }",
+            "source": "decorator"
+          },
+          {
+            "binding": "emptyStateAction",
+            "member": "emptyStateAction",
+            "type": "CxTableEmptyStateAction | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -11333,12 +11432,12 @@
             "source": "decorator"
           },
           {
-            "binding": "noMatchesText",
-            "member": "noMatchesText",
-            "type": "string",
+            "binding": "noMatchesState",
+            "member": "noMatchesState",
+            "type": "CxTableStateMessage",
             "required": false,
             "transform": null,
-            "defaultValue": "'No results match the current filters.'",
+            "defaultValue": "{ heading: 'No results match this view.', visual: 'none', }",
             "source": "decorator"
           },
           {
@@ -11436,7 +11535,7 @@
           {
             "binding": "activeRowIdChange",
             "member": "activeRowIdChange",
-            "type": "string",
+            "type": "string | undefined",
             "source": "decorator"
           },
           {
@@ -11464,6 +11563,12 @@
             "source": "decorator"
           },
           {
+            "binding": "emptyStateActionSelect",
+            "member": "emptyStateActionSelect",
+            "type": "CxTableEmptyStateAction",
+            "source": "decorator"
+          },
+          {
             "binding": "filterLoadMore",
             "member": "filterLoadMore",
             "type": "CxColumnFilterLoadMoreEvent",
@@ -11479,6 +11584,12 @@
             "binding": "filterValuesChange",
             "member": "filterValuesChange",
             "type": "CxColumnFilterValueMap",
+            "source": "decorator"
+          },
+          {
+            "binding": "resetTable",
+            "member": "resetTable",
+            "type": "void",
             "source": "decorator"
           },
           {
@@ -11510,17 +11621,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "30880a0feffd5eb9173e121b4fa63c924179155a9e81c87123ca46a2d5a4359d"
+          "sha256": "e9697e2c5c9174aa07364a4aa4cd628985fcc402d99439e68146a2cb57e9183b"
         },
         "template": {
           "kind": "external",
-          "sha256": "d253747c6b9ebf800cca379f9bbccd078d772cbe12261b5746b70f257bf9b01a"
+          "sha256": "8239b044da37fecf02ed16c54f37e3e6610680d725e2a7fb460064e17ec1731c"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "3202d60c33377e65f98ceb683f0a3a944d97a3704d1e182b4f696a7142f9629a"
+            "sha256": "c567675f63ec7b9a20c47025198ebe7c8340992abd99be22c854068622c75bb3"
           }
         ]
       }
@@ -11596,16 +11707,25 @@
             "type": "CxTableDensity",
             "required": false,
             "transform": null,
-            "defaultValue": "'compact'",
+            "defaultValue": "'comfortable'",
             "source": "decorator"
           },
           {
-            "binding": "emptyText",
-            "member": "emptyText",
-            "type": "string",
+            "binding": "emptyState",
+            "member": "emptyState",
+            "type": "CxTableStateMessage",
             "required": false,
             "transform": null,
-            "defaultValue": "'No results to display.'",
+            "defaultValue": "{ heading: 'No results to display.', visual: 'none', }",
+            "source": "decorator"
+          },
+          {
+            "binding": "emptyStateAction",
+            "member": "emptyStateAction",
+            "type": "CxTableEmptyStateAction | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -11615,6 +11735,15 @@
             "required": false,
             "transform": null,
             "defaultValue": "'filters'",
+            "source": "decorator"
+          },
+          {
+            "binding": "filtersToQueryConditions",
+            "member": "filtersToQueryConditions",
+            "type": "readonly CxQueryFieldCondition[] | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -11663,12 +11792,12 @@
             "source": "decorator"
           },
           {
-            "binding": "noMatchesText",
-            "member": "noMatchesText",
-            "type": "string",
+            "binding": "noMatchesState",
+            "member": "noMatchesState",
+            "type": "CxTableStateMessage",
             "required": false,
             "transform": null,
-            "defaultValue": "'No results match the current filters.'",
+            "defaultValue": "{ heading: 'No results match this view.', visual: 'none', }",
             "source": "decorator"
           },
           {
@@ -11714,6 +11843,33 @@
             "required": false,
             "transform": null,
             "defaultValue": "'Search query'",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryConditions",
+            "member": "queryConditions",
+            "type": "readonly CxQueryFieldCondition[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryFields",
+            "member": "queryFields",
+            "type": "readonly CxQueryFieldDefinition[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryToFilterTranslation",
+            "member": "queryToFilterTranslation",
+            "type": "CxFilterBarQueryTranslation | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -11949,7 +12105,7 @@
           {
             "binding": "activeRowIdChange",
             "member": "activeRowIdChange",
-            "type": "string",
+            "type": "string | undefined",
             "source": "decorator"
           },
           {
@@ -11968,6 +12124,12 @@
             "binding": "densityChange",
             "member": "densityChange",
             "type": "CxTableDensity",
+            "source": "decorator"
+          },
+          {
+            "binding": "emptyStateActionSelect",
+            "member": "emptyStateActionSelect",
+            "type": "CxTableEmptyStateAction",
             "source": "decorator"
           },
           {
@@ -12019,9 +12181,27 @@
             "source": "decorator"
           },
           {
+            "binding": "queryConditionsChange",
+            "member": "queryConditionsChange",
+            "type": "readonly CxQueryFieldCondition[]",
+            "source": "decorator"
+          },
+          {
             "binding": "queryValueChange",
             "member": "queryValueChange",
             "type": "string",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryValueRetry",
+            "member": "queryValueRetry",
+            "type": "CxQueryFieldValueRetryEvent",
+            "source": "decorator"
+          },
+          {
+            "binding": "queryValueSearch",
+            "member": "queryValueSearch",
+            "type": "CxQueryFieldValueSearchEvent",
             "source": "decorator"
           },
           {
@@ -12112,11 +12292,11 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "c31244f947f505481188d89b23233b9e5a5a46e7c97b645e43e9a4ff51257477"
+          "sha256": "05ba6162f9a9f81b0f7561f28f0c914c31a1bf29016bf15570c864758ae0f396"
         },
         "template": {
           "kind": "external",
-          "sha256": "2ec5282637eea56e5a4cdccedefb233b9ecc43bfa4798a86069532ea8f1b36ea"
+          "sha256": "4d7ef6c19d1e6538ea4c40ce4015545db2194db734cf083bc9de31c832a9c4cd"
         },
         "styles": [
           {
@@ -12350,7 +12530,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "ae9e34c135ed666aedfc879d96e0f365a45dabc600a24469b27c1758fea65da5"
+            "sha256": "68d5d1ef9a16ba443ca9863d9577f038a1eabe76f4baaefc55998326e7e2ecf8"
           }
         ]
       }
@@ -12523,17 +12703,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "d2a86820c2c2c663a11b3c5ad5e359de3acac5bf685a047cb77589821fee20ef"
+          "sha256": "51a59a5d8af775cd81505d63fbddc3d7afdcc897d58e2a5b2310b88ac6377b8b"
         },
         "template": {
           "kind": "external",
-          "sha256": "9f4943258d2b149fe77e21f001ce2d97ec8eedb1fa78e333d4603085236fbc6c"
+          "sha256": "5411fabd9d905f9fc681c1d6313e752b37f5c0f5d798f7ecdb19759ecf4bc3e5"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a81ba133bad206d334f5c26b324dad58e82b11fbfe61c7fb6c7b0b62bf88057a"
+            "sha256": "6ca6a929aec130e24b06b46cde5270e7c60be4515c1ea7f0abd7af848170e4cb"
           }
         ]
       }
@@ -14414,7 +14594,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "b0470b45f18efd14acba7cce3a42c8a8141695dae6c18534b52187645d1bd3a4"
+          "sha256": "f2a98f20c081ea0544102e0b88f987ef1f1c162825e79dcddd953a8bcc0a2214"
         },
         "template": {
           "kind": "external",

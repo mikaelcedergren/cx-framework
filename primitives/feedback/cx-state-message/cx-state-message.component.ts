@@ -12,11 +12,11 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { type CxIconName } from '../../icons/manifest';
-import { CxButtonComponent, type CxButtonMood } from '../../primitives/actions/cx-button';
-import { type CxFeedbackAction, visibleCxFeedbackAction } from '../../primitives/feedback/cx-feedback-action';
-import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner';
-import { CxIconComponent } from '../../primitives/media/cx-icon';
+import { type CxIconName } from '../../../icons/manifest';
+import { CxButtonComponent, type CxButtonMood } from '../../actions/cx-button';
+import { type CxFeedbackAction, visibleCxFeedbackAction } from '../cx-feedback-action';
+import { CxSpinnerComponent } from '../cx-spinner';
+import { CxIconComponent } from '../../media/cx-icon';
 
 export type CxStateMessageState = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
 export type CxStateMessageVisual = 'icon' | 'none';

@@ -104,9 +104,9 @@
       "selectors": [
         "cx-state-message"
       ],
-      "area": "pattern",
+      "area": "primitive",
       "category": "cx-state-message",
-      "path": "patterns/cx-state-message/cx-state-message.component.ts"
+      "path": "primitives/feedback/cx-state-message/cx-state-message.component.ts"
     },
     {
       "name": "cx-filter-bar",

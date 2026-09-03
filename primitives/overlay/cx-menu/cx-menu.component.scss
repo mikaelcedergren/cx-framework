@@ -46,6 +46,26 @@
   width: 100%;
 }
 
+.cx-menu__option-wrap {
+  min-width: 0;
+}
+
+.cx-menu__trailing-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-right: var(--space-xs);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) ease;
+}
+
+.cx-menu__option-wrap:hover .cx-menu__trailing-actions,
+.cx-menu__option-wrap:focus-within .cx-menu__trailing-actions,
+.cx-menu__trailing-actions:has(button[aria-expanded='true']) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .cx-menu__groups {
   display: flex;
   width: 100%;
@@ -63,6 +83,22 @@
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--surface);
+}
+
+// A portaled popover supplies the radius that keeps its framing lane even.
+// Standalone menus keep their ordinary group radius through the fallback.
+.cx-menu__group:first-child {
+  border-top-left-radius: var(--cx-popover-inner-radius, var(--radius-md));
+  border-top-right-radius: var(--cx-popover-inner-radius, var(--radius-md));
+}
+
+.cx-menu__group:last-child {
+  border-bottom-right-radius: var(--cx-popover-inner-radius, var(--radius-md));
+  border-bottom-left-radius: var(--cx-popover-inner-radius, var(--radius-md));
+}
+
+.cx-menu__group--heading {
+  background: transparent;
 }
 
 .cx-menu__empty {

@@ -1,7 +1,7 @@
 import { type CxDropdownFilterMode, type CxDropdownOption, type CxDropdownTranslations } from '../../inputs/cx-dropdown';
 import { type CxDateSpanDisabledDates, type CxDateSpanPickerWeekStart, type CxDateSpanQuickRange } from '../../inputs/cx-date-span-picker';
 import { type CxTagFieldTag } from '../../inputs/cx-tag-field';
-export type CxColumnFilterKind = 'search' | 'multi-select' | 'tag-field' | 'date-span';
+export type CxColumnFilterKind = 'search' | 'single-select' | 'multi-select' | 'tag-field' | 'date-span' | 'number-span' | 'range';
 type CxColumnFilterDefinitionBase<TKind extends CxColumnFilterKind> = {
     kind: TKind;
     placeholder?: string;
@@ -12,6 +12,16 @@ export type CxColumnFilterSearchDefinition = CxColumnFilterDefinitionBase<'searc
 };
 export type CxColumnFilterMultiSelectDefinition = CxColumnFilterDefinitionBase<'multi-select'> & {
     options: readonly CxDropdownOption[];
+    presentation?: 'checklist' | 'dropdown';
+    searchable?: boolean;
+    filterMode?: CxDropdownFilterMode;
+    hasMore?: boolean;
+    loadingMore?: boolean;
+    translations?: CxDropdownTranslations;
+};
+export type CxColumnFilterSingleSelectDefinition = CxColumnFilterDefinitionBase<'single-select'> & {
+    options: readonly CxDropdownOption[];
+    presentation?: 'radio' | 'dropdown';
     searchable?: boolean;
     filterMode?: CxDropdownFilterMode;
     hasMore?: boolean;
@@ -32,11 +42,20 @@ export type CxColumnFilterDateSpanDefinition = CxColumnFilterDefinitionBase<'dat
     timeEnabled?: boolean;
     closeOnSelect?: boolean;
 };
+type CxColumnFilterNumericDefinitionBase<TKind extends 'number-span' | 'range'> = CxColumnFilterDefinitionBase<TKind> & {
+    min: number;
+    max: number;
+    step?: number;
+    prependText?: string;
+    appendText?: string;
+};
+export type CxColumnFilterNumberSpanDefinition = CxColumnFilterNumericDefinitionBase<'number-span'>;
+export type CxColumnFilterRangeDefinition = CxColumnFilterNumericDefinitionBase<'range'>;
 /**
  * Add future built-in interactions as a new discriminated member. The table
  * surfaces consume this union and do not need column-type-specific inputs.
  */
-export type CxColumnFilterDefinition = CxColumnFilterSearchDefinition | CxColumnFilterMultiSelectDefinition | CxColumnFilterTagFieldDefinition | CxColumnFilterDateSpanDefinition;
+export type CxColumnFilterDefinition = CxColumnFilterSearchDefinition | CxColumnFilterSingleSelectDefinition | CxColumnFilterMultiSelectDefinition | CxColumnFilterTagFieldDefinition | CxColumnFilterDateSpanDefinition | CxColumnFilterNumberSpanDefinition | CxColumnFilterRangeDefinition;
 export type CxColumnFilterDefinitionOf<TKind extends CxColumnFilterKind> = Extract<CxColumnFilterDefinition, {
     kind: TKind;
 }>;
@@ -44,11 +63,18 @@ export type CxColumnFilterDateSpanValue = Readonly<{
     start?: string;
     end?: string;
 }>;
+export type CxColumnFilterNumericSpanValue = Readonly<{
+    min?: number;
+    max?: number;
+}>;
 export type CxColumnFilterValueByKind = {
     search: string;
+    'single-select': string;
     'multi-select': readonly string[];
     'tag-field': readonly string[];
     'date-span': CxColumnFilterDateSpanValue;
+    'number-span': CxColumnFilterNumericSpanValue;
+    range: CxColumnFilterNumericSpanValue;
 };
 export type CxColumnFilterValueFor<TKind extends CxColumnFilterKind> = CxColumnFilterValueByKind[TKind];
 /**
@@ -71,12 +97,15 @@ export interface CxColumnFilterLoadMoreEvent {
 }
 export declare function assertCxColumnFilterDefinition(value: unknown): asserts value is CxColumnFilterDefinition;
 export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterSearchDefinition, value: unknown): string | undefined;
+export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterSingleSelectDefinition, value: unknown): string | undefined;
 export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterMultiSelectDefinition, value: unknown): readonly string[] | undefined;
 export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterTagFieldDefinition, value: unknown): readonly string[] | undefined;
 export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterDateSpanDefinition, value: unknown): CxColumnFilterDateSpanValue | undefined;
+export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterNumberSpanDefinition | CxColumnFilterRangeDefinition, value: unknown): CxColumnFilterNumericSpanValue | undefined;
 export declare function normalizeCxColumnFilterValue(definition: CxColumnFilterDefinition, value: unknown): CxColumnFilterValue | undefined;
 export declare function isCxColumnFilterValueActive(definition: CxColumnFilterDefinition, value: unknown): boolean;
 export declare function isCxColumnFilterDateSpanValue(value: unknown): value is CxColumnFilterDateSpanValue;
+export declare function isCxColumnFilterNumericSpanValue(value: unknown): value is CxColumnFilterNumericSpanValue;
 export declare function summarizeCxColumnFilterValue(definition: CxColumnFilterDefinition, value: unknown): string | undefined;
 /**
  * Returns a new controlled state map with one column updated. Clearing a value

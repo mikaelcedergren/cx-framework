@@ -1,75 +1,92 @@
-<!-- Tooltips sit off the list axis (right) so an open tooltip never covers sibling options. -->
-@if (clickable) {
-  <button
-    #control
-    type="button"
-    class="cx-option"
-    [class.cx-option--primary]="mood === 'primary'"
-    [class.cx-option--accent]="mood === 'accent'"
-    [class.cx-option--info]="mood === 'info'"
-    [class.cx-option--success]="mood === 'success'"
-    [class.cx-option--warning]="mood === 'warning'"
-    [class.cx-option--danger]="mood === 'danger'"
-    [class.cx-option--selected]="selected && selectedHighlight"
-    [class.cx-option--active]="active"
-    [class.cx-option--submenu-open]="submenu === 'open'"
-    [class.cx-option--with-checkbox]="showCheckbox"
-    [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
-    [class.cx-option--append-only]="hasAppendOnlyLayout()"
-    [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
-    [class.cx-option--disabled]="disabled"
-    [disabled]="disabled"
-    [attr.role]="role || null"
-    [attr.aria-disabled]="disabled ? 'true' : null"
-    [attr.aria-selected]="ariaSelectedValue()"
-    [attr.aria-checked]="ariaCheckedValue()"
-    [attr.aria-posinset]="ariaPosInSet ?? null"
-    [attr.aria-setsize]="ariaSetSize ?? null"
-    [cxTooltip]="label"
-    [cxTooltipOverflow]="true"
-    cxTooltipPosition="right"
+<!-- The row owns the visual state so independent trailing controls share the
+     option background without ever nesting one button inside another. -->
+<div
+  class="cx-option__row"
+  [class.cx-option__row--selected]="selected && selectedHighlight"
+  [class.cx-option__row--active]="active"
+  [class.cx-option__row--submenu-open]="submenu === 'open'"
+  [class.cx-option__row--static]="!clickable"
+  [class.cx-option__row--disabled]="disabled"
+>
+  <!-- Tooltips sit off the list axis (right) so an open tooltip never covers sibling options. -->
+  @if (clickable) {
+    <button
+      #control
+      type="button"
+      class="cx-option"
+      [class.cx-option--primary]="mood === 'primary'"
+      [class.cx-option--accent]="mood === 'accent'"
+      [class.cx-option--info]="mood === 'info'"
+      [class.cx-option--success]="mood === 'success'"
+      [class.cx-option--warning]="mood === 'warning'"
+      [class.cx-option--danger]="mood === 'danger'"
+      [class.cx-option--selected]="selected && selectedHighlight"
+      [class.cx-option--active]="active"
+      [class.cx-option--submenu-open]="submenu === 'open'"
+      [class.cx-option--with-checkbox]="showCheckbox"
+      [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
+      [class.cx-option--append-only]="hasAppendOnlyLayout()"
+      [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
+      [class.cx-option--disabled]="disabled"
+      [disabled]="disabled"
+      [attr.role]="role || null"
+      [attr.aria-disabled]="disabled ? 'true' : null"
+      [attr.aria-selected]="ariaSelectedValue()"
+      [attr.aria-checked]="ariaCheckedValue()"
+      [attr.aria-posinset]="ariaPosInSet ?? null"
+      [attr.aria-setsize]="ariaSetSize ?? null"
+      [cxTooltip]="label"
+      [cxTooltipOverflow]="true"
+      cxTooltipPosition="right"
+    >
+      <ng-container [ngTemplateOutlet]="optionContent" />
+    </button>
+  } @else {
+    <div
+      #control
+      class="cx-option cx-option--static"
+      [class.cx-option--primary]="mood === 'primary'"
+      [class.cx-option--accent]="mood === 'accent'"
+      [class.cx-option--info]="mood === 'info'"
+      [class.cx-option--success]="mood === 'success'"
+      [class.cx-option--warning]="mood === 'warning'"
+      [class.cx-option--danger]="mood === 'danger'"
+      [class.cx-option--selected]="selected && selectedHighlight"
+      [class.cx-option--submenu-open]="submenu === 'open'"
+      [class.cx-option--with-checkbox]="showCheckbox"
+      [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
+      [class.cx-option--append-only]="hasAppendOnlyLayout()"
+      [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
+      [class.cx-option--disabled]="disabled"
+      [attr.role]="role || null"
+      [attr.inert]="disabled ? '' : null"
+      [attr.aria-disabled]="disabled ? 'true' : null"
+      [attr.aria-selected]="ariaSelectedValue()"
+      [attr.aria-checked]="ariaCheckedValue()"
+      [attr.aria-posinset]="ariaPosInSet ?? null"
+      [attr.aria-setsize]="ariaSetSize ?? null"
+      [cxTooltip]="label"
+      [cxTooltipOverflow]="true"
+      cxTooltipPosition="right"
+    >
+      <ng-container [ngTemplateOutlet]="optionContent" />
+    </div>
+  }
+
+  <span
+    #controlSlot
+    class="cx-option__control-slot"
+    (click)="stopControlEvent($event)"
+    (keydown)="stopControlEvent($event)"
+    (pointerdown)="stopControlEvent($event)"
   >
-    <ng-container [ngTemplateOutlet]="optionContent" />
-  </button>
-} @else {
-  <div
-    #control
-    class="cx-option cx-option--static"
-    [class.cx-option--primary]="mood === 'primary'"
-    [class.cx-option--accent]="mood === 'accent'"
-    [class.cx-option--info]="mood === 'info'"
-    [class.cx-option--success]="mood === 'success'"
-    [class.cx-option--warning]="mood === 'warning'"
-    [class.cx-option--danger]="mood === 'danger'"
-    [class.cx-option--selected]="selected && selectedHighlight"
-    [class.cx-option--submenu-open]="submenu === 'open'"
-    [class.cx-option--with-checkbox]="showCheckbox"
-    [class.cx-option--without-icons]="!showCheckbox && !showPrependIcon() && !appendIconName()"
-    [class.cx-option--append-only]="hasAppendOnlyLayout()"
-    [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
-    [class.cx-option--disabled]="disabled"
-    [attr.role]="role || null"
-    [attr.inert]="disabled ? '' : null"
-    [attr.aria-disabled]="disabled ? 'true' : null"
-    [attr.aria-selected]="ariaSelectedValue()"
-    [attr.aria-checked]="ariaCheckedValue()"
-    [attr.aria-posinset]="ariaPosInSet ?? null"
-    [attr.aria-setsize]="ariaSetSize ?? null"
-    [cxTooltip]="label"
-    [cxTooltipOverflow]="true"
-    cxTooltipPosition="right"
-  >
-    <ng-container [ngTemplateOutlet]="optionContent" />
-  </div>
-}
+    <ng-content select="[control]" />
+  </span>
+</div>
 
 <ng-template #optionContent>
   @if (showCheckbox) {
-    <span
-      class="cx-option__checkbox"
-      [class.cx-option__checkbox--selected]="selected"
-      aria-hidden="true"
-    >
+    <span class="cx-option__checkbox" [class.cx-option__checkbox--selected]="selected" aria-hidden="true">
       <span class="cx-option__checkbox-check"></span>
     </span>
   }
@@ -104,15 +121,5 @@
         <cx-icon [icon]="appendIconValue" size="16" />
       </span>
     }
-
-    <span
-      #controlSlot
-      class="cx-option__control-slot"
-      (click)="stopControlEvent($event)"
-      (keydown)="stopControlEvent($event)"
-      (pointerdown)="stopControlEvent($event)"
-    >
-      <ng-content select="[control]" />
-    </span>
   </span>
 </ng-template>

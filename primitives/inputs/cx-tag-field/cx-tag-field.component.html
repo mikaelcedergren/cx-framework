@@ -22,26 +22,15 @@
     (click)="onFieldClick($event)"
   >
     <div class="cx-tag-field__tokens">
-      @for (tag of selectedTags$(); track tag.id; let index = $index) {
-        <span class="cx-tag-field__token" [attr.data-selected-tag-id]="tag.id">
-          <cx-tag
-            [text]="formatOptionLabel(tag)"
-            [color]="toTagColor(tag.color)"
-          />
-          <button
-            #selectedTagRemove
-            type="button"
-            class="cx-tag-field__token-remove"
-            tabindex="-1"
-            [disabled]="isLocked$()"
-            [attr.aria-label]="'Remove ' + formatOptionLabel(tag)"
-            (focus)="onSelectedTagFocus(tag)"
-            (keydown)="onSelectedTagKeydown($event, tag, index)"
-            (click)="removeTagFromPointer($event, tag)"
-          >
-            <cx-icon icon="remove" [size]="12" />
-          </button>
-        </span>
+      @for (tag of selectedTags$(); track tag.id) {
+        <cx-tag
+          class="cx-tag-field__token"
+          [attr.data-selected-tag-id]="tag.id"
+          [text]="formatOptionLabel(tag)"
+          [color]="toTagColor(tag.color)"
+          [dismissible]="!isLocked$()"
+          (dismiss)="dismissTag(tag)"
+        />
       }
 
       <input

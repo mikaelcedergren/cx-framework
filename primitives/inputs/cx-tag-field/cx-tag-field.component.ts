@@ -8,9 +8,7 @@ import {
   Input,
   OnDestroy,
   Output,
-  QueryList,
   ViewChild,
-  ViewChildren,
   computed,
   inject,
   signal,
@@ -114,9 +112,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
   private popoverRef?: CxPopoverComponent;
   @ViewChild('draftNameInput')
   private draftNameInputRef?: CxTextFieldComponent;
-  @ViewChildren('selectedTagRemove', { read: ElementRef })
-  private selectedTagRemoveRefs?: QueryList<ElementRef<HTMLButtonElement>>;
-
   protected readonly overlay = new CxFloatingSurfaceController(
     (rect, viewport) => this.measureOverlay(rect, viewport),
     () => this.popoverRef?.surfaceElement(),
@@ -451,64 +446,19 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
       this.closePopover();
       return;
     }
-    if (
-      (event.key === 'Backspace' || event.key === 'ArrowLeft')
-      && !this.queryState()
-      && this.selectedTags$().length > 0
-    ) {
+    if (event.key === 'Backspace' && !this.queryState() && this.selectedTags$().length > 0) {
       event.preventDefault();
-      this.focusSelectedTag(this.selectedTags$().length - 1);
-    }
-  }
-
-  protected onSelectedTagFocus(tag: CxTagFieldTag): void {
-    this.announce(`${this.formatOptionLabel(tag)} selected. Press Backspace or Delete to remove.`);
-  }
-
-  protected onSelectedTagKeydown(event: KeyboardEvent, tag: CxTagFieldTag, index: number): void {
-    if (this.isLocked$() || event.isComposing) {
-      return;
-    }
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      this.focusSelectedTag(Math.max(index - 1, 0));
-      return;
-    }
-    if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      if (index >= this.selectedTags$().length - 1) {
-        this.focusInput();
-      } else {
-        this.focusSelectedTag(index + 1);
+      const lastTag = this.selectedTags$().at(-1);
+      if (lastTag) {
+        this.removeTag(lastTag);
+        if (this.openState()) {
+          this.refreshPopover();
+        }
       }
-      return;
-    }
-    if (event.key === 'Backspace' || event.key === 'Delete') {
-      event.preventDefault();
-      this.removeTagAndFocus(tag, index);
-      return;
-    }
-    if (event.key === 'Escape') {
-      if (!this.openState()) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      this.closePopover();
-      this.focusInput();
-      return;
-    }
-    if (this.isPrintableKey(event)) {
-      event.preventDefault();
-      this.queryState.set(event.key);
-      this.openPopover('first');
-      this.focusInput();
-      this.announceResults();
     }
   }
 
-  protected removeTagFromPointer(event: MouseEvent, tag: CxTagFieldTag): void {
-    event.stopPropagation();
+  protected dismissTag(tag: CxTagFieldTag): void {
     this.removeTag(tag);
     if (this.openState()) {
       this.refreshPopover();
@@ -786,23 +736,6 @@ export class CxTagFieldComponent implements AfterViewInit, OnDestroy {
 
   private focusInput(): void {
     queueMicrotask(() => this.inputRef?.nativeElement.focus());
-  }
-
-  private focusSelectedTag(index: number): void {
-    const refs = this.selectedTagRemoveRefs?.toArray() ?? [];
-    refs[index]?.nativeElement.focus();
-  }
-
-  private removeTagAndFocus(tag: CxTagFieldTag, index: number): void {
-    this.removeTag(tag);
-    queueMicrotask(() => {
-      const remaining = this.selectedTags$().length;
-      if (remaining === 0) {
-        this.focusInput();
-        return;
-      }
-      this.focusSelectedTag(Math.max(0, Math.min(index - 1, remaining - 1)));
-    });
   }
 
   private removeTag(tag: CxTagFieldTag): void {

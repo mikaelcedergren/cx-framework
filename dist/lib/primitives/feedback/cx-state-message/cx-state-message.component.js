@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, PLATFORM_ID, ViewChild, inject, } from '@angular/core';
-import { CxButtonComponent } from '../../primitives/actions/cx-button/index.js';
-import { visibleCxFeedbackAction } from '../../primitives/feedback/cx-feedback-action.js';
-import { CxSpinnerComponent } from '../../primitives/feedback/cx-spinner/index.js';
-import { CxIconComponent } from '../../primitives/media/cx-icon/index.js';
+import { CxButtonComponent } from '../../actions/cx-button/index.js';
+import { visibleCxFeedbackAction } from '../cx-feedback-action.js';
+import { CxSpinnerComponent } from '../cx-spinner/index.js';
+import { CxIconComponent } from '../../media/cx-icon/index.js';
 import * as i0 from "@angular/core";
 const CX_STATE_MESSAGE_PRESETS = {
     pending: {

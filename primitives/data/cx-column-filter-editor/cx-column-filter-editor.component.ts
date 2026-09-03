@@ -11,17 +11,27 @@ import {
 } from '@angular/core';
 import { CxCheckboxComponent } from '../../inputs/cx-checkbox';
 import { CxDateSpanPickerComponent } from '../../inputs/cx-date-span-picker';
+import { CxDropdownComponent } from '../../inputs/cx-dropdown';
+import { CxNumberFieldComponent } from '../../inputs/cx-number-field';
+import { CxRadioComponent } from '../../inputs/cx-radio';
+import { CxSliderComponent, type CxSliderRangeValue } from '../../inputs/cx-slider';
 import { CxTagFieldComponent } from '../../inputs/cx-tag-field';
 import { CxTextFieldComponent } from '../../inputs/cx-text-field';
 import {
   assertCxColumnFilterDefinition,
   isCxColumnFilterDateSpanValue,
+  isCxColumnFilterNumericSpanValue,
+  isCxColumnFilterValueActive,
   normalizeCxColumnFilterValue,
   type CxColumnFilterDateSpanDefinition,
   type CxColumnFilterDateSpanValue,
   type CxColumnFilterDefinition,
   type CxColumnFilterMultiSelectDefinition,
+  type CxColumnFilterNumberSpanDefinition,
+  type CxColumnFilterNumericSpanValue,
+  type CxColumnFilterRangeDefinition,
   type CxColumnFilterSearchDefinition,
+  type CxColumnFilterSingleSelectDefinition,
   type CxColumnFilterTagFieldDefinition,
   type CxColumnFilterValue,
 } from './cx-column-filter.types';
@@ -31,6 +41,10 @@ import {
   imports: [
     CxCheckboxComponent,
     CxDateSpanPickerComponent,
+    CxDropdownComponent,
+    CxNumberFieldComponent,
+    CxRadioComponent,
+    CxSliderComponent,
     CxTagFieldComponent,
     CxTextFieldComponent,
   ],
@@ -88,6 +102,11 @@ export class CxColumnFilterEditorComponent {
       ? (this.definitionState() as CxColumnFilterMultiSelectDefinition)
       : undefined,
   );
+  protected readonly singleSelectDefinition$ = computed(() =>
+    this.definitionState()?.kind === 'single-select'
+      ? (this.definitionState() as CxColumnFilterSingleSelectDefinition)
+      : undefined,
+  );
   protected readonly tagFieldDefinition$ = computed(() =>
     this.definitionState()?.kind === 'tag-field'
       ? (this.definitionState() as CxColumnFilterTagFieldDefinition)
@@ -98,6 +117,16 @@ export class CxColumnFilterEditorComponent {
       ? (this.definitionState() as CxColumnFilterDateSpanDefinition)
       : undefined,
   );
+  protected readonly numberSpanDefinition$ = computed(() =>
+    this.definitionState()?.kind === 'number-span'
+      ? (this.definitionState() as CxColumnFilterNumberSpanDefinition)
+      : undefined,
+  );
+  protected readonly rangeDefinition$ = computed(() =>
+    this.definitionState()?.kind === 'range'
+      ? (this.definitionState() as CxColumnFilterRangeDefinition)
+      : undefined,
+  );
   protected readonly searchValue$ = computed(() => {
     const value = this.valueState();
     return typeof value === 'string' ? value : '';
@@ -106,11 +135,16 @@ export class CxColumnFilterEditorComponent {
     const value = this.valueState();
     return Array.isArray(value) ? [...value] : [];
   });
-  protected readonly hasMultiSelectValue$ = computed(
-    () =>
-      this.multiSelectDefinition$() !== undefined &&
-      this.selectedValues$().length > 0,
-  );
+  protected readonly singleSelectValue$ = computed(() => {
+    const value = this.valueState();
+    return typeof value === 'string' ? value : undefined;
+  });
+  protected readonly hasValue$ = computed(() => {
+    const definition = this.definitionState();
+    return definition
+      ? isCxColumnFilterValueActive(definition, this.valueState())
+      : false;
+  });
   protected readonly dateSpanValue$ = computed<CxColumnFilterDateSpanValue>(
     () => {
       const value = this.valueState();
@@ -120,6 +154,17 @@ export class CxColumnFilterEditorComponent {
       return {};
     },
   );
+  protected readonly numericSpanValue$ = computed<CxColumnFilterNumericSpanValue>(
+    () => {
+      const value = this.valueState();
+      return isCxColumnFilterNumericSpanValue(value) ? { ...value } : {};
+    },
+  );
+  protected readonly rangeValue$ = computed<CxSliderRangeValue>(() => {
+    const definition = this.rangeDefinition$();
+    const value = this.numericSpanValue$();
+    return [value.min ?? definition?.min ?? 0, value.max ?? definition?.max ?? 100];
+  });
   protected resolvedAriaLabel(): string {
     const explicitAriaLabel = this.ariaLabel?.trim();
     if (explicitAriaLabel) {
@@ -150,6 +195,9 @@ export class CxColumnFilterEditorComponent {
         .some(value => value.toLocaleLowerCase().includes(query)),
     );
   });
+  protected readonly singleSelectOptions$ = computed(() => [
+    ...(this.singleSelectDefinition$()?.options ?? []),
+  ]);
   protected readonly tagFieldTags$ = computed(() => [
     ...(this.tagFieldDefinition$()?.tags ?? []),
   ]);
@@ -180,6 +228,32 @@ export class CxColumnFilterEditorComponent {
 
   protected onSelectedValuesChange(values: string[]): void {
     this.commitValue(values);
+  }
+
+  protected onSingleSelectValueChange(value: string | undefined): void {
+    this.commitValue(value);
+  }
+
+  protected onSingleSelectOptionChange(optionId: string, selected: boolean): void {
+    if (selected) {
+      this.commitValue(optionId);
+    }
+  }
+
+  protected onSingleSelectKeydown(event: KeyboardEvent): void {
+    if (!['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(event.key)) {
+      return;
+    }
+    const group = event.currentTarget;
+    if (!(group instanceof HTMLElement)) return;
+    const radios = [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]:not(:disabled)')];
+    const currentIndex = radios.indexOf(event.target as HTMLInputElement);
+    if (currentIndex < 0 || radios.length < 2) return;
+    event.preventDefault();
+    const direction = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1;
+    const next = radios[(currentIndex + direction + radios.length) % radios.length];
+    next?.focus();
+    next?.click();
   }
 
   protected isMultiSelectOptionSelected(optionId: string): boolean {
@@ -219,6 +293,23 @@ export class CxColumnFilterEditorComponent {
   protected onDateSpanValueChange(value: CxColumnFilterDateSpanValue): void {
     this.commitValue(value);
   }
+
+  protected onNumericSpanValueChange(
+    edge: 'min' | 'max',
+    value: number | undefined,
+  ): void {
+    this.commitValue({ ...this.numericSpanValue$(), [edge]: value });
+  }
+
+  protected onRangeValueChange(value: CxSliderRangeValue): void {
+    this.commitValue({ min: value[0], max: value[1] });
+  }
+
+  protected readonly formatRangeValue = (value: number): string => {
+    const definition = this.rangeDefinition$();
+    const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
+    return `${definition?.prependText ?? ''}${number}${definition?.appendText ?? ''}`;
+  };
 
   protected onLoadMore(): void {
     this.loadMore.emit();

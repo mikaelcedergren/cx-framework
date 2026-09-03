@@ -1,0 +1,39 @@
+<div
+  class="cx-table-tags"
+  role="group"
+  [attr.aria-label]="ariaLabel$() || null"
+>
+  <div class="cx-table-tags__visible" aria-hidden="true">
+    @for (tag of visibleTags$(); track $index) {
+      <cx-tag
+        [text]="tag.label"
+        [color]="tag.color ?? 'default'"
+        [outline]="tag.outline ?? false"
+      />
+    }
+    @if (hiddenTagCount$() > 0) {
+      <cx-tag
+        class="cx-table-tags__overflow"
+        [text]="'+' + hiddenTagCount$()"
+      />
+    }
+  </div>
+
+  <div class="cx-table-tags__measure" aria-hidden="true">
+    @for (tag of tags$(); track $index) {
+      <cx-tag
+        class="cx-table-tags__measure-tag"
+        [text]="tag.label"
+        [color]="tag.color ?? 'default'"
+        [outline]="tag.outline ?? false"
+      />
+    }
+    @for (hiddenCount of hiddenTagCounts$(); track hiddenCount) {
+      <cx-tag
+        class="cx-table-tags__measure-overflow"
+        [attr.data-hidden-count]="hiddenCount"
+        [text]="'+' + hiddenCount"
+      />
+    }
+  </div>
+</div>

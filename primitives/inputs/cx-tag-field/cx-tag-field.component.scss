@@ -48,81 +48,9 @@
 }
 
 .cx-tag-field__token {
-  position: relative;
-  display: inline-flex;
   min-width: 0;
   max-width: 100%;
   flex: 0 1 auto;
-  align-items: center;
-}
-
-/* The tag owns the visible token surface, so reserve the precise-pointer
-   remove lane inside that surface instead of letting the local control cover
-   a long label. */
-.cx-tag-field__token > cx-tag {
-  --cx-tag-padding-inline-end: calc(var(--controller-size-small) + var(--space-2xs));
-}
-
-.cx-tag-field__token-remove {
-  position: absolute;
-  top: 50%;
-  right: var(--space-2xs);
-  display: inline-flex;
-  width: 18px;
-  height: 18px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: var(--line);
-  border-radius: var(--radius-pill);
-  corner-shape: round;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
-  color: var(--ink);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-50%) scale(0.94);
-  transition:
-    opacity var(--motion-fast) var(--ease-out-in),
-    transform var(--motion-fast) var(--ease-out-in),
-    background-color var(--motion-fast) var(--ease-out-in),
-    border-color var(--motion-fast) var(--ease-out-in);
-}
-
-/* :focus-visible (not :focus-within) so a pointer click can never leave the
-   remove button stuck visible; keyboard focus still reveals it. */
-.cx-tag-field__token:hover .cx-tag-field__token-remove,
-.cx-tag-field__token:has(.cx-tag-field__token-remove:focus-visible) .cx-tag-field__token-remove {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(-50%) scale(1);
-}
-
-.cx-tag-field__token-remove:hover {
-  border-color: var(--opacity-mid);
-  background: var(--opacity-low);
-}
-
-.cx-tag-field__token-remove:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
-
-.cx-tag-field__token-remove:disabled {
-  cursor: default;
-}
-
-@media (hover: none), (pointer: coarse) {
-  .cx-tag-field__token-remove {
-    position: static;
-    width: var(--controller-size-small);
-    height: var(--controller-size-small);
-    flex: 0 0 var(--controller-size-small);
-    margin-inline-start: calc(0px - var(--controller-size-small) - var(--space-2xs));
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
 }
 
 .cx-tag-field__input {

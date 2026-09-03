@@ -438,7 +438,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   protected listboxLabel(): string {
-    return `${this.stageHeading()} for ${this.label.trim() || 'filters'}`;
+    return `${this.stageHeading()} for ${this.label.trim() || this.ariaLabel?.trim() || 'filters'}`;
   }
 
   protected currentSuggestionsLoading(): boolean {

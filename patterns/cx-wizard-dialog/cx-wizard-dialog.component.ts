@@ -26,7 +26,7 @@ import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key
 import { CxDismissRequest, type CxDismissReason } from '../../primitives/overlay/dismiss-request';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
-import { CxStateMessageComponent } from '../cx-state-message';
+import { CxStateMessageComponent } from '../../primitives/feedback/cx-state-message';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
 import { CxWizardDialogStepDirective } from './cx-wizard-dialog-step.directive';
 

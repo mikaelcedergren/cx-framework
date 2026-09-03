@@ -35,12 +35,15 @@
       }
     } @else {
       <div class="cx-filter-bar__query">
-        <cx-text-field
+        <cx-query-field
           label=""
           [ariaLabel]="queryAriaLabel"
-          prependIcon="query"
-          [value]="queryValue$()"
-          (valueChange)="onQueryChange($event)"
+          [fields]="resolvedQueryFields$()"
+          [value]="resolvedQueryConditions$()"
+          [growVertically]="false"
+          (valueChange)="onQueryConditionsChange($event)"
+          (valueSearch)="queryValueSearch.emit($event)"
+          (valueRetry)="queryValueRetry.emit($event)"
         />
       </div>
     }
@@ -50,9 +53,12 @@
     <div class="cx-filter-bar__active-filters" #activeFiltersRegion>
       @if (hiddenActiveFilterCount$() > 0) {
         <button
+          #activeFilterOverflowAnchor
           type="button"
           class="cx-filter-bar__active-filters-more"
           [attr.aria-label]="moreActiveFiltersLabel$()"
+          [attr.aria-expanded]="overflowFilterPopoverOpen$()"
+          [attr.aria-controls]="overflowFilterPopoverOpen$() ? overflowFilterDialogId : null"
           (click)="onMoreActiveFiltersPressed()"
         >
           +{{ hiddenActiveFilterCount$() }}
@@ -132,66 +138,81 @@
   [placement]="filterPopoverPlacement$()"
   [role]="'dialog'"
   ariaLabel="Filters"
+  surfaceVariant="grouped"
   (backdropPressed)="closeFloatingPopovers()"
 >
-  <div class="cx-filter-bar__popover-content">
-    <cx-text-field
-      #filterSearchControl
-      class="cx-filter-bar__filter-search"
-      label=""
-      [ariaLabel]="filterSearchAriaLabel"
-      placeholder="Search columns"
-      prependIcon="search"
-      [clearable]="true"
-      [value]="filterSearchValue$()"
-      (valueChange)="onFilterSearchValueChange($event)"
+  @if (activeFilterCount$() > 0) {
+    <button actions type="button" class="cx-filter-bar__filter-clear" (click)="clearAllFilters()">
+      Clear all
+    </button>
+  }
+
+  <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--filters">
+    <cx-tabs
+      class="cx-filter-bar__filter-tabs"
+      ariaLabel="Filter views"
+      [controlsId]="filterListPanelId"
+      [items]="filterViewTabs"
+      [selectedId]="filterView$()"
+      [transparent]="true"
+      (selectedIdChange)="onFilterViewChange($event)"
     />
 
-    @if (activeFilterCount$() > 0) {
-      <div class="cx-filter-bar__filter-actions">
-        <span>{{ activeFilterCount$() }} active</span>
-        <button type="button" class="cx-filter-bar__filter-clear" (click)="clearAllFilters()">
-          Clear all
-        </button>
+    <div
+      class="cx-filter-bar__filter-view"
+      [id]="filterListPanelId"
+      role="tabpanel"
+      [attr.aria-labelledby]="filterListPanelId + '-tab-' + (filterView$() === 'recommended' ? 0 : 1)"
+    >
+      <cx-text-field
+        #filterSearchControl
+        class="cx-filter-bar__filter-search"
+        label=""
+        [ariaLabel]="filterSearchAriaLabel"
+        placeholder="Search columns"
+        prependIcon="search"
+        [clearable]="true"
+        [value]="filterSearchValue$()"
+        (valueChange)="onFilterSearchValueChange($event)"
+      />
+
+      <div class="cx-filter-bar__filters">
+        @for (filter of filteredFilters$(); track filter.id) {
+          <cx-expansion-panel
+            class="cx-filter-bar__filter-panel"
+            variant="flat"
+            [attr.data-cx-filter-panel]="filter.id"
+            [heading]="filter.label"
+            [expanded]="isFilterExpanded(filter.id)"
+            (expandedChange)="onFilterExpandedChange(filter.id, $event)"
+          >
+            @if (isFilterActive(filter)) {
+              <button
+                actions
+                type="button"
+                class="cx-filter-bar__filter-clear cx-filter-bar__filter-clear--column"
+                [attr.aria-label]="'Clear ' + filter.label + ' filter'"
+                (click)="clearFilter(filter)"
+              >
+                Clear
+              </button>
+            }
+
+            @if (isFilterExpanded(filter.id)) {
+              <!-- Heading and Clear come from the panel here, so the editor
+                   renders neither; the tag popover has no such chrome. -->
+              <ng-container
+                [ngTemplateOutlet]="columnFilterEditor"
+                [ngTemplateOutletContext]="{ filter, label: '', showClear: false }"
+              />
+            }
+          </cx-expansion-panel>
+        } @empty {
+          <div class="cx-filter-bar__filter-empty" role="status">
+            {{ filterSearchValue$().trim() ? 'No matching filters' : 'No recommended filters' }}
+          </div>
+        }
       </div>
-    }
-
-    <div class="cx-filter-bar__filters">
-      @for (filter of filteredFilters$(); track filter.id) {
-        <cx-expansion-panel
-          class="cx-filter-bar__filter-panel"
-          variant="flat"
-          [attr.data-cx-filter-panel]="filter.id"
-          [heading]="filter.label"
-          [expanded]="isFilterExpanded(filter.id)"
-          (expandedChange)="onFilterExpandedChange(filter.id, $event)"
-        >
-          @if (isFilterActive(filter)) {
-            <button
-              actions
-              type="button"
-              class="cx-filter-bar__filter-clear cx-filter-bar__filter-clear--column"
-              [attr.aria-label]="'Clear ' + filter.label + ' filter'"
-              (click)="clearFilter(filter)"
-            >
-              Clear
-            </button>
-          }
-
-          @if (isFilterExpanded(filter.id)) {
-            <!-- Heading and Clear come from the panel here, so the editor
-                 renders neither; the tag popover has no such chrome. -->
-            <ng-container
-              [ngTemplateOutlet]="columnFilterEditor"
-              [ngTemplateOutletContext]="{ filter, label: '', showClear: false }"
-            />
-          }
-        </cx-expansion-panel>
-      } @empty {
-        <div class="cx-filter-bar__filter-empty" role="status">
-          No matching columns
-        </div>
-      }
     </div>
   </div>
 </cx-popover>
@@ -223,6 +244,107 @@
     </div>
   }
 </cx-popover>
+
+<cx-popover
+  #activeFilterOverflowPopover
+  [open]="overflowFilterPopoverOpen$() && hiddenActiveFilters$().length > 0 && mode$() === 'filters' && showActiveFilters$()"
+  [showBackdrop]="true"
+  heading="More active filters"
+  [left]="overflowFilterMetrics$()?.left"
+  [top]="overflowFilterMetrics$()?.top"
+  [bottom]="overflowFilterMetrics$()?.bottom"
+  [width]="overflowFilterMetrics$()?.width"
+  [maxHeight]="overflowFilterMetrics$()?.maxHeight"
+  [placement]="overflowFilterMetrics$()?.placement"
+  [surfaceId]="overflowFilterDialogId"
+  role="dialog"
+  ariaLabel="More active filters"
+  surfaceVariant="grouped"
+  (backdropPressed)="closeActiveFilterOverflow()"
+>
+  <div class="cx-filter-bar__overflow-filters">
+    @for (filter of hiddenActiveFilters$(); track filter.id) {
+      <cx-expansion-panel
+        class="cx-filter-bar__overflow-filter-panel"
+        variant="flat"
+        [attr.data-cx-overflow-filter-panel]="filter.id"
+        [heading]="overflowFilterHeading(filter)"
+        [expanded]="isOverflowFilterExpanded(filter.id)"
+        (expandedChange)="onOverflowFilterExpandedChange(filter.id, $event)"
+      >
+        <button
+          actions
+          type="button"
+          class="cx-filter-bar__filter-clear cx-filter-bar__filter-clear--column"
+          [attr.aria-label]="'Clear ' + filter.label + ' filter'"
+          (click)="clearFilter(filter)"
+        >
+          Clear
+        </button>
+
+        @if (isOverflowFilterExpanded(filter.id)) {
+          <ng-container
+            [ngTemplateOutlet]="columnFilterEditor"
+            [ngTemplateOutletContext]="{ filter, label: '', showClear: false }"
+          />
+        }
+      </cx-expansion-panel>
+    }
+  </div>
+</cx-popover>
+
+<cx-dialog
+  [open]="queryTranslationDialogOpen$()"
+  variant="confirm"
+  size="default"
+  mood="warning"
+  heading="Some conditions can’t become filters"
+  description="Filter mode can’t represent the highlighted parts of this query. Switching will keep the compatible filters and remove the rest."
+  [primaryText]="queryTranslationPrimaryText$()"
+  secondaryText="Keep query"
+  (primary)="confirmQueryToFilterSwitch()"
+  (secondary)="keepQueryMode()"
+>
+  <div body class="cx-filter-bar__translation">
+    <div class="cx-filter-bar__translation-query" aria-label="Query translation preview">
+      @for (condition of resolvedQueryConditions$(); track condition.id; let first = $first) {
+        @if (!first) {
+          <span
+            class="cx-filter-bar__translation-token cx-filter-bar__translation-token--join"
+            [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'join')"
+          >{{ (condition.join ?? 'and').toUpperCase() }}</span>
+        }
+        <span
+          class="cx-filter-bar__translation-token"
+          [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'field')"
+        >{{ queryConditionFieldLabel(condition) }}</span>
+        <span
+          class="cx-filter-bar__translation-token"
+          [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'operator')"
+        >{{ queryConditionOperatorLabel(condition) }}</span>
+        @if (queryConditionHasValue(condition)) {
+          <span
+            class="cx-filter-bar__translation-token"
+            [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'value')"
+          >{{ queryConditionValueLabel(condition) }}</span>
+        }
+      }
+    </div>
+
+    <p class="cx-filter-bar__translation-summary">{{ queryTranslationSummary$() }}</p>
+
+    @if (pendingQueryTranslationState(); as translation) {
+      <ul class="cx-filter-bar__translation-issues" aria-label="Conditions that will be removed">
+        @for (issue of translation.issues; track issue.conditionId + '-' + issue.part) {
+          <li>
+            <strong>{{ queryTranslationIssueLabel(issue) }}</strong>
+            <span>{{ issue.reason }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</cx-dialog>
 
 <!-- One editor wiring for every surface in this bar: the definition, the
      current value and the three outputs can never drift between them. Only

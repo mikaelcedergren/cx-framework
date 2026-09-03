@@ -4,7 +4,11 @@ import { type CxMenuItem } from '../../overlay/cx-menu';
 import { type CxSeverityLevel, type CxSeverityTagFavor } from '../../display/cx-severity-tag';
 import { type CxStatusTagMood } from '../../display/cx-status-tag';
 import { type CxTagColor } from '../../display/cx-tag';
+import { type CxAvatarColor } from '../../display/cx-avatar';
 import { type CxTrendTagFavor, type CxTrendTagUnit } from '../../display/cx-trend-tag';
+import { type CxProgressBarMood } from '../../feedback/cx-progress-bar';
+import { CxSkeletonLoader } from '../../feedback/cx-skeleton-loader';
+import { type CxStateMessageVisual } from '../../feedback/cx-state-message';
 import { type CxColumnFilterDefinition, type CxColumnFilterLoadMoreEvent, type CxColumnFilterQueryChangeEvent, type CxColumnFilterValue, type CxColumnFilterValueMap } from '../cx-column-filter-editor';
 import * as i0 from "@angular/core";
 export type CxTableDensity = 'comfortable' | 'compact';
@@ -66,12 +70,39 @@ export type CxTableCell = {
     label: string;
     color?: CxTagColor;
     outline?: boolean;
+} | {
+    kind: 'tags';
+    tags: readonly {
+        label: string;
+        color?: CxTagColor;
+        outline?: boolean;
+    }[];
+} | {
+    kind: 'person';
+    name: string;
+    detail?: string;
+    src?: string;
+    color?: CxAvatarColor;
+} | {
+    kind: 'progress';
+    value: number;
+    mood?: CxProgressBarMood;
+    label?: string;
 };
 export interface CxTableRow {
     id: string;
     kind?: CxTableRowKind;
     cells: Record<string, CxTableCell | undefined>;
     menuItems?: CxMenuItem[];
+}
+export interface CxTableStateMessage {
+    heading: string;
+    description?: string;
+    icon?: CxIconName;
+    visual?: CxStateMessageVisual;
+}
+export interface CxTableEmptyStateAction {
+    text: string;
 }
 export interface CxTableRowMenuSelectEvent {
     rowId: string;
@@ -124,8 +155,8 @@ export declare class CxTableComponent implements OnDestroy {
     private readonly selectedRowIdsState;
     private readonly columnOrderState;
     private readonly columnWidthOverridesState;
-    private appliedFirstColumnAutoFit?;
-    private firstColumnAutoFitTimer?;
+    private appliedKeyColumnAutoFit?;
+    private keyColumnAutoFitTimer?;
     private readonly contentWidthsState;
     private readonly columnLeftOffsetsState;
     private readonly effectivePinnedColumnIdsState;
@@ -162,8 +193,9 @@ export declare class CxTableComponent implements OnDestroy {
     loading: boolean;
     showRowActions: boolean;
     rightClickMenu: boolean;
-    emptyText: string;
-    noMatchesText: string;
+    emptyState: CxTableStateMessage;
+    emptyStateAction: CxTableEmptyStateAction | undefined;
+    noMatchesState: CxTableStateMessage;
     set selectionMode(value: CxTableSelectionMode);
     set columns(value: readonly CxTableColumn[]);
     set rows(value: readonly CxTableRow[]);
@@ -171,13 +203,15 @@ export declare class CxTableComponent implements OnDestroy {
     set selectedRowIds(value: string[] | undefined);
     set filterValues(value: CxColumnFilterValueMap | undefined);
     set sort(value: CxTableSort | undefined);
-    readonly activeRowIdChange: EventEmitter<string>;
+    readonly activeRowIdChange: EventEmitter<string | undefined>;
+    readonly emptyStateActionSelect: EventEmitter<CxTableEmptyStateAction>;
     readonly selectedRowIdsChange: EventEmitter<string[]>;
     readonly rowMenuItemSelect: EventEmitter<CxTableRowMenuSelectEvent>;
     readonly rowActivate: EventEmitter<CxTableRowActivateEvent>;
     readonly columnOrderChange: EventEmitter<string[]>;
     readonly sortChange: EventEmitter<CxTableSort | undefined>;
     readonly filterValuesChange: EventEmitter<Readonly<Record<string, CxColumnFilterValue>>>;
+    readonly resetTable: EventEmitter<void>;
     readonly filterQueryChange: EventEmitter<CxColumnFilterQueryChangeEvent>;
     readonly filterLoadMore: EventEmitter<CxColumnFilterLoadMoreEvent>;
     readonly columnHeaderMenuOpenChange: EventEmitter<boolean>;
@@ -205,10 +239,11 @@ export declare class CxTableComponent implements OnDestroy {
         maxHeight: number;
         placement: "top" | "bottom";
     } | undefined>;
-    protected readonly skeletonRows: number[];
+    protected readonly loadingSkeleton$: import("@angular/core").Signal<CxSkeletonLoader>;
     protected readonly hasRowMenus$: import("@angular/core").Signal<boolean>;
     protected readonly hasRowSelection$: import("@angular/core").Signal<boolean>;
-    protected readonly rowIds$: import("@angular/core").Signal<string[]>;
+    protected readonly tableColumnSpan$: import("@angular/core").Signal<number>;
+    protected readonly selectableRowIds$: import("@angular/core").Signal<string[]>;
     protected readonly selectedVisibleRowIds$: import("@angular/core").Signal<string[]>;
     protected readonly allRowsSelected$: import("@angular/core").Signal<boolean>;
     protected readonly partiallySelectedRows$: import("@angular/core").Signal<boolean>;
@@ -231,7 +266,9 @@ export declare class CxTableComponent implements OnDestroy {
     protected trackColumn(index: number, column: CxTableColumn): string;
     protected trackRow(index: number, row: CxTableRow): string;
     protected cellFor(row: CxTableRow, columnId: string): CxTableCell | undefined;
+    protected progressPercent(value: number): string;
     protected rowKind(row: CxTableRow): CxTableRowKind;
+    protected rowIsSelectable(row: CxTableRow): boolean;
     protected rowIsKeyboardReachable(row: CxTableRow): boolean;
     protected rowLabel(row: CxTableRow): string | null;
     protected resolvedTextIcon(row: CxTableRow, column: CxTableColumn, cell: CxTableCell): CxIconName | undefined;
@@ -243,6 +280,7 @@ export declare class CxTableComponent implements OnDestroy {
     protected isColumnHideable(column: CxTableColumn): boolean;
     protected hasColumnHeaderMenuProperties(column: CxTableColumn): boolean;
     protected columnFilterValue(column: CxTableColumn): CxColumnFilterValue | undefined;
+    protected isColumnFilterActive(column: CxTableColumn): boolean;
     protected columnFilterSummary(column: CxTableColumn): string | undefined;
     protected canPinColumn(column: CxTableColumn): boolean;
     protected canHideColumn(column: CxTableColumn): boolean;
@@ -255,7 +293,8 @@ export declare class CxTableComponent implements OnDestroy {
     protected onColumnFilterValueChange(column: CxTableColumn, value: CxColumnFilterValue | undefined): void;
     protected onColumnFilterQueryChange(columnId: string, query: string): void;
     protected onColumnFilterLoadMore(columnId: string): void;
-    protected clearFilters(): void;
+    protected onResetTable(): void;
+    protected onEmptyStateAction(action: CxTableEmptyStateAction): void;
     protected onColumnHeaderAction(column: CxTableColumn, action: CxTableColumnHeaderAction): void;
     private applyColumnSort;
     private openColumnHeaderMenu;
@@ -290,16 +329,16 @@ export declare class CxTableComponent implements OnDestroy {
     private resolveRowContextMenuPosition;
     private stopReorderSession;
     /**
-     * The first column carries the most important information, so it sizes to
-     * its content automatically whenever rows or columns change — until the
+     * The key column carries the row identity, so it sizes to its content
+     * automatically whenever rows or columns change — until the
      * user resizes it manually, which takes ownership of the width.
      * Timeout-based (not animation frames) so it also runs in hidden tabs, and
      * retried briefly because the new rows render one change-detection pass
      * after the input setter fires.
      */
-    private scheduleFirstColumnAutoFit;
+    private scheduleKeyColumnAutoFit;
     /** Returns true when settled: applied, or skipped because the user owns the width. */
-    private applyFirstColumnAutoFit;
+    private applyKeyColumnAutoFit;
     /**
      * Auto-fit must never be the reason a horizontal scrollbar exists: the key
      * column prefers its content width but yields — down to the shared column
@@ -309,7 +348,7 @@ export declare class CxTableComponent implements OnDestroy {
      * without duplicating layout math. Any overflow that remains at the minimum
      * width comes from content-sized columns, and then the scrollbar is honest.
      */
-    private capFirstColumnWidthToViewport;
+    private capAutoFitColumnWidthToViewport;
     private updateColumnWidth;
     private syncPinnedColumnOffsets;
     private observeTableViewport;
@@ -340,13 +379,15 @@ export declare class CxTableComponent implements OnDestroy {
     private applyColumnWidthToDom;
     private isResizeGesture;
     private rowOwnsKeyboardEvent;
+    private moveRowFocus;
+    private setActiveRow;
     private eventComesFromInteractiveDescendant;
     private elementPathToRow;
     private isInteractiveElement;
     private keyTextCell;
     private updateDragPreview;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxTableComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableComponent, "cx-table", never, { "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyText": { "alias": "emptyText"; "required": false; }; "noMatchesText": { "alias": "noMatchesText"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; }, { "activeRowIdChange": "activeRowIdChange"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "rowActivate": "rowActivate"; "columnOrderChange": "columnOrderChange"; "sortChange": "sortChange"; "filterValuesChange": "filterValuesChange"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "columnHeaderMenuOpenChange": "columnHeaderMenuOpenChange"; "columnPinChange": "columnPinChange"; "columnVisibilityChange": "columnVisibilityChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableComponent, "cx-table", never, { "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyState": { "alias": "emptyState"; "required": false; }; "emptyStateAction": { "alias": "emptyStateAction"; "required": false; }; "noMatchesState": { "alias": "noMatchesState"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; }, { "activeRowIdChange": "activeRowIdChange"; "emptyStateActionSelect": "emptyStateActionSelect"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "rowActivate": "rowActivate"; "columnOrderChange": "columnOrderChange"; "sortChange": "sortChange"; "filterValuesChange": "filterValuesChange"; "resetTable": "resetTable"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "columnHeaderMenuOpenChange": "columnHeaderMenuOpenChange"; "columnPinChange": "columnPinChange"; "columnVisibilityChange": "columnVisibilityChange"; }, never, never, true, never>;
 }
 export {};
 //# sourceMappingURL=cx-table.component.d.ts.map

@@ -45,6 +45,8 @@ export type CxMenuItem = {
     dividerBefore?: boolean;
     dividerAfter?: boolean;
     items?: readonly CxMenuItem[];
+    /** Independent actions shown from a trailing kebab without replacing the row's primary action or choice. */
+    trailingActions?: readonly CxMenuItem[];
 };
 export type CxMenuGroup = {
     id?: string;
@@ -64,8 +66,10 @@ type CxResolvedMenuItem = CxMenuItem & {
     appendIcon?: CxIconName;
     dividerBeforeResolved: boolean;
     hasChildren: boolean;
+    hasTrailingActions: boolean;
     role: CxMenuItemRole;
     items?: CxResolvedMenuItem[];
+    trailingActions?: CxResolvedMenuItem[];
 };
 type CxResolvedMenuGroup = Omit<CxMenuGroup, 'id' | 'items'> & {
     id: string;
@@ -76,6 +80,8 @@ type CxResolvedMenuVisualGroup = Pick<CxResolvedMenuGroup, 'id' | 'label' | 'des
 };
 type CxMenuSubmenuSurface = {
     path: string;
+    anchorPath: string;
+    anchorKind: 'option' | 'trailing-actions';
     label: string;
     level: number;
     items: CxResolvedMenuItem[];
@@ -119,6 +125,7 @@ export declare class CxMenuComponent implements AfterContentInit, OnDestroy {
     private triggerDirectives?;
     private triggerChangesSubscription?;
     private rootPopoverRef?;
+    private triggerAnchorRef?;
     private disabledValue;
     set disabled(value: boolean);
     get disabled(): boolean;
@@ -167,6 +174,10 @@ export declare class CxMenuComponent implements AfterContentInit, OnDestroy {
     private activateItem;
     protected submenuSurfaceId(path: string): string;
     protected itemSubmenuState(parentPath: string, item: CxResolvedMenuItem): 'none' | 'open' | 'closed';
+    protected itemTrailingActionsState(parentPath: string, item: CxResolvedMenuItem): boolean;
+    protected trailingActionsSurfaceId(parentPath: string, item: CxResolvedMenuItem): string;
+    protected onTrailingActionsClick(item: CxResolvedMenuItem, level: number, parentPath: string, anchorElement: HTMLElement, event: MouseEvent): void;
+    protected onTrailingActionsKeydown(event: KeyboardEvent, anchorElement: HTMLElement): void;
     protected onDocumentPointerDown(event: PointerEvent): void;
     protected onEscapeKey(): void;
     protected onDocumentKeydown(event: KeyboardEvent): void;
@@ -175,6 +186,7 @@ export declare class CxMenuComponent implements AfterContentInit, OnDestroy {
     protected setOpen(nextOpen: boolean, restoreFocus?: boolean): void;
     private syncSurfaceMetrics;
     private openSubmenu;
+    private openTrailingActions;
     private trimSubmenus;
     private updateCurrentId;
     private closeSurface;
@@ -182,13 +194,15 @@ export declare class CxMenuComponent implements AfterContentInit, OnDestroy {
     private onHostVisibilityChange;
     private isSurfaceActive;
     private syncSubmenuSurfaceMetrics;
-    private moveOptionFocus;
+    private moveMenuFocus;
     private rootSurfaceElement;
     private menuSurfaceElements;
     private targetIsInsideMenuSurface;
     private optionButtonsInSurface;
     private optionButtonByPath;
     private optionWrapByPath;
+    private trailingActionsButtonByPath;
+    private focusParentControl;
     private focusWhenReady;
     private focusTargetIsStable;
     private focusTrigger;

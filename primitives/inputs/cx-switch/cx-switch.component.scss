@@ -36,6 +36,23 @@
   text-align: left;
 }
 
+// Keep the control's exported baseline stable even when it has no visible
+// label. Baseline-aligned parents can then treat an icon-only switch like the
+// same body-text control without shifting either the track or its content.
+.cx-switch::before {
+  content: '\200B';
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+  width: 0;
+  padding-top: var(--space-2xs);
+  overflow: hidden;
+  color: transparent;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  visibility: hidden;
+}
+
 .cx-switch--disabled {
   opacity: var(--opacity-disabled);
   cursor: default;
@@ -164,6 +181,12 @@
   --cx-switch-thumb-hover-x: var(--space-2xs);
 
   column-gap: var(--space-xs);
+}
+
+.cx-switch--small::before {
+  padding-top: 0;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
 }
 
 .cx-switch--small .cx-switch__label {

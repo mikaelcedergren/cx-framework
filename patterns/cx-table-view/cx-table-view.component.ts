@@ -14,6 +14,7 @@ import {
   type CxFilterBarColumnOption,
   type CxFilterBarFilter,
   type CxFilterBarMode,
+  type CxFilterBarQueryTranslation,
 } from '../cx-filter-bar';
 import { type CxToggleChipGroupOption } from '../../primitives/inputs/cx-toggle-chip-group';
 import {
@@ -29,6 +30,8 @@ import {
   type CxTableRowMenuSelectEvent,
   type CxTableSort,
   type CxTableSortDirection,
+  type CxTableStateMessage,
+  type CxTableEmptyStateAction,
 } from '../../primitives/data/cx-table';
 import {
   type CxColumnFilterLoadMoreEvent,
@@ -41,6 +44,12 @@ import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
 import { CxPaginationComponent, type CxPaginationPage } from '../../primitives/navigation/cx-pagination';
 import { CxActionBarComponent, type CxActionBarData } from '../cx-action-bar';
+import {
+  type CxQueryFieldCondition,
+  type CxQueryFieldDefinition,
+  type CxQueryFieldValueRetryEvent,
+  type CxQueryFieldValueSearchEvent,
+} from '../../primitives/data/cx-query-field';
 
 export type CxTableViewPaginationMode = 'none' | 'pages';
 
@@ -70,6 +79,10 @@ export class CxTableViewComponent {
   @Input() toggleFilters: CxToggleChipGroupOption[] = [];
   @Input() selectedToggleFilterIds: string[] = [];
   @Input() queryValue = '';
+  @Input() queryFields: readonly CxQueryFieldDefinition[] = [];
+  @Input() queryConditions: readonly CxQueryFieldCondition[] = [];
+  @Input() queryToFilterTranslation: CxFilterBarQueryTranslation | undefined;
+  @Input() filtersToQueryConditions: readonly CxQueryFieldCondition[] | undefined;
   @Input() queryAriaLabel = 'Search query';
   @Input() savedViews: CxMenuItem[] = [];
   @Input() groupByOptions: CxButtonGroupOption[] = [];
@@ -90,7 +103,7 @@ export class CxTableViewComponent {
     return this.columnsState();
   }
   @Input() rows: readonly CxTableRow[] = [];
-  @Input() density: CxTableDensity = 'compact';
+  @Input() density: CxTableDensity = 'comfortable';
   @Input() rowActivation: CxTableRowActivation = 'none';
   @Input() showHeaders = true;
   @Input() columnsResizable = true;
@@ -100,8 +113,15 @@ export class CxTableViewComponent {
   @Input() loading = false;
   @Input() showRowActions = true;
   @Input() rightClickMenu = true;
-  @Input() emptyText = 'No results to display.';
-  @Input() noMatchesText = 'No results match the current filters.';
+  @Input() emptyState: CxTableStateMessage = {
+    heading: 'No results to display.',
+    visual: 'none',
+  };
+  @Input() emptyStateAction: CxTableEmptyStateAction | undefined;
+  @Input() noMatchesState: CxTableStateMessage = {
+    heading: 'No results match this view.',
+    visual: 'none',
+  };
   @Input() sort: CxTableSort | undefined;
   @Input() activeRowId: string | undefined;
   @Input() selectionMode: CxTableSelectionMode = 'none';
@@ -123,6 +143,9 @@ export class CxTableViewComponent {
   @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
   @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
   @Output() readonly queryValueChange = new EventEmitter<string>();
+  @Output() readonly queryConditionsChange = new EventEmitter<readonly CxQueryFieldCondition[]>();
+  @Output() readonly queryValueSearch = new EventEmitter<CxQueryFieldValueSearchEvent>();
+  @Output() readonly queryValueRetry = new EventEmitter<CxQueryFieldValueRetryEvent>();
   @Output() readonly savedViewSelect = new EventEmitter<string>();
   @Output() readonly activeSavedViewIdChange = new EventEmitter<string | undefined>();
   @Output() readonly densityChange = new EventEmitter<CxTableDensity>();
@@ -137,7 +160,8 @@ export class CxTableViewComponent {
   @Output() readonly resetTable = new EventEmitter<void>();
   @Output() readonly sortChange = new EventEmitter<CxTableSort | undefined>();
   @Output() readonly columnOrderChange = new EventEmitter<string[]>();
-  @Output() readonly activeRowIdChange = new EventEmitter<string>();
+  @Output() readonly activeRowIdChange = new EventEmitter<string | undefined>();
+  @Output() readonly emptyStateActionSelect = new EventEmitter<CxTableEmptyStateAction>();
   @Output() readonly rowActivate = new EventEmitter<CxTableRowActivateEvent>();
   @Output() readonly selectedRowIdsChange = new EventEmitter<string[]>();
   @Output() readonly rowMenuItemSelect = new EventEmitter<CxTableRowMenuSelectEvent>();

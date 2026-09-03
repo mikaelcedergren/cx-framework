@@ -3,6 +3,10 @@
 }
 
 .cx-popover {
+  // Keep nested surfaces concentric so the framing lane stays visually even
+  // through every corner instead of snapping the inner curve to the radius scale.
+  --cx-popover-inner-radius: calc(var(--radius-xl) - var(--surface-separation));
+
   position: fixed;
   z-index: var(--z-index-popover);
   display: flex;
@@ -33,16 +37,16 @@
   transform-origin: top center;
 }
 
-/* Side surfaces (menu flyouts) grow from the edge that touches their anchor
-   and enter along their own axis rather than the vertical drop. */
+/* Placement still names the edge a surface belongs to, but entry motion must
+   never alter its measured geometry. A translated popover visibly drifts
+   beneath the pointer and makes a newly opened child surface look as though
+   its parent has re-anchored. */
 .cx-popover--left {
   transform-origin: right center;
-  animation-name: cx-popover-enter-from-right;
 }
 
 .cx-popover--right {
   transform-origin: left center;
-  animation-name: cx-popover-enter-from-left;
 }
 
 .cx-popover--raised {
@@ -57,7 +61,7 @@
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: var(--cx-popover-inner-radius);
   background: var(--surface-alt);
   padding: 0;
   overscroll-behavior: contain;
@@ -80,7 +84,7 @@
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
-  border-radius: var(--radius-lg);
+  border-radius: var(--cx-popover-inner-radius);
   background: var(--surface);
   overscroll-behavior: contain;
 }
@@ -97,42 +101,17 @@
 /* The body sets no gap — consumers space their own islands — so the heading
    island owns the separation that makes it read as a separate island. */
 .cx-popover__island--heading {
+  background: transparent;
   margin-bottom: var(--surface-separation);
 }
 
 @keyframes cx-popover-enter {
   from {
     opacity: 0;
-    transform: translateY(-4px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes cx-popover-enter-from-left {
-  from {
-    opacity: 0;
-    transform: translateX(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes cx-popover-enter-from-right {
-  from {
-    opacity: 0;
-    transform: translateX(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 

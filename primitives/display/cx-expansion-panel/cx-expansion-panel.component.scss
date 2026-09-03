@@ -141,35 +141,20 @@
   overflow: hidden;
 }
 
-// The opacity here is motion and nothing else: it fades the body in as the row
-// unfolds, instead of letting the text wipe up hard-edged. It is NOT what hides a
-// closed panel — the shell's zero-height row and the clip's `overflow: hidden` do
-// that, and `inert` in the template is what makes the content unreachable.
-//
-// So do not read `opacity: 0` as "hidden". Anything that needs a closed panel's
-// content to show — a print stylesheet, a snapshot, a find-in-page — has to raise
-// this as well as the row, or it gets an open box with nothing in it.
 .cx-expansion-panel__content {
   padding: var(--space-sm);
   font-size: var(--font-size-body);
   color: var(--ink);
   box-sizing: border-box;
-  opacity: 0;
-  transition: opacity var(--motion-base) var(--ease-out);
 }
 
 .cx-expansion-panel--expanded .cx-expansion-panel__content {
   background: var(--opacity-low);
 }
 
-.cx-expansion-panel__content-shell--expanded .cx-expansion-panel__content {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   .cx-expansion-panel__content-shell,
-  .cx-expansion-panel__content,
   .cx-expansion-panel__chevron {
     transition: none;
   }

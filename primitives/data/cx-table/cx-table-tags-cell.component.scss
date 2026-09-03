@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-table-tags {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.cx-table-tags__visible,
+.cx-table-tags__measure {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.cx-table-tags__visible {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cx-table-tags__visible > cx-tag,
+.cx-table-tags__measure > cx-tag {
+  flex: 0 0 auto;
+}
+
+.cx-table-tags__measure {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: max-content;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}

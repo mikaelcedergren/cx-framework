@@ -44,6 +44,11 @@ import {
 import { CxOptionGroupComponent } from '../../primitives/overlay/cx-option-group';
 import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
 import { CxTooltipComponent } from '../../primitives/overlay/cx-tooltip';
+import { CxDialogComponent } from '../../primitives/overlay/cx-dialog';
+import {
+  CxTabsComponent,
+  type CxTabItem,
+} from '../../primitives/navigation/cx-tabs';
 import {
   measureCxFloatingSurface,
   type CxFloatingSurfacePlacement,
@@ -58,17 +63,27 @@ import {
   assertCxColumnFilterDefinition,
   estimateCxColumnFilterHeight,
   isCxColumnFilterValueActive,
+  normalizeCxColumnFilterValueMap,
   withCxColumnFilterValue,
 } from '../../primitives/data/cx-column-filter-editor';
+import {
+  CxQueryFieldComponent,
+  type CxQueryFieldCondition,
+  type CxQueryFieldDefinition,
+  type CxQueryFieldValueRetryEvent,
+  type CxQueryFieldValueSearchEvent,
+} from '../../primitives/data/cx-query-field';
 
 export type CxFilterBarMode = 'filters' | 'query';
 export type CxFilterBarDisplayMode = 'compact' | 'comfortable';
 export type CxFilterBarSortDirection = 'asc' | 'desc';
+export type CxFilterBarFilterView = 'all' | 'recommended';
 
 export interface CxFilterBarFilter {
   id: string;
   label: string;
   filter: CxColumnFilterDefinition;
+  recommended?: boolean;
 }
 
 export interface CxFilterBarColumnOption {
@@ -77,13 +92,37 @@ export interface CxFilterBarColumnOption {
   pinnable?: boolean;
 }
 
+export type CxFilterBarQueryTranslationIssuePart =
+  | 'condition'
+  | 'join'
+  | 'field'
+  | 'operator'
+  | 'value';
+
+export interface CxFilterBarQueryTranslationIssue {
+  conditionId: string;
+  part: CxFilterBarQueryTranslationIssuePart;
+  reason: string;
+}
+
+/**
+ * Product-owned result for expressing the current query with filter controls.
+ * The filter bar owns the safe transition, but never guesses what a field or
+ * operator means in the collection it controls.
+ */
+export interface CxFilterBarQueryTranslation {
+  filterValues: CxColumnFilterValueMap;
+  translatedConditionIds: readonly string[];
+  issues: readonly CxFilterBarQueryTranslationIssue[];
+}
+
 /**
  * Position held for the surface anchored to an active-filter tag. The tag can
  * disappear while its editor is open — clearing the last value deactivates the
  * filter — so the surface keeps the metrics it opened with instead of
  * re-reading an anchor that may already be detached.
  */
-interface CxFilterBarTagSurfaceMetrics {
+interface CxFilterBarSurfaceMetrics {
   left: number | undefined;
   top: number | undefined;
   bottom: number | undefined;
@@ -95,9 +134,22 @@ interface CxFilterBarTagSurfaceMetrics {
 const CX_FILTER_BAR_MAX_PINNED_COLUMNS = 3;
 /** Same surface width as the table's column-header filter, so one filter reads the same in both places. */
 const CX_FILTER_BAR_TAG_POPOVER_WIDTH = 320;
+const CX_FILTER_BAR_OVERFLOW_POPOVER_WIDTH = 360;
 const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
-  { id: 'compact', label: 'Compact' },
   { id: 'comfortable', label: 'Comfortable' },
+  { id: 'compact', label: 'Compact' },
+];
+const FILTER_VIEW_TABS: CxTabItem[] = [
+  { id: 'recommended', label: 'Recommended filters' },
+  { id: 'all', label: 'All filters' },
+];
+const DEFAULT_QUERY_FIELDS: readonly CxQueryFieldDefinition[] = [
+  {
+    id: 'search',
+    label: 'Search',
+    operators: [{ id: 'contains', label: 'contains' }],
+    value: { kind: 'text' },
+  },
 ];
 
 @Component({
@@ -106,16 +158,19 @@ const DISPLAY_OPTIONS: CxButtonGroupOption[] = [
     CommonModule,
     CxButtonGroupComponent,
     CxColumnFilterEditorComponent,
+    CxQueryFieldComponent,
     CxExpansionPanelComponent,
     CxIconButtonComponent,
     CxTagComponent,
     CxTextFieldComponent,
     CxDropdownComponent,
+    CxDialogComponent,
     CxMenuComponent,
     CxMenuTriggerDirective,
     CxOptionGroupComponent,
     CxPopoverComponent,
     CxSwitchComponent,
+    CxTabsComponent,
     CxToggleButtonComponent,
     CxToggleChipGroupComponent,
     CxTooltipComponent,
@@ -128,6 +183,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private static instanceCounter = 0;
   private readonly instanceId = ++CxFilterBarComponent.instanceCounter;
   protected readonly tagFilterDialogId = `cx-filter-bar-${this.instanceId}-tag-filter`;
+  protected readonly overflowFilterDialogId = `cx-filter-bar-${this.instanceId}-overflow-filters`;
+  protected readonly filterListPanelId = `cx-filter-bar-${this.instanceId}-filter-list`;
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly modeState = signal<CxFilterBarMode>('filters');
   private readonly quickFiltersState = signal<CxButtonGroupOption[]>([]);
@@ -140,13 +197,29 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   /** null means every active-filter tag fits; a number is how many fit from the newest end. */
   private readonly visibleActiveFilterCountState = signal<number | null>(null);
   private readonly filterSearchValueState = signal('');
+  private readonly filterViewState = signal<CxFilterBarFilterView>('recommended');
   private readonly expandedFilterIdState = signal<string | undefined>(
     undefined,
   );
   private readonly queryValueState = signal('');
+  private readonly queryFieldsState = signal<readonly CxQueryFieldDefinition[]>(
+    [],
+  );
+  private readonly queryConditionsState = signal<
+    readonly CxQueryFieldCondition[]
+  >([]);
+  private readonly queryToFilterTranslationState = signal<
+    CxFilterBarQueryTranslation | undefined
+  >(undefined);
+  private readonly filtersToQueryConditionsState = signal<
+    readonly CxQueryFieldCondition[] | undefined
+  >(undefined);
+  protected readonly pendingQueryTranslationState = signal<
+    CxFilterBarQueryTranslation | undefined
+  >(undefined);
   private readonly savedViewsState = signal<CxMenuItem[]>([]);
   private readonly activeSavedViewIdState = signal<string | undefined>(undefined);
-  private readonly displayModeState = signal<CxFilterBarDisplayMode>('compact');
+  private readonly displayModeState = signal<CxFilterBarDisplayMode>('comfortable');
   private readonly groupByOptionsState = signal<CxButtonGroupOption[]>([]);
   private readonly groupByState = signal('none');
   private readonly sortOptionsState = signal<CxDropdownOption[]>([]);
@@ -174,10 +247,16 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private readonly propertiesPopoverPlacementState = signal<'bottom' | 'top'>('bottom');
   private readonly tagFilterIdState = signal<string | undefined>(undefined);
   private readonly tagFilterMetricsState = signal<
-    CxFilterBarTagSurfaceMetrics | undefined
+    CxFilterBarSurfaceMetrics | undefined
+  >(undefined);
+  private readonly overflowFilterPopoverOpenState = signal(false);
+  private readonly overflowExpandedFilterIdState = signal<string | undefined>(undefined);
+  private readonly overflowFilterMetricsState = signal<
+    CxFilterBarSurfaceMetrics | undefined
   >(undefined);
   private tagFilterAnchor?: HTMLElement;
   private tagFilterLockedPlacement?: CxFloatingSurfacePlacement;
+  private overflowFilterLockedPlacement?: CxFloatingSurfacePlacement;
   private resizeObserver?: ResizeObserver;
   // Placement is decided once per open; re-syncs keep the side so an open
   // popover never flips — growing content scrolls inside it instead.
@@ -212,6 +291,12 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @ViewChild('tagFilterPopover')
   private tagFilterPopoverRef?: CxPopoverComponent;
 
+  @ViewChild('activeFilterOverflowAnchor', { read: ElementRef })
+  private activeFilterOverflowAnchorRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('activeFilterOverflowPopover')
+  private activeFilterOverflowPopoverRef?: CxPopoverComponent;
+
   // The expansion panel and the tag popover render the same editor template,
   // so the instance is identified by which surface contains it. The two lists
   // come from one query and stay index-aligned.
@@ -243,7 +328,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       this.resizeObserver?.observe(next);
       this.scheduleActiveFilterMeasure();
     } else {
-      this.visibleActiveFilterCountState.set(null);
+      this.setVisibleActiveFilterCount(null);
     }
   }
 
@@ -255,6 +340,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   public set mode(value: CxFilterBarMode | undefined) {
     const next = value === 'query' ? 'query' : 'filters';
     this.modeState.set(next);
+    if (next === 'filters') {
+      this.pendingQueryTranslationState.set(undefined);
+    }
     if (next === 'query') {
       // An owner can switch modes without going through applyMode, and query
       // mode removes the tag row this surface is anchored to.
@@ -289,6 +377,12 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       assertCxColumnFilterDefinition(filter.filter);
     }
     this.filtersState.set(next);
+    if (
+      this.filterViewState() === 'recommended'
+      && !next.some(filter => filter.recommended)
+    ) {
+      this.filterViewState.set('all');
+    }
     const expandedFilterId = this.expandedFilterIdState();
     if (
       expandedFilterId &&
@@ -300,6 +394,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (tagFilterId && !next.some(filter => filter.id === tagFilterId)) {
       this.closeTagFilterPopover(false);
     }
+    this.reconcileActiveFilterOverflow();
   }
 
   @Input()
@@ -312,6 +407,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.showActiveFiltersState.set(value !== false);
     if (value === false) {
       this.closeTagFilterPopover(false);
+      this.closeActiveFilterOverflow(false);
     }
   }
 
@@ -321,13 +417,41 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input()
+  public set queryFields(
+    value: readonly CxQueryFieldDefinition[] | null | undefined,
+  ) {
+    this.queryFieldsState.set(value ?? []);
+  }
+
+  @Input()
+  public set queryConditions(
+    value: readonly CxQueryFieldCondition[] | null | undefined,
+  ) {
+    this.queryConditionsState.set(value ?? []);
+  }
+
+  @Input()
+  public set queryToFilterTranslation(
+    value: CxFilterBarQueryTranslation | null | undefined,
+  ) {
+    this.queryToFilterTranslationState.set(value ?? undefined);
+  }
+
+  @Input()
+  public set filtersToQueryConditions(
+    value: readonly CxQueryFieldCondition[] | null | undefined,
+  ) {
+    this.filtersToQueryConditionsState.set(value ?? undefined);
+  }
+
+  @Input()
   public set savedViews(value: CxMenuItem[]) {
     this.savedViewsState.set(value ?? []);
   }
 
   @Input()
   public set displayMode(value: CxFilterBarDisplayMode | undefined) {
-    this.displayModeState.set(value === 'comfortable' ? 'comfortable' : 'compact');
+    this.displayModeState.set(value === 'compact' ? 'compact' : 'comfortable');
   }
 
   @Input()
@@ -387,6 +511,13 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @Output() readonly filterQueryChange = new EventEmitter<CxColumnFilterQueryChangeEvent>();
   @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
   @Output() readonly queryValueChange = new EventEmitter<string>();
+  @Output() readonly queryConditionsChange = new EventEmitter<
+    readonly CxQueryFieldCondition[]
+  >();
+  @Output() readonly queryValueSearch =
+    new EventEmitter<CxQueryFieldValueSearchEvent>();
+  @Output() readonly queryValueRetry =
+    new EventEmitter<CxQueryFieldValueRetryEvent>();
   @Output() readonly savedViewSelect = new EventEmitter<string>();
   @Output() readonly activeSavedViewIdChange = new EventEmitter<string | undefined>();
   @Output() readonly displayModeChange = new EventEmitter<CxFilterBarDisplayMode>();
@@ -409,7 +540,48 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly filters$ = this.filtersState.asReadonly();
   protected readonly filterSearchValue$ =
     this.filterSearchValueState.asReadonly();
+  protected readonly filterView$ = this.filterViewState.asReadonly();
   protected readonly queryValue$ = this.queryValueState.asReadonly();
+  protected readonly queryTranslationDialogOpen$ = computed(
+    () => this.pendingQueryTranslationState() !== undefined,
+  );
+  protected readonly resolvedQueryFields$ = computed<
+    readonly CxQueryFieldDefinition[]
+  >(() =>
+    this.queryFieldsState().length > 0
+      ? this.queryFieldsState()
+      : DEFAULT_QUERY_FIELDS,
+  );
+  protected readonly resolvedQueryConditions$ = computed<
+    readonly CxQueryFieldCondition[]
+  >(() => {
+    if (this.queryFieldsState().length > 0) {
+      return this.queryConditionsState();
+    }
+    const value = this.queryValueState().trim();
+    return value
+      ? [{ id: 'search', fieldId: 'search', operatorId: 'contains', value }]
+      : [];
+  });
+  protected readonly queryTranslationRemovedConditionIds$ = computed(() => {
+    const translatedIds = new Set(
+      this.pendingQueryTranslationState()?.translatedConditionIds ?? [],
+    );
+    return this.resolvedQueryConditions$()
+      .filter(condition => !translatedIds.has(condition.id))
+      .map(condition => condition.id);
+  });
+  protected readonly queryTranslationSummary$ = computed(() => {
+    const translated = new Set(
+      this.pendingQueryTranslationState()?.translatedConditionIds ?? [],
+    ).size;
+    const removed = this.queryTranslationRemovedConditionIds$().length;
+    return `${translated} ${translated === 1 ? 'condition' : 'conditions'} will become filters. ${removed} ${removed === 1 ? 'condition' : 'conditions'} will be removed.`;
+  });
+  protected readonly queryTranslationPrimaryText$ = computed(() => {
+    const count = this.queryTranslationRemovedConditionIds$().length;
+    return `Switch and remove ${count} ${count === 1 ? 'condition' : 'conditions'}`;
+  });
   protected readonly savedViews$ = this.savedViewsState.asReadonly();
   protected readonly activeSavedViewId$ = this.activeSavedViewIdState.asReadonly();
   protected readonly displayMode$ = this.displayModeState.asReadonly();
@@ -439,6 +611,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly propertiesPopoverMaxHeight$ = this.propertiesPopoverMaxHeightState.asReadonly();
   protected readonly propertiesPopoverPlacement$ = this.propertiesPopoverPlacementState.asReadonly();
   protected readonly tagFilterMetrics$ = this.tagFilterMetricsState.asReadonly();
+  protected readonly overflowFilterPopoverOpen$ = this.overflowFilterPopoverOpenState.asReadonly();
+  protected readonly overflowFilterMetrics$ = this.overflowFilterMetricsState.asReadonly();
   /**
    * Resolved from the filter list, never from the active tags: clearing the
    * last value removes the tag but must not empty the editor the user is
@@ -475,13 +649,23 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     const hiddenCount = this.hiddenActiveFilterCount$();
     return hiddenCount === 1 ? 'Show 1 more active filter' : `Show ${hiddenCount} more active filters`;
   });
+  protected readonly hiddenActiveFilters$ = computed(() => {
+    const hiddenIds = new Set(
+      this.activeFilterTags$()
+        .slice(0, this.hiddenActiveFilterCount$())
+        .map(tag => tag.id),
+    );
+    return this.filtersState().filter(filter => hiddenIds.has(filter.id));
+  });
   protected readonly filterButtonAriaLabel$ = computed(() => {
     const count = this.activeFilterCount$();
     return count === 0 ? 'Open filters' : `Open filters, ${count} active`;
   });
   protected readonly filteredFilters$ = computed(() => {
     const query = this.filterSearchValueState().trim().toLocaleLowerCase();
-    const filters = this.filtersState();
+    const filters = this.filterViewState() === 'recommended'
+      ? this.filtersState().filter(filter => filter.recommended)
+      : this.filtersState();
     if (!query) {
       return filters;
     }
@@ -489,6 +673,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       filter.label.toLocaleLowerCase().includes(query),
     );
   });
+  protected readonly filterViewTabs = FILTER_VIEW_TABS;
   protected readonly filteredColumnOptions$ = computed(() => {
     const query = this.columnSearchValueState().trim().toLowerCase();
     const options = this.columnOptionsState();
@@ -520,7 +705,6 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
         ...item,
         type,
         selected: selectable ? active : undefined,
-        appendIcon: active ? 'check' : undefined,
       };
     }),
   );
@@ -533,7 +717,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     return [
       { id: 'switch-mode', label: switchLabel, prependIcon: switchIcon },
       { id: 'export-table', label: 'Export table', prependIcon: 'export' },
-      { id: 'reset-table', label: 'Reset table', prependIcon: 'reset', dividerBefore: true },
+      { id: 'reset-table', label: 'Reset view', prependIcon: 'reset', dividerBefore: true },
     ];
   });
   protected readonly displayOptions = DISPLAY_OPTIONS;
@@ -550,6 +734,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       }
       if (this.tagFilterIdState()) {
         this.syncTagFilterMetrics();
+      }
+      if (this.overflowFilterPopoverOpenState()) {
+        this.syncActiveFilterOverflowMetrics();
       }
       if (this.activeFiltersRegionEl) {
         this.scheduleActiveFilterMeasure();
@@ -607,6 +794,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.filterValuesState.set(next);
     this.filterValuesChange.emit(next);
     this.invalidateSavedViewSelection();
+    this.reconcileActiveFilterOverflow();
   }
 
   protected onFilterQueryChange(columnId: string, query: string): void {
@@ -636,6 +824,18 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.filterSearchValueState.set(value);
   }
 
+  protected onFilterViewChange(value: string): void {
+    const next: CxFilterBarFilterView = value === 'recommended' ? 'recommended' : 'all';
+    this.filterViewState.set(next);
+    const expandedFilterId = this.expandedFilterIdState();
+    if (
+      expandedFilterId
+      && !this.filteredFilters$().some(filter => filter.id === expandedFilterId)
+    ) {
+      this.expandedFilterIdState.set(undefined);
+    }
+  }
+
   protected onFilterExpandedChange(
     filterId: string,
     expanded: boolean,
@@ -643,6 +843,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.expandedFilterIdState.set(expanded ? filterId : undefined);
     if (expanded) {
       this.scheduleExpandedFilterReveal(filterId);
+      this.scheduleExpandedFilterFocus(filterId);
     }
   }
 
@@ -766,9 +967,62 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   }
 
   protected onMoreActiveFiltersPressed(): void {
-    if (!this.filterPopoverOpenState()) {
-      this.toggleFilterPopover();
+    if (this.overflowFilterPopoverOpenState()) {
+      this.closeActiveFilterOverflow();
+      return;
     }
+    if (this.hiddenActiveFilters$().length === 0) {
+      return;
+    }
+
+    this.closeFilterPopover(false);
+    this.closeTagFilterPopover(false);
+    this.propertiesPopoverOpenState.set(false);
+    this.overflowExpandedFilterIdState.set(undefined);
+    this.overflowFilterLockedPlacement = undefined;
+    this.syncActiveFilterOverflowMetrics();
+    this.overflowFilterPopoverOpenState.set(true);
+    this.filterPopoverOpenChange.emit(true);
+    this.scheduleActiveFilterOverflowFocus();
+  }
+
+  protected isOverflowFilterExpanded(filterId: string): boolean {
+    return this.overflowExpandedFilterIdState() === filterId;
+  }
+
+  protected onOverflowFilterExpandedChange(filterId: string, expanded: boolean): void {
+    this.overflowExpandedFilterIdState.set(expanded ? filterId : undefined);
+    if (expanded) {
+      this.scheduleExpandedFilterFocus(filterId, 'overflow');
+    }
+    queueMicrotask(() => this.syncActiveFilterOverflowMetrics());
+  }
+
+  protected overflowFilterHeading(filter: CxFilterBarFilter): string {
+    return filter.label;
+  }
+
+  public closeActiveFilterOverflow(restoreFocus = true): void {
+    if (!this.overflowFilterPopoverOpenState()) {
+      return;
+    }
+    this.overflowFilterPopoverOpenState.set(false);
+    this.overflowExpandedFilterIdState.set(undefined);
+    this.overflowFilterMetricsState.set(undefined);
+    this.overflowFilterLockedPlacement = undefined;
+    this.filterPopoverOpenChange.emit(false);
+
+    if (!restoreFocus) {
+      return;
+    }
+    queueMicrotask(() => {
+      const trigger = this.activeFilterOverflowAnchorRef?.nativeElement;
+      if (trigger?.isConnected) {
+        trigger.focus();
+        return;
+      }
+      this.filterTriggerRef?.nativeElement.querySelector<HTMLElement>('button')?.focus();
+    });
   }
 
   protected clearAllFilters(): void {
@@ -778,19 +1032,31 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.filterValuesState.set({});
     this.filterValuesChange.emit({});
     this.invalidateSavedViewSelection();
+    this.reconcileActiveFilterOverflow();
   }
 
-  protected onQueryChange(value: string): void {
-    this.queryValueState.set(value);
-    this.queryValueChange.emit(value);
+  protected onQueryConditionsChange(value: readonly CxQueryFieldCondition[]): void {
+    if (this.queryFieldsState().length > 0) {
+      this.queryConditionsState.set(value);
+      this.queryConditionsChange.emit(value);
+    } else {
+      const nextValue =
+        value.length === 1 && typeof value[0]?.value === 'string'
+          ? value[0].value
+          : '';
+      this.queryValueState.set(nextValue);
+      this.queryValueChange.emit(nextValue);
+    }
     this.invalidateSavedViewSelection();
   }
 
   protected onSavedViewSelect(itemId: string): void {
     const item = this.savedViewsState().find(candidate => candidate.id === itemId);
-    const nextActiveId = item?.type === 'action' ? undefined : itemId;
-    this.activeSavedViewIdState.set(nextActiveId);
-    this.activeSavedViewIdChange.emit(nextActiveId);
+    if (item) {
+      const nextActiveId = item.type === 'action' ? undefined : itemId;
+      this.activeSavedViewIdState.set(nextActiveId);
+      this.activeSavedViewIdChange.emit(nextActiveId);
+    }
     this.savedViewSelect.emit(itemId);
     this.closeFilterPopover(false);
     this.propertiesPopoverOpenState.set(false);
@@ -810,13 +1076,82 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (itemId === 'switch-mode') {
-      this.applyMode(this.modeState() === 'filters' ? 'query' : 'filters');
+      this.requestModeSwitch();
       return;
     }
     if (itemId === 'reset-table') {
       this.resetTable.emit();
       this.invalidateSavedViewSelection();
     }
+  }
+
+  protected queryConditionFieldLabel(condition: CxQueryFieldCondition): string {
+    return this.resolvedQueryFields$().find(field => field.id === condition.fieldId)?.label
+      ?? condition.fieldId;
+  }
+
+  protected queryConditionOperatorLabel(condition: CxQueryFieldCondition): string {
+    const field = this.resolvedQueryFields$().find(candidate => candidate.id === condition.fieldId);
+    return field?.operators.find(operator => operator.id === condition.operatorId)?.label
+      ?? condition.operatorId;
+  }
+
+  protected queryConditionValueLabel(condition: CxQueryFieldCondition): string {
+    const values = Array.isArray(condition.value) ? condition.value : [condition.value];
+    const field = this.resolvedQueryFields$().find(candidate => candidate.id === condition.fieldId);
+    const options = field?.value?.kind === 'options' ? field.value.options : [];
+    return values
+      .filter(value => value !== undefined && value !== null && String(value).length > 0)
+      .map(value => options.find(option => option.id === String(value))?.label ?? String(value))
+      .join(', ');
+  }
+
+  protected queryConditionHasValue(condition: CxQueryFieldCondition): boolean {
+    return this.queryConditionValueLabel(condition).length > 0;
+  }
+
+  protected queryTranslationPartUnsupported(
+    conditionId: string,
+    part: CxFilterBarQueryTranslationIssuePart,
+  ): boolean {
+    const issues = this.pendingQueryTranslationState()?.issues ?? [];
+    return issues.some(issue =>
+      issue.conditionId === conditionId
+      && (issue.part === part || issue.part === 'condition'),
+    );
+  }
+
+  protected queryTranslationIssueLabel(issue: CxFilterBarQueryTranslationIssue): string {
+    const condition = this.resolvedQueryConditions$().find(candidate => candidate.id === issue.conditionId);
+    if (!condition) {
+      return issue.part;
+    }
+    if (issue.part === 'join') {
+      return (condition.join ?? 'and').toUpperCase();
+    }
+    if (issue.part === 'field') {
+      return this.queryConditionFieldLabel(condition);
+    }
+    if (issue.part === 'operator') {
+      return this.queryConditionOperatorLabel(condition);
+    }
+    if (issue.part === 'value') {
+      return this.queryConditionValueLabel(condition);
+    }
+    return `${this.queryConditionFieldLabel(condition)} ${this.queryConditionOperatorLabel(condition)}`;
+  }
+
+  protected keepQueryMode(): void {
+    this.pendingQueryTranslationState.set(undefined);
+  }
+
+  protected confirmQueryToFilterSwitch(): void {
+    const translation = this.pendingQueryTranslationState();
+    if (!translation) {
+      return;
+    }
+    this.pendingQueryTranslationState.set(undefined);
+    this.applyQueryTranslation(translation);
   }
 
   protected onOverflowOpenChange(open: boolean): void {
@@ -930,6 +1265,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.closeTagFilterPopover(false);
+    this.closeActiveFilterOverflow(false);
     this.propertiesPopoverOpenState.set(false);
     const next = !this.filterPopoverOpenState();
     if (next) {
@@ -958,6 +1294,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     // One filter surface at a time; the tag popover has its own focus restore
     // for the paths where the user dismissed it directly.
     this.closeTagFilterPopover(false);
+    this.closeActiveFilterOverflow(false);
     if (!this.filterPopoverOpenState()) {
       return;
     }
@@ -1023,7 +1360,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (
       !this.filterPopoverOpenState() &&
       !this.propertiesPopoverOpenState() &&
-      !this.tagFilterIdState()
+      !this.tagFilterIdState() &&
+      !this.overflowFilterPopoverOpenState()
     ) {
       return;
     }
@@ -1043,6 +1381,10 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       this.closeTagFilterPopover();
       return;
     }
+    if (this.overflowFilterPopoverOpenState()) {
+      this.closeActiveFilterOverflow();
+      return;
+    }
     if (this.filterPopoverOpenState()) {
       this.closeFilterPopover();
     }
@@ -1059,6 +1401,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     if (this.tagFilterIdState()) {
       this.syncTagFilterMetrics();
     }
+    if (this.overflowFilterPopoverOpenState()) {
+      this.syncActiveFilterOverflowMetrics();
+    }
   }
 
   private applyMode(mode: CxFilterBarMode): void {
@@ -1067,6 +1412,69 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.closeFilterPopover(false);
     this.propertiesPopoverOpenState.set(false);
     this.invalidateSavedViewSelection();
+  }
+
+  private requestModeSwitch(): void {
+    if (this.modeState() === 'filters') {
+      const translatedQuery = this.filtersToQueryConditionsState();
+      if (translatedQuery !== undefined && this.queryFieldsState().length > 0) {
+        this.queryConditionsState.set(translatedQuery);
+        this.queryConditionsChange.emit(translatedQuery);
+      }
+      this.applyMode('query');
+      return;
+    }
+
+    const conditions = this.resolvedQueryConditions$();
+    const translation = this.resolveQueryToFilterTranslation(conditions);
+    const translatedIds = new Set(translation.translatedConditionIds);
+    const hasLoss = translation.issues.length > 0
+      || conditions.some(condition => !translatedIds.has(condition.id));
+    if (hasLoss) {
+      this.closeFilterPopover(false);
+      this.propertiesPopoverOpenState.set(false);
+      this.pendingQueryTranslationState.set(translation);
+      return;
+    }
+    this.applyQueryTranslation(translation);
+  }
+
+  private resolveQueryToFilterTranslation(
+    conditions: readonly CxQueryFieldCondition[],
+  ): CxFilterBarQueryTranslation {
+    const supplied = this.queryToFilterTranslationState();
+    if (supplied) {
+      return supplied;
+    }
+    return {
+      filterValues: {},
+      translatedConditionIds: [],
+      issues: conditions.map(condition => ({
+        conditionId: condition.id,
+        part: 'condition' as const,
+        reason: 'This condition has no filter-mode equivalent.',
+      })),
+    };
+  }
+
+  private applyQueryTranslation(translation: CxFilterBarQueryTranslation): void {
+    const definitions = Object.fromEntries(
+      this.filtersState().map(filter => [filter.id, filter.filter]),
+    );
+    const nextValues = normalizeCxColumnFilterValueMap(
+      definitions,
+      translation.filterValues,
+    );
+    this.filterValuesState.set(nextValues);
+    this.filterValuesChange.emit(nextValues);
+    if (this.queryFieldsState().length > 0) {
+      this.queryConditionsState.set([]);
+      this.queryConditionsChange.emit([]);
+    } else {
+      this.queryValueState.set('');
+      this.queryValueChange.emit('');
+    }
+    this.applyMode('filters');
   }
 
   public invalidateSavedViewSelection(): void {
@@ -1088,6 +1496,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       return true;
     }
     if (this.tagFilterPopoverRef?.surfaceElement()?.contains(target)) {
+      return true;
+    }
+    if (this.activeFilterOverflowPopoverRef?.surfaceElement()?.contains(target)) {
       return true;
     }
     const targetElement = target instanceof Element ? target : target.parentElement;
@@ -1157,12 +1568,122 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  private syncActiveFilterOverflowMetrics(): void {
+    const anchor = this.activeFilterOverflowAnchorRef?.nativeElement;
+    const filters = this.hiddenActiveFilters$();
+    if (!anchor?.isConnected || filters.length === 0 || typeof window === 'undefined') {
+      return;
+    }
+    const expandedFilterId = this.overflowExpandedFilterIdState();
+    const expandedFilter = expandedFilterId
+      ? filters.find(filter => filter.id === expandedFilterId)
+      : undefined;
+    const estimatedHeight = Math.min(
+      filters.length * 48
+        + 48
+        + (expandedFilter ? estimateCxColumnFilterHeight(expandedFilter.filter) : 0),
+      560,
+    );
+    const surface = measureCxFloatingSurface({
+      triggerRect: anchor.getBoundingClientRect(),
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      width: CX_FILTER_BAR_OVERFLOW_POPOVER_WIDTH,
+      estimatedHeight,
+      minWidth: 280,
+      align: 'end',
+      gap: 4,
+      lockedPlacement: this.overflowFilterLockedPlacement,
+    });
+    this.overflowFilterLockedPlacement = surface.placement;
+    this.overflowFilterMetricsState.set({
+      left: surface.left,
+      top: surface.top,
+      bottom: surface.bottom,
+      width: surface.width,
+      maxHeight: surface.maxHeight,
+      placement: surface.placement,
+    });
+  }
+
+  private scheduleActiveFilterOverflowFocus(attempt = 0): void {
+    const focusFirstFilter = (): void => {
+      if (!this.overflowFilterPopoverOpenState()) {
+        return;
+      }
+      const surface = this.activeFilterOverflowPopoverRef?.surfaceElement();
+      const trigger = surface?.querySelector<HTMLElement>(
+        '.cx-filter-bar__overflow-filter-panel button',
+      );
+      if (trigger) {
+        trigger.focus();
+        return;
+      }
+      if (attempt < 12) {
+        this.scheduleActiveFilterOverflowFocus(attempt + 1);
+      }
+    };
+    if (typeof requestAnimationFrame === 'undefined') {
+      queueMicrotask(focusFirstFilter);
+      return;
+    }
+    requestAnimationFrame(focusFirstFilter);
+  }
+
+  private reconcileActiveFilterOverflow(): void {
+    const hiddenIds = new Set(this.hiddenActiveFilters$().map(filter => filter.id));
+    const expandedFilterId = this.overflowExpandedFilterIdState();
+    if (expandedFilterId && !hiddenIds.has(expandedFilterId)) {
+      this.overflowExpandedFilterIdState.set(undefined);
+    }
+    if (!this.overflowFilterPopoverOpenState()) {
+      return;
+    }
+    if (hiddenIds.size === 0) {
+      this.closeActiveFilterOverflow(false);
+      return;
+    }
+    queueMicrotask(() => this.syncActiveFilterOverflowMetrics());
+  }
+
   private scheduleTagFilterFocus(filterId: string, attempt = 0): void {
     if (typeof requestAnimationFrame === 'undefined') {
       queueMicrotask(() => this.focusTagFilterEditor(filterId, attempt));
       return;
     }
     requestAnimationFrame(() => this.focusTagFilterEditor(filterId, attempt));
+  }
+
+  private scheduleExpandedFilterFocus(
+    filterId: string,
+    surface: 'filters' | 'overflow' = 'filters',
+    attempt = 0,
+  ): void {
+    const focusEditor = (): void => {
+      const expandedFilterId = surface === 'overflow'
+        ? this.overflowExpandedFilterIdState()
+        : this.expandedFilterIdState();
+      if (expandedFilterId !== filterId) {
+        return;
+      }
+      const popover = surface === 'overflow'
+        ? this.activeFilterOverflowPopoverRef
+        : this.filterPopoverRef;
+      const popoverSurface = popover?.surfaceElement();
+      this.columnFilterEditorIn(popoverSurface)?.focus();
+      const activeElement = typeof document === 'undefined' ? undefined : document.activeElement;
+      if (activeElement && popoverSurface?.contains(activeElement)) {
+        return;
+      }
+      if (attempt < 12) {
+        this.scheduleExpandedFilterFocus(filterId, surface, attempt + 1);
+      }
+    };
+    if (typeof requestAnimationFrame === 'undefined') {
+      queueMicrotask(focusEditor);
+      return;
+    }
+    requestAnimationFrame(focusEditor);
   }
 
   /**
@@ -1238,6 +1759,11 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  private setVisibleActiveFilterCount(value: number | null): void {
+    this.visibleActiveFilterCountState.set(value);
+    this.reconcileActiveFilterOverflow();
+  }
+
   /**
    * Counts how many tags wrapped past the first row. Tags stay in normal flow
    * (wrapped rows are clipped by the container), so this read never changes
@@ -1246,14 +1772,14 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   private measureActiveFilterTags(): void {
     const container = this.activeFiltersRegionEl;
     if (!container) {
-      this.visibleActiveFilterCountState.set(null);
+      this.setVisibleActiveFilterCount(null);
       return;
     }
     const tagElements = Array.from(
       container.querySelectorAll<HTMLElement>('.cx-filter-bar__active-filter'),
     );
     if (tagElements.length === 0) {
-      this.visibleActiveFilterCountState.set(null);
+      this.setVisibleActiveFilterCount(null);
       return;
     }
     // The first row is defined by every child including the +N pill; a tag
@@ -1266,7 +1792,7 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       element => element.offsetTop >= firstRowTop + rowHeight,
     ).length;
     if (wrappedCount === 0) {
-      this.visibleActiveFilterCountState.set(null);
+      this.setVisibleActiveFilterCount(null);
       return;
     }
     // The pill occupies row space too; without this check a single tag that
@@ -1276,10 +1802,10 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
       tagElements.reduce((sum, element) => sum + element.offsetWidth, 0) +
       gap * (tagElements.length - 1);
     if (totalWidth <= container.clientWidth) {
-      this.visibleActiveFilterCountState.set(null);
+      this.setVisibleActiveFilterCount(null);
       return;
     }
-    this.visibleActiveFilterCountState.set(tagElements.length - wrappedCount);
+    this.setVisibleActiveFilterCount(tagElements.length - wrappedCount);
   }
 
   private scheduleFilterFocus(): void {

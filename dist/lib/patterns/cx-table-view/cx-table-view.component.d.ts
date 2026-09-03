@@ -1,13 +1,14 @@
 import { EventEmitter } from '@angular/core';
-import { type CxFilterBarColumnOption, type CxFilterBarFilter, type CxFilterBarMode } from '../cx-filter-bar';
+import { type CxFilterBarColumnOption, type CxFilterBarFilter, type CxFilterBarMode, type CxFilterBarQueryTranslation } from '../cx-filter-bar';
 import { type CxToggleChipGroupOption } from '../../primitives/inputs/cx-toggle-chip-group';
-import { type CxTableColumn, type CxTableDensity, type CxTableRowActivation, type CxTableSelectionMode, type CxTableColumnPinChangeEvent, type CxTableColumnVisibilityChangeEvent, type CxTableRowActivateEvent, type CxTableRow, type CxTableRowMenuSelectEvent, type CxTableSort, type CxTableSortDirection } from '../../primitives/data/cx-table';
+import { type CxTableColumn, type CxTableDensity, type CxTableRowActivation, type CxTableSelectionMode, type CxTableColumnPinChangeEvent, type CxTableColumnVisibilityChangeEvent, type CxTableRowActivateEvent, type CxTableRow, type CxTableRowMenuSelectEvent, type CxTableSort, type CxTableSortDirection, type CxTableStateMessage, type CxTableEmptyStateAction } from '../../primitives/data/cx-table';
 import { type CxColumnFilterLoadMoreEvent, type CxColumnFilterQueryChangeEvent, type CxColumnFilterValueMap } from '../../primitives/data/cx-column-filter-editor';
 import { type CxButtonGroupOption } from '../../primitives/actions/cx-button-group';
 import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
 import { type CxPaginationPage } from '../../primitives/navigation/cx-pagination';
 import { type CxActionBarData } from '../cx-action-bar';
+import { type CxQueryFieldCondition, type CxQueryFieldDefinition, type CxQueryFieldValueRetryEvent, type CxQueryFieldValueSearchEvent } from '../../primitives/data/cx-query-field';
 import * as i0 from "@angular/core";
 export type CxTableViewPaginationMode = 'none' | 'pages';
 export declare class CxTableViewComponent {
@@ -24,6 +25,10 @@ export declare class CxTableViewComponent {
     toggleFilters: CxToggleChipGroupOption[];
     selectedToggleFilterIds: string[];
     queryValue: string;
+    queryFields: readonly CxQueryFieldDefinition[];
+    queryConditions: readonly CxQueryFieldCondition[];
+    queryToFilterTranslation: CxFilterBarQueryTranslation | undefined;
+    filtersToQueryConditions: readonly CxQueryFieldCondition[] | undefined;
     queryAriaLabel: string;
     savedViews: CxMenuItem[];
     groupByOptions: CxButtonGroupOption[];
@@ -49,8 +54,9 @@ export declare class CxTableViewComponent {
     loading: boolean;
     showRowActions: boolean;
     rightClickMenu: boolean;
-    emptyText: string;
-    noMatchesText: string;
+    emptyState: CxTableStateMessage;
+    emptyStateAction: CxTableEmptyStateAction | undefined;
+    noMatchesState: CxTableStateMessage;
     sort: CxTableSort | undefined;
     activeRowId: string | undefined;
     selectionMode: CxTableSelectionMode;
@@ -67,6 +73,9 @@ export declare class CxTableViewComponent {
     readonly filterQueryChange: EventEmitter<CxColumnFilterQueryChangeEvent>;
     readonly filterLoadMore: EventEmitter<CxColumnFilterLoadMoreEvent>;
     readonly queryValueChange: EventEmitter<string>;
+    readonly queryConditionsChange: EventEmitter<readonly CxQueryFieldCondition[]>;
+    readonly queryValueSearch: EventEmitter<CxQueryFieldValueSearchEvent>;
+    readonly queryValueRetry: EventEmitter<CxQueryFieldValueRetryEvent>;
     readonly savedViewSelect: EventEmitter<string>;
     readonly activeSavedViewIdChange: EventEmitter<string | undefined>;
     readonly densityChange: EventEmitter<CxTableDensity>;
@@ -81,7 +90,8 @@ export declare class CxTableViewComponent {
     readonly resetTable: EventEmitter<void>;
     readonly sortChange: EventEmitter<CxTableSort | undefined>;
     readonly columnOrderChange: EventEmitter<string[]>;
-    readonly activeRowIdChange: EventEmitter<string>;
+    readonly activeRowIdChange: EventEmitter<string | undefined>;
+    readonly emptyStateActionSelect: EventEmitter<CxTableEmptyStateAction>;
     readonly rowActivate: EventEmitter<CxTableRowActivateEvent>;
     readonly selectedRowIdsChange: EventEmitter<string[]>;
     readonly rowMenuItemSelect: EventEmitter<CxTableRowMenuSelectEvent>;
@@ -102,6 +112,6 @@ export declare class CxTableViewComponent {
     protected onColumnHeaderMenuOpenChange(open: boolean): void;
     private resolvedVisibleColumnIds;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxTableViewComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableViewComponent, "cx-table-view", never, { "heading": { "alias": "heading"; "required": false; }; "showFilterBar": { "alias": "showFilterBar"; "required": false; }; "showActiveFilters": { "alias": "showActiveFilters"; "required": false; }; "filterBarMode": { "alias": "filterBarMode"; "required": false; }; "quickFilters": { "alias": "quickFilters"; "required": false; }; "selectedQuickFilterId": { "alias": "selectedQuickFilterId"; "required": false; }; "toggleFilters": { "alias": "toggleFilters"; "required": false; }; "selectedToggleFilterIds": { "alias": "selectedToggleFilterIds"; "required": false; }; "queryValue": { "alias": "queryValue"; "required": false; }; "queryAriaLabel": { "alias": "queryAriaLabel"; "required": false; }; "savedViews": { "alias": "savedViews"; "required": false; }; "groupByOptions": { "alias": "groupByOptions"; "required": false; }; "groupBy": { "alias": "groupBy"; "required": false; }; "sortOptions": { "alias": "sortOptions"; "required": false; }; "sortBy": { "alias": "sortBy"; "required": false; }; "sortDirection": { "alias": "sortDirection"; "required": false; }; "thenBy": { "alias": "thenBy"; "required": false; }; "thenByDirection": { "alias": "thenByDirection"; "required": false; }; "columnOptions": { "alias": "columnOptions"; "required": false; }; "visibleColumnIds": { "alias": "visibleColumnIds"; "required": false; }; "pinnedColumnIds": { "alias": "pinnedColumnIds"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyText": { "alias": "emptyText"; "required": false; }; "noMatchesText": { "alias": "noMatchesText"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "paginationMode": { "alias": "paginationMode"; "required": false; }; "page": { "alias": "page"; "required": false; }; "pageSizes": { "alias": "pageSizes"; "required": false; }; "actionBarData": { "alias": "actionBarData"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; }, { "filterBarModeChange": "filterBarModeChange"; "selectedQuickFilterIdChange": "selectedQuickFilterIdChange"; "selectedToggleFilterIdsChange": "selectedToggleFilterIdsChange"; "filterValuesChange": "filterValuesChange"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "queryValueChange": "queryValueChange"; "savedViewSelect": "savedViewSelect"; "activeSavedViewIdChange": "activeSavedViewIdChange"; "densityChange": "densityChange"; "groupByChange": "groupByChange"; "sortByChange": "sortByChange"; "sortDirectionChange": "sortDirectionChange"; "thenByChange": "thenByChange"; "thenByDirectionChange": "thenByDirectionChange"; "visibleColumnIdsChange": "visibleColumnIdsChange"; "pinnedColumnIdsChange": "pinnedColumnIdsChange"; "exportTable": "exportTable"; "resetTable": "resetTable"; "sortChange": "sortChange"; "columnOrderChange": "columnOrderChange"; "activeRowIdChange": "activeRowIdChange"; "rowActivate": "rowActivate"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "pageChange": "pageChange"; "actionBarDeselectAll": "actionBarDeselectAll"; "actionBarAction": "actionBarAction"; }, never, ["[actions], [cxTableViewActions]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableViewComponent, "cx-table-view", never, { "heading": { "alias": "heading"; "required": false; }; "showFilterBar": { "alias": "showFilterBar"; "required": false; }; "showActiveFilters": { "alias": "showActiveFilters"; "required": false; }; "filterBarMode": { "alias": "filterBarMode"; "required": false; }; "quickFilters": { "alias": "quickFilters"; "required": false; }; "selectedQuickFilterId": { "alias": "selectedQuickFilterId"; "required": false; }; "toggleFilters": { "alias": "toggleFilters"; "required": false; }; "selectedToggleFilterIds": { "alias": "selectedToggleFilterIds"; "required": false; }; "queryValue": { "alias": "queryValue"; "required": false; }; "queryFields": { "alias": "queryFields"; "required": false; }; "queryConditions": { "alias": "queryConditions"; "required": false; }; "queryToFilterTranslation": { "alias": "queryToFilterTranslation"; "required": false; }; "filtersToQueryConditions": { "alias": "filtersToQueryConditions"; "required": false; }; "queryAriaLabel": { "alias": "queryAriaLabel"; "required": false; }; "savedViews": { "alias": "savedViews"; "required": false; }; "groupByOptions": { "alias": "groupByOptions"; "required": false; }; "groupBy": { "alias": "groupBy"; "required": false; }; "sortOptions": { "alias": "sortOptions"; "required": false; }; "sortBy": { "alias": "sortBy"; "required": false; }; "sortDirection": { "alias": "sortDirection"; "required": false; }; "thenBy": { "alias": "thenBy"; "required": false; }; "thenByDirection": { "alias": "thenByDirection"; "required": false; }; "columnOptions": { "alias": "columnOptions"; "required": false; }; "visibleColumnIds": { "alias": "visibleColumnIds"; "required": false; }; "pinnedColumnIds": { "alias": "pinnedColumnIds"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyState": { "alias": "emptyState"; "required": false; }; "emptyStateAction": { "alias": "emptyStateAction"; "required": false; }; "noMatchesState": { "alias": "noMatchesState"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "paginationMode": { "alias": "paginationMode"; "required": false; }; "page": { "alias": "page"; "required": false; }; "pageSizes": { "alias": "pageSizes"; "required": false; }; "actionBarData": { "alias": "actionBarData"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; }, { "filterBarModeChange": "filterBarModeChange"; "selectedQuickFilterIdChange": "selectedQuickFilterIdChange"; "selectedToggleFilterIdsChange": "selectedToggleFilterIdsChange"; "filterValuesChange": "filterValuesChange"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "queryValueChange": "queryValueChange"; "queryConditionsChange": "queryConditionsChange"; "queryValueSearch": "queryValueSearch"; "queryValueRetry": "queryValueRetry"; "savedViewSelect": "savedViewSelect"; "activeSavedViewIdChange": "activeSavedViewIdChange"; "densityChange": "densityChange"; "groupByChange": "groupByChange"; "sortByChange": "sortByChange"; "sortDirectionChange": "sortDirectionChange"; "thenByChange": "thenByChange"; "thenByDirectionChange": "thenByDirectionChange"; "visibleColumnIdsChange": "visibleColumnIdsChange"; "pinnedColumnIdsChange": "pinnedColumnIdsChange"; "exportTable": "exportTable"; "resetTable": "resetTable"; "sortChange": "sortChange"; "columnOrderChange": "columnOrderChange"; "activeRowIdChange": "activeRowIdChange"; "emptyStateActionSelect": "emptyStateActionSelect"; "rowActivate": "rowActivate"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "pageChange": "pageChange"; "actionBarDeselectAll": "actionBarDeselectAll"; "actionBarAction": "actionBarAction"; }, never, ["[actions], [cxTableViewActions]"], true, never>;
 }
 //# sourceMappingURL=cx-table-view.component.d.ts.map

@@ -19,6 +19,11 @@ export type CxIconButtonVariant = 'default' | 'transparent';
 export class CxIconButtonComponent implements OnDestroy {
   @Input() icon: CxIconName = 'info';
   @Input() ariaLabel = 'Icon button';
+  /** Optional semantic role when the button participates in a composite widget such as a menu. */
+  @Input() role?: string;
+  @Input() ariaHasPopup?: string;
+  @Input() ariaExpanded?: boolean;
+  @Input() ariaControls?: string;
   @Input() mood: CxButtonMood = 'default';
   @Input() variant: CxIconButtonVariant = 'default';
   @Input() size: CxButtonSize = 'default';

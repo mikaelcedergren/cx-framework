@@ -28,12 +28,6 @@
   padding-left: var(--space-2xs);
 }
 
-/* Reserve the exact trailing lane occupied by the hover-revealed dismiss
-   action. Long labels truncate before the action instead of sitting under it. */
-.cx-tag--dismissible {
-  padding-inline-end: calc(var(--controller-size-small) + var(--space-2xs));
-}
-
 /* A passive tag must never suggest it can be pressed, so pointer and hover
    treatment belong to the interactive variant only. */
 .cx-tag--interactive {
@@ -100,13 +94,13 @@
   white-space: nowrap;
 }
 
-/* On precise pointers the reserved trailing lane keeps this out-of-flow
-   control clear of the label while letting it stay hidden at rest. Hover or
-   keyboard focus reveals it without changing the tag's measured width. */
+/* The dismiss action is a true overlay: a dismissible tag keeps the exact
+   footprint of its passive twin, then lets the action cover the label's end
+   on hover or keyboard focus without moving surrounding content. */
 .cx-tag__dismiss {
   position: absolute;
   top: 50%;
-  right: var(--space-2xs);
+  inset-inline-end: var(--space-2xs);
   display: inline-flex;
   width: 18px;
   height: 18px;
@@ -154,20 +148,14 @@
   outline-offset: var(--outline-tab-offset);
 }
 
-/* Touch has no hover reveal. Put every dismiss action in flow and keep it
-   visible so passive and interactive tags remain equally operable. */
+/* Touch has no hover reveal. Keep the action overlaid but visible and large
+   enough to use, so accessibility does not change the tag's footprint. */
 @media (hover: none), (pointer: coarse) {
-  .cx-tag--dismissible {
-    padding-inline-end: var(--space-xs);
-  }
-
   .cx-tag__dismiss {
-    position: static;
     width: var(--controller-size-small);
     height: var(--controller-size-small);
     opacity: 1;
     pointer-events: auto;
-    translate: none;
   }
 }
 

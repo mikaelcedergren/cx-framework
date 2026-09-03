@@ -55,7 +55,7 @@
       }
     </div>
   } @else if (hasContent()) {
-    <div class="cx-explorer__content">
+    <div #explorerContent class="cx-explorer__content">
       @if (rootItems$().length > 0) {
         <ul class="cx-explorer__root-items">
           @for (item of rootItems$(); track item.id) {
@@ -232,10 +232,9 @@
                             >
                               <cx-icon [icon]="itemIcon(item)" [size]="16" />
                             </span>
-                            <span
-                              class="cx-explorer__row-label"
-                              >{{ item.name }}</span
-                            >
+                            <span class="cx-explorer__row-label">{{
+                              item.name
+                            }}</span>
                           </button>
                           <div class="cx-explorer__row-actions">
                             @if (hasItemMenu()) {

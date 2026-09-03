@@ -1,6 +1,6 @@
 <div class="cx-menu" [class.cx-menu--fill]="layout$() === 'fill'">
   @if (presentation$().kind === 'trigger') {
-    <span class="cx-menu__trigger">
+    <span #triggerAnchor class="cx-menu__trigger">
       <ng-content select="[cxMenuTrigger]" />
     </span>
   }
@@ -11,6 +11,7 @@
       [open]="isOpen$()"
       [owner]="rootPopoverOwner"
       [showBackdrop]="true"
+      [heading]="heading$()"
       [surfaceId]="rootSurfaceId"
       [role]="'menu'"
       [ariaLabel]="resolvedMenuAriaLabel"
@@ -24,11 +25,6 @@
       (backdropPressed)="setOpen(false, true)"
     >
       <div class="cx-menu__groups">
-        @if (heading$()) {
-          <div class="cx-menu__group">
-            <cx-option-group [label]="heading$()" variant="heading" />
-          </div>
-        }
         @for (group of visualGroups$(); track group.id) {
           <div class="cx-menu__group">
             @if (group.label || group.description) {
@@ -54,7 +50,27 @@
                   [selected]="itemSelectedState(item)"
                   [shortcutParts]="item.shortcutParts"
                   [submenu]="itemSubmenuState('', item)"
-                />
+                >
+                  @if (item.hasTrailingActions) {
+                    <cx-icon-button
+                      control
+                      class="cx-menu__trailing-actions"
+                      icon="menu-vertical"
+                      variant="transparent"
+                      size="small"
+                      [ariaLabel]="'Actions for ' + item.label"
+                      [role]="'menuitem'"
+                      [ariaHasPopup]="'menu'"
+                      [ariaExpanded]="itemTrailingActionsState('', item)"
+                      [ariaControls]="trailingActionsSurfaceId('', item)"
+                      [attr.data-cx-menu-scope]="scopeId"
+                      [attr.data-menu-trailing-actions-path]="itemPath('', item.id)"
+                      [disabled]="item.disabled ?? false"
+                      (click)="onTrailingActionsClick(item, 0, '', $any($event.currentTarget), $event)"
+                      (keydown)="onTrailingActionsKeydown($event, $any($event.target))"
+                    />
+                  }
+                </cx-option>
               </div>
             }
           </div>
@@ -76,7 +92,7 @@
     >
       <div class="cx-menu__groups">
         @if (heading$()) {
-          <div class="cx-menu__group">
+          <div class="cx-menu__group cx-menu__group--heading">
             <cx-option-group [label]="heading$()" variant="heading">
               <!-- ngProjectAs: a forwarded ng-content carries no attributes, so
                    without it this content matches no slot and is dropped. -->
@@ -109,7 +125,27 @@
                   [selected]="itemSelectedState(item)"
                   [shortcutParts]="item.shortcutParts"
                   [submenu]="itemSubmenuState('', item)"
-                />
+                >
+                  @if (item.hasTrailingActions) {
+                    <cx-icon-button
+                      control
+                      class="cx-menu__trailing-actions"
+                      icon="menu-vertical"
+                      variant="transparent"
+                      size="small"
+                      [ariaLabel]="'Actions for ' + item.label"
+                      [role]="'menuitem'"
+                      [ariaHasPopup]="'menu'"
+                      [ariaExpanded]="itemTrailingActionsState('', item)"
+                      [ariaControls]="trailingActionsSurfaceId('', item)"
+                      [attr.data-cx-menu-scope]="scopeId"
+                      [attr.data-menu-trailing-actions-path]="itemPath('', item.id)"
+                      [disabled]="item.disabled ?? false"
+                      (click)="onTrailingActionsClick(item, 0, '', $any($event.currentTarget), $event)"
+                      (keydown)="onTrailingActionsKeydown($event, $any($event.target))"
+                    />
+                  }
+                </cx-option>
               </div>
             }
           </div>
@@ -160,7 +196,27 @@
                   [selected]="itemSelectedState(item)"
                   [shortcutParts]="item.shortcutParts"
                   [submenu]="itemSubmenuState(surface.path, item)"
-                />
+                >
+                  @if (item.hasTrailingActions) {
+                    <cx-icon-button
+                      control
+                      class="cx-menu__trailing-actions"
+                      icon="menu-vertical"
+                      variant="transparent"
+                      size="small"
+                      [ariaLabel]="'Actions for ' + item.label"
+                      [role]="'menuitem'"
+                      [ariaHasPopup]="'menu'"
+                      [ariaExpanded]="itemTrailingActionsState(surface.path, item)"
+                      [ariaControls]="trailingActionsSurfaceId(surface.path, item)"
+                      [attr.data-cx-menu-scope]="scopeId"
+                      [attr.data-menu-trailing-actions-path]="itemPath(surface.path, item.id)"
+                      [disabled]="item.disabled ?? false"
+                      (click)="onTrailingActionsClick(item, surface.level, surface.path, $any($event.currentTarget), $event)"
+                      (keydown)="onTrailingActionsKeydown($event, $any($event.target))"
+                    />
+                  }
+                </cx-option>
               </div>
             }
           </div>

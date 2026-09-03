@@ -14,6 +14,92 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.24
+
+- `cx-expansion-panel` now animates only its disclosure shell and chevron. Projected content no
+  longer runs a separate fade during expansion, so controls remain visually anchored while the
+  panel opens and closes; consumers need no adjustment.
+- `cx-filter-bar` and `cx-table-view` query mode now renders `cx-query-field`. Supply
+  `queryFields` and controlled `queryConditions`, apply `queryConditionsChange` to the collection,
+  and pass the resulting rows back. Existing `queryValue` consumers remain compatible through one
+  default `Search contains` condition; remote value sources can use `queryValueSearch` and
+  `queryValueRetry`.
+- Filter/query mode changes can now preserve one canonical view instead of keeping stale hidden
+  states. Supply `filtersToQueryConditions` for the direct filter-to-query representation and
+  `queryToFilterTranslation` for the reverse representation. Lossless query translations switch
+  immediately. A translation with issues opens a confirmation dialog that shows the real query,
+  highlights the unsupported parts, and applies only the compatible filters after confirmation.
+- `cx-table`, `cx-table-view`, and `cx-filter-bar` now default to Comfortable density. The Table
+  properties control presents Comfortable before Compact. Set `density="compact"` or
+  `displayMode="compact"` explicitly where a deliberately dense table should stay compact.
+- `cx-filter-bar` now moves focus into the first usable filter control when an accordion opens,
+  matching column-header and active-filter-tag entry. Choice filters should present radio options
+  or checkboxes directly inside these surfaces; searchable checklists keep search above their
+  independently scrolling option list.
+- `cx-menu` items can now declare `trailingActions` for an independent kebab beside the row's
+  primary action or choice. Use it for compact row management such as Update view and Delete view;
+  do not combine it with the same item's `items` submenu.
+- `cx-menu` now resolves prepend-icon alignment within each divider-separated visual group. This
+  lets an iconless choice list sit above a distinct icon-led action such as Save view without
+  reserving empty icon space in the choices.
+- `cx-popover` entry motion now fades without translating the surface. Anchored popovers and nested
+  menu actions therefore remain fixed from their first painted frame; consumers need no adjustment.
+- `cx-state-message` is now exported from the feedback primitives package area instead of patterns.
+  Root-package imports stay unchanged; consumers importing its internal source path must move to
+  `primitives/feedback/cx-state-message`.
+- `cx-table` and `cx-table-view` replace `emptyText` and `noMatchesText` with structured
+  `emptyState` and `noMatchesState` inputs. Use `emptyStateAction` plus
+  `emptyStateActionSelect` for an unfiltered empty-state action. Filtered-empty tables use Reset view
+  for recovery. Loading now keeps the real header and uses the shared table skeleton.
+- `cx-table` now emits `resetTable` when its filtered-empty Reset view recovery is selected, without
+  clearing an isolated filter slice first. Restore one owner-defined default state across quick and
+  toggle filters, column filters, queries, visible and pinned columns, grouping, sorting, density,
+  and pagination. `cx-table-view` relays the same event from both the table and filter bar.
+- `cx-table` no longer applies active-row highlighting to folder rows. With
+  `rowActivation="active"`, activating a folder clears the item highlight and emits
+  `activeRowIdChange` with `undefined` before emitting the folder activation event.
+- `cx-table` rows now use Arrow Up and Arrow Down for row-to-row keyboard movement, Space for
+  item selection when multiple selection is enabled, and Enter for the row's primary activation.
+  Folder rows remain focusable when navigable but never become selected or active-highlighted.
+- Popover and menu headings now use small, regular-weight `opacity-high` text directly on the
+  floating surface, without a separate background tile. Existing `heading` inputs inherit the
+  quieter hierarchy.
+- `cx-column-filter-editor`, `cx-table`, `cx-filter-bar`, and `cx-table-view` now accept
+  `single-select`, `number-span`, and `range` filter definitions. Multi-select definitions can set
+  `presentation: 'dropdown'` for long searchable sets; existing checklist behavior remains the
+  default. Values remain controlled and JSON-safe.
+- `cx-table` rows can now use additive `person`, `progress`, and `tags` cells. These compose the
+  existing avatar, progress bar, and tag components inside table-owned cell layout.
+- `cx-table` now auto-fits the column marked `key` instead of assuming the first column owns row
+  identity, and respects an explicit fixed or `content` size on that key column. Tables without a
+  declared key retain the first-column fallback.
+- `cx-table` column-action popovers now place the column label in the shared popover header rather
+  than repeating it inside the filter editor. Active filters expose Clear in that header.
+- `cx-table` selection checkbox cells now mirror their row's default, zebra, hover, and active
+  surfaces while pinned, so selection and row state read as one continuous treatment.
+- `cx-table` folder rows are now always excluded from selection. In multiple-selection tables they
+  keep the shared selection-column alignment without rendering a checkbox; select all, partial
+  selection, selected counts, and bulk selection operate on item rows only.
+- `cx-table` person cells now use the standard close-content gap between the avatar and name so the
+  two values remain visually distinct at compact table density.
+- `cx-table` progress cells now place the compact track and a small percentage on one line. Existing
+  progress cells inherit the denser scan pattern automatically; no row-data change is required.
+- `cx-table` tags cells now preserve whole tags that fit and replace the hidden remainder with a
+  passive `+N` tag. Continue passing the complete ordered tag collection; do not truncate it in the
+  consumer.
+- `cx-filter-bar` now opens `+N` active-filter overflow as a focused list of only the hidden active
+  filters. Each row uses only the filter title and expands the shared filter editor inline; the
+  main filter button remains the complete filter browser.
+- `cx-filter-bar` filter entries can now set `recommended: true`. The filter browser separates the
+  curated subset from the complete catalog with Recommended filters first and selected by default,
+  followed by All filters. Search continues to refine the selected view.
+- `cx-tag` dismiss actions no longer reserve a trailing lane. Dismissible and non-dismissible tags
+  now have the same footprint, and the action overlays the label when revealed. Consumers inherit
+  the quieter layout automatically; no markup or input change is required.
+- `cx-tag-field` now renders each selected value directly through dismissible `cx-tag`. The field no
+  longer reserves a private remove lane or recreates tag dismissal; empty-query Backspace removes
+  the last value, and standard keyboard navigation reaches each tag's dismiss action.
+
 ## 0.9.23
 
 - `cx-top-bar` descriptions now use the small body typography role and its matching line height.

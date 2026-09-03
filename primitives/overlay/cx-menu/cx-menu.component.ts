@@ -21,6 +21,7 @@ import { eventMatchesShortcut, isTypingTarget } from '../../actions/shared/short
 import { CxOptionComponent } from '../cx-option';
 import { CxOptionGroupComponent } from '../cx-option-group';
 import { CxPopoverComponent } from '../cx-popover';
+import { CxIconButtonComponent } from '../../actions/cx-icon-button';
 import { CxHostVisibilityObserver, isHostVisible } from '../../shared/host-visibility';
 import { measureCxFloatingSurface } from '../floating-surface';
 import { CxMenuTriggerDirective } from './cx-menu-trigger.directive';
@@ -63,6 +64,8 @@ export type CxMenuItem = {
   dividerBefore?: boolean;
   dividerAfter?: boolean;
   items?: readonly CxMenuItem[];
+  /** Independent actions shown from a trailing kebab without replacing the row's primary action or choice. */
+  trailingActions?: readonly CxMenuItem[];
 };
 
 export type CxMenuGroup = {
@@ -85,8 +88,10 @@ type CxResolvedMenuItem = CxMenuItem & {
   appendIcon?: CxIconName;
   dividerBeforeResolved: boolean;
   hasChildren: boolean;
+  hasTrailingActions: boolean;
   role: CxMenuItemRole;
   items?: CxResolvedMenuItem[];
+  trailingActions?: CxResolvedMenuItem[];
 };
 
 type CxResolvedMenuGroup = Omit<CxMenuGroup, 'id' | 'items'> & {
@@ -100,6 +105,8 @@ type CxResolvedMenuVisualGroup = Pick<CxResolvedMenuGroup, 'id' | 'label' | 'des
 
 type CxMenuSubmenuSurface = {
   path: string;
+  anchorPath: string;
+  anchorKind: 'option' | 'trailing-actions';
   label: string;
   level: number;
   items: CxResolvedMenuItem[];
@@ -120,9 +127,9 @@ function estimateMenuSurfaceHeight(items: readonly CxMenuItem[]): number {
 }
 
 function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelection): CxResolvedMenuItem[] {
-  const hasPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
   return items.map((item, index) => {
     const hasChildren = childItemsFor(item).length > 0;
+    const hasTrailingActions = trailingActionsFor(item).length > 0;
     const itemType: CxMenuItemType = hasChildren ? 'action' : (item.type ?? (selection ? 'choice' : 'action'));
     if (hasChildren && (item.type === 'choice' || item.selected !== undefined)) {
       throw new Error(`[cx-menu] Submenu item "${item.id}" cannot declare choice state.`);
@@ -133,20 +140,17 @@ function resolveMenuItems(items: readonly CxMenuItem[], selection?: CxMenuSelect
     return {
       ...item,
       type: itemType,
-      prependIcon: hasPrependIcons ? item.prependIcon : undefined,
       dividerBeforeResolved: index > 0 && ((item.dividerBefore ?? false) || (items[index - 1]?.dividerAfter ?? false)),
       hasChildren,
+      hasTrailingActions,
       role: resolveMenuItemRole({ ...item, type: itemType }, hasChildren, selection),
       items: hasChildren ? resolveMenuItems(childItemsFor(item), item.selection) : undefined,
+      trailingActions: hasTrailingActions ? resolveMenuItems(trailingActionsFor(item)) : undefined,
     };
   });
 }
 
-function resolveMenuItemRole(
-  item: CxMenuItem,
-  hasChildren: boolean,
-  selection: CxMenuSelection | undefined,
-): CxMenuItemRole {
+function resolveMenuItemRole(item: CxMenuItem, hasChildren: boolean, selection: CxMenuSelection | undefined): CxMenuItemRole {
   if (hasChildren || item.type === 'action' || (!item.type && !selection)) {
     return 'menuitem';
   }
@@ -160,11 +164,14 @@ function childItemsFor(item: CxMenuItem): readonly CxMenuItem[] {
   return item.items ?? [];
 }
 
+function trailingActionsFor(item: CxMenuItem): readonly CxMenuItem[] {
+  return item.trailingActions ?? [];
+}
+
 function validateMenuItems(items: readonly CxMenuItem[], seenIds = new Set<string>()): void {
   if (!Array.isArray(items)) {
     throw new Error('[cx-menu] items must be an array.');
   }
-  const preservesPrependIcons = items.length > 0 && items.every(item => !!item.prependIcon);
   for (const item of items) {
     const id = item.id?.trim();
     if (!id) {
@@ -174,7 +181,11 @@ function validateMenuItems(items: readonly CxMenuItem[], seenIds = new Set<strin
       throw new Error(`[cx-menu] item ids must be unique; received "${id}" more than once.`);
     }
     seenIds.add(id);
+    if (childItemsFor(item).length > 0 && trailingActionsFor(item).length > 0) {
+      throw new Error(`[cx-menu] Item "${item.id}" cannot have both a submenu and trailing actions.`);
+    }
     validateMenuItems(childItemsFor(item), seenIds);
+    validateMenuItems(trailingActionsFor(item), seenIds);
   }
 }
 
@@ -216,15 +227,28 @@ function splitMenuItemsIntoVisualGroups(
   if (current.items.length > 0 || current.label || current.description) {
     groups.push(current);
   }
-  return groups;
+  return groups.map(group => {
+    const keepsPrependIcons = group.items.length > 0 && group.items.every(item => !!item.prependIcon);
+    if (keepsPrependIcons) {
+      return group;
+    }
+    return {
+      ...group,
+      items: group.items.map(item => ({ ...item, prependIcon: undefined })),
+    };
+  });
 }
 
 function resolveMenuVisualGroups(groups: readonly CxResolvedMenuGroup[]): CxResolvedMenuVisualGroup[] {
-  return groups.flatMap(group => splitMenuItemsIntoVisualGroups(group.items, group.id, group.label, group.description));
+  return groups.flatMap((group) => splitMenuItemsIntoVisualGroups(group.items, group.id, group.label, group.description));
 }
 
 function buildItemPath(parentPath: string, itemId: string): string {
   return parentPath ? `${parentPath}/${itemId}` : itemId;
+}
+
+function buildTrailingActionsPath(itemPath: string): string {
+  return `${itemPath}/__trailing-actions`;
 }
 
 /**
@@ -243,7 +267,9 @@ function measureCxMenuSideSurface(input: {
   lockedSide?: 'left' | 'right';
   viewportPadding?: number;
   gap?: number;
-}): Pick<CxMenuSubmenuSurface, 'left' | 'top' | 'maxHeight'> & { side: 'left' | 'right' } {
+}): Pick<CxMenuSubmenuSurface, 'left' | 'top' | 'maxHeight'> & {
+  side: 'left' | 'right';
+} {
   const viewportPadding = input.viewportPadding ?? 8;
   const gap = input.gap ?? 8;
   const maxViewportWidth = Math.max(input.viewportWidth - viewportPadding * 2, 0);
@@ -262,9 +288,7 @@ function measureCxMenuSideSurface(input: {
   const leftBase = side === 'right' ? input.triggerRect.right + gap : input.triggerRect.left - width - gap;
   const left = Math.floor(clamp(leftBase, viewportPadding, input.viewportWidth - width - viewportPadding));
   const maxTop = Math.max(
-    input.viewportHeight -
-      Math.min(input.estimatedHeight, input.viewportHeight - viewportPadding * 2) -
-      viewportPadding,
+    input.viewportHeight - Math.min(input.estimatedHeight, input.viewportHeight - viewportPadding * 2) - viewportPadding,
     viewportPadding,
   );
   const top = Math.floor(clamp(input.triggerRect.top, viewportPadding, maxTop));
@@ -275,7 +299,7 @@ function measureCxMenuSideSurface(input: {
 
 @Component({
   selector: 'cx-menu',
-  imports: [CxOptionComponent, CxOptionGroupComponent, CxPopoverComponent],
+  imports: [CxIconButtonComponent, CxOptionComponent, CxOptionGroupComponent, CxPopoverComponent],
   templateUrl: './cx-menu.component.html',
   styleUrl: './cx-menu.component.scss',
   host: {
@@ -286,7 +310,7 @@ function measureCxMenuSideSurface(input: {
 export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private static instanceCounter = 0;
   private readonly host = inject(ElementRef<HTMLElement>);
-  private readonly hostVisibility = new CxHostVisibilityObserver(this.host.nativeElement, visible =>
+  private readonly hostVisibility = new CxHostVisibilityObserver(this.host.nativeElement, (visible) =>
     this.onHostVisibilityChange(visible),
   );
   private readonly instanceId = ++CxMenuComponent.instanceCounter;
@@ -345,6 +369,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
   @ViewChild('rootPopover')
   private rootPopoverRef?: CxPopoverComponent;
+
+  @ViewChild('triggerAnchor', { read: ElementRef })
+  private triggerAnchorRef?: ElementRef<HTMLElement>;
 
   private disabledValue = false;
 
@@ -444,8 +471,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
   @Input()
   public set placement(value: CxMenuPlacement | undefined) {
-    const placement: CxMenuPlacement =
-      value === 'top' || value === 'right' || value === 'bottom' || value === 'left' ? value : 'auto';
+    const placement: CxMenuPlacement = value === 'top' || value === 'right' || value === 'bottom' || value === 'left' ? value : 'auto';
     if (this.placementState() === placement) {
       return;
     }
@@ -492,11 +518,9 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     return [{ id: 'default', items: resolveMenuItems(this.itemsState()) }];
   });
   protected readonly visibleGroups$ = computed<CxResolvedMenuGroup[]>(() =>
-    this.normalizedGroups$().filter(group => group.items.length > 0),
+    this.normalizedGroups$().filter((group) => group.items.length > 0),
   );
-  protected readonly visualGroups$ = computed<CxResolvedMenuVisualGroup[]>(() =>
-    resolveMenuVisualGroups(this.visibleGroups$()),
-  );
+  protected readonly visualGroups$ = computed<CxResolvedMenuVisualGroup[]>(() => resolveMenuVisualGroups(this.visibleGroups$()));
 
   protected get resolvedMenuAriaLabel(): string {
     return this.headingState() || this.ariaLabel;
@@ -571,12 +595,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     this.activateItem(item);
   }
 
-  protected onResolvedItemPointerEnter(
-    item: CxResolvedMenuItem,
-    level: number,
-    parentPath: string,
-    optionWrap: HTMLElement,
-  ): void {
+  protected onResolvedItemPointerEnter(item: CxResolvedMenuItem, level: number, parentPath: string, optionWrap: HTMLElement): void {
     if (item.disabled) {
       this.trimSubmenus(level);
       return;
@@ -604,7 +623,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       case 'Home':
       case 'End': {
         event.preventDefault();
-        this.moveOptionFocus(event.key, optionWrap);
+        const option = optionWrap.querySelector<HTMLElement>('.cx-option');
+        if (option) {
+          this.moveMenuFocus(event.key, option);
+        }
         return;
       }
       case 'ArrowRight': {
@@ -614,7 +636,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
         event.preventDefault();
         const itemPath = buildItemPath(parentPath, item.id);
         this.openSubmenu(item, level, itemPath, optionWrap);
-        const firstChildId = item.items?.find(child => !child.disabled)?.id;
+        const firstChildId = item.items?.find((child) => !child.disabled)?.id;
         if (firstChildId) {
           const childPath = buildItemPath(itemPath, firstChildId);
           this.focusWhenReady(() => this.optionButtonByPath(childPath));
@@ -627,7 +649,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
         }
         event.preventDefault();
         this.trimSubmenus(level - 1);
-        this.optionButtonByPath(parentPath)?.focus();
+        this.focusParentControl(parentPath);
         return;
       }
       default:
@@ -678,7 +700,53 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return 'none';
     }
     const path = buildItemPath(parentPath, item.id);
-    return this.submenuSurfacesState().some(surface => surface.path === path) ? 'open' : 'closed';
+    return this.submenuSurfacesState().some((surface) => surface.path === path) ? 'open' : 'closed';
+  }
+
+  protected itemTrailingActionsState(parentPath: string, item: CxResolvedMenuItem): boolean {
+    if (!item.hasTrailingActions) {
+      return false;
+    }
+    const path = buildTrailingActionsPath(buildItemPath(parentPath, item.id));
+    return this.submenuSurfacesState().some((surface) => surface.path === path);
+  }
+
+  protected trailingActionsSurfaceId(parentPath: string, item: CxResolvedMenuItem): string {
+    return this.submenuSurfaceId(buildTrailingActionsPath(buildItemPath(parentPath, item.id)));
+  }
+
+  protected onTrailingActionsClick(
+    item: CxResolvedMenuItem,
+    level: number,
+    parentPath: string,
+    anchorElement: HTMLElement,
+    event: MouseEvent,
+  ): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (item.disabled || !item.trailingActions?.length) {
+      return;
+    }
+
+    const itemPath = buildItemPath(parentPath, item.id);
+    const surfacePath = buildTrailingActionsPath(itemPath);
+    if (this.submenuSurfacesState().some((surface) => surface.path === surfacePath)) {
+      this.trimSubmenus(level);
+      return;
+    }
+
+    this.openTrailingActions(item, level, itemPath, anchorElement);
+    if (event.detail === 0) {
+      this.focusWhenReady(() => this.optionButtonsInSurface(document.getElementById(this.submenuSurfaceId(surfacePath)))[0] ?? null);
+    }
+  }
+
+  protected onTrailingActionsKeydown(event: KeyboardEvent, anchorElement: HTMLElement): void {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Home' && event.key !== 'End') {
+      return;
+    }
+    event.preventDefault();
+    this.moveMenuFocus(event.key, anchorElement);
   }
 
   @HostListener('document:pointerdown', ['$event'])
@@ -715,7 +783,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return;
     }
     const item = this.findShortcutItem(
-      this.normalizedGroups$().flatMap(group => group.items),
+      this.normalizedGroups$().flatMap((group) => group.items),
       event,
     );
     if (!item || item.disabled || item.hasChildren) {
@@ -782,16 +850,16 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
               top: presentation.top,
               bottom: presentation.top,
             }
-        : this.triggerElement?.getBoundingClientRect();
+        : // The wrapper keeps the menu anchored to layout while a button's
+          // pressed transform settles; nested surfaces must not correct it later.
+          (this.triggerAnchorRef?.nativeElement ?? this.triggerElement)?.getBoundingClientRect();
     if (!rect) {
       return;
     }
 
     if (sideRequested) {
       const lockedSide =
-        this.surfaceLockedPlacement === 'left' || this.surfaceLockedPlacement === 'right'
-          ? this.surfaceLockedPlacement
-          : undefined;
+        this.surfaceLockedPlacement === 'left' || this.surfaceLockedPlacement === 'right' ? this.surfaceLockedPlacement : undefined;
       const surface = measureCxMenuSideSurface({
         triggerRect: rect,
         viewportWidth: window.innerWidth,
@@ -813,9 +881,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
 
     const lockedDrop =
-      this.surfaceLockedPlacement === 'top' || this.surfaceLockedPlacement === 'bottom'
-        ? this.surfaceLockedPlacement
-        : undefined;
+      this.surfaceLockedPlacement === 'top' || this.surfaceLockedPlacement === 'bottom' ? this.surfaceLockedPlacement : undefined;
     const surface = measureCxFloatingSurface({
       triggerRect: rect,
       viewportWidth: window.innerWidth,
@@ -856,6 +922,8 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
     const nextSurface: CxMenuSubmenuSurface = {
       path: itemPath,
+      anchorPath: itemPath,
+      anchorKind: 'option',
       label: item.label,
       level: level + 1,
       items: item.items,
@@ -865,13 +933,47 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     };
 
     this.setSubmenuSurfaces([
-      ...this.submenuSurfacesState().filter(existingSurface => existingSurface.level < nextSurface.level),
+      ...this.submenuSurfacesState().filter((existingSurface) => existingSurface.level < nextSurface.level),
+      nextSurface,
+    ]);
+  }
+
+  private openTrailingActions(item: CxResolvedMenuItem, level: number, itemPath: string, anchorElement: HTMLElement): void {
+    if (!item.trailingActions?.length || typeof window === 'undefined') {
+      this.trimSubmenus(level);
+      return;
+    }
+
+    const rect = anchorElement.getBoundingClientRect();
+    const surface = measureCxMenuSideSurface({
+      triggerRect: rect,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      width: this.widthState(),
+      estimatedHeight: estimateMenuSurfaceHeight(item.trailingActions),
+      prefer: 'right',
+    });
+
+    const nextSurface: CxMenuSubmenuSurface = {
+      path: buildTrailingActionsPath(itemPath),
+      anchorPath: itemPath,
+      anchorKind: 'trailing-actions',
+      label: `${item.label} actions`,
+      level: level + 1,
+      items: item.trailingActions,
+      left: surface.left,
+      top: surface.top,
+      maxHeight: surface.maxHeight,
+    };
+
+    this.setSubmenuSurfaces([
+      ...this.submenuSurfacesState().filter((existingSurface) => existingSurface.level < nextSurface.level),
       nextSurface,
     ]);
   }
 
   private trimSubmenus(level: number): void {
-    this.setSubmenuSurfaces(this.submenuSurfacesState().filter(existingSurface => existingSurface.level <= level));
+    this.setSubmenuSurfaces(this.submenuSurfacesState().filter((existingSurface) => existingSurface.level <= level));
   }
 
   private updateCurrentId(itemId: string): void {
@@ -942,7 +1044,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
 
     const refreshedSurfaces: CxMenuSubmenuSurface[] = [];
     for (const surface of this.submenuSurfacesState()) {
-      const anchorElement = this.optionWrapByPath(surface.path);
+      const anchorElement =
+        surface.anchorKind === 'trailing-actions'
+          ? this.trailingActionsButtonByPath(surface.anchorPath)
+          : this.optionWrapByPath(surface.anchorPath);
       if (!anchorElement) {
         continue;
       }
@@ -965,14 +1070,13 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     this.setSubmenuSurfaces(refreshedSurfaces);
   }
 
-  private moveOptionFocus(key: string, optionWrap: HTMLElement): void {
-    const surface = optionWrap.closest('[data-cx-popover-surface]');
+  private moveMenuFocus(key: string, currentControl: HTMLElement): void {
+    const surface = currentControl.closest('[data-cx-popover-surface]');
     const options = this.optionButtonsInSurface(surface);
     if (options.length === 0) {
       return;
     }
-    const current = optionWrap.querySelector<HTMLElement>('.cx-option');
-    const currentIndex = current ? options.indexOf(current) : -1;
+    const currentIndex = options.indexOf(currentControl);
     let nextIndex: number;
     if (key === 'Home') {
       nextIndex = 0;
@@ -1003,21 +1107,21 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     return [
       this.rootSurfaceElement(),
       ...this.submenuSurfacesState()
-        .map(surface => document.getElementById(this.submenuSurfaceId(surface.path)))
+        .map((surface) => document.getElementById(this.submenuSurfaceId(surface.path)))
         .filter((surface): surface is HTMLElement => surface !== null),
     ].filter((surface): surface is HTMLElement => surface instanceof HTMLElement);
   }
 
   private targetIsInsideMenuSurface(target: Node): boolean {
-    return this.menuSurfaceElements().some(surface => surface.contains(target));
+    return this.menuSurfaceElements().some((surface) => surface.contains(target));
   }
 
   private optionButtonsInSurface(surface: Element | null): HTMLElement[] {
     if (!surface) {
       return [];
     }
-    return Array.from(surface.querySelectorAll<HTMLElement>('.cx-menu__option-wrap .cx-option')).filter(
-      button => !button.hasAttribute('disabled'),
+    return Array.from(surface.querySelectorAll<HTMLElement>('.cx-menu__option-wrap .cx-option, .cx-menu__trailing-actions button')).filter(
+      (button) => !button.hasAttribute('disabled'),
     );
   }
 
@@ -1028,15 +1132,35 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
   private optionWrapByPath(path: string): HTMLElement | null {
     for (const surface of this.menuSurfaceElements()) {
       const option = Array.from(surface.querySelectorAll<HTMLElement>('[data-menu-item-path]')).find(
-        element =>
-          element.getAttribute('data-cx-menu-scope') === this.scopeId &&
-          element.getAttribute('data-menu-item-path') === path,
+        (element) => element.getAttribute('data-cx-menu-scope') === this.scopeId && element.getAttribute('data-menu-item-path') === path,
       );
       if (option) {
         return option;
       }
     }
     return null;
+  }
+
+  private trailingActionsButtonByPath(path: string): HTMLElement | null {
+    for (const surface of this.menuSurfaceElements()) {
+      const button = Array.from(surface.querySelectorAll<HTMLElement>('[data-menu-trailing-actions-path]')).find(
+        (element) =>
+          element.getAttribute('data-cx-menu-scope') === this.scopeId && element.getAttribute('data-menu-trailing-actions-path') === path,
+      );
+      if (button) {
+        return button.querySelector<HTMLElement>('button') ?? button;
+      }
+    }
+    return null;
+  }
+
+  private focusParentControl(parentPath: string): void {
+    const parentSurface = this.submenuSurfacesState().find((surface) => surface.path === parentPath);
+    if (parentSurface?.anchorKind === 'trailing-actions') {
+      this.trailingActionsButtonByPath(parentSurface.anchorPath)?.focus();
+      return;
+    }
+    this.optionButtonByPath(parentPath)?.focus();
   }
 
   private focusWhenReady(resolve: () => HTMLElement | null, attempt = 0): void {
@@ -1063,11 +1187,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return false;
     }
     const surface = target.closest<HTMLElement>('[data-cx-popover-surface]');
-    return (
-      !surface
-      || surface.classList.contains('cx-menu__inline-surface')
-      || surface.parentElement === document.body
-    );
+    return !surface || surface.classList.contains('cx-menu__inline-surface') || surface.parentElement === document.body;
   }
 
   private focusTrigger(): void {
@@ -1096,9 +1216,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       return;
     }
     if (triggerDirectives.length !== 1) {
-      throw new Error(
-        `[cx-menu] Trigger presentation requires exactly one cxMenuTrigger; found ${triggerDirectives.length}.`,
-      );
+      throw new Error(`[cx-menu] Trigger presentation requires exactly one cxMenuTrigger; found ${triggerDirectives.length}.`);
     }
 
     const button = triggerDirectives[0].nativeButton();
@@ -1209,7 +1327,12 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     }
     if (value?.kind === 'context' && Number.isFinite(value.left) && Number.isFinite(value.top)) {
       return value.owner instanceof HTMLElement
-        ? { kind: 'context', left: value.left, top: value.top, owner: value.owner }
+        ? {
+            kind: 'context',
+            left: value.left,
+            top: value.top,
+            owner: value.owner,
+          }
         : { kind: 'context', left: value.left, top: value.top };
     }
     throw new Error('[cx-menu] presentation must be trigger, inline, or a finite context point.');
@@ -1230,7 +1353,7 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
     if (groups.length === 0) {
       return this.itemsState();
     }
-    return groups.flatMap(group => group.items);
+    return groups.flatMap((group) => group.items);
   }
 
   private findShortcutItem(items: readonly CxResolvedMenuItem[], event: KeyboardEvent): CxResolvedMenuItem | undefined {
@@ -1241,6 +1364,10 @@ export class CxMenuComponent implements AfterContentInit, OnDestroy {
       const childMatch = item.items ? this.findShortcutItem(item.items, event) : undefined;
       if (childMatch) {
         return childMatch;
+      }
+      const trailingActionMatch = item.trailingActions ? this.findShortcutItem(item.trailingActions, event) : undefined;
+      if (trailingActionMatch) {
+        return trailingActionMatch;
       }
     }
     return undefined;

@@ -6,6 +6,9 @@ export function assertCxColumnFilterDefinition(value) {
     switch (value['kind']) {
         case 'search':
             return;
+        case 'single-select':
+            assertStableOptionCollection(value['options'], 'single-select options');
+            return;
         case 'multi-select':
             assertStableOptionCollection(value['options'], 'multi-select options');
             return;
@@ -17,6 +20,10 @@ export function assertCxColumnFilterDefinition(value) {
                 assertStableOptionCollection(value['quickRanges'], 'date-span quick ranges');
             }
             return;
+        case 'number-span':
+        case 'range':
+            assertNumericFilterDefinition(value, value['kind']);
+            return;
         default:
             throw new Error(`cx-column-filter-editor does not support filter kind “${value['kind']}”.`);
     }
@@ -25,11 +32,17 @@ export function normalizeCxColumnFilterValue(definition, value) {
     switch (definition.kind) {
         case 'search':
             return normalizeSearchValue(value);
+        case 'single-select':
+            return normalizeSingleSelectValue(definition, value);
         case 'multi-select':
         case 'tag-field':
             return normalizeStableIds(value);
         case 'date-span':
             return normalizeDateSpanValue(value);
+        case 'number-span':
+            return normalizeNumericSpanValue(definition, value, false);
+        case 'range':
+            return normalizeNumericSpanValue(definition, value, true);
     }
 }
 export function isCxColumnFilterValueActive(definition, value) {
@@ -37,6 +50,10 @@ export function isCxColumnFilterValueActive(definition, value) {
 }
 export function isCxColumnFilterDateSpanValue(value) {
     return isRecord(value);
+}
+export function isCxColumnFilterNumericSpanValue(value) {
+    return isRecord(value)
+        && (typeof value['min'] === 'number' || typeof value['max'] === 'number');
 }
 export function summarizeCxColumnFilterValue(definition, value) {
     const normalizedValue = normalizeCxColumnFilterValue(definition, value);
@@ -47,6 +64,11 @@ export function summarizeCxColumnFilterValue(definition, value) {
         case 'search':
             return typeof normalizedValue === 'string'
                 ? normalizedValue.trim()
+                : undefined;
+        case 'single-select':
+            return typeof normalizedValue === 'string'
+                ? definition.options.find(option => option.id === normalizedValue)?.label
+                    ?? normalizedValue
                 : undefined;
         case 'multi-select':
             return isStringIdArray(normalizedValue)
@@ -61,6 +83,11 @@ export function summarizeCxColumnFilterValue(definition, value) {
                 return formatCxDateSpanDisplay(normalizedValue.start, normalizedValue.end, definition.timeEnabled === true);
             }
             return undefined;
+        case 'number-span':
+        case 'range':
+            return isCxColumnFilterNumericSpanValue(normalizedValue)
+                ? summarizeNumericSpan(definition, normalizedValue)
+                : undefined;
     }
 }
 /**
@@ -113,21 +140,32 @@ export function estimateCxColumnFilterHeight(definition) {
     if (!definition) {
         return 0;
     }
-    if (definition.kind !== 'multi-select') {
-        return 96;
+    if (definition.kind === 'single-select' && definition.presentation !== 'dropdown') {
+        return 52 + Math.min(Math.max(definition.options.length, 1) * 36, 320);
     }
-    const optionListHeight = Math.min(Math.max(definition.options.length, 1) * 36, 320);
-    return (48 +
-        optionListHeight +
-        (definition.searchable ? 40 : 0) +
-        (definition.hint ? 24 : 0) +
-        (definition.hasMore ? 36 : 0));
+    if (definition.kind === 'multi-select' && definition.presentation !== 'dropdown') {
+        const optionListHeight = Math.min(Math.max(definition.options.length, 1) * 36, 320);
+        return (48 +
+            optionListHeight +
+            (definition.searchable ? 40 : 0) +
+            (definition.hint ? 24 : 0) +
+            (definition.hasMore ? 36 : 0));
+    }
+    return definition.kind === 'number-span' ? 148 : 104;
 }
 function normalizeSearchValue(value) {
     if (typeof value !== 'string' || !value.trim()) {
         return undefined;
     }
     return value;
+}
+function normalizeSingleSelectValue(definition, value) {
+    if (typeof value !== 'string' || !value.trim()) {
+        return undefined;
+    }
+    return definition.options.some(option => option.id === value)
+        ? value
+        : undefined;
 }
 function normalizeStableIds(value) {
     if (!Array.isArray(value)) {
@@ -158,6 +196,40 @@ function normalizeDateSpanValue(value) {
         ...(end ? { end } : {}),
     };
 }
+function normalizeNumericSpanValue(definition, value, clearFullRange) {
+    if (!isRecord(value)) {
+        return undefined;
+    }
+    const rawMin = normalizeFiniteNumber(value['min']);
+    const rawMax = normalizeFiniteNumber(value['max']);
+    if (rawMin === undefined && rawMax === undefined) {
+        return undefined;
+    }
+    const boundedMin = rawMin === undefined
+        ? undefined
+        : Math.min(Math.max(rawMin, definition.min), definition.max);
+    const boundedMax = rawMax === undefined
+        ? undefined
+        : Math.min(Math.max(rawMax, definition.min), definition.max);
+    const min = boundedMin !== undefined && boundedMax !== undefined
+        ? Math.min(boundedMin, boundedMax)
+        : boundedMin;
+    const max = boundedMin !== undefined && boundedMax !== undefined
+        ? Math.max(boundedMin, boundedMax)
+        : boundedMax;
+    if (clearFullRange && min === definition.min && max === definition.max) {
+        return undefined;
+    }
+    return {
+        ...(min !== undefined ? { min } : {}),
+        ...(max !== undefined ? { max } : {}),
+    };
+}
+function normalizeFiniteNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value)
+        ? value
+        : undefined;
+}
 function normalizeIsoDateValue(value) {
     if (typeof value !== 'string') {
         return undefined;
@@ -176,6 +248,19 @@ function summarizeSelectedIds(selectedIds, labelsById) {
     }
     return labelsById.get(selectedIds[0] ?? '')?.trim() || '1 selected';
 }
+function summarizeNumericSpan(definition, value) {
+    const format = (amount) => {
+        const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(amount);
+        return `${definition.prependText ?? ''}${number}${definition.appendText ?? ''}`;
+    };
+    if (value.min !== undefined && value.max !== undefined) {
+        return `${format(value.min)}–${format(value.max)}`;
+    }
+    if (value.min !== undefined) {
+        return `From ${format(value.min)}`;
+    }
+    return `Up to ${format(value.max ?? definition.max)}`;
+}
 function cxColumnFilterValuesEqual(currentValue, nextValue) {
     if (currentValue === nextValue) {
         return true;
@@ -192,11 +277,32 @@ function cxColumnFilterValuesEqual(currentValue, nextValue) {
             currentValue.length === nextValue.length &&
             currentValue.every((item, index) => item === nextValue[index]));
     }
-    return isCxColumnFilterDateSpanValue(currentValue) &&
-        isCxColumnFilterDateSpanValue(nextValue)
-        ? currentValue.start === nextValue.start &&
-            currentValue.end === nextValue.end
-        : false;
+    if (isCxColumnFilterNumericSpanValue(currentValue)
+        || isCxColumnFilterNumericSpanValue(nextValue)) {
+        return isCxColumnFilterNumericSpanValue(currentValue)
+            && isCxColumnFilterNumericSpanValue(nextValue)
+            && currentValue.min === nextValue.min
+            && currentValue.max === nextValue.max;
+    }
+    return isCxColumnFilterDateSpanValue(currentValue)
+        && isCxColumnFilterDateSpanValue(nextValue)
+        && currentValue.start === nextValue.start
+        && currentValue.end === nextValue.end;
+}
+function assertNumericFilterDefinition(value, kind) {
+    const min = value['min'];
+    const max = value['max'];
+    const step = value['step'];
+    if (typeof min !== 'number'
+        || !Number.isFinite(min)
+        || typeof max !== 'number'
+        || !Number.isFinite(max)
+        || max <= min) {
+        throw new Error(`cx-column-filter-editor requires ${kind} min and max with max greater than min.`);
+    }
+    if (step !== undefined && (typeof step !== 'number' || !Number.isFinite(step) || step <= 0)) {
+        throw new Error(`cx-column-filter-editor requires ${kind} step to be greater than zero.`);
+    }
 }
 function assertStableOptionCollection(value, collectionName) {
     if (!Array.isArray(value)) {

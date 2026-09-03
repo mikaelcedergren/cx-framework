@@ -2,12 +2,12 @@
   class="cx-column-filter-editor"
   [attr.data-filter-kind]="definition$()?.kind"
 >
-  @if (label.trim() || (showClearAction && hasMultiSelectValue$())) {
+  @if (label.trim() || (showClearAction && hasValue$())) {
     <div class="cx-column-filter-editor__heading">
       @if (label.trim()) {
         <div class="cx-column-filter-editor__label">{{ label.trim() }}</div>
       }
-      @if (showClearAction && hasMultiSelectValue$()) {
+      @if (showClearAction && hasValue$()) {
         <button
           type="button"
           class="cx-column-filter-editor__clear"
@@ -19,6 +19,56 @@
         </button>
       }
     </div>
+  }
+
+  @if (singleSelectDefinition$(); as filter) {
+    @if (filter.presentation === 'dropdown') {
+      <cx-dropdown
+        #primaryControl
+        class="cx-column-filter-editor__control"
+        label=""
+        selection="single"
+        [ariaLabel]="resolvedAriaLabel()"
+        [placeholder]="filter.placeholder ?? 'Select an option'"
+        [optional]="true"
+        [clearable]="showClearAction"
+        [disabled]="disabled"
+        [loading]="loading"
+        [searchable]="filter.searchable ?? false"
+        [filterMode]="filter.filterMode ?? 'client'"
+        [availableValues]="singleSelectOptions$()"
+        [value]="singleSelectValue$()"
+        [hasMore]="filter.hasMore ?? false"
+        [loadingMore]="filter.loadingMore ?? false"
+        [translations]="filter.translations"
+        [hint]="filter.hint"
+        (valueChange)="onSingleSelectValueChange($event)"
+        (queryChange)="onMultiSelectQueryChange($event)"
+        (loadMore)="onLoadMore()"
+      />
+    } @else {
+      <div
+        #primaryControl
+        class="cx-column-filter-editor__radio-options"
+        role="radiogroup"
+        [attr.aria-label]="resolvedAriaLabel()"
+        (keydown)="onSingleSelectKeydown($event)"
+      >
+        @for (option of singleSelectOptions$(); track option.id) {
+          <cx-radio
+            class="cx-column-filter-editor__radio-option"
+            [text]="option.label"
+            [hint]="option.description"
+            [selected]="singleSelectValue$() === option.id"
+            [disabled]="disabled || loading || option.disabled === true"
+            (selectedChange)="onSingleSelectOptionChange(option.id, $event)"
+          />
+        }
+      </div>
+      @if (filter.hint) {
+        <div class="cx-column-filter-editor__hint">{{ filter.hint }}</div>
+      }
+    }
   }
 
   @if (searchDefinition$(); as filter) {
@@ -40,6 +90,31 @@
   }
 
   @if (multiSelectDefinition$(); as filter) {
+    @if (filter.presentation === 'dropdown') {
+      <cx-dropdown
+        #primaryControl
+        class="cx-column-filter-editor__control"
+        label=""
+        selection="multiple"
+        [ariaLabel]="resolvedAriaLabel()"
+        [placeholder]="filter.placeholder ?? 'Select options'"
+        [optional]="true"
+        [clearable]="showClearAction"
+        [disabled]="disabled"
+        [loading]="loading"
+        [searchable]="filter.searchable ?? false"
+        [filterMode]="filter.filterMode ?? 'client'"
+        [availableValues]="multiSelectOptions$()"
+        [values]="selectedValues$()"
+        [hasMore]="filter.hasMore ?? false"
+        [loadingMore]="filter.loadingMore ?? false"
+        [translations]="filter.translations"
+        [hint]="filter.hint"
+        (valuesChange)="onSelectedValuesChange($event)"
+        (queryChange)="onMultiSelectQueryChange($event)"
+        (loadMore)="onLoadMore()"
+      />
+    } @else {
     <div
       #primaryControl
       class="cx-column-filter-editor__multi-select"
@@ -112,6 +187,7 @@
         </button>
       }
     </div>
+    }
   }
 
   @if (tagFieldDefinition$(); as filter) {
@@ -157,6 +233,66 @@
       [allDayEnabled]="false"
       [closeOnSelect]="filter.closeOnSelect ?? true"
       (valueChange)="onDateSpanValueChange($event)"
+    />
+  }
+
+  @if (numberSpanDefinition$(); as filter) {
+    <div
+      #primaryControl
+      class="cx-column-filter-editor__number-span"
+      role="group"
+      [attr.aria-label]="resolvedAriaLabel()"
+    >
+      <cx-number-field
+        label="Minimum"
+        [value]="numericSpanValue$().min"
+        [min]="filter.min"
+        [max]="numericSpanValue$().max ?? filter.max"
+        [step]="filter.step"
+        [prependText]="filter.prependText"
+        [appendText]="filter.appendText"
+        [optional]="true"
+        [clearable]="showClearAction"
+        [disabled]="disabled"
+        [loading]="loading"
+        (valueChange)="onNumericSpanValueChange('min', $event)"
+      />
+      <cx-number-field
+        label="Maximum"
+        [value]="numericSpanValue$().max"
+        [min]="numericSpanValue$().min ?? filter.min"
+        [max]="filter.max"
+        [step]="filter.step"
+        [prependText]="filter.prependText"
+        [appendText]="filter.appendText"
+        [optional]="true"
+        [clearable]="showClearAction"
+        [disabled]="disabled"
+        [loading]="loading"
+        (valueChange)="onNumericSpanValueChange('max', $event)"
+      />
+    </div>
+    @if (filter.hint) {
+      <div class="cx-column-filter-editor__hint">{{ filter.hint }}</div>
+    }
+  }
+
+  @if (rangeDefinition$(); as filter) {
+    <cx-slider
+      #primaryControl
+      class="cx-column-filter-editor__control"
+      label=""
+      [range]="true"
+      [rangeValue]="rangeValue$()"
+      [min]="filter.min"
+      [max]="filter.max"
+      [step]="filter.step ?? 1"
+      [showValue]="true"
+      [showTooltipOnDrag]="true"
+      [valueFormatter]="formatRangeValue"
+      [hint]="filter.hint"
+      [disabled]="disabled || loading"
+      (rangeValueChange)="onRangeValueChange($event)"
     />
   }
 </div>

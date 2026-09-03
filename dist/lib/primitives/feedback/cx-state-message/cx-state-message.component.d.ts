@@ -1,7 +1,7 @@
 import { type AfterViewChecked, EventEmitter } from '@angular/core';
-import { type CxIconName } from '../../icons/manifest';
-import { type CxButtonMood } from '../../primitives/actions/cx-button';
-import { type CxFeedbackAction } from '../../primitives/feedback/cx-feedback-action';
+import { type CxIconName } from '../../../icons/manifest';
+import { type CxButtonMood } from '../../actions/cx-button';
+import { type CxFeedbackAction } from '../cx-feedback-action';
 import * as i0 from "@angular/core";
 export type CxStateMessageState = 'default' | 'pending' | 'success' | 'scheduled' | 'danger';
 export type CxStateMessageVisual = 'icon' | 'none';
