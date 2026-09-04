@@ -23,9 +23,11 @@ entrypoints their role requires from this repo on GitHub `main`. Each repository
 ownership and release boundary, and no downstream repo depends on Cortex directly through app
 imports, package dependencies, local `file:` links, scripts, styles, or copied source.
 
-If a consuming project needs a framework upgrade, make the source fix in Cortex, package this repo
-again, obtain the user's explicit push authorisation under the shared Git policy, push it to
-GitHub, then reinstall and rebuild the consumer. That is how one small fix benefits every product.
+If a consuming project reveals a framework gap during feature work, stop, explain the exact gap and
+natural owner, and ask what the user wants to do. Do not change Cortex or create a consumer
+workaround automatically. Only after the user explicitly authorises that framework work, make the
+source fix in Cortex, package this repo again, obtain explicit push authorisation, push it to
+GitHub, then reinstall and rebuild the consumer.
 
 Rules that still apply:
 
