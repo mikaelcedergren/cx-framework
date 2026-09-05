@@ -253,8 +253,30 @@ function containServerListeners() {
   Object.defineProperty(net.Server.prototype, "listen", {
     configurable: false,
     enumerable: false,
-    value: guardedListen,
-    writable: false,
+    get() {
+      return guardedListen;
+    },
+    set(wrapper) {
+      // Dev servers wrap an instance's listen method to finish initialization.
+      // Their captured delegate still reaches guardedListen; the shared native
+      // entrypoint remains inaccessible and the prototype cannot be replaced.
+      if (
+        this === net.Server.prototype ||
+        !(this instanceof net.Server) ||
+        typeof wrapper !== "function"
+      ) {
+        throw blocked(
+          "net.Server.listen",
+          "replacing the shared listener guard",
+        );
+      }
+      Object.defineProperty(this, "listen", {
+        configurable: true,
+        enumerable: true,
+        value: wrapper,
+        writable: true,
+      });
+    },
   });
 }
 

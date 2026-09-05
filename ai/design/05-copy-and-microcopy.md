@@ -96,8 +96,8 @@ RULE-ID: copy.status.waiting SCOPE: status-message TYPE: SHOULD TOPIC: feedback 
 
 ## Dates and time
 
-RULE-ID: copy.dates.human-display SCOPE: human-date TYPE: SHOULD TOPIC: data-display RULE: Use an unambiguous human-readable absolute date. DESCRIPTION: A spelled-out month such as `6 May 2026` avoids locale-dependent day/month inversion in display copy.
+RULE-ID: copy.dates.human-display SCOPE: human-date TYPE: MUST TOPIC: data-display RULE: Always display dates as `D MMM YYYY`, optionally followed by a space and 24-hour `HH:mm`, such as `5 Sep 2026` or `5 Sep 2026 11:34`. DESCRIPTION: Use an unpadded day, a three-letter English month (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec), and a four-digit year. Never use numeric month dates, full month names, ordinal suffixes, commas, or an AM/PM suffix. The fixed order and named month make dates compact and unambiguous internationally; preserve the product's timezone contract.
 
 RULE-ID: copy.dates.machine-format SCOPE: machine-date TYPE: MAY TOPIC: data-display RULE: Use ISO date formats for machine, storage, API, or explicitly technical contexts. DESCRIPTION: `YYYY-MM-DD` is unambiguous when the surface is intentionally technical; do not describe it as a localized human date.
 
-RULE-ID: copy.dates.relative SCOPE: relative-time TYPE: SHOULD TOPIC: data-display RULE: Use relative time only when recency is the user's question. DESCRIPTION: Logs, reports, audits, and detail views need an absolute date and time.
+RULE-ID: copy.dates.relative SCOPE: relative-time TYPE: MUST TOPIC: data-display RULE: Never replace an absolute date with relative wording. DESCRIPTION: When recency helps, a phrase such as `2 hours ago` may supplement the absolute date, which still follows copy.dates.human-display.

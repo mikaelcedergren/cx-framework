@@ -6,7 +6,7 @@ import { CxOverlayStateService } from '../overlay-state.js';
 import { CxTooltipSurfaceComponent } from './cx-tooltip-surface.component.js';
 import * as i0 from "@angular/core";
 let cxTooltipId = 0;
-const CX_TOOLTIP_DEFAULT_DELAY_MS = 1000;
+const CX_TOOLTIP_DEFAULT_DELAY_MS = 500;
 const CX_TOOLTIP_CLOSE_GRACE_MS = 120;
 const CX_TOOLTIP_OVERFLOW_ATTRIBUTE = 'data-cx-tooltip-overflow';
 const CX_TOOLTIP_OVERFLOW_TARGET = `[${CX_TOOLTIP_OVERFLOW_ATTRIBUTE}]`;

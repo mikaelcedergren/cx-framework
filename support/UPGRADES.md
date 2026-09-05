@@ -14,6 +14,15 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.28
+
+- `cx-tooltip` and `cxTooltip` now open after 500 ms on hover by default. Keyboard focus
+  remains immediate. Consumers using the default delay need no changes.
+- The hermetic E2E runner supports development servers that wrap their own listener,
+  including Angular/Vite. The exact owned loopback port and single-listener limit
+  remain enforced. No consumer configuration changes are needed.
+- Portable date guidance uses `5 Sep 2026` or `5 Sep 2026 11:34` for human dates.
+
 ## 0.9.27
 
 - `cx-tag-field` again accepts pointer clicks on option labels for selection and on
