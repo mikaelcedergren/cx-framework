@@ -141,6 +141,9 @@ export async function createExactOriginProxy(allowedOrigin) {
     socket.once("close", () => connections.delete(socket));
   });
   server.on("connect", (request, socket, head) => {
+    // Reloading a hot-update client can reset a tunnel during an upstream write.
+    // Close the pair instead of letting that ordinary transport error kill the runner.
+    socket.once("error", () => socket.destroy());
     if (request.url !== allowed.host) {
       denyProxyTunnel(socket);
       return;
@@ -151,11 +154,13 @@ export async function createExactOriginProxy(allowedOrigin) {
     });
     connections.add(upstream);
     upstream.once("close", () => connections.delete(upstream));
+    let established = false;
     upstream.once("connect", () => {
       if (socket.destroyed) {
         upstream.destroy();
         return;
       }
+      established = true;
       socket.write(
         "HTTP/1.1 200 Connection Established\r\nConnection: keep-alive\r\n\r\n",
       );
@@ -164,7 +169,9 @@ export async function createExactOriginProxy(allowedOrigin) {
       upstream.pipe(socket);
     });
     upstream.once("error", () => {
-      if (!socket.destroyed) {
+      if (established) {
+        socket.destroy();
+      } else if (!socket.destroyed) {
         socket.end("HTTP/1.1 502 Bad Gateway\r\nConnection: close\r\n\r\n");
       }
     });

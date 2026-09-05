@@ -237,17 +237,29 @@ function containChildProcessSpawns() {
 function containServerListeners() {
   const listenGuardMarker = Symbol.for("cx.e2e.hermetic-listen");
   if (net.Server.prototype.listen?.[listenGuardMarker] === true) return;
-  let listenerCreated = false;
+  let activeListener;
   const guardedListen = function (...args) {
     if (targetServer !== "1") {
       throw blocked("net.Server.listen", "an unowned listener");
     }
-    if (listenerCreated) {
+    if (activeListener) {
       throw blocked("net.Server.listen", "a second target listener");
     }
     const contained = containedListenArguments(args);
-    listenerCreated = true;
-    return nativeServerListen.apply(this, contained);
+    activeListener = this;
+    // Permit a closed availability probe or dev-server restart on the same
+    // owned endpoint, without permitting overlapping listeners.
+    const release = () => {
+      if (activeListener === this) activeListener = undefined;
+    };
+    this.once("close", release);
+    try {
+      return nativeServerListen.apply(this, contained);
+    } catch (error) {
+      this.removeListener("close", release);
+      release();
+      throw error;
+    }
   };
   Object.defineProperty(guardedListen, listenGuardMarker, { value: true });
   Object.defineProperty(net.Server.prototype, "listen", {

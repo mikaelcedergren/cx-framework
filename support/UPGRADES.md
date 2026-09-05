@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.29
+
+- The hermetic E2E runner permits an availability probe to close before a development
+  server binds the same owned loopback port. Other ports and simultaneous listeners
+  remain blocked. No consumer configuration changes are needed.
+- Reloading a hot-update client closes interrupted proxy tunnels without terminating
+  the test runner. The proxy still admits only the exact owned origin.
+
 ## 0.9.28
 
 - `cx-tooltip` and `cxTooltip` now open after 500 ms on hover by default. Keyboard focus
