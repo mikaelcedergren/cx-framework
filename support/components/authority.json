@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 128,
-  "catalogSha256": "cd8986dd44ecabeb2358b96d34739c899277a26bf65aacab4a16cc6b8a242d16",
+  "componentCount": 130,
+  "catalogSha256": "227befea4e66fe7e5406b928afb703718361876b07405813d7d65d4164811207",
   "components": [
     {
       "name": "cx-account-control",
@@ -1531,24 +1531,6 @@
             "source": "decorator"
           },
           {
-            "binding": "background",
-            "member": "background",
-            "type": "boolean",
-            "required": false,
-            "transform": "booleanAttribute",
-            "defaultValue": "false",
-            "source": "decorator"
-          },
-          {
-            "binding": "border",
-            "member": "border",
-            "type": "boolean",
-            "required": false,
-            "transform": "booleanAttribute",
-            "defaultValue": "false",
-            "source": "decorator"
-          },
-          {
             "binding": "expandable",
             "member": "expandable",
             "type": "boolean",
@@ -1612,15 +1594,6 @@
             "source": "decorator"
           },
           {
-            "binding": "padding",
-            "member": "padding",
-            "type": "CxCardPadding",
-            "required": false,
-            "transform": null,
-            "defaultValue": "'default'",
-            "source": "decorator"
-          },
-          {
             "binding": "previewHeight",
             "member": "previewHeight",
             "type": "number",
@@ -1648,15 +1621,6 @@
             "source": "decorator"
           },
           {
-            "binding": "shadow",
-            "member": "shadow",
-            "type": "boolean",
-            "required": false,
-            "transform": "booleanAttribute",
-            "defaultValue": "false",
-            "source": "decorator"
-          },
-          {
             "binding": "tabs",
             "member": "tabs",
             "type": "readonly CxTabItem[] | undefined",
@@ -1681,6 +1645,15 @@
             "required": false,
             "transform": null,
             "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "variant",
+            "member": "variant",
+            "type": "CxCardVariant",
+            "required": false,
+            "transform": null,
+            "defaultValue": "'default'",
             "source": "decorator"
           }
         ],
@@ -1713,21 +1686,25 @@
         {
           "ordinal": 2,
           "selector": "*"
+        },
+        {
+          "ordinal": 3,
+          "selector": "[slot=footer], [cxCardFooter]"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "3838c3b8246fcb75e2fa3500bd1fd822a3655e56e91088265df8c30891280d79"
+          "sha256": "e522b58d094f5e5652b204f17a88e9ff356703dc84a473bcf0686425aa9cde99"
         },
         "template": {
           "kind": "external",
-          "sha256": "e2a0232b7cac7c5379c629d84cb483ee1cfde8d529041a3a0e75b1e74ae8c65c"
+          "sha256": "6fda46fc7bdc3712db2db7e8402889f6d5b9190409b842b7e73128541da810a1"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "6f7ce459c5e4f08eadeef96cf1e6a24111a692e9554b0170343d7dc6fdfb4637"
+            "sha256": "6ff3162ca9abdf5a093466970f2a448e75b53ae4a0cada8431c26aead84b9281"
           }
         ]
       }
@@ -3945,17 +3922,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "f55fb318caadebcf45284c13bf7afc397e363440315a73e835f5dd4269f92162"
+          "sha256": "7fb390a10f969a2a8921642e1bfdb4075eee556bd905f4c4767121038c0c281a"
         },
         "template": {
           "kind": "external",
-          "sha256": "63c1a792159c6fd897e86afd7645558c6d50877ed9fdedad5e9dee8e9b92ddf7"
+          "sha256": "2b88a677557cfc6b0e64c9c53d7e3dd8317ec107cfe92abef163456922b01d41"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "9ea5fbda91350b821d57d68a6d567c30f90d83c7ec36191838dbccb35493bfe7"
+            "sha256": "506a6e9858ce1984568f2377043cfd47de0fe5b45a29f86b06f431e9eb44ef38"
           }
         ]
       }
@@ -5993,7 +5970,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "08c88a87078811065f170a14156c61b627566ff6f0aa689f5b438029ad58d183"
+            "sha256": "914ac30b8aee265d994308afee3ae6a7530c4f7f1a5133b2dfd9f9def02a1837"
           }
         ]
       }
@@ -6100,22 +6077,26 @@
       "contentProjection": [
         {
           "ordinal": 1,
+          "selector": "[infoContent]"
+        },
+        {
+          "ordinal": 2,
           "selector": "*"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "ae231feeccb638a3ba48ef3c557aae9978bf41c1a4a14df6a0d373a5cf2a108a"
+          "sha256": "7ea466a7518806da984c8cab53ef27c20001ac01a354e2a096198b07f44e344e"
         },
         "template": {
           "kind": "external",
-          "sha256": "be30598160a4eeca5d0f9d31def7abdb2b39f31d54bea29f7248912ddd363013"
+          "sha256": "d45e1a9be8d0d5f31c670501f105f5a5676257a3a433ba77417884595f198bc4"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "592fc6db9d4a5f4ffd6982e5b7778b5eaf926d5eacc54959a038748f3f8106a0"
+            "sha256": "47374ec5f5b644119423baa233547b59d7fec13df394870cb4928700285d8d83"
           }
         ]
       }
@@ -6154,6 +6135,31 @@
             "sha256": "9bf3c671292a33338445b478dd64505bf7c3168214d4b64ccd1d1e023e8377a9"
           }
         ]
+      }
+    },
+    {
+      "name": "cx-labeled-row-info",
+      "area": "pattern",
+      "category": "cx-labeled-row",
+      "kind": "directive",
+      "selectors": [
+        "[infoContent]"
+      ],
+      "publicApi": {
+        "symbol": "CxLabeledRowInfoDirective",
+        "inputs": [],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "01e3a970459ac37d92207aaf36ac7651f4eda6ccfd3e7473255c4ac0d8639bc1"
+        },
+        "template": {
+          "kind": "none",
+          "sha256": null
+        },
+        "styles": []
       }
     },
     {
@@ -7888,6 +7894,15 @@
             "transform": null,
             "defaultValue": "'none'",
             "source": "decorator"
+          },
+          {
+            "binding": "tooltip",
+            "member": "tooltip",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
           }
         ],
         "outputs": []
@@ -7904,17 +7919,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "949259d6a897099c619e13a5a26a73775e2e2b2aa36a75cb4f6ae5a350a48d9f"
+          "sha256": "8ecd6d5bad0b5d0e63fd3dd598f4b9f8bdb2b2c717e49a621f7ef2d0109e5c5a"
         },
         "template": {
           "kind": "external",
-          "sha256": "20a802d3f8f0b76c18bae6986fbe78569a4d3a190fb955214693df62bd4fe901"
+          "sha256": "f7ad2f02e09993f5ba537385d028d674510adecbcb96f3a8d7ed1d59d2915ba4"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "59e63f02604711994c67b56f06d5b55735ec50ca442a8e615d8e2b55de021066"
+            "sha256": "340660dc179d2f97892ab4a80e09774570908bc83f7d74c9c0deaebadb5ce8f7"
           }
         ]
       }
@@ -10173,6 +10188,56 @@
             "ordinal": 1,
             "kind": "external",
             "sha256": "d0aab6d7e180b496bf5677b9a8f17bd72ee41522be65cf5e4a9b879181225fdc"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-sidebar-layout",
+      "area": "pattern",
+      "category": "cx-sidebar-layout",
+      "kind": "component",
+      "selectors": [
+        "cx-sidebar-layout"
+      ],
+      "publicApi": {
+        "symbol": "CxSidebarLayoutComponent",
+        "inputs": [
+          {
+            "binding": "placement",
+            "member": "placement",
+            "type": "CxSidebarLayoutPlacement",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[sidebar]"
+        },
+        {
+          "ordinal": 2,
+          "selector": "*"
+        }
+      ],
+      "evidence": {
+        "source": {
+          "sha256": "a2d2bfb567c460f98fa958eb642480b2885e46684ff64b4c11f22764bf3ef2a2"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "a1385f14b4fc78a8628a59099f8098c86de52115b8e7cd5600935afd22bca916"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "c3344bb0922e00c6e4f8cac26d62bbe0a1d2e5c4da74e815b370745a0f220263"
           }
         ]
       }

@@ -6,12 +6,14 @@ The portable design guidance and skills under `../ai/` do not read this metadata
 
 - `components/registry.json`: every component and directive reachable from `public-api.ts`, with selector and source path; exported tooling is marked as `area: tooling`, `category: reference`
 - `components/authority.json`: generated, self-contained public contract for every registry entry, including selector and class identity, input/output bindings and types, content-projection selectors, defaults/transforms, and exact source/template/style digests
-- `components/guidance.json`: complete, substantive exact-component guidance for the Cortex component reference and technical library consumers; every key must resolve through the registry
+- `components/guidance.json`: complete, substantive exact-component guidance for people choosing and using the Cortex components; every key must resolve through the registry
 - `components/locks.json`: a sorted list of registry components the user has locked as read-only source; only the workbench Lock switch writes it, and Cortex's source-side lock guard fails closed when this authority cannot be trusted
 - `UPGRADES.md`: version-by-version record of public API, default, and behaviour changes for agents upgrading a consuming product; usage only, never internals or visual refinement
 - `validation/visibility.rules.json`: the executable, framework-wide critical contract that no user-facing element renders without visible purpose
 
 Do not create empty placeholder catalogs. A discovery file must be populated and consumed, or it should not exist. Do not edit `components/authority.json` by hand. Generate it from the public export graph, registry, Angular declarations, and templates:
+
+Write component guidance in plain English for a designer or product author. Explain what the component is for, when it fits, and the user-facing behavior that matters. Keep selectors, properties, events, code structure, and other technical contracts in the API reference. `RULE-ID: copy.component-guidance.reader-language` owns this standard.
 
 ```sh
 pnpm --dir framework components:authority

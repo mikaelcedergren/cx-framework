@@ -85,7 +85,7 @@ Treat uncertain data and external-contract cleanup as high risk. Stop when autho
 - generated artifacts, caches, archives, logs, temporary files, and abandoned assets
 - inconsistent ignore rules and accidental tracked output
 
-Read instructions and project memory as authority when explicitly canonical. Do not rewrite them as a side effect of cleanup.
+Read instructions and project memory as authority when explicitly canonical.
 
 ## Finding classification
 

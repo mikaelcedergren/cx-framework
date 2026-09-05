@@ -1,10 +1,11 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, OnDestroy } from '@angular/core';
 import { type CxFileUpload, type CxFileUploadValue } from '../../primitives/inputs/cx-file-upload';
 import { type CxIconName } from '../../icons/manifest';
 import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
 import { type CxTextAreaSizing } from '../../primitives/inputs/cx-text-area';
 import { type CxFieldValidation } from '../../primitives/inputs/shared/field.types';
 import { type CxDynamicFieldOption, type CxDynamicFieldValue } from '../cx-dynamic-fields';
+import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
 import * as i0 from "@angular/core";
 export type CxLabeledRowRadioOption = {
     id: string;
@@ -71,10 +72,25 @@ export type CxLabeledRowContent = {
     fields?: CxDynamicFieldValue[];
     disabled?: boolean;
 };
-export declare class CxLabeledRowComponent {
+export declare class CxLabeledRowComponent implements OnDestroy {
     private readonly radioValueState;
     private readonly hostElement;
+    private readonly document;
     private readonly group;
+    private readonly infoContent;
+    private readonly infoTriggerRef;
+    private readonly infoPopoverRef;
+    private readonly infoSurfaceFocusRef;
+    private readonly infoOpenState;
+    private readonly hostVisibility;
+    private infoFocusTimer?;
+    private infoOpenTracking;
+    protected readonly infoPopoverId: string;
+    protected readonly infoPopoverMaxWidth = 320;
+    protected readonly infoOpen: import("@angular/core").Signal<boolean>;
+    protected readonly hasInfoContent: import("@angular/core").Signal<boolean>;
+    protected readonly infoOverlay: CxFloatingSurfaceController;
+    constructor();
     /** A row placed directly in a cx-labeled-row-group defers its label column to the group. */
     protected get grouped(): boolean;
     label: string;
@@ -93,6 +109,11 @@ export declare class CxLabeledRowComponent {
     readonly dynamicFieldsChange: EventEmitter<CxDynamicFieldValue[]>;
     protected contentInputBound: boolean;
     protected contentState: CxLabeledRowContent;
+    ngOnDestroy(): void;
+    protected get infoAriaLabel(): string;
+    protected get infoTriggerElement(): HTMLElement | undefined;
+    protected toggleInfoPopover(): void;
+    protected closeInfoPopover(): void;
     protected onInputValueChange(value: string): void;
     protected onSelectValueChange(value: string | undefined): void;
     protected onSelectValuesChange(value: string[]): void;
@@ -103,7 +124,14 @@ export declare class CxLabeledRowComponent {
     protected onDynamicFieldsChange(value: CxDynamicFieldValue[]): void;
     protected isRadioSelected(optionId: string): boolean;
     protected validationMessages(validation: CxFieldValidation | null | undefined): readonly import("../../public-api").CxRenderedValidationMessage[];
+    private measureInfoOverlay;
+    private scheduleInfoSurfaceFocus;
+    private clearInfoFocusTimer;
+    private startInfoTracking;
+    private stopInfoTracking;
+    private readonly onCapturedDocumentScroll;
+    private readonly onWindowResize;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxLabeledRowComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxLabeledRowComponent, "cx-labeled-row", never, { "label": { "alias": "label"; "required": false; }; "size": { "alias": "size"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "content": { "alias": "content"; "required": false; }; }, { "inputValueChange": "inputValueChange"; "selectValueChange": "selectValueChange"; "selectValuesChange": "selectValuesChange"; "radioValueChange": "radioValueChange"; "checkboxCheckedChange": "checkboxCheckedChange"; "switchCheckedChange": "switchCheckedChange"; "fileUploadChange": "fileUploadChange"; "dynamicFieldsChange": "dynamicFieldsChange"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxLabeledRowComponent, "cx-labeled-row", never, { "label": { "alias": "label"; "required": false; }; "size": { "alias": "size"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "content": { "alias": "content"; "required": false; }; }, { "inputValueChange": "inputValueChange"; "selectValueChange": "selectValueChange"; "selectValuesChange": "selectValuesChange"; "radioValueChange": "radioValueChange"; "checkboxCheckedChange": "checkboxCheckedChange"; "switchCheckedChange": "switchCheckedChange"; "fileUploadChange": "fileUploadChange"; "dynamicFieldsChange": "dynamicFieldsChange"; }, ["infoContent"], ["[infoContent]", "*"], true, never>;
 }
 //# sourceMappingURL=cx-labeled-row.component.d.ts.map

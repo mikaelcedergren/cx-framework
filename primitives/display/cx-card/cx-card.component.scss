@@ -12,9 +12,9 @@
   flex-direction: column;
   gap: var(--surface-separation);
   overflow: hidden;
-  border: var(--line-discreet);
+  border: 0;
   border-radius: var(--radius-lg);
-  background-color: var(--surface-alt);
+  background-color: var(--opacity-low);
   box-shadow: none;
   box-sizing: border-box;
   padding: var(--surface-separation);
@@ -25,22 +25,9 @@
     transform var(--motion-fast) var(--ease-out);
 }
 
-:host(.cx-card-host--background) .cx-card {
-  background-color: var(--surface-alt);
-}
-
 :host(.cx-card-host--border) .cx-card {
-  gap: 0;
   border: var(--line);
-  padding: 0;
-}
-
-:host(.cx-card-host--border) :is(.cx-card__viewport, .cx-card__content) {
-  border-radius: calc(var(--radius-lg) - var(--border-width));
-}
-
-:host(.cx-card-host--shadow) .cx-card {
-  box-shadow: var(--shadow-low);
+  background-color: transparent;
 }
 
 :host(.cx-card-host--interactive) {
@@ -65,7 +52,7 @@
   outline: none;
 }
 
-:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__viewport) {
+:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__viewport, .cx-card__footer) {
   pointer-events: none;
 }
 
@@ -85,9 +72,20 @@
   background-color: var(--opacity-low);
 }
 
-:host(.cx-card-host--interactive.cx-card-host--background) .cx-card:has(.cx-card__activation:hover),
 :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
   background-color: var(--opacity-darken);
+}
+
+// An outlined card remains one transparent plane in every interaction state.
+// Its border carries hover and press feedback instead of introducing a fill.
+:host(.cx-card-host--interactive.cx-card-host--border) .cx-card:has(.cx-card__activation:hover) {
+  border-color: var(--border-hover);
+  background-color: transparent;
+}
+
+:host(.cx-card-host--interactive.cx-card-host--border) .cx-card:has(.cx-card__activation:active) {
+  border-color: var(--border-active);
+  background-color: transparent;
 }
 
 // Pointer only: on touch the hover state sticks after a tap, which would leave
@@ -105,10 +103,6 @@
   box-shadow: none;
 }
 
-:host(.cx-card-host--interactive.cx-card-host--shadow) .cx-card:has(.cx-card__activation:active) {
-  box-shadow: var(--shadow-low);
-}
-
 @media (prefers-reduced-motion: reduce) {
   :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover),
   :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
@@ -119,14 +113,6 @@
 :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:focus-visible) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
-}
-
-:host(.cx-card-host--padding-none) :is(.cx-card__header, .cx-card__content) {
-  padding: 0;
-}
-
-:host(.cx-card-host--padding-large) :is(.cx-card__header, .cx-card__content) {
-  padding: var(--space-md);
 }
 
 :host(.cx-card-host--mood-primary) .cx-card__icon {
@@ -159,7 +145,7 @@
   min-height: var(--controller-size);
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-sm);
+  padding: 0 var(--space-sm);
   box-sizing: border-box;
 }
 
@@ -182,11 +168,13 @@
 
 .cx-card__heading {
   min-width: 0;
+  overflow: hidden;
   color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-body);
-  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cx-card__header-actions {
@@ -215,6 +203,13 @@
 .cx-card__menu {
   display: inline-flex;
   flex: 0 0 auto;
+  opacity: 0.15;
+  transition: opacity var(--motion-fast) ease;
+}
+
+.cx-card:hover .cx-card__menu,
+.cx-card:focus-within .cx-card__menu {
+  opacity: 1;
 }
 
 // A heading-only card (e.g. a one-line note) projects no body; drop the empty
@@ -223,7 +218,7 @@
   display: none;
 }
 
-.cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(.cx-card__content:empty) {
+.cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(.cx-card__content:empty):has(.cx-card__footer:empty) {
   display: none;
 }
 
@@ -262,7 +257,7 @@
   gap: var(--space-sm);
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: transparent;
   padding: var(--space-sm);
   box-sizing: border-box;
 }
@@ -274,16 +269,10 @@
   flex-shrink: 0;
 }
 
-// The fade is the truncation cue: it tells the reader there is more before they
-// find the control. It fades to the content island's own surface.
-.cx-card__viewport--clamped::after {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 48px;
-  background: linear-gradient(to bottom, transparent, var(--surface));
-  pointer-events: none;
+// Fade the content itself so transparent cards never need a painted fade tile.
+.cx-card__viewport--clamped {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
 }
 
 .cx-card__expand {
@@ -303,13 +292,13 @@
     color var(--motion-fast) var(--ease-out);
 }
 
-:host(.cx-card-host--border) .cx-card__expand {
-  border-radius: 0 0 calc(var(--radius-lg) - var(--border-width)) calc(var(--radius-lg) - var(--border-width));
-}
-
 .cx-card__expand:hover {
   background: var(--opacity-low);
   color: var(--ink);
+}
+
+:host(.cx-card-host--border) .cx-card__expand:hover {
+  background: transparent;
 }
 
 .cx-card__expand:focus-visible {
@@ -324,6 +313,25 @@
 
 .cx-card__expand[aria-expanded='true'] .cx-card__expand-chevron {
   transform: rotate(180deg);
+}
+
+.cx-card__footer {
+  display: flex;
+  min-width: 0;
+  min-height: var(--controller-size);
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-top: var(--line-discreet);
+  box-sizing: border-box;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+.cx-card__footer:empty {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

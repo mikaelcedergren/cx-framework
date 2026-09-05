@@ -7,6 +7,13 @@ import * as i0 from "@angular/core";
 export type CxDropdownOption = {
     id: string;
     label: string;
+    /**
+     * Options that share a group label render under one quiet header row.
+     * A header appears wherever the label changes while reading the list top
+     * to bottom, so consumers keep grouped options adjacent and place
+     * ungrouped options before the first group.
+     */
+    group?: string;
     description?: string;
     prependIcon?: CxIconName;
     appendIcon?: CxIconName;
@@ -33,9 +40,18 @@ export type CxDropdownTranslations = Partial<{
     createLabel: string;
     selectedCount: CxDropdownSelectedCountTranslation;
 }>;
-type CxDropdownRenderedOption = {
+type CxDropdownRow = {
+    kind: 'group';
+    key: string;
+    label: string;
+} | {
+    kind: 'option';
+    key: string;
     option: CxDropdownOption;
-    index: number;
+    optionIndex: number;
+};
+type CxDropdownRenderedRow = CxDropdownRow & {
+    rowIndex: number;
 };
 export declare class CxDropdownComponent implements AfterViewInit, OnDestroy {
     private static nextId;
@@ -107,10 +123,13 @@ export declare class CxDropdownComponent implements AfterViewInit, OnDestroy {
     protected readonly displayText$: import("@angular/core").Signal<string>;
     protected readonly showPlaceholder$: import("@angular/core").Signal<boolean>;
     protected readonly filteredOptions$: import("@angular/core").Signal<CxDropdownOption[]>;
+    protected readonly rows$: import("@angular/core").Signal<CxDropdownRow[]>;
+    private readonly optionRowIndexes$;
     protected readonly virtualizedOptions$: import("@angular/core").Signal<boolean>;
-    protected readonly renderedOptions$: import("@angular/core").Signal<CxDropdownRenderedOption[]>;
+    protected readonly renderedRows$: import("@angular/core").Signal<CxDropdownRenderedRow[]>;
     protected readonly virtualOptionsHeight$: import("@angular/core").Signal<number>;
     protected readonly virtualOptionsOffset$: import("@angular/core").Signal<string>;
+    protected readonly optionHeight$: import("@angular/core").Signal<number>;
     protected readonly labelText$: import("@angular/core").Signal<string>;
     protected readonly searchEnabled$: import("@angular/core").Signal<boolean>;
     protected readonly createValue$: import("@angular/core").Signal<string>;

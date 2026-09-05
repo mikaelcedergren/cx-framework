@@ -20,7 +20,7 @@ import { CxTabsComponent, type CxTabItem } from '../../navigation/cx-tabs';
 import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
 
 export type CxCardMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
-export type CxCardPadding = 'none' | 'default' | 'large';
+export type CxCardVariant = 'default' | 'border';
 
 // Overflow below this many pixels is not worth an expand control: the fade would
 // hide more than the expansion reveals. Roughly one body line of text.
@@ -30,15 +30,17 @@ let nextCardContentId = 0;
 
 @Component({
   selector: 'cx-card',
-  imports: [CxIconButtonComponent, CxIconComponent, CxMenuComponent, CxMenuTriggerDirective, CxTabsComponent],
+  imports: [
+    CxIconButtonComponent,
+    CxIconComponent,
+    CxMenuComponent,
+    CxMenuTriggerDirective,
+    CxTabsComponent,
+  ],
   templateUrl: './cx-card.component.html',
   styleUrl: './cx-card.component.scss',
   host: {
-    '[class.cx-card-host--background]': 'background',
-    '[class.cx-card-host--border]': 'border',
-    '[class.cx-card-host--shadow]': 'shadow',
-    '[class.cx-card-host--padding-none]': 'padding === "none"',
-    '[class.cx-card-host--padding-large]': 'padding === "large"',
+    '[class.cx-card-host--border]': 'variant === "border"',
     '[class.cx-card-host--interactive]': 'activatable',
     '[class.cx-card-host--mood-primary]': 'mood === "primary"',
     '[class.cx-card-host--mood-accent]': 'mood === "accent"',
@@ -71,10 +73,7 @@ export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() heading: string | undefined;
   @Input() icon: CxIconName | undefined;
   @Input() mood: CxCardMood = 'default';
-  @Input() padding: CxCardPadding = 'default';
-  @Input({ transform: booleanAttribute }) background = false;
-  @Input({ transform: booleanAttribute }) border = false;
-  @Input({ transform: booleanAttribute }) shadow = false;
+  @Input() variant: CxCardVariant = 'default';
   /** Action mode. The card exposes a real button surface and emits pressed. */
   @Input({ transform: booleanAttribute }) interactive = false;
   /** Navigation mode. Takes precedence over interactive and exposes a real link surface. */

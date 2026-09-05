@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,12 +6,19 @@ import {
   EventEmitter,
   HostBinding,
   Input,
+  OnDestroy,
   Output,
+  computed,
+  contentChild,
+  effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { CxLabeledRowGroupComponent } from './cx-labeled-row-group.component';
+import { CxLabeledRowInfoDirective } from './cx-labeled-row-info.directive';
 import { CxValidationMessageComponent } from '../../primitives/feedback/cx-validation-message';
+import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxCheckboxComponent } from '../../primitives/inputs/cx-checkbox';
 import {
   type CxFileUpload,
@@ -30,6 +37,23 @@ import {
   type CxDynamicFieldOption,
   type CxDynamicFieldValue,
 } from '../cx-dynamic-fields';
+import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
+import {
+  CxFloatingSurfaceController,
+  type CxFloatingSurfaceRequest,
+  type CxFloatingSurfaceViewport,
+} from '../../primitives/overlay/floating-surface-controller';
+import { CxHostVisibilityObserver } from '../../primitives/shared/host-visibility';
+
+const CX_LABELED_ROW_INFO_MAX_WIDTH = 320;
+const CX_LABELED_ROW_INFO_MAX_HEIGHT = 320;
+const CX_LABELED_ROW_INFO_ESTIMATED_WIDTH = 280;
+const CX_LABELED_ROW_INFO_MIN_WIDTH = 220;
+const CX_LABELED_ROW_INFO_ESTIMATED_HEIGHT = 240;
+const CX_LABELED_ROW_INFO_VIEWPORT_PADDING = 8;
+const CX_LABELED_ROW_INFO_GAP = 4;
+
+let nextLabeledRowInfoId = 0;
 
 export type CxLabeledRowRadioOption = {
   id: string;
@@ -113,6 +137,7 @@ export type CxLabeledRowContent =
   imports: [
     CommonModule,
     CxValidationMessageComponent,
+    CxIconButtonComponent,
     CxCheckboxComponent,
     CxDynamicFieldsComponent,
     CxFileUploadComponent,
@@ -121,15 +146,48 @@ export type CxLabeledRowContent =
     CxDropdownComponent,
     CxSwitchComponent,
     CxTextAreaComponent,
+    CxPopoverComponent,
   ],
   templateUrl: './cx-labeled-row.component.html',
   styleUrl: './cx-labeled-row.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxLabeledRowComponent {
+export class CxLabeledRowComponent implements OnDestroy {
   private readonly radioValueState = signal<string | undefined>(undefined);
   private readonly hostElement: HTMLElement = inject(ElementRef).nativeElement;
+  private readonly document = inject(DOCUMENT);
   private readonly group = inject(CxLabeledRowGroupComponent, { optional: true });
+  private readonly infoContent = contentChild(CxLabeledRowInfoDirective);
+  private readonly infoTriggerRef = viewChild<ElementRef<HTMLElement>>('infoTrigger');
+  private readonly infoPopoverRef = viewChild<CxPopoverComponent>('infoPopover');
+  private readonly infoSurfaceFocusRef = viewChild<ElementRef<HTMLElement>>('infoSurfaceFocus');
+  private readonly infoOpenState = signal(false);
+  private readonly hostVisibility = new CxHostVisibilityObserver(this.hostElement, visible => {
+    if (!visible && this.infoOpenState()) {
+      this.closeInfoPopover();
+    }
+  });
+  private infoFocusTimer?: number;
+  private infoOpenTracking = false;
+
+  protected readonly infoPopoverId = `cx-labeled-row-info-${++nextLabeledRowInfoId}`;
+  protected readonly infoPopoverMaxWidth = CX_LABELED_ROW_INFO_MAX_WIDTH;
+  protected readonly infoOpen = this.infoOpenState.asReadonly();
+  protected readonly hasInfoContent = computed(
+    () => this.infoContent()?.hasVisibleContent() ?? false,
+  );
+  protected readonly infoOverlay = new CxFloatingSurfaceController(
+    (rect, viewport) => this.measureInfoOverlay(rect, viewport),
+    () => this.infoPopoverRef()?.surfaceElement(),
+  );
+
+  constructor() {
+    effect(() => {
+      if (this.infoOpenState() && !this.hasInfoContent()) {
+        this.closeInfoPopover();
+      }
+    });
+  }
 
   /** A row placed directly in a cx-labeled-row-group defers its label column to the group. */
   @HostBinding('class.cx-labeled-row--grouped')
@@ -174,6 +232,51 @@ export class CxLabeledRowComponent {
     text: 'Paste chaos here',
   };
 
+  public ngOnDestroy(): void {
+    this.stopInfoTracking();
+    this.infoOverlay.destroy();
+    this.clearInfoFocusTimer();
+  }
+
+  protected get infoAriaLabel(): string {
+    const label = this.label.trim();
+    return label ? `More information about ${label}` : 'More information';
+  }
+
+  protected get infoTriggerElement(): HTMLElement | undefined {
+    return this.infoTriggerRef()?.nativeElement;
+  }
+
+  protected toggleInfoPopover(): void {
+    if (this.infoOpenState()) {
+      this.closeInfoPopover();
+      return;
+    }
+    if (!this.hasInfoContent()) {
+      return;
+    }
+    const trigger = this.infoTriggerRef()?.nativeElement;
+    if (!trigger) {
+      return;
+    }
+
+    this.infoOverlay.endSession();
+    this.infoOverlay.sync(trigger);
+    this.infoOpenState.set(true);
+    this.startInfoTracking();
+    this.scheduleInfoSurfaceFocus();
+  }
+
+  protected closeInfoPopover(): void {
+    if (!this.infoOpenState()) {
+      return;
+    }
+    this.clearInfoFocusTimer();
+    this.infoOpenState.set(false);
+    this.stopInfoTracking();
+    this.infoOverlay.endSession();
+  }
+
   protected onInputValueChange(value: string): void {
     this.inputValueChange.emit(value);
   }
@@ -214,4 +317,92 @@ export class CxLabeledRowComponent {
   protected validationMessages(validation: CxFieldValidation | null | undefined) {
     return normalizeCxValidation(validation);
   }
+
+  private measureInfoOverlay(
+    _rect: DOMRect,
+    viewport: CxFloatingSurfaceViewport,
+  ): CxFloatingSurfaceRequest {
+    const viewportWidth = Math.max(
+      viewport.width - CX_LABELED_ROW_INFO_VIEWPORT_PADDING * 2,
+      0,
+    );
+    const viewportHeight = Math.max(
+      viewport.height - CX_LABELED_ROW_INFO_VIEWPORT_PADDING * 2,
+      0,
+    );
+    const estimatedWidth = Math.min(CX_LABELED_ROW_INFO_ESTIMATED_WIDTH, viewportWidth);
+    return {
+      width: estimatedWidth,
+      minWidth: Math.min(CX_LABELED_ROW_INFO_MIN_WIDTH, viewportWidth),
+      estimatedHeight: Math.min(CX_LABELED_ROW_INFO_ESTIMATED_HEIGHT, viewportHeight),
+      align: 'start',
+      viewportPadding: CX_LABELED_ROW_INFO_VIEWPORT_PADDING,
+      gap: CX_LABELED_ROW_INFO_GAP,
+      maxHeightCap: Math.min(CX_LABELED_ROW_INFO_MAX_HEIGHT, viewportHeight),
+    };
+  }
+
+  private scheduleInfoSurfaceFocus(): void {
+    const windowRef = this.document.defaultView;
+    if (!windowRef) {
+      return;
+    }
+    this.clearInfoFocusTimer();
+    this.infoFocusTimer = windowRef.setTimeout(() => {
+      this.infoFocusTimer = undefined;
+      this.infoOverlay.sync();
+      this.infoSurfaceFocusRef()?.nativeElement.focus({ preventScroll: true });
+    });
+  }
+
+  private clearInfoFocusTimer(): void {
+    const windowRef = this.document.defaultView;
+    if (windowRef && this.infoFocusTimer !== undefined) {
+      windowRef.clearTimeout(this.infoFocusTimer);
+    }
+    this.infoFocusTimer = undefined;
+  }
+
+  private startInfoTracking(): void {
+    if (this.infoOpenTracking) {
+      return;
+    }
+    this.infoOpenTracking = true;
+    this.hostVisibility.start();
+    this.document.addEventListener('scroll', this.onCapturedDocumentScroll, true);
+    this.document.defaultView?.addEventListener('resize', this.onWindowResize);
+    this.infoOverlay.observeTrigger(this.infoTriggerRef()?.nativeElement, () => {
+      if (this.hostVisibility.check()) {
+        this.infoOverlay.sync();
+      }
+    });
+  }
+
+  private stopInfoTracking(): void {
+    this.hostVisibility.stop();
+    if (!this.infoOpenTracking) {
+      return;
+    }
+    this.infoOpenTracking = false;
+    this.document.removeEventListener('scroll', this.onCapturedDocumentScroll, true);
+    this.document.defaultView?.removeEventListener('resize', this.onWindowResize);
+    this.infoOverlay.stopObservingTrigger();
+  }
+
+  private readonly onCapturedDocumentScroll = (event: Event): void => {
+    if (!this.infoOpenState() || !this.hostVisibility.check()) {
+      return;
+    }
+    const target = event.target;
+    if (target instanceof Node && this.infoPopoverRef()?.surfaceElement()?.contains(target)) {
+      return;
+    }
+    this.infoOverlay.sync();
+  };
+
+  private readonly onWindowResize = (): void => {
+    if (this.infoOpenState() && this.hostVisibility.check()) {
+      this.infoOverlay.sync();
+    }
+  };
 }

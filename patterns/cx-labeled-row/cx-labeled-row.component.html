@@ -6,9 +6,48 @@
 >
   @if (hasLabel) {
     <div class="cx-labeled-row__label">
-      <span class="cx-labeled-row__label-text">{{ label }}</span>
+      <div class="cx-labeled-row__label-line">
+        <span class="cx-labeled-row__label-text">{{ label }}</span>
+        @if (hasInfoContent()) {
+          <span #infoTrigger class="cx-labeled-row__info-trigger">
+            <cx-icon-button
+              icon="info"
+              size="small"
+              variant="transparent"
+              [ariaLabel]="infoAriaLabel"
+              ariaHasPopup="dialog"
+              [ariaExpanded]="infoOpen()"
+              [ariaControls]="infoPopoverId"
+              (pressed)="toggleInfoPopover()"
+            />
+          </span>
+        }
+      </div>
       @if (optional) {
         <span class="cx-labeled-row__optional">Optional</span>
+      }
+
+      @if (hasInfoContent() && infoOpen()) {
+        <cx-popover
+          #infoPopover
+          [open]="true"
+          [owner]="infoTriggerElement"
+          [showBackdrop]="true"
+          [surfaceId]="infoPopoverId"
+          role="dialog"
+          [ariaLabel]="infoAriaLabel"
+          [maxWidth]="infoPopoverMaxWidth"
+          [maxHeight]="infoOverlay.maxHeight$()"
+          [left]="infoOverlay.left$()"
+          [top]="infoOverlay.top$()"
+          [bottom]="infoOverlay.bottom$()"
+          [placement]="infoOverlay.placement$()"
+          (backdropPressed)="closeInfoPopover()"
+        >
+          <div #infoSurfaceFocus class="cx-labeled-row__info-content" tabindex="-1">
+            <ng-content select="[infoContent]" />
+          </div>
+        </cx-popover>
       }
     </div>
   }

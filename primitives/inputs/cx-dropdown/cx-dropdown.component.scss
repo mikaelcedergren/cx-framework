@@ -233,6 +233,15 @@
   overflow-anchor: none;
 }
 
+// Group headers occupy exactly one option row so the uniform-row scroll
+// geometry (virtual window, scroll-into-view, overlay height) stays valid.
+.cx-dropdown__group {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
 .cx-dropdown__virtual-spacer {
   position: relative;
   flex: 0 0 auto;

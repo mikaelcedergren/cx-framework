@@ -23,6 +23,7 @@ export * from './patterns/cx-process';
 export * from './patterns/cx-utility-bar';
 export * from './patterns/cx-radio-reveal';
 export * from './patterns/cx-side-nav';
+export * from './patterns/cx-sidebar-layout';
 export * from './patterns/cx-table-view';
 export * from './patterns/cx-top-bar';
 export * from './patterns/cx-wizard-dialog';

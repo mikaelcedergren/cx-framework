@@ -28,16 +28,18 @@
       [class.cx-option--append-only]="hasAppendOnlyLayout()"
       [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
       [class.cx-option--disabled]="disabled"
-      [disabled]="disabled"
+      [disabled]="useNativeDisabled()"
       [attr.role]="role || null"
       [attr.aria-disabled]="disabled ? 'true' : null"
       [attr.aria-selected]="ariaSelectedValue()"
       [attr.aria-checked]="ariaCheckedValue()"
       [attr.aria-posinset]="ariaPosInSet ?? null"
       [attr.aria-setsize]="ariaSetSize ?? null"
-      [cxTooltip]="label"
-      [cxTooltipOverflow]="true"
+      [cxTooltip]="tooltipText()"
+      [cxTooltipOverflow]="!hasExplicitTooltip()"
       cxTooltipPosition="right"
+      (click)="onPrimaryClick($event)"
+      (keydown)="onPrimaryKeydown($event)"
     >
       <ng-container [ngTemplateOutlet]="optionContent" />
     </button>
@@ -59,15 +61,18 @@
       [class.cx-option--with-trailing]="!!appendIconName() || hasShortcut() || !!description"
       [class.cx-option--disabled]="disabled"
       [attr.role]="role || null"
-      [attr.inert]="disabled ? '' : null"
+      [attr.inert]="disabled && !hasExplicitTooltip() ? '' : null"
+      [attr.tabindex]="hasExplicitTooltip() ? 0 : null"
       [attr.aria-disabled]="disabled ? 'true' : null"
       [attr.aria-selected]="ariaSelectedValue()"
       [attr.aria-checked]="ariaCheckedValue()"
       [attr.aria-posinset]="ariaPosInSet ?? null"
       [attr.aria-setsize]="ariaSetSize ?? null"
-      [cxTooltip]="label"
-      [cxTooltipOverflow]="true"
+      [cxTooltip]="tooltipText()"
+      [cxTooltipOverflow]="!hasExplicitTooltip()"
       cxTooltipPosition="right"
+      (click)="onPrimaryClick($event)"
+      (keydown)="onPrimaryKeydown($event)"
     >
       <ng-container [ngTemplateOutlet]="optionContent" />
     </div>
@@ -97,15 +102,17 @@
     </span>
   }
 
-  <span #labelContent class="cx-option__content">
-    <span class="cx-option__label" data-cx-tooltip-overflow>{{ label }}</span>
-  </span>
+  <span class="cx-option__text">
+    <span #labelContent class="cx-option__content">
+      <span class="cx-option__label" data-cx-tooltip-overflow>{{ label }}</span>
+    </span>
 
-  <span class="cx-option__trailing">
     @if (description) {
       <span class="cx-option__description" data-cx-tooltip-overflow>{{ description }}</span>
     }
+  </span>
 
+  <span class="cx-option__trailing">
     <span #appendSlot class="cx-option__append-slot">
       <ng-content select="[append]" />
     </span>

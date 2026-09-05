@@ -59,7 +59,7 @@
       [ariaLabel]="resolvedTabsAriaLabel"
       [controlsId]="contentId"
       [transparent]="true"
-      [divided]="false"
+      [divided]="true"
       (selectedIdChange)="onTabSelect($event)"
     />
   }
@@ -94,4 +94,8 @@
       <cx-icon class="cx-card__expand-chevron" icon="chevron-down" [size]="16" />
     </button>
   }
+
+  <div class="cx-card__footer">
+    <ng-content select="[slot=footer], [cxCardFooter]" />
+  </div>
 </div>

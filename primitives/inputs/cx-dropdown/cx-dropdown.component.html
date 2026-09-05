@@ -148,27 +148,33 @@
                 [class.cx-dropdown__virtual-window]="virtualizedOptions$()"
                 [style.transform]="virtualizedOptions$() ? virtualOptionsOffset$() : null"
               >
-                @for (entry of renderedOptions$(); track entry.option.id) {
-                  <cx-option
-                    #optionRow
-                    [attr.data-cx-dropdown-option-index]="entry.index"
-                    [role]="'option'"
-                    [label]="entry.option.label"
-                    [description]="entry.option.description"
-                    [prependIcon]="entry.option.prependIcon"
-                    [appendIcon]="entry.option.appendIcon"
-                    [mood]="entry.option.mood ?? 'default'"
-                    [shortcutParts]="entry.option.shortcutParts"
-                    [active]="activeOptionId$() === entry.option.id"
-                    [selected]="isOptionSelected(entry.option.id)"
-                    [selectedHighlight]="!isMultiple$()"
-                    [showCheckbox]="isMultiple$()"
-                    [disabled]="isOptionDisabled(entry.option)"
-                    [ariaSetSize]="virtualizedOptions$() ? filteredOptions$().length : undefined"
-                    [ariaPosInSet]="virtualizedOptions$() ? entry.index + 1 : undefined"
-                    (click)="selectOption(entry.option, true)"
-                    (keydown)="onOptionKeydown($event, entry.option)"
-                  />
+                @for (entry of renderedRows$(); track entry.key) {
+                  @if (entry.kind === 'group') {
+                    <div class="cx-dropdown__group" role="presentation" [style.height.px]="optionHeight$()">
+                      <cx-option-group [label]="entry.label" />
+                    </div>
+                  } @else {
+                    <cx-option
+                      #optionRow
+                      [attr.data-cx-dropdown-option-index]="entry.optionIndex"
+                      [role]="'option'"
+                      [label]="entry.option.label"
+                      [description]="entry.option.description"
+                      [prependIcon]="entry.option.prependIcon"
+                      [appendIcon]="entry.option.appendIcon"
+                      [mood]="entry.option.mood ?? 'default'"
+                      [shortcutParts]="entry.option.shortcutParts"
+                      [active]="activeOptionId$() === entry.option.id"
+                      [selected]="isOptionSelected(entry.option.id)"
+                      [selectedHighlight]="!isMultiple$()"
+                      [showCheckbox]="isMultiple$()"
+                      [disabled]="isOptionDisabled(entry.option)"
+                      [ariaSetSize]="virtualizedOptions$() ? filteredOptions$().length : undefined"
+                      [ariaPosInSet]="virtualizedOptions$() ? entry.optionIndex + 1 : undefined"
+                      (click)="selectOption(entry.option, true)"
+                      (keydown)="onOptionKeydown($event, entry.option)"
+                    />
+                  }
                 }
               </div>
             </div>

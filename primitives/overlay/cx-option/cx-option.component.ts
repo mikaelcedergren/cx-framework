@@ -27,6 +27,7 @@ export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 export class CxOptionComponent implements OnChanges {
   @Input() label = 'Option';
   @Input() description?: string;
+  @Input() tooltip?: string;
   @Input() prependIcon?: CxIconName;
   @Input() appendIcon?: CxIconName;
   @Input() shortcutParts: readonly string[] | undefined;
@@ -101,6 +102,34 @@ export class CxOptionComponent implements OnChanges {
   }
 
   protected stopControlEvent(event: Event): void {
+    event.stopPropagation();
+  }
+
+  protected hasExplicitTooltip(): boolean {
+    return Boolean(this.tooltip?.trim());
+  }
+
+  protected tooltipText(): string {
+    return this.tooltip?.trim() || this.label;
+  }
+
+  protected useNativeDisabled(): boolean {
+    return this.disabled && !this.hasExplicitTooltip();
+  }
+
+  protected onPrimaryClick(event: MouseEvent): void {
+    if (!this.disabled && this.clickable) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  protected onPrimaryKeydown(event: KeyboardEvent): void {
+    if ((!this.disabled && this.clickable) || (event.key !== 'Enter' && event.key !== ' ')) {
+      return;
+    }
+    event.preventDefault();
     event.stopPropagation();
   }
 

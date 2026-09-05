@@ -14,6 +14,51 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.26
+
+- `cx-card` accepts optional footer content through `[slot=footer]` or `[cxCardFooter]`. The
+  footer appears only when content is provided and gives quiet supporting context a consistent
+  place below the card body.
+- `cx-sidebar-layout` is a new two-region page layout. Project secondary content through the
+  `[sidebar]` slot and primary content through the default slot; set `placement` to `start` or
+  `end`. It keeps the secondary region sticky with one inward divider on wide layouts, then moves
+  it into normal flow above the content with a horizontal divider below the mobile breakpoint.
+  Use `--cx-sidebar-layout-width` and `--cx-sidebar-layout-offset` only when the page needs to
+  override the 280px width or standard sticky inset.
+- `cx-option` accepts optional `tooltip` text for brief explanations on available or disabled
+  options. Empty or omitted text keeps the existing behavior. An explicit tooltip takes priority
+  over the automatic clipped-text preview, and a disabled option with tooltip text remains
+  focusable for explanation while activation stays blocked.
+- `cx-option` now gives trailing text and trailing elements different space priority. Supporting
+  text truncates before the primary label, while tags, switches, shortcuts, icons, and independent
+  actions keep their natural width and make the primary label truncate around them. Consumers do
+  not need to choose a layout mode.
+
+- `cx-labeled-row` — project non-empty content with `[infoContent]` to add the fixed
+  discreet info button beside the label. It opens on click or keyboard activation and accepts
+  formatted or composed content. Existing rows need no migration.
+
+- `cx-dropdown` options accept an optional `group` label. Options sharing a label render under one
+  quiet, non-selectable header row; a header appears wherever the label changes while reading the
+  list top to bottom, so keep grouped options adjacent and place ungrouped options before the
+  first group. Search hides a group's header when none of its options match. Existing consumers
+  need no change.
+- `cx-card` now uses one `opacity-low` plane with no border by default and owns one consistent
+  internal padding treatment. Set `variant="border"` to make the complete card transparent without
+  changing its spacing. The `background`, `border`, `shadow`, and `padding` inputs are removed:
+  delete those bindings and replace a true `border` binding with the border variant. Cards with
+  `href` or `interactive` provide their own hover lift and shadow, while passive cards stay flat.
+  Expandable cards fade without painting a backing tile, so bordered cards remain transparent
+  while collapsed.
+- `cx-card` top-position tabs now use the standard divided treatment automatically. Existing
+  `tabs` consumers need no additional binding.
+- `cx-card` headings now stay on one line and truncate with an ellipsis when needed. Existing
+  headings need no adjustment.
+- `cx-card` action menus now rest at low opacity and become fully visible when the card is hovered
+  or focused. Existing `menuItems` consumers need no adjustment.
+- `cx-kpi` now uses the quiet `opacity-low` fill without a border. Existing consumers need no
+  change.
+
 ## 0.9.25
 
 - `cx-server-artifact` now accepts the already-published `cx-development-favicon` command in an

@@ -22,6 +22,7 @@ import { CxTextFieldComponent } from '../cx-text-field';
 import { CxIconComponent } from '../../media/cx-icon';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxOptionComponent, type CxOptionMood } from '../../overlay/cx-option';
+import { CxOptionGroupComponent } from '../../overlay/cx-option-group';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 import {
@@ -47,6 +48,13 @@ const CX_DROPDOWN_LOAD_MORE_DISTANCE = 96;
 export type CxDropdownOption = {
   id: string;
   label: string;
+  /**
+   * Options that share a group label render under one quiet header row.
+   * A header appears wherever the label changes while reading the list top
+   * to bottom, so consumers keep grouped options adjacent and place
+   * ungrouped options before the first group.
+   */
+  group?: string;
   description?: string;
   prependIcon?: CxIconName;
   appendIcon?: CxIconName;
@@ -75,10 +83,10 @@ export type CxDropdownTranslations = Partial<{
   selectedCount: CxDropdownSelectedCountTranslation;
 }>;
 type CxDropdownFocusTarget = 'search' | 'selected' | 'first' | 'last' | 'create' | 'none';
-type CxDropdownRenderedOption = {
-  option: CxDropdownOption;
-  index: number;
-};
+type CxDropdownRow =
+  | { kind: 'group'; key: string; label: string }
+  | { kind: 'option'; key: string; option: CxDropdownOption; optionIndex: number };
+type CxDropdownRenderedRow = CxDropdownRow & { rowIndex: number };
 
 const CX_DROPDOWN_DEFAULT_TRANSLATIONS = {
   optional: 'Optional',
@@ -104,6 +112,7 @@ const CX_DROPDOWN_DEFAULT_TRANSLATIONS = {
     CxIconComponent,
     CxTextFieldComponent,
     CxOptionComponent,
+    CxOptionGroupComponent,
     CxPopoverComponent,
     CxSpinnerComponent,
     CxTooltipDirective,
@@ -270,30 +279,56 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
       return haystack.includes(query);
     });
   });
+  // The scroll geometry (virtual window, scroll-into-view, overlay sizing)
+  // counts rendered rows, while selection, focus, and typeahead keep counting
+  // options; group headers exist only in the row layer.
+  protected readonly rows$ = computed<CxDropdownRow[]>(() => {
+    const rows: CxDropdownRow[] = [];
+    let previousGroup: string | undefined;
+    this.filteredOptions$().forEach((option, optionIndex) => {
+      const group = option.group?.trim() || undefined;
+      if (group && group !== previousGroup) {
+        rows.push({ kind: 'group', key: `group:${optionIndex}`, label: group });
+      }
+      previousGroup = group;
+      rows.push({ kind: 'option', key: option.id, option, optionIndex });
+    });
+    return rows;
+  });
+  private readonly optionRowIndexes$ = computed<number[]>(() => {
+    const indexes: number[] = [];
+    this.rows$().forEach((row, rowIndex) => {
+      if (row.kind === 'option') {
+        indexes[row.optionIndex] = rowIndex;
+      }
+    });
+    return indexes;
+  });
   protected readonly virtualizedOptions$ = computed(
-    () => this.filteredOptions$().length > CX_DROPDOWN_VIRTUALIZATION_THRESHOLD,
+    () => this.rows$().length > CX_DROPDOWN_VIRTUALIZATION_THRESHOLD,
   );
-  protected readonly renderedOptions$ = computed<CxDropdownRenderedOption[]>(() => {
-    const options = this.filteredOptions$();
+  protected readonly renderedRows$ = computed<CxDropdownRenderedRow[]>(() => {
+    const rows = this.rows$();
     if (!this.virtualizedOptions$()) {
-      return options.map((option, index) => ({ option, index }));
+      return rows.map((row, rowIndex) => ({ ...row, rowIndex }));
     }
 
-    const optionHeight = this.optionHeightState();
+    const rowHeight = this.optionHeightState();
     const viewportHeight = this.optionsViewportHeightState() || 320;
-    const visibleCount = Math.ceil(viewportHeight / optionHeight);
-    const start = Math.max(0, Math.floor(this.scrollTopState() / optionHeight) - CX_DROPDOWN_VIRTUAL_BUFFER);
-    const end = Math.min(options.length, start + visibleCount + CX_DROPDOWN_VIRTUAL_BUFFER * 2);
-    return options.slice(start, end).map((option, offset) => ({ option, index: start + offset }));
+    const visibleCount = Math.ceil(viewportHeight / rowHeight);
+    const start = Math.max(0, Math.floor(this.scrollTopState() / rowHeight) - CX_DROPDOWN_VIRTUAL_BUFFER);
+    const end = Math.min(rows.length, start + visibleCount + CX_DROPDOWN_VIRTUAL_BUFFER * 2);
+    return rows.slice(start, end).map((row, offset) => ({ ...row, rowIndex: start + offset }));
   });
   protected readonly virtualOptionsHeight$ = computed(() =>
-    this.virtualizedOptions$() ? this.filteredOptions$().length * this.optionHeightState() : 0,
+    this.virtualizedOptions$() ? this.rows$().length * this.optionHeightState() : 0,
   );
   protected readonly virtualOptionsOffset$ = computed(() =>
     this.virtualizedOptions$()
-      ? `translateY(${(this.renderedOptions$()[0]?.index ?? 0) * this.optionHeightState()}px)`
+      ? `translateY(${(this.renderedRows$()[0]?.rowIndex ?? 0) * this.optionHeightState()}px)`
       : 'translateY(0)',
   );
+  protected readonly optionHeight$ = this.optionHeightState.asReadonly();
   protected readonly labelText$ = computed(() => {
     const trimmedLabel = this.label.trim();
     return trimmedLabel || '';
@@ -1102,13 +1137,18 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     }
     this.updateOptionsViewport(scroller);
     const optionHeight = this.optionHeightState();
-    const optionTop = index * optionHeight;
+    const rows = this.rows$();
+    const rowIndex = this.optionRowIndexes$()[index] ?? index;
+    // An option directly below its group header carries that header as
+    // context: scrolling up to the option must reveal the header with it.
+    const topRowIndex = rows[rowIndex - 1]?.kind === 'group' ? rowIndex - 1 : rowIndex;
+    const optionTop = rowIndex * optionHeight;
     const optionBottom = optionTop + optionHeight;
     let nextScrollTop = scroller.scrollTop;
     if (align === 'center') {
       nextScrollTop = optionTop - Math.max((scroller.clientHeight - optionHeight) / 2, 0);
     } else if (optionTop < scroller.scrollTop) {
-      nextScrollTop = optionTop;
+      nextScrollTop = topRowIndex * optionHeight;
     } else if (optionBottom > scroller.scrollTop + scroller.clientHeight) {
       nextScrollTop = optionBottom - scroller.clientHeight;
     }
@@ -1401,7 +1441,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
       searchHeight +
         createHeight +
         loadingMoreHeight +
-        Math.max(this.filteredOptions$().length, 1) * optionHeight +
+        Math.max(this.rows$().length, 1) * optionHeight +
         stateHeight,
       CX_DROPDOWN_POPOVER_MAX_HEIGHT,
     );

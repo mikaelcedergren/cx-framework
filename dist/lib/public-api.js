@@ -22,6 +22,7 @@ export * from './patterns/cx-process/index.js';
 export * from './patterns/cx-utility-bar/index.js';
 export * from './patterns/cx-radio-reveal/index.js';
 export * from './patterns/cx-side-nav/index.js';
+export * from './patterns/cx-sidebar-layout/index.js';
 export * from './patterns/cx-table-view/index.js';
 export * from './patterns/cx-top-bar/index.js';
 export * from './patterns/cx-wizard-dialog/index.js';

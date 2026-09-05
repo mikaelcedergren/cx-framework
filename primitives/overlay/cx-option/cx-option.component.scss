@@ -263,10 +263,20 @@
   color: inherit;
 }
 
-.cx-option__content {
+.cx-option__text {
+  display: inline-flex;
   min-width: 0;
   max-width: 100%;
   flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-md);
+  overflow: hidden;
+}
+
+.cx-option__content {
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
 }
 
 .cx-option__label {
@@ -283,7 +293,7 @@
 
 .cx-option__description {
   min-width: 0;
-  max-width: 100%;
+  max-width: 44ch;
   flex: 1 1 auto;
   color: var(--placeholder);
   font-size: var(--font-size-body-sm);
@@ -296,12 +306,7 @@
 .cx-option__trailing {
   display: inline-flex;
   min-width: 0;
-  // No percentage cap here: percentages resolve to zero during intrinsic
-  // max-content sizing, which makes content-sized popovers under-measure the
-  // trailing text. The higher shrink factor makes trailing content give way
-  // well before the label when a row runs out of space.
-  max-width: 44ch;
-  flex: 0 4 auto;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-sm);
@@ -309,7 +314,11 @@
   color: var(--opacity-high);
 }
 
-.cx-option__trailing:not(:has(.cx-option__description, .cx-option__shortcut, .cx-option__icon, .cx-option__append-slot > *)),
+.cx-option__text:has(.cx-option__description) + .cx-option__trailing {
+  margin-left: 0;
+}
+
+.cx-option__trailing:not(:has(.cx-option__shortcut, .cx-option__icon, .cx-option__append-slot > *)),
 .cx-option__append-slot:not(:has(> *)),
 .cx-option__control-slot:not(:has(> *)) {
   display: none;

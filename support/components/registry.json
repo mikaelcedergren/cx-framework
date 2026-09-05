@@ -127,6 +127,15 @@
       "path": "patterns/cx-labeled-row/cx-labeled-row.component.ts"
     },
     {
+      "name": "cx-labeled-row-info",
+      "selectors": [
+        "[infoContent]"
+      ],
+      "area": "pattern",
+      "category": "cx-labeled-row",
+      "path": "patterns/cx-labeled-row/cx-labeled-row-info.directive.ts"
+    },
+    {
       "name": "cx-labeled-row-group",
       "selectors": [
         "cx-labeled-row-group"
@@ -197,6 +206,15 @@
       "area": "pattern",
       "category": "cx-side-nav",
       "path": "patterns/cx-side-nav/cx-side-nav.component.ts"
+    },
+    {
+      "name": "cx-sidebar-layout",
+      "selectors": [
+        "cx-sidebar-layout"
+      ],
+      "area": "pattern",
+      "category": "cx-sidebar-layout",
+      "path": "patterns/cx-sidebar-layout/cx-sidebar-layout.component.ts"
     },
     {
       "name": "cx-table-view",

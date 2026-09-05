@@ -7,9 +7,9 @@
   flex-direction: column;
   gap: var(--space-sm);
   padding: var(--space-md);
-  border: var(--line-discreet);
+  border: 0;
   border-radius: var(--radius-xl);
-  background: var(--surface-alt);
+  background: var(--opacity-low);
 }
 
 .cx-kpi__header {

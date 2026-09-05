@@ -20,6 +20,16 @@ consumer must migrate to the new selector, prop, token, default, or behavior. Ne
 compatibility shim, legacy alias, deprecated prop, fallback, or restored behavior to Cortex merely
 because a consumer still uses the old contract.
 
+## Work-Mac Foundry exception
+
+Foundry's editable work-Mac runtime is the only consumer that does not wait for the GitHub package.
+`dev:polish` builds the current Cortex framework into a complete, validated local package artifact
+under `~/Library/Application Support/Cortex/cx-framework-local/`. Foundry consumes that artifact
+through the normal `@mikaelcedergren/cx-framework` entrypoints and restarts when its identity
+changes. It never imports Cortex source, reads Cortex data, edits the generated `cx-framework`
+repository, or changes the GitHub dependency recorded for published builds. Every other consumer
+and every published release continues to use GitHub.
+
 ## Source of truth
 
 Make framework changes in the source app first. New components, patterns, tokens, icons, AI docs, AI skills, support files, and scripts should live under `framework/`.

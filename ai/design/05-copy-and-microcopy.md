@@ -16,6 +16,8 @@ RULE-ID: copy.plain-language SCOPE: copy TYPE: SHOULD TOPIC: copy RULE: Use the 
 
 RULE-ID: copy.reader-language SCOPE: copy TYPE: MUST TOPIC: copy RULE: Write for the reader instead of mirroring the underlying data model. DESCRIPTION: Convert field names, enum values, status tokens, and key-value structures into natural language. EXCEPT: Preserve structured representation when the surface intentionally presents data in that form.
 
+RULE-ID: copy.component-guidance.reader-language SCOPE: component-usage-guidance TYPE: MUST TOPIC: guidance RULE: Explain when and how to use a component in plain language. DESCRIPTION: Write for a designer or product author choosing a component. Describe its purpose, suitable situations, and important user-facing behavior without selectors, properties, events, code structure, or implementation instructions; keep technical contracts in the API reference.
+
 RULE-ID: copy.sentence-case SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
 
 RULE-ID: copy.concise SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Keep operational copy short and scannable as accuracy allows. DESCRIPTION: Lead with the point and use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action; a reading surface may remain long when reading is the task.

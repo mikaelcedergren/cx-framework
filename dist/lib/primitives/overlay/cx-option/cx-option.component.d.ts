@@ -6,6 +6,7 @@ export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 export declare class CxOptionComponent implements OnChanges {
     label: string;
     description?: string;
+    tooltip?: string;
     prependIcon?: CxIconName;
     appendIcon?: CxIconName;
     shortcutParts: readonly string[] | undefined;
@@ -41,7 +42,12 @@ export declare class CxOptionComponent implements OnChanges {
     protected ariaSelectedValue(): string | null;
     protected ariaCheckedValue(): string | null;
     protected stopControlEvent(event: Event): void;
+    protected hasExplicitTooltip(): boolean;
+    protected tooltipText(): string;
+    protected useNativeDisabled(): boolean;
+    protected onPrimaryClick(event: MouseEvent): void;
+    protected onPrimaryKeydown(event: KeyboardEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxOptionComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxOptionComponent, "cx-option", never, { "label": { "alias": "label"; "required": false; }; "description": { "alias": "description"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "shortcutParts": { "alias": "shortcutParts"; "required": false; }; "submenu": { "alias": "submenu"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "active": { "alias": "active"; "required": false; }; "selected": { "alias": "selected"; "required": false; }; "selectedHighlight": { "alias": "selectedHighlight"; "required": false; }; "showCheckbox": { "alias": "showCheckbox"; "required": false; }; "clickable": { "alias": "clickable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "role": { "alias": "role"; "required": false; }; "ariaPosInSet": { "alias": "ariaPosInSet"; "required": false; }; "ariaSetSize": { "alias": "ariaSetSize"; "required": false; }; }, {}, never, ["[control]", "[append]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxOptionComponent, "cx-option", never, { "label": { "alias": "label"; "required": false; }; "description": { "alias": "description"; "required": false; }; "tooltip": { "alias": "tooltip"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "shortcutParts": { "alias": "shortcutParts"; "required": false; }; "submenu": { "alias": "submenu"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "active": { "alias": "active"; "required": false; }; "selected": { "alias": "selected"; "required": false; }; "selectedHighlight": { "alias": "selectedHighlight"; "required": false; }; "showCheckbox": { "alias": "showCheckbox"; "required": false; }; "clickable": { "alias": "clickable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "role": { "alias": "role"; "required": false; }; "ariaPosInSet": { "alias": "ariaPosInSet"; "required": false; }; "ariaSetSize": { "alias": "ariaSetSize"; "required": false; }; }, {}, never, ["[control]", "[append]"], true, never>;
 }
 //# sourceMappingURL=cx-option.component.d.ts.map
