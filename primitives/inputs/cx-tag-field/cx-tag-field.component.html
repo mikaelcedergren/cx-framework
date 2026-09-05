@@ -143,7 +143,6 @@
                 (click)="toggleTag(tag)"
               >
                 <cx-option
-                  [clickable]="false"
                   [label]="formatOptionLabel(tag)"
                   [active]="isTagActive(tag.id)"
                   [selected]="isTagSelected(tag.id)"
@@ -173,7 +172,6 @@
             (click)="openCreateDialog()"
           >
             <cx-option
-              [clickable]="false"
               [label]="createActionLabel$()"
               [active]="isCreateActive()"
               [selected]="false"

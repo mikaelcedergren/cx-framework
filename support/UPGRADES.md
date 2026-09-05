@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.27
+
+- `cx-tag-field` again accepts pointer clicks on option labels for selection and on
+  “Create tag” to open its creation dialog. Keyboard interaction is unchanged. Consumers
+  need no API changes.
+
 ## 0.9.26
 
 - `cx-card` accepts optional footer content through `[slot=footer]` or `[cxCardFooter]`. The
