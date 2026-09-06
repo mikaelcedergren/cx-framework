@@ -1053,3 +1053,9 @@ database can therefore be verified before writes, enter WAL mode, and complete i
 checkpoint without retaining the earlier integrity check's pager lock. Existing schemas and
 execution-scope APIs are unchanged. Explicit offline operators use `verifyOwnedSqliteSnapshot` for
 a private, descriptor-pinned, immutable read with no sidecars and an expiring read-only callback.
+
+## 0.9.33 — read-only schema metadata
+
+Owned SQLite verification permits the read-only `table_list` pragma, including its SQL table
+function. Product verifiers can prove STRICT table metadata before shared startup or during an
+immutable offline inspection. Mutation pragmas and writes remain denied.

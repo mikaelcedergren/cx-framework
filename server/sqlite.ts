@@ -733,6 +733,7 @@ const OWNED_SQLITE_READONLY_PRAGMAS = new Set([
   "integrity_check",
   "journal_mode",
   "query_only",
+  "table_list",
 ]);
 
 function runOwnedSqliteBeforeWriteVerification({
