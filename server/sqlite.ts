@@ -733,7 +733,17 @@ const OWNED_SQLITE_READONLY_PRAGMAS = new Set([
   "integrity_check",
   "journal_mode",
   "query_only",
+]);
+
+// These pragmas only inspect schema objects; their argument names an object, never a setting.
+const OWNED_SQLITE_SCHEMA_PRAGMAS = new Set([
+  "foreign_key_list",
+  "index_info",
+  "index_list",
+  "index_xinfo",
+  "table_info",
   "table_list",
+  "table_xinfo",
 ]);
 
 function runOwnedSqliteBeforeWriteVerification({
@@ -753,9 +763,10 @@ function runOwnedSqliteBeforeWriteVerification({
       }
       if (
         actionCode === sqliteConstants.SQLITE_PRAGMA &&
-        argument2 === null &&
         argument1 !== null &&
-        OWNED_SQLITE_READONLY_PRAGMAS.has(argument1.toLowerCase())
+        (OWNED_SQLITE_SCHEMA_PRAGMAS.has(argument1.toLowerCase()) ||
+          (argument2 === null &&
+            OWNED_SQLITE_READONLY_PRAGMAS.has(argument1.toLowerCase())))
       ) {
         return sqliteConstants.SQLITE_OK;
       }

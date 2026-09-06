@@ -1059,3 +1059,10 @@ a private, descriptor-pinned, immutable read with no sidecars and an expiring re
 Owned SQLite verification permits the read-only `table_list` pragma, including its SQL table
 function. Product verifiers can prove STRICT table metadata before shared startup or during an
 immutable offline inspection. Mutation pragmas and writes remain denied.
+
+## 0.9.34 — parameterized schema inspection
+
+Owned SQLite verification accepts table, column, index, and foreign-key metadata queries with
+object-name arguments, including parameterized SQL table functions. These arguments select schema
+objects; they do not change database settings. Setting changes and writes remain denied in both
+before-write and immutable snapshot verification. No product API or schema migration changes.
