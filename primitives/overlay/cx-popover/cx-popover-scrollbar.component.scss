@@ -1,0 +1,52 @@
+:host {
+  position: absolute;
+  inset-block: calc(var(--surface-separation) + var(--space-xs));
+  inset-inline-end: var(--surface-separation);
+  width: var(--space-md);
+  pointer-events: none;
+}
+
+.cx-popover-scrollbar__thumb {
+  position: absolute;
+  inset-inline: 0;
+  border-radius: var(--radius-pill);
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  user-select: none;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+.cx-popover-scrollbar__thumb::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--space-xs);
+  width: var(--space-xs);
+  border-radius: inherit;
+  background: var(--opacity-high);
+}
+
+:host-context(.cx-popover:hover) .cx-popover-scrollbar__thumb,
+.cx-popover-scrollbar__thumb:focus-visible,
+.cx-popover-scrollbar__thumb--active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cx-popover-scrollbar__thumb:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-popover-scrollbar__thumb {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .cx-popover-scrollbar__thumb::after {
+    background: CanvasText;
+  }
+}

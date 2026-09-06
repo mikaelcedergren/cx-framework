@@ -14,6 +14,9 @@ import { CxShortcutKeyComponent } from '../../display/cx-shortcut-key';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxTooltipDirective } from '../cx-tooltip';
 
+export type CxOptionSize = 'small' | 'default' | 'large';
+export type CxOptionDescriptionAlign = 'start' | 'end';
+
 export type CxOptionMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 
@@ -27,6 +30,8 @@ export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 export class CxOptionComponent implements OnChanges {
   @Input() label = 'Option';
   @Input() description?: string;
+  @Input() descriptionAlign: CxOptionDescriptionAlign = 'start';
+  @Input() size: CxOptionSize = 'default';
   @Input() tooltip?: string;
   @Input() prependIcon?: CxIconName;
   @Input() appendIcon?: CxIconName;
@@ -45,6 +50,10 @@ export class CxOptionComponent implements OnChanges {
    * cx-menu passes "menuitem".
    */
   @Input() role?: string;
+  /** Stable identity for a composite control's active descendant. */
+  @Input() controlId?: string;
+  /** Composite controls keep focus on their input and remove rows from the Tab sequence. */
+  @Input() tabIndex?: number;
   /** Position within a partially rendered set (1-based); virtualized listboxes pass this. */
   @Input() ariaPosInSet?: number;
   /** Total size of a partially rendered set; virtualized listboxes pass this. */

@@ -3,6 +3,13 @@ export declare class ConfigurationError extends Error {
 }
 export type Environment = Readonly<Record<string, string | undefined>>;
 export type NodeEnvironment = "development" | "test" | "production";
+export interface ExecutionPolicy {
+    readonly executionScope: string;
+    readonly dataMode: "shared" | "isolated";
+    readonly scheduleOwner: boolean;
+}
+/** Trusted process configuration; never derive queue ownership from a request or NODE_ENV. */
+export declare function resolveExecutionPolicy(environment: Environment): ExecutionPolicy;
 /** Parse NODE_ENV without normalising mistakes into a different runtime policy. */
 export declare function nodeEnvironmentValue(environment: Environment): NodeEnvironment;
 /** Parse the production-only release-validation switch while proving NODE_ENV exact. */

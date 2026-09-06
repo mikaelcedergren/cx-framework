@@ -356,7 +356,7 @@ export function applySqliteMigrations(database, migrations, options) {
     assertMigrationLedger(database, prepared);
     const appliedVersions = [];
     for (const definition of prepared) {
-        const applied = withImmediateTransaction(database, () => {
+        const applied = withMigrationTransaction(database, definition.migration.rebuildReferencedTables === true, () => {
             const existing = database.get(`SELECT version, name, fingerprint
          FROM ${SQLITE_MIGRATION_LEDGER_TABLE}
          WHERE version = ?`, [definition.migration.version]);
@@ -401,7 +401,7 @@ export function applySqliteMigrationsAtomically(database, migrations, options) {
         throw new Error("Atomic SQLite migrations require final-state verification.");
     }
     const prepared = prepareMigrations(migrations, options.fingerprint);
-    return withImmediateTransaction(database, () => {
+    return withMigrationTransaction(database, prepared.some(({ migration }) => migration.rebuildReferencedTables === true), () => {
         database.execute(MIGRATION_LEDGER_SQL);
         assertMigrationLedger(database, prepared);
         const evidence = options.captureState(database);
@@ -446,9 +446,41 @@ export function verifySqliteIntegrity(database) {
         throw new Error("SQLite integrity validation did not return ok.");
     }
 }
+function withMigrationTransaction(database, rebuildReferencedTables, work) {
+    if (!rebuildReferencedTables)
+        return withImmediateTransaction(database, work);
+    // SQLite requires foreign_keys OFF before BEGIN when replacing a referenced table. The
+    // transaction still owns all writes; validate the complete reference graph before committing.
+    if (singlePragmaValue(database, "PRAGMA foreign_keys") !== 1) {
+        throw new Error("Referenced-table migrations require foreign-key enforcement on entry.");
+    }
+    database.execute("PRAGMA foreign_keys = OFF");
+    try {
+        if (singlePragmaValue(database, "PRAGMA foreign_keys") !== 0) {
+            throw new Error("Referenced-table migrations cannot run inside an existing transaction.");
+        }
+        return withImmediateTransaction(database, () => {
+            const result = work();
+            if (database.get("SELECT * FROM pragma_foreign_key_check LIMIT 1")) {
+                throw new Error("Referenced-table migration violates a foreign key.");
+            }
+            return result;
+        });
+    }
+    finally {
+        database.execute("PRAGMA foreign_keys = ON");
+        if (singlePragmaValue(database, "PRAGMA foreign_keys") !== 1) {
+            throw new Error("Referenced-table migration failed to restore foreign-key enforcement.");
+        }
+    }
+}
 function prepareMigrations(migrations, fingerprint) {
     const names = new Set();
     return migrations.map((migration, index) => {
+        if (migration.rebuildReferencedTables !== undefined &&
+            migration.rebuildReferencedTables !== true) {
+            throw new Error("A referenced-table migration marker must be true when provided.");
+        }
         const expectedVersion = index + 1;
         if (migration.version !== expectedVersion) {
             throw new Error(`SQLite migration versions must be contiguous from 1; expected ${expectedVersion}, received ${migration.version}.`);
@@ -480,6 +512,9 @@ function canonicalMigrationSource(migration) {
         name: migration.name,
         statements: migration.statements,
         version: migration.version,
+        ...(migration.rebuildReferencedTables === true
+            ? { rebuildReferencedTables: true }
+            : {}),
     });
 }
 function insertMigrationLedgerEntry(database, definition, appliedAt) {

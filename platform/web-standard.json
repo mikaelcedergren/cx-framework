@@ -10,18 +10,6 @@
     "typescript": "~6.0.3",
     "playwright": "1.60.0"
   },
-  "continuousIntegration": {
-    "checkoutAction": "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
-    "setupNodeAction": "actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
-    "profiles": {
-      "web-product": {
-        "requiredCommands": ["check", "e2e"]
-      },
-      "framework-package": {
-        "requiredCommands": ["check"]
-      }
-    }
-  },
   "pnpmWorkspace": {
     "autoInstallPeers": false,
     "dedupePeerDependents": false,

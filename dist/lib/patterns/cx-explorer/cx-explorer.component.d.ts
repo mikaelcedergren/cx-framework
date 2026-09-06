@@ -30,14 +30,9 @@ export type CxExplorerMenuAction = {
     id: string;
     actionId: string;
 };
-/**
- * The icon vocabulary offered by the built-in icon & color editor: friendly,
- * content-shaped identities rather than the full product icon manifest.
- * Consumers with a different vocabulary pass `itemIcons`.
- */
+/** The complete library, kept in sync with the generated icon manifest. */
 export declare const CX_EXPLORER_DEFAULT_ITEM_ICONS: readonly CxIconName[];
 type CxExplorerRenameTarget = {
-    kind: "folder" | "item";
     id: string;
 };
 /**
@@ -64,17 +59,15 @@ export declare class CxExplorerComponent implements OnDestroy {
     /** One open folder at most; the untouched default is fully collapsed. */
     private readonly expandedFolderId;
     protected readonly renaming: import("@angular/core").WritableSignal<CxExplorerRenameTarget | null>;
+    private pickerPopover?;
+    protected readonly pickerSearch: import("@angular/core").WritableSignal<string>;
     protected readonly pickerItemId: import("@angular/core").WritableSignal<string | null>;
     protected readonly resizing: import("@angular/core").WritableSignal<boolean>;
     private readonly resizedWidth;
     private activeResizeSession?;
     protected readonly skeletonRows: string[];
     protected readonly pickerColors: readonly ["blue", "cyan", "lime", "green", "yellow", "orange", "tangerine", "red", "pink", "purple", "violet"];
-    protected readonly pickerWidth = 272;
-    /**
-     * Fixed-size surface: the measure callback publishes the final metrics, so
-     * no post-render surface pass is needed.
-     */
+    /** Measure the swatch-led content once, then keep that width while searching. */
     protected readonly pickerOverlay: CxFloatingSurfaceController;
     set folders(value: readonly CxExplorerFolder[] | null | undefined);
     /** Persistent, browse-only selections rendered above the folder hierarchy. */
@@ -120,7 +113,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     readonly folderChange: EventEmitter<CxExplorerFolderChange>;
     /** Controlled folder order after a drag completes. */
     readonly folderOrderChange: EventEmitter<readonly string[]>;
-    /** The item's identity changed (rename or icon & color); emits the updated item. */
+    /** The item's icon or color changed; emits the updated item. */
     readonly itemChange: EventEmitter<CxExplorerItem>;
     /** Delete intent only — the consumer owns confirmation and the actual removal. */
     readonly folderDelete: EventEmitter<string>;
@@ -130,7 +123,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected readonly rootItems$: import("@angular/core").Signal<readonly CxExplorerItem[]>;
     protected readonly folders$: import("@angular/core").Signal<readonly CxExplorerFolder[]>;
     protected readonly selectedItemId$: import("@angular/core").Signal<string | undefined>;
-    protected readonly itemIcons$: import("@angular/core").Signal<readonly CxIconName[]>;
+    protected readonly filteredPickerIcons: import("@angular/core").Signal<CxIconName[]>;
     get widthVar(): string | null;
     get minWidthVar(): string | null;
     /** The item the icon & color editor is open for; closes when the item disappears. */
@@ -170,9 +163,9 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected hasItemMenu(): boolean;
     protected onFolderMenuSelect(folder: CxExplorerFolder, actionId: string): void;
     protected onItemMenuSelect(item: CxExplorerItem, actionId: string, row: HTMLElement): void;
-    protected isRenaming(kind: "folder" | "item", id: string): boolean;
-    protected beginRename(kind: "folder" | "item", id: string): void;
-    protected commitRename(event: Event, kind: "folder" | "item", current: {
+    protected isRenaming(id: string): boolean;
+    protected beginRename(id: string): void;
+    protected commitRename(event: Event, current: {
         id: string;
         name: string;
     }): void;
@@ -183,6 +176,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected closePicker(): void;
     protected isPickerIconSelected(item: CxExplorerItem, icon: CxIconName): boolean;
     protected onPickerColor(item: CxExplorerItem, color: CxTagColor | undefined): void;
+    protected onPickerReset(item: CxExplorerItem): void;
+    private focusPickerSearch;
     protected onPickerIcon(item: CxExplorerItem, icon: CxIconName): void;
     protected onCreateItem(folder: CxExplorerFolder): void;
     private findItem;

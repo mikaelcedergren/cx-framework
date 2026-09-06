@@ -41,13 +41,22 @@
   flex: 0 0 auto;
 }
 
-.cx-explorer__header:empty {
-  display: none;
+.cx-explorer__new-folder {
+  margin-top: var(--space-sm);
+  flex: 0 0 auto;
+  opacity: 0;
+  transition: opacity var(--motion-fast) ease;
 }
 
-.cx-explorer__new-folder {
-  margin-left: auto;
-  flex: 0 0 auto;
+.cx-explorer:hover .cx-explorer__new-folder,
+.cx-explorer__new-folder:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .cx-explorer__new-folder {
+    opacity: 1;
+  }
 }
 
 // Same interaction model as the detail panel, on Explorer's free end edge.
@@ -128,7 +137,6 @@
   flex-direction: column;
   gap: 0;
   overflow: auto;
-  scrollbar-gutter: stable;
   overscroll-behavior: contain;
 }
 
@@ -404,23 +412,37 @@
 
 .cx-explorer__picker {
   display: flex;
+  min-width: 0;
+  min-height: 0;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  gap: var(--surface-separation);
+}
+
+.cx-explorer__picker-group {
+  display: flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface);
 }
 
 .cx-explorer__picker-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs);
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(6, minmax(0, var(--controller-size)));
+  gap: var(--space-sm);
 }
 
 .cx-explorer__swatch {
-  width: var(--controller-size-small);
-  height: var(--controller-size-small);
+  width: 100%;
+  aspect-ratio: 1;
   padding: 0;
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--cx-explorer-swatch) 80%, var(--surface));
   cursor: pointer;
 }
@@ -445,10 +467,27 @@
   outline-offset: var(--outline-tab-offset);
 }
 
+// Only the palette contributes intrinsic width; search and results fill it.
+.cx-explorer__picker-search,
+.cx-explorer__picker-icons {
+  min-width: 0;
+  contain: inline-size;
+}
+
 .cx-explorer__picker-icons {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: var(--space-2xs);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-sm);
+  max-height: calc(var(--controller-size-small) * 6 + var(--space-sm) * 5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cx-explorer__picker-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
 }
 
 .cx-explorer__picker-icon {
@@ -483,7 +522,8 @@
   .cx-explorer__items,
   .cx-explorer__items-inner,
   .cx-explorer__skeleton-row,
-  .cx-explorer__row-actions {
+  .cx-explorer__row-actions,
+  .cx-explorer__new-folder {
     transition: none;
     animation: none;
   }

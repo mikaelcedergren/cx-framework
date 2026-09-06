@@ -1169,6 +1169,15 @@
       "area": "primitive",
       "category": "inputs",
       "path": "primitives/inputs/cx-password-field/cx-password-field.component.ts"
+    },
+    {
+      "name": "cx-launcher",
+      "selectors": [
+        "cx-launcher"
+      ],
+      "area": "pattern",
+      "category": "cx-launcher",
+      "path": "patterns/cx-launcher/cx-launcher.component.ts"
     }
   ]
 }

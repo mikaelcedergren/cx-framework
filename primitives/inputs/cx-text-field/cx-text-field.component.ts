@@ -19,6 +19,13 @@ import {
   normalizeCxValidation,
 } from '../shared/field.types';
 
+/** Connects a composite search field to the listbox it controls. */
+export type CxTextFieldCombobox = {
+  controls: string;
+  expanded: boolean;
+  activeDescendant?: string;
+};
+
 @Component({
   selector: 'cx-text-field',
   imports: [CxValidationMessageComponent, CxIconComponent, CxSpinnerComponent],
@@ -53,6 +60,7 @@ export class CxTextFieldComponent {
   @Input() prependText: string | undefined;
   @Input() appendText: string | undefined;
   @Input() hint: string | undefined;
+  @Input() combobox: CxTextFieldCombobox | undefined;
 
   @Input()
   public set validation(value: CxFieldValidation | null | undefined) {

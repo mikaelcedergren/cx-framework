@@ -14,6 +14,71 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.9.31
+
+- Durable jobs require an explicit `executionScope` when creating a store. Every enqueue,
+  child job, claim, transition, recovery, and retention operation belongs to that store's scope.
+  Queue idempotency, barriers, and concurrency are per scope. Keep product spending, provider
+  limits, and deduplication of real external operations global.
+- Append durable-job migration 5 after your product's issued migrations. Keep the first four
+  issued migrations byte-stable; do not map the expanding array over old product version numbers.
+  Preserve `rebuildReferencedTables: true` when mapping and fingerprinting migrations. The runner
+  rebuilds referenced tables in a transaction and checks foreign keys before committing. Recreate
+  any product-owned `cx_jobs` triggers in the same atomic product migration batch.
+- Migration 5 preserves old jobs in the reserved `legacy` scope, which no worker may open.
+  `assignLegacyDurableJobScopes` explicitly assigns terminal history or never-attempted queued
+  work, with a synchronous transactional callback to align product request ownership. Attempted
+  active work requires a product-specific outcome decision before reassignment; do not replay an
+  ambiguous provider operation. Stop every old writer before migrating, prepare compatible web
+  and worker artifacts for both environments, and never restart an old unscoped worker afterward.
+- `resolveExecutionPolicy` requires trusted startup values for `CX_EXECUTION_SCOPE`, `CX_DATA_MODE`
+  (`shared` or `isolated`), and `CX_SCHEDULE_OWNER` (`true` or `false`). Normal dev uses real data
+  with scope `development` and schedules disabled; the production owner uses `production`.
+  Tests and polish use isolated data; release validation uses isolated scope `validation`.
+  Foundry keeps its independent owner-local scope `local`. Static products need no data policy.
+  Shared-store startup must verify the existing schema; apply migrations only in a controlled
+  storage upgrade. Only the declared owner starts schedules and global retention.
+
+## 0.9.30
+
+- Local verification replaces required GitHub Actions. Remove `.github/workflows/` after adopting
+  this package; `cx-platform-check` validates product, toolchain, workspace, and local command
+  contracts without requiring hosted workflows. Continue running `pnpm check` and `pnpm e2e`
+  locally. This supersedes the workflow requirements in earlier upgrade entries.
+
+- `cx-popover` now overlays its scrollbar without reserving content width. The thumb
+  appears on hover, keyboard focus, or scrolling and supports dragging and keyboard
+  navigation. Native wheel, touch, and focus scrolling remain available. No consumer
+  changes are required.
+
+- `cx-explorer` keeps Rename and inline renaming for folders only. Nested items
+  are renamed in their open content heading; their menu retains Icon & color and
+  Delete. `itemChange` now reports appearance changes only.
+
+- `cx-explorer` no longer reserves an empty scrollbar gutter. Rows and the folder
+  creation button keep equal side spacing when the content fits; native scrolling
+  remains available when needed. No consumer changes are required.
+
+- `cx-explorer` keeps its header alignment space and moves folder creation to a full-width
+  plus below the folders. It appears while Explorer is hovered or the button has keyboard focus and stays visible on
+  devices without hover. `folderCreate` and automatic renaming are unchanged.
+
+- New `cx-launcher` provides a modal search-and-open collection with required item
+  types (such as Page, Foundation, and Component), optional icons and keywords, ranked matching, keyboard selection,
+  bounded scrolling, and focus restoration. Supply `items`, bind `open` /
+  `openChange`, and handle `select`. Products own shortcuts, access, and navigation.
+- `cx-text-field` accepts an optional `combobox` connection (`controls`, `expanded`,
+  `activeDescendant`) for searchable composite controls. Ordinary fields are unchanged.
+- `cx-option` accepts `controlId` and `tabIndex` for composite focus management,
+  `size` for row scale, and `descriptionAlign="end"` for descriptions at the far
+  edge. Ordinary option defaults are unchanged.
+
+- `cx-explorer` now offers the complete icon library in a grouped popover: two full-width
+  rows of rounded square color swatches, then a separate surface for icon search and results. The palette determines the popover width from
+  the shared control-size and spacing tokens; filtering keeps that width stable. The top-right Reset action clears the icon and color
+  together through `itemChange`, restoring the default appearance. Consumers need no changes;
+  use `itemIcons` to restrict the available icons when that is a product requirement.
+
 ## 0.9.29
 
 - The hermetic E2E runner permits an availability probe to close before a development

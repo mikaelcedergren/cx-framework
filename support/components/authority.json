@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 130,
-  "catalogSha256": "1794f94a49bbb08f2cecbe326a207e2f1b94ae8823683fb69ac37d085b92fd4d",
+  "componentCount": 131,
+  "catalogSha256": "0ad54d63bdb4e5a5aa38717924f6b4bcc34e839404343f0e1dc5b2eb06e9058d",
   "components": [
     {
       "name": "cx-account-control",
@@ -4461,17 +4461,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "28297c6c01a4da29117e626b7ebac88d46dcbf572441cee7c527f19829f87122"
+          "sha256": "20c4b7fbc0a2b89ea3c43abfb3d3bf30e93ab55fac9663eb69a569f57e7bc188"
         },
         "template": {
           "kind": "external",
-          "sha256": "b24f22292e59ce58a1db93b0ce25f473ac3f7dc6c90c3ded78f07f1340f4de07"
+          "sha256": "32b425679b4997178180adb6e5c44a86faf0e0971fb168012ec34e61621c3e87"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "3201df316826e9cfa159b49e3200ee429eb4ff37e6fd7b0e6f1efd58afaef138"
+            "sha256": "c597e536ca859f709e31eff1f9b8ba9676c6c895a601b47237b0138bf1464dae"
           }
         ]
       }
@@ -6163,6 +6163,69 @@
       }
     },
     {
+      "name": "cx-launcher",
+      "area": "pattern",
+      "category": "cx-launcher",
+      "kind": "component",
+      "selectors": [
+        "cx-launcher"
+      ],
+      "publicApi": {
+        "symbol": "CxLauncherComponent",
+        "inputs": [
+          {
+            "binding": "items",
+            "member": "items",
+            "type": "readonly CxLauncherItem[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "open",
+            "member": "open",
+            "type": "boolean",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          }
+        ],
+        "outputs": [
+          {
+            "binding": "openChange",
+            "member": "openChange",
+            "type": "boolean",
+            "source": "decorator"
+          },
+          {
+            "binding": "select",
+            "member": "select",
+            "type": "string",
+            "source": "decorator"
+          }
+        ]
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "c2717a105a45c876acb2dc7743ee6f644177638da524456b79bec3b823bda52f"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "c5210928a7f393ff4470f0d28d98e7e99bdba1e08e408d7a9005d6c0bccc8853"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "539311ebb2dfa56f1ce715bd2a297bb9b781998355607eb5946d69958f649fad"
+          }
+        ]
+      }
+    },
+    {
       "name": "cx-lightbox",
       "area": "primitive",
       "category": "overlay",
@@ -7797,12 +7860,30 @@
             "source": "decorator"
           },
           {
+            "binding": "controlId",
+            "member": "controlId",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "description",
             "member": "description",
             "type": "string",
             "required": false,
             "transform": null,
             "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "descriptionAlign",
+            "member": "descriptionAlign",
+            "type": "CxOptionDescriptionAlign",
+            "required": false,
+            "transform": null,
+            "defaultValue": "'start'",
             "source": "decorator"
           },
           {
@@ -7887,12 +7968,30 @@
             "source": "decorator"
           },
           {
+            "binding": "size",
+            "member": "size",
+            "type": "CxOptionSize",
+            "required": false,
+            "transform": null,
+            "defaultValue": "'default'",
+            "source": "decorator"
+          },
+          {
             "binding": "submenu",
             "member": "submenu",
             "type": "CxOptionSubmenu",
             "required": false,
             "transform": null,
             "defaultValue": "'none'",
+            "source": "decorator"
+          },
+          {
+            "binding": "tabIndex",
+            "member": "tabIndex",
+            "type": "number",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -7919,17 +8018,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "8ecd6d5bad0b5d0e63fd3dd598f4b9f8bdb2b2c717e49a621f7ef2d0109e5c5a"
+          "sha256": "caa67c25801a92afd9150e5b57b3928a36a71b9eefb39c4f9513f0ab80ffa3a9"
         },
         "template": {
           "kind": "external",
-          "sha256": "f7ad2f02e09993f5ba537385d028d674510adecbcb96f3a8d7ed1d59d2915ba4"
+          "sha256": "b138bf83f186604e5c931a1a49f7cccd006e2b36a10a5f53477a33bddf1c909b"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "340660dc179d2f97892ab4a80e09774570908bc83f7d74c9c0deaebadb5ce8f7"
+            "sha256": "8882885f35bc78fc5c8cd8832527272bc3e7e39830bb4beff72c588295308450"
           }
         ]
       }
@@ -8615,17 +8714,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "7b652eb4d5c161882521d5cffbae9612ecb63d9d6b3c70c865d0e957b3435c02"
+          "sha256": "da0bd980189ac7cf2453a4f60b1aa6c797c77b08775e1c82387a4aeb7e4e83c6"
         },
         "template": {
           "kind": "external",
-          "sha256": "1affe8228c44f86d64ce30cf73e3738a229d1d36f0d0bd54301f477a2945b7db"
+          "sha256": "c208b6ab297757484a9c5214af00368644096454ce58f226d6e8a7cf6be28360"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "5fcec3e4beef6d6100130e7cad634c5e939fcd6d1d881fc831d2791d0b6c69e1"
+            "sha256": "24389473558423027946eb730c883847e9932865531c8ac945253ac29d3d4092"
           }
         ]
       }
@@ -13080,6 +13179,15 @@
             "source": "decorator"
           },
           {
+            "binding": "combobox",
+            "member": "combobox",
+            "type": "CxTextFieldCombobox | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "disabled",
             "member": "disabled",
             "type": "boolean",
@@ -13226,11 +13334,11 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "f17816c4958111d994758b729e79b07a3f25610b695f801c2b0d84d8637ecff4"
+          "sha256": "d68bc542ca629e5fbad25c16da2f3b5c492dca816113c791b96709e69344922c"
         },
         "template": {
           "kind": "external",
-          "sha256": "c26db2d976f544d7448ed45a2b17af27afbbf7d9cc9407a5f8dec0497df2016a"
+          "sha256": "480ee15fcca770a2b401851aae26cad9d8eba8de800587ad78e97f8360ccc3dc"
         },
         "styles": [
           {

@@ -1,0 +1,80 @@
+@if (open$()) {
+  <div
+    #root
+    class="cx-launcher"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Launcher"
+    [cdkTrapFocus]="trapsFocus()"
+    (click)="onBackdrop($event)"
+    (keydown)="onKeydown($event)"
+  >
+    <div class="cx-launcher__surface">
+      <cx-text-field
+        class="cx-launcher__search"
+        label=""
+        ariaLabel="Search items"
+        autocomplete="off"
+        prependIcon="search"
+        size="large"
+        [value]="query$()"
+        [combobox]="{
+          controls: listId,
+          expanded: results$().length > 0,
+          activeDescendant: activeControlId$(),
+        }"
+        (valueChange)="onQuery($event)"
+      >
+        @if (activeItem$()) {
+          <span cxTrailing class="cx-launcher__shortcut" aria-hidden="true">
+            <cx-shortcut-key [parts]="['Enter']" />
+          </span>
+        }
+      </cx-text-field>
+      <div class="cx-launcher__results-frame">
+        <div
+          #results
+          class="cx-launcher__results"
+          role="listbox"
+          [id]="listId"
+          aria-label="Launcher"
+        >
+          @for (item of results$(); track item.id; let index = $index) {
+            <cx-option
+              [role]="'option'"
+              [controlId]="optionId(index)"
+              [tabIndex]="-1"
+              [label]="item.label"
+              [description]="item.type"
+              descriptionAlign="end"
+              size="large"
+              [prependIcon]="item.icon"
+              [tooltip]="item.label + ' — ' + item.type"
+              [disabled]="item.disabled ?? false"
+              [active]="activeItem$()?.id === item.id"
+              [selected]="activeItem$()?.id === item.id"
+              [selectedHighlight]="false"
+              [ariaPosInSet]="index + 1"
+              [ariaSetSize]="results$().length"
+              (pointermove)="onPointer($event, item)"
+              (pointerdown)="$event.preventDefault()"
+              (click)="activate(item)"
+            />
+          }
+        </div>
+        @if (!results$().length) {
+          <div class="cx-launcher__empty" role="status">
+            <span>{{
+              empty$() ? "No items available" : "No matching items"
+            }}</span>
+            @if (!empty$()) {
+              <span class="cx-launcher__support"
+                >Try another name or keyword.</span
+              >
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

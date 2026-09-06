@@ -96,6 +96,8 @@ export interface SqliteMigration {
     readonly version: number;
     readonly name: string;
     readonly statements: readonly [string, ...string[]];
+    /** Rebuild a referenced table inside one transaction, validating every foreign key before commit. */
+    readonly rebuildReferencedTables?: true;
 }
 export interface SqliteMigrationOptions {
     readonly fingerprint: (canonicalSource: string) => string;

@@ -37,7 +37,7 @@ Make framework changes in the source app first. New components, patterns, tokens
 Public Angular APIs must be exported from `public-api.ts`. If raw icon assets change, regenerate the icon manifest before exporting. After any public component source or template change, regenerate `support/components/authority.json` from the Cortex root with `pnpm --dir framework components:authority`; it is derived package evidence and is never edited by hand.
 
 Angular code has one package entrypoint: `@mikaelcedergren/cx-framework`. Exact component tooling resolves the packed, self-contained authority through the explicit `@mikaelcedergren/cx-framework/support/components/authority.json` export; it exposes selector/class identity, typed public bindings, projection selectors, defaults/transforms, and path-free source/template/style digests without exposing the source files themselves. Component, pattern,
-tooling, and Node TypeScript remain in the generated repository solely as rebuild-CI input; packed
+tooling, and Node TypeScript remain in the generated repository solely as local rebuild input; packed
 and Git dependency installs exclude those raw source folders. Installed public resource subpaths
 are limited to `ai`, `fonts`, `icons`, the three explicit platform resources (`README.md`,
 `cx-product.schema.json`, and `web-standard.json`), `styles`, `support`, and `tokens`. The
@@ -208,7 +208,7 @@ the four package commands (`cx-development-favicon`, `cx-framework-skills`, `cx-
 `cx-server-artifact`)
 plus their private, non-exported `workspace-contract.mjs` parser helper. Raw Angular and Node
 TypeScript, workbench source, root TypeScript entry files, build scripts, and tsconfigs remain in
-the generated repository for CI but never enter a consumer or server artifact. This distinction
+the generated repository for local rebuild checks but never enter a consumer or server artifact. This distinction
 applies to both packed installs and Git dependencies.
 
 The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The portable design-system application contract lives at `ai/design/02-design-system.md`, never as a second root-level copy. Component-family terms in this tree are semantic roles: an agent inspects the consuming product's own design system and public APIs, then uses the best available component, configuration, or composition. The portable tree never maps those roles to `cx-*` names or depends on `support/` metadata.
@@ -227,10 +227,10 @@ package-path relocation and the public export allowlist, verifies the complete p
 skill/resource graph, bumps `framework/package.json`, exports the package repo, refreshes package
 dependencies, and builds both the Angular library and Node runtime in Cortex before copying the
 output. It validates and imports the copied distribution before rebuilding, then requires the
-rebuild to be byte-identical. Generated-package CI additionally requires every `dist/` file to be
-tracked and clean both before and after that comparison. The generated repository uses the
-`framework-package` CI profile: it invokes its canonical `pnpm check` gate, but deliberately has no
-`pnpm e2e` command because it is an immutable package repository, not a runnable browser product.
+rebuild to be byte-identical. Local package verification additionally requires every `dist/` file to be
+tracked and clean both before and after that comparison through `pnpm dist:git`. Run
+`pnpm dist:git`, `pnpm check`, and `pnpm dist:git` locally before publishing a committed package.
+The generated repository has no `pnpm e2e` command because it is an immutable package repository.
 Framework browser journeys remain owned and exercised by the Cortex source repository. The
 validator packs the real artifact,
 installs it with pnpm offline and with lifecycle scripts disabled into an isolated clean consumer, proves the public authority subpath resolves there while raw component/tooling source does not exist,

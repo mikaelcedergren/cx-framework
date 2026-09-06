@@ -16,12 +16,13 @@ import { CxOptionGroupComponent } from '../cx-option-group';
 import { isHostVisible } from '../../shared/host-visibility';
 import { CxPopoverBackdropComponent } from '../cx-popover-backdrop/cx-popover-backdrop.component';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
+import { CxPopoverScrollbarComponent } from './cx-popover-scrollbar.component';
 
 export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 
 @Component({
   selector: 'cx-popover',
-  imports: [NgTemplateOutlet, CxOptionGroupComponent, CxPopoverBackdropComponent],
+  imports: [NgTemplateOutlet, CxOptionGroupComponent, CxPopoverBackdropComponent, CxPopoverScrollbarComponent],
   templateUrl: './cx-popover.component.html',
   styleUrl: './cx-popover.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

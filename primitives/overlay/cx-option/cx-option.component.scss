@@ -350,3 +350,19 @@
 .cx-option--danger .cx-option__description {
   color: var(--cx-option-mood-color);
 }
+
+.cx-option__row--small .cx-option {
+  min-height: var(--controller-size-small);
+  padding-block: 0;
+}
+
+.cx-option__row--large .cx-option {
+  min-height: var(--controller-size-large);
+  padding: var(--space-sm);
+}
+
+.cx-option__row--description-end .cx-option__description {
+  flex: 0 1 auto;
+  margin-inline-start: auto;
+  text-align: end;
+}

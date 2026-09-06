@@ -8,6 +8,7 @@ export type DurableJobStatus = "blocked" | "failed" | "queued" | "running" | "su
  */
 export type DurableJobExecutionClass = "barrier-recovery" | "standard";
 export interface DurableJob {
+    readonly executionScope: string;
     readonly attempts: number;
     readonly availableAt: number;
     readonly createdAt: number;
@@ -102,6 +103,7 @@ export interface DurableJobRecoveryResult {
     readonly retried: number;
 }
 export interface DurableJobStore {
+    readonly executionScope: string;
     readonly leaseDurationMs: number;
     readonly maxConcurrentJobs: number;
     claim(owner: string): DurableJobClaim | null;
@@ -118,13 +120,14 @@ export interface DurableJobStore {
     withTransaction<Result>(work: (transaction: DurableJobTransaction) => Result): Result;
 }
 export interface DurableJobStoreOptions {
+    readonly executionScope: string;
     readonly createJobId: () => string;
     readonly createLeaseToken: () => string;
     readonly database: SyncSqliteDatabase;
     readonly leaseDurationMs: number;
     /**
-     * Maximum claims that may be valid across every process sharing this database.
-     * Every claim-capable store sharing this table must configure the same value. Use `1` when
+     * Maximum claims that may be valid across every process sharing this execution scope.
+     * Every claim-capable store sharing this scope must configure the same value. Use `1` when
      * queue-wide deferral must preserve strict execution order.
      */
     readonly maxConcurrentJobs: number;
@@ -137,6 +140,7 @@ export interface DurableJobStoreOptions {
     readonly retryMaximumDelayMs: number;
 }
 export interface DurableJobExecutionContext {
+    readonly executionScope: string;
     readonly attempt: number;
     readonly idempotencyKey: string;
     readonly jobId: string;
@@ -165,13 +169,8 @@ export interface DurableWorkerOptions {
 }
 /** Canonical durable-job table owned through each product's append-only migration history. */
 export declare const DURABLE_JOB_TABLE = "cx_jobs";
-/**
- * Immutable durable-job schema history for product-owned migration ledgers.
- *
- * Products assign these statements their own contiguous migration versions. Issued entries are
- * append-only: changing an existing entry would invalidate a product's already-applied migration
- * fingerprint. A new queue capability therefore always adds a new entry.
- */
+/** Existing unscoped jobs are held for an explicit offline ownership decision. */
+export declare const LEGACY_DURABLE_JOB_SCOPE = "legacy";
 export declare const DURABLE_JOB_SCHEMA_MIGRATIONS: readonly [Readonly<{
     version: 1;
     name: "initial_durable_jobs";
@@ -188,7 +187,26 @@ export declare const DURABLE_JOB_SCHEMA_MIGRATIONS: readonly [Readonly<{
     version: 4;
     name: "durable_job_replacement_guard";
     statements: readonly ["CREATE TABLE main.cx_jobs_v4_validation (\n         invalid_state INTEGER NOT NULL\n       ) STRICT", "INSERT INTO main.cx_jobs_v4_validation (invalid_state)\n       SELECT NULL\n       WHERE EXISTS (\n         SELECT 1\n         FROM main.cx_jobs\n         WHERE rowid <= 0\n            OR NOT (\n              (\n                execution_class = 'standard'\n                AND barrier_recovery_reserve IS NULL\n              )\n              OR\n              (\n                execution_class = 'barrier-recovery'\n                AND (\n                  (\n                    status IN ('blocked', 'queued')\n                    AND barrier_recovery_reserve IS NOT NULL\n                    AND length(barrier_recovery_reserve) = 4096\n                  )\n                  OR\n                  (\n                    status IN ('running', 'succeeded', 'failed')\n                    AND barrier_recovery_reserve IS NULL\n                  )\n                )\n              )\n            )\n       )", "DROP TABLE main.cx_jobs_v4_validation", "CREATE TRIGGER cx_jobs_insert_conflict_guard\n       BEFORE INSERT ON cx_jobs\n       WHEN NEW.rowid <> -1\n         OR EXISTS (\n           SELECT 1\n           FROM cx_jobs AS existing\n           WHERE existing.id = NEW.id\n              OR (\n                existing.type = NEW.type\n                AND existing.idempotency_key = NEW.idempotency_key\n              )\n              OR (\n                NEW.lease_token IS NOT NULL\n                AND existing.lease_token = NEW.lease_token\n              )\n       )\n       BEGIN\n         SELECT RAISE(ABORT, 'durable job insert conflicts cannot replace existing jobs');\n       END", "CREATE TRIGGER cx_jobs_rowid_contract_insert\n       AFTER INSERT ON cx_jobs\n       WHEN NEW.rowid <= 0\n       BEGIN\n         SELECT RAISE(ABORT, 'durable jobs require framework-owned positive row IDs');\n       END", "CREATE TRIGGER cx_jobs_update_conflict_guard\n       BEFORE UPDATE OF rowid, _rowid_, oid, id, type, idempotency_key, lease_token\n       ON cx_jobs\n       WHEN NEW.rowid IS NOT OLD.rowid\n         OR EXISTS (\n           SELECT 1\n           FROM cx_jobs AS existing\n           WHERE existing.rowid <> OLD.rowid\n             AND (\n               existing.id = NEW.id\n               OR (\n                 existing.type = NEW.type\n                 AND existing.idempotency_key = NEW.idempotency_key\n               )\n               OR (\n                 NEW.lease_token IS NOT NULL\n                 AND existing.lease_token = NEW.lease_token\n               )\n             )\n       )\n       BEGIN\n         SELECT RAISE(ABORT, 'durable job update conflicts cannot replace existing jobs');\n       END"];
+}>, Readonly<{
+    version: 5;
+    name: "durable_job_execution_scopes";
+    rebuildReferencedTables: true;
+    statements: readonly [string, "INSERT INTO cx_jobs_scoped (rowid, id, type, payload_json, idempotency_key, status,\n         barrier, attempts, max_attempts, scheduled_at, available_at, lease_owner, lease_token,\n         lease_expires_at, started_at, finished_at, failure_code, failure_message,\n         created_at, updated_at, execution_class, barrier_recovery_reserve, execution_scope)\n       SELECT rowid, *, 'legacy' FROM cx_jobs", "DROP TABLE cx_jobs", "ALTER TABLE cx_jobs_scoped RENAME TO cx_jobs", ...string[], "CREATE TRIGGER cx_jobs_scope_immutable\n       BEFORE UPDATE OF execution_scope ON cx_jobs\n       WHEN OLD.execution_scope <> 'legacy' AND NEW.execution_scope IS NOT OLD.execution_scope\n       BEGIN\n         SELECT RAISE(ABORT, 'durable job execution scope is immutable');\n       END"];
 }>];
+export declare function validateDurableJobExecutionScope(value: string): string;
+/**
+ * Explicit offline ownership assignment, never worker recovery. Previously attempted active work
+ * requires a product-specific outcome decision first; it is never replayed by assigning a scope.
+ * Products synchronize their request metadata inside the same transaction through afterAssign.
+ */
+export declare function assignLegacyDurableJobScopes({ database, assignments, afterAssign, }: {
+    readonly database: SyncSqliteDatabase;
+    readonly assignments: readonly {
+        readonly id: string;
+        readonly executionScope: string;
+    }[];
+    readonly afterAssign?: () => void;
+}): number;
 export declare class JobIdempotencyConflictError extends Error {
     constructor(type: string, idempotencyKey: string);
 }
@@ -206,7 +224,7 @@ export declare class DurableWorkerDrainTimeoutError extends Error {
     constructor(timeoutMs: number);
 }
 export declare function boundedExponentialBackoff(attempt: number, initialDelayMs: number, maximumDelayMs: number): number;
-export declare function createDurableJobStore({ createJobId, createLeaseToken, database, leaseDurationMs, maxConcurrentJobs, maxOutstandingJobs, maxPayloadBytes, maxRetainedJobs, now, recoveryBatchSize, retryInitialDelayMs, retryMaximumDelayMs, }: DurableJobStoreOptions): DurableJobStore;
+export declare function createDurableJobStore({ executionScope, createJobId, createLeaseToken, database, leaseDurationMs, maxConcurrentJobs, maxOutstandingJobs, maxPayloadBytes, maxRetainedJobs, now, recoveryBatchSize, retryInitialDelayMs, retryMaximumDelayMs, }: DurableJobStoreOptions): DurableJobStore;
 export declare function createDurableWorker({ classifyFailure, createAbortController, handlers, heartbeatIntervalMs, owner, scheduleHeartbeat, scheduleTimeout, store, }: DurableWorkerOptions): DurableWorker;
 export declare function isDurableJobDelay(disposition: unknown): disposition is DurableJobDelay;
 export declare function isDurableJobDeferral(disposition: unknown): disposition is DurableJobDeferral;

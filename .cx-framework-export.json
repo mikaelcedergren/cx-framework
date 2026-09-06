@@ -3,7 +3,6 @@
   "generator": "cx-framework-export",
   "ownedTopLevelEntries": [
     ".cx-framework-export.json",
-    ".github",
     ".gitignore",
     ".npmignore",
     ".nvmrc",

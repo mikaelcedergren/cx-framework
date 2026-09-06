@@ -12,6 +12,72 @@ export type Environment = Readonly<Record<string, string | undefined>>;
 
 export type NodeEnvironment = "development" | "test" | "production";
 
+export interface ExecutionPolicy {
+  readonly executionScope: string;
+  readonly dataMode: "shared" | "isolated";
+  readonly scheduleOwner: boolean;
+}
+
+/** Trusted process configuration; never derive queue ownership from a request or NODE_ENV. */
+export function resolveExecutionPolicy(
+  environment: Environment,
+): ExecutionPolicy {
+  const executionScope = environment["CX_EXECUTION_SCOPE"];
+  const dataMode = environment["CX_DATA_MODE"];
+  const scheduler = environment["CX_SCHEDULE_OWNER"];
+  if (
+    !executionScope ||
+    !/^[a-z][a-z0-9_-]{0,63}$/.test(executionScope) ||
+    executionScope === "legacy"
+  ) {
+    throw new ConfigurationError(
+      "CX_EXECUTION_SCOPE must name an explicit non-legacy execution scope.",
+    );
+  }
+  if (dataMode !== "shared" && dataMode !== "isolated") {
+    throw new ConfigurationError(
+      "CX_DATA_MODE must be exactly shared or isolated.",
+    );
+  }
+  if (scheduler !== "true" && scheduler !== "false") {
+    throw new ConfigurationError(
+      "CX_SCHEDULE_OWNER must be exactly true or false.",
+    );
+  }
+  const scheduleOwner = scheduler === "true";
+  if (
+    scheduleOwner &&
+    executionScope !== "production" &&
+    executionScope !== "local"
+  ) {
+    throw new ConfigurationError(
+      "Only production or an owner-local scope can own recurring schedules.",
+    );
+  }
+  if (
+    ["test", "polish", "validation"].includes(executionScope) &&
+    dataMode !== "isolated"
+  ) {
+    throw new ConfigurationError(
+      "Test, polish, and validation scopes require isolated data.",
+    );
+  }
+  if (executionScope === "production" && dataMode !== "shared") {
+    throw new ConfigurationError(
+      "The production scope requires the authoritative shared store.",
+    );
+  }
+  if (
+    releaseValidationEnvironmentValue(environment) !==
+    (executionScope === "validation")
+  ) {
+    throw new ConfigurationError(
+      "The validation scope is reserved for CX_RELEASE_VALIDATION=1.",
+    );
+  }
+  return Object.freeze({ executionScope, dataMode, scheduleOwner });
+}
+
 /** Parse NODE_ENV without normalising mistakes into a different runtime policy. */
 export function nodeEnvironmentValue(
   environment: Environment,

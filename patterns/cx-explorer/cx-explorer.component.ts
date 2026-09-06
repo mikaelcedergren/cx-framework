@@ -20,7 +20,8 @@ import {
   type CdkDragDrop,
   moveItemInArray,
 } from "@angular/cdk/drag-drop";
-import { type CxIconName } from "../../icons/manifest";
+import { cxIcons, type CxIconName } from "../../icons/manifest";
+import { CxButtonComponent } from "../../primitives/actions/cx-button";
 import { CxIconButtonComponent } from "../../primitives/actions/cx-icon-button";
 import {
   CX_TAG_COLOR_PICKER_OPTIONS,
@@ -73,7 +74,6 @@ const MENU_STYLE = `${RESERVED_MENU_PREFIX}style`;
 const MENU_DELETE = `${RESERVED_MENU_PREFIX}delete`;
 
 const DEFAULT_ITEM_ICON: CxIconName = "document";
-const PICKER_WIDTH = 272;
 const PICKER_ESTIMATED_HEIGHT = 332;
 const FOLDER_CREATE_RENAME_TIMEOUT_MS = 30_000;
 const EXPANDED_FOLDER_STORAGE_PREFIX = "cx-explorer.expanded-folder.";
@@ -81,51 +81,11 @@ const EXPLORER_DEFAULT_WIDTH = 260;
 const EXPLORER_RESIZE_STEP = 8;
 const EXPLORER_RESIZE_LARGE_STEP = 32;
 
-/**
- * The icon vocabulary offered by the built-in icon & color editor: friendly,
- * content-shaped identities rather than the full product icon manifest.
- * Consumers with a different vocabulary pass `itemIcons`.
- */
-export const CX_EXPLORER_DEFAULT_ITEM_ICONS: readonly CxIconName[] = [
-  "note",
-  "document",
-  "documents",
-  "books",
-  "bookmark",
-  "star",
-  "heart",
-  "flag",
-  "bolt",
-  "award",
-  "calendar",
-  "camera",
-  "cash",
-  "chat",
-  "check-square",
-  "cloud",
-  "envelope",
-  "image",
-  "link",
-  "list-bullets",
-  "lock",
-  "package",
-  "phone",
-  "pin",
-  "play",
-  "radar",
-  "robot",
-  "schedule",
-  "shield",
-  "statistics",
-  "tag",
-  "terminal",
-  "time",
-  "trend-up",
-  "user",
-  "workflow",
-];
+/** The complete library, kept in sync with the generated icon manifest. */
+export const CX_EXPLORER_DEFAULT_ITEM_ICONS: readonly CxIconName[] =
+  cxIcons.map((icon) => icon.name as CxIconName);
 
-type CxExplorerRenameTarget = { kind: "folder" | "item"; id: string };
+type CxExplorerRenameTarget = { id: string };
 
 /**
  * Content rail for browsing and managing one-level collections of user
@@ -140,6 +100,7 @@ type CxExplorerRenameTarget = { kind: "folder" | "item"; id: string };
     CdkDrag,
     CdkDragHandle,
     CdkDropList,
+    CxButtonComponent,
     CxIconButtonComponent,
     CxIconComponent,
     CxSearchFieldComponent,
@@ -199,6 +160,9 @@ export class CxExplorerComponent implements OnDestroy {
   private readonly expandedFolderId = signal<string | null>(null);
 
   protected readonly renaming = signal<CxExplorerRenameTarget | null>(null);
+  @ViewChild(CxPopoverComponent) private pickerPopover?: CxPopoverComponent;
+
+  protected readonly pickerSearch = signal("");
   protected readonly pickerItemId = signal<string | null>(null);
   protected readonly resizing = signal(false);
   private readonly resizedWidth = signal<string | null>(null);
@@ -215,18 +179,17 @@ export class CxExplorerComponent implements OnDestroy {
     (_, index) => `skeleton-${index}`,
   );
   protected readonly pickerColors = CX_TAG_COLOR_PICKER_OPTIONS;
-  protected readonly pickerWidth = PICKER_WIDTH;
 
-  /**
-   * Fixed-size surface: the measure callback publishes the final metrics, so
-   * no post-render surface pass is needed.
-   */
-  protected readonly pickerOverlay = new CxFloatingSurfaceController(() => ({
-    width: PICKER_WIDTH,
-    estimatedHeight: PICKER_ESTIMATED_HEIGHT,
-    align: "end",
-    gap: 6,
-  }));
+  /** Measure the swatch-led content once, then keep that width while searching. */
+  protected readonly pickerOverlay = new CxFloatingSurfaceController(
+    (rect) => ({
+      width: rect.width,
+      estimatedHeight: PICKER_ESTIMATED_HEIGHT,
+      align: "end",
+      gap: 6,
+    }),
+    () => this.pickerPopover?.surfaceElement(),
+  );
 
   @Input()
   public set folders(value: readonly CxExplorerFolder[] | null | undefined) {
@@ -239,7 +202,7 @@ export class CxExplorerComponent implements OnDestroy {
     const createdFolders = folders.filter((folder) => !baseline.has(folder.id));
     if (createdFolders.length !== 1) return;
     this.clearFolderCreateRequest();
-    this.beginRename("folder", createdFolders[0]!.id);
+    this.beginRename(createdFolders[0]!.id);
   }
 
   /** Persistent, browse-only selections rendered above the folder hierarchy. */
@@ -343,7 +306,7 @@ export class CxExplorerComponent implements OnDestroy {
   @Output() readonly folderChange = new EventEmitter<CxExplorerFolderChange>();
   /** Controlled folder order after a drag completes. */
   @Output() readonly folderOrderChange = new EventEmitter<readonly string[]>();
-  /** The item's identity changed (rename or icon & color); emits the updated item. */
+  /** The item's icon or color changed; emits the updated item. */
   @Output() readonly itemChange = new EventEmitter<CxExplorerItem>();
   /** Delete intent only — the consumer owns confirmation and the actual removal. */
   @Output() readonly folderDelete = new EventEmitter<string>();
@@ -354,7 +317,16 @@ export class CxExplorerComponent implements OnDestroy {
   protected readonly rootItems$ = this.rootItemsState.asReadonly();
   protected readonly folders$ = this.foldersState.asReadonly();
   protected readonly selectedItemId$ = this.selectedItemIdState.asReadonly();
-  protected readonly itemIcons$ = this.itemIconsState.asReadonly();
+  protected readonly filteredPickerIcons = computed(() => {
+    const terms = this.pickerSearch()
+      .trim()
+      .toLowerCase()
+      .split(/[\s-]+/)
+      .filter(Boolean);
+    return this.itemIconsState().filter((icon) =>
+      terms.every((term) => icon.includes(term)),
+    );
+  });
 
   @HostBinding("style.--cx-explorer-width") get widthVar(): string | null {
     return this.resizedWidth() ?? this.width;
@@ -526,7 +498,7 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected toggleFolder(folder: CxExplorerFolder): void {
-    if (this.isRenaming("folder", folder.id)) return;
+    if (this.isRenaming(folder.id)) return;
     this.setExpandedFolder(this.isFolderExpanded(folder) ? null : folder.id);
   }
 
@@ -561,7 +533,6 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   protected onItemPressed(item: CxExplorerItem): void {
-    if (this.isRenaming("item", item.id)) return;
     this.selectedItemIdState.set(item.id);
     this.selectedItemIdChange.emit(item.id);
   }
@@ -612,7 +583,6 @@ export class CxExplorerComponent implements OnDestroy {
   protected itemMenu(): readonly CxMenuItem[] {
     if (!this.editable) return this.itemMenuItemsState();
     return [
-      { id: MENU_RENAME, label: "Rename", prependIcon: "edit" },
       { id: MENU_STYLE, label: "Icon & color", prependIcon: "squares-rotated" },
       ...this.itemMenuItemsState(),
       {
@@ -638,7 +608,7 @@ export class CxExplorerComponent implements OnDestroy {
     actionId: string,
   ): void {
     if (actionId === MENU_RENAME) {
-      this.beginRename("folder", folder.id);
+      this.beginRename(folder.id);
       return;
     }
     if (actionId === MENU_DELETE) {
@@ -653,10 +623,6 @@ export class CxExplorerComponent implements OnDestroy {
     actionId: string,
     row: HTMLElement,
   ): void {
-    if (actionId === MENU_RENAME) {
-      this.beginRename("item", item.id);
-      return;
-    }
     if (actionId === MENU_STYLE) {
       this.openPicker(item, row);
       return;
@@ -668,15 +634,15 @@ export class CxExplorerComponent implements OnDestroy {
     this.menuAction.emit({ kind: "item", id: item.id, actionId });
   }
 
-  protected isRenaming(kind: "folder" | "item", id: string): boolean {
+  protected isRenaming(id: string): boolean {
     const target = this.renaming();
-    return !!target && target.kind === kind && target.id === id;
+    return !!target && target.id === id;
   }
 
-  protected beginRename(kind: "folder" | "item", id: string): void {
+  protected beginRename(id: string): void {
     if (!this.editable) return;
     this.closePicker();
-    this.renaming.set({ kind, id });
+    this.renaming.set({ id });
     // The input exists only after the next render pass; select-all so typing
     // replaces the current name.
     afterRenderFrame(() => {
@@ -690,21 +656,13 @@ export class CxExplorerComponent implements OnDestroy {
 
   protected commitRename(
     event: Event,
-    kind: "folder" | "item",
     current: { id: string; name: string },
   ): void {
-    if (!this.isRenaming(kind, current.id)) return;
+    if (!this.isRenaming(current.id)) return;
     this.renaming.set(null);
     const name = (event.target as HTMLInputElement).value.trim();
     if (!name || name === current.name) return;
-    if (kind === "folder") {
-      this.folderChange.emit({ id: current.id, name });
-      return;
-    }
-    const item = this.findItem(current.id);
-    if (item) {
-      this.itemChange.emit({ ...item, name });
-    }
+    this.folderChange.emit({ id: current.id, name });
   }
 
   protected cancelRename(event: Event): void {
@@ -729,20 +687,13 @@ export class CxExplorerComponent implements OnDestroy {
   protected openPicker(item: CxExplorerItem, row: HTMLElement): void {
     this.renaming.set(null);
     this.pickerOverlay.endSession();
+    this.pickerSearch.set("");
     this.pickerItemId.set(item.id);
     this.pickerOverlay.sync(row);
     // Focus follows into the editor so the keyboard path continues where the
     // menu handed over; the popover restores focus on close. The surface
     // exists only after the next render pass.
-    afterRenderFrame(() => {
-      const surface = this.host.nativeElement.querySelector<HTMLElement>(
-        ".cx-explorer__picker",
-      );
-      const target =
-        surface?.querySelector<HTMLElement>('button[aria-pressed="true"]') ??
-        surface?.querySelector<HTMLElement>("button");
-      target?.focus();
-    });
+    afterRenderFrame(() => this.focusPickerSearch());
   }
 
   protected closePicker(): void {
@@ -764,6 +715,19 @@ export class CxExplorerComponent implements OnDestroy {
   ): void {
     if ((item.color ?? undefined) === color) return;
     this.itemChange.emit({ ...item, color });
+  }
+
+  protected onPickerReset(item: CxExplorerItem): void {
+    if (!item.icon && !item.color) return;
+    this.itemChange.emit({ ...item, icon: undefined, color: undefined });
+    this.focusPickerSearch();
+  }
+
+  private focusPickerSearch(): void {
+    this.pickerPopover
+      ?.surfaceElement()
+      ?.querySelector<HTMLInputElement>("input")
+      ?.focus();
   }
 
   protected onPickerIcon(item: CxExplorerItem, icon: CxIconName): void {

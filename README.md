@@ -39,7 +39,7 @@ Install the package from GitHub:
 The GitHub package carries immutable, checked-in `dist/lib` and `dist/server` entrypoints built in
 Cortex. Installation runs no build lifecycle, so consumers keep this package absent from the pnpm
 11 `allowBuilds` map in `pnpm-workspace.yaml`; a clean install with lifecycle scripts disabled is
-the supported delivery path. Generated-package CI imports that checked-in output before building,
+the supported delivery path. Local package verification imports that checked-in output before building,
 then proves a fresh rebuild is byte-identical.
 
 The complete Angular runtime is an optional peer contract: Angular, Angular CDK, RxJS, `tslib`,
@@ -59,7 +59,7 @@ package-specific consequence.
 Installed dependencies contain immutable compiled output, public resources, three executable
 runtime commands, and their private, non-exported `workspace-contract.mjs` parser helper only. Raw
 Angular/Node TypeScript and package build tooling remain in the generated Git repository for
-byte-identity CI, but `package.json.files` excludes them from packed and Git dependency installs.
+byte-identity verification, but `package.json.files` excludes them from packed and Git dependency installs.
 
 ## Component authority
 

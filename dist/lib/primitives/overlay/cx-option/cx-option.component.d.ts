@@ -1,11 +1,15 @@
 import { type OnChanges, type SimpleChanges } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import * as i0 from "@angular/core";
+export type CxOptionSize = 'small' | 'default' | 'large';
+export type CxOptionDescriptionAlign = 'start' | 'end';
 export type CxOptionMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxOptionSubmenu = 'none' | 'open' | 'closed';
 export declare class CxOptionComponent implements OnChanges {
     label: string;
     description?: string;
+    descriptionAlign: CxOptionDescriptionAlign;
+    size: CxOptionSize;
     tooltip?: string;
     prependIcon?: CxIconName;
     appendIcon?: CxIconName;
@@ -24,6 +28,10 @@ export declare class CxOptionComponent implements OnChanges {
      * cx-menu passes "menuitem".
      */
     role?: string;
+    /** Stable identity for a composite control's active descendant. */
+    controlId?: string;
+    /** Composite controls keep focus on their input and remove rows from the Tab sequence. */
+    tabIndex?: number;
     /** Position within a partially rendered set (1-based); virtualized listboxes pass this. */
     ariaPosInSet?: number;
     /** Total size of a partially rendered set; virtualized listboxes pass this. */
@@ -48,6 +56,6 @@ export declare class CxOptionComponent implements OnChanges {
     protected onPrimaryClick(event: MouseEvent): void;
     protected onPrimaryKeydown(event: KeyboardEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxOptionComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxOptionComponent, "cx-option", never, { "label": { "alias": "label"; "required": false; }; "description": { "alias": "description"; "required": false; }; "tooltip": { "alias": "tooltip"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "shortcutParts": { "alias": "shortcutParts"; "required": false; }; "submenu": { "alias": "submenu"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "active": { "alias": "active"; "required": false; }; "selected": { "alias": "selected"; "required": false; }; "selectedHighlight": { "alias": "selectedHighlight"; "required": false; }; "showCheckbox": { "alias": "showCheckbox"; "required": false; }; "clickable": { "alias": "clickable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "role": { "alias": "role"; "required": false; }; "ariaPosInSet": { "alias": "ariaPosInSet"; "required": false; }; "ariaSetSize": { "alias": "ariaSetSize"; "required": false; }; }, {}, never, ["[control]", "[append]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxOptionComponent, "cx-option", never, { "label": { "alias": "label"; "required": false; }; "description": { "alias": "description"; "required": false; }; "descriptionAlign": { "alias": "descriptionAlign"; "required": false; }; "size": { "alias": "size"; "required": false; }; "tooltip": { "alias": "tooltip"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "shortcutParts": { "alias": "shortcutParts"; "required": false; }; "submenu": { "alias": "submenu"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "active": { "alias": "active"; "required": false; }; "selected": { "alias": "selected"; "required": false; }; "selectedHighlight": { "alias": "selectedHighlight"; "required": false; }; "showCheckbox": { "alias": "showCheckbox"; "required": false; }; "clickable": { "alias": "clickable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "role": { "alias": "role"; "required": false; }; "controlId": { "alias": "controlId"; "required": false; }; "tabIndex": { "alias": "tabIndex"; "required": false; }; "ariaPosInSet": { "alias": "ariaPosInSet"; "required": false; }; "ariaSetSize": { "alias": "ariaSetSize"; "required": false; }; }, {}, never, ["[control]", "[append]"], true, never>;
 }
 //# sourceMappingURL=cx-option.component.d.ts.map

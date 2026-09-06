@@ -17,6 +17,7 @@ export type DurableJobStatus =
 export type DurableJobExecutionClass = "barrier-recovery" | "standard";
 
 export interface DurableJob {
+  readonly executionScope: string;
   readonly attempts: number;
   readonly availableAt: number;
   readonly createdAt: number;
@@ -125,6 +126,7 @@ export interface DurableJobRecoveryResult {
 }
 
 export interface DurableJobStore {
+  readonly executionScope: string;
   readonly leaseDurationMs: number;
   readonly maxConcurrentJobs: number;
   claim(owner: string): DurableJobClaim | null;
@@ -150,13 +152,14 @@ export interface DurableJobStore {
 }
 
 export interface DurableJobStoreOptions {
+  readonly executionScope: string;
   readonly createJobId: () => string;
   readonly createLeaseToken: () => string;
   readonly database: SyncSqliteDatabase;
   readonly leaseDurationMs: number;
   /**
-   * Maximum claims that may be valid across every process sharing this database.
-   * Every claim-capable store sharing this table must configure the same value. Use `1` when
+   * Maximum claims that may be valid across every process sharing this execution scope.
+   * Every claim-capable store sharing this scope must configure the same value. Use `1` when
    * queue-wide deferral must preserve strict execution order.
    */
   readonly maxConcurrentJobs: number;
@@ -170,6 +173,7 @@ export interface DurableJobStoreOptions {
 }
 
 export interface DurableJobExecutionContext {
+  readonly executionScope: string;
   readonly attempt: number;
   readonly idempotencyKey: string;
   readonly jobId: string;
@@ -213,6 +217,7 @@ export interface DurableWorkerOptions {
 }
 
 interface DurableJobRow extends SqliteRow {
+  readonly execution_scope: string;
   readonly attempts: number;
   readonly available_at: number;
   readonly created_at: number;
@@ -263,7 +268,7 @@ export const DURABLE_JOB_TABLE = "cx_jobs";
  * append-only: changing an existing entry would invalidate a product's already-applied migration
  * fingerprint. A new queue capability therefore always adds a new entry.
  */
-export const DURABLE_JOB_SCHEMA_MIGRATIONS = Object.freeze([
+const ISSUED_DURABLE_JOB_MIGRATIONS = Object.freeze([
   Object.freeze({
     version: 1,
     name: "initial_durable_jobs",
@@ -500,6 +505,123 @@ export const DURABLE_JOB_SCHEMA_MIGRATIONS = Object.freeze([
   }),
 ] as const);
 
+/** Existing unscoped jobs are held for an explicit offline ownership decision. */
+export const LEGACY_DURABLE_JOB_SCOPE = "legacy";
+
+export const DURABLE_JOB_SCHEMA_MIGRATIONS = Object.freeze([
+  ...ISSUED_DURABLE_JOB_MIGRATIONS,
+  Object.freeze({
+    version: 5,
+    name: "durable_job_execution_scopes",
+    rebuildReferencedTables: true,
+    statements: Object.freeze([
+      ISSUED_DURABLE_JOB_MIGRATIONS[0].statements[0]
+        .replace(
+          `CREATE TABLE ${DURABLE_JOB_TABLE}`,
+          "CREATE TABLE cx_jobs_scoped",
+        )
+        .replace(
+          "UNIQUE (type, idempotency_key)",
+          `execution_class TEXT NOT NULL DEFAULT 'standard' CHECK (execution_class IN ('standard', 'barrier-recovery')),
+    barrier_recovery_reserve BLOB CHECK (barrier_recovery_reserve IS NULL OR length(barrier_recovery_reserve) = ${BARRIER_RECOVERY_RESERVE_BYTES}),
+    execution_scope TEXT NOT NULL CHECK (length(execution_scope) BETWEEN 1 AND 64 AND execution_scope NOT GLOB '*[^a-z0-9_-]*'),
+    UNIQUE (execution_scope, type, idempotency_key)`,
+        ),
+      `INSERT INTO cx_jobs_scoped (rowid, id, type, payload_json, idempotency_key, status,
+         barrier, attempts, max_attempts, scheduled_at, available_at, lease_owner, lease_token,
+         lease_expires_at, started_at, finished_at, failure_code, failure_message,
+         created_at, updated_at, execution_class, barrier_recovery_reserve, execution_scope)
+       SELECT rowid, *, '${LEGACY_DURABLE_JOB_SCOPE}' FROM ${DURABLE_JOB_TABLE}`,
+      `DROP TABLE ${DURABLE_JOB_TABLE}`,
+      `ALTER TABLE cx_jobs_scoped RENAME TO ${DURABLE_JOB_TABLE}`,
+      ...ISSUED_DURABLE_JOB_MIGRATIONS.flatMap(({ statements }) => statements)
+        .filter((sql) => /^CREATE (?:INDEX|TRIGGER) /.test(sql))
+        .map((sql) =>
+          sql
+            .replaceAll(
+              "existing.type = NEW.type",
+              "existing.execution_scope = NEW.execution_scope AND existing.type = NEW.type",
+            )
+            .replace(
+              "BEFORE UPDATE OF rowid,",
+              "BEFORE UPDATE OF execution_scope, rowid,",
+            )
+            .replaceAll(
+              `ON ${DURABLE_JOB_TABLE} (status,`,
+              `ON ${DURABLE_JOB_TABLE} (execution_scope, status,`,
+            ),
+        ),
+      `CREATE TRIGGER cx_jobs_scope_immutable
+       BEFORE UPDATE OF execution_scope ON ${DURABLE_JOB_TABLE}
+       WHEN OLD.execution_scope <> '${LEGACY_DURABLE_JOB_SCOPE}' AND NEW.execution_scope IS NOT OLD.execution_scope
+       BEGIN
+         SELECT RAISE(ABORT, 'durable job execution scope is immutable');
+       END`,
+    ] as const),
+  }),
+] as const);
+
+export function validateDurableJobExecutionScope(value: string): string {
+  if (
+    typeof value !== "string" ||
+    !/^[a-z][a-z0-9_-]{0,63}$/.test(value) ||
+    value === LEGACY_DURABLE_JOB_SCOPE
+  ) {
+    throw new Error(
+      "A durable job store requires an explicit non-legacy execution scope.",
+    );
+  }
+  return value;
+}
+
+/**
+ * Explicit offline ownership assignment, never worker recovery. Previously attempted active work
+ * requires a product-specific outcome decision first; it is never replayed by assigning a scope.
+ * Products synchronize their request metadata inside the same transaction through afterAssign.
+ */
+export function assignLegacyDurableJobScopes({
+  database,
+  assignments,
+  afterAssign,
+}: {
+  readonly database: SyncSqliteDatabase;
+  readonly assignments: readonly {
+    readonly id: string;
+    readonly executionScope: string;
+  }[];
+  readonly afterAssign?: () => void;
+}): number {
+  assertBoundedBatchSize(assignments.length, "Legacy job assignment batch");
+  const selected = assignments.map(({ id, executionScope }) => ({
+    id: validateGeneratedIdentifier(id, "legacy job ID"),
+    executionScope: validateDurableJobExecutionScope(executionScope),
+  }));
+  if (new Set(selected.map(({ id }) => id)).size !== selected.length) {
+    throw new Error("Legacy job assignments must name each job exactly once.");
+  }
+  return withImmediateTransaction(database, () => {
+    for (const { id, executionScope } of selected) {
+      const result = database.run(
+        `UPDATE ${DURABLE_JOB_TABLE} SET execution_scope = ?
+         WHERE id = ? AND execution_scope = '${LEGACY_DURABLE_JOB_SCOPE}'
+           AND (status IN ('succeeded', 'failed') OR (status = 'queued' AND attempts = 0))`,
+        [executionScope, id],
+      );
+      if (result.changes !== 1)
+        throw new Error(
+          `Legacy job ${id} requires an outcome decision or is already assigned.`,
+        );
+    }
+    const result: unknown = afterAssign?.();
+    if (result && typeof result === "object" && "then" in result) {
+      throw new Error(
+        "Legacy job ownership synchronization must be synchronous.",
+      );
+    }
+    return selected.length;
+  });
+}
+
 export class JobIdempotencyConflictError extends Error {
   constructor(type: string, idempotencyKey: string) {
     super(
@@ -562,6 +684,7 @@ export function boundedExponentialBackoff(
 }
 
 export function createDurableJobStore({
+  executionScope,
   createJobId,
   createLeaseToken,
   database,
@@ -575,6 +698,7 @@ export function createDurableJobStore({
   retryInitialDelayMs,
   retryMaximumDelayMs,
 }: DurableJobStoreOptions): DurableJobStore {
+  const scope = validateDurableJobExecutionScope(executionScope);
   for (const [label, value] of [
     ["job ID generator", createJobId],
     ["lease-token generator", createLeaseToken],
@@ -618,10 +742,10 @@ export function createDurableJobStore({
     const expired = database.all<ExpiredJobRow>(
       `SELECT id, lease_owner, lease_token, attempts, max_attempts, barrier
        FROM ${DURABLE_JOB_TABLE}
-       WHERE status = 'running' AND lease_expires_at <= ?
+       WHERE execution_scope = ? AND status = 'running' AND lease_expires_at <= ?
        ORDER BY lease_expires_at, id
        LIMIT ?`,
-      [timestamp, recoveryBatchSize],
+      [scope, timestamp, recoveryBatchSize],
     );
 
     for (const row of expired) {
@@ -659,12 +783,13 @@ export function createDurableJobStore({
                failure_code = 'lease_expired',
                failure_message = 'The previous worker stopped before completing this job.',
                updated_at = ?
-           WHERE id = ? AND status = 'running' AND lease_owner = ?
+           WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
              AND lease_token = ? AND attempts = ?
              AND lease_expires_at <= ?`,
           [
             availableAt,
             timestamp,
+            scope,
             id,
             leaseOwner,
             leaseToken,
@@ -681,12 +806,13 @@ export function createDurableJobStore({
                lease_expires_at = NULL, failure_code = 'lease_expired',
                failure_message = 'The worker stopped and this job exhausted its attempts.',
                barrier_recovery_reserve = NULL, finished_at = ?, updated_at = ?
-           WHERE id = ? AND status = 'running' AND lease_owner = ?
+           WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
              AND lease_token = ? AND attempts = ?
              AND lease_expires_at <= ?`,
           [
             timestamp,
             timestamp,
+            scope,
             id,
             leaseOwner,
             leaseToken,
@@ -722,8 +848,8 @@ export function createDurableJobStore({
 
     const existing = database.get<DurableJobRow>(
       `SELECT * FROM ${DURABLE_JOB_TABLE}
-       WHERE type = ? AND idempotency_key = ?`,
-      [type, idempotencyKey],
+       WHERE execution_scope = ? AND type = ? AND idempotency_key = ?`,
+      [scope, type, idempotencyKey],
     );
     const scheduledAt =
       input.availableAt ??
@@ -753,7 +879,8 @@ export function createDurableJobStore({
     const outstandingCount = database.get(
       `SELECT COUNT(*) AS count
        FROM ${DURABLE_JOB_TABLE}
-       WHERE status IN ('blocked', 'queued', 'running')`,
+       WHERE execution_scope = ? AND status IN ('blocked', 'queued', 'running')`,
+      [scope],
     );
     if (!outstandingCount) {
       throw new Error("SQLite did not return the outstanding job count.");
@@ -765,13 +892,14 @@ export function createDurableJobStore({
     const id = validateGeneratedIdentifier(createJobId(), "job ID");
     const result = database.run(
       `INSERT INTO ${DURABLE_JOB_TABLE}
-         (id, type, payload_json, idempotency_key, status, execution_class,
+         (execution_scope, id, type, payload_json, idempotency_key, status, execution_class,
           barrier_recovery_reserve, attempts,
           max_attempts, scheduled_at, available_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 'queued', ?,
+       VALUES (?, ?, ?, ?, ?, 'queued', ?,
                CASE WHEN ? = 'barrier-recovery' THEN zeroblob(${BARRIER_RECOVERY_RESERVE_BYTES}) ELSE NULL END,
                0, ?, ?, ?, ?, ?)`,
       [
+        scope,
         id,
         type,
         payloadJson,
@@ -791,8 +919,8 @@ export function createDurableJobStore({
       );
     }
     const row = database.get<DurableJobRow>(
-      `SELECT * FROM ${DURABLE_JOB_TABLE} WHERE id = ?`,
-      [id],
+      `SELECT * FROM ${DURABLE_JOB_TABLE} WHERE execution_scope = ? AND id = ?`,
+      [scope, id],
     );
     if (!row) throw new Error("Durable job enqueue did not create its row.");
     return Object.freeze({ created: true, job: parseJob(row) });
@@ -825,6 +953,7 @@ export function createDurableJobStore({
   }
 
   return Object.freeze({
+    executionScope: scope,
     leaseDurationMs,
     maxConcurrentJobs,
     enqueue(input: EnqueueDurableJob) {
@@ -848,7 +977,8 @@ export function createDurableJobStore({
         const running = database.get(
           `SELECT COUNT(*) AS count, COALESCE(MAX(barrier), 0) AS has_barrier
            FROM ${DURABLE_JOB_TABLE}
-           WHERE status = 'running'`,
+           WHERE execution_scope = ? AND status = 'running'`,
+          [scope],
         );
         if (!running) {
           throw new Error("SQLite did not return the running job count.");
@@ -866,9 +996,10 @@ export function createDurableJobStore({
         const blocked = database.get<DurableJobRow>(
           `SELECT *
            FROM ${DURABLE_JOB_TABLE}
-           WHERE status = 'blocked'
+           WHERE execution_scope = ? AND status = 'blocked'
            ORDER BY available_at, created_at, id
            LIMIT 1`,
+          [scope],
         );
         const hasBlockedBarrier = blocked ? 1 : 0;
         const row = database.get<DurableJobRow>(
@@ -884,11 +1015,11 @@ export function createDurableJobStore({
              SELECT id FROM (
                SELECT id, available_at, created_at, 0 AS priority
                FROM ${DURABLE_JOB_TABLE}
-               WHERE status = 'blocked' AND available_at <= ?
+               WHERE execution_scope = ? AND status = 'blocked' AND available_at <= ?
                UNION ALL
                SELECT id, available_at, created_at, 1 AS priority
                FROM ${DURABLE_JOB_TABLE}
-               WHERE status = 'queued' AND available_at <= ?
+               WHERE execution_scope = ? AND status = 'queued' AND available_at <= ?
                  AND attempts < max_attempts
                  AND (? = 0 OR execution_class = 'barrier-recovery')
              )
@@ -904,7 +1035,9 @@ export function createDurableJobStore({
             leaseExpiresAt,
             timestamp,
             timestamp,
+            scope,
             timestamp,
+            scope,
             timestamp,
             hasBlockedBarrier,
             timestamp,
@@ -924,13 +1057,14 @@ export function createDurableJobStore({
       const row = database.get(
         `UPDATE ${DURABLE_JOB_TABLE}
          SET lease_expires_at = MAX(lease_expires_at, ?), updated_at = ?
-         WHERE id = ? AND status = 'running' AND lease_owner = ?
+         WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
            AND lease_token = ? AND attempts = ?
            AND lease_expires_at > ?
          RETURNING lease_expires_at`,
         [
           requestedLeaseExpiresAt,
           timestamp,
+          scope,
           claim.id,
           claim.leaseOwner,
           claim.leaseToken,
@@ -950,12 +1084,13 @@ export function createDurableJobStore({
              lease_expires_at = NULL, failure_code = NULL,
              failure_message = NULL, barrier_recovery_reserve = NULL,
              finished_at = ?, updated_at = ?
-         WHERE id = ? AND status = 'running' AND lease_owner = ?
+         WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
            AND lease_token = ? AND attempts = ?
            AND lease_expires_at > ?`,
         [
           timestamp,
           timestamp,
+          scope,
           claim.id,
           claim.leaseOwner,
           claim.leaseToken,
@@ -985,7 +1120,7 @@ export function createDurableJobStore({
                ELSE NULL
              END,
              failure_code = ?, failure_message = ?, updated_at = ?
-         WHERE id = ? AND status = 'running' AND lease_owner = ?
+         WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
            AND lease_token = ? AND attempts = ? AND attempts > 0
            AND lease_expires_at > ?`,
         [
@@ -993,6 +1128,7 @@ export function createDurableJobStore({
           safeDelay.code,
           safeDelay.message,
           timestamp,
+          scope,
           claim.id,
           claim.leaseOwner,
           claim.leaseToken,
@@ -1026,7 +1162,7 @@ export function createDurableJobStore({
                ELSE NULL
              END,
              failure_code = ?, failure_message = ?, updated_at = ?
-         WHERE id = ? AND status = 'running' AND lease_owner = ?
+         WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
            AND lease_token = ? AND attempts = ? AND attempts > 0
            AND lease_expires_at > ?`,
         [
@@ -1034,6 +1170,7 @@ export function createDurableJobStore({
           safeDeferral.code,
           safeDeferral.message,
           timestamp,
+          scope,
           claim.id,
           claim.leaseOwner,
           claim.leaseToken,
@@ -1073,7 +1210,7 @@ export function createDurableJobStore({
                  ELSE NULL
                END,
                failure_code = ?, failure_message = ?, updated_at = ?
-           WHERE id = ? AND status = 'running' AND lease_owner = ?
+           WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
              AND lease_token = ? AND attempts = ?
              AND lease_expires_at > ?
            RETURNING status, available_at`,
@@ -1082,6 +1219,7 @@ export function createDurableJobStore({
             safeFailure.code,
             safeFailure.message,
             timestamp,
+            scope,
             claim.id,
             claim.leaseOwner,
             claim.leaseToken,
@@ -1107,7 +1245,7 @@ export function createDurableJobStore({
          SET status = 'failed', barrier = 0, lease_owner = NULL, lease_token = NULL,
              lease_expires_at = NULL, failure_code = ?, failure_message = ?,
              barrier_recovery_reserve = NULL, finished_at = ?, updated_at = ?
-         WHERE id = ? AND status = 'running' AND lease_owner = ?
+         WHERE execution_scope = ? AND id = ? AND status = 'running' AND lease_owner = ?
            AND lease_token = ? AND attempts = ?
            AND lease_expires_at > ?`,
         [
@@ -1115,6 +1253,7 @@ export function createDurableJobStore({
           safeFailure.message,
           timestamp,
           timestamp,
+          scope,
           claim.id,
           claim.leaseOwner,
           claim.leaseToken,
@@ -1128,8 +1267,8 @@ export function createDurableJobStore({
     get(id: string) {
       const safeId = validateGeneratedIdentifier(id, "job ID");
       const row = database.get<DurableJobRow>(
-        `SELECT * FROM ${DURABLE_JOB_TABLE} WHERE id = ?`,
-        [safeId],
+        `SELECT * FROM ${DURABLE_JOB_TABLE} WHERE execution_scope = ? AND id = ?`,
+        [scope, safeId],
       );
       return row ? parseJob(row) : null;
     },
@@ -1148,11 +1287,11 @@ export function createDurableJobStore({
          WHERE id IN (
            SELECT id
            FROM ${DURABLE_JOB_TABLE}
-           WHERE status IN ('succeeded', 'failed') AND finished_at < ?
+           WHERE execution_scope = ? AND status IN ('succeeded', 'failed') AND finished_at < ?
            ORDER BY finished_at, id
            LIMIT ?
          )`,
-        [before, limit],
+        [scope, before, limit],
       ).changes;
     },
   });
@@ -1271,6 +1410,7 @@ export function createDurableWorker({
           let handlerFailed = false;
           try {
             await handler(claim.payload, {
+              executionScope: claim.executionScope,
               attempt: claim.attempts,
               heartbeat: () => store.heartbeat(claim),
               idempotencyKey: claim.idempotencyKey,
@@ -1387,6 +1527,7 @@ function parseJob(row: DurableJobRow): DurableJob {
     attempts: integerColumn(row, "attempts"),
     availableAt: integerColumn(row, "available_at"),
     createdAt: integerColumn(row, "created_at"),
+    executionScope: textColumn(row, "execution_scope"),
     executionClass: executionClassColumn(row, "execution_class"),
     failureCode: nullableTextColumn(row, "failure_code"),
     failureMessage: nullableTextColumn(row, "failure_message"),

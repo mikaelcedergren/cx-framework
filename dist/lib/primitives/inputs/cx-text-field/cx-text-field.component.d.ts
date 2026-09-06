@@ -2,6 +2,12 @@ import { EventEmitter } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { type CxFieldValidation, type CxFieldSize } from '../shared/field.types';
 import * as i0 from "@angular/core";
+/** Connects a composite search field to the listbox it controls. */
+export type CxTextFieldCombobox = {
+    controls: string;
+    expanded: boolean;
+    activeDescendant?: string;
+};
 export declare class CxTextFieldComponent {
     private static nextId;
     private readonly valueState;
@@ -26,6 +32,7 @@ export declare class CxTextFieldComponent {
     prependText: string | undefined;
     appendText: string | undefined;
     hint: string | undefined;
+    combobox: CxTextFieldCombobox | undefined;
     set validation(value: CxFieldValidation | null | undefined);
     set value(value: string | undefined);
     readonly valueChange: EventEmitter<string>;
@@ -50,6 +57,6 @@ export declare class CxTextFieldComponent {
     protected onEscapeKey(): void;
     protected onClear(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxTextFieldComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxTextFieldComponent, "cx-text-field", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "name": { "alias": "name"; "required": false; }; "autocomplete": { "alias": "autocomplete"; "required": false; }; "inlineEdit": { "alias": "inlineEdit"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "clearable": { "alias": "clearable"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "prependText": { "alias": "prependText"; "required": false; }; "appendText": { "alias": "appendText"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "focusChange": "focusChange"; "clear": "clear"; }, never, ["[cxTrailing]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxTextFieldComponent, "cx-text-field", never, { "label": { "alias": "label"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "name": { "alias": "name"; "required": false; }; "autocomplete": { "alias": "autocomplete"; "required": false; }; "inlineEdit": { "alias": "inlineEdit"; "required": false; }; "optional": { "alias": "optional"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "size": { "alias": "size"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "clearable": { "alias": "clearable"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "appendIcon": { "alias": "appendIcon"; "required": false; }; "prependText": { "alias": "prependText"; "required": false; }; "appendText": { "alias": "appendText"; "required": false; }; "hint": { "alias": "hint"; "required": false; }; "combobox": { "alias": "combobox"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "value": { "alias": "value"; "required": false; }; }, { "valueChange": "valueChange"; "focusChange": "focusChange"; "clear": "clear"; }, never, ["[cxTrailing]"], true, never>;
 }
 //# sourceMappingURL=cx-text-field.component.d.ts.map

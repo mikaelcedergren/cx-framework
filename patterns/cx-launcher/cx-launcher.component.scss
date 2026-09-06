@@ -1,0 +1,85 @@
+:host {
+  display: contents;
+}
+
+.cx-launcher {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: min(12dvh, 96px) var(--space-md) var(--space-md);
+  background: var(--overlay-backdrop);
+  backdrop-filter: blur(var(--frost-softness));
+  overscroll-behavior: contain;
+}
+
+.cx-launcher__surface {
+  display: flex;
+  flex-direction: column;
+  width: 680px;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  gap: var(--space-sm);
+}
+
+// Intentional Launcher-only override: an opaque search surface over the blurred backdrop.
+:host ::ng-deep .cx-launcher__search .cx-text-field__field-shell {
+  background: var(--surface);
+}
+
+.cx-launcher__results-frame {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--floating-surface-border);
+  // Keep the frame, list, and Option corners concentric through both insets.
+  border-radius: calc(
+    var(--radius-sm) + var(--space-xs) + var(--surface-separation)
+  );
+  background: var(--surface-alt);
+  box-shadow: var(--shadow-mid);
+  padding: var(--surface-separation);
+}
+
+.cx-launcher__results {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: calc(var(--radius-sm) + var(--space-xs));
+  background: var(--surface);
+  padding: var(--space-xs);
+}
+
+.cx-launcher__results:empty {
+  display: none;
+}
+
+.cx-launcher__shortcut {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--ink-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+.cx-launcher__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  border-radius: calc(var(--radius-sm) + var(--space-xs));
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--font-size-body);
+}
+
+.cx-launcher__support {
+  color: var(--ink-muted);
+  font-size: var(--font-size-body-sm);
+}

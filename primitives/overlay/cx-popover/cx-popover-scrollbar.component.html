@@ -1,0 +1,24 @@
+@if (metrics().maximum > 0 && metrics().height > 0) {
+  <div
+    class="cx-popover-scrollbar__thumb"
+    role="scrollbar"
+    tabindex="0"
+    aria-label="Scroll popover"
+    aria-orientation="vertical"
+    aria-valuemin="0"
+    [attr.aria-controls]="viewport().id"
+    [attr.aria-valuemax]="metrics().maximum"
+    [attr.aria-valuenow]="metrics().position"
+    [class.cx-popover-scrollbar__thumb--active]="scrolling() || dragging()"
+    [style.height.px]="metrics().height"
+    [style.top.px]="metrics().top"
+    (pointerdown)="startDrag($event)"
+    (pointermove)="moveDrag($event)"
+    (pointerup)="endDrag($event)"
+    (pointercancel)="endDrag($event)"
+    (lostpointercapture)="endDrag($event)"
+    (keydown)="onKeydown($event)"
+    (wheel)="onWheel($event)"
+    (click)="$event.stopPropagation()"
+  ></div>
+}

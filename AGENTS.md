@@ -31,6 +31,9 @@ GitHub, then reinstall and rebuild the consumer.
 
 Rules that still apply:
 
+- Verification runs through local package commands. Do not create GitHub Actions workflows or
+  other automated CI configuration unless the owner explicitly requests it.
+
 - Follow the shared Git policy in the development-root `AGENTS.md`: work on the current branch,
   never create a branch, pull when relevant, and push only after the user's specific current
   authorisation. Only after this package is pushed to GitHub `main` do consuming apps reinstall.
@@ -43,7 +46,7 @@ Rules that still apply:
   generated roots, preserves Git/install/lockfile controls, and rejects unknown top-level data
   instead of deleting it.
 - `dist/` is immutable built output produced and verified in Cortex, exported with this package,
-  and committed here. Never edit it directly. Package installation runs no build lifecycle; CI
+  and committed here. Never edit it directly. Package installation runs no build lifecycle; local validation
   proves the checked-in output is usable before rebuilding and byte-identical afterward.
 - The generated repository retains raw source for that rebuild proof. The installed dependency is
   narrower: `package.json.files` includes immutable output, public resources, and runtime commands,

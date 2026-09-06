@@ -26,15 +26,6 @@
 
   <div class="cx-explorer__header">
     <ng-content select="[header]" />
-    @if (editable) {
-      <cx-icon-button
-        class="cx-explorer__new-folder"
-        icon="plus"
-        ariaLabel="New folder"
-        cxTooltip="New folder"
-        (pressed)="onFolderCreate()"
-      />
-    }
   </div>
 
   @if (searchable) {
@@ -54,7 +45,7 @@
         <span class="cx-explorer__skeleton-row"></span>
       }
     </div>
-  } @else if (hasContent()) {
+  } @else if (hasContent() || editable) {
     <div #explorerContent class="cx-explorer__content">
       @if (rootItems$().length > 0) {
         <ul class="cx-explorer__root-items">
@@ -99,13 +90,13 @@
               class="cx-explorer__folder"
               cdkDrag
               [cdkDragData]="folder"
-              [cdkDragDisabled]="!editable || isRenaming('folder', folder.id)"
+              [cdkDragDisabled]="!editable || isRenaming(folder.id)"
             >
               <div
                 class="cx-explorer__row cx-explorer__row--folder"
                 cdkDragHandle
               >
-                @if (isRenaming("folder", folder.id)) {
+                @if (isRenaming(folder.id)) {
                   <span class="cx-explorer__row-icon" aria-hidden="true">
                     <cx-icon icon="folder" [size]="16" />
                   </span>
@@ -114,7 +105,7 @@
                     type="text"
                     aria-label="Folder name"
                     [value]="folder.name"
-                    (blur)="commitRename($event, 'folder', folder)"
+                    (blur)="commitRename($event, folder)"
                     (keydown.enter)="onRenameEnter($event)"
                     (keydown.escape)="cancelRename($event)"
                   />
@@ -125,7 +116,7 @@
                     [attr.aria-expanded]="isFolderExpanded(folder)"
                     aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
                     (click)="toggleFolder(folder)"
-                    (dblclick)="editable && beginRename('folder', folder.id)"
+                    (dblclick)="editable && beginRename(folder.id)"
                     (keydown.alt.arrowup)="
                       onFolderMoveByKeyboard($event, folder, -1)
                     "
@@ -195,68 +186,47 @@
                         #itemRow
                         [style.--cx-explorer-accent]="itemAccent(item)"
                       >
-                        @if (isRenaming("item", item.id)) {
+                        <button
+                          class="cx-explorer__row-main"
+                          type="button"
+                          [class.cx-explorer__row-main--selected]="
+                            isSelected(item)
+                          "
+                          [attr.aria-current]="
+                            isSelected(item) ? 'true' : null
+                          "
+                          (click)="onItemPressed(item)"
+                        >
                           <span
                             class="cx-explorer__row-icon cx-explorer__row-icon--accent"
                             aria-hidden="true"
                           >
                             <cx-icon [icon]="itemIcon(item)" [size]="16" />
                           </span>
-                          <input
-                            class="cx-explorer__rename-input"
-                            type="text"
-                            aria-label="Page name"
-                            [value]="item.name"
-                            (blur)="commitRename($event, 'item', item)"
-                            (keydown.enter)="onRenameEnter($event)"
-                            (keydown.escape)="cancelRename($event)"
-                          />
-                        } @else {
-                          <button
-                            class="cx-explorer__row-main"
-                            type="button"
-                            [class.cx-explorer__row-main--selected]="
-                              isSelected(item)
-                            "
-                            [attr.aria-current]="
-                              isSelected(item) ? 'true' : null
-                            "
-                            (click)="onItemPressed(item)"
-                            (dblclick)="
-                              editable && beginRename('item', item.id)
-                            "
-                          >
-                            <span
-                              class="cx-explorer__row-icon cx-explorer__row-icon--accent"
-                              aria-hidden="true"
+                          <span class="cx-explorer__row-label">{{
+                            item.name
+                          }}</span>
+                        </button>
+                        <div class="cx-explorer__row-actions">
+                          @if (hasItemMenu()) {
+                            <cx-menu
+                              [presentation]="{ kind: 'trigger' }"
+                              [items]="itemMenu()"
+                              ariaLabel="Page actions"
+                              (itemSelect)="
+                                onItemMenuSelect(item, $event, itemRow)
+                              "
                             >
-                              <cx-icon [icon]="itemIcon(item)" [size]="16" />
-                            </span>
-                            <span class="cx-explorer__row-label">{{
-                              item.name
-                            }}</span>
-                          </button>
-                          <div class="cx-explorer__row-actions">
-                            @if (hasItemMenu()) {
-                              <cx-menu
-                                [presentation]="{ kind: 'trigger' }"
-                                [items]="itemMenu()"
+                              <cx-icon-button
+                                cxMenuTrigger
+                                icon="menu-vertical"
+                                size="small"
+                                variant="transparent"
                                 ariaLabel="Page actions"
-                                (itemSelect)="
-                                  onItemMenuSelect(item, $event, itemRow)
-                                "
-                              >
-                                <cx-icon-button
-                                  cxMenuTrigger
-                                  icon="menu-vertical"
-                                  size="small"
-                                  variant="transparent"
-                                  ariaLabel="Page actions"
-                                />
-                              </cx-menu>
-                            }
-                          </div>
-                        }
+                              />
+                            </cx-menu>
+                          }
+                        </div>
                       </li>
                     }
                   </ul>
@@ -266,6 +236,16 @@
           }
         </div>
       }
+      @if (editable) {
+        <cx-icon-button
+          class="cx-explorer__new-folder"
+          icon="plus"
+          ariaLabel="New folder"
+          cxTooltip="New folder"
+          [block]="true"
+          (pressed)="onFolderCreate()"
+        />
+      }
     </div>
   }
 </aside>
@@ -274,51 +254,81 @@
   <cx-popover
     [open]="true"
     [showBackdrop]="true"
-    [width]="pickerWidth"
+    [width]="pickerOverlay.width$()"
     [left]="pickerOverlay.left$()"
     [top]="pickerOverlay.top$()"
     [bottom]="pickerOverlay.bottom$()"
     [maxHeight]="pickerOverlay.maxHeight$()"
     [placement]="pickerOverlay.placement$()"
     role="dialog"
+    heading="Icon & color"
     ariaLabel="Icon & color"
+    surfaceVariant="grouped"
     (backdropPressed)="closePicker()"
   >
+    <cx-button
+      actions
+      text="Reset"
+      size="small"
+      [transparent]="true"
+      [disabled]="!item.icon && !item.color"
+      (pressed)="onPickerReset(item)"
+    />
     <div
       class="cx-explorer__picker"
       [style.--cx-explorer-accent]="itemAccent(item)"
     >
-      <div class="cx-explorer__picker-swatches" role="group" aria-label="Color">
-        <button
-          class="cx-explorer__swatch cx-explorer__swatch--none"
-          type="button"
-          aria-label="No color"
-          [attr.aria-pressed]="!item.color"
-          (click)="onPickerColor(item, undefined)"
-        ></button>
-        @for (color of pickerColors; track color) {
+      <div class="cx-explorer__picker-group">
+        <div
+          class="cx-explorer__picker-swatches"
+          role="group"
+          aria-label="Color"
+        >
           <button
-            class="cx-explorer__swatch"
+            class="cx-explorer__swatch cx-explorer__swatch--none"
             type="button"
-            [style.--cx-explorer-swatch]="swatchAccent(color)"
-            [attr.aria-label]="color"
-            [attr.aria-pressed]="item.color === color"
-            (click)="onPickerColor(item, color)"
+            aria-label="No color"
+            [attr.aria-pressed]="!item.color"
+            (click)="onPickerColor(item, undefined)"
           ></button>
-        }
+          @for (color of pickerColors; track color) {
+            <button
+              class="cx-explorer__swatch"
+              type="button"
+              [style.--cx-explorer-swatch]="swatchAccent(color)"
+              [attr.aria-label]="color"
+              [attr.aria-pressed]="item.color === color"
+              (click)="onPickerColor(item, color)"
+            ></button>
+          }
+        </div>
       </div>
-      <div class="cx-explorer__picker-icons" role="group" aria-label="Icon">
-        @for (icon of itemIcons$(); track icon) {
-          <button
-            class="cx-explorer__picker-icon"
-            type="button"
-            [attr.aria-label]="icon"
-            [attr.aria-pressed]="isPickerIconSelected(item, icon)"
-            (click)="onPickerIcon(item, icon)"
-          >
-            <cx-icon [icon]="icon" [size]="16" />
-          </button>
-        }
+      <div class="cx-explorer__picker-group">
+        <cx-search-field
+          class="cx-explorer__picker-search"
+          label=""
+          ariaLabel="Search icons"
+          [clearable]="true"
+          [value]="pickerSearch()"
+          (valueChange)="pickerSearch.set($event)"
+        />
+        <div class="cx-explorer__picker-icons" role="group" aria-label="Icon">
+          @for (icon of filteredPickerIcons(); track icon) {
+            <button
+              class="cx-explorer__picker-icon"
+              type="button"
+              [attr.aria-label]="icon"
+              [attr.aria-pressed]="isPickerIconSelected(item, icon)"
+              (click)="onPickerIcon(item, icon)"
+            >
+              <cx-icon [icon]="icon" [size]="16" />
+            </button>
+          } @empty {
+            <p class="cx-explorer__picker-empty" role="status">
+              No icons found
+            </p>
+          }
+        </div>
       </div>
     </div>
   </cx-popover>

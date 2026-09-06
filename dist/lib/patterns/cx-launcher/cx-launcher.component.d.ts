@@ -1,0 +1,44 @@
+import { EventEmitter, OnDestroy } from "@angular/core";
+import { type CxLauncherItem } from "./launcher-items";
+import * as i0 from "@angular/core";
+export declare class CxLauncherComponent implements OnDestroy {
+    private readonly document;
+    private readonly overlayState;
+    private readonly itemsState;
+    private readonly openState;
+    private readonly queryState;
+    private readonly activeIdState;
+    private overlayHandle?;
+    private focusPending;
+    private scrollPending;
+    private pointerPosition?;
+    private readonly focusListener;
+    private root?;
+    private results?;
+    private search?;
+    protected readonly listId: string;
+    protected readonly open$: import("@angular/core").Signal<boolean>;
+    protected readonly query$: import("@angular/core").Signal<string>;
+    protected readonly results$: import("@angular/core").Signal<readonly CxLauncherItem[]>;
+    protected readonly activeItem$: import("@angular/core").Signal<CxLauncherItem | undefined>;
+    protected readonly activeControlId$: import("@angular/core").Signal<string | undefined>;
+    protected readonly empty$: import("@angular/core").Signal<boolean>;
+    protected readonly trapsFocus: import("@angular/core").WritableSignal<boolean>;
+    constructor();
+    set items(value: readonly CxLauncherItem[]);
+    set open(value: boolean);
+    readonly openChange: EventEmitter<boolean>;
+    readonly select: EventEmitter<string>;
+    ngOnDestroy(): void;
+    protected optionId(index: number): string;
+    protected onQuery(value: string): void;
+    protected onPointer(event: PointerEvent, item: CxLauncherItem): void;
+    protected onKeydown(event: KeyboardEvent): void;
+    protected activate(item: CxLauncherItem): void;
+    protected dismiss(): void;
+    protected onBackdrop(event: MouseEvent): void;
+    private keepFocusInside;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CxLauncherComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxLauncherComponent, "cx-launcher", never, { "items": { "alias": "items"; "required": false; }; "open": { "alias": "open"; "required": false; }; }, { "openChange": "openChange"; "select": "select"; }, never, never, true, never>;
+}
+//# sourceMappingURL=cx-launcher.component.d.ts.map

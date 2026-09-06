@@ -24,7 +24,7 @@
     [style.top.px]="top"
     [style.bottom.px]="bottom"
   >
-    <div class="cx-popover__body" data-cx-popover-scroll-container>
+    <div #scrollBody class="cx-popover__body" data-cx-popover-scroll-container>
       @if (surfaceVariant === 'grouped' && normalizedTitle) {
         <div class="cx-popover__island cx-popover__island--heading">
           <ng-container [ngTemplateOutlet]="headingRow" />
@@ -39,6 +39,7 @@
         <ng-content />
       </div>
     </div>
+    <cx-popover-scrollbar [viewport]="surfaceVariant === 'grouped' ? scrollBody : content" />
   </div>
 }
 

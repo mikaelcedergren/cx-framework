@@ -19,6 +19,7 @@ export * from './patterns/cx-mural';
 export * from './patterns/cx-navigation-recovery';
 export * from './patterns/cx-null-controller';
 export * from './patterns/cx-process';
+export * from './patterns/cx-launcher';
 export * from './patterns/cx-utility-bar';
 export * from './patterns/cx-radio-reveal';
 export * from './patterns/cx-side-nav';

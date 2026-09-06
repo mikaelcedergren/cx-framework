@@ -19,6 +19,7 @@ export * from './patterns/cx-mural/index.js';
 export * from './patterns/cx-navigation-recovery/index.js';
 export * from './patterns/cx-null-controller/index.js';
 export * from './patterns/cx-process/index.js';
+export * from './patterns/cx-launcher/index.js';
 export * from './patterns/cx-utility-bar/index.js';
 export * from './patterns/cx-radio-reveal/index.js';
 export * from './patterns/cx-side-nav/index.js';
