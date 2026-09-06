@@ -353,7 +353,7 @@ function validateSafeLogError(value) {
         "EvalError",
         "AggregateError",
     ]);
-    const location = /^[a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?):\d{1,8}:\d{1,8}$/;
+    const location = /^[a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?|py):\d{1,8}:\d{1,8}$/;
     function entry(candidate, keys) {
         if (!candidate ||
             typeof candidate !== "object" ||
@@ -418,7 +418,7 @@ function safeError(error) {
             for (const line of stack.split("\n").slice(1, 25)) {
                 // Only executable source basenames and numeric positions survive. No message, locals,
                 // function arguments, absolute paths, URL credentials, query strings, or custom fields.
-                const match = /^\s+at .*?[/\\]([a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?)):(\d{1,8}):(\d{1,8})\)?$/.exec(line);
+                const match = /^\s+at .*?[/\\]([a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?|py)):(\d{1,8}):(\d{1,8})\)?$/.exec(line);
                 if (match)
                     locations.push(`${match[1]}:${match[2]}:${match[3]}`);
                 if (locations.length === 8) {

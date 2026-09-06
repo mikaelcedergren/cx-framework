@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.2
+
+- The structured-log validator accepts sanitized `.py` source locations from Python producers.
+  Error evidence remains limited to source basenames and numeric positions, with the same
+  bounded cause chain and reproducible fingerprint. Unknown columns use zero. Python adapters
+  must omit messages, paths, locals and arbitrary exception fields, and use the declared schema.
+
 ## 0.10.1
 
 - The shared JSON error middleware is the terminal error boundary. When headers have already

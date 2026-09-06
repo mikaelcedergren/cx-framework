@@ -526,7 +526,7 @@ function validateSafeLogError(value: unknown): SafeLogError {
     "EvalError",
     "AggregateError",
   ]);
-  const location = /^[a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?):\d{1,8}:\d{1,8}$/;
+  const location = /^[a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?|py):\d{1,8}:\d{1,8}$/;
   function entry(
     candidate: unknown,
     keys: readonly string[],
@@ -608,7 +608,7 @@ function safeError(error: unknown): SafeLogError {
         // Only executable source basenames and numeric positions survive. No message, locals,
         // function arguments, absolute paths, URL credentials, query strings, or custom fields.
         const match =
-          /^\s+at .*?[/\\]([a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?)):(\d{1,8}):(\d{1,8})\)?$/.exec(
+          /^\s+at .*?[/\\]([a-zA-Z0-9_-]{1,80}\.(?:[cm]?js|tsx?|py)):(\d{1,8}):(\d{1,8})\)?$/.exec(
             line,
           );
         if (match) locations.push(`${match[1]}:${match[2]}:${match[3]}`);
