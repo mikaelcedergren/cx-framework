@@ -158,12 +158,17 @@ export function acquireServerWorkerReadinessLease({
   });
 }
 
-interface WorkerLifetimeReference {
+export interface WorkerLifetimeReference {
   readonly closed: boolean;
   close(): void;
 }
 
-function createWorkerLifetimeReference(): WorkerLifetimeReference {
+/**
+ * Keep an initialized listener-free runtime alive without polling or creating work.
+ * Close during shutdown. This is only a process lifetime reference, not a readiness
+ * proof; production workers use their release-bound readiness lease instead.
+ */
+export function createWorkerLifetimeReference(): WorkerLifetimeReference {
   const channel = new MessageChannel();
   let closed = false;
   try {

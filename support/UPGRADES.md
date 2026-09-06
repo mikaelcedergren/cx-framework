@@ -1066,3 +1066,11 @@ Owned SQLite verification accepts table, column, index, and foreign-key metadata
 object-name arguments, including parameterized SQL table functions. These arguments select schema
 objects; they do not change database settings. Setting changes and writes remain denied in both
 before-write and immutable snapshot verification. No product API or schema migration changes.
+
+## 0.9.35 — idle worker lifetime
+
+`server/worker-readiness` exports `createWorkerLifetimeReference` for an initialized, listener-free
+runtime that must remain supervised even when its work is disabled. It holds no timer, listener,
+data handle, or provider operation; close it during shutdown. It is not a readiness proof.
+Production workers continue using the release-bound readiness lease, which already owns this
+reference. Development runtimes without that lease can now use the same lifetime primitive.

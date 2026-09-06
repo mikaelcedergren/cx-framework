@@ -83,7 +83,12 @@ export function acquireServerWorkerReadinessLease({ environment = process.env, i
         workerKey: worker.key,
     });
 }
-function createWorkerLifetimeReference() {
+/**
+ * Keep an initialized listener-free runtime alive without polling or creating work.
+ * Close during shutdown. This is only a process lifetime reference, not a readiness
+ * proof; production workers use their release-bound readiness lease instead.
+ */
+export function createWorkerLifetimeReference() {
     const channel = new MessageChannel();
     let closed = false;
     try {

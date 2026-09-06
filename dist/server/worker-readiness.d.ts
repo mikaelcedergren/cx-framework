@@ -49,6 +49,16 @@ export declare function createServerWorkerReadiness({ identity, productId, worke
  * handle is invoked. The reference keeps an intentionally idle listener-free worker supervised.
  */
 export declare function acquireServerWorkerReadinessLease({ environment, identity, workerKey, }: AcquireServerWorkerReadinessLeaseOptions): ServerWorkerReadinessLease | undefined;
+export interface WorkerLifetimeReference {
+    readonly closed: boolean;
+    close(): void;
+}
+/**
+ * Keep an initialized listener-free runtime alive without polling or creating work.
+ * Close during shutdown. This is only a process lifetime reference, not a readiness
+ * proof; production workers use their release-bound readiness lease instead.
+ */
+export declare function createWorkerLifetimeReference(): WorkerLifetimeReference;
 export declare function parseServerWorkerReadiness(value: unknown): ServerWorkerReadiness;
 /**
  * Send one readiness receipt only inside shared release validation. Ordinary production and
