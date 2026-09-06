@@ -3,6 +3,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { localBindHost, nodeEnvironmentValue, portEnvironmentValue, releaseValidationEnvironmentValue, } from "./configuration.js";
 import { apiNotFoundMiddleware, jsonErrorMiddleware } from "./errors.js";
 import { healthMiddleware } from "./health.js";
+import { createRuntimeLogger, } from "./logging.js";
 import { requestIdMiddleware } from "./request-id.js";
 import { assertServerProcessRole } from "./process-role.js";
 import { loadProductManifestFile, } from "./product-manifest.js";
@@ -93,6 +94,20 @@ export function createStaticSiteApplication(options) {
     const noindexPaths = options.noindexPaths ?? [];
     const noindex = noindexHeader(noindexPaths);
     const configuration = resolveStaticSiteConfiguration(options);
+    const logger = createRuntimeLogger({
+        identity: {
+            service: configuration.manifest.id,
+            environment: configuration.nodeEnvironment,
+            executionScope: (options.environment ?? process.env)["CX_EXECUTION_SCOPE"] ??
+                (configuration.releaseValidation
+                    ? "validation"
+                    : configuration.nodeEnvironment),
+            role: "web",
+            releaseId: configuration.serverIdentity?.releaseId ?? "development",
+            pid: process.pid,
+        },
+        ...(options.logSink === undefined ? {} : { sink: options.logSink }),
+    });
     if (configuration.serverIdentity) {
         assertServerProcessRole({
             artifactRoot: dirname(configuration.manifestFile),
@@ -115,7 +130,9 @@ export function createStaticSiteApplication(options) {
     });
     const app = requireStaticSiteApplication(options.express());
     hardenApplication(app);
-    app.use(requestIdMiddleware());
+    app.use(requestIdMiddleware(options.trustedProxyAddress === undefined
+        ? {}
+        : { trustedProxyAddress: options.trustedProxyAddress }));
     app.use(securityHeaders({ frameOptions: options.frameOptions ?? "DENY" }));
     if (noindexPaths.length > 0)
         app.use(noindex);
@@ -142,26 +159,46 @@ export function createStaticSiteApplication(options) {
             next(error);
         }
     });
-    app.use(jsonErrorMiddleware({
-        ...(options.onInternalError
-            ? { onInternalError: options.onInternalError }
-            : {}),
-    }));
-    return Object.freeze({ app, browserServing, configuration });
+    app.use(jsonErrorMiddleware({ logger }));
+    return Object.freeze({ app, browserServing, configuration, logger });
 }
 export function createStaticSiteServer(options) {
     const shutdownTimeoutMs = options.shutdownTimeoutMs ?? 10_000;
     assertTimerDelayMilliseconds(shutdownTimeoutMs, "Static-site shutdown timeout");
     const shutdownSignalNames = validateShutdownSignalNames(options.shutdownSignalNames);
     const application = createStaticSiteApplication(options);
-    const { appName, browserDir, host, port } = application.configuration;
+    const { host, port } = application.configuration;
+    const { logger } = application;
+    const onShutdownError = (error) => {
+        logger.emit({
+            event: "service.shutdown",
+            level: "error",
+            category: "operation",
+            outcome: "failure",
+            error,
+        });
+        if (options.onShutdownError)
+            options.onShutdownError(error);
+        else
+            process.exitCode = 1;
+    };
     const server = application.app.listen(port, host, (error) => {
         if (error) {
-            const detail = error instanceof Error ? error.message : String(error);
-            console.error(`[${appName}] failed to listen on http://${host}:${port}: ${detail}`);
+            logger.emit({
+                event: "service.listen",
+                level: "fatal",
+                category: "operation",
+                outcome: "failure",
+                error,
+            });
             throw error;
         }
-        console.log(`[${appName}] serving ${application.browserServing.browserDir || browserDir} on http://${host}:${port}`);
+        logger.emit({
+            event: "service.listen",
+            level: "info",
+            category: "operation",
+            outcome: "success",
+        });
     });
     const shutdown = createGracefulShutdown({
         server,
@@ -171,13 +208,13 @@ export function createStaticSiteServer(options) {
     try {
         disposeShutdownSignals = bindShutdownSignals({
             names: shutdownSignalNames,
-            onError: options.onShutdownError ?? defaultShutdownError,
+            onError: onShutdownError,
             shutdown,
             signals: options.shutdownSignals ?? process,
         });
     }
     catch (error) {
-        rollbackFailedServerStartup(server, error, options.onShutdownError ?? defaultShutdownError);
+        rollbackFailedServerStartup(server, error, onShutdownError, logger);
     }
     return Object.freeze({
         ...application,
@@ -199,7 +236,7 @@ function requireStaticSiteApplication(value) {
     }
     return value;
 }
-function rollbackFailedServerStartup(server, registrationError, onError) {
+function rollbackFailedServerStartup(server, registrationError, onError, logger) {
     try {
         server.close((closeError) => {
             if (!closeError)
@@ -208,7 +245,14 @@ function rollbackFailedServerStartup(server, registrationError, onError) {
                 onError(closeError);
             }
             catch (reportingError) {
-                defaultShutdownError(new AggregateError([closeError, reportingError], "Failed to report a static-site startup rollback error."));
+                logger.emit({
+                    event: "service.rollback",
+                    level: "error",
+                    category: "operation",
+                    outcome: "failure",
+                    error: new AggregateError([closeError, reportingError]),
+                });
+                process.exitCode = 1;
             }
         });
     }
@@ -294,9 +338,4 @@ function lstatIfPresent(candidate) {
 }
 function isNodeError(error) {
     return error instanceof Error && "code" in error;
-}
-function defaultShutdownError(error) {
-    const detail = error instanceof Error ? (error.stack ?? error.message) : String(error);
-    console.error(`[static-site] graceful shutdown failed: ${detail}`);
-    process.exitCode = 1;
 }

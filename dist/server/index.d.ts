@@ -6,6 +6,7 @@ export * from "./gate.js";
 export * from "./health.js";
 export * from "./http.js";
 export * from "./listen.js";
+export * from "./logging.js";
 export * from "./origin.js";
 export * from "./private-environment.js";
 export * from "./product-manifest.js";

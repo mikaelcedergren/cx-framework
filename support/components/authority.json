@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 131,
-  "catalogSha256": "0ad54d63bdb4e5a5aa38717924f6b4bcc34e839404343f0e1dc5b2eb06e9058d",
+  "catalogSha256": "396019db488bb641ca888746b7dc3a104e9f12efd4b725ae87e86ceb0bbb2744",
   "components": [
     {
       "name": "cx-account-control",
@@ -4471,7 +4471,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "c597e536ca859f709e31eff1f9b8ba9676c6c895a601b47237b0138bf1464dae"
+            "sha256": "4e7f82ee3676c9e685074257ff28767509053d51415f6f1a4bd61fd91a202bd9"
           }
         ]
       }
@@ -6908,7 +6908,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "5f0eeb1f9bef33e301523d0e6adaa684f5f22821e5f665006827b48fb8d3d1fb"
+          "sha256": "666874497216240c32a2eda1d01e50212d12734b451f43010d66ac936f3467ba"
         },
         "template": {
           "kind": "external",
@@ -6918,7 +6918,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "54795f618fb183c91637f9d22e2c5eba163d5598146f087b068ee637543a538a"
+            "sha256": "4df964fb9b20ed60397d0242c19436f10755f4d3843d0e96ca3bd619a438101a"
           }
         ]
       }

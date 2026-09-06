@@ -11,6 +11,11 @@ import {
 } from "./configuration.js";
 import { apiNotFoundMiddleware, jsonErrorMiddleware } from "./errors.js";
 import { healthMiddleware } from "./health.js";
+import {
+  createRuntimeLogger,
+  type LogSink,
+  type RuntimeLogger,
+} from "./logging.js";
 import type {
   CloseableServer,
   HardenableApplication,
@@ -147,7 +152,8 @@ export interface StaticSiteOptions {
   readonly frameOptions?: "DENY" | "SAMEORIGIN";
   readonly manifestFile: string;
   readonly noindexPaths?: readonly string[];
-  readonly onInternalError?: (error: unknown) => void;
+  readonly logSink?: LogSink;
+  readonly trustedProxyAddress?: "127.0.0.1" | "::1";
   readonly repoRoot: string;
   readonly serverIdentityFile?: string;
 }
@@ -163,6 +169,7 @@ export interface StaticSiteApplicationResult {
   readonly app: StaticSiteApplication;
   readonly browserServing: BrowserServing;
   readonly configuration: StaticSiteConfiguration;
+  readonly logger: RuntimeLogger;
 }
 
 export interface StaticSiteServerResult extends StaticSiteApplicationResult {
@@ -296,6 +303,21 @@ export function createStaticSiteApplication(
   const noindexPaths = options.noindexPaths ?? [];
   const noindex = noindexHeader(noindexPaths);
   const configuration = resolveStaticSiteConfiguration(options);
+  const logger = createRuntimeLogger({
+    identity: {
+      service: configuration.manifest.id,
+      environment: configuration.nodeEnvironment,
+      executionScope:
+        (options.environment ?? process.env)["CX_EXECUTION_SCOPE"] ??
+        (configuration.releaseValidation
+          ? "validation"
+          : configuration.nodeEnvironment),
+      role: "web",
+      releaseId: configuration.serverIdentity?.releaseId ?? "development",
+      pid: process.pid,
+    },
+    ...(options.logSink === undefined ? {} : { sink: options.logSink }),
+  });
   if (configuration.serverIdentity) {
     assertServerProcessRole({
       artifactRoot: dirname(configuration.manifestFile),
@@ -318,7 +340,13 @@ export function createStaticSiteApplication(
   });
   const app = requireStaticSiteApplication(options.express());
   hardenApplication(app);
-  app.use(requestIdMiddleware());
+  app.use(
+    requestIdMiddleware(
+      options.trustedProxyAddress === undefined
+        ? {}
+        : { trustedProxyAddress: options.trustedProxyAddress },
+    ),
+  );
   app.use(securityHeaders({ frameOptions: options.frameOptions ?? "DENY" }));
   if (noindexPaths.length > 0) app.use(noindex);
   const compressionMiddleware = options.compression();
@@ -358,15 +386,9 @@ export function createStaticSiteApplication(
       }
     },
   );
-  app.use(
-    jsonErrorMiddleware({
-      ...(options.onInternalError
-        ? { onInternalError: options.onInternalError }
-        : {}),
-    }),
-  );
+  app.use(jsonErrorMiddleware({ logger }));
 
-  return Object.freeze({ app, browserServing, configuration });
+  return Object.freeze({ app, browserServing, configuration, logger });
 }
 
 export function createStaticSiteServer(
@@ -381,18 +403,36 @@ export function createStaticSiteServer(
     options.shutdownSignalNames,
   );
   const application = createStaticSiteApplication(options);
-  const { appName, browserDir, host, port } = application.configuration;
+  const { host, port } = application.configuration;
+  const { logger } = application;
+  const onShutdownError = (error: unknown): void => {
+    logger.emit({
+      event: "service.shutdown",
+      level: "error",
+      category: "operation",
+      outcome: "failure",
+      error,
+    });
+    if (options.onShutdownError) options.onShutdownError(error);
+    else process.exitCode = 1;
+  };
   const server = application.app.listen(port, host, (error) => {
     if (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      console.error(
-        `[${appName}] failed to listen on http://${host}:${port}: ${detail}`,
-      );
+      logger.emit({
+        event: "service.listen",
+        level: "fatal",
+        category: "operation",
+        outcome: "failure",
+        error,
+      });
       throw error;
     }
-    console.log(
-      `[${appName}] serving ${application.browserServing.browserDir || browserDir} on http://${host}:${port}`,
-    );
+    logger.emit({
+      event: "service.listen",
+      level: "info",
+      category: "operation",
+      outcome: "success",
+    });
   });
   const shutdown = createGracefulShutdown({
     server,
@@ -402,16 +442,12 @@ export function createStaticSiteServer(
   try {
     disposeShutdownSignals = bindShutdownSignals({
       names: shutdownSignalNames,
-      onError: options.onShutdownError ?? defaultShutdownError,
+      onError: onShutdownError,
       shutdown,
       signals: options.shutdownSignals ?? process,
     });
   } catch (error) {
-    rollbackFailedServerStartup(
-      server,
-      error,
-      options.onShutdownError ?? defaultShutdownError,
-    );
+    rollbackFailedServerStartup(server, error, onShutdownError, logger);
   }
   return Object.freeze({
     ...application,
@@ -445,6 +481,7 @@ function rollbackFailedServerStartup(
   server: CloseableServer,
   registrationError: unknown,
   onError: (error: unknown) => void,
+  logger: RuntimeLogger,
 ): never {
   try {
     server.close((closeError) => {
@@ -452,12 +489,14 @@ function rollbackFailedServerStartup(
       try {
         onError(closeError);
       } catch (reportingError) {
-        defaultShutdownError(
-          new AggregateError(
-            [closeError, reportingError],
-            "Failed to report a static-site startup rollback error.",
-          ),
-        );
+        logger.emit({
+          event: "service.rollback",
+          level: "error",
+          category: "operation",
+          outcome: "failure",
+          error: new AggregateError([closeError, reportingError]),
+        });
+        process.exitCode = 1;
       }
     });
   } catch (closeError) {
@@ -573,11 +612,4 @@ function lstatIfPresent(
 
 function isNodeError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && "code" in error;
-}
-
-function defaultShutdownError(error: unknown): void {
-  const detail =
-    error instanceof Error ? (error.stack ?? error.message) : String(error);
-  console.error(`[static-site] graceful shutdown failed: ${detail}`);
-  process.exitCode = 1;
 }

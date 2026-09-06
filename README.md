@@ -76,6 +76,107 @@ output while excluding raw `patterns/`, `primitives/`, and `tooling/` trees. Usa
 in `support/components/guidance.json`, and version-to-version migration instructions remain in
 `support/UPGRADES.md`.
 
+## Structured logging
+
+`server/logging` provides the Node-only logger. Construct one identity per process role from trusted
+startup configuration. Keep the execution scope distinct from `NODE_ENV`: ordinary development
+may share product records while its work and logs remain in the development scope.
+
+```ts
+import {
+  createRuntimeLogger,
+  runWithLogContext,
+} from "@mikaelcedergren/cx-framework/server/logging";
+import { jsonErrorMiddleware } from "@mikaelcedergren/cx-framework/server/errors";
+
+const logger = createRuntimeLogger({
+  identity: {
+    service: "example",
+    environment: "production",
+    executionScope: "production",
+    role: "web",
+    releaseId: serverIdentity.releaseId,
+    pid: process.pid,
+  },
+});
+
+app.use(jsonErrorMiddleware({ logger })); // Register after product routes.
+runWithLogContext({ runId, jobId }, () => {
+  logger.emit({
+    event: "job.complete",
+    level: "info",
+    category: "operation",
+    outcome: "success",
+    durationMs,
+    attempt,
+  });
+});
+```
+
+Events require `event`, `level`, `category` and `outcome`. Identity, schema version and UTC timestamp
+are supplied by the logger. Levels are `debug`, `info`, `warn`, `error`, `fatal`; categories are
+`diagnostic`, `operation`, `security`, `maintenance`; outcomes are `started`, `success`, `failure`,
+`retry`, `cancelled`, `skipped`. Event names contain two to six lowercase dot-separated components,
+up to 96 characters. All labels and opaque IDs use at most 128 ASCII identifier characters.
+
+The optional fields are `requestId`, `runId`, `jobId`, `effectId`, `code`, `routeId`, `provider`,
+`operation`, a standard `method`, `statusCode`, `upstreamStatusCode`, `cacheStatus`, `durationMs`,
+`upstreamDurationMs`, `attempt`, `count`, `bytes`, `inputTokens`, `outputTokens`, and `error`.
+Cache status is `hit`, `miss`, `bypass`, `expired`, `stale`, `updating`, `revalidated`, or `none`;
+host adapters classify gateway values before emitting them. Numeric measurements are finite and nonnegative;
+counts are safe integers. Labels must come from reviewed source and references must be opaque.
+Syntax checks cannot distinguish a secret from a valid identifier: callers must never place
+credentials or private content in these fields. URLs, headers, bodies and arbitrary metadata are
+unsupported. Invalid events return `false` and increment `invalid`; they are never partly logged.
+
+Host collectors use `parseLogRecord(line)` to decode the same bounded schema without duplicating
+validation. It preserves the original timestamp and identity, rejects unknown fields and unsafe
+error evidence, and verifies the error fingerprint. It does not inherit the collector's context.
+Collectors must additionally match identity to the registered writer and classify clock skew or
+missing coverage; a valid record does not authenticate its producer or prove delivery.
+
+An error yields its built-in type, a stable fingerprint, at most eight executable source basenames
+with line/column positions per cause, and at most four total cause entries. Error messages,
+absolute paths, arbitrary properties, URL arguments and function arguments are omitted. Release
+identity supplies the source version needed to resolve locations. Fingerprints identify code
+locations, not individual incidents. Records are capped at 16 KiB including their newline.
+
+`requestIdMiddleware()` creates an ID and retains it through asynchronous handlers. It ignores
+incoming IDs by default. Only set `trustedProxyAddress` to an exact loopback socket peer after
+configuring that gateway to overwrite `X-Request-ID`; another local process is inside that trust
+boundary too. This setting does not authenticate a caller. New `runWithLogContext` scopes replace
+old context and restore it after completion; explicitly carry approved parent IDs into child work.
+Persist those references with job admission and restore them in the worker. No request or product
+object is held by the context store.
+
+`jsonErrorMiddleware({ logger })` records hidden failures, every 5xx, and errors after headers,
+once per request at that boundary. Expected 4xx responses produce no diagnostic stack by default.
+This is the terminal error boundary: after headers, it calls `response.destroy()` instead of
+forwarding the original private error to the server's default logger. HTTP adapters and test
+doubles must support that method; Express already does.
+The static-site application installs this boundary automatically, exposes `logger` in its result,
+and emits structured listen/shutdown-failure events. Dynamic products pass their process logger.
+Product services own the vocabulary for other lifecycle, retry, provider and final outcomes.
+
+Debug is off until `logger.enableDebug(durationMs)` is explicitly called with a duration of at
+most one hour; zero disables it immediately. A monotonic clock bounds elapsed debug time even if
+the wall clock changes. The API installs no timer or remote control endpoint.
+
+The default sink writes JSON lines to stderr. `createWritableLogSink` reuses one bounded adapter
+per stream, allows at most 64 KiB of pending data, and rejects writes under backpressure instead
+of creating a retry queue. A successful `emit` means accepted by transport, not persisted to disk.
+Late write failures, pending bytes and availability are reported by `logger.status().sink`;
+logger counters distinguish accepted, dropped, invalid and filtered events. Counters saturate and
+remain process-local; the host samples them before restart where possible and reports unknown
+coverage when it cannot. A sink failure never recursively emits a log or blocks an HTTP error
+response. An injected sink owns its own bounded behavior and nonthrowing `status()` implementation.
+
+This package opens no file/socket/timer or stream listener when imported and adds no production
+dependency. It does not rotate files, enforce disk quotas, install capture processes, persist loss
+counters, project history or collect browser errors. Those are host responsibilities. Raw runtime
+crashes and subprocess stderr also need host capture; the structured API cannot sanitize output
+that bypasses it. Host retention policy must keep diagnostics separate from authoritative data.
+
 ## Node web runtime
 
 Server entrypoints are ESM-only, require Node 26, and resolve only under Node's package conditions.

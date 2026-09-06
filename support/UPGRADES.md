@@ -14,6 +14,35 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.1
+
+- The shared JSON error middleware is the terminal error boundary. When headers have already
+  been sent, it records the sanitized cause and destroys the response without forwarding the
+  private error to Express's default logger. HTTP response adapters and test doubles must
+  implement `destroy()`; real Express responses already do.
+
+## 0.10.0
+
+- `cx-markdown-editor` now edits checkbox lists, dividers, and strikethrough, and
+  formats pasted Markdown. Checkbox state is saved as `[ ]` / `[x]`; new items
+  start unchecked. Paste as plain text keeps syntax literal, as do code blocks.
+  Existing `value` / `valueChange` integrations require no changes.
+
+- Import the structured logger and operation context from `server/logging`. Events accept only
+  declared operational fields; arbitrary metadata and private error messages are not serialized.
+  Inspect `logger.status()` for invalid/dropped events and transport failures. An accepted write
+  is not proof of durable storage. Host capture and retention remain outside this package.
+- `jsonErrorMiddleware` now requires `{ logger }`. Remove `onInternalError` callbacks and pass
+  the product's `createRuntimeLogger` instance. Hidden failures, exposed 5xx errors, and failures
+  after headers are recorded once per request. Keep product error codes within 128 characters.
+- The static-site application creates its logger from the manifest, environment, execution
+  scope and release identity, and exposes it in the result. Remove `onInternalError`; inject
+  `logSink` only when the host or an isolated test owns transport. Lifecycle output is structured.
+- Request context follows asynchronous handlers automatically. Replace `trustIncoming` with an
+  explicit `trustedProxyAddress` only after the local gateway overwrites `X-Request-ID` on every
+  proxy path. Direct dev/test servers leave this unset. Carry only opaque references into jobs
+  with `runWithLogContext`; context replacement prevents unrelated work inheriting an old request.
+
 ## 0.9.31
 
 - Durable jobs require an explicit `executionScope` when creating a store. Every enqueue,

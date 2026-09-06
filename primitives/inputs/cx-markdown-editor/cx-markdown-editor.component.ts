@@ -4,6 +4,8 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EnvironmentInjector,
+  Injector,
   EventEmitter,
   Input,
   OnDestroy,
@@ -13,6 +15,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { createListItemViews } from './markdown-editor-list-item-view';
 import type { EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
@@ -59,6 +62,10 @@ export type CxMarkdownEditorLayout = 'default' | 'fill';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
+  private readonly listItemViews = createListItemViews(
+    inject(EnvironmentInjector),
+    inject(Injector),
+  );
   private engine: MarkdownEditorEngine | undefined;
   private view: EditorView | undefined;
   private destroyed = false;
@@ -97,6 +104,7 @@ export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
   public set disabled(value: boolean) {
     this.disabledState.set(!!value);
     this.view?.setProps({});
+    this.listItemViews.refresh();
   }
 
   @Input()
@@ -128,6 +136,7 @@ export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
     const state = engine.createMarkdownEditorState(this.lastKnownValue);
     this.view = new engine.EditorView(this.contentRef.nativeElement, {
       state,
+      nodeViews: this.listItemViews.nodeViews,
       editable: () => !this.disabledState(),
       attributes: this.editorAttributes(),
       dispatchTransaction: transaction => this.onTransaction(transaction),
@@ -175,7 +184,9 @@ export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
     return attributes;
   }
 
-  private onTransaction(transaction: Parameters<NonNullable<EditorView['props']['dispatchTransaction']>>[0]): void {
+  private onTransaction(
+    transaction: Parameters<NonNullable<EditorView['props']['dispatchTransaction']>>[0],
+  ): void {
     const view = this.view;
     const engine = this.engine;
     if (!view || !engine) {

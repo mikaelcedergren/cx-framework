@@ -2,6 +2,7 @@ export type HeaderValue = string | number | readonly string[];
 
 export interface HttpRequest {
   readonly ip?: string | undefined;
+  readonly socket?: { readonly remoteAddress?: string | undefined } | undefined;
   readonly method?: string | undefined;
   readonly path?: string | undefined;
   readonly url?: string | undefined;
@@ -14,6 +15,7 @@ export interface HttpRequest {
 
 export interface HttpResponse {
   readonly headersSent?: boolean | undefined;
+  destroy(): unknown;
   getHeader?(name: string): HeaderValue | undefined;
   setHeader(name: string, value: HeaderValue): unknown;
   status(code: number): this;

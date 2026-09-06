@@ -1,4 +1,5 @@
 import { type Environment, type NodeEnvironment } from "./configuration.js";
+import { type LogSink, type RuntimeLogger } from "./logging.js";
 import type { CloseableServer, HardenableApplication, HttpRequest, HttpResponse, Middleware, NextFunction, SignalSource } from "./http.js";
 import { type ProductManifest } from "./product-manifest.js";
 import { type ServerReleaseIdentity } from "./server-identity.js";
@@ -57,7 +58,8 @@ export interface StaticSiteOptions {
     readonly frameOptions?: "DENY" | "SAMEORIGIN";
     readonly manifestFile: string;
     readonly noindexPaths?: readonly string[];
-    readonly onInternalError?: (error: unknown) => void;
+    readonly logSink?: LogSink;
+    readonly trustedProxyAddress?: "127.0.0.1" | "::1";
     readonly repoRoot: string;
     readonly serverIdentityFile?: string;
 }
@@ -71,6 +73,7 @@ export interface StaticSiteApplicationResult {
     readonly app: StaticSiteApplication;
     readonly browserServing: BrowserServing;
     readonly configuration: StaticSiteConfiguration;
+    readonly logger: RuntimeLogger;
 }
 export interface StaticSiteServerResult extends StaticSiteApplicationResult {
     readonly disposeShutdownSignals: () => void;

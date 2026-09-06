@@ -13,6 +13,7 @@ export type CxMarkdownEditorLayout = 'default' | 'fill';
  * conversion restores the literal text.
  */
 export declare class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
+    private readonly listItemViews;
     private engine;
     private view;
     private destroyed;

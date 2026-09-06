@@ -1,4 +1,5 @@
 import type { HttpRequest, HttpResponse, NextFunction } from "./http.js";
+import { type RuntimeLogger } from "./logging.js";
 export type JsonPrimitive = boolean | number | string | null;
 export type JsonValue = JsonPrimitive | readonly JsonValue[] | {
     readonly [key: string]: JsonValue;
@@ -32,8 +33,8 @@ export declare function errorEnvelope(error: unknown, requestId?: string): {
 };
 export declare function notFoundError(pathname: string): HttpError;
 export declare function apiNotFoundMiddleware(): (request: HttpRequest, _response: HttpResponse, next: NextFunction) => void;
-export declare function jsonErrorMiddleware({ onInternalError, }?: {
-    onInternalError?: (error: unknown, request: HttpRequest) => void;
-}): (error: unknown, request: HttpRequest, response: HttpResponse, next: NextFunction) => void;
+export declare function jsonErrorMiddleware({ logger, }: {
+    logger: Pick<RuntimeLogger, "emit">;
+}): (error: unknown, request: HttpRequest, response: HttpResponse, _next: NextFunction) => void;
 export declare function normalizeHttpError(error: unknown): HttpError;
 //# sourceMappingURL=errors.d.ts.map

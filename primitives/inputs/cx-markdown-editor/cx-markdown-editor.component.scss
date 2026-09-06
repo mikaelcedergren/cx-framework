@@ -53,9 +53,9 @@ cx-markdown-editor .ProseMirror {
 
 // The compact UI markdown scale belongs to the default presentation only —
 // document mode gets its type from the global `.cx-article` contract (the
-// component puts that class on the ProseMirror root), and these
-// higher-specificity rules would override it.
-cx-markdown-editor:not(.cx-markdown-editor-host--document) .ProseMirror {
+// component puts that class on the ProseMirror root). The presentation guard
+// adds no specificity, so the editor's shared structural rules apply equally.
+cx-markdown-editor:where(:not(.cx-markdown-editor-host--document)) .ProseMirror {
   @include markdown-type.cx-markdown-type;
 }
 
@@ -88,6 +88,12 @@ cx-markdown-editor .ProseMirror li {
   position: relative;
 }
 
+// Outside markers must fit inside the editor's scrolling viewport, including
+// multi-digit numbers. Keep wrapped lines aligned with the item text.
+cx-markdown-editor .ProseMirror ol {
+  padding-inline-start: 3em;
+}
+
 cx-markdown-editor .ProseMirror-hideselection *::selection {
   background: transparent;
 }
@@ -100,4 +106,25 @@ cx-markdown-editor img.ProseMirror-separator {
   display: inline !important;
   border: none !important;
   margin: 0 !important;
+}
+
+cx-markdown-editor .ProseMirror .cx-markdown-editor__task {
+  list-style: none;
+}
+
+cx-markdown-editor .cx-markdown-editor__task-control {
+  position: absolute;
+  inset-inline-end: calc(100% + var(--space-xs));
+  inset-block-start: 0;
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+
+cx-markdown-editor .cx-markdown-editor__task-content > p {
+  margin-bottom: var(--space-2xs);
+}
+
+cx-markdown-editor .cx-markdown-editor__task-content > :last-child {
+  margin-bottom: 0;
 }

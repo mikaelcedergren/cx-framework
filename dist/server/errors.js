@@ -1,3 +1,4 @@
+import { createErrorRecorder } from "./logging.js";
 export class HttpError extends Error {
     code;
     status;
@@ -5,7 +6,7 @@ export class HttpError extends Error {
     expose;
     constructor({ code, message, status, details, expose = true, cause, }) {
         super(message, cause === undefined ? undefined : { cause });
-        if (!/^[a-z][a-z0-9_]*$/.test(code)) {
+        if (code.length > 128 || !/^[a-z][a-z0-9_]*$/.test(code)) {
             throw new Error(`Invalid HTTP error code: ${code}`);
         }
         if (!Number.isInteger(status) || status < 400 || status > 599) {
@@ -49,15 +50,30 @@ export function apiNotFoundMiddleware() {
         next(notFoundError(request.originalUrl ?? request.url ?? request.path ?? "/"));
     };
 }
-export function jsonErrorMiddleware({ onInternalError, } = {}) {
-    return (error, request, response, next) => {
+export function jsonErrorMiddleware({ logger, }) {
+    const recordError = createErrorRecorder(logger);
+    return (error, request, response, _next) => {
+        const normalized = normalizeHttpError(error);
+        if (!normalized.expose ||
+            normalized.status >= 500 ||
+            response.headersSent) {
+            recordError({
+                event: "http.internal_error",
+                level: "error",
+                category: "diagnostic",
+                outcome: "failure",
+                code: normalized.code,
+                statusCode: normalized.status,
+                ...(request.requestId ? { requestId: request.requestId } : {}),
+                error,
+            }, request);
+        }
         if (response.headersSent) {
-            next(error);
+            // This is the terminal error boundary. Express's default handler would print the original
+            // exception after closing the socket, bypassing the sanitized logger and duplicating it.
+            response.destroy();
             return;
         }
-        const normalized = normalizeHttpError(error);
-        if (!normalized.expose)
-            onInternalError?.(error, request);
         const result = errorEnvelope(normalized, request.requestId);
         response.status(result.status).type("application/json").json(result.body);
     };
