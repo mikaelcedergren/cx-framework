@@ -137,6 +137,13 @@ export declare function configureSqlite(database: SyncSqliteDatabase, configurat
  * empty rollback journal that SQLite legitimately recreates may be re-pinned.
  */
 export declare function openOwnedSqliteDatabase(options: OpenOwnedSqliteDatabaseOptions): OwnedSqliteDatabase;
+/** Verify a closed, owned SQLite snapshot without creating a journal or exposing a write API. */
+export declare function verifyOwnedSqliteSnapshot({ databasePath, operationalRoot, verify, maximumBytes, }: {
+    readonly databasePath: string;
+    readonly operationalRoot: string;
+    readonly verify: (database: ReadonlySyncSqliteDatabase) => void;
+    readonly maximumBytes?: number;
+}): void;
 export declare function applySqliteMigrations(database: SyncSqliteDatabase, migrations: readonly SqliteMigration[], options: SqliteMigrationOptions): SqliteMigrationResult;
 /**
  * Apply every pending migration as one verified batch.

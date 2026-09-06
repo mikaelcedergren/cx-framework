@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import { DatabaseSync, constants as sqliteConstants } from "node:sqlite";
 const MIGRATION_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
@@ -218,7 +219,15 @@ export function openOwnedSqliteDatabase(options) {
             emitOwnedSqliteOpenCheckpoint(options, "before_write_verified");
             storage.assertWhileOpen();
         }
+        const previousJournalMode = singlePragmaValue(guarded, "PRAGMA journal_mode");
         configureSqlite(guarded, options.configuration);
+        // Recheck a verified authority after changing the pager's journal mode. A pre-transition
+        // integrity check otherwise retains a read lock that prevents the first WAL checkpoint.
+        // Fresh initialization and the standalone configuration primitive own no prior data proof.
+        if (options.requireExisting &&
+            previousJournalMode !== options.configuration.journalMode) {
+            verifySqliteIntegrity(guarded);
+        }
         storage.assertWhileOpen();
         emitOwnedSqliteOpenCheckpoint(options, "configured");
         storage.assertWhileOpen();
@@ -266,6 +275,131 @@ export function openOwnedSqliteDatabase(options) {
             collectError(errors, () => native?.close());
         errors.push(...storage.closeProofs());
         throwCollectedErrors(errors, "Owned SQLite opening failed.");
+        throw error;
+    }
+}
+/** Verify a closed, owned SQLite snapshot without creating a journal or exposing a write API. */
+export function verifyOwnedSqliteSnapshot({ databasePath, operationalRoot, verify, maximumBytes = 512 * 1024 * 1024, }) {
+    assertPositiveSafeInteger(maximumBytes, "SQLite snapshot byte ceiling");
+    if (typeof verify !== "function")
+        throw new TypeError("SQLite snapshot verification requires a callback.");
+    const storage = prepareOwnedSqliteSnapshot(databasePath, operationalRoot);
+    let descriptor;
+    let native;
+    const failures = [];
+    let check;
+    try {
+        storage.assertBeforeWritableOpen();
+        descriptor = fs.openSync(storage.databasePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+        const before = fs.fstatSync(descriptor, { bigint: true });
+        if (before.size > BigInt(maximumBytes))
+            throw new Error("SQLite snapshot exceeds its byte ceiling.");
+        check = () => {
+            storage.assertWhileOpen();
+            const current = fs.fstatSync(descriptor, { bigint: true });
+            const atPath = fs.lstatSync(storage.databasePath, { bigint: true });
+            for (const field of [
+                "dev",
+                "ino",
+                "size",
+                "mtimeNs",
+                "ctimeNs",
+                "mode",
+                "nlink",
+            ]) {
+                if (current[field] !== before[field] || atPath[field] !== before[field])
+                    throw new Error("SQLite snapshot changed during verification.");
+            }
+        };
+        check();
+        const uri = pathToFileURL(`/dev/fd/${descriptor}`);
+        uri.searchParams.set("immutable", "1");
+        native = new DatabaseSync(uri, {
+            readOnly: true,
+            allowExtension: false,
+            defensive: true,
+        });
+        const database = guardOwnedSqliteDatabase(createPreparedSyncSqliteAdapter(native), check);
+        database.execute("PRAGMA query_only = ON");
+        runOwnedSqliteBeforeWriteVerification({
+            beforeWrite: verify,
+            database,
+            native,
+        });
+        check();
+    }
+    catch (error) {
+        failures.push(error);
+    }
+    if (native)
+        collectError(failures, () => native.close());
+    if (check)
+        collectError(failures, check);
+    if (descriptor !== undefined)
+        collectError(failures, () => fs.closeSync(descriptor));
+    failures.push(...storage.closeProofs());
+    throwCollectedErrors(failures, "Owned SQLite snapshot verification failed.");
+}
+function prepareOwnedSqliteSnapshot(databasePath, operationalRoot) {
+    const root = normalizedAbsoluteSqlitePath(operationalRoot, "operational root");
+    const selected = normalizedAbsoluteSqlitePath(databasePath, "database path");
+    const relative = path.relative(root, selected);
+    if (!relative || pathEscapesRoot(relative))
+        throw new Error("SQLite snapshot must remain inside its operational root.");
+    const parents = path
+        .relative(root, path.dirname(selected))
+        .split(path.sep)
+        .filter(Boolean);
+    const directories = [];
+    let main;
+    const closeProofs = () => {
+        const errors = [];
+        if (main)
+            collectError(errors, () => main.close());
+        for (const directory of directories.toReversed())
+            collectError(errors, () => directory.close());
+        return errors;
+    };
+    try {
+        directories.push(pinOwnedDirectory({
+            canonicalPath: root,
+            directoryPath: root,
+            label: "SQLite snapshot operational root",
+            requirePrivateMode: parents.length === 0,
+        }));
+        let current = root;
+        for (const segment of parents) {
+            current = path.join(current, segment);
+            directories.push(pinOwnedDirectory({
+                canonicalPath: current,
+                directoryPath: current,
+                label: "SQLite snapshot directory",
+                requirePrivateMode: true,
+            }));
+        }
+        main = pinOwnedFile({
+            filePath: selected,
+            createMissing: false,
+            label: "SQLite snapshot database",
+        });
+        const check = () => {
+            assertOwnedDirectoryProofs(directories);
+            main.assertLinked();
+            for (const suffix of ["-wal", "-shm", "-journal"])
+                assertOwnedSqliteArtifactAbsent(selected + suffix, "SQLite snapshot sidecar");
+            assertOwnedDirectoryProofs(directories);
+        };
+        check();
+        return {
+            databasePath: selected,
+            assertWhileOpen: check,
+            assertBeforeWritableOpen: check,
+            assertAfterSqliteClose: check,
+            closeProofs,
+        };
+    }
+    catch (error) {
+        throwCollectedErrors([error, ...closeProofs()], "SQLite snapshot ownership proof failed.");
         throw error;
     }
 }

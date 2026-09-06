@@ -1045,3 +1045,11 @@ menu is open, focus returns to it on close, and a side placement hugs its rect.`
 - Package support files — the empty `support/validation/composition.rules.json` and
   `support/validation/placement.rules.json` placeholders were removed. Stop importing or
   inspecting either path; they had no runtime replacement or rules to migrate.
+
+## 0.9.32 — verified SQLite journal transitions
+
+Owned SQLite opening rechecks integrity after a journal-mode change. A restored rollback-journal
+database can therefore be verified before writes, enter WAL mode, and complete its offline
+checkpoint without retaining the earlier integrity check's pager lock. Existing schemas and
+execution-scope APIs are unchanged. Explicit offline operators use `verifyOwnedSqliteSnapshot` for
+a private, descriptor-pinned, immutable read with no sidecars and an expiring read-only callback.
