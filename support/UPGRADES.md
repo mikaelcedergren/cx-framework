@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.4
+
+- `cx-card` reserves the natural width of header metadata and the menu before allocating
+  space to the heading. Short tags remain readable with their normal gaps; oversized
+  metadata moves the action group to a separate row and stays within the card. Keep using
+  the existing `meta` slot and `menuItems`; no consumer API or tag styling changes are needed.
+
 ## 0.10.3
 
 - Static servers record successful shutdown after the listener closes, once even when several

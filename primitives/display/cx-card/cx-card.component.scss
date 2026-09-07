@@ -141,6 +141,7 @@
 
 .cx-card__header {
   display: flex;
+  flex-wrap: wrap;
   min-width: 0;
   min-height: var(--controller-size);
   align-items: center;
@@ -155,10 +156,13 @@
 
 .cx-card__identity {
   display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   align-items: center;
   gap: var(--space-sm);
+}
+
+.cx-card__identity:empty {
+  display: none;
 }
 
 .cx-card__icon {
@@ -167,7 +171,11 @@
 }
 
 .cx-card__heading {
+  // The text takes remaining space without contributing its full length to
+  // the identity's intrinsic minimum; the icon still keeps its natural size.
+  width: 0;
   min-width: 0;
+  flex: 1 1 auto;
   overflow: hidden;
   color: var(--ink);
   font-size: var(--font-size-body);
@@ -180,7 +188,10 @@
 .cx-card__header-actions {
   display: inline-flex;
   min-width: 0;
-  flex: 0 1 auto;
+  max-width: 100%;
+  // Reserve short metadata and controls together. An oversized group moves
+  // to its own row, where metadata can truncate within the available width.
+  flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-sm);
@@ -197,6 +208,10 @@
 }
 
 .cx-card__meta:empty {
+  display: none;
+}
+
+.cx-card__header-actions:not(:has(.cx-card__meta > *, .cx-card__menu)) {
   display: none;
 }
 

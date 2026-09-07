@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 131,
-  "catalogSha256": "396019db488bb641ca888746b7dc3a104e9f12efd4b725ae87e86ceb0bbb2744",
+  "catalogSha256": "690f22c6d3f27c09b58b0af565f86c8c55880829fe5a16dda5aa1a51b6b3938c",
   "components": [
     {
       "name": "cx-account-control",
@@ -1704,7 +1704,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "6ff3162ca9abdf5a093466970f2a448e75b53ae4a0cada8431c26aead84b9281"
+            "sha256": "0ba62832f426eeb58d147964079b977a9c02f92b21c2c79a1cfc8a7c38313a33"
           }
         ]
       }
