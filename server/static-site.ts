@@ -425,7 +425,8 @@ export function createStaticSiteServer(
         outcome: "failure",
         error,
       });
-      throw error;
+      process.exitCode = 1;
+      return;
     }
     logger.emit({
       event: "service.listen",
@@ -434,10 +435,27 @@ export function createStaticSiteServer(
       outcome: "success",
     });
   });
-  const shutdown = createGracefulShutdown({
+  const httpShutdown = createGracefulShutdown({
     server,
     timeoutMs: shutdownTimeoutMs,
   });
+  let closing: Promise<void> | undefined;
+  const shutdown: GracefulShutdown = {
+    get closing() {
+      return httpShutdown.closing;
+    },
+    close(reason) {
+      closing ??= httpShutdown.close(reason).then(() => {
+        logger.emit({
+          event: "service.shutdown",
+          level: "info",
+          category: "operation",
+          outcome: "success",
+        });
+      });
+      return closing;
+    },
+  };
   let disposeShutdownSignals: () => void;
   try {
     disposeShutdownSignals = bindShutdownSignals({

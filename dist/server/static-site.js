@@ -191,7 +191,8 @@ export function createStaticSiteServer(options) {
                 outcome: "failure",
                 error,
             });
-            throw error;
+            process.exitCode = 1;
+            return;
         }
         logger.emit({
             event: "service.listen",
@@ -200,10 +201,27 @@ export function createStaticSiteServer(options) {
             outcome: "success",
         });
     });
-    const shutdown = createGracefulShutdown({
+    const httpShutdown = createGracefulShutdown({
         server,
         timeoutMs: shutdownTimeoutMs,
     });
+    let closing;
+    const shutdown = {
+        get closing() {
+            return httpShutdown.closing;
+        },
+        close(reason) {
+            closing ??= httpShutdown.close(reason).then(() => {
+                logger.emit({
+                    event: "service.shutdown",
+                    level: "info",
+                    category: "operation",
+                    outcome: "success",
+                });
+            });
+            return closing;
+        },
+    };
     let disposeShutdownSignals;
     try {
         disposeShutdownSignals = bindShutdownSignals({

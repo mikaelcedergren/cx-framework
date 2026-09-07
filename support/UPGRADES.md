@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.3
+
+- Static servers record successful shutdown after the listener closes, once even when several
+  callers request shutdown. Listener failures emit one sanitized fatal event and set exit status
+  one without an additional raw uncaught stack. Synchronous configuration/startup errors still
+  belong to the executable entrypoint's structured error boundary.
+
 ## 0.10.2
 
 - The structured-log validator accepts sanitized `.py` source locations from Python producers.
