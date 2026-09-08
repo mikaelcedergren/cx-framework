@@ -65,6 +65,7 @@ const FRAMEWORK_PACKAGE_RUNTIME_SCRIPTS = new Set([
   "check-product.mjs",
   "cx-development-favicon.mjs",
   "cx-server-artifact.mjs",
+  "cx-style-token-check.mjs",
   "install-ai-skills.mjs",
   "workspace-contract.mjs",
 ]);

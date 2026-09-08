@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.6
+
+- `cx-server-artifact` accepts the published `cx-style-token-check` command introduced in 0.10.5.
+  Self-contained server builds retain that command and the gate's compiled global-token stylesheet
+  while continuing to reject unpublished framework source and build tools. Refresh the package
+  before building a server artifact; no application API or visual changes are required.
+
 ## 0.10.5
 
 - `cx-wizard-dialog` now hides its top-right close button by default. Set
