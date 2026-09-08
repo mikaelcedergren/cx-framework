@@ -70,7 +70,7 @@
 }
 
 .cx-account-control:disabled {
-  opacity: 0.5;
+  opacity: var(--opacity-disabled);
   cursor: default;
 }
 
@@ -99,6 +99,8 @@
 
 .cx-account-control__icon {
   flex: 0 0 auto;
-  color: var(--opacity-mid);
-  transition: color var(--motion-fast) ease, opacity var(--motion-base) ease var(--motion-fast);
+  color: var(--opacity-high);
+  transition:
+    color var(--motion-fast) ease,
+    opacity var(--motion-base) ease var(--motion-fast);
 }

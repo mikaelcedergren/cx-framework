@@ -110,6 +110,10 @@ RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panel
 
 RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use the consuming product's established labeled-row component or pattern for forms or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; apply `RULE-ID: forms.horizontal-layout` to form orientation, and apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch. Do not wrap arbitrary page content or content without a label-value relationship.
 
+## Field hints
+
+RULE-ID: field-hints.start-alignment SCOPE: component COMPONENT: form-fields TYPE: MUST TOPIC: layout RULE: Align field hints to the start edge of their field. DESCRIPTION: Hints establish their own alignment instead of inheriting centered or end alignment from a surrounding surface.
+
 ## State messages
 
 RULE-ID: state-messages.whole-region SCOPE: component COMPONENT: state-messages TYPE: MUST TOPIC: state RULE: Use a state message only when it describes a whole expected content region that is empty, waiting, completed, or unavailable. DESCRIPTION: A missing cell or individual value needs an inline state, not a takeover of the whole region.

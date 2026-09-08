@@ -13,10 +13,6 @@
 }
 
 .cx-option {
-  --cx-option-hover-background: var(--opacity-mid);
-  --cx-option-active-background: var(--opacity-mid);
-  --cx-option-mood-color: var(--ink);
-
   display: flex;
   width: auto;
   min-height: var(--controller-size);
@@ -37,9 +33,6 @@
 }
 
 .cx-option__row {
-  --cx-option-hover-background: var(--opacity-mid);
-  --cx-option-active-background: var(--opacity-mid);
-
   display: flex;
   width: 100%;
   min-width: 0;
@@ -75,8 +68,11 @@
 
 .cx-option__row:not(.cx-option__row--static, .cx-option__row--disabled):hover,
 .cx-option__row--active:not(.cx-option__row--static, .cx-option__row--disabled),
-.cx-option__row:not(.cx-option__row--static, .cx-option__row--disabled):focus-within {
-  background: var(--cx-option-hover-background);
+.cx-option__row:not(
+    .cx-option__row--static,
+    .cx-option__row--disabled
+  ):focus-within {
+  background: var(--opacity-mid);
 }
 
 .cx-option:focus-visible {
@@ -94,78 +90,105 @@
 }
 
 .cx-option--primary {
-  --cx-option-hover-background: var(--primary-opacity);
-  --cx-option-active-background: var(--primary-opacity);
-  --cx-option-mood-color: var(--primary);
+  color: var(--primary);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--primary) {
-  --cx-option-hover-background: var(--primary-opacity);
-  --cx-option-active-background: var(--primary-opacity);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--primary-opacity);
+  }
 }
 
 .cx-option--accent {
-  --cx-option-hover-background: var(--accent-opacity);
-  --cx-option-active-background: var(--accent-opacity);
-  --cx-option-mood-color: var(--accent);
+  color: var(--accent);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--accent) {
-  --cx-option-hover-background: var(--accent-opacity);
-  --cx-option-active-background: var(--accent-opacity);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--accent-opacity);
+  }
 }
 
 .cx-option--info {
-  --cx-option-hover-background: var(--info-opacity);
-  --cx-option-active-background: var(--info-opacity);
-  --cx-option-mood-color: var(--info);
+  color: var(--info);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--info) {
-  --cx-option-hover-background: var(--info-opacity);
-  --cx-option-active-background: var(--info-opacity);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--info-opacity);
+  }
 }
 
 .cx-option--success {
-  --cx-option-hover-background: var(--success-opacity);
-  --cx-option-active-background: var(--success-opacity);
-  --cx-option-mood-color: var(--success);
+  color: var(--success);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--success) {
-  --cx-option-hover-background: var(--success-opacity);
-  --cx-option-active-background: var(--success-opacity);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--success-opacity);
+  }
 }
 
 .cx-option--warning {
-  --cx-option-hover-background: var(--warning-opacity);
-  --cx-option-active-background: var(--warning-opacity);
-  --cx-option-mood-color: var(--warning);
+  color: var(--warning);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--warning) {
-  --cx-option-hover-background: var(--warning-opacity);
-  --cx-option-active-background: var(--warning-opacity);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--warning-opacity);
+  }
 }
 
 .cx-option--danger {
-  --cx-option-hover-background: var(--danger-opacity);
-  --cx-option-active-background: var(--danger-opacity);
-  --cx-option-mood-color: var(--danger);
+  color: var(--danger);
+  .cx-option__description {
+    color: inherit;
+  }
 }
 
 .cx-option__row:has(.cx-option--danger) {
-  --cx-option-hover-background: var(--danger-opacity);
-  --cx-option-active-background: var(--danger-opacity);
-}
-
-.cx-option--primary,
-.cx-option--accent,
-.cx-option--info,
-.cx-option--success,
-.cx-option--warning,
-.cx-option--danger {
-  color: var(--cx-option-mood-color);
+  &:not(.cx-option__row--static, .cx-option__row--disabled):is(
+      :hover,
+      :focus-within,
+      .cx-option__row--active
+    ) {
+    background: var(--danger-opacity);
+  }
 }
 
 .cx-option--disabled {
@@ -229,7 +252,7 @@
 
 .cx-option__checkbox-check::before,
 .cx-option__checkbox-check::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -318,7 +341,9 @@
   margin-left: 0;
 }
 
-.cx-option__trailing:not(:has(.cx-option__shortcut, .cx-option__icon, .cx-option__append-slot > *)),
+.cx-option__trailing:not(
+  :has(.cx-option__shortcut, .cx-option__icon, .cx-option__append-slot > *)
+),
 .cx-option__append-slot:not(:has(> *)),
 .cx-option__control-slot:not(:has(> *)) {
   display: none;
@@ -348,7 +373,7 @@
 .cx-option--success .cx-option__description,
 .cx-option--warning .cx-option__description,
 .cx-option--danger .cx-option__description {
-  color: var(--cx-option-mood-color);
+  color: inherit;
 }
 
 .cx-option__row--small .cx-option {

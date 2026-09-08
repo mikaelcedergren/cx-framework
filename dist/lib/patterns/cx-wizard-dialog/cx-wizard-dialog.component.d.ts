@@ -21,6 +21,7 @@ export interface CxWizardDialogData {
     size?: CxWizardDialogSize;
     loadingActionId?: CxWizardDialogAction | string;
     feedbackVisible?: boolean;
+    /** Shows the top-right close button. Off by default; Cancel and Escape are unaffected. */
     dismissible?: boolean;
 }
 export declare class CxWizardDialogComponent implements AfterContentChecked, OnChanges, OnDestroy {

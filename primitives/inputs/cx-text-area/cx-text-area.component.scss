@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: block;
@@ -12,26 +12,95 @@
 }
 
 .cx-text-area {
-  --cx-text-area-font-size: var(--font-size-body);
-  --cx-text-area-line-height: var(--line-height-body);
-
   width: 100%;
 }
 
 .cx-text-area--small {
-  --cx-text-area-font-size: var(--font-size-body-sm);
+  .cx-text-area__gutter-row {
+    min-height: calc(var(--font-size-body-sm) * var(--line-height-body));
+  }
+
+  .cx-text-area__highlight-line {
+    height: calc(var(--font-size-body-sm) * var(--line-height-body));
+  }
+
+  .cx-text-area__range-mirror {
+    font-size: var(--font-size-body-sm);
+  }
+
+  .cx-text-area__range-line {
+    min-height: calc(var(--font-size-body-sm) * var(--line-height-body));
+  }
+
+  .cx-text-area__field {
+    font-size: var(--font-size-body-sm);
+  }
+
+  .cx-text-area__markdown {
+    font-size: var(--font-size-body-sm);
+  }
 }
 
 .cx-text-area--large {
-  --cx-text-area-font-size: var(--font-size-title-3);
+  .cx-text-area__gutter-row {
+    min-height: calc(var(--font-size-body-lg) * var(--line-height-body));
+  }
+
+  .cx-text-area__highlight-line {
+    height: calc(var(--font-size-body-lg) * var(--line-height-body));
+  }
+
+  .cx-text-area__range-mirror {
+    font-size: var(--font-size-body-lg);
+  }
+
+  .cx-text-area__range-line {
+    min-height: calc(var(--font-size-body-lg) * var(--line-height-body));
+  }
+
+  .cx-text-area__field {
+    font-size: var(--font-size-body-lg);
+  }
+
+  .cx-text-area__markdown {
+    font-size: var(--font-size-body-lg);
+  }
 }
 
 .cx-text-area--document {
-  --cx-text-area-font-size: 18px;
-  --cx-text-area-line-height: 1.75;
+  .cx-text-area__gutter {
+    line-height: var(--line-height-body-lg);
+  }
+
+  .cx-text-area__gutter-row {
+    min-height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+  }
+
+  .cx-text-area__highlight-line {
+    height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+  }
+
+  .cx-text-area__range-mirror {
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+  }
+
+  .cx-text-area__range-line {
+    min-height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+  }
+
+  .cx-text-area__field {
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+  }
+
+  .cx-text-area__markdown {
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+  }
 }
 
-@include field.field-header('cx-text-area');
+@include field.field-header("cx-text-area");
 
 .cx-text-area__shell {
   width: 100%;
@@ -42,17 +111,26 @@
   overflow: hidden;
 }
 
-@include field.field-shell-state('.cx-text-area__shell', '.cx-text-area__field');
-@include field.field-shell-interaction('.cx-text-area__shell');
+@include field.field-shell-state(
+  ".cx-text-area__shell",
+  ".cx-text-area__field"
+);
+@include field.field-shell-interaction(".cx-text-area__shell");
 
 // Ring focusVariant strengthens the keyboard state without changing pointer focus.
-:host-context([data-cx-keyboard-navigation]) .cx-text-area__shell--focus-ring:not(.cx-text-area__shell--error):has(.cx-text-area__field:focus) {
+:host-context([data-cx-keyboard-navigation])
+  .cx-text-area__shell--focus-ring:not(.cx-text-area__shell--error):has(
+    .cx-text-area__field:focus
+  ) {
   border-color: var(--primary);
   outline: var(--outline-tab);
   outline-offset: 0;
 }
 
-@include field.field-shell-inline-edit('.cx-text-area__shell', '.cx-text-area__field');
+@include field.field-shell-inline-edit(
+  ".cx-text-area__shell",
+  ".cx-text-area__field"
+);
 
 .cx-text-area__editor {
   display: grid;
@@ -82,7 +160,7 @@
   font-family: var(--font-family-mono);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-medium);
-  line-height: var(--cx-text-area-line-height);
+  line-height: var(--line-height-body);
   text-align: right;
   user-select: none;
   letter-spacing: 0;
@@ -106,7 +184,7 @@
   display: grid;
   grid-template-columns: 12px minmax(2ch, auto);
   column-gap: var(--space-2xs);
-  min-height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
+  min-height: calc(var(--font-size-body) * var(--line-height-body));
   align-items: center;
   justify-items: end;
 }
@@ -146,7 +224,7 @@
 }
 
 .cx-text-area__highlight-line {
-  height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
+  height: calc(var(--font-size-body) * var(--line-height-body));
 }
 
 .cx-text-area__highlight-line--error {
@@ -165,9 +243,9 @@
   pointer-events: none;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-text-area-font-size);
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-text-area-line-height);
+  line-height: var(--line-height-body);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -181,7 +259,7 @@
 }
 
 .cx-text-area__range-line {
-  min-height: calc(var(--cx-text-area-font-size) * var(--cx-text-area-line-height));
+  min-height: calc(var(--font-size-body) * var(--line-height-body));
 }
 
 .cx-text-area__range-segment--success {
@@ -205,9 +283,9 @@
   background: transparent;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-text-area-font-size);
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-text-area-line-height);
+  line-height: var(--line-height-body);
   box-sizing: border-box;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -274,15 +352,15 @@
   z-index: 2;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-text-area-font-size);
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--cx-text-area-line-height);
+  line-height: var(--line-height-body);
   cursor: text;
   box-sizing: border-box;
   overflow-wrap: anywhere;
 }
 
-@include field.field-messages('cx-text-area');
+@include field.field-messages("cx-text-area");
 
 .cx-text-area__validation {
   display: grid;

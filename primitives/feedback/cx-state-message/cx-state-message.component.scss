@@ -40,7 +40,7 @@
   align-items: center;
   justify-content: center;
   padding-bottom: var(--space-sm);
-  color: var(--opacity-mid);
+  color: var(--opacity-high);
 }
 
 .cx-state-message--horizontal {
@@ -59,7 +59,6 @@
 .cx-state-message--horizontal .cx-state-message__icon {
   padding-bottom: 0;
   /* The mark's own air plus the heading's leading, measured by the component. */
-  margin-top: calc(-1 * var(--cx-state-message-icon-ink, 0px));
 }
 
 .cx-state-message--horizontal .cx-state-message__actions {

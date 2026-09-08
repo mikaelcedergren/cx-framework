@@ -7,6 +7,12 @@ description: Use automatically when explicitly invoked as Cleaner or when asked 
 
 Run the complete cleanup lifecycle when invoked: discover, inspect, plan, clean, verify, report, and finish. Do not present mode choices and do not stop after the plan.
 
+## Required styling contract
+
+[MUST] Before auditing or changing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This is required for every styling task, including wrappers, pages, and runtime styling.
+
+[MUST] Identify existing violations as well as newly introduced ones. Use the product's full token audit when auditing CSS-based source. Existing violations remain findings; fix only the authorised, editable owner and never treat an unchanged baseline as approval.
+
 ## Authority granted by invocation
 
 Treat invocation as permission to make local, reversible repository changes and evidence-backed deletions inside the automatically detected scope.

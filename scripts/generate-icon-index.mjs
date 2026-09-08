@@ -1,3 +1,4 @@
+import { compileGlobalTokens } from "./compile-global-tokens.mjs";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -8,7 +9,6 @@ const repoRoot = join(__dirname, "..");
 const iconRoot = join(repoRoot, "icons");
 const sourceDir = join(iconRoot, "svg");
 const outputPath = join(iconRoot, "index.html");
-const radiusTokenSource = readFileSync(join(repoRoot, "tokens", "_radius.scss"), "utf8");
 const args = process.argv.slice(2);
 const validArgs = new Set(["--check", "--help", "-h"]);
 const unknownArgs = args.filter((arg) => !validArgs.has(arg));
@@ -27,7 +27,9 @@ Options:
 }
 
 if (unknownArgs.length > 0) {
-  console.error(`Unknown option${unknownArgs.length === 1 ? "" : "s"}: ${unknownArgs.join(", ")}`);
+  console.error(
+    `Unknown option${unknownArgs.length === 1 ? "" : "s"}: ${unknownArgs.join(", ")}`,
+  );
   console.error("Run with --help for usage.");
   process.exit(1);
 }
@@ -35,8 +37,23 @@ if (unknownArgs.length > 0) {
 const SVG_ELEMENT_PATTERN = /<([a-zA-Z][\w:-]*)\b/g;
 const ELEMENT_PATTERN = /<\/?([a-zA-Z][\w:-]*)\b([^>]*)>/g;
 const ATTRIBUTE_PATTERN = /([a-zA-Z_:][\w:.-]*)\s*=\s*"([^"]*)"/g;
-const GRAPHIC_TAGS = new Set(["path", "circle", "ellipse", "line", "polyline", "polygon", "rect"]);
-const NON_PATH_SHAPE_TAGS = new Set(["circle", "ellipse", "line", "polyline", "polygon", "rect"]);
+const GRAPHIC_TAGS = new Set([
+  "path",
+  "circle",
+  "ellipse",
+  "line",
+  "polyline",
+  "polygon",
+  "rect",
+]);
+const NON_PATH_SHAPE_TAGS = new Set([
+  "circle",
+  "ellipse",
+  "line",
+  "polyline",
+  "polygon",
+  "rect",
+]);
 const STRUCTURAL_TAGS = new Set([
   "clippath",
   "defs",
@@ -66,21 +83,14 @@ const GEOMETRY_ATTRIBUTES = [
   "points",
   "transform",
 ];
-const INHERITED_ATTRIBUTES = ["fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin"];
+const INHERITED_ATTRIBUTES = [
+  "fill",
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+];
 const TARGET_STROKE_WIDTH = 1.5;
-
-function readRadiusToken(name) {
-  const match = radiusTokenSource.match(new RegExp(`--${name}:\\s*([^;]+);`));
-  if (!match) {
-    throw new Error(`Missing radius token: --${name}`);
-  }
-  return match[1].trim();
-}
-
-const cornerShape = readRadiusToken("corner-shape");
-const radiusSm = readRadiusToken("radius-sm");
-const radiusMd = readRadiusToken("radius-md");
-const radiusPill = readRadiusToken("radius-pill");
 
 function slugify(value) {
   return value
@@ -110,7 +120,10 @@ function parseStyle(value) {
           return [part.toLowerCase(), ""];
         }
 
-        return [part.slice(0, separatorIndex).trim().toLowerCase(), part.slice(separatorIndex + 1).trim()];
+        return [
+          part.slice(0, separatorIndex).trim().toLowerCase(),
+          part.slice(separatorIndex + 1).trim(),
+        ];
       }),
   );
 }
@@ -165,7 +178,10 @@ function parseElements(svg) {
       attrs,
       inheritedAttrs,
       isStructuralChild: stack.some(
-        (item) => item.tagName === "defs" || item.tagName === "mask" || item.tagName === "clippath",
+        (item) =>
+          item.tagName === "defs" ||
+          item.tagName === "mask" ||
+          item.tagName === "clippath",
       ),
     };
 
@@ -204,7 +220,9 @@ function normalizePaintValue(value) {
 
 function isNonNonePaint(value) {
   const normalized = normalizePaintValue(value);
-  return Boolean(normalized && normalized !== "none" && normalized !== "transparent");
+  return Boolean(
+    normalized && normalized !== "none" && normalized !== "transparent",
+  );
 }
 
 function hasEffectiveFill(element) {
@@ -254,8 +272,12 @@ function createShapeFingerprint(elements) {
   const parts = elements
     .filter((element) => GRAPHIC_TAGS.has(element.tagName))
     .map((element) => {
-      const attrs = GEOMETRY_ATTRIBUTES.filter((name) => getAttr(element, name) !== undefined)
-        .map((name) => `${name}=${normalizeGeometryValue(getAttr(element, name))}`)
+      const attrs = GEOMETRY_ATTRIBUTES.filter(
+        (name) => getAttr(element, name) !== undefined,
+      )
+        .map(
+          (name) => `${name}=${normalizeGeometryValue(getAttr(element, name))}`,
+        )
         .join("|");
 
       return `${element.tagName}:${attrs}`;
@@ -344,14 +366,24 @@ function analyzeIcon(fileName, svg) {
   const name = fileName.replace(/\.svg$/, "");
   const elements = parseElements(svg);
   const root = elements.find((element) => element.tagName === "svg");
-  const graphicElements = elements.filter((element) => GRAPHIC_TAGS.has(element.tagName));
-  const visibleGraphicElements = graphicElements.filter((element) => !element.isStructuralChild);
+  const graphicElements = elements.filter((element) =>
+    GRAPHIC_TAGS.has(element.tagName),
+  );
+  const visibleGraphicElements = graphicElements.filter(
+    (element) => !element.isStructuralChild,
+  );
   const pathElements = elements.filter((element) => element.tagName === "path");
-  const structuralElements = elements.filter((element) => STRUCTURAL_TAGS.has(element.tagName));
+  const structuralElements = elements.filter((element) =>
+    STRUCTURAL_TAGS.has(element.tagName),
+  );
   const elementCounts = collectElementCounts(svg);
   const fillMatches = visibleGraphicElements.filter(hasEffectiveFill);
-  const graphicIndexByElement = new Map(graphicElements.map((element, index) => [element, index + 1]));
-  const pathIndexByElement = new Map(pathElements.map((element, index) => [element, index + 1]));
+  const graphicIndexByElement = new Map(
+    graphicElements.map((element, index) => [element, index + 1]),
+  );
+  const pathIndexByElement = new Map(
+    pathElements.map((element, index) => [element, index + 1]),
+  );
   const fillDetails = fillMatches.map((element) => ({
     tag: element.tagName,
     target:
@@ -360,15 +392,29 @@ function analyzeIcon(fileName, svg) {
         : `${element.tagName} ${graphicIndexByElement.get(element)}`,
     fill: getEffectiveAttr(element, "fill") ?? "implicit black",
   }));
-  const strokeElements = graphicElements.filter((element) => isNonNonePaint(getEffectiveAttr(element, "stroke")));
-  const strokeWidthValues = strokeElements.map((element) => getEffectiveAttr(element, "stroke-width") ?? "missing");
-  const strokeColorValues = strokeElements.map((element) => getEffectiveAttr(element, "stroke") ?? "missing");
-  const strokeLinecapValues = strokeElements.map((element) => getEffectiveAttr(element, "stroke-linecap") ?? "missing");
+  const strokeElements = graphicElements.filter((element) =>
+    isNonNonePaint(getEffectiveAttr(element, "stroke")),
+  );
+  const strokeWidthValues = strokeElements.map(
+    (element) => getEffectiveAttr(element, "stroke-width") ?? "missing",
+  );
+  const strokeColorValues = strokeElements.map(
+    (element) => getEffectiveAttr(element, "stroke") ?? "missing",
+  );
+  const strokeLinecapValues = strokeElements.map(
+    (element) => getEffectiveAttr(element, "stroke-linecap") ?? "missing",
+  );
   const strokeLinejoinValues = strokeElements.map(
     (element) => getEffectiveAttr(element, "stroke-linejoin") ?? "missing",
   );
-  const nonPathShapeCount = [...NON_PATH_SHAPE_TAGS].reduce((total, tag) => total + (elementCounts[tag] ?? 0), 0);
-  const graphicElementCount = [...GRAPHIC_TAGS].reduce((total, tag) => total + (elementCounts[tag] ?? 0), 0);
+  const nonPathShapeCount = [...NON_PATH_SHAPE_TAGS].reduce(
+    (total, tag) => total + (elementCounts[tag] ?? 0),
+    0,
+  );
+  const graphicElementCount = [...GRAPHIC_TAGS].reduce(
+    (total, tag) => total + (elementCounts[tag] ?? 0),
+    0,
+  );
   const hasMask = /<mask\b/i.test(svg);
   const hasDefs = /<defs\b/i.test(svg);
   const hasDasharray = /stroke-dasharray=/i.test(svg);
@@ -377,26 +423,45 @@ function analyzeIcon(fileName, svg) {
   const hasRootIdIssue = rootIdValue !== "icon";
   const rootFillValue = getAttr(root, "fill");
   const hasRootFillIssue = normalizePaintValue(rootFillValue) !== "none";
-  const isPortalPathData = (elementCounts.path ?? 0) === 1 && graphicElementCount === 1;
+  const isPortalPathData =
+    (elementCounts.path ?? 0) === 1 && graphicElementCount === 1;
   const hasStroke = strokeElements.length > 0;
-  const hasStrokeWidthIssue = !hasStroke || strokeWidthValues.some((value) => !isTargetStrokeWidth(value));
-  const hasStrokeColorIssue = strokeColorValues.some((value) => !isCurrentColor(value));
-  const hasLinecapIssue = hasStroke && strokeLinecapValues.some((value) => value !== "round");
-  const hasLinejoinIssue = hasStroke && strokeLinejoinValues.some((value) => value !== "round");
+  const hasStrokeWidthIssue =
+    !hasStroke ||
+    strokeWidthValues.some((value) => !isTargetStrokeWidth(value));
+  const hasStrokeColorIssue = strokeColorValues.some(
+    (value) => !isCurrentColor(value),
+  );
+  const hasLinecapIssue =
+    hasStroke && strokeLinecapValues.some((value) => value !== "round");
+  const hasLinejoinIssue =
+    hasStroke && strokeLinejoinValues.some((value) => value !== "round");
   const hasViewBoxIssue = getAttr(root, "viewbox") !== "0 0 24 24";
-  const hasSizeIssue = getAttr(root, "width") !== "24" || getAttr(root, "height") !== "24";
+  const hasSizeIssue =
+    getAttr(root, "width") !== "24" || getAttr(root, "height") !== "24";
   const preserveAspectRatioValue = getAttr(root, "preserveaspectratio");
-  const hasPreserveAspectRatioIssue = preserveAspectRatioValue?.trim().toLowerCase() === "none";
+  const hasPreserveAspectRatioIssue =
+    preserveAspectRatioValue?.trim().toLowerCase() === "none";
   const widthValue = parseLengthNumber(getAttr(root, "width"));
   const heightValue = parseLengthNumber(getAttr(root, "height"));
-  const rootRatio = widthValue !== null && heightValue !== null ? Math.abs(widthValue / heightValue) : null;
+  const rootRatio =
+    widthValue !== null && heightValue !== null
+      ? Math.abs(widthValue / heightValue)
+      : null;
   const viewBoxRatio = parseViewBoxRatio(getAttr(root, "viewbox"));
   const hasMissingRatioSource = rootRatio === null && viewBoxRatio === null;
-  const hasNonSquareViewBoxRatio = viewBoxRatio !== null && !ratiosMatch(viewBoxRatio, 1);
+  const hasNonSquareViewBoxRatio =
+    viewBoxRatio !== null && !ratiosMatch(viewBoxRatio, 1);
   const hasRootViewBoxRatioMismatch = !ratiosMatch(rootRatio, viewBoxRatio);
-  const hasStyleAttribute = elements.some((element) => getAttr(element, "style") !== undefined);
-  const hasTransform = elements.some((element) => getAttr(element, "transform") !== undefined);
-  const hasNonUniformScaleIssue = elements.some((element) => hasNonUniformScale(getAttr(element, "transform")));
+  const hasStyleAttribute = elements.some(
+    (element) => getAttr(element, "style") !== undefined,
+  );
+  const hasTransform = elements.some(
+    (element) => getAttr(element, "transform") !== undefined,
+  );
+  const hasNonUniformScaleIssue = elements.some((element) =>
+    hasNonUniformScale(getAttr(element, "transform")),
+  );
   const hasAspectIssue =
     hasMissingRatioSource ||
     hasNonSquareViewBoxRatio ||
@@ -417,12 +482,16 @@ function analyzeIcon(fileName, svg) {
   }
 
   if (hasFill) {
-    checks.push(`Uses fill on ${fillMatches.length} graphic element(s): ${summarizeFillDetails(fillDetails)}.`);
+    checks.push(
+      `Uses fill on ${fillMatches.length} graphic element(s): ${summarizeFillDetails(fillDetails)}.`,
+    );
     tags.push("fill");
   }
 
   if (hasRootFillIssue) {
-    checks.push(`Root SVG should set fill="none" (found ${formatFoundValue(rootFillValue)}).`);
+    checks.push(
+      `Root SVG should set fill="none" (found ${formatFoundValue(rootFillValue)}).`,
+    );
     tags.push("root-fill");
   }
 
@@ -434,7 +503,9 @@ function analyzeIcon(fileName, svg) {
   }
 
   if (hasStrokeColorIssue) {
-    checks.push(`Stroke color must use currentColor (${formatList(strokeColorValues)}).`);
+    checks.push(
+      `Stroke color must use currentColor (${formatList(strokeColorValues)}).`,
+    );
     tags.push("stroke-color");
   }
 
@@ -463,12 +534,16 @@ function analyzeIcon(fileName, svg) {
   }
 
   if (hasLinecapIssue) {
-    checks.push(`Stroke linecap is not consistently round (${formatList(strokeLinecapValues)}).`);
+    checks.push(
+      `Stroke linecap is not consistently round (${formatList(strokeLinecapValues)}).`,
+    );
     tags.push("stroke-style");
   }
 
   if (hasLinejoinIssue) {
-    checks.push(`Stroke linejoin is not consistently round (${formatList(strokeLinejoinValues)}).`);
+    checks.push(
+      `Stroke linejoin is not consistently round (${formatList(strokeLinejoinValues)}).`,
+    );
     tags.push("stroke-style");
   }
 
@@ -487,7 +562,9 @@ function analyzeIcon(fileName, svg) {
   }
 
   if (structuralElements.length > 0) {
-    checks.push(`Contains structural SVG element(s): ${formatList(structuralElements.map((element) => element.tag))}.`);
+    checks.push(
+      `Contains structural SVG element(s): ${formatList(structuralElements.map((element) => element.tag))}.`,
+    );
     tags.push("structure");
   }
 
@@ -568,14 +645,20 @@ for (const icon of icons) {
   byShapeHash.set(icon.shapeHash, shapeGroup);
 }
 
-const exactDuplicateGroups = [...byHash.values()].filter((group) => group.length > 1).map((group) => group.sort());
+const exactDuplicateGroups = [...byHash.values()]
+  .filter((group) => group.length > 1)
+  .map((group) => group.sort());
 const visualDuplicateGroups = [...byShapeHash.values()]
   .filter((group) => group.length > 1)
   .map((group) => group.sort());
 
 for (const icon of icons) {
-  const duplicateGroup = exactDuplicateGroups.find((group) => group.includes(icon.name));
-  const visualDuplicateGroup = visualDuplicateGroups.find((group) => group.includes(icon.name));
+  const duplicateGroup = exactDuplicateGroups.find((group) =>
+    group.includes(icon.name),
+  );
+  const visualDuplicateGroup = visualDuplicateGroups.find((group) =>
+    group.includes(icon.name),
+  );
 
   if (duplicateGroup) {
     icon.tags.push("exact-duplicate");
@@ -584,7 +667,9 @@ for (const icon of icons) {
 
   if (visualDuplicateGroup) {
     icon.tags.push("visual-duplicate");
-    icon.checks.push(`Possible visual duplicate: ${visualDuplicateGroup.join(", ")}.`);
+    icon.checks.push(
+      `Possible visual duplicate: ${visualDuplicateGroup.join(", ")}.`,
+    );
   }
 
   icon.tags = [...new Set(icon.tags)];
@@ -627,30 +712,7 @@ const html = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Icon source index</title>
     <style>
-      :root {
-        color-scheme: light;
-        --bg: #f7f8fa;
-        --panel: #ffffff;
-        --panel-soft: #f1f5f7;
-        --border: #d9e1e5;
-        --border-strong: #a9b8c0;
-        --text: #172126;
-        --muted: #62727b;
-        --teal: #007a78;
-        --teal-soft: #e2f7f5;
-        --amber: #986600;
-        --amber-soft: #fff4d8;
-        --red: #b42318;
-        --red-soft: #ffe7e4;
-        --blue: #005f73;
-        --ink: #11181c;
-        --shadow: 0 1px 2px rgba(12, 24, 32, 0.08);
-        --corner-shape: ${cornerShape};
-        --radius-sm: ${radiusSm};
-        --radius-md: ${radiusMd};
-        --radius-pill: ${radiusPill};
-      }
-
+      ${compileGlobalTokens()}
       *,
       *::before,
       *::after {
@@ -659,9 +721,9 @@ const html = `<!doctype html>
       }
 
       html {
-        background: var(--bg);
-        color: var(--text);
-        font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--surface-alt);
+        color: var(--ink);
+        font: var(--font-size-body)/var(--line-height-body) var(--font-family-base);
       }
 
       body {
@@ -673,46 +735,44 @@ const html = `<!doctype html>
       }
 
       .page {
-        --page-max-width: 1680px;
-        --page-padding: 24px;
         margin: 0 auto;
-        max-width: var(--page-max-width);
-        padding: var(--page-padding);
+        max-width: var(--measure-xl);
+        padding: var(--gutter-page);
       }
 
       .page-header {
-        margin-bottom: 18px;
+        margin-bottom: var(--space-md);
       }
 
       .eyebrow {
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 700;
+        color: var(--opacity-high);
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-bold);
         letter-spacing: 0;
-        margin: 0 0 4px;
+        margin: 0 0 var(--space-xs);
       }
 
       h1 {
-        font-size: 28px;
+        font-size: var(--font-size-title-1);
         letter-spacing: 0;
         line-height: 1.15;
         margin: 0;
       }
 
       .result-count {
-        color: var(--muted);
-        font-weight: 750;
+        color: var(--opacity-high);
+        font-weight: var(--font-weight-bold);
       }
 
       .toolbar {
         align-items: center;
-        background: rgba(247, 248, 250, 0.94);
-        border-bottom: 1px solid var(--border);
+        background: var(--surface-alt);
+        border-bottom: 1px solid var(--opacity-mid);
         display: grid;
-        gap: 12px;
+        gap: var(--space-md);
         grid-template-columns: minmax(160px, 220px) minmax(0, 1fr) auto;
-        margin: 0 calc(50% - 50vw) 16px;
-        padding: 10px max(var(--page-padding), calc((100vw - var(--page-max-width)) / 2 + var(--page-padding)));
+        margin: 0 calc(50% - 50vw) var(--space-md);
+        padding: var(--space-sm) max(var(--gutter-page), calc((100vw - var(--measure-xl)) / 2 + var(--gutter-page)));
         position: sticky;
         top: 0;
         z-index: 20;
@@ -720,105 +780,105 @@ const html = `<!doctype html>
 
       .search {
         appearance: none;
-        background: var(--panel);
-        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        border: 1px solid var(--opacity-high);
         border-radius: var(--radius-sm);
-        color: var(--text);
+        color: var(--ink);
         font: inherit;
         height: 36px;
-        padding: 0 12px;
+        padding: 0 var(--space-md);
         width: 100%;
       }
 
       .search:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(0, 122, 120, 0.16);
-        outline: none;
+        border-color: var(--primary);
+        outline: var(--outline-tab);
+        outline-offset: var(--outline-tab-offset);
       }
 
       .filters {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: var(--space-sm);
       }
 
       .filter-description {
         grid-column: 1 / -1;
         margin: 0;
-        color: var(--muted);
-        font-size: 12px;
+        color: var(--opacity-high);
+        font-size: var(--font-size-body-sm);
         line-height: 1.4;
       }
 
       .filter-button {
         align-items: center;
         appearance: none;
-        background: var(--panel);
-        border: 1px solid var(--border);
+        background: var(--surface);
+        border: 1px solid var(--opacity-mid);
         border-radius: var(--radius-pill);
         corner-shape: round;
-        color: var(--text);
+        color: var(--ink);
         cursor: pointer;
         display: inline-flex;
-        gap: 6px;
+        gap: var(--space-sm);
         font: inherit;
-        font-size: 12px;
-        font-weight: 650;
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-medium);
         min-height: 30px;
-        padding: 5px 10px;
+        padding: var(--space-xs) var(--space-sm);
       }
 
       .filter-button[aria-pressed="true"] {
         background: var(--ink);
         border-color: var(--ink);
-        color: white;
+        color: var(--on-ink);
       }
 
       .filter-button__count {
-        color: var(--muted);
-        font-weight: 750;
+        color: var(--opacity-high);
+        font-weight: var(--font-weight-bold);
       }
 
       .filter-button[aria-pressed="true"] .filter-button__count {
-        color: rgba(255, 255, 255, 0.78);
+        color: var(--on-ink);
       }
 
       .grid {
         display: grid;
-        gap: 12px;
+        gap: var(--space-md);
         grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
       }
 
       .card {
-        background: var(--panel);
-        border: 1px solid var(--border);
+        background: var(--surface);
+        border: 1px solid var(--opacity-mid);
         border-radius: var(--radius-md);
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-low);
         display: grid;
-        gap: 10px;
-        padding: 12px;
+        gap: var(--space-sm);
+        padding: var(--space-md);
       }
 
       .card__header {
         align-items: flex-start;
         display: grid;
-        gap: 8px;
+        gap: var(--space-sm);
         grid-template-columns: minmax(0, 1fr) auto;
       }
 
       .card__name {
-        font-size: 15px;
-        font-weight: 750;
+        font-size: var(--font-size-body);
+        font-weight: var(--font-weight-bold);
         margin: 0;
         overflow-wrap: anywhere;
       }
 
       .card__meta {
-        color: var(--muted);
+        color: var(--opacity-high);
         display: flex;
         flex-wrap: wrap;
-        font-size: 12px;
-        gap: 4px 8px;
+        font-size: var(--font-size-body-sm);
+        gap: var(--space-xs) var(--space-sm);
         justify-content: flex-end;
         margin-top: 0;
         max-width: 320px;
@@ -828,66 +888,66 @@ const html = `<!doctype html>
         align-items: center;
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: var(--space-sm);
         justify-content: flex-end;
       }
 
       .issue-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
-        margin-top: 8px;
+        gap: var(--space-xs);
+        margin-top: var(--space-sm);
       }
 
       .issue-tag {
         align-items: center;
-        background: var(--red-soft);
-        border: 1px solid rgba(180, 35, 24, 0.22);
+        background: var(--danger-opacity);
+        border: var(--border-width) solid var(--danger-opacity);
         border-radius: var(--radius-pill);
         corner-shape: round;
         color: var(--red);
         display: inline-flex;
-        font-size: 11px;
-        font-weight: 750;
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-bold);
         min-height: 22px;
-        padding: 2px 7px;
+        padding: var(--space-2xs) var(--space-sm);
       }
 
       .source-link {
         align-items: center;
-        border: 1px solid var(--border);
+        border: 1px solid var(--opacity-mid);
         border-radius: var(--radius-sm);
-        color: var(--muted);
+        color: var(--opacity-high);
         display: inline-flex;
-        font-size: 12px;
-        font-weight: 650;
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-medium);
         height: 28px;
         justify-content: center;
         min-width: 58px;
-        padding: 0 8px;
+        padding: 0 var(--space-sm);
         text-decoration: none;
       }
 
       .source-link:hover {
-        border-color: var(--border-strong);
-        color: var(--text);
+        border-color: var(--opacity-high);
+        color: var(--ink);
       }
 
       .checks {
-        color: var(--muted);
-        font-size: 12px;
+        color: var(--opacity-high);
+        font-size: var(--font-size-body-sm);
         margin: 0;
       }
 
       .checks summary {
         cursor: pointer;
-        font-weight: 650;
+        font-weight: var(--font-weight-medium);
       }
 
       .checks ul {
         display: grid;
-        gap: 3px;
-        margin: 6px 0 0;
+        gap: var(--space-xs);
+        margin: var(--space-sm) 0 0;
         padding: 0;
       }
 
@@ -897,21 +957,21 @@ const html = `<!doctype html>
 
       .variants {
         display: grid;
-        gap: 8px;
+        gap: var(--space-sm);
         grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
       }
 
       .variant {
         display: grid;
-        gap: 6px;
+        gap: var(--space-sm);
         min-width: 0;
       }
 
       .variant__art {
         align-items: center;
         aspect-ratio: 1 / 1;
-        background: #ffffff;
-        border: 1px solid var(--border);
+        background: var(--surface);
+        border: 1px solid var(--opacity-mid);
         border-radius: var(--radius-md);
         color: var(--ink);
         display: flex;
@@ -922,7 +982,7 @@ const html = `<!doctype html>
       }
 
       .variant__art--aspect::before {
-        border: 1px dashed var(--border-strong);
+        border: 1px dashed var(--opacity-high);
         content: "";
         height: 32px;
         left: 50%;
@@ -933,7 +993,7 @@ const html = `<!doctype html>
       }
 
       .variant__art--color {
-        gap: 4px;
+        gap: var(--space-xs);
       }
 
       .variant__art--fill {
@@ -948,16 +1008,16 @@ const html = `<!doctype html>
       }
 
       .variant__art.is-empty::after {
-        color: var(--muted);
+        color: var(--opacity-high);
         content: "No paths";
-        font-size: 11px;
-        font-weight: 700;
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-bold);
       }
 
       .variant__label {
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 700;
+        color: var(--opacity-high);
+        font-size: var(--font-size-body-sm);
+        font-weight: var(--font-weight-bold);
         text-align: center;
       }
 
@@ -988,7 +1048,7 @@ const html = `<!doctype html>
       }
 
       .test-svg--fill-base {
-        color: var(--muted);
+        color: var(--opacity-high);
         opacity: 0.22;
       }
 
@@ -999,10 +1059,10 @@ const html = `<!doctype html>
 
       .empty {
         align-items: center;
-        background: var(--panel);
-        border: 1px solid var(--border);
+        background: var(--surface);
+        border: 1px solid var(--opacity-mid);
         border-radius: var(--radius-md);
-        color: var(--muted);
+        color: var(--opacity-high);
         display: flex;
         justify-content: center;
         min-height: 180px;
@@ -1020,7 +1080,7 @@ const html = `<!doctype html>
 
       @media (max-width: 560px) {
         .page {
-          --page-padding: 14px;
+          padding: var(--gutter-page);
         }
 
         .card__header {
@@ -1227,9 +1287,9 @@ const html = `<!doctype html>
 
       function createColorSvgs(icon, index) {
         return [
-          ["ink", "#11181c"],
-          ["red", "#b42318"],
-          ["blue", "#005f73"],
+          ["ink", "var(--ink)"],
+          ["red", "var(--red)"],
+          ["blue", "var(--blue)"],
         ]
           .map(([name, color]) => {
             const svg = prepareSvg(icon.svg, icon, "color-" + name, index);
@@ -1503,7 +1563,9 @@ if (isCheckMode) {
   }
 
   if (iconsWithChecks.length > 0) {
-    console.error(`Icon checks failed: ${iconsWithChecks.length} of ${icons.length} icons have issues.`);
+    console.error(
+      `Icon checks failed: ${iconsWithChecks.length} of ${icons.length} icons have issues.`,
+    );
 
     for (const icon of iconsWithChecks) {
       console.error(`- ${icon.name}: ${icon.checks.join(" ")}`);
@@ -1515,5 +1577,7 @@ if (isCheckMode) {
   }
 } else {
   writeFileSync(outputPath, html);
-  console.log(`Wrote ${relative(repoRoot, outputPath)} with ${icons.length} icons.`);
+  console.log(
+    `Wrote ${relative(repoRoot, outputPath)} with ${icons.length} icons.`,
+  );
 }

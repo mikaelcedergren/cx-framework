@@ -2,7 +2,7 @@
   #trigger
   [text]="triggerText"
   appendIcon="chevron-down"
-  [style.--cx-button-width]="triggerWidth ? triggerWidth + 'px' : null"
+  [style.width]="triggerWidth ? triggerWidth + 'px' : null"
   (click)="toggleOpen()"
 />
 
@@ -27,15 +27,24 @@
   >
     @if (description) {
       <!-- Stages the heading-row slot: a real link is what this slot is for. -->
-      <a actions class="cx-popover-demo__heading-link" href="#" (click)="$event.preventDefault()">
+      <a
+        actions
+        class="cx-popover-demo__heading-link"
+        href="#"
+        (click)="$event.preventDefault()"
+      >
         {{ description }}
       </a>
     }
 
-    @if (scenario === 'workspace-menu') {
+    @if (scenario === "workspace-menu") {
       <div class="cx-popover-demo__groups">
         <div class="cx-popover-demo__group">
-          <cx-option label="Daily digest" [clickable]="false" (pointerenter)="closeSubmenu()">
+          <cx-option
+            label="Daily digest"
+            [clickable]="false"
+            (pointerenter)="closeSubmenu()"
+          >
             <cx-switch
               control
               ariaLabel="Daily digest"
@@ -52,24 +61,77 @@
             label="Theme"
             [submenu]="submenuState('theme')"
             (pointerenter)="openSubmenu('theme', $any($event.currentTarget))"
-            (focusin)="openSubmenuFromFocus('theme', $any($event.currentTarget))"
-            (click)="openSubmenuFromClick('theme', $any($event.currentTarget), $event)"
-            (keydown)="openSubmenuFromKeyboard('theme', $any($event.currentTarget), $event)"
+            (focusin)="
+              openSubmenuFromFocus('theme', $any($event.currentTarget))
+            "
+            (click)="
+              openSubmenuFromClick('theme', $any($event.currentTarget), $event)
+            "
+            (keydown)="
+              openSubmenuFromKeyboard(
+                'theme',
+                $any($event.currentTarget),
+                $event
+              )
+            "
           />
         </div>
 
         <div class="cx-popover-demo__group">
-          <cx-option [role]="'menuitem'" label="Open" prependIcon="open-new" (pointerenter)="closeSubmenu()" (click)="close()" />
-          <cx-option [role]="'menuitem'" label="Members" prependIcon="users" (pointerenter)="closeSubmenu()" (click)="close()" />
-          <cx-option [role]="'menuitem'" label="Invite people" prependIcon="plus" (pointerenter)="closeSubmenu()" (click)="close()" />
-          <cx-option [role]="'menuitem'" label="Copy link" prependIcon="copy" (pointerenter)="closeSubmenu()" (click)="close()" />
-          <cx-option [role]="'menuitem'" label="Settings" prependIcon="settings" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option
+            [role]="'menuitem'"
+            label="Open"
+            prependIcon="open-new"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
+          <cx-option
+            [role]="'menuitem'"
+            label="Members"
+            prependIcon="users"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
+          <cx-option
+            [role]="'menuitem'"
+            label="Invite people"
+            prependIcon="plus"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
+          <cx-option
+            [role]="'menuitem'"
+            label="Copy link"
+            prependIcon="copy"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
+          <cx-option
+            [role]="'menuitem'"
+            label="Settings"
+            prependIcon="settings"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
         </div>
 
         <div class="cx-popover-demo__group">
           <cx-option-group label="Internal" />
-          <cx-option [role]="'menuitem'" label="Archive" prependIcon="archive" (pointerenter)="closeSubmenu()" (click)="close()" />
-          <cx-option [role]="'menuitem'" label="Delete" prependIcon="delete" mood="danger" (pointerenter)="closeSubmenu()" (click)="close()" />
+          <cx-option
+            [role]="'menuitem'"
+            label="Archive"
+            prependIcon="archive"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
+          <cx-option
+            [role]="'menuitem'"
+            label="Delete"
+            prependIcon="delete"
+            mood="danger"
+            (pointerenter)="closeSubmenu()"
+            (click)="close()"
+          />
         </div>
       </div>
     } @else {

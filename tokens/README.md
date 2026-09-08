@@ -9,7 +9,11 @@ This is the concrete token contract for the Cortex Angular component library. It
 - Components consume semantic roles and never branch on a theme class.
 - A consuming product may select or define a theme profile, but it must not patch individual component internals to imitate one.
 
-Use a token at the property that consumes it. Do not add a local `--cx-*` alias merely to rename another token. A component custom property is justified only when it carries a runtime value, creates an intentional consumer boundary, centralizes a reused derived calculation, or coordinates a variant across several internal declarations.
+Before styling, apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../ai/design/03-ux-rules.md#tokens-and-color). This document owns the concrete token purposes below; the shared rules own direct use, value selection, and approval for new tokens.
+
+For example, use `color: var(--opacity-high)` for supporting text, `border-color: var(--opacity-mid)` for a separator, and `background: var(--opacity-low)` for a quiet fill. These three tokens resolve to colours, not numeric opacity values. Global semantic mappings such as `--primary: var(--blue)` remain part of the shared vocabulary.
+
+The automated source check reads the approved definition files listed in the repository's `style-token-policy.json`. Declaring a variable in `:root` elsewhere does not make it approved. Adding a new token or changing those ownership declarations requires the approval described by the shared rules; the check cannot establish semantic purpose or user approval.
 
 ## Semantic colour
 
@@ -49,30 +53,30 @@ Do not stack surfaces to fake depth. Floating surfaces use deliberate contrast a
 
 The spacing scale follows a 4px rhythm:
 
-| Token | Value |
-| --- | ---: |
-| `--space-2xs` | 2px |
-| `--space-xs` | 4px |
-| `--space-sm` | 8px |
-| `--space-md` | 16px |
-| `--space-lg` | 24px |
-| `--space-xl` | 32px |
-| `--space-2xl` | 64px |
+| Token         | Value |
+| ------------- | ----: |
+| `--space-2xs` |   2px |
+| `--space-xs`  |   4px |
+| `--space-sm`  |   8px |
+| `--space-md`  |  16px |
+| `--space-lg`  |  24px |
+| `--space-xl`  |  32px |
+| `--space-2xl` |  64px |
 
 Start with `--space-sm` for close text-like relationships and `--space-md` for separate or visually heavier groups. Larger gaps need a real page pause. Typography is fitted perceptually rather than forced onto the spacing grid.
 
 The base type scale is:
 
-| Token | Value |
-| --- | ---: |
+| Token                 |         Value |
+| --------------------- | ------------: |
 | `--font-size-display` | fluid 40–72px |
-| `--font-size-title-1` | 24px |
-| `--font-size-title-2` | 20px |
-| `--font-size-title-3` | 18px |
-| `--font-size-body-lg` | 16px |
-| `--font-size-body` | 14px |
-| `--font-size-body-sm` | 12px |
-| `--font-size-body-xs` | 10px |
+| `--font-size-title-1` |          24px |
+| `--font-size-title-2` |          20px |
+| `--font-size-title-3` |          18px |
+| `--font-size-body-lg` |          16px |
+| `--font-size-body`    |          14px |
+| `--font-size-body-sm` |          12px |
+| `--font-size-body-xs` |          10px |
 
 Display type and `--line-height-display` belong to the primary headline of a marketing or editorial hero. Ordinary page titles, section headings, dialogs, and application UI use the fixed title scale. Body text is the default component text; smaller sizes are reserved for labels, help, metadata, captions, badges, shortcuts, and other genuinely secondary information.
 

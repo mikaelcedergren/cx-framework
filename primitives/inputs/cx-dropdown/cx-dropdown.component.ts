@@ -333,7 +333,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
     const trimmedLabel = this.label.trim();
     return trimmedLabel || '';
   });
-  protected readonly searchEnabled$ = computed(() => this.searchableState() || this.creatableState());
+  protected readonly searchEnabled$ = this.searchableState.asReadonly();
   protected readonly createValue$ = computed(() => this.searchQueryState().trim());
 
   @Input() label = 'Entity';
@@ -405,9 +405,6 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   @Input()
   public set creatable(value: boolean | undefined) {
     this.creatableState.set(value === true);
-    if (!this.searchEnabled$()) {
-      this.setSearchQuery('', false);
-    }
   }
   @Input() hint: string | undefined;
   @Input()

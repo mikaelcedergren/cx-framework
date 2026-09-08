@@ -1,4 +1,4 @@
-@use '../../../styles/markdown-type';
+@use "../../../styles/markdown-type";
 
 // ViewEncapsulation.None: ProseMirror renders the contenteditable document
 // outside Angular's template, so every selector stays anchored to the
@@ -55,7 +55,8 @@ cx-markdown-editor .ProseMirror {
 // document mode gets its type from the global `.cx-article` contract (the
 // component puts that class on the ProseMirror root). The presentation guard
 // adds no specificity, so the editor's shared structural rules apply equally.
-cx-markdown-editor:where(:not(.cx-markdown-editor-host--document)) .ProseMirror {
+cx-markdown-editor:where(:not(.cx-markdown-editor-host--document))
+  .ProseMirror {
   @include markdown-type.cx-markdown-type;
 }
 
@@ -69,8 +70,9 @@ cx-markdown-editor .cx-markdown-editor__placeholder {
 // Match the article base (see styles/_article.scss) so the
 // placeholder overlay sits exactly where the first paragraph renders.
 cx-markdown-editor.cx-markdown-editor-host--document,
-cx-markdown-editor.cx-markdown-editor-host--document .cx-markdown-editor__placeholder {
-  font-size: var(--cx-article-base, 18px);
+cx-markdown-editor.cx-markdown-editor-host--document
+  .cx-markdown-editor__placeholder {
+  font-size: var(--font-size-body-lg);
   line-height: 1.6;
 }
 

@@ -4,10 +4,6 @@
 }
 
 .cx-badge {
-  --cx-badge-cutout-size: 3px;
-  --cx-badge-indicator-width: 8px;
-  --cx-badge-indicator-height: 8px;
-
   position: relative;
   display: inline-flex;
   min-width: 8px;
@@ -24,89 +20,11 @@
 }
 
 .cx-badge__content--cutout {
-  --cx-badge-indicator-right: 0px;
-  --cx-badge-indicator-top: 0px;
-  --cx-badge-indicator-center-offset-x: calc(
-    (var(--cx-badge-indicator-width) / 4) + var(--cx-badge-indicator-right)
-  );
-  --cx-badge-indicator-center-x: calc(100% - var(--cx-badge-indicator-center-offset-x));
-  --cx-badge-indicator-center-y: calc(
-    (var(--cx-badge-indicator-height) / 4) + var(--cx-badge-indicator-top)
-  );
-  --cx-badge-cutout-radius: calc(
-    (var(--cx-badge-indicator-height) / 2) + var(--cx-badge-cutout-size)
-  );
-  --cx-badge-cutout-straight-width: calc(
-    var(--cx-badge-indicator-width) - var(--cx-badge-indicator-height)
-  );
-  --cx-badge-cutout-left-center-x: calc(
-    var(--cx-badge-indicator-center-x) - (var(--cx-badge-cutout-straight-width) / 2)
-  );
-  --cx-badge-cutout-right-center-x: calc(
-    var(--cx-badge-indicator-center-x) + (var(--cx-badge-cutout-straight-width) / 2)
-  );
-  --cx-badge-cutout-rect-right: calc(
-    var(--cx-badge-indicator-center-offset-x) - (var(--cx-badge-cutout-straight-width) / 2)
-  );
-  --cx-badge-cutout-rect-top: calc(
-    var(--cx-badge-indicator-center-y) - var(--cx-badge-cutout-radius)
-  );
-
-  // A real capsule-shaped subtraction: two circular ends joined by the center mask layer.
-  mask-image:
-    linear-gradient(#000 0 0),
-    radial-gradient(
-      circle var(--cx-badge-cutout-radius)
-        at var(--cx-badge-cutout-left-center-x) var(--cx-badge-indicator-center-y),
-      #000 0 calc(100% - 1px),
-      transparent 100%
-    ),
-    linear-gradient(#000 0 0),
-    radial-gradient(
-      circle var(--cx-badge-cutout-radius)
-        at var(--cx-badge-cutout-right-center-x) var(--cx-badge-indicator-center-y),
-      #000 0 calc(100% - 1px),
-      transparent 100%
-    );
+  // The measured capsule subtraction is bound directly to the mask properties.
   mask-composite: subtract, add, add;
-  mask-position:
-    0 0,
-    0 0,
-    right var(--cx-badge-cutout-rect-right) top var(--cx-badge-cutout-rect-top),
-    0 0;
   mask-repeat: no-repeat;
-  mask-size:
-    100% 100%,
-    100% 100%,
-    max(1px, var(--cx-badge-cutout-straight-width)) calc(2 * var(--cx-badge-cutout-radius)),
-    100% 100%;
-  -webkit-mask-image:
-    linear-gradient(#000 0 0),
-    radial-gradient(
-      circle var(--cx-badge-cutout-radius)
-        at var(--cx-badge-cutout-left-center-x) var(--cx-badge-indicator-center-y),
-      #000 0 calc(100% - 1px),
-      transparent 100%
-    ),
-    linear-gradient(#000 0 0),
-    radial-gradient(
-      circle var(--cx-badge-cutout-radius)
-        at var(--cx-badge-cutout-right-center-x) var(--cx-badge-indicator-center-y),
-      #000 0 calc(100% - 1px),
-      transparent 100%
-    );
   -webkit-mask-composite: xor, source-over, source-over;
-  -webkit-mask-position:
-    0 0,
-    0 0,
-    right var(--cx-badge-cutout-rect-right) top var(--cx-badge-cutout-rect-top),
-    0 0;
   -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size:
-    100% 100%,
-    100% 100%,
-    max(1px, var(--cx-badge-cutout-straight-width)) calc(2 * var(--cx-badge-cutout-radius)),
-    100% 100%;
 }
 
 .cx-badge__indicator {
@@ -159,28 +77,23 @@
 }
 
 .cx-badge__indicator--dot {
-  width: var(--cx-badge-indicator-width);
-  height: var(--cx-badge-indicator-height);
+  width: 8px;
+  height: 8px;
   border-radius: var(--radius-pill);
   corner-shape: round;
 }
 
 .cx-badge--with-value {
   width: auto;
-  min-width: var(--cx-badge-indicator-width);
-  min-height: var(--cx-badge-indicator-height);
-}
-
-.cx-badge--with-value .cx-badge__content--cutout {
-  --cx-badge-indicator-right: -2px;
-  --cx-badge-indicator-top: -2px;
+  min-width: 8px;
+  min-height: 8px;
 }
 
 .cx-badge__indicator--count,
 .cx-badge__indicator--text {
   top: -2px;
   right: -2px;
-  height: var(--cx-badge-indicator-height);
+  height: 16px;
   min-width: 16px;
   border-radius: var(--radius-pill);
   corner-shape: round;

@@ -32,7 +32,8 @@
   background: var(--surface);
   box-shadow: var(--shadow-high);
   color: var(--ink);
-  animation: cx-wizard-dialog-enter calc(var(--motion-slow) * 2) var(--ease-out-strong);
+  animation: cx-wizard-dialog-enter calc(var(--motion-slow) * 2)
+    var(--ease-out-strong);
 }
 
 .cx-wizard-dialog--large {
@@ -251,7 +252,8 @@
   flex-direction: column;
   gap: var(--space-lg);
   justify-content: flex-start;
-  padding: calc((var(--space-lg) * 2) + 24px) var(--space-xl) var(--space-xl);
+  padding: calc((var(--space-lg) * 2) + var(--space-lg)) var(--space-xl)
+    var(--space-xl);
   box-sizing: border-box;
 }
 

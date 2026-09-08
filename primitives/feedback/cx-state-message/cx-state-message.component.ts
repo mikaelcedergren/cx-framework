@@ -25,11 +25,14 @@ export type CxStateMessageLayout = 'vertical' | 'horizontal';
 /** A state message answers with solid buttons; transparency is not one of its choices. */
 export type CxStateMessageAction = Omit<CxFeedbackAction, 'transparent'>;
 
-const CX_STATE_MESSAGE_PRESETS: Record<Exclude<CxStateMessageState, 'default'>, {
-  heading: string;
-  description: string;
-  icon: CxIconName;
-}> = {
+const CX_STATE_MESSAGE_PRESETS: Record<
+  Exclude<CxStateMessageState, 'default'>,
+  {
+    heading: string;
+    description: string;
+    icon: CxIconName;
+  }
+> = {
   pending: {
     heading: 'Working on it',
     description: "Hold tight while we get this ready. We'll let you know when it's done.",
@@ -42,7 +45,8 @@ const CX_STATE_MESSAGE_PRESETS: Record<Exclude<CxStateMessageState, 'default'>, 
   },
   scheduled: {
     heading: 'Scheduled',
-    description: 'This will run automatically at the scheduled time. You can cancel it if plans change.',
+    description:
+      'This will run automatically at the scheduled time. You can cancel it if plans change.',
     icon: 'schedule',
   },
   danger: {
@@ -92,7 +96,8 @@ export class CxStateMessageComponent implements AfterViewChecked {
   @Input() icon: CxIconName | undefined;
 
   @Output('action') readonly actionEmitter = new EventEmitter<CxStateMessageAction>();
-  @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxStateMessageAction>();
+  @Output('secondaryAction') readonly secondaryActionEmitter =
+    new EventEmitter<CxStateMessageAction>();
 
   public ngAfterViewChecked(): void {
     this.syncIconInkOffset();
@@ -138,7 +143,10 @@ export class CxStateMessageComponent implements AfterViewChecked {
   }
 
   protected get visibleAction(): CxStateMessageAction | undefined {
-    return this.visibleActionFor(this.action) ?? this.visibleActionFor(CX_STATE_MESSAGE_STATE_ACTIONS[this.state]);
+    return (
+      this.visibleActionFor(this.action) ??
+      this.visibleActionFor(CX_STATE_MESSAGE_STATE_ACTIONS[this.state])
+    );
   }
 
   protected get visibleSecondaryAction(): CxStateMessageAction | undefined {
@@ -149,14 +157,17 @@ export class CxStateMessageComponent implements AfterViewChecked {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
   }
 
-  private get resolvedPreset(): typeof CX_STATE_MESSAGE_PRESETS[keyof typeof CX_STATE_MESSAGE_PRESETS] | undefined {
+  private get resolvedPreset():
+    (typeof CX_STATE_MESSAGE_PRESETS)[keyof typeof CX_STATE_MESSAGE_PRESETS] | undefined {
     if (this.state === 'default') {
       return undefined;
     }
     return CX_STATE_MESSAGE_PRESETS[this.state];
   }
 
-  private visibleActionFor(action: CxStateMessageAction | undefined): CxStateMessageAction | undefined {
+  private visibleActionFor(
+    action: CxStateMessageAction | undefined,
+  ): CxStateMessageAction | undefined {
     return visibleCxFeedbackAction(action);
   }
 
@@ -176,8 +187,7 @@ export class CxStateMessageComponent implements AfterViewChecked {
    * A top-aligned mark reads as dropped unless its ink starts on the heading's cap
    * line. Both offsets are real and neither is knowable from CSS: an icon carries
    * its own air inside its box, and that air differs per glyph, while the heading
-   * keeps half its leading above the caps. Publish the difference so the layout can
-   * lift the mark by exactly that much.
+   * keeps half its leading above the caps. Apply that difference directly to the horizontal mark’s top margin.
    */
   private syncIconInkOffset(): void {
     const region = this.iconRegionRef?.nativeElement;
@@ -189,11 +199,12 @@ export class CxStateMessageComponent implements AfterViewChecked {
 
     const air = this.iconInkAir(region);
     const heading = this.messageBodyRef?.nativeElement.querySelector('.cx-state-message__heading');
-    const offset = Math.max(0, air - (heading ? capLeading(heading) : 0));
+    const offset =
+      this.layout === 'horizontal' ? Math.max(0, air - (heading ? capLeading(heading) : 0)) : 0;
     if (region === this.measuredRegion && offset === this.measuredOffset) {
       return;
     }
-    region.style.setProperty('--cx-state-message-icon-ink', `${offset}px`);
+    region.style.marginTop = `${-offset}px`;
     this.measuredRegion = region;
     this.measuredOffset = offset;
   }

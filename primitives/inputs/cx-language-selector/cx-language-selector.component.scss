@@ -1,0 +1,182 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+}
+
+:host:empty {
+  display: none;
+}
+
+.cx-language-selector__trigger {
+  box-sizing: border-box;
+  display: inline-flex;
+  max-width: 100%;
+  min-width: 160px;
+  min-height: var(--controller-size);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border: var(--line);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  transition: border-color var(--motion-fast) ease;
+}
+
+.cx-language-selector__trigger:hover {
+  border-color: var(--opacity-mid);
+  outline: var(--outline-field-interaction);
+}
+
+.cx-language-selector__trigger--open {
+  border-color: var(--border-open);
+  outline: var(--outline-field-interaction);
+}
+
+:host-context([data-cx-keyboard-navigation])
+  .cx-language-selector__trigger:focus {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-language-selector__trigger-label,
+.cx-language-selector__option-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-language-selector__trigger-label {
+  flex: 1 1 auto;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-control);
+}
+
+.cx-language-selector__flag {
+  display: inline-flex;
+  width: 24px;
+  min-width: 24px;
+  align-items: center;
+  justify-content: center;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: var(--icon-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1;
+}
+
+.cx-language-selector__chevron,
+.cx-language-selector__selected-icon {
+  flex: 0 0 auto;
+}
+
+.cx-language-selector__chevron {
+  transition: transform var(--motion-fast) ease;
+}
+
+.cx-language-selector__trigger--open .cx-language-selector__chevron {
+  transform: rotate(180deg);
+}
+
+.cx-language-selector__surface {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  max-height: inherit;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cx-language-selector__search {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-sm) var(--space-sm) var(--space-xs);
+}
+
+.cx-language-selector__options {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cx-language-selector__option {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--controller-size);
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: start;
+  transition: background var(--motion-fast) ease;
+}
+
+.cx-language-selector__option:hover,
+.cx-language-selector__option:focus-visible {
+  background: var(--opacity-mid);
+}
+
+.cx-language-selector__option--selected {
+  background: var(--opacity-low);
+}
+
+.cx-language-selector__option:focus-visible {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
+}
+
+.cx-language-selector__option-label {
+  flex: 1 1 auto;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-control);
+}
+
+.cx-language-selector__state {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 128px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.cx-language-selector__state-heading {
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
+}
+
+.cx-language-selector__state-text {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-language-selector__trigger,
+  .cx-language-selector__chevron,
+  .cx-language-selector__option {
+    transition: none;
+  }
+}

@@ -74,7 +74,7 @@
 
 .cx-toggle-chip:disabled {
   cursor: default;
-  opacity: 0.4;
+  opacity: var(--opacity-disabled);
 }
 
 .cx-toggle-chip__check {

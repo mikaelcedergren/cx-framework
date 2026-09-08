@@ -58,7 +58,7 @@
   box-sizing: border-box;
   max-width: calc(100% - 2 * var(--space-sm));
   margin: 0;
-  color: var(--opacity-mid);
+  color: var(--opacity-high);
   font-size: var(--font-size-body-xs);
   line-height: var(--line-height-small);
   overflow-wrap: anywhere;
@@ -129,8 +129,8 @@
   // The selected ring draws 4px outside its tile (2px outline + 2px offset).
   // Bleed the scroll box outward by that much so the ring survives the grid's
   // own clipping while the tiles keep their alignment.
-  padding: 4px;
-  margin: -4px;
+  padding: var(--space-xs);
+  margin: calc(-1 * var(--space-xs));
 }
 
 .cx-mural__option {
@@ -158,11 +158,11 @@
   object-fit: cover;
 }
 
-.cx-mural__option[aria-pressed='true'] {
+.cx-mural__option[aria-pressed="true"] {
   color: var(--ink);
 }
 
-.cx-mural__option[aria-pressed='true'] .cx-mural__thumb {
+.cx-mural__option[aria-pressed="true"] .cx-mural__thumb {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }

@@ -9,12 +9,18 @@
   [class.cx-badge--success]="mood === 'success'"
   [class.cx-badge--warning]="mood === 'warning'"
   [class.cx-badge--danger]="mood === 'danger'"
-  [style.--cx-badge-indicator-width]="indicatorWidth()"
-  [style.--cx-badge-indicator-height]="indicatorHeight()"
+  [style.min-width]="hasValue() ? indicatorWidth() : null"
+  [style.min-height]="hasValue() ? indicatorHeight() : null"
 >
   <span
     class="cx-badge__content"
     [class.cx-badge__content--cutout]="placement === 'corner' && showsIndicator()"
+    [style.mask-image]="cutoutStyles?.image"
+    [style.mask-position]="cutoutStyles?.position"
+    [style.mask-size]="cutoutStyles?.size"
+    [style.-webkit-mask-image]="cutoutStyles?.image"
+    [style.-webkit-mask-position]="cutoutStyles?.position"
+    [style.-webkit-mask-size]="cutoutStyles?.size"
   >
     <ng-content />
   </span>

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  signal,
+} from '@angular/core';
 import { CxIconComponent } from '../cx-icon';
 import { CxSpinnerComponent } from '../../feedback/cx-spinner';
 
@@ -27,13 +35,12 @@ type NormalizedCxImage = Required<CxImage>;
   templateUrl: './cx-image.component.html',
   styleUrl: './cx-image.component.scss',
   host: {
-    '[style.--cx-image-width]': 'hostWidth',
-    '[style.--cx-image-height]': 'hostHeight',
-    '[style.--cx-image-max-width]': 'hostMaxWidth',
-    '[style.--cx-image-max-height]': 'hostMaxHeight',
-    '[style.--cx-image-object-fit]': 'hostObjectFit',
-    '[style.--cx-image-border-radius]': 'hostBorderRadius',
-    '[style.--cx-image-corner-shape]': 'hostCornerShape',
+    '[style.width]': 'hostWidth',
+    '[style.height]': 'hostHeight',
+    '[style.max-width]': 'hostMaxWidth',
+    '[style.max-height]': 'hostMaxHeight',
+    '[style.border-radius]': 'hostBorderRadius',
+    '[style.corner-shape]': 'hostCornerShape',
     '[class.cx-image-host--clickable]': 'hostClickable',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,8 +53,10 @@ export class CxImageComponent {
   protected readonly image$ = this.imageState.asReadonly();
   protected readonly loading$ = this.loadingState.asReadonly();
   protected readonly fallbackText$ = computed(() => this.fallbackTextState().trim());
-  protected readonly styleVars$ = computed(() => calculateImageStyleVars(this.imageState()));
-  protected readonly showImage$ = computed(() => !!this.imageState().src && !this.loadingState() && !this.failedState());
+  protected readonly imageStyles$ = computed(() => calculateImageStyles(this.imageState()));
+  protected readonly showImage$ = computed(
+    () => !!this.imageState().src && !this.loadingState() && !this.failedState(),
+  );
   protected readonly showFallback$ = computed(() => !this.showImage$() && !this.loadingState());
 
   @Input()
@@ -69,31 +78,31 @@ export class CxImageComponent {
   @Output() readonly imageClick = new EventEmitter<CxImage>();
 
   public get hostWidth(): string {
-    return this.styleVars$()['--cx-image-width'];
+    return this.imageStyles$()['width'];
   }
 
   public get hostHeight(): string {
-    return this.styleVars$()['--cx-image-height'];
+    return this.imageStyles$()['height'];
   }
 
   public get hostMaxWidth(): string {
-    return this.styleVars$()['--cx-image-max-width'];
+    return this.imageStyles$()['max-width'];
   }
 
   public get hostMaxHeight(): string {
-    return this.styleVars$()['--cx-image-max-height'];
+    return this.imageStyles$()['max-height'];
   }
 
   public get hostObjectFit(): string {
-    return this.styleVars$()['--cx-image-object-fit'];
+    return this.imageStyles$()['object-fit'];
   }
 
   public get hostBorderRadius(): string {
-    return this.styleVars$()['--cx-image-border-radius'];
+    return this.imageStyles$()['border-radius'];
   }
 
   public get hostCornerShape(): string {
-    return this.styleVars$()['--cx-image-corner-shape'];
+    return this.imageStyles$()['corner-shape'];
   }
 
   public get hostClickable(): boolean {
@@ -134,15 +143,15 @@ function normalizeCxImage(image: CxImage | undefined): NormalizedCxImage {
   };
 }
 
-function calculateImageStyleVars(image: NormalizedCxImage): Record<string, string> {
+function calculateImageStyles(image: NormalizedCxImage): Record<string, string> {
   return {
-    '--cx-image-width': resolveImageSizeValue(image.width),
-    '--cx-image-height': resolveImageSizeValue(image.height),
-    '--cx-image-max-width': image.maxWidth === 'auto' ? 'none' : resolveImageSizeValue(image.maxWidth),
-    '--cx-image-max-height': image.maxHeight === 'auto' ? 'none' : resolveImageSizeValue(image.maxHeight),
-    '--cx-image-object-fit': image.objectFit,
-    '--cx-image-border-radius': resolveImageRadiusValue(image.borderRadius),
-    '--cx-image-corner-shape': image.borderRadius === 'round' ? 'round' : 'var(--corner-shape, round)',
+    width: resolveImageSizeValue(image.width),
+    height: resolveImageSizeValue(image.height),
+    'max-width': image.maxWidth === 'auto' ? 'none' : resolveImageSizeValue(image.maxWidth),
+    'max-height': image.maxHeight === 'auto' ? 'none' : resolveImageSizeValue(image.maxHeight),
+    'object-fit': image.objectFit,
+    'border-radius': resolveImageRadiusValue(image.borderRadius),
+    'corner-shape': image.borderRadius === 'round' ? 'round' : 'var(--corner-shape, round)',
   };
 }
 

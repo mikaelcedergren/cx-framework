@@ -49,7 +49,9 @@ export class CxBadgeComponent implements OnChanges, OnDestroy {
       if (!entry) {
         return;
       }
-      const borderBox = Array.isArray(entry.borderBoxSize) ? entry.borderBoxSize[0] : entry.borderBoxSize;
+      const borderBox = Array.isArray(entry.borderBoxSize)
+        ? entry.borderBoxSize[0]
+        : entry.borderBoxSize;
       const width = borderBox?.inlineSize ?? element.getBoundingClientRect().width;
       if (Number.isFinite(width) && width > 0 && this.measuredIndicatorWidth() !== width) {
         this.measuredIndicatorWidth.set(width);
@@ -114,11 +116,35 @@ export class CxBadgeComponent implements OnChanges, OnDestroy {
     return this.hasValue() ? '16px' : '8px';
   }
 
+  protected get cutoutStyles(): {
+    image: string;
+    position: string;
+    size: string;
+  } | null {
+    if (this.placement !== 'corner' || !this.showsIndicator()) return null;
+    const width = Number.parseFloat(this.indicatorWidth());
+    const height = Number.parseFloat(this.indicatorHeight());
+    const inset = this.hasValue() ? -2 : 0;
+    const centerOffset = width / 4 + inset;
+    const centerY = height / 4 + inset;
+    const straightWidth = width - height;
+    const radius = `calc(${height / 2}px + var(--space-xs))`;
+    const left = `calc(100% - ${centerOffset + straightWidth / 2}px)`;
+    const right = `calc(100% - ${centerOffset - straightWidth / 2}px)`;
+    return {
+      image: `linear-gradient(#000 0 0), radial-gradient(circle ${radius} at ${left} ${centerY}px, #000 0 calc(100% - 1px), transparent 100%), linear-gradient(#000 0 0), radial-gradient(circle ${radius} at ${right} ${centerY}px, #000 0 calc(100% - 1px), transparent 100%)`,
+      position: `0 0, 0 0, right ${centerOffset - straightWidth / 2}px top calc(${centerY}px - ${radius}), 0 0`,
+      size: `100% 100%, 100% 100%, ${Math.max(1, straightWidth)}px calc(2 * ${radius}), 100% 100%`,
+    };
+  }
+
   private validateValueCombination(): void {
     this.invalidValueCombination = this.hasCount() && this.hasText();
     if (this.invalidValueCombination) {
       if (!this.warnedInvalidValueCombination) {
-        console.error('[cx-badge] count and text cannot be used together. Provide one value or leave both empty for a dot.');
+        console.error(
+          '[cx-badge] count and text cannot be used together. Provide one value or leave both empty for a dot.',
+        );
         this.warnedInvalidValueCombination = true;
       }
       return;

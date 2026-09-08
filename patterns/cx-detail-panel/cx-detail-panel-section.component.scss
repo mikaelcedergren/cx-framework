@@ -8,7 +8,11 @@
   gap: var(--space-sm);
   padding: var(--space-md);
   border: var(--line-discreet);
-  border-radius: var(--cx-detail-panel-island-radius, var(--radius-lg));
+  border-radius: var(--radius-lg);
   background: var(--surface);
   box-sizing: border-box;
+}
+
+:host-context(.cx-detail-panel--fixed) {
+  border-radius: var(--radius-md);
 }

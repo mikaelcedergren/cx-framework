@@ -35,10 +35,15 @@
     font-size: var(--font-size-body-sm);
     font-weight: var(--font-weight-regular);
     line-height: var(--line-height-body-relaxed);
+    text-align: start;
   }
 }
 
-@mixin field-shell-state($selector, $focus-target: null, $loading-cursor: progress) {
+@mixin field-shell-state(
+  $selector,
+  $focus-target: null,
+  $loading-cursor: progress
+) {
   #{$selector} {
     transition:
       border-color var(--motion-fast) ease,
@@ -55,7 +60,8 @@
   }
 
   @if $focus-target != null {
-    :host-context([data-cx-keyboard-navigation]) #{$selector}:has(#{$focus-target}:focus) {
+    :host-context([data-cx-keyboard-navigation])
+      #{$selector}:has(#{$focus-target}:focus) {
       outline: var(--outline-tab);
       outline-offset: var(--outline-tab-offset);
     }
@@ -67,7 +73,7 @@
   }
 
   #{$selector}--disabled {
-    opacity: 0.55;
+    opacity: var(--opacity-disabled);
     cursor: default;
   }
 
@@ -78,7 +84,9 @@
 
 @mixin field-shell-interaction($selector) {
   #{$selector}:hover:not(#{$selector}--disabled):not(#{$selector}--error),
-  #{$selector}:focus-within:not(#{$selector}--disabled):not(#{$selector}--error) {
+  #{$selector}:focus-within:not(#{$selector}--disabled):not(
+      #{$selector}--error
+    ) {
     outline: var(--outline-field-interaction);
     outline-offset: 0;
   }
@@ -90,15 +98,23 @@
     background: transparent;
   }
 
-  #{$selector}--inline-edit:hover:not(#{$selector}--disabled):not(#{$selector}--error),
-  #{$selector}--inline-edit#{$selector}--focused:not(#{$selector}--disabled):not(#{$selector}--error),
-  #{$selector}--inline-edit:has(#{$focus-target}:focus-visible):not(#{$selector}--disabled):not(#{$selector}--error) {
+  #{$selector}--inline-edit:hover:not(#{$selector}--disabled):not(
+      #{$selector}--error
+    ),
+  #{$selector}--inline-edit#{$selector}--focused:not(
+      #{$selector}--disabled
+    ):not(#{$selector}--error),
+  #{$selector}--inline-edit:has(#{$focus-target}:focus-visible):not(
+      #{$selector}--disabled
+    ):not(#{$selector}--error) {
     border-color: var(--border-hover);
     background: var(--opacity-darken);
   }
 
   #{$selector}--inline-edit#{$selector}--error,
-  #{$selector}--inline-edit#{$selector}--error:hover:not(#{$selector}--disabled) {
+  #{$selector}--inline-edit#{$selector}--error:hover:not(
+      #{$selector}--disabled
+    ) {
     border-color: var(--danger);
   }
 }

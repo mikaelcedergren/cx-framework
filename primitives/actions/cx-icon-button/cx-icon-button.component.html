@@ -8,6 +8,7 @@
   [class.cx-icon-button--warning]="mood === 'warning'"
   [class.cx-icon-button--danger]="mood === 'danger'"
   [class.cx-icon-button--success]="mood === 'success'"
+  [class.cx-icon-button--emphasis]="variant === 'emphasis'"
   [class.cx-icon-button--transparent]="variant === 'transparent'"
   [class.cx-icon-button--small]="size === 'small'"
   [class.cx-icon-button--selected]="selected"
@@ -44,9 +45,7 @@
   }
 
   @if (hasBadge()) {
-    <!-- Inline placement renders the bare indicator with no internal corner
-         offsets, so the wrapper alone decides where the badge sits — from the
-         same variables that position the background cutout. -->
+    <!-- The wrapper anchors the bare indicator outside the background cutout. -->
     <span class="cx-icon-button__badge" aria-hidden="true">
       <cx-badge placement="inline" [count]="badgeCount()" />
     </span>

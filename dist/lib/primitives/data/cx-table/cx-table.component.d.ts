@@ -91,6 +91,10 @@ export type CxTableCell = {
 };
 export interface CxTableRow {
     id: string;
+    /** Disables all row interactions without clearing owner-supplied selection. */
+    disabled?: boolean;
+    /** Disables only selection; row activation and actions remain available. */
+    selectionDisabled?: boolean;
     kind?: CxTableRowKind;
     cells: Record<string, CxTableCell | undefined>;
     menuItems?: CxMenuItem[];

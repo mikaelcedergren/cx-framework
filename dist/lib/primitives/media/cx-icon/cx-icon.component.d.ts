@@ -11,6 +11,7 @@ export declare class CxIconComponent {
     private shapeValue;
     protected resolvedSize: string;
     protected resolvedSizeClass: CxIconSizeClass;
+    protected get resolvedHeight(): string;
     icon: CxIconName | undefined;
     set size(value: CxIconSizeInput);
     get size(): CxIconSizeInput;

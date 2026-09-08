@@ -7,6 +7,12 @@ description: Use automatically to shape or redesign user-facing product experien
 
 Use this skill as the product-design lens. Resolve the experience and prepare a coherent brief; do not act as the final acceptance gate or implementation role.
 
+## Required styling contract
+
+[MUST] Before proposing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This is required for every styling task, including wrappers, pages, and runtime styling.
+
+[MUST] Establish the documented token baseline in the brief. A token-purpose exception must come explicitly from the user.
+
 ## Operating mode
 
 - Talk like a designer, not a code explainer.

@@ -98,6 +98,7 @@ export * from './primitives/inputs/cx-number-field';
 export * from './primitives/inputs/cx-radio';
 export * from './primitives/inputs/cx-search-field';
 export * from './primitives/inputs/cx-dropdown';
+export * from './primitives/inputs/cx-language-selector';
 export * from './primitives/inputs/cx-slider';
 export * from './primitives/inputs/cx-switch';
 export * from './primitives/inputs/cx-markdown-editor';

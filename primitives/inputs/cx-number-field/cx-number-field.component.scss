@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: block;
@@ -9,7 +9,7 @@
   width: 100%;
 }
 
-@include field.field-header('cx-number-field');
+@include field.field-header("cx-number-field");
 
 .cx-number-field__field-shell {
   box-sizing: border-box;
@@ -25,7 +25,11 @@
   color: var(--ink);
 }
 
-@include field.field-shell-state('.cx-number-field__field-shell', '.cx-number-field__field', $loading-cursor: default);
+@include field.field-shell-state(
+  ".cx-number-field__field-shell",
+  ".cx-number-field__field",
+  $loading-cursor: default
+);
 
 .cx-number-field--small .cx-number-field__field-shell {
   min-height: var(--controller-size-small);
@@ -156,7 +160,7 @@
   text-align: center;
 }
 
-@include field.field-messages('cx-number-field');
+@include field.field-messages("cx-number-field");
 
 .cx-number-field__validation {
   display: inline-flex;
@@ -185,5 +189,5 @@
 
 .cx-number-field__validation-icon {
   flex: 0 0 auto;
-  margin-top: 2px;
+  margin-top: var(--space-2xs);
 }

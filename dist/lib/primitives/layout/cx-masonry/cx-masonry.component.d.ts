@@ -6,7 +6,6 @@ export declare class CxMasonryComponent {
     gap: CxLayoutGap;
     protected get normalizedColumns(): string;
     protected get normalizedColumnsMobile(): string;
-    protected get resolvedGap(): string;
     private clampColumns;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMasonryComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CxMasonryComponent, "cx-masonry", never, { "columns": { "alias": "columns"; "required": false; }; "columnsMobile": { "alias": "columnsMobile"; "required": false; }; "gap": { "alias": "gap"; "required": false; }; }, {}, never, ["*"], true, never>;

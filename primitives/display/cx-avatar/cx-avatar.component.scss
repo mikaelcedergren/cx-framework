@@ -2,26 +2,29 @@
   display: inline-flex;
   flex: 0 0 auto;
   container-type: inline-size;
-  width: var(--cx-avatar-size, 32px);
-  height: var(--cx-avatar-size, 32px);
+  width: 32px;
+  height: 32px;
 }
 
 :host(.cx-avatar-host--small) {
-  --cx-avatar-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 :host(.cx-avatar-host--default) {
-  --cx-avatar-size: 32px;
+  width: 32px;
+  height: 32px;
 }
 
 :host(.cx-avatar-host--large) {
-  --cx-avatar-size: 48px;
+  width: 48px;
+  height: 48px;
 }
 
 .cx-avatar {
   display: flex;
-  width: var(--cx-avatar-size);
-  height: var(--cx-avatar-size);
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   overflow: hidden;

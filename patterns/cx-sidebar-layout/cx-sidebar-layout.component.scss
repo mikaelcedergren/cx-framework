@@ -12,20 +12,16 @@
   width: 100%;
   min-width: 0;
   grid-template-areas: "sidebar content";
-  grid-template-columns: minmax(
-      0,
-      var(--cx-sidebar-layout-width, 280px)
-    ) minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, 280px)
+    minmax(0, 1fr);
   align-items: start;
   box-sizing: border-box;
 }
 
 :host([data-placement="end"]) > .cx-sidebar-layout {
   grid-template-areas: "content sidebar";
-  grid-template-columns: minmax(0, 1fr) minmax(
-      0,
-      var(--cx-sidebar-layout-width, 280px)
-    );
+  grid-template-columns: minmax(0, 1fr) minmax(0, 280px);
 }
 
 .cx-sidebar-layout__sidebar {
@@ -45,15 +41,9 @@
 
 .cx-sidebar-layout__sticky {
   position: sticky;
-  inset-block-start: var(
-    --cx-sidebar-layout-offset,
-    var(--cx-scroll-offset, var(--space-md))
-  );
+  inset-block-start: calc(var(--space-2xl) + var(--space-md));
   max-block-size: calc(
-    100dvh - var(
-        --cx-sidebar-layout-offset,
-        var(--cx-scroll-offset, var(--space-md))
-      ) - var(--space-md)
+    100dvh - calc(var(--space-2xl) + var(--space-md)) - var(--space-md)
   );
   overflow: auto;
   overscroll-behavior: contain;

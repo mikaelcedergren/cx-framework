@@ -5,6 +5,7 @@
 } @else if (showImage$()) {
   <img
     class="cx-image"
+    [style.object-fit]="hostObjectFit"
     [src]="image$().src"
     [alt]="image$().alt"
     (load)="onImageLoad()"

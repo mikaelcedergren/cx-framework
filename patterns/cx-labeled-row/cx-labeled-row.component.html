@@ -1,6 +1,5 @@
 <div
   class="cx-labeled-row"
-  [class.cx-labeled-row--no-label]="!hasLabel"
   [class.cx-labeled-row--small]="size === 'small'"
   [class.cx-labeled-row--large]="size === 'large'"
 >
@@ -44,7 +43,11 @@
           [placement]="infoOverlay.placement$()"
           (backdropPressed)="closeInfoPopover()"
         >
-          <div #infoSurfaceFocus class="cx-labeled-row__info-content" tabindex="-1">
+          <div
+            #infoSurfaceFocus
+            class="cx-labeled-row__info-content"
+            tabindex="-1"
+          >
             <ng-content select="[infoContent]" />
           </div>
         </cx-popover>
@@ -55,13 +58,13 @@
   <div class="cx-labeled-row__content">
     @if (contentInputBound) {
       @switch (content.kind) {
-        @case ('text') {
+        @case ("text") {
           <div class="cx-labeled-row__field-shell">
             <div class="cx-labeled-row__plain-text">{{ content.text }}</div>
           </div>
         }
 
-        @case ('input') {
+        @case ("input") {
           <div class="cx-labeled-row__field-shell">
             <cx-text-field
               [label]="''"
@@ -77,7 +80,7 @@
           </div>
         }
 
-        @case ('textarea') {
+        @case ("textarea") {
           <div class="cx-labeled-row__field-shell">
             <cx-text-area
               [label]="''"
@@ -93,7 +96,7 @@
           </div>
         }
 
-        @case ('select') {
+        @case ("select") {
           <div class="cx-labeled-row__field-shell">
             <cx-dropdown
               [label]="''"
@@ -112,7 +115,7 @@
           </div>
         }
 
-        @case ('radio-group') {
+        @case ("radio-group") {
           <div class="cx-labeled-row__field-shell">
             <div class="cx-labeled-row__radio-group-field">
               <div class="cx-labeled-row__radio-group">
@@ -136,7 +139,7 @@
           </div>
         }
 
-        @case ('checkbox') {
+        @case ("checkbox") {
           <div class="cx-labeled-row__field-shell">
             <cx-checkbox
               [text]="content.label"
@@ -153,7 +156,7 @@
           </div>
         }
 
-        @case ('switch') {
+        @case ("switch") {
           <div class="cx-labeled-row__field-shell">
             <cx-switch
               [text]="content.label"
@@ -165,7 +168,7 @@
           </div>
         }
 
-        @case ('file-upload') {
+        @case ("file-upload") {
           <div class="cx-labeled-row__field-shell">
             <cx-file-upload
               [multiple]="content.multiple ?? false"
@@ -178,7 +181,7 @@
           </div>
         }
 
-        @case ('dynamic-fields') {
+        @case ("dynamic-fields") {
           <div class="cx-labeled-row__field-shell">
             <cx-dynamic-fields
               [options]="content.options"

@@ -1,0 +1,148 @@
+@if (hasLanguages$() && selectedLanguage$(); as selected) {
+  <button
+    #triggerButton
+    type="button"
+    class="cx-language-selector__trigger"
+    [class.cx-language-selector__trigger--open]="isOpen$()"
+    [attr.aria-label]="triggerAriaLabel$()"
+    [attr.aria-expanded]="isOpen$()"
+    [attr.aria-controls]="isOpen$() ? listboxId : null"
+    aria-haspopup="listbox"
+    (click)="toggleOpen(triggerButton)"
+    (keydown)="onTriggerKeydown($event, triggerButton)"
+  >
+    <span class="cx-language-selector__flag" aria-hidden="true">{{
+      selected.flag
+    }}</span>
+    <span class="cx-language-selector__trigger-label">{{
+      selected.label
+    }}</span>
+    <cx-icon
+      class="cx-language-selector__chevron"
+      icon="chevron-down"
+      size="16"
+    />
+  </button>
+
+  @if (isOpen$()) {
+    <cx-popover
+      #popover
+      [open]="true"
+      [owner]="triggerButton"
+      [showBackdrop]="true"
+      [surfaceId]="popoverId"
+      [width]="overlay.width$()"
+      [minWidth]="overlay.minWidth$()"
+      [maxWidth]="popoverMaxWidth"
+      [maxHeight]="overlay.maxHeight$()"
+      [left]="overlay.left$()"
+      [top]="overlay.top$()"
+      [bottom]="overlay.bottom$()"
+      [placement]="overlay.placement$()"
+      (backdropPressed)="closePopover()"
+    >
+      <div class="cx-language-selector__surface">
+        @if (showSearch$()) {
+          <div class="cx-language-selector__search">
+            <cx-text-field
+              #searchInput
+              label=""
+              [ariaLabel]="translation('search')"
+              prependIcon="search"
+              [clearable]="true"
+              [value]="searchQuery$()"
+              (valueChange)="onSearchChange($event)"
+              (keydown)="onSearchKeydown($event)"
+            />
+          </div>
+        }
+
+        <div
+          class="cx-language-selector__options"
+          data-cx-popover-scroll-container
+          role="listbox"
+          [id]="listboxId"
+          [attr.aria-label]="translation('ariaLabel')"
+        >
+          @if (filteredLanguages$().length === 0) {
+            <div
+              class="cx-language-selector__state"
+              role="status"
+              aria-live="polite"
+            >
+              <div class="cx-language-selector__state-heading">
+                {{ translation("noResults") }}
+              </div>
+              <div class="cx-language-selector__state-text">
+                {{ translation("noResultsDescription") }}
+              </div>
+            </div>
+          } @else if (hasSearchQuery$()) {
+            @for (language of filteredLanguages$(); track language.id) {
+              <ng-container
+                [ngTemplateOutlet]="languageOption"
+                [ngTemplateOutletContext]="{
+                  $implicit: language,
+                  key: 'search:' + language.id,
+                }"
+              />
+            }
+          } @else {
+            @if (showRecommended$()) {
+              <cx-option-group [label]="translation('recommended')" />
+              @for (language of recommendedLanguages$(); track language.id) {
+                <ng-container
+                  [ngTemplateOutlet]="languageOption"
+                  [ngTemplateOutletContext]="{
+                    $implicit: language,
+                    key: 'recommended:' + language.id,
+                  }"
+                />
+              }
+              <cx-option-group [label]="translation('allLanguages')" />
+            }
+            @for (language of filteredLanguages$(); track language.id) {
+              <ng-container
+                [ngTemplateOutlet]="languageOption"
+                [ngTemplateOutletContext]="{
+                  $implicit: language,
+                  key: 'all:' + language.id,
+                }"
+              />
+            }
+          }
+        </div>
+      </div>
+    </cx-popover>
+  }
+}
+
+<ng-template #languageOption let-language let-key="key">
+  <button
+    #optionButton
+    type="button"
+    class="cx-language-selector__option"
+    [class.cx-language-selector__option--selected]="
+      selectedLanguage$()?.id === language.id
+    "
+    [attr.data-language-option-key]="key"
+    role="option"
+    tabindex="-1"
+    [attr.aria-selected]="selectedLanguage$()?.id === language.id"
+    (click)="selectLanguage(language)"
+    (keydown)="onOptionKeydown($event, language)"
+  >
+    <span class="cx-language-selector__flag" aria-hidden="true">{{
+      language.flag
+    }}</span>
+    <span class="cx-language-selector__option-label">{{ language.label }}</span>
+    @if (selectedLanguage$()?.id === language.id) {
+      <cx-icon
+        class="cx-language-selector__selected-icon"
+        icon="check"
+        mood="primary"
+        size="16"
+      />
+    }
+  </button>
+</ng-template>

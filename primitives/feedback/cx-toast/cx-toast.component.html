@@ -10,8 +10,8 @@
     [class.cx-toast--danger]="mood === 'danger'"
     [class.cx-toast--multiline]="isMultiline"
     [class.cx-toast--timed]="effectiveTimed"
-    [style.--cx-toast-timer-progress]="timerProgress$()"
-    [style.--cx-toast-timer-duration]="timerTransition$() + 'ms'"
+    [style.transform]="'scaleX(' + timerProgress$() + ')'"
+    [style.transition-duration.ms]="timerTransition$()"
     role="status"
     [attr.aria-live]="mood === 'danger' ? 'assertive' : 'polite'"
     (pointerenter)="onPointerEnter()"
@@ -21,7 +21,13 @@
     (transitionend)="onTransitionEnd($event)"
   >
     @if (moodIcon; as iconName) {
-      <cx-icon class="cx-toast__mood-icon" [icon]="iconName" [mood]="mood" shape="circle-outline" size="24" />
+      <cx-icon
+        class="cx-toast__mood-icon"
+        [icon]="iconName"
+        [mood]="mood"
+        shape="circle-outline"
+        size="24"
+      />
     }
 
     @if (hasContent) {
@@ -69,7 +75,8 @@
           <cx-icon-button
             class="cx-toast__dismiss"
             icon="remove"
-            ariaLabel="Dismiss notification" variant="transparent"
+            ariaLabel="Dismiss notification"
+            variant="transparent"
             (pressed)="dismiss()"
           />
         }

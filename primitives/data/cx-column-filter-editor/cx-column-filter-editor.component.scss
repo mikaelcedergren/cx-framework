@@ -130,6 +130,10 @@
   line-height: var(--line-height-small);
 }
 
+.cx-column-filter-editor__hint {
+  text-align: start;
+}
+
 .cx-column-filter-editor__load-more {
   min-height: var(--controller-size);
   align-self: flex-start;

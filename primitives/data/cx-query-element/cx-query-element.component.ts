@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
-export type CxQueryElementKind = 'insert' | 'field' | 'operator' | 'boolean' | 'parenthesis' | 'values';
+export type CxQueryElementKind =
+  'insert' | 'field' | 'operator' | 'boolean' | 'parenthesis' | 'values';
 
 export interface CxQueryElementData {
   id?: string;
@@ -31,6 +32,8 @@ const DEFAULT_QUERY_ELEMENT_DATA: CxQueryElementData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxQueryElementComponent {
+  @Input() size: 'small' | 'default' | 'large' = 'default';
+
   protected kind: CxQueryElementKind = DEFAULT_QUERY_ELEMENT_DATA.kind;
   protected label = DEFAULT_QUERY_ELEMENT_DATA.label ?? '';
   protected values: readonly string[] = [];
@@ -49,7 +52,7 @@ export class CxQueryElementComponent {
 
     this.kind = data.kind;
     this.label = data.label ?? this.defaultLabelFor(data.kind);
-    this.values = (data.values ?? []).map(item => item?.trim() ?? '');
+    this.values = (data.values ?? []).map((item) => item?.trim() ?? '');
     this.valuesPrefix = data.valuesPrefix ?? '';
     this.valuesDivider = data.valuesDivider ?? ', ';
     this.valuesSuffix = data.valuesSuffix ?? '';
@@ -79,7 +82,7 @@ export class CxQueryElementComponent {
       return this.resolvedLabel();
     }
 
-    const values = this.values.map(value => value || '<Empty>');
+    const values = this.values.map((value) => value || '<Empty>');
     return `${this.valuesPrefix}${values.join(this.valuesDivider)}${this.valuesSuffix}`;
   }
 

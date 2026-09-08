@@ -6,7 +6,7 @@
 
 .cx-index-nav {
   display: flex;
-  width: var(--cx-index-nav-width, 280px);
+  width: 280px;
   height: 100%;
   min-height: 0;
   flex-direction: column;
@@ -173,7 +173,8 @@ button.cx-index-nav__folder--toggle {
   grid-template-rows: 1fr;
 }
 
-.cx-index-nav__items--expanded.cx-index-nav__items--collapsible .cx-index-nav__items-inner {
+.cx-index-nav__items--expanded.cx-index-nav__items--collapsible
+  .cx-index-nav__items-inner {
   visibility: visible;
   pointer-events: auto;
   opacity: 1;
@@ -185,7 +186,7 @@ button.cx-index-nav__folder--toggle {
   min-height: 0;
   flex-direction: column;
   gap: 1px;
-  padding-left: calc(16px + var(--space-sm));
+  padding-left: calc(var(--space-md) + var(--space-sm));
 }
 
 /* ---- Items ---- */
@@ -236,7 +237,7 @@ button.cx-index-nav__folder--toggle {
 
 /* Active state must read clearly, not as a faint tint — add a leading accent. */
 .cx-index-nav__item--active::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 4px;
@@ -248,9 +249,10 @@ button.cx-index-nav__folder--toggle {
 }
 
 .cx-index-nav__item--disabled {
-  color: var(--opacity-mid);
+  color: var(--ink);
   cursor: default;
   pointer-events: none;
+  opacity: var(--opacity-disabled);
 }
 
 .cx-index-nav__label {
@@ -335,13 +337,12 @@ button.cx-index-nav__folder--toggle {
 .cx-index-nav__skeleton-row {
   height: calc(28px + var(--space-2xs) * 2);
   border-radius: var(--radius-sm);
-  background:
-    linear-gradient(
-      90deg,
-      var(--opacity-low),
-      var(--opacity-mid),
-      var(--opacity-low)
-    );
+  background: linear-gradient(
+    90deg,
+    var(--opacity-low),
+    var(--opacity-mid),
+    var(--opacity-low)
+  );
   background-size: 180% 100%;
   animation: cx-index-nav-skeleton 1.2s ease-in-out infinite;
 }

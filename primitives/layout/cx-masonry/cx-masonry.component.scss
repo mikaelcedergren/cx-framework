@@ -1,4 +1,5 @@
-@use '../../../tokens/breakpoints-scale' as bp;
+@use "../../../tokens/spacing-scale" as space;
+@use "../../../tokens/breakpoints-scale" as bp;
 
 // ViewEncapsulation.None: keep every selector anchored to the cx-masonry
 // element so nothing leaks beyond the primitive.
@@ -12,8 +13,6 @@ cx-masonry > .cx-masonry {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  column-count: var(--cx-masonry-columns, 3);
-  column-gap: var(--cx-masonry-gap, var(--space-md));
 }
 
 cx-masonry > .cx-masonry:empty {
@@ -23,20 +22,34 @@ cx-masonry > .cx-masonry:empty {
 // Items flow down each column; keep each item whole and give the column flow
 // the same rhythm as the column gap. The negative bottom margin on the wrapper
 // swallows the trailing item margin of every column.
-cx-masonry > .cx-masonry {
-  margin-block-end: calc(var(--cx-masonry-gap, var(--space-md)) * -1);
-}
 
 cx-masonry > .cx-masonry > * {
   display: block;
   width: 100%;
   box-sizing: border-box;
   break-inside: avoid;
-  margin-block-end: var(--cx-masonry-gap, var(--space-md));
+}
+
+@for $columns from 1 through 12 {
+  cx-masonry[data-columns="#{$columns}"] > .cx-masonry {
+    column-count: $columns;
+  }
+}
+
+@each $name, $token in space.$scale {
+  cx-masonry[data-gap="#{$name}"] > .cx-masonry {
+    column-gap: $token;
+    margin-block-end: calc($token * -1);
+  }
+  cx-masonry[data-gap="#{$name}"] > .cx-masonry > * {
+    margin-block-end: $token;
+  }
 }
 
 @media (max-width: (bp.$mobile - 1px)) {
-  cx-masonry > .cx-masonry {
-    column-count: var(--cx-masonry-columns-mobile, 1);
+  @for $columns from 1 through 12 {
+    cx-masonry[data-columns-mobile="#{$columns}"] > .cx-masonry {
+      column-count: $columns;
+    }
   }
 }

@@ -4,11 +4,6 @@
 }
 
 .cx-split-button {
-  --cx-split-button-background: var(--opacity-low);
-  --cx-split-button-color: var(--ink);
-  --cx-split-button-hover-background: var(--opacity-mid);
-  --cx-split-button-divider: var(--opacity-mid);
-
   display: inline-flex;
   width: auto;
   min-width: 0;
@@ -16,8 +11,8 @@
   align-items: stretch;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  background: var(--cx-split-button-background);
-  color: var(--cx-split-button-color);
+  background: var(--opacity-low);
+  color: var(--ink);
   transition:
     background-color var(--motion-fast) ease,
     color var(--motion-fast) ease,
@@ -25,89 +20,189 @@
 }
 
 .cx-split-button--default {
-  --cx-split-button-background: var(--opacity-low);
-  --cx-split-button-color: var(--ink);
-  --cx-split-button-hover-background: var(--opacity-mid);
-  --cx-split-button-divider: var(--opacity-mid);
+  background: var(--opacity-low);
+  color: var(--ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid var(--opacity-mid);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--opacity-mid);
+  }
 }
 
 .cx-split-button--primary {
-  --cx-split-button-background: var(--primary);
-  --cx-split-button-color: var(--on-ink);
-  --cx-split-button-hover-background: var(--primary-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--on-ink) 24%, transparent);
+  background: var(--primary);
+  color: var(--on-ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--on-ink) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--primary-alt);
+  }
 }
 
 .cx-split-button--accent {
-  --cx-split-button-background: var(--accent);
-  --cx-split-button-color: var(--surface);
-  --cx-split-button-hover-background: var(--accent-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--surface) 24%, transparent);
+  background: var(--accent);
+  color: var(--surface);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--surface) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--accent-alt);
+  }
 }
 
 .cx-split-button--info {
-  --cx-split-button-background: var(--info);
-  --cx-split-button-color: var(--on-ink);
-  --cx-split-button-hover-background: var(--info-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--on-ink) 24%, transparent);
+  background: var(--info);
+  color: var(--on-ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--on-ink) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--info-alt);
+  }
 }
 
 .cx-split-button--success {
-  --cx-split-button-background: var(--success);
-  --cx-split-button-color: var(--on-ink);
-  --cx-split-button-hover-background: var(--success-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--on-ink) 24%, transparent);
+  background: var(--success);
+  color: var(--on-ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--on-ink) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--success-alt);
+  }
 }
 
 .cx-split-button--warning {
-  --cx-split-button-background: var(--warning);
-  --cx-split-button-color: var(--on-ink);
-  --cx-split-button-hover-background: var(--warning-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--on-ink) 24%, transparent);
+  background: var(--warning);
+  color: var(--on-ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--on-ink) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--warning-alt);
+  }
 }
 
 .cx-split-button--danger {
-  --cx-split-button-background: var(--danger);
-  --cx-split-button-color: var(--on-ink);
-  --cx-split-button-hover-background: var(--danger-alt);
-  --cx-split-button-divider: color-mix(in srgb, var(--on-ink) 24%, transparent);
+  background: var(--danger);
+  color: var(--on-ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid
+      color-mix(in srgb, var(--on-ink) 24%, transparent);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--danger-alt);
+  }
 }
 
 .cx-split-button--transparent {
-  --cx-split-button-background: transparent;
-  --cx-split-button-color: var(--ink);
-  --cx-split-button-hover-background: var(--opacity-low);
-  --cx-split-button-divider: var(--opacity-mid);
+  background: transparent;
+  color: var(--ink);
+
+  .cx-split-button__trigger {
+    border-left: var(--border-width) solid var(--opacity-mid);
+  }
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--opacity-low);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--primary {
-  --cx-split-button-color: var(--primary);
-  --cx-split-button-hover-background: var(--primary-opacity);
+  color: var(--primary);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--primary-opacity);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--accent {
-  --cx-split-button-color: var(--accent);
-  --cx-split-button-hover-background: var(--accent-opacity);
+  color: var(--accent);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--accent-opacity);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--info {
-  --cx-split-button-color: var(--info);
-  --cx-split-button-hover-background: var(--info-opacity);
+  color: var(--info);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--info-opacity);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--success {
-  --cx-split-button-color: var(--success);
-  --cx-split-button-hover-background: var(--success-opacity);
+  color: var(--success);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--success-opacity);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--warning {
-  --cx-split-button-color: var(--warning);
-  --cx-split-button-hover-background: var(--warning-opacity);
+  color: var(--warning);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--warning-opacity);
+  }
 }
 
 .cx-split-button--transparent.cx-split-button--danger {
-  --cx-split-button-color: var(--danger);
-  --cx-split-button-hover-background: var(--danger-opacity);
+  color: var(--danger);
+
+  .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
+  .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
+  &.cx-split-button--open .cx-split-button__trigger {
+    background: var(--danger-opacity);
+  }
 }
 
 .cx-split-button--small {
@@ -124,7 +219,7 @@
 }
 
 .cx-split-button--disabled {
-  opacity: 0.2;
+  opacity: var(--opacity-disabled);
 }
 
 .cx-split-button__main,
@@ -153,7 +248,7 @@
 
 .cx-split-button__trigger {
   width: var(--controller-size);
-  border-left: var(--border-width) solid var(--cx-split-button-divider);
+  border-left: var(--border-width) solid var(--opacity-mid);
   padding: 0;
 }
 
@@ -186,7 +281,7 @@
 .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
 .cx-split-button__trigger:is(:hover, :focus-visible):not(:disabled),
 .cx-split-button--open .cx-split-button__trigger {
-  background: var(--cx-split-button-hover-background);
+  background: var(--opacity-mid);
 }
 
 .cx-split-button__main:focus-visible,

@@ -24,7 +24,10 @@ import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key';
 import { CxDismissRequest, type CxDismissReason } from '../../primitives/overlay/dismiss-request';
-import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
+import {
+  CxOverlayStateService,
+  type CxOverlayStateHandle,
+} from '../../primitives/overlay/overlay-state';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
 import { CxStateMessageComponent } from '../../primitives/feedback/cx-state-message';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
@@ -53,6 +56,7 @@ export interface CxWizardDialogData {
   size?: CxWizardDialogSize;
   loadingActionId?: CxWizardDialogAction | string;
   feedbackVisible?: boolean;
+  /** Shows the top-right close button. Off by default; Cancel and Escape are unaffected. */
   dismissible?: boolean;
 }
 
@@ -60,7 +64,7 @@ const EMPTY_WIZARD: CxWizardDialogData = {
   steps: [],
   index: 0,
   size: 'default',
-  dismissible: true,
+  dismissible: false,
 };
 
 @Component({
@@ -108,25 +112,29 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   protected readonly wizard$ = this.wizardState.asReadonly();
   protected readonly steps$ = computed(() => this.wizard$().steps);
   protected readonly currentStepIndex$ = computed(() => this.clampIndex(this.wizard$().index ?? 0));
-  protected readonly currentStep$ = computed<CxWizardDialogStep | undefined>(() => this.steps$()[this.currentStepIndex$()]);
+  protected readonly currentStep$ = computed<CxWizardDialogStep | undefined>(
+    () => this.steps$()[this.currentStepIndex$()],
+  );
   protected readonly activeTemplate$ = computed(() => {
     const activeStepId = this.currentStep$()?.id;
     if (!activeStepId) {
       return null;
     }
-    return this.stepTemplates().find(template => template.stepId === activeStepId)?.templateRef ?? null;
+    return (
+      this.stepTemplates().find((template) => template.stepId === activeStepId)?.templateRef ?? null
+    );
   });
   protected readonly loadingActionId$ = computed(() => this.wizard$().loadingActionId);
   protected readonly isLoading$ = computed(() => this.loading || !!this.loadingActionId$());
-  protected readonly isFirstStep$ = computed(() =>
-    this.steps$().length === 0 || this.currentStepIndex$() === 0,
+  protected readonly isFirstStep$ = computed(
+    () => this.steps$().length === 0 || this.currentStepIndex$() === 0,
   );
-  protected readonly isLastStep$ = computed(() =>
-    this.steps$().length === 0 || this.currentStepIndex$() === this.steps$().length - 1,
+  protected readonly isLastStep$ = computed(
+    () => this.steps$().length === 0 || this.currentStepIndex$() === this.steps$().length - 1,
   );
   protected readonly showFeedback$ = computed(() => this.wizard$().feedbackVisible === true);
   protected readonly isLarge$ = computed(() => this.wizard$().size === 'large');
-  protected readonly dismissible$ = computed(() => this.wizard$().dismissible !== false);
+  protected readonly dismissible$ = computed(() => this.wizard$().dismissible === true);
   protected readonly primaryLabel$ = computed(() => {
     if (this.isLastStep$()) {
       const override = this.confirmLabel.trim();
@@ -135,11 +143,15 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     return 'Continue';
   });
   protected readonly secondaryLabel$ = computed(() => (this.isFirstStep$() ? 'Cancel' : 'Back'));
-  protected readonly currentHeading$ = computed(() => this.currentStep$()?.heading.trim() || this.currentStep$()?.name || 'Step');
+  protected readonly currentHeading$ = computed(
+    () => this.currentStep$()?.heading.trim() || this.currentStep$()?.name || 'Step',
+  );
   protected readonly currentInfoHeading$ = computed(
     () => this.currentStep$()?.infoHeading.trim() || this.currentStep$()?.name || 'Step guidance',
   );
-  protected readonly currentInfoDescription$ = computed(() => this.currentStep$()?.infoDescription.trim() || undefined);
+  protected readonly currentInfoDescription$ = computed(
+    () => this.currentStep$()?.infoDescription.trim() || undefined,
+  );
 
   @Input() loading = false;
   @Input() confirmLabel = '';
@@ -148,13 +160,12 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   public set wizard(value: CxWizardDialogData | null | undefined) {
     const previousStepId = this.currentStep$()?.id;
     const activeElement = this.document.activeElement;
-    const focusedInOutgoingStep = this.openState()
-      && !!previousStepId
-      && activeElement instanceof HTMLElement
-      && (
-        !!this.stepContent?.nativeElement.contains(activeElement)
-        || !!this.stepInfoContent?.nativeElement.contains(activeElement)
-      );
+    const focusedInOutgoingStep =
+      this.openState() &&
+      !!previousStepId &&
+      activeElement instanceof HTMLElement &&
+      (!!this.stepContent?.nativeElement.contains(activeElement) ||
+        !!this.stepInfoContent?.nativeElement.contains(activeElement));
     const nextWizard = this.normalizeWizard(value);
     const nextStepId = nextWizard.steps[nextWizard.index ?? 0]?.id;
 
@@ -301,16 +312,19 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   private focusStepAfterRender(expectedStepId: string): void {
-    afterNextRender(() => {
-      if (
-        !this.openState()
-        || !this.overlayState.isTopmost(this.overlayHandle)
-        || this.currentStep$()?.id !== expectedStepId
-      ) {
-        return;
-      }
-      this.stepHeading?.nativeElement.focus({ preventScroll: true });
-    }, { injector: this.injector });
+    afterNextRender(
+      () => {
+        if (
+          !this.openState() ||
+          !this.overlayState.isTopmost(this.overlayHandle) ||
+          this.currentStep$()?.id !== expectedStepId
+        ) {
+          return;
+        }
+        this.stepHeading?.nativeElement.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
 
   private releaseOverlay(): void {
@@ -323,7 +337,9 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     this.stepTemplates().forEach((template, index) => {
       const id = template.stepId.trim();
       if (!id) {
-        throw new Error(`[cx-wizard-dialog] step template at index ${index} requires a non-empty id.`);
+        throw new Error(
+          `[cx-wizard-dialog] step template at index ${index} requires a non-empty id.`,
+        );
       }
       if (templateIds.has(id)) {
         throw new Error(`[cx-wizard-dialog] step template id "${id}" must be unique.`);
@@ -333,7 +349,9 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
     for (const step of this.steps$()) {
       if (!templateIds.has(step.id)) {
-        throw new Error(`[cx-wizard-dialog] step "${step.id}" requires a matching cxWizardDialogStep template.`);
+        throw new Error(
+          `[cx-wizard-dialog] step "${step.id}" requires a matching cxWizardDialogStep template.`,
+        );
       }
     }
   }
@@ -377,7 +395,8 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
       const heading = typeof step?.heading === 'string' ? step.heading.trim() : '';
       const infoHeading = typeof step?.infoHeading === 'string' ? step.infoHeading.trim() : '';
-      const infoDescription = typeof step?.infoDescription === 'string' ? step.infoDescription.trim() : '';
+      const infoDescription =
+        typeof step?.infoDescription === 'string' ? step.infoDescription.trim() : '';
       if (step.infoCustom !== true) {
       }
 
@@ -389,18 +408,21 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
         infoDescription,
         icon: step.icon,
         infoCustom: step.infoCustom === true,
-        status: step.status === 'success' ? 'success' as const : 'default' as const,
+        status: step.status === 'success' ? ('success' as const) : ('default' as const),
       };
     });
 
-    const index = Math.max(0, Math.min(Math.trunc(value.index ?? 0), Math.max(steps.length - 1, 0)));
+    const index = Math.max(
+      0,
+      Math.min(Math.trunc(value.index ?? 0), Math.max(steps.length - 1, 0)),
+    );
 
     return {
       ...value,
       steps,
       index,
       size: value.size === 'large' ? 'large' : 'default',
-      dismissible: value.dismissible !== false,
+      dismissible: value.dismissible === true,
     };
   }
 }

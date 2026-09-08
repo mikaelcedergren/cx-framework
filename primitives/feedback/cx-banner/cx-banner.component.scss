@@ -23,7 +23,7 @@
   width: 100vw;
   box-shadow: var(--shadow-mid);
   transform: translateY(calc(-100% - var(--space-sm)));
-  transition: transform 320ms var(--ease-out);
+  transition: transform var(--motion-slow) var(--ease-out);
 }
 
 .cx-banner--persistent {
@@ -84,7 +84,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-2xs);
 }
 
 .cx-banner__title {

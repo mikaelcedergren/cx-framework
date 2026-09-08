@@ -17,11 +17,7 @@ import {
   signal,
 } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
-import {
-  CxMenuComponent,
-  CxMenuTriggerDirective,
-  type CxMenuItem,
-} from '../../overlay/cx-menu';
+import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../overlay/cx-menu';
 import { CxPopoverComponent } from '../../overlay/cx-popover';
 import { CxOptionComponent } from '../../overlay/cx-option';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
@@ -35,32 +31,17 @@ import {
   type CxSeverityLevel,
   type CxSeverityTagFavor,
 } from '../../display/cx-severity-tag';
-import {
-  CxStatusTagComponent,
-  type CxStatusTagMood,
-} from '../../display/cx-status-tag';
-import {
-  CxTagComponent,
-  type CxTagColor,
-} from '../../display/cx-tag';
-import {
-  CxAvatarComponent,
-  type CxAvatarColor,
-} from '../../display/cx-avatar';
+import { CxStatusTagComponent, type CxStatusTagMood } from '../../display/cx-status-tag';
+import { CxTagComponent, type CxTagColor } from '../../display/cx-tag';
+import { CxAvatarComponent, type CxAvatarColor } from '../../display/cx-avatar';
 import {
   CxTrendTagComponent,
   type CxTrendTagFavor,
   type CxTrendTagUnit,
 } from '../../display/cx-trend-tag';
 import { CxIconComponent } from '../../media/cx-icon';
-import {
-  CxProgressBarComponent,
-  type CxProgressBarMood,
-} from '../../feedback/cx-progress-bar';
-import {
-  CxSkeletonLoader,
-  CxSkeletonLoaderComponent,
-} from '../../feedback/cx-skeleton-loader';
+import { CxProgressBarComponent, type CxProgressBarMood } from '../../feedback/cx-progress-bar';
+import { CxSkeletonLoader, CxSkeletonLoaderComponent } from '../../feedback/cx-skeleton-loader';
 import {
   CxStateMessageComponent,
   type CxStateMessageVisual,
@@ -176,6 +157,10 @@ export type CxTableCell =
 
 export interface CxTableRow {
   id: string;
+  /** Disables all row interactions without clearing owner-supplied selection. */
+  disabled?: boolean;
+  /** Disables only selection; row activation and actions remain available. */
+  selectionDisabled?: boolean;
   kind?: CxTableRowKind;
   cells: Record<string, CxTableCell | undefined>;
   menuItems?: CxMenuItem[];
@@ -284,12 +269,14 @@ function hasSerializableFilterValue(value: CxColumnFilterValue): boolean {
   if (Array.isArray(value)) {
     return value.length > 0;
   }
-  const span = value as { start?: string; end?: string; min?: number; max?: number };
+  const span = value as {
+    start?: string;
+    end?: string;
+    min?: number;
+    max?: number;
+  };
   return Boolean(
-    span.start
-    || span.end
-    || typeof span.min === 'number'
-    || typeof span.max === 'number',
+    span.start || span.end || typeof span.min === 'number' || typeof span.max === 'number',
   );
 }
 
@@ -400,8 +387,10 @@ export class CxTableComponent implements OnDestroy {
       }
     | undefined;
 
-  @ViewChild('tableElement') private readonly tableElement?: ElementRef<HTMLTableElement>;
-  @ViewChild('columnHeaderPopover') private readonly columnHeaderPopover?: CxPopoverComponent;
+  @ViewChild('tableElement')
+  private readonly tableElement?: ElementRef<HTMLTableElement>;
+  @ViewChild('columnHeaderPopover')
+  private readonly columnHeaderPopover?: CxPopoverComponent;
   @ViewChild(CxColumnFilterEditorComponent)
   private readonly columnFilterEditor?: CxColumnFilterEditorComponent;
   @Input() density: CxTableDensity = 'comfortable';
@@ -446,18 +435,20 @@ export class CxTableComponent implements OnDestroy {
         assertCxColumnFilterDefinition(column.filter);
       }
     }
-    const nextIds = nextColumns.map(column => column.id);
+    const nextIds = nextColumns.map((column) => column.id);
     const currentOrder = this.columnOrderState();
-    const preservedOrder = currentOrder.filter(id => nextIds.includes(id));
-    const appendedIds = nextIds.filter(id => !preservedOrder.includes(id));
+    const preservedOrder = currentOrder.filter((id) => nextIds.includes(id));
+    const appendedIds = nextIds.filter((id) => !preservedOrder.includes(id));
 
     this.columnsState.set(nextColumns);
-    this.columnOrderState.set(this.normalizeColumnOrder([...preservedOrder, ...appendedIds], nextColumns));
+    this.columnOrderState.set(
+      this.normalizeColumnOrder([...preservedOrder, ...appendedIds], nextColumns),
+    );
     const openHeaderColumnId = this.columnHeaderMenuColumnIdState();
     if (openHeaderColumnId && !nextIds.includes(openHeaderColumnId)) {
       this.closeColumnHeaderMenu(false);
     }
-    this.columnWidthOverridesState.update(current =>
+    this.columnWidthOverridesState.update((current) =>
       Object.fromEntries(Object.entries(current).filter(([id]) => nextIds.includes(id))),
     );
     this.scheduleKeyColumnAutoFit();
@@ -466,30 +457,51 @@ export class CxTableComponent implements OnDestroy {
   @Input()
   public set rows(value: readonly CxTableRow[]) {
     const nextRows = value ?? [];
-    const nextRowIds = new Set(nextRows.map(row => row.id));
+    const nextRowIds = new Set(nextRows.map((row) => row.id));
     this.rowsState.set(nextRows);
     const activeRowId = this.activeRowIdState();
-    const activeRow = activeRowId ? nextRows.find(row => row.id === activeRowId) : undefined;
+    const activeRow = activeRowId ? nextRows.find((row) => row.id === activeRowId) : undefined;
     if (activeRowId && (!activeRow || this.rowKind(activeRow) === 'folder')) {
       this.activeRowIdState.set(undefined);
     }
     this.scheduleKeyColumnAutoFit();
+    const pendingRow = nextRows.find((row) => row.id === this.pendingContextMenuState?.rowId);
+    if (
+      this.pendingContextMenuState &&
+      (!pendingRow || pendingRow.disabled || !pendingRow.menuItems?.length)
+    ) {
+      this.pendingContextMenuState = undefined;
+    }
 
     const openRowMenuId = this.openRowMenuIdState();
-    const openRowMenu = openRowMenuId ? nextRows.find(row => row.id === openRowMenuId) : undefined;
-    if (openRowMenuId && (!nextRowIds.has(openRowMenuId) || (openRowMenu?.menuItems?.length ?? 0) === 0)) {
+    const openRowMenu = openRowMenuId
+      ? nextRows.find((row) => row.id === openRowMenuId)
+      : undefined;
+    if (
+      openRowMenuId &&
+      (!nextRowIds.has(openRowMenuId) ||
+        openRowMenu?.disabled ||
+        (openRowMenu?.menuItems?.length ?? 0) === 0)
+    ) {
       this.openRowMenuIdState.set(undefined);
     }
     const contextMenu = this.contextMenuState();
-    const contextRow = contextMenu ? nextRows.find(row => row.id === contextMenu.rowId) : undefined;
-    if (contextMenu && (!nextRowIds.has(contextMenu.rowId) || (contextRow?.menuItems?.length ?? 0) === 0)) {
+    const contextRow = contextMenu
+      ? nextRows.find((row) => row.id === contextMenu.rowId)
+      : undefined;
+    if (
+      contextMenu &&
+      (!nextRowIds.has(contextMenu.rowId) ||
+        contextRow?.disabled ||
+        (contextRow?.menuItems?.length ?? 0) === 0)
+    ) {
       this.closeContextMenu(false);
     }
   }
 
   @Input()
   public set activeRowId(value: string | undefined) {
-    const row = value ? this.rowsState().find(candidate => candidate.id === value) : undefined;
+    const row = value ? this.rowsState().find((candidate) => candidate.id === value) : undefined;
     this.activeRowIdState.set(row && this.rowKind(row) === 'folder' ? undefined : value);
   }
 
@@ -521,22 +533,24 @@ export class CxTableComponent implements OnDestroy {
   @Output() readonly filterLoadMore = new EventEmitter<CxColumnFilterLoadMoreEvent>();
   @Output() readonly columnHeaderMenuOpenChange = new EventEmitter<boolean>();
   @Output() readonly columnPinChange = new EventEmitter<CxTableColumnPinChangeEvent>();
-  @Output() readonly columnVisibilityChange = new EventEmitter<CxTableColumnVisibilityChangeEvent>();
+  @Output() readonly columnVisibilityChange =
+    new EventEmitter<CxTableColumnVisibilityChangeEvent>();
 
   protected readonly columns$ = computed(() => {
     const columns = this.columnsState();
-    const columnMap = new Map(columns.map(column => [column.id, column]));
+    const columnMap = new Map(columns.map((column) => [column.id, column]));
     const ordered = this.columnOrderState()
-      .map(id => columnMap.get(id))
+      .map((id) => columnMap.get(id))
       .filter((column): column is CxTableColumn => column !== undefined);
 
-    const orderedIds = new Set(ordered.map(column => column.id));
-    const resolvedColumns = ordered.length === columns.length
-      ? ordered
-      : [...ordered, ...columns.filter(column => !orderedIds.has(column.id))];
+    const orderedIds = new Set(ordered.map((column) => column.id));
+    const resolvedColumns =
+      ordered.length === columns.length
+        ? ordered
+        : [...ordered, ...columns.filter((column) => !orderedIds.has(column.id))];
     return [
-      ...resolvedColumns.filter(column => column.pinned === true),
-      ...resolvedColumns.filter(column => column.pinned !== true),
+      ...resolvedColumns.filter((column) => column.pinned === true),
+      ...resolvedColumns.filter((column) => column.pinned !== true),
     ];
   });
   protected readonly rows$ = this.rowsState.asReadonly();
@@ -547,7 +561,7 @@ export class CxTableComponent implements OnDestroy {
   protected readonly contextMenuItems$ = computed(() => {
     const contextMenu = this.contextMenuState();
     return contextMenu
-      ? this.rowsState().find(row => row.id === contextMenu.rowId)?.menuItems ?? []
+      ? (this.rowsState().find((row) => row.id === contextMenu.rowId)?.menuItems ?? [])
       : [];
   });
   protected readonly resizingColumnId$ = this.resizingColumnIdState.asReadonly();
@@ -563,28 +577,32 @@ export class CxTableComponent implements OnDestroy {
     CxSkeletonLoader.ofTable(Math.max(1, this.columns$().length), 5).withMargin('0'),
   );
   protected readonly hasRowMenus$ = computed(() =>
-    this.rowsState().some(row => (row.menuItems?.length ?? 0) > 0),
+    this.rowsState().some((row) => (row.menuItems?.length ?? 0) > 0),
   );
   protected readonly hasRowSelection$ = computed(() => this.selectionModeState() === 'multiple');
-  protected readonly tableColumnSpan$ = computed(() => Math.max(
-    1,
-    this.columns$().length
-      + (this.hasRowSelection$() ? 1 : 0)
-      + (this.hasRowMenus$() && this.showRowActions ? 1 : 0),
-  ));
+  protected readonly tableColumnSpan$ = computed(() =>
+    Math.max(
+      1,
+      this.columns$().length +
+        (this.hasRowSelection$() ? 1 : 0) +
+        (this.hasRowMenus$() && this.showRowActions ? 1 : 0),
+    ),
+  );
   protected readonly selectableRowIds$ = computed(() =>
     this.rowsState()
-      .filter(row => this.rowIsSelectable(row))
-      .map(row => row.id),
+      .filter((row) => this.rowIsSelectable(row))
+      .map((row) => row.id),
   );
   protected readonly selectedVisibleRowIds$ = computed(() => {
     const selectableRowIds = new Set(this.selectableRowIds$());
-    return this.selectedRowIdsState().filter(rowId => selectableRowIds.has(rowId));
+    return this.selectedRowIdsState().filter((rowId) => selectableRowIds.has(rowId));
   });
   protected readonly allRowsSelected$ = computed(() => {
     const selectableRowIds = this.selectableRowIds$();
-    return selectableRowIds.length > 0
-      && this.selectedVisibleRowIds$().length === selectableRowIds.length;
+    return (
+      selectableRowIds.length > 0 &&
+      this.selectedVisibleRowIds$().length === selectableRowIds.length
+    );
   });
   protected readonly partiallySelectedRows$ = computed(() => {
     const selectedCount = this.selectedVisibleRowIds$().length;
@@ -593,10 +611,11 @@ export class CxTableComponent implements OnDestroy {
   protected readonly activeFilterCount$ = computed(() => {
     const definitions = new Map(
       this.columnsState()
-        .filter((column): column is CxTableColumn & { filter: CxColumnFilterDefinition } =>
-          column.filter !== undefined,
+        .filter(
+          (column): column is CxTableColumn & { filter: CxColumnFilterDefinition } =>
+            column.filter !== undefined,
         )
-        .map(column => [column.id, column.filter]),
+        .map((column) => [column.id, column.filter]),
     );
     return Object.entries(this.filterValuesState()).filter(([columnId, value]) => {
       const definition = definitions.get(columnId);
@@ -609,7 +628,17 @@ export class CxTableComponent implements OnDestroy {
   constructor() {
     afterRenderEffect(() => {
       const columns = this.columnsState();
-      this.rowsState();
+      const rows = this.rowsState();
+      const focused = this.tableElement?.nativeElement.ownerDocument.activeElement;
+      const focusedRow = focused?.closest('tr[data-row-id]');
+      if (
+        focused instanceof HTMLElement &&
+        focusedRow &&
+        this.tableElement?.nativeElement.contains(focusedRow) &&
+        rows.some((row) => row.disabled && row.id === focusedRow.getAttribute('data-row-id'))
+      ) {
+        focused.blur();
+      }
       // Selection owns a real sticky leading column. Reading the mode here
       // reruns this post-render measurement after that column enters or leaves
       // the DOM, so existing pinned columns never retain its old offset.
@@ -668,7 +697,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected activateRow(row: CxTableRow): void {
-    if (this.rowActivation === 'none') {
+    if (row.disabled || this.rowActivation === 'none') {
       return;
     }
 
@@ -690,10 +719,13 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected onRowKeydown(event: KeyboardEvent, row: CxTableRow, rowElement?: HTMLElement): void {
-    if (!this.rowOwnsKeyboardEvent(event, rowElement)) {
+    if (row.disabled || !this.rowOwnsKeyboardEvent(event, rowElement)) {
       return;
     }
-    if (this.rightClickMenu && (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10'))) {
+    if (
+      this.rightClickMenu &&
+      (event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10'))
+    ) {
       event.preventDefault();
       event.stopPropagation();
       this.openRowContextMenu(row, rowElement, undefined, 'keyboard');
@@ -725,7 +757,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected onRowContextMenu(event: MouseEvent, row: CxTableRow, rowElement?: HTMLElement): void {
-    if (!this.rightClickMenu || (row.menuItems?.length ?? 0) === 0) {
+    if (row.disabled || !this.rightClickMenu || (row.menuItems?.length ?? 0) === 0) {
       return;
     }
     if (this.eventComesFromInteractiveDescendant(event, rowElement)) {
@@ -734,11 +766,17 @@ export class CxTableComponent implements OnDestroy {
 
     event.preventDefault();
     event.stopPropagation();
-    this.openRowContextMenu(row, rowElement, { left: event.clientX, top: event.clientY }, 'pointer');
+    this.openRowContextMenu(
+      row,
+      rowElement,
+      { left: event.clientX, top: event.clientY },
+      'pointer',
+    );
   }
 
   protected onRowMenuOpenChange(rowId: string, open: boolean): void {
     if (open) {
+      if (this.rowsState().find((row) => row.id === rowId)?.disabled) return;
       this.closeContextMenu(false);
       this.closeColumnHeaderMenu(false);
       this.openRowMenuIdState.set(rowId);
@@ -751,6 +789,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected onRowMenuItemSelect(rowId: string, itemId: string): void {
+    if (this.rowsState().find((row) => row.id === rowId)?.disabled) return;
     this.rowMenuItemSelect.emit({ rowId, itemId });
   }
 
@@ -760,7 +799,7 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
 
-    this.rowMenuItemSelect.emit({ rowId: contextMenu.rowId, itemId });
+    this.onRowMenuItemSelect(contextMenu.rowId, itemId);
   }
 
   protected onContextMenuOpenChange(open: boolean): void {
@@ -779,21 +818,31 @@ export class CxTableComponent implements OnDestroy {
 
     if (!this.destroyed && !this.contextMenuTeardownPending) {
       this.contextMenuTeardownPending = true;
-      afterNextRender(() => {
-        if (this.destroyed) {
-          return;
-        }
-        this.contextMenuTeardownPending = false;
-        const pendingContextMenu = this.pendingContextMenuState;
-        this.pendingContextMenuState = undefined;
-        if (pendingContextMenu) {
-          this.contextMenuState.set(pendingContextMenu);
-        }
-      }, { injector: this.injector });
+      afterNextRender(
+        () => {
+          if (this.destroyed) {
+            return;
+          }
+          this.contextMenuTeardownPending = false;
+          const pendingContextMenu = this.pendingContextMenuState;
+          this.pendingContextMenuState = undefined;
+          if (pendingContextMenu) {
+            this.contextMenuState.set(pendingContextMenu);
+          }
+        },
+        { injector: this.injector },
+      );
     }
 
-    if (restoreFocus && contextMenu.invocation === 'keyboard' && contextMenu.originRow?.isConnected) {
-      queueMicrotask(() => contextMenu.originRow?.focus());
+    if (
+      restoreFocus &&
+      contextMenu.invocation === 'keyboard' &&
+      contextMenu.originRow?.isConnected
+    ) {
+      queueMicrotask(() => {
+        const row = this.rowsState().find((candidate) => candidate.id === contextMenu.rowId);
+        if (row && this.rowIsKeyboardReachable(row)) contextMenu.originRow?.focus();
+      });
     }
   }
 
@@ -807,18 +856,21 @@ export class CxTableComponent implements OnDestroy {
     }
 
     const selectableRowIds = this.selectableRowIds$();
-    const visibleRowIdSet = new Set(this.rowsState().map(row => row.id));
-    const preservedHiddenIds = this.selectedRowIdsState().filter(rowId => !visibleRowIdSet.has(rowId));
-    const nextSelectedRowIds = checked
-      ? [...preservedHiddenIds, ...selectableRowIds]
-      : preservedHiddenIds;
+    const selectableRowIdSet = new Set(selectableRowIds);
+    // Bulk selection changes only eligible rows in this view. Disabled and
+    // off-page selections remain owned by the caller, like a disabled checkbox.
+    const preservedIds = this.selectedRowIdsState().filter(
+      (rowId) => !selectableRowIdSet.has(rowId),
+    );
+    const nextSelectedRowIds = checked ? [...preservedIds, ...selectableRowIds] : preservedIds;
 
     this.selectedRowIdsState.set(nextSelectedRowIds);
     this.selectedRowIdsChange.emit(nextSelectedRowIds);
   }
 
   protected toggleRowSelection(rowId: string, checked: boolean): void {
-    if (this.selectionModeState() !== 'multiple') {
+    const row = this.rowsState().find((candidate) => candidate.id === rowId);
+    if (this.selectionModeState() !== 'multiple' || !row || !this.rowIsSelectable(row)) {
       return;
     }
 
@@ -827,14 +879,14 @@ export class CxTableComponent implements OnDestroy {
       ? currentSelectedRowIds.includes(rowId)
         ? currentSelectedRowIds
         : [...currentSelectedRowIds, rowId]
-      : currentSelectedRowIds.filter(selectedRowId => selectedRowId !== rowId);
+      : currentSelectedRowIds.filter((selectedRowId) => selectedRowId !== rowId);
 
     this.selectedRowIdsState.set(nextSelectedRowIds);
     this.selectedRowIdsChange.emit(nextSelectedRowIds);
   }
 
   protected selectionLabel(row: CxTableRow): string {
-    const keyColumn = this.columns$().find(column => column.key);
+    const keyColumn = this.columns$().find((column) => column.key);
     const keyCell = keyColumn ? row.cells[keyColumn.id] : undefined;
     if (keyCell?.kind === 'text' && keyCell.value.trim()) {
       return `Select row ${keyCell.value.trim()}`;
@@ -855,9 +907,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected progressPercent(value: number): string {
-    const normalizedValue = Number.isFinite(value)
-      ? Math.min(Math.max(value, 0), 100)
-      : 0;
+    const normalizedValue = Number.isFinite(value) ? Math.min(Math.max(value, 0), 100) : 0;
     return `${Math.round(normalizedValue)}%`;
   }
 
@@ -866,13 +916,16 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected rowIsSelectable(row: CxTableRow): boolean {
-    return this.rowKind(row) === 'item';
+    return this.rowKind(row) === 'item' && !row.disabled && !row.selectionDisabled;
   }
 
   protected rowIsKeyboardReachable(row: CxTableRow): boolean {
-    return this.rowActivation !== 'none'
-      || (this.selectionModeState() === 'multiple' && this.rowIsSelectable(row))
-      || (this.rightClickMenu && (row.menuItems?.length ?? 0) > 0);
+    if (row.disabled) return false;
+    return (
+      this.rowActivation !== 'none' ||
+      (this.selectionModeState() === 'multiple' && this.rowIsSelectable(row)) ||
+      (this.rightClickMenu && (row.menuItems?.length ?? 0) > 0)
+    );
   }
 
   protected rowLabel(row: CxTableRow): string | null {
@@ -883,7 +936,11 @@ export class CxTableComponent implements OnDestroy {
     return `${this.rowKind(row) === 'folder' ? 'Folder' : 'Item'} ${keyCell.value}`;
   }
 
-  protected resolvedTextIcon(row: CxTableRow, column: CxTableColumn, cell: CxTableCell): CxIconName | undefined {
+  protected resolvedTextIcon(
+    row: CxTableRow,
+    column: CxTableColumn,
+    cell: CxTableCell,
+  ): CxIconName | undefined {
     if (cell.kind !== 'text') {
       return undefined;
     }
@@ -911,7 +968,7 @@ export class CxTableComponent implements OnDestroy {
 
   protected columnHeaderMenuColumn(): CxTableColumn | undefined {
     const columnId = this.columnHeaderMenuColumnIdState();
-    return columnId ? this.columns$().find(column => column.id === columnId) : undefined;
+    return columnId ? this.columns$().find((column) => column.id === columnId) : undefined;
   }
 
   protected isColumnFilterable(column: CxTableColumn): boolean {
@@ -935,8 +992,10 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected isColumnFilterActive(column: CxTableColumn): boolean {
-    return column.filter !== undefined
-      && isCxColumnFilterValueActive(column.filter, this.filterValuesState()[column.id]);
+    return (
+      column.filter !== undefined &&
+      isCxColumnFilterValueActive(column.filter, this.filterValuesState()[column.id])
+    );
   }
 
   protected columnFilterSummary(column: CxTableColumn): string | undefined {
@@ -952,7 +1011,7 @@ export class CxTableComponent implements OnDestroy {
     if (this.isColumnPinned(column)) {
       return true;
     }
-    const pinnedColumns = this.columns$().filter(candidate => candidate.pinned === true);
+    const pinnedColumns = this.columns$().filter((candidate) => candidate.pinned === true);
     if (pinnedColumns.length >= CX_TABLE_MAX_PINNED_COLUMNS) {
       return false;
     }
@@ -1018,12 +1077,7 @@ export class CxTableComponent implements OnDestroy {
     if (!column.filter) {
       return;
     }
-    const next = withCxColumnFilterValue(
-      this.filterValuesState(),
-      column.id,
-      column.filter,
-      value,
-    );
+    const next = withCxColumnFilterValue(this.filterValuesState(), column.id, column.filter, value);
     if (next === this.filterValuesState()) {
       return;
     }
@@ -1124,10 +1178,12 @@ export class CxTableComponent implements OnDestroy {
 
   private adjacentColumnHeaderTrigger(trigger: HTMLElement): HTMLElement | undefined {
     const triggers = Array.from(
-      this.tableElement?.nativeElement.querySelectorAll<HTMLElement>('button.cx-table__head-trigger') ?? [],
+      this.tableElement?.nativeElement.querySelectorAll<HTMLElement>(
+        'button.cx-table__head-trigger',
+      ) ?? [],
     );
     const index = triggers.indexOf(trigger);
-    return index < 0 ? undefined : triggers[index + 1] ?? triggers[index - 1];
+    return index < 0 ? undefined : (triggers[index + 1] ?? triggers[index - 1]);
   }
 
   private focusColumnHeaderMenuWhenReady(column: CxTableColumn, attempt = 0): void {
@@ -1144,8 +1200,9 @@ export class CxTableComponent implements OnDestroy {
       this.retryColumnHeaderMenuFocus(column, attempt);
       return;
     }
-    const firstAction = surface
-      ?.querySelector<HTMLButtonElement>('.cx-table__header-menu-actions button:not(:disabled)');
+    const firstAction = surface?.querySelector<HTMLButtonElement>(
+      '.cx-table__header-menu-actions button:not(:disabled)',
+    );
     if (firstAction) {
       firstAction.focus();
       return;
@@ -1179,8 +1236,7 @@ export class CxTableComponent implements OnDestroy {
     }
     const rect = triggerElement.getBoundingClientRect();
     const propertyActionCount =
-      Number(this.isColumnPinnable(column)) +
-      Number(this.isColumnHideable(column));
+      Number(this.isColumnPinnable(column)) + Number(this.isColumnHideable(column));
     const islandCount =
       Number(column.filter !== undefined) +
       Number(this.isColumnSortable(column)) +
@@ -1250,9 +1306,11 @@ export class CxTableComponent implements OnDestroy {
   }
 
   protected columnWidthValue(column: CxTableColumn): number {
-    return this.columnWidthOverridesState()[column.id]
-      ?? this.contentWidthsState()[column.id]
-      ?? this.currentColumnWidth(column.id);
+    return (
+      this.columnWidthOverridesState()[column.id] ??
+      this.contentWidthsState()[column.id] ??
+      this.currentColumnWidth(column.id)
+    );
   }
 
   protected onColumnResizePointerDown(event: PointerEvent, column: CxTableColumn): void {
@@ -1371,7 +1429,11 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
 
-    const indicator = this.resolveDropIndicator(event.clientX, event.clientY, this.activeReorderSession.columnId);
+    const indicator = this.resolveDropIndicator(
+      event.clientX,
+      event.clientY,
+      this.activeReorderSession.columnId,
+    );
     this.dropIndicatorState.set(indicator);
     this.updateDragPreview(event.clientX, event.clientY, this.activeReorderSession.columnLabel);
   }
@@ -1514,7 +1576,7 @@ export class CxTableComponent implements OnDestroy {
     position?: { left: number; top: number },
     invocation: 'pointer' | 'keyboard' = 'pointer',
   ): void {
-    if ((row.menuItems?.length ?? 0) === 0) {
+    if (row.disabled || (row.menuItems?.length ?? 0) === 0) {
       return;
     }
 
@@ -1539,7 +1601,10 @@ export class CxTableComponent implements OnDestroy {
     this.contextMenuState.set(nextContextMenu);
   }
 
-  private resolveRowContextMenuPosition(rowElement?: HTMLElement): { left: number; top: number } {
+  private resolveRowContextMenuPosition(rowElement?: HTMLElement): {
+    left: number;
+    top: number;
+  } {
     const rect = rowElement?.getBoundingClientRect();
     if (!rect) {
       return { left: 16, top: 16 };
@@ -1596,7 +1661,7 @@ export class CxTableComponent implements OnDestroy {
   /** Returns true when settled: applied, or skipped because the user owns the width. */
   private applyKeyColumnAutoFit(): boolean {
     const columns = this.columns$();
-    const keyColumn = columns.find(column => column.key) ?? columns[0];
+    const keyColumn = columns.find((column) => column.key) ?? columns[0];
     if (!keyColumn || this.rowsState().length === 0) {
       return false;
     }
@@ -1607,7 +1672,7 @@ export class CxTableComponent implements OnDestroy {
     const applied = this.appliedKeyColumnAutoFit;
     if (keyColumn.size !== undefined && keyColumn.size !== 'flex') {
       if (applied && this.columnWidthOverridesState()[applied.columnId] === applied.width) {
-        this.columnWidthOverridesState.update(current => {
+        this.columnWidthOverridesState.update((current) => {
           const next = { ...current };
           delete next[applied.columnId];
           return next;
@@ -1617,7 +1682,7 @@ export class CxTableComponent implements OnDestroy {
       return true;
     }
     if (applied && applied.columnId !== keyColumn.id) {
-      this.columnWidthOverridesState.update(current => {
+      this.columnWidthOverridesState.update((current) => {
         if (current[applied.columnId] !== applied.width) return current;
         const next = { ...current };
         delete next[applied.columnId];
@@ -1626,8 +1691,7 @@ export class CxTableComponent implements OnDestroy {
     }
     const override = this.columnWidthOverridesState()[keyColumn.id];
     const autoFitOwnsWidth =
-      override === undefined ||
-      (applied?.columnId === keyColumn.id && applied.width === override);
+      override === undefined || (applied?.columnId === keyColumn.id && applied.width === override);
     if (!autoFitOwnsWidth) {
       return true;
     }
@@ -1671,7 +1735,7 @@ export class CxTableComponent implements OnDestroy {
     if (this.columnWidthOverridesState()[columnId] === nextWidth) {
       return;
     }
-    this.columnWidthOverridesState.update(current => ({
+    this.columnWidthOverridesState.update((current) => ({
       ...current,
       [columnId]: nextWidth,
     }));
@@ -1680,7 +1744,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   private syncPinnedColumnOffsets(): void {
-    const pinnedColumns = this.columns$().filter(column => column.pinned === true);
+    const pinnedColumns = this.columns$().filter((column) => column.pinned === true);
     if (pinnedColumns.length === 0) {
       if (this.effectivePinnedColumnIdsState().length > 0) {
         this.effectivePinnedColumnIdsState.set([]);
@@ -1700,7 +1764,7 @@ export class CxTableComponent implements OnDestroy {
       effectivePinnedColumns.push(column);
     }
 
-    const effectiveIds = effectivePinnedColumns.map(column => column.id);
+    const effectiveIds = effectivePinnedColumns.map((column) => column.id);
     const currentEffectiveIds = this.effectivePinnedColumnIdsState();
     if (
       effectiveIds.length !== currentEffectiveIds.length ||
@@ -1720,8 +1784,7 @@ export class CxTableComponent implements OnDestroy {
     const currentKeys = Object.keys(current);
     const nextKeys = Object.keys(next);
     const changed =
-      currentKeys.length !== nextKeys.length ||
-      nextKeys.some(key => current[key] !== next[key]);
+      currentKeys.length !== nextKeys.length || nextKeys.some((key) => current[key] !== next[key]);
     if (changed) {
       this.columnLeftOffsetsState.set(next);
     }
@@ -1767,8 +1830,8 @@ export class CxTableComponent implements OnDestroy {
       return pinnedColumns.length <= CX_TABLE_MAX_PINNED_COLUMNS;
     }
 
-    const pinnedIds = new Set(pinnedColumns.map(column => column.id));
-    const hasUnpinnedColumn = this.columns$().some(column => !pinnedIds.has(column.id));
+    const pinnedIds = new Set(pinnedColumns.map((column) => column.id));
+    const hasUnpinnedColumn = this.columns$().some((column) => !pinnedIds.has(column.id));
     const selectionWidth = this.currentSelectionColumnWidth();
     const reachableWidth = hasUnpinnedColumn
       ? Math.max(CX_TABLE_MIN_UNPINNED_WIDTH, viewportWidth * CX_TABLE_MIN_UNPINNED_RATIO)
@@ -1785,7 +1848,9 @@ export class CxTableComponent implements OnDestroy {
       return 0;
     }
     const table = this.tableElement?.nativeElement;
-    const cell = table?.querySelector<HTMLElement>('.cx-table__head-cell--selection, .cx-table__cell--selection');
+    const cell = table?.querySelector<HTMLElement>(
+      '.cx-table__head-cell--selection, .cx-table__cell--selection',
+    );
     return cell?.getBoundingClientRect().width ?? CX_TABLE_SELECTION_COLUMN_WIDTH;
   }
 
@@ -1799,7 +1864,9 @@ export class CxTableComponent implements OnDestroy {
       return this.clampColumnWidth(120);
     }
 
-    const cell = table.querySelector(`th[data-column-id="${this.escapeColumnId(columnId)}"]`) as HTMLElement | null;
+    const cell = table.querySelector(
+      `th[data-column-id="${this.escapeColumnId(columnId)}"]`,
+    ) as HTMLElement | null;
     return this.clampColumnWidth(cell?.getBoundingClientRect().width ?? 120);
   }
 
@@ -1818,13 +1885,15 @@ export class CxTableComponent implements OnDestroy {
     let paddedCell: HTMLElement | undefined;
 
     const headerCell = table.querySelector(`th${selector}`) as HTMLElement | null;
-    const headerContent = headerCell?.querySelector('.cx-table__head-content') as HTMLElement | null;
+    const headerContent = headerCell?.querySelector(
+      '.cx-table__head-content',
+    ) as HTMLElement | null;
     if (headerContent) {
       maxContentWidth = Math.max(maxContentWidth, this.measureNaturalContentWidth(headerContent));
       paddedCell = headerCell ?? undefined;
     }
 
-    table.querySelectorAll(`td${selector}`).forEach(node => {
+    table.querySelectorAll(`td${selector}`).forEach((node) => {
       const cell = node as HTMLElement;
       const content = cell.querySelector('.cx-table__measure-target') as HTMLElement | null;
       if (content) {
@@ -1879,9 +1948,9 @@ export class CxTableComponent implements OnDestroy {
     clientY: number,
     draggingColumnId: string,
   ): CxTableDropIndicator {
-    const target = document.elementFromPoint(clientX, clientY)?.closest(
-      'th[data-column-id]',
-    ) as HTMLElement | null;
+    const target = document
+      .elementFromPoint(clientX, clientY)
+      ?.closest('th[data-column-id]') as HTMLElement | null;
 
     if (!target || !this.tableElement?.nativeElement.contains(target)) {
       return undefined;
@@ -1891,9 +1960,13 @@ export class CxTableComponent implements OnDestroy {
     if (!columnId || columnId === draggingColumnId) {
       return undefined;
     }
-    const draggingColumn = this.columnsState().find(column => column.id === draggingColumnId);
-    const targetColumn = this.columnsState().find(column => column.id === columnId);
-    if (!draggingColumn || !targetColumn || this.isColumnPinned(draggingColumn) !== this.isColumnPinned(targetColumn)) {
+    const draggingColumn = this.columnsState().find((column) => column.id === draggingColumnId);
+    const targetColumn = this.columnsState().find((column) => column.id === columnId);
+    if (
+      !draggingColumn ||
+      !targetColumn ||
+      this.isColumnPinned(draggingColumn) !== this.isColumnPinned(targetColumn)
+    ) {
       return undefined;
     }
 
@@ -1957,21 +2030,22 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
     const currentOrder = [...this.columnOrderState()];
-    const partition = currentOrder.filter(columnId => {
-      const candidate = this.columnsState().find(item => item.id === columnId);
+    const partition = currentOrder.filter((columnId) => {
+      const candidate = this.columnsState().find((item) => item.id === columnId);
       return candidate && this.isColumnPinned(candidate) === this.isColumnPinned(column);
     });
     const currentIndex = partition.indexOf(column.id);
     if (currentIndex < 0) {
       return;
     }
-    const nextIndex = direction === 'first'
-      ? 0
-      : direction === 'last'
-        ? partition.length - 1
-        : direction === 'previous'
-          ? Math.max(currentIndex - 1, 0)
-          : Math.min(currentIndex + 1, partition.length - 1);
+    const nextIndex =
+      direction === 'first'
+        ? 0
+        : direction === 'last'
+          ? partition.length - 1
+          : direction === 'previous'
+            ? Math.max(currentIndex - 1, 0)
+            : Math.min(currentIndex + 1, partition.length - 1);
     if (nextIndex === currentIndex) {
       this.announceColumnPosition(column, 'Moving');
       return;
@@ -1981,7 +2055,7 @@ export class CxTableComponent implements OnDestroy {
     partition.splice(nextIndex, 0, column.id);
     const partitionIds = new Set(partition);
     let partitionIndex = 0;
-    const nextOrder = currentOrder.map(columnId =>
+    const nextOrder = currentOrder.map((columnId) =>
       partitionIds.has(columnId) ? partition[partitionIndex++]! : columnId,
     );
     this.columnOrderState.set(this.normalizeColumnOrder(nextOrder, this.columnsState()));
@@ -1999,7 +2073,9 @@ export class CxTableComponent implements OnDestroy {
     this.keyboardReorderSession = undefined;
     this.draggingColumnIdState.set(undefined);
     this.columnReorderAnnouncementState.set(
-      changed ? `${session.columnLabel} column move complete.` : `${session.columnLabel} column position unchanged.`,
+      changed
+        ? `${session.columnLabel} column move complete.`
+        : `${session.columnLabel} column position unchanged.`,
     );
     if (changed) {
       this.columnOrderChange.emit(nextOrder);
@@ -2013,7 +2089,9 @@ export class CxTableComponent implements OnDestroy {
       return;
     }
     this.keyboardReorderSession = undefined;
-    this.columnOrderState.set(this.normalizeColumnOrder(session.originalOrder, this.columnsState()));
+    this.columnOrderState.set(
+      this.normalizeColumnOrder(session.originalOrder, this.columnsState()),
+    );
     this.draggingColumnIdState.set(undefined);
     if (announce) {
       this.columnReorderAnnouncementState.set(`${session.columnLabel} column move cancelled.`);
@@ -2024,7 +2102,9 @@ export class CxTableComponent implements OnDestroy {
   }
 
   private focusColumnGripAfterRender(columnId: string): void {
-    afterNextRender(() => this.focusColumnGrip(columnId), { injector: this.injector });
+    afterNextRender(() => this.focusColumnGrip(columnId), {
+      injector: this.injector,
+    });
   }
 
   private announceColumnPosition(column: CxTableColumn, prefix: string): void {
@@ -2036,19 +2116,25 @@ export class CxTableComponent implements OnDestroy {
   }
 
   private focusColumnGrip(columnId: string): void {
-    const grips = this.tableElement?.nativeElement.querySelectorAll<HTMLElement>('[data-column-grip-id]');
-    Array.from(grips ?? []).find(grip => grip.dataset['columnGripId'] === columnId)?.focus();
+    const grips =
+      this.tableElement?.nativeElement.querySelectorAll<HTMLElement>('[data-column-grip-id]');
+    Array.from(grips ?? [])
+      .find((grip) => grip.dataset['columnGripId'] === columnId)
+      ?.focus();
   }
 
-  private normalizeColumnOrder(order: readonly string[], columns: readonly CxTableColumn[]): string[] {
-    const columnMap = new Map(columns.map(column => [column.id, column]));
+  private normalizeColumnOrder(
+    order: readonly string[],
+    columns: readonly CxTableColumn[],
+  ): string[] {
+    const columnMap = new Map(columns.map((column) => [column.id, column]));
     const completeOrder = [
-      ...order.filter(id => columnMap.has(id)),
-      ...columns.map(column => column.id).filter(id => !order.includes(id)),
+      ...order.filter((id) => columnMap.has(id)),
+      ...columns.map((column) => column.id).filter((id) => !order.includes(id)),
     ];
     return [
-      ...completeOrder.filter(id => columnMap.get(id)?.pinned === true),
-      ...completeOrder.filter(id => columnMap.get(id)?.pinned !== true),
+      ...completeOrder.filter((id) => columnMap.get(id)?.pinned === true),
+      ...completeOrder.filter((id) => columnMap.get(id)?.pinned !== true),
     ];
   }
 
@@ -2069,7 +2155,7 @@ export class CxTableComponent implements OnDestroy {
 
     const pxWidth = `${width}px`;
     const selector = `[data-column-id="${this.escapeColumnId(columnId)}"]`;
-    table.querySelectorAll(selector).forEach(node => {
+    table.querySelectorAll(selector).forEach((node) => {
       const element = node as HTMLElement;
       element.style.width = pxWidth;
       element.style.minWidth = pxWidth;
@@ -2088,13 +2174,17 @@ export class CxTableComponent implements OnDestroy {
 
   private moveRowFocus(row: CxTableRow, direction: -1 | 1): void {
     const rows = this.rowsState();
-    const currentIndex = rows.findIndex(candidate => candidate.id === row.id);
+    const currentIndex = rows.findIndex((candidate) => candidate.id === row.id);
     if (currentIndex < 0) {
       return;
     }
 
     let nextIndex = currentIndex + direction;
-    while (nextIndex >= 0 && nextIndex < rows.length && !this.rowIsKeyboardReachable(rows[nextIndex])) {
+    while (
+      nextIndex >= 0 &&
+      nextIndex < rows.length &&
+      !this.rowIsKeyboardReachable(rows[nextIndex])
+    ) {
       nextIndex += direction;
     }
     if (nextIndex < 0 || nextIndex >= rows.length) {
@@ -2104,7 +2194,7 @@ export class CxTableComponent implements OnDestroy {
     const nextRow = rows[nextIndex];
     const nextRowElement = Array.from(
       this.tableElement?.nativeElement.querySelectorAll<HTMLElement>('tbody tr[data-row-id]') ?? [],
-    ).find(element => element.dataset['rowId'] === nextRow.id);
+    ).find((element) => element.dataset['rowId'] === nextRow.id);
     if (!nextRowElement) {
       return;
     }
@@ -2129,9 +2219,8 @@ export class CxTableComponent implements OnDestroy {
       return false;
     }
     const composedPath = event.composedPath?.() ?? [];
-    const path = composedPath.length > 0
-      ? composedPath
-      : this.elementPathToRow(event.target, rowElement);
+    const path =
+      composedPath.length > 0 ? composedPath : this.elementPathToRow(event.target, rowElement);
 
     for (const target of path) {
       if (target === rowElement) {
@@ -2158,9 +2247,11 @@ export class CxTableComponent implements OnDestroy {
   }
 
   private isInteractiveElement(element: Element): boolean {
-    if (element.matches(
-      'button, input, select, textarea, label, summary, a[href], area[href], audio[controls], video[controls], iframe',
-    )) {
+    if (
+      element.matches(
+        'button, input, select, textarea, label, summary, a[href], area[href], audio[controls], video[controls], iframe',
+      )
+    ) {
       return true;
     }
     if (element instanceof HTMLElement && element.isContentEditable) {
@@ -2174,7 +2265,7 @@ export class CxTableComponent implements OnDestroy {
   }
 
   private keyTextCell(row: CxTableRow): Extract<CxTableCell, { kind: 'text' }> | undefined {
-    const keyColumn = this.columns$().find(column => column.key);
+    const keyColumn = this.columns$().find((column) => column.key);
     const keyCell = keyColumn ? row.cells[keyColumn.id] : undefined;
     return keyCell?.kind === 'text' && keyCell.value.trim() ? keyCell : undefined;
   }
@@ -2200,5 +2291,4 @@ export class CxTableComponent implements OnDestroy {
       top,
     });
   }
-
 }

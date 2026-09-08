@@ -17,7 +17,7 @@
   justify-content: center;
   border-radius: var(--radius-xs);
   border: var(--line);
-  color: var(--cx-shortcut-key-color, var(--placeholder));
+  color: inherit;
   box-sizing: border-box;
 }
 
@@ -32,12 +32,12 @@
 
 .cx-shortcut-key__icon {
   display: inline-flex;
-  color: var(--cx-shortcut-key-color, var(--placeholder));
+  color: inherit;
 }
 
 .cx-shortcut-key__text {
   display: block;
-  color: var(--cx-shortcut-key-color, var(--placeholder));
+  color: inherit;
   font-size: var(--font-size-body-xs);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-small);

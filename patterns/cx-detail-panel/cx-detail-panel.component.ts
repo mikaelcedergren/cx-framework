@@ -19,10 +19,17 @@ import {
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
 import { CxIconComponent, type CxIconMood } from '../../primitives/media/cx-icon';
-import { CxMenuComponent, CxMenuTriggerDirective, type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import {
+  CxMenuComponent,
+  CxMenuTriggerDirective,
+  type CxMenuItem,
+} from '../../primitives/overlay/cx-menu';
 import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
 import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
-import { CxOverlayStateService, type CxOverlayStateHandle } from '../../primitives/overlay/overlay-state';
+import {
+  CxOverlayStateService,
+  type CxOverlayStateHandle,
+} from '../../primitives/overlay/overlay-state';
 import { CxTabsComponent, type CxTabItem } from '../../primitives/navigation/cx-tabs';
 import { isHostVisible } from '../../primitives/shared/host-visibility';
 import { CxDetailPanelSectionComponent } from './cx-detail-panel-section.component';
@@ -169,17 +176,10 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     return this.selectedTabIdValue;
   }
 
-  public ngAfterViewChecked(): void {
-  }
+  public ngAfterViewChecked(): void {}
 
-  // Exposed as custom properties so the responsive width rules can replace
-  // them cleanly without competing with inline width declarations.
-  @HostBinding('style.--cx-detail-panel-width') get widthVar(): string | null {
-    return this.resizedWidth$() ?? this.width;
-  }
-
-  @HostBinding('style.--cx-detail-panel-min-width') get minWidthVar(): string | null {
-    return this.minWidth;
+  @HostBinding('style.width') get resolvedWidth(): string {
+    return `min(max(380px, ${this.minWidth ?? '0px'}, ${this.resizedWidth$() ?? this.width ?? '450px'}), 100%)`;
   }
 
   @HostBinding('class.cx-detail-panel-host--floating')
@@ -192,7 +192,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
 
   protected get hasTabs(): boolean {
-    return this.tabs.some(tab => tab.id?.trim());
+    return this.tabs.some((tab) => tab.id?.trim());
   }
 
   protected get normalizedHeading(): string {
@@ -208,7 +208,9 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     if (label) {
       return label;
     }
-    return this.normalizedHeading ? `Actions for ${this.normalizedHeading}` : 'Detail panel actions';
+    return this.normalizedHeading
+      ? `Actions for ${this.normalizedHeading}`
+      : 'Detail panel actions';
   }
 
   protected get resolvedTabsAriaLabel(): string {
@@ -347,9 +349,12 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
 
   protected get selectedTabButtonId(): string | null {
-    const normalizedTabs = this.tabs.filter(tab => tab.id?.trim());
-    const selectedIndex = normalizedTabs.findIndex(tab => tab.id.trim() === this.selectedTabId && !tab.disabled);
-    const resolvedIndex = selectedIndex >= 0 ? selectedIndex : normalizedTabs.findIndex(tab => !tab.disabled);
+    const normalizedTabs = this.tabs.filter((tab) => tab.id?.trim());
+    const selectedIndex = normalizedTabs.findIndex(
+      (tab) => tab.id.trim() === this.selectedTabId && !tab.disabled,
+    );
+    const resolvedIndex =
+      selectedIndex >= 0 ? selectedIndex : normalizedTabs.findIndex((tab) => !tab.disabled);
     return resolvedIndex >= 0 ? `${this.tabPanelId}-tab-${resolvedIndex}` : null;
   }
 
@@ -425,9 +430,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     this.dismissMeasureFrame = window.requestAnimationFrame(() => {
       this.dismissMeasureFrame = undefined;
       const surface = this.panelSurface?.nativeElement;
-      const animationMs = surface
-        ? maximumAnimationTimeMs(window.getComputedStyle(surface))
-        : 0;
+      const animationMs = surface ? maximumAnimationTimeMs(window.getComputedStyle(surface)) : 0;
       this.dismissFallbackTimer = window.setTimeout(
         () => this.completeDismiss(),
         animationMs + DETAIL_PANEL_DISMISS_FALLBACK_BUFFER_MS,
@@ -477,7 +480,7 @@ function maximumAnimationTimeMs(style: CSSStyleDeclaration): number {
 }
 
 function parseCssTimes(value: string): number[] {
-  const times = value.split(',').map(part => {
+  const times = value.split(',').map((part) => {
     const normalized = part.trim();
     const numeric = Number.parseFloat(normalized);
     if (!Number.isFinite(numeric)) {
@@ -522,7 +525,9 @@ function validateDetailPanelMenuLevel(
     const label = typeof item?.label === 'string' ? item.label.trim() : '';
     const labelKey = label.toLowerCase();
     if (labels.has(labelKey)) {
-      throw new Error(`[cx-detail-panel] menu item label "${label}" must be unique within ${path}.`);
+      throw new Error(
+        `[cx-detail-panel] menu item label "${label}" must be unique within ${path}.`,
+      );
     }
     labels.add(labelKey);
 

@@ -44,7 +44,8 @@ export type CxButtonGroupSize = 'default' | 'small';
 })
 export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   @ViewChild('rowRef') private readonly rowRef?: ElementRef<HTMLElement>;
-  @ViewChildren('buttonRef', { read: ElementRef }) private readonly buttonRefs?: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('buttonRef', { read: ElementRef })
+  private readonly buttonRefs?: QueryList<ElementRef<HTMLElement>>;
 
   private readonly availableValuesState = signal<CxButtonGroupOption[]>([]);
   private readonly valueState = signal<string | undefined>(undefined);
@@ -105,22 +106,18 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
     return this.fillState();
   }
 
-  @HostBinding('style.--cx-button-group-indicator-x')
   protected get indicatorX(): string {
     return `${this.indicatorX$()}px`;
   }
 
-  @HostBinding('style.--cx-button-group-indicator-y')
   protected get indicatorY(): string {
     return `${this.indicatorY$()}px`;
   }
 
-  @HostBinding('style.--cx-button-group-indicator-width')
   protected get indicatorWidth(): string {
     return `${this.indicatorWidth$()}px`;
   }
 
-  @HostBinding('style.--cx-button-group-indicator-height')
   protected get indicatorHeight(): string {
     return `${this.indicatorHeight$()}px`;
   }
@@ -128,7 +125,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   protected readonly size$ = this.sizeState.asReadonly();
   protected readonly disabled$ = this.disabledState.asReadonly();
   protected readonly buttons$ = computed<CxButtonGroupButton[]>(() =>
-    this.availableValuesState().map(option => {
+    this.availableValuesState().map((option) => {
       const name = option.label?.trim() || option.id?.trim() || '';
       return {
         id: option.id,
@@ -179,8 +176,8 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
 
     const buttons = this.buttons$();
     const enabledIndexes = buttons
-      .map((button, buttonIndex) => button.disabled ? -1 : buttonIndex)
-      .filter(buttonIndex => buttonIndex >= 0);
+      .map((button, buttonIndex) => (button.disabled ? -1 : buttonIndex))
+      .filter((buttonIndex) => buttonIndex >= 0);
     if (enabledIndexes.length === 0) {
       return;
     }
@@ -217,14 +214,19 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
     }
 
     const buttons = this.buttons$();
-    const selectedEnabledIndex = buttons.findIndex(button => button.selected && !button.disabled);
-    const tabStopIndex = selectedEnabledIndex >= 0
-      ? selectedEnabledIndex
-      : buttons.findIndex(button => !button.disabled);
+    const selectedEnabledIndex = buttons.findIndex((button) => button.selected && !button.disabled);
+    const tabStopIndex =
+      selectedEnabledIndex >= 0
+        ? selectedEnabledIndex
+        : buttons.findIndex((button) => !button.disabled);
     return index === tabStopIndex ? '0' : '-1';
   }
 
-  private nextEnabledIndex(enabledIndexes: readonly number[], currentIndex: number, direction: 1 | -1): number {
+  private nextEnabledIndex(
+    enabledIndexes: readonly number[],
+    currentIndex: number,
+    direction: 1 | -1,
+  ): number {
     const currentEnabledPosition = enabledIndexes.indexOf(currentIndex);
     if (currentEnabledPosition < 0) {
       return direction === 1 ? enabledIndexes[0]! : enabledIndexes[enabledIndexes.length - 1]!;
@@ -248,7 +250,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
       this.resizeObserver.observe(this.rowRef.nativeElement);
     }
 
-    this.buttonRefs?.forEach(button => this.resizeObserver?.observe(button.nativeElement));
+    this.buttonRefs?.forEach((button) => this.resizeObserver?.observe(button.nativeElement));
   }
 
   private scheduleIndicatorRefresh(): void {
@@ -268,7 +270,7 @@ export class CxButtonGroupComponent implements AfterViewInit, OnDestroy {
   }
 
   private refreshIndicator(): void {
-    const selectedIndex = this.buttons$().findIndex(button => button.selected);
+    const selectedIndex = this.buttons$().findIndex((button) => button.selected);
     const selectedButton = this.buttonRefs?.toArray()[selectedIndex]?.nativeElement;
     if (selectedIndex < 0 || selectedButton === undefined) {
       this.indicatorVisible$.set(false);

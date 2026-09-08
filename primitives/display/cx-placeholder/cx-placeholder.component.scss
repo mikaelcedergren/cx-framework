@@ -27,7 +27,7 @@
 }
 
 .cx-placeholder::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: var(--space-sm);
   border: 1px dashed color-mix(in srgb, var(--placeholder) 48%, transparent);
@@ -46,7 +46,7 @@
 }
 
 .cx-placeholder__text {
-  color: var(--opacity-mid);
+  color: var(--opacity-high);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body-relaxed);

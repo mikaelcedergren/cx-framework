@@ -1,14 +1,10 @@
-@use 'tokens/breakpoints' as bp;
+@use "tokens/breakpoints" as bp;
 
 :host {
   display: contents;
 }
 
 .cx-utility-bar {
-  --link: var(--on-utility-bar);
-  --cx-icon-button-transparent-color: var(--on-utility-bar);
-  --cx-icon-button-transparent-hover-background: color-mix(in srgb, var(--on-utility-bar) 10%, transparent);
-
   display: flex;
   width: 100%;
   min-width: 0;

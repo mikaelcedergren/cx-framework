@@ -5,8 +5,7 @@
 //   .cx-embed  — wraps a replaced element (iframe / video / object) in a fixed-
 //                ratio, fluid box, so an embedded video (Vimeo, YouTube, …)
 //                scales with its column instead of overflowing or needing magic
-//                numbers. The ratio is a token — override per instance with
-//                `--cx-embed-ratio` (defaults to 16/9), or use a modifier class.
+//                numbers. Use a ratio modifier or set aspect-ratio directly.
 //
 //   .cx-figure — an image (or a .cx-embed) plus an optional caption, with the
 //                spacing and caption treatment shared across editorial and
@@ -19,11 +18,10 @@
 // which Angular view encapsulation never tags.
 
 .cx-embed {
-  --cx-embed-ratio: 16 / 9;
+  aspect-ratio: 16 / 9;
 
   display: block;
   inline-size: 100%;
-  aspect-ratio: var(--cx-embed-ratio);
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--opacity-low);
@@ -39,21 +37,21 @@
   border: 0;
 }
 
-// Discoverable ratio modifiers, so callers don't have to remember the custom property.
+// Common media ratios.
 .cx-embed--square {
-  --cx-embed-ratio: 1 / 1;
+  aspect-ratio: 1 / 1;
 }
 
 .cx-embed--4-3 {
-  --cx-embed-ratio: 4 / 3;
+  aspect-ratio: 4 / 3;
 }
 
 .cx-embed--3-2 {
-  --cx-embed-ratio: 3 / 2;
+  aspect-ratio: 3 / 2;
 }
 
 .cx-embed--21-9 {
-  --cx-embed-ratio: 21 / 9;
+  aspect-ratio: 21 / 9;
 }
 
 .cx-figure {

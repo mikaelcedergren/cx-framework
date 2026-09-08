@@ -1,23 +1,34 @@
 :host {
   display: block;
   width: 100%;
-  --cx-alert-accent: var(--ink);
 }
 
 :host(.cx-alert--info) {
-  --cx-alert-accent: var(--info);
+  .cx-alert__visual,
+  .cx-alert__heading {
+    color: var(--info);
+  }
 }
 
 :host(.cx-alert--success) {
-  --cx-alert-accent: var(--success);
+  .cx-alert__visual,
+  .cx-alert__heading {
+    color: var(--success);
+  }
 }
 
 :host(.cx-alert--warning) {
-  --cx-alert-accent: var(--warning);
+  .cx-alert__visual,
+  .cx-alert__heading {
+    color: var(--warning);
+  }
 }
 
 :host(.cx-alert--danger) {
-  --cx-alert-accent: var(--danger);
+  .cx-alert__visual,
+  .cx-alert__heading {
+    color: var(--danger);
+  }
 }
 
 .cx-alert__surface {
@@ -43,7 +54,7 @@
   height: 20px;
   align-items: center;
   justify-content: center;
-  color: var(--cx-alert-accent);
+  color: var(--ink);
 }
 
 .cx-alert__visual cx-spinner {
@@ -61,7 +72,7 @@
 }
 
 .cx-alert__heading {
-  color: var(--cx-alert-accent);
+  color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-body);

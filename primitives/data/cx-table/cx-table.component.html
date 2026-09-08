@@ -31,109 +31,126 @@
       </colgroup>
       @if (showHeaders) {
         <thead>
-        <tr class="cx-table__head-row">
-          @if (hasRowSelection$()) {
-            <th class="cx-table__head-cell cx-table__head-cell--selection" scope="col">
-              <cx-checkbox
-                [value]="partiallySelectedRows$() ? 'indeterminate' : allRowsSelected$() ? 'selected' : 'deselected'"
-                ariaLabel="Select all rows"
-                (selectedChange)="toggleAllRowsSelection($event)"
-              />
-            </th>
-          }
-          @for (column of columns$(); track trackColumn($index, column)) {
-            <th
-              class="cx-table__head-cell"
-              [class.cx-table__head-cell--interactive]="hasColumnHeaderMenu(column) || columnsReorderable || columnsResizable"
-              [class.cx-table__head-cell--end]="column.align === 'end'"
-              [class.cx-table__head-cell--pinned]="isColumnEffectivelyPinned(column)"
-              [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
-              [class.cx-table__head-cell--dragging]="draggingColumnId$() === column.id"
-              [class.cx-table__head-cell--drop-before]="dropIndicator$()?.columnId === column.id && dropIndicator$()?.position === 'before'"
-              [class.cx-table__head-cell--drop-after]="dropIndicator$()?.columnId === column.id && dropIndicator$()?.position === 'after'"
-              [style.width]="columnWidth(column)"
-              [style.min-width]="columnWidth(column)"
-              [style.max-width]="columnWidth(column)"
-              [style.left]="columnPinnedLeft(column)"
-              [attr.data-column-id]="column.id"
-              [attr.aria-sort]="sortAria(column.id)"
-              scope="col"
-            >
-              <div class="cx-table__head-content">
-                @if (hasColumnHeaderMenu(column)) {
-                  <button
-                    #headerTrigger
-                    type="button"
-                    class="cx-table__head-trigger"
-                    [attr.aria-label]="columnHeaderTriggerAriaLabel(column)"
-                    aria-haspopup="dialog"
-                    [attr.aria-expanded]="isColumnHeaderMenuOpen(column)"
-                    [attr.aria-controls]="columnHeaderDialogId"
-                    [cxTooltip]="column.label"
-                    [cxTooltipOverflow]="true"
-                    (click)="onColumnHeaderTriggerClick($event, column, headerTrigger)"
-                  >
-                    <span class="cx-table__head-label" data-cx-tooltip-overflow>{{ column.label }}</span>
-                    @if (sortIcon(column.id); as iconName) {
-                      <cx-icon class="cx-table__sort-icon" [icon]="iconName" [size]="14" />
-                    }
-                  </button>
-                } @else {
-                  <span class="cx-table__head-trigger cx-table__head-trigger--static">
-                    <span
-                      class="cx-table__head-label"
+          <tr class="cx-table__head-row">
+            @if (hasRowSelection$()) {
+              <th class="cx-table__head-cell cx-table__head-cell--selection" scope="col">
+                <cx-checkbox
+                  [value]="
+                    partiallySelectedRows$()
+                      ? 'indeterminate'
+                      : allRowsSelected$()
+                        ? 'selected'
+                        : 'deselected'
+                  "
+                  ariaLabel="Select all rows"
+                  [disabled]="selectableRowIds$().length === 0"
+                  (selectedChange)="toggleAllRowsSelection($event)"
+                />
+              </th>
+            }
+            @for (column of columns$(); track trackColumn($index, column)) {
+              <th
+                class="cx-table__head-cell"
+                [class.cx-table__head-cell--interactive]="
+                  hasColumnHeaderMenu(column) || columnsReorderable || columnsResizable
+                "
+                [class.cx-table__head-cell--end]="column.align === 'end'"
+                [class.cx-table__head-cell--pinned]="isColumnEffectivelyPinned(column)"
+                [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
+                [class.cx-table__head-cell--dragging]="draggingColumnId$() === column.id"
+                [class.cx-table__head-cell--drop-before]="
+                  dropIndicator$()?.columnId === column.id &&
+                  dropIndicator$()?.position === 'before'
+                "
+                [class.cx-table__head-cell--drop-after]="
+                  dropIndicator$()?.columnId === column.id && dropIndicator$()?.position === 'after'
+                "
+                [style.width]="columnWidth(column)"
+                [style.min-width]="columnWidth(column)"
+                [style.max-width]="columnWidth(column)"
+                [style.left]="columnPinnedLeft(column)"
+                [attr.data-column-id]="column.id"
+                [attr.aria-sort]="sortAria(column.id)"
+                scope="col"
+              >
+                <div class="cx-table__head-content">
+                  @if (hasColumnHeaderMenu(column)) {
+                    <button
+                      #headerTrigger
+                      type="button"
+                      class="cx-table__head-trigger"
+                      [attr.aria-label]="columnHeaderTriggerAriaLabel(column)"
+                      aria-haspopup="dialog"
+                      [attr.aria-expanded]="isColumnHeaderMenuOpen(column)"
+                      [attr.aria-controls]="columnHeaderDialogId"
                       [cxTooltip]="column.label"
                       [cxTooltipOverflow]="true"
-                    >{{ column.label }}</span>
-                  </span>
+                      (click)="onColumnHeaderTriggerClick($event, column, headerTrigger)"
+                    >
+                      <span class="cx-table__head-label" data-cx-tooltip-overflow>{{
+                        column.label
+                      }}</span>
+                      @if (sortIcon(column.id); as iconName) {
+                        <cx-icon class="cx-table__sort-icon" [icon]="iconName" [size]="14" />
+                      }
+                    </button>
+                  } @else {
+                    <span class="cx-table__head-trigger cx-table__head-trigger--static">
+                      <span
+                        class="cx-table__head-label"
+                        [cxTooltip]="column.label"
+                        [cxTooltipOverflow]="true"
+                        >{{ column.label }}</span
+                      >
+                    </span>
+                  }
+                  @if (columnsReorderable) {
+                    <button
+                      #columnGrip
+                      type="button"
+                      class="cx-table__column-grip"
+                      [class.cx-table__column-grip--active]="draggingColumnId$() === column.id"
+                      [attr.aria-label]="'Reorder ' + column.label + ' column'"
+                      [attr.data-column-grip-id]="column.id"
+                      (pointerdown)="onColumnGripPointerDown($event, column)"
+                      (pointermove)="onColumnGripPointerMove($event)"
+                      (pointerup)="onColumnGripPointerUp($event)"
+                      (pointercancel)="onColumnGripPointerCancel($event)"
+                      (lostpointercapture)="onColumnGripLostPointerCapture($event)"
+                      (keydown)="onColumnGripKeydown($event, column, columnGrip)"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <cx-icon icon="grip-vertical" [size]="16" />
+                    </button>
+                  }
+                </div>
+                @if (columnsResizable) {
+                  <div
+                    class="cx-table__column-resizer"
+                    [class.cx-table__column-resizer--active]="resizingColumnId$() === column.id"
+                    [attr.aria-label]="'Resize ' + column.label + ' column'"
+                    aria-orientation="vertical"
+                    [attr.aria-valuemin]="columnMinWidth"
+                    [attr.aria-valuemax]="columnMaxWidth"
+                    [attr.aria-valuenow]="columnWidthValue(column)"
+                    [attr.aria-valuetext]="columnWidthValue(column) + ' pixels'"
+                    tabindex="0"
+                    role="separator"
+                    (pointerdown)="onColumnResizePointerDown($event, column)"
+                    (pointermove)="onColumnResizePointerMove($event)"
+                    (pointerup)="onColumnResizePointerUp($event)"
+                    (pointercancel)="onColumnResizePointerCancel($event)"
+                    (lostpointercapture)="onColumnResizeLostPointerCapture($event)"
+                    (keydown)="onColumnResizeKeydown($event, column)"
+                    (dblclick)="onColumnResizeDoubleClick($event, column)"
+                  ></div>
                 }
-                @if (columnsReorderable) {
-                  <button
-                    #columnGrip
-                    type="button"
-                    class="cx-table__column-grip"
-                    [class.cx-table__column-grip--active]="draggingColumnId$() === column.id"
-                    [attr.aria-label]="'Reorder ' + column.label + ' column'"
-                    [attr.data-column-grip-id]="column.id"
-                    (pointerdown)="onColumnGripPointerDown($event, column)"
-                    (pointermove)="onColumnGripPointerMove($event)"
-                    (pointerup)="onColumnGripPointerUp($event)"
-                    (pointercancel)="onColumnGripPointerCancel($event)"
-                    (lostpointercapture)="onColumnGripLostPointerCapture($event)"
-                    (keydown)="onColumnGripKeydown($event, column, columnGrip)"
-                    (click)="$event.stopPropagation()"
-                  >
-                    <cx-icon icon="grip-vertical" [size]="16" />
-                  </button>
-                }
-              </div>
-              @if (columnsResizable) {
-                <div
-                  class="cx-table__column-resizer"
-                  [class.cx-table__column-resizer--active]="resizingColumnId$() === column.id"
-                  [attr.aria-label]="'Resize ' + column.label + ' column'"
-                  aria-orientation="vertical"
-                  [attr.aria-valuemin]="columnMinWidth"
-                  [attr.aria-valuemax]="columnMaxWidth"
-                  [attr.aria-valuenow]="columnWidthValue(column)"
-                  [attr.aria-valuetext]="columnWidthValue(column) + ' pixels'"
-                  tabindex="0"
-                  role="separator"
-                  (pointerdown)="onColumnResizePointerDown($event, column)"
-                  (pointermove)="onColumnResizePointerMove($event)"
-                  (pointerup)="onColumnResizePointerUp($event)"
-                  (pointercancel)="onColumnResizePointerCancel($event)"
-                  (lostpointercapture)="onColumnResizeLostPointerCapture($event)"
-                  (keydown)="onColumnResizeKeydown($event, column)"
-                  (dblclick)="onColumnResizeDoubleClick($event, column)"
-                ></div>
-              }
-            </th>
-          }
-          @if (hasRowMenus$() && showRowActions) {
-            <th class="cx-table__head-cell cx-table__head-cell--menu" scope="col"></th>
-          }
-        </tr>
+              </th>
+            }
+            @if (hasRowMenus$() && showRowActions) {
+              <th class="cx-table__head-cell cx-table__head-cell--menu" scope="col"></th>
+            }
+          </tr>
         </thead>
       }
 
@@ -146,182 +163,204 @@
           </tr>
         } @else {
           @for (row of rows$(); track trackRow($index, row)) {
-          <tr
-            class="cx-table__row"
-            [class.cx-table__row--active]="rowKind(row) === 'item' && activeRowId$() === row.id"
-            [class.cx-table__row--folder]="rowKind(row) === 'folder'"
-            [class.cx-table__row--item]="rowKind(row) === 'item'"
-            [attr.data-row-id]="row.id"
-            [attr.tabindex]="rowIsKeyboardReachable(row) ? '0' : null"
-            [attr.aria-label]="rowLabel(row)"
-            (click)="onRowClick($event, row, $any($event.currentTarget))"
-            (keydown)="onRowKeydown($event, row, $any($event.currentTarget))"
-            (contextmenu)="onRowContextMenu($event, row, $any($event.currentTarget))"
-          >
-            @if (hasRowSelection$()) {
-              @if (rowIsSelectable(row)) {
+            <tr
+              class="cx-table__row"
+              [class.cx-table__row--disabled]="row.disabled"
+              [attr.aria-disabled]="row.disabled ? 'true' : null"
+              [class.cx-table__row--active]="
+                !row.disabled && rowKind(row) === 'item' && activeRowId$() === row.id
+              "
+              [class.cx-table__row--folder]="rowKind(row) === 'folder'"
+              [class.cx-table__row--item]="rowKind(row) === 'item'"
+              [attr.data-row-id]="row.id"
+              [attr.tabindex]="rowIsKeyboardReachable(row) ? '0' : null"
+              [attr.aria-label]="rowLabel(row)"
+              (click)="onRowClick($event, row, $any($event.currentTarget))"
+              (keydown)="onRowKeydown($event, row, $any($event.currentTarget))"
+              (contextmenu)="onRowContextMenu($event, row, $any($event.currentTarget))"
+            >
+              @if (hasRowSelection$()) {
+                @if (rowKind(row) === 'item') {
+                  <td
+                    class="cx-table__cell cx-table__cell--selection"
+                    (click)="$event.stopPropagation()"
+                    (keydown)="$event.stopPropagation()"
+                  >
+                    <cx-checkbox
+                      [selected]="isRowSelected(row.id)"
+                      [disabled]="!rowIsSelectable(row)"
+                      [ariaLabel]="selectionLabel(row)"
+                      (selectedChange)="toggleRowSelection(row.id, $event)"
+                    />
+                  </td>
+                } @else {
+                  <td class="cx-table__cell cx-table__cell--selection"></td>
+                }
+              }
+              @for (column of columns$(); track trackColumn($index, column)) {
+                @if (cellFor(row, column.id); as cell) {
+                  <td
+                    class="cx-table__cell"
+                    [class.cx-table__cell--key]="column.key"
+                    [class.cx-table__cell--end]="column.align === 'end'"
+                    [class.cx-table__cell--pinned]="isColumnEffectivelyPinned(column)"
+                    [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
+                    [style.width]="columnWidth(column)"
+                    [style.min-width]="columnWidth(column)"
+                    [style.max-width]="columnWidth(column)"
+                    [style.left]="columnPinnedLeft(column)"
+                    [attr.data-column-id]="column.id"
+                  >
+                    <div class="cx-table__cell-content">
+                      <div class="cx-table__measure-target">
+                        @switch (cell.kind) {
+                          @case ('status-tag') {
+                            <cx-status-tag
+                              [mood]="cell.mood"
+                              [text]="cell.text"
+                              [icon]="cell.icon"
+                            />
+                          }
+                          @case ('severity-tag') {
+                            <cx-severity-tag
+                              [severity]="cell.severity"
+                              [score]="cell.score"
+                              [kev]="cell.kev ?? false"
+                              [display]="cell.display ?? 'severity'"
+                              [favor]="cell.favor ?? 'low'"
+                            />
+                          }
+                          @case ('trend-tag') {
+                            <cx-trend-tag
+                              [amount]="cell.amount"
+                              [favor]="cell.favor ?? 'up'"
+                              [unit]="cell.unit ?? 'percent'"
+                            />
+                          }
+                          @case ('tag') {
+                            <cx-tag
+                              [text]="cell.label"
+                              [color]="cell.color ?? 'default'"
+                              [outline]="cell.outline ?? false"
+                            />
+                          }
+                          @case ('tags') {
+                            <cx-table-tags-cell [tags]="cell.tags" />
+                          }
+                          @case ('person') {
+                            <div class="cx-table__person">
+                              <cx-avatar
+                                [name]="cell.name"
+                                [src]="cell.src"
+                                [color]="cell.color ?? 'auto'"
+                                size="small"
+                                ariaLabel=""
+                              />
+                              <span class="cx-table__person-copy">
+                                <span class="cx-table__person-name">{{ cell.name }}</span>
+                                @if (cell.detail) {
+                                  <span class="cx-table__person-detail">{{ cell.detail }}</span>
+                                }
+                              </span>
+                            </div>
+                          }
+                          @case ('progress') {
+                            <div class="cx-table__progress">
+                              <cx-progress-bar
+                                class="cx-table__progress-bar"
+                                label=""
+                                [ariaLabel]="cell.label ?? 'Progress'"
+                                [value]="cell.value"
+                                [mood]="cell.mood ?? 'default'"
+                                [showValue]="false"
+                              />
+                              <span class="cx-table__progress-value" aria-hidden="true">
+                                {{ progressPercent(cell.value) }}
+                              </span>
+                            </div>
+                          }
+                          @default {
+                            <span
+                              class="cx-table__text"
+                              [class.cx-table__text--strong]="cell.strong"
+                              [class.cx-table__text--muted]="cell.muted"
+                            >
+                              @if (resolvedTextIcon(row, column, cell); as iconName) {
+                                <cx-icon
+                                  class="cx-table__text-icon"
+                                  [icon]="iconName"
+                                  [size]="16"
+                                />
+                              }
+                              <span
+                                class="cx-table__text-value"
+                                [cxTooltip]="cell.value"
+                                [cxTooltipDisabled]="row.disabled ?? false"
+                                [cxTooltipOverflow]="true"
+                                >{{ cell.value }}</span
+                              >
+                            </span>
+                          }
+                        }
+                      </div>
+                    </div>
+                  </td>
+                } @else {
+                  <td
+                    class="cx-table__cell"
+                    [class.cx-table__cell--key]="column.key"
+                    [class.cx-table__cell--end]="column.align === 'end'"
+                    [class.cx-table__cell--pinned]="isColumnEffectivelyPinned(column)"
+                    [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
+                    [style.width]="columnWidth(column)"
+                    [style.min-width]="columnWidth(column)"
+                    [style.max-width]="columnWidth(column)"
+                    [style.left]="columnPinnedLeft(column)"
+                    [attr.data-column-id]="column.id"
+                  ></td>
+                }
+              }
+
+              @if (hasRowMenus$() && showRowActions) {
                 <td
-                  class="cx-table__cell cx-table__cell--selection"
+                  class="cx-table__cell cx-table__cell--menu"
                   (click)="$event.stopPropagation()"
                   (keydown)="$event.stopPropagation()"
                 >
-                  <cx-checkbox
-                    [selected]="isRowSelected(row.id)"
-                    [ariaLabel]="selectionLabel(row)"
-                    (selectedChange)="toggleRowSelection(row.id, $event)"
-                  />
-                </td>
-              } @else {
-                <td class="cx-table__cell cx-table__cell--selection"></td>
-              }
-            }
-            @for (column of columns$(); track trackColumn($index, column)) {
-              @if (cellFor(row, column.id); as cell) {
-                <td
-                  class="cx-table__cell"
-                  [class.cx-table__cell--key]="column.key"
-                  [class.cx-table__cell--end]="column.align === 'end'"
-                  [class.cx-table__cell--pinned]="isColumnEffectivelyPinned(column)"
-                  [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
-                  [style.width]="columnWidth(column)"
-                  [style.min-width]="columnWidth(column)"
-                  [style.max-width]="columnWidth(column)"
-                  [style.left]="columnPinnedLeft(column)"
-                  [attr.data-column-id]="column.id"
-                >
-                  <div class="cx-table__cell-content">
-                    <div class="cx-table__measure-target">
-                      @switch (cell.kind) {
-                        @case ('status-tag') {
-                          <cx-status-tag [mood]="cell.mood" [text]="cell.text" [icon]="cell.icon" />
-                        }
-                        @case ('severity-tag') {
-                          <cx-severity-tag
-                            [severity]="cell.severity"
-                            [score]="cell.score"
-                            [kev]="cell.kev ?? false"
-                            [display]="cell.display ?? 'severity'"
-                            [favor]="cell.favor ?? 'low'"
-                          />
-                        }
-                        @case ('trend-tag') {
-                          <cx-trend-tag
-                            [amount]="cell.amount"
-                            [favor]="cell.favor ?? 'up'"
-                            [unit]="cell.unit ?? 'percent'"
-                          />
-                        }
-                        @case ('tag') {
-                          <cx-tag
-                            [text]="cell.label"
-                            [color]="cell.color ?? 'default'"
-                            [outline]="cell.outline ?? false"
-                          />
-                        }
-                        @case ('tags') {
-                          <cx-table-tags-cell [tags]="cell.tags" />
-                        }
-                        @case ('person') {
-                          <div class="cx-table__person">
-                            <cx-avatar
-                              [name]="cell.name"
-                              [src]="cell.src"
-                              [color]="cell.color ?? 'auto'"
-                              size="small"
-                              ariaLabel=""
-                            />
-                            <span class="cx-table__person-copy">
-                              <span class="cx-table__person-name">{{ cell.name }}</span>
-                              @if (cell.detail) {
-                                <span class="cx-table__person-detail">{{ cell.detail }}</span>
-                              }
-                            </span>
-                          </div>
-                        }
-                        @case ('progress') {
-                          <div class="cx-table__progress">
-                            <cx-progress-bar
-                              class="cx-table__progress-bar"
-                              label=""
-                              [ariaLabel]="cell.label ?? 'Progress'"
-                              [value]="cell.value"
-                              [mood]="cell.mood ?? 'default'"
-                              [showValue]="false"
-                            />
-                            <span class="cx-table__progress-value" aria-hidden="true">
-                              {{ progressPercent(cell.value) }}
-                            </span>
-                          </div>
-                        }
-                        @default {
-                          <span
-                            class="cx-table__text"
-                            [class.cx-table__text--strong]="cell.strong"
-                            [class.cx-table__text--muted]="cell.muted"
-                          >
-                            @if (resolvedTextIcon(row, column, cell); as iconName) {
-                              <cx-icon class="cx-table__text-icon" [icon]="iconName" [size]="16" />
-                            }
-                            <span
-                              class="cx-table__text-value"
-                              [cxTooltip]="cell.value"
-                              [cxTooltipOverflow]="true"
-                            >{{ cell.value }}</span>
-                          </span>
-                        }
-                      }
-                    </div>
-                  </div>
-                </td>
-              } @else {
-                <td
-                  class="cx-table__cell"
-                  [class.cx-table__cell--key]="column.key"
-                  [class.cx-table__cell--end]="column.align === 'end'"
-                  [class.cx-table__cell--pinned]="isColumnEffectivelyPinned(column)"
-                  [class.cx-table__cell--last-pinned]="isLastPinnedColumn(column)"
-                  [style.width]="columnWidth(column)"
-                  [style.min-width]="columnWidth(column)"
-                  [style.max-width]="columnWidth(column)"
-                  [style.left]="columnPinnedLeft(column)"
-                  [attr.data-column-id]="column.id"
-                ></td>
-              }
-            }
-
-            @if (hasRowMenus$() && showRowActions) {
-              <td
-                class="cx-table__cell cx-table__cell--menu"
-                (click)="$event.stopPropagation()"
-                (keydown)="$event.stopPropagation()"
-              >
-                @if (row.menuItems?.length) {
-                  <cx-menu
-                    [presentation]="{ kind: 'trigger' }"
-                    [items]="row.menuItems"
-                    [open]="openRowMenuId$() === row.id"
-                    (openChange)="onRowMenuOpenChange(row.id, $event)"
-                    (itemSelect)="onRowMenuItemSelect(row.id, $event)"
-                  >
+                  @if (row.menuItems?.length && row.disabled) {
                     <cx-icon-button
                       data-row-menu-trigger
-                      cxMenuTrigger
                       class="cx-table__row-menu-trigger"
                       icon="menu-vertical"
-                      ariaLabel="Row actions" variant="transparent"
+                      ariaLabel="Row actions"
+                      variant="transparent"
+                      [disabled]="true"
                     />
-                  </cx-menu>
-                }
-              </td>
-            }
-          </tr>
+                  } @else if (row.menuItems?.length) {
+                    <cx-menu
+                      [presentation]="{ kind: 'trigger' }"
+                      [items]="row.menuItems"
+                      [open]="openRowMenuId$() === row.id"
+                      (openChange)="onRowMenuOpenChange(row.id, $event)"
+                      (itemSelect)="onRowMenuItemSelect(row.id, $event)"
+                    >
+                      <cx-icon-button
+                        data-row-menu-trigger
+                        cxMenuTrigger
+                        class="cx-table__row-menu-trigger"
+                        icon="menu-vertical"
+                        ariaLabel="Row actions"
+                        variant="transparent"
+                      />
+                    </cx-menu>
+                  }
+                </td>
+              }
+            </tr>
           }
           @if (rows$().length === 0) {
             <tr class="cx-table__empty-row">
-              <td
-                class="cx-table__empty-cell"
-                [attr.colspan]="tableColumnSpan$()"
-              >
+              <td class="cx-table__empty-cell" [attr.colspan]="tableColumnSpan$()">
                 @if (activeFilterCount$() > 0) {
                   <cx-state-message
                     [heading]="noMatchesState.heading"
@@ -447,7 +486,11 @@
 
     @if (contextMenu$(); as contextMenu) {
       <cx-menu
-        [presentation]="{ kind: 'context', left: contextMenu.point.left, top: contextMenu.point.top }"
+        [presentation]="{
+          kind: 'context',
+          left: contextMenu.point.left,
+          top: contextMenu.point.top,
+        }"
         [open]="true"
         [items]="contextMenuItems$()"
         ariaLabel="Row actions"

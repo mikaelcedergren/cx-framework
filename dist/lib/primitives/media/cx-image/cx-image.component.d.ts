@@ -23,7 +23,7 @@ export declare class CxImageComponent {
     protected readonly image$: import("@angular/core").Signal<Required<CxImage>>;
     protected readonly loading$: import("@angular/core").Signal<boolean>;
     protected readonly fallbackText$: import("@angular/core").Signal<string>;
-    protected readonly styleVars$: import("@angular/core").Signal<Record<string, string>>;
+    protected readonly imageStyles$: import("@angular/core").Signal<Record<string, string>>;
     protected readonly showImage$: import("@angular/core").Signal<boolean>;
     protected readonly showFallback$: import("@angular/core").Signal<boolean>;
     set image(value: CxImage | undefined);

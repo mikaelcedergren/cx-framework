@@ -16,38 +16,18 @@
   // cannot straddle it — it has to take the column on one side. It takes the
   // near side: one border-width back, which reads as centred, where the far side
   // reads as a pixel too far right.
-  --cx-side-nav-row-height: calc(
-    var(--controller-size-small) + var(--space-sm) * 2
-  );
   // Nested rows are tighter: they carry only a label, so top-level breathing
   // room reads as airiness one level in.
-  --cx-side-nav-subrow-height: calc(
-    var(--controller-size-small) + var(--space-xs) * 2
-  );
   // Separation between rows. The guide has to bridge it, or a 1px line reads as
   // a dashed one.
-  --cx-side-nav-row-gap: 1px;
-  --cx-side-nav-rail: calc(var(--controller-size-small) + var(--space-sm));
-  --cx-side-nav-guide: calc(
-    var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width)
-  );
-  --cx-side-nav-guide-offset: calc(
-    var(--cx-side-nav-guide) - var(--cx-side-nav-rail)
-  );
-  --cx-side-nav-elbow: calc(var(--space-sm) + var(--space-xs));
   // The guide is structure, not decoration: quieter than the labels it belongs
   // to, but it has to survive being 1px wide, which the `--line` tokens do not
   // at this length. Mixed from `--ink` so every theme scales it against its own
   // surface.
-  --cx-side-nav-guide-line: var(--border-width) solid
-    color-mix(in srgb, var(--ink) 18%, transparent);
   // Collapsed rail. Derived from the same pieces that place the icon column —
   // aside padding, row padding, icon slot — so the icons keep their exact x in
   // both states: collapsing reads as the right edge sweeping in past pinned
   // icons, never as icons re-centring.
-  --cx-side-nav-rail-width: calc(
-    var(--space-sm) * 2 + var(--space-xs) * 2 + var(--controller-size-small)
-  );
 
   display: flex;
   width: 240px;
@@ -64,7 +44,9 @@
 }
 
 .cx-side-nav--collapsed {
-  width: var(--cx-side-nav-rail-width);
+  width: calc(
+    var(--space-sm) * 2 + var(--space-xs) * 2 + var(--controller-size-small)
+  );
 }
 
 /* A classic (non-overlay) scrollbar would take a third of the rail: the stable
@@ -160,7 +142,7 @@
 
 .cx-side-nav__skeleton-row {
   display: block;
-  height: var(--cx-side-nav-row-height);
+  height: calc(var(--controller-size-small) + var(--space-sm) * 2);
   border-radius: var(--radius-sm);
   background: linear-gradient(
     90deg,
@@ -178,7 +160,7 @@
   flex: 1 1 auto;
   width: 100%;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
   overflow: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
@@ -188,7 +170,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
 }
 
 .cx-side-nav__node {
@@ -196,14 +178,14 @@
   width: 100%;
   min-width: 0;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
 }
 
 .cx-side-nav__group-items {
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
 }
 
 .cx-side-nav__group-items--collapsible {
@@ -240,21 +222,21 @@
   width: 100%;
   min-height: 0;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
 }
 
 /* Reserves the rail that the tree guide is drawn in. Sits on the container so
    the rows inside keep the same padding as top-level rows — which is what makes
    a nested label align with its parent's label. */
 .cx-side-nav__branch {
-  padding-left: var(--cx-side-nav-rail);
+  padding-left: calc(var(--controller-size-small) + var(--space-sm));
 }
 
 /* Nested rows keep the top-level content box but shed vertical air; the guide
    geometry follows automatically because the elbow anchors to the row's own
    centre. */
 .cx-side-nav__node--branch > .cx-side-nav__item {
-  min-height: var(--cx-side-nav-subrow-height);
+  min-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
   padding-block: var(--space-xs);
 }
 
@@ -265,11 +247,17 @@
   content: "";
   position: absolute;
   top: 0;
-  left: var(--cx-side-nav-guide-offset);
-  width: var(--cx-side-nav-elbow);
+  left: calc(
+    calc(
+        var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width)
+      ) - calc(var(--controller-size-small) + var(--space-sm))
+  );
+  width: calc(var(--space-sm) + var(--space-xs));
   height: 50%;
-  border-left: var(--cx-side-nav-guide-line);
-  border-bottom: var(--cx-side-nav-guide-line);
+  border-left: var(--border-width) solid
+    color-mix(in srgb, var(--ink) 18%, transparent);
+  border-bottom: var(--border-width) solid
+    color-mix(in srgb, var(--ink) 18%, transparent);
   border-bottom-left-radius: var(--radius-sm);
   pointer-events: none;
 }
@@ -281,9 +269,14 @@
   content: "";
   position: absolute;
   top: 50%;
-  bottom: calc(-1 * var(--cx-side-nav-row-gap));
-  left: var(--cx-side-nav-guide-offset);
-  border-left: var(--cx-side-nav-guide-line);
+  bottom: calc(-1 * 1px);
+  left: calc(
+    calc(
+        var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width)
+      ) - calc(var(--controller-size-small) + var(--space-sm))
+  );
+  border-left: var(--border-width) solid
+    color-mix(in srgb, var(--ink) 18%, transparent);
   pointer-events: none;
 }
 
@@ -298,9 +291,14 @@
   content: "";
   position: absolute;
   top: 0;
-  bottom: calc(-1 * var(--cx-side-nav-row-gap));
-  left: var(--cx-side-nav-guide-offset);
-  border-left: var(--cx-side-nav-guide-line);
+  bottom: calc(-1 * 1px);
+  left: calc(
+    calc(
+        var(--space-xs) + var(--controller-size-small) / 2 - var(--border-width)
+      ) - calc(var(--controller-size-small) + var(--space-sm))
+  );
+  border-left: var(--border-width) solid
+    color-mix(in srgb, var(--ink) 18%, transparent);
   pointer-events: none;
 }
 
@@ -322,7 +320,7 @@
   display: flex;
   min-height: 0;
   flex-direction: column;
-  gap: var(--cx-side-nav-row-gap);
+  gap: 1px;
   overflow: hidden;
   visibility: hidden;
   pointer-events: none;
@@ -359,7 +357,7 @@
   // Pinned so the row's height comes from the design, not from whether it
   // happens to carry an icon — an iconless row would otherwise shrink to its
   // text height.
-  min-height: var(--cx-side-nav-row-height);
+  min-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-xs);
@@ -398,9 +396,10 @@
 }
 
 .cx-side-nav__item--disabled {
-  color: var(--opacity-mid);
+  color: var(--ink);
   cursor: default;
   pointer-events: none;
+  opacity: var(--opacity-disabled);
 }
 
 .cx-side-nav__item--toggle {

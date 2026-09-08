@@ -1,6 +1,4 @@
 :host {
-  --cx-action-area-reveal-duration: 300ms;
-
   display: block;
   position: relative;
   min-width: 0;
@@ -8,7 +6,7 @@
   box-sizing: border-box;
   outline: 2px solid transparent;
   outline-offset: 2px;
-  transition: outline-color var(--cx-action-area-reveal-duration) var(--ease-out);
+  transition: outline-color var(--motion-slow) var(--ease-out);
 }
 
 :host(.cx-action-area-host--active) {
@@ -39,8 +37,8 @@
   pointer-events: none;
   transform: translateY(calc(var(--space-xs) * -1));
   transition:
-    opacity var(--cx-action-area-reveal-duration) var(--ease-out),
-    transform var(--cx-action-area-reveal-duration) var(--ease-out);
+    opacity var(--motion-slow) var(--ease-out),
+    transform var(--motion-slow) var(--ease-out);
 }
 
 :host(.cx-action-area-host--active) .cx-action-area__actions {

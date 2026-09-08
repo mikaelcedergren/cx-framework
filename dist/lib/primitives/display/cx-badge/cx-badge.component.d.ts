@@ -26,6 +26,11 @@ export declare class CxBadgeComponent implements OnChanges, OnDestroy {
     protected displayText(): string;
     protected indicatorWidth(): string;
     protected indicatorHeight(): string;
+    protected get cutoutStyles(): {
+        image: string;
+        position: string;
+        size: string;
+    } | null;
     private validateValueCombination;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxBadgeComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CxBadgeComponent, "cx-badge", never, { "visible": { "alias": "visible"; "required": false; }; "placement": { "alias": "placement"; "required": false; }; "count": { "alias": "count"; "required": false; }; "text": { "alias": "text"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; }, {}, never, ["*"], true, never>;

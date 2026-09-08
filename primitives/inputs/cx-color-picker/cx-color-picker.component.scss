@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: inline-flex;
@@ -12,7 +12,7 @@
   gap: var(--space-xs);
 }
 
-@include field.field-header('cx-color-picker', 0);
+@include field.field-header("cx-color-picker", 0);
 
 .cx-color-picker__trigger {
   box-sizing: border-box;
@@ -90,11 +90,9 @@
 }
 
 .cx-color-picker__swatch {
-  --cx-color-picker-swatch-size: calc(var(--icon-size-md) - 2px);
-
   display: inline-flex;
-  width: var(--cx-color-picker-swatch-size);
-  height: var(--cx-color-picker-swatch-size);
+  width: calc(var(--icon-size-md) - 2px);
+  height: calc(var(--icon-size-md) - 2px);
   flex: 0 0 auto;
   border: var(--border-width) solid var(--opacity-mid);
   border-radius: var(--radius-sm);
@@ -124,7 +122,7 @@
   transform: rotate(180deg);
 }
 
-@include field.field-messages('cx-color-picker', 0);
+@include field.field-messages("cx-color-picker", 0);
 
 .cx-color-picker__options {
   display: flex;
@@ -191,46 +189,46 @@
   color: var(--ink);
 }
 
-.cx-color-picker__swatch[data-color='blue'] {
+.cx-color-picker__swatch[data-color="blue"] {
   background: var(--blue);
 }
 
-.cx-color-picker__swatch[data-color='cyan'] {
+.cx-color-picker__swatch[data-color="cyan"] {
   background: var(--cyan);
 }
 
-.cx-color-picker__swatch[data-color='lime'] {
+.cx-color-picker__swatch[data-color="lime"] {
   background: var(--lime);
 }
 
-.cx-color-picker__swatch[data-color='green'] {
+.cx-color-picker__swatch[data-color="green"] {
   background: var(--green);
 }
 
-.cx-color-picker__swatch[data-color='yellow'] {
+.cx-color-picker__swatch[data-color="yellow"] {
   background: var(--yellow);
 }
 
-.cx-color-picker__swatch[data-color='orange'] {
+.cx-color-picker__swatch[data-color="orange"] {
   background: var(--orange);
 }
 
-.cx-color-picker__swatch[data-color='tangerine'] {
+.cx-color-picker__swatch[data-color="tangerine"] {
   background: var(--tangerine);
 }
 
-.cx-color-picker__swatch[data-color='red'] {
+.cx-color-picker__swatch[data-color="red"] {
   background: var(--red);
 }
 
-.cx-color-picker__swatch[data-color='pink'] {
+.cx-color-picker__swatch[data-color="pink"] {
   background: var(--pink);
 }
 
-.cx-color-picker__swatch[data-color='purple'] {
+.cx-color-picker__swatch[data-color="purple"] {
   background: var(--purple);
 }
 
-.cx-color-picker__swatch[data-color='violet'] {
+.cx-color-picker__swatch[data-color="violet"] {
   background: var(--violet);
 }

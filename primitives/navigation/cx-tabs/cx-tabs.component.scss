@@ -91,7 +91,7 @@
 .cx-tabs__tab--disabled,
 .cx-tabs__tab:disabled {
   cursor: default;
-  opacity: 0.45;
+  opacity: var(--opacity-disabled);
 }
 
 .cx-tabs__label {
@@ -125,20 +125,15 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: var(--cx-tabs-indicator-width);
   height: 2px;
   background: var(--ink);
   pointer-events: none;
-  transform: translateX(var(--cx-tabs-indicator-x));
   transition:
     transform var(--motion-base) var(--ease-out),
     width var(--motion-base) var(--ease-out);
 }
 
 .cx-tabs__overflow {
-  --cx-icon-button-transparent-color: var(--opacity-high);
-  --cx-icon-button-transparent-hover-background: var(--opacity-low);
-
   display: inline-flex;
   flex: 0 0 var(--controller-size);
   align-items: center;
@@ -146,11 +141,6 @@
   align-self: stretch;
   min-height: 40px;
   width: var(--controller-size);
-}
-
-.cx-tabs__overflow:hover,
-.cx-tabs__overflow:has([aria-expanded='true']) {
-  --cx-icon-button-transparent-color: var(--ink);
 }
 
 .cx-tabs__overflow--hidden {

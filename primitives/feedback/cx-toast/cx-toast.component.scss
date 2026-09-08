@@ -10,7 +10,10 @@
   box-sizing: border-box;
   display: flex;
   width: fit-content;
-  max-width: min(calc(var(--controller-size) * 15), calc(100vw - var(--space-xl)));
+  max-width: min(
+    calc(var(--controller-size) * 15),
+    calc(100vw - var(--space-xl))
+  );
   min-height: calc(var(--controller-size) + var(--space-md) + var(--space-2xs));
   align-items: center;
   gap: var(--space-sm);
@@ -101,8 +104,7 @@
   height: var(--space-2xs);
   background: var(--primary);
   transform-origin: left center;
-  transform: scaleX(var(--cx-toast-timer-progress, 1));
-  transition: transform var(--cx-toast-timer-duration, 0ms) linear;
+  transition: transform 0ms linear;
 }
 
 .cx-toast--success .cx-toast__timer {

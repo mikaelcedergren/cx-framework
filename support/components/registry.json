@@ -829,6 +829,15 @@
       "path": "primitives/inputs/cx-dropdown/cx-dropdown.component.ts"
     },
     {
+      "name": "cx-language-selector",
+      "selectors": [
+        "cx-language-selector"
+      ],
+      "area": "primitive",
+      "category": "inputs",
+      "path": "primitives/inputs/cx-language-selector/cx-language-selector.component.ts"
+    },
+    {
       "name": "cx-slider",
       "selectors": [
         "cx-slider"

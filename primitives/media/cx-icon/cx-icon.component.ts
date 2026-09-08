@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { getCxIcon, type CxIconName } from '../../../icons/manifest';
 
 export type CxIconSize = '12' | '14' | '16' | '20' | '24' | '32' | '64' | 'auto';
-export type CxIconMood = 'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
+export type CxIconMood =
+  'default' | 'primary' | 'accent' | 'info' | 'success' | 'warning' | 'danger';
 export type CxIconShape =
   | 'none'
   | 'square-subtle'
@@ -24,9 +25,8 @@ function resolveIconSize(value: Exclude<CxIconSizeInput, undefined>): {
   cssValue: string;
   sizeClass: CxIconSizeClass;
 } {
-  const normalized = typeof value === 'number'
-    ? (Number.isFinite(value) ? String(value) : '')
-    : value.trim();
+  const normalized =
+    typeof value === 'number' ? (Number.isFinite(value) ? String(value) : '') : value.trim();
 
   if (normalized === 'auto') {
     return { cssValue: '100%', sizeClass: 'auto' };
@@ -36,7 +36,7 @@ function resolveIconSize(value: Exclude<CxIconSizeInput, undefined>): {
     return {
       cssValue: `${normalized}px`,
       sizeClass: CX_ICON_SIZES.has(normalized as CxIconSize)
-        ? normalized as CxIconSize
+        ? (normalized as CxIconSize)
         : 'custom',
     };
   }
@@ -51,7 +51,8 @@ function resolveIconSize(value: Exclude<CxIconSizeInput, undefined>): {
 @Component({
   selector: 'cx-icon',
   host: {
-    '[style.--cx-icon-size]': 'resolvedSize',
+    '[style.width]': 'resolvedSize',
+    '[style.height]': 'resolvedHeight',
     '[class.cx-icon--size-12]': 'resolvedSizeClass === "12"',
     '[class.cx-icon--size-14]': 'resolvedSizeClass === "14"',
     '[class.cx-icon--size-16]': 'resolvedSizeClass === "16"',
@@ -85,6 +86,10 @@ export class CxIconComponent {
 
   protected resolvedSize = `${DEFAULT_ICON_SIZE}px`;
   protected resolvedSizeClass: CxIconSizeClass = DEFAULT_ICON_SIZE;
+
+  protected get resolvedHeight(): string {
+    return this.resolvedSizeClass === 'auto' && this.shape !== 'none' ? 'auto' : this.resolvedSize;
+  }
 
   @Input() icon: CxIconName | undefined;
 

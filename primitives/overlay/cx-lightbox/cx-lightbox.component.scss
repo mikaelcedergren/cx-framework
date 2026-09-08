@@ -19,7 +19,9 @@
 }
 
 .cx-lightbox--gallery {
-  grid-template-columns: var(--controller-size) minmax(0, 1fr) var(--controller-size);
+  grid-template-columns: var(--controller-size) minmax(0, 1fr) var(
+      --controller-size
+    );
 }
 
 .cx-lightbox__surface {
@@ -35,7 +37,8 @@
   justify-self: center;
   margin: 0;
   outline: none;
-  animation: cx-lightbox-image-enter calc(var(--motion-slow) * 2) var(--ease-out-strong);
+  animation: cx-lightbox-image-enter calc(var(--motion-slow) * 2)
+    var(--ease-out-strong);
 }
 
 .cx-lightbox--gallery .cx-lightbox__surface {
@@ -77,14 +80,6 @@
 }
 
 .cx-lightbox__control {
-  --cx-icon-button-default-background: var(--emphasis);
-  --cx-icon-button-default-color: var(--on-emphasis);
-  --cx-icon-button-default-hover-background: color-mix(
-    in srgb,
-    var(--emphasis) 88%,
-    var(--on-emphasis) 12%
-  );
-
   border-radius: var(--radius-pill);
   corner-shape: round;
   box-shadow: var(--shadow-low);

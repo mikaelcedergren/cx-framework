@@ -1,9 +1,9 @@
-import { EventEmitter, OnDestroy } from "@angular/core";
-import { type CdkDragDrop } from "@angular/cdk/drag-drop";
-import { type CxIconName } from "../../icons/manifest";
-import { type CxTagColor } from "../../primitives/display/cx-tag";
-import { type CxMenuItem } from "../../primitives/overlay/cx-menu";
-import { CxFloatingSurfaceController } from "../../primitives/overlay/floating-surface-controller";
+import { EventEmitter, OnDestroy } from '@angular/core';
+import { type CdkDragDrop } from '@angular/cdk/drag-drop';
+import { type CxIconName } from '../../icons/manifest';
+import { type CxTagColor } from '../../primitives/display/cx-tag';
+import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
+import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
 import * as i0 from "@angular/core";
 /** A selectable content entry. Icon and color are its visual identity. */
 export interface CxExplorerItem {
@@ -26,7 +26,7 @@ export type CxExplorerFolderChange = {
 };
 /** A consumer-added menu entry was chosen on a folder or item row. */
 export type CxExplorerMenuAction = {
-    kind: "folder" | "item";
+    kind: 'folder' | 'item';
     id: string;
     actionId: string;
 };
@@ -46,6 +46,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     private readonly host;
     private readonly explorerSurface?;
     private set explorerContent(value);
+    protected readonly scrollbarGutter: import("@angular/core").WritableSignal<number>;
     private readonly rootItemsState;
     private readonly foldersState;
     private readonly selectedItemIdState;
@@ -124,8 +125,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected readonly folders$: import("@angular/core").Signal<readonly CxExplorerFolder[]>;
     protected readonly selectedItemId$: import("@angular/core").Signal<string | undefined>;
     protected readonly filteredPickerIcons: import("@angular/core").Signal<CxIconName[]>;
-    get widthVar(): string | null;
-    get minWidthVar(): string | null;
+    protected get resolvedWidth(): string;
+    protected get resolvedMinWidth(): string;
     /** The item the icon & color editor is open for; closes when the item disappears. */
     protected readonly pickerItem: import("@angular/core").Signal<CxExplorerItem | null>;
     ngOnDestroy(): void;

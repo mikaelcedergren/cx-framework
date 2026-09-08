@@ -78,7 +78,10 @@
             @if (isEditingPart(condition.id, 'join')) {
               <ng-container [ngTemplateOutlet]="editorTemplate" />
             }
-            @if (!isEditingPart(condition.id, 'join') || showStructuredNavigationTarget(condition.id, 'join')) {
+            @if (
+              !isEditingPart(condition.id, 'join') ||
+              showStructuredNavigationTarget(condition.id, 'join')
+            ) {
               <button
                 type="button"
                 class="cx-query-field__join"
@@ -94,14 +97,22 @@
 
           <div
             class="cx-query-field__clause"
-            [class.cx-query-field__clause--editing]="isEditingPart(condition.id, 'field') || isEditingPart(condition.id, 'operator') || isEditingPart(condition.id, 'value')"
+            [class.cx-query-field__clause--editing]="
+              isEditingPart(condition.id, 'field') ||
+              isEditingPart(condition.id, 'operator') ||
+              isEditingPart(condition.id, 'value')
+            "
             [class.cx-query-field__clause--invalid]="isConditionInvalid(condition.id)"
           >
             @if (isEditingPart(condition.id, 'field')) {
               <ng-container [ngTemplateOutlet]="editorTemplate" />
             }
-            @if (!isEditingPart(condition.id, 'field') || showStructuredNavigationTarget(condition.id, 'field')) {
+            @if (
+              !isEditingPart(condition.id, 'field') ||
+              showStructuredNavigationTarget(condition.id, 'field')
+            ) {
               <cx-query-element
+                [size]="size"
                 [data]="fieldElementData(condition)"
                 (pressed)="openConditionPartFromPointer(condition, 'field')"
               />
@@ -109,25 +120,36 @@
               @if (isEditingPart(condition.id, 'operator')) {
                 <ng-container [ngTemplateOutlet]="editorTemplate" />
               }
-              @if (!isEditingPart(condition.id, 'operator') || showStructuredNavigationTarget(condition.id, 'operator')) {
+              @if (
+                !isEditingPart(condition.id, 'operator') ||
+                showStructuredNavigationTarget(condition.id, 'operator')
+              ) {
                 <cx-query-element
+                  [size]="size"
                   [data]="operatorElementData(condition)"
                   (pressed)="openConditionPartFromPointer(condition, 'operator')"
                 />
 
                 @if (conditionNeedsValue(condition)) {
                   @if (isEditingPart(condition.id, 'value')) {
-                    @if (!showStructuredNavigationTarget(condition.id, 'value') && draftValueSummary()) {
+                    @if (
+                      !showStructuredNavigationTarget(condition.id, 'value') && draftValueSummary()
+                    ) {
                       <span
                         class="cx-query-field__draft-values"
                         [cxTooltip]="draftValueSummary()"
                         [cxTooltipOverflow]="true"
-                      >{{ draftValueSummary() }}</span>
+                        >{{ draftValueSummary() }}</span
+                      >
                     }
                     <ng-container [ngTemplateOutlet]="editorTemplate" />
                   }
-                  @if (!isEditingPart(condition.id, 'value') || showStructuredNavigationTarget(condition.id, 'value')) {
+                  @if (
+                    !isEditingPart(condition.id, 'value') ||
+                    showStructuredNavigationTarget(condition.id, 'value')
+                  ) {
                     <cx-query-element
+                      [size]="size"
                       [data]="valueElementData(condition)"
                       (pressed)="openConditionPartFromPointer(condition, 'value')"
                     />
@@ -162,17 +184,26 @@
               <ng-container [ngTemplateOutlet]="editorTemplate" />
             } @else {
               <div class="cx-query-field__clause cx-query-field__clause--editing">
-                <cx-query-element [data]="draftFieldElementData()" (pressed)="openDraftPart('field')" />
+                <cx-query-element
+                  [size]="size"
+                  [data]="draftFieldElementData()"
+                  (pressed)="openDraftPart('field')"
+                />
                 @if (draft$()?.stage === 'operator') {
                   <ng-container [ngTemplateOutlet]="editorTemplate" />
                 } @else {
-                  <cx-query-element [data]="draftOperatorElementData()" (pressed)="openDraftPart('operator')" />
+                  <cx-query-element
+                    [size]="size"
+                    [data]="draftOperatorElementData()"
+                    (pressed)="openDraftPart('operator')"
+                  />
                   @if (draftValueSummary()) {
                     <span
                       class="cx-query-field__draft-values"
                       [cxTooltip]="draftValueSummary()"
                       [cxTooltipOverflow]="true"
-                    >{{ draftValueSummary() }}</span>
+                      >{{ draftValueSummary() }}</span
+                    >
                   }
                   <ng-container [ngTemplateOutlet]="editorTemplate" />
                 }
@@ -204,7 +235,9 @@
     }
   </div>
 
-  <span class="cx-query-field__sr-only" [id]="statusId" aria-live="polite">{{ editorStatusText() }}</span>
+  <span class="cx-query-field__sr-only" [id]="statusId" aria-live="polite">{{
+    editorStatusText()
+  }}</span>
 
   @if (showHint$() || validationMessages$().length > 0) {
     <div class="cx-query-field__messages" [id]="messagesId">
@@ -246,7 +279,11 @@
           </div>
         </div>
       } @else if (currentSuggestionsError(); as error) {
-        <div class="cx-query-field__state cx-query-field__state--error" role="status" aria-live="polite">
+        <div
+          class="cx-query-field__state cx-query-field__state--error"
+          role="status"
+          aria-live="polite"
+        >
           <div class="cx-query-field__state-copy">
             <div class="cx-query-field__state-heading">Values couldn’t load</div>
             <div class="cx-query-field__state-text">{{ error }}</div>
@@ -255,7 +292,9 @@
       } @else if (suggestions$().length === 0) {
         <div class="cx-query-field__state" role="status" aria-live="polite">
           <div class="cx-query-field__state-copy">
-            <div class="cx-query-field__state-heading">{{ emptyHeading() }}</div>
+            <div class="cx-query-field__state-heading">
+              {{ emptyHeading() }}
+            </div>
             @if (emptyDescription(); as description) {
               <div class="cx-query-field__state-text">{{ description }}</div>
             }
@@ -274,28 +313,21 @@
       >
         @if (!currentSuggestionsLoading() && !currentSuggestionsError()) {
           @for (suggestion of suggestions$(); track suggestion.key; let index = $index) {
-            <div
-              class="cx-query-field__option"
-              [class.cx-query-field__option--active]="isSuggestionActive(index)"
-              [id]="suggestionDomId(index)"
-              role="option"
-              [attr.aria-label]="suggestion.disabled ? suggestion.label : null"
-              [attr.aria-selected]="suggestionAriaSelected(suggestion)"
-              [attr.aria-disabled]="suggestion.disabled ? 'true' : null"
+            <cx-option
+              [active]="isSuggestionActive(index)"
+              [controlId]="suggestionDomId(index)"
+              [role]="'option'"
+              [tabIndex]="-1"
+              [label]="suggestion.label"
+              [description]="suggestion.description"
+              [selected]="suggestion.selected ?? false"
+              [selectedHighlight]="!showSuggestionCheckbox(suggestion)"
+              [showCheckbox]="showSuggestionCheckbox(suggestion)"
+              [disabled]="suggestion.disabled ?? false"
               (pointerenter)="setActiveSuggestion(index)"
               (pointerdown)="onSuggestionPointerDown($event)"
               (click)="selectSuggestion(index)"
-            >
-              <cx-option
-                [clickable]="false"
-                [label]="suggestion.label"
-                [description]="suggestion.description"
-                [selected]="suggestion.selected ?? false"
-                [selectedHighlight]="!showSuggestionCheckbox(suggestion)"
-                [showCheckbox]="showSuggestionCheckbox(suggestion)"
-                [disabled]="suggestion.disabled ?? false"
-              />
-            </div>
+            />
           }
         }
       </div>

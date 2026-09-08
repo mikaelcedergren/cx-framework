@@ -5,10 +5,8 @@
 // a reading-optimised treatment. Native elements need no classes; ingress,
 // discreet text, and explained keywords use the explicit article roles below.
 //
-// Sizing is em-relative off a single base, so a whole block scales from one
-// number: `--cx-article-base`. `.cx-article--lg` scales that base fluidly for
-// hero/landing contexts and gives its h1 the fluid display role; set
-// `--cx-article-base` inline for anything in between.
+// Typography starts from the global large-body role. The large editorial
+// variant gives its hero heading the fluid display role.
 //
 // Global (not component-scoped) on purpose: an article is usually injected via
 // [innerHTML] (markdown, CMS), which Angular's view encapsulation never tags —
@@ -24,22 +22,17 @@
 // re-emitting this file's global `.cx-article` CSS. It is forwarded here so
 // `@use 'article'` consumers keep one entry point.
 
-@use 'editorial-type';
-@forward 'editorial-type';
+@use "editorial-type";
+@forward "editorial-type";
 
 .cx-article {
-  --cx-article-base: 18px;
-
-  // The reading measure is configurable the same way the type base is: set
-  // --cx-article-measure inline (or on a wrapper) for anything the default
-  // does not fit — e.g. `none` for a full-width hero summary.
-  max-inline-size: var(--cx-article-measure, var(--measure-md));
+  max-inline-size: var(--measure-md);
   margin-inline: auto;
   color: var(--ink);
   font-family: var(--font-family-base);
-  font-size: var(--cx-article-base);
+  font-size: var(--font-size-body-lg);
   font-weight: var(--font-weight-regular);
-  line-height: 1.6;
+  line-height: var(--line-height-body-lg);
 
   @include editorial-type.cx-editorial-type;
 
@@ -63,9 +56,7 @@
 }
 
 .cx-article--lg {
-  // Keep the complete editorial hierarchy below the display h1 as it reaches
-  // its 40px mobile floor, then grow to the 22px landing base on wide screens.
-  --cx-article-base: clamp(18px, 2.25vw, 22px);
+  font-size: clamp(var(--font-size-body-lg), 2.25vw, 22px);
 
   h1 {
     font-size: var(--font-size-display);

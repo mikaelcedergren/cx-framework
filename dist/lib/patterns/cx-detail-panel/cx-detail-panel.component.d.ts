@@ -70,8 +70,7 @@ export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestr
     set selectedTabId(value: string | undefined);
     get selectedTabId(): string | undefined;
     ngAfterViewChecked(): void;
-    get widthVar(): string | null;
-    get minWidthVar(): string | null;
+    get resolvedWidth(): string;
     protected get floatingHostClass(): boolean;
     protected get isFixed(): boolean;
     protected get hasTabs(): boolean;

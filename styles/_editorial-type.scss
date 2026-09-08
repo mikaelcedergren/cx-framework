@@ -135,7 +135,7 @@
   }
 
   code {
-    padding: 2px 6px;
+    padding: var(--space-2xs) var(--space-sm);
     border-radius: var(--radius-sm);
     background: var(--opacity-low);
     font-family: var(--font-family-mono);

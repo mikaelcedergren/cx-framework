@@ -189,7 +189,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   private readonly activeSuggestionIndexState = signal(-1);
   private readonly navigationStatusState = signal('');
   private readonly structuredCaretState = signal(false);
-  private readonly knownValueOptionsState = signal<ReadonlyMap<string, ReadonlyMap<string, CxQueryFieldOption>>>(new Map());
+  private readonly knownValueOptionsState = signal<
+    ReadonlyMap<string, ReadonlyMap<string, CxQueryFieldOption>>
+  >(new Map());
   private readonly hasHiddenQueryBeforeState = signal(false);
   private readonly hasHiddenQueryAfterState = signal(false);
   private nextConditionId = 0;
@@ -206,9 +208,10 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   protected readonly listboxId = `cx-query-field-listbox-${this.instanceId}`;
   protected readonly popoverMaxWidth = CX_QUERY_FIELD_POPOVER_MAX_WIDTH;
   protected readonly finishShortcutParts = CX_QUERY_FIELD_FINISH_SHORTCUT;
-  protected readonly finishShortcutAria = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform)
-    ? 'Meta+Enter'
-    : 'Control+Enter';
+  protected readonly finishShortcutAria =
+    typeof navigator !== 'undefined' && /mac/i.test(navigator.platform)
+      ? 'Meta+Enter'
+      : 'Control+Enter';
 
   @ViewChild('fieldContainer', { read: ElementRef })
   private fieldContainerRef?: ElementRef<HTMLElement>;
@@ -275,7 +278,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     const conditions = this.normalizeConditions(value ?? []);
     this.conditionsState.set(conditions);
     const targetId = this.draftState()?.targetId;
-    if (targetId && !conditions.some(condition => condition.id === targetId)) {
+    if (targetId && !conditions.some((condition) => condition.id === targetId)) {
       this.closeEditor(false);
     }
   }
@@ -320,9 +323,15 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     }
     return messages;
   });
-  protected readonly hasError$ = computed(() => this.validationMessages$().some(message => message.type === 'error'));
-  protected readonly showHint$ = computed(() => Boolean(this.hintState()) && this.validationMessages$().length === 0);
-  protected readonly suggestions$ = computed<readonly CxQueryFieldSuggestion[]>(() => this.buildSuggestions());
+  protected readonly hasError$ = computed(() =>
+    this.validationMessages$().some((message) => message.type === 'error'),
+  );
+  protected readonly showHint$ = computed(
+    () => Boolean(this.hintState()) && this.validationMessages$().length === 0,
+  );
+  protected readonly suggestions$ = computed<readonly CxQueryFieldSuggestion[]>(() =>
+    this.buildSuggestions(),
+  );
 
   public ngAfterViewInit(): void {
     const field = this.fieldContainerRef?.nativeElement;
@@ -443,7 +452,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   protected currentSuggestionsLoading(): boolean {
     const source = this.valueSourceForDraft();
-    return this.draftState()?.stage === 'value' && source?.kind === 'options' && source.loading === true;
+    return (
+      this.draftState()?.stage === 'value' && source?.kind === 'options' && source.loading === true
+    );
   }
 
   protected currentSuggestionsError(): string | undefined {
@@ -470,13 +481,14 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       }
     }
     if (query) {
-      const object = draft?.stage === 'field'
-        ? 'fields'
-        : draft?.stage === 'operator'
-          ? 'operators'
-          : draft?.stage === 'join'
-            ? 'connectors'
-            : 'values';
+      const object =
+        draft?.stage === 'field'
+          ? 'fields'
+          : draft?.stage === 'operator'
+            ? 'operators'
+            : draft?.stage === 'join'
+              ? 'connectors'
+              : 'values';
       return `No ${object} match “${query}”`;
     }
     if (draft?.stage === 'operator') {
@@ -551,21 +563,23 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     const conditionElement = target.closest<HTMLElement>('[data-query-condition-id]');
     const conditionId = conditionElement?.dataset['queryConditionId'];
     const condition = conditionId
-      ? this.conditionsState().find(item => item.id === conditionId)
+      ? this.conditionsState().find((item) => item.id === conditionId)
       : undefined;
-    this.navigationStatusState.set(condition
-      ? `${this.conditionSummary(condition)}. Press Backspace to remove this filter.`
-      : '');
+    this.navigationStatusState.set(
+      condition
+        ? `${this.conditionSummary(condition)}. Press Backspace to remove this filter.`
+        : '',
+    );
   }
 
   protected onContainerKeydown(event: KeyboardEvent): void {
     if (
-      this.isLocked()
-      || event.isComposing
-      || event.altKey
-      || event.ctrlKey
-      || event.metaKey
-      || event.shiftKey
+      this.isLocked() ||
+      event.isComposing ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
     ) {
       return;
     }
@@ -595,7 +609,10 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return;
     }
     if (current instanceof HTMLInputElement) {
-      if (current.selectionStart !== current.selectionEnd || (this.openState() && current.value.length > 0)) {
+      if (
+        current.selectionStart !== current.selectionEnd ||
+        (this.openState() && current.value.length > 0)
+      ) {
         return;
       }
       const atStart = current.selectionStart === 0;
@@ -714,10 +731,10 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return;
     }
     if (
-      (event.key === ' ' || event.key === 'Spacebar')
-      && this.isMultipleValueStage()
-      && this.isQueryFinishable()
-      && !this.editorTextState()
+      (event.key === ' ' || event.key === 'Spacebar') &&
+      this.isMultipleValueStage() &&
+      this.isQueryFinishable() &&
+      !this.editorTextState()
     ) {
       const index = this.normalizedActiveSuggestionIndex();
       const suggestion = this.suggestions$()[index];
@@ -731,9 +748,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       event.preventDefault();
       const draft = this.draftState();
       if (
-        this.structuredCaretState()
-        && draft?.targetId
-        && !this.hasUncommittedDraftChanges(draft)
+        this.structuredCaretState() &&
+        draft?.targetId &&
+        !this.hasUncommittedDraftChanges(draft)
       ) {
         this.deleteConditionFromCaret(draft.targetId);
         return;
@@ -762,7 +779,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     };
     this.draftState.set(draft);
     this.structuredCaretState.set(structuredNavigation);
-    this.editorTextState.set(stage === 'value' && !structuredNavigation ? this.scalarEditorText(draft) : '');
+    this.editorTextState.set(
+      stage === 'value' && !structuredNavigation ? this.scalarEditorText(draft) : '',
+    );
     this.openState.set(true);
     if (stage === 'value') {
       this.emitManualValueSearch('', draft);
@@ -783,10 +802,10 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   protected openDraftPart(stage: 'join' | 'field' | 'operator'): void {
     const draft = this.draftState();
     if (
-      !draft
-      || this.isLocked()
-      || (stage === 'join' && this.conditionsState().length === 0)
-      || (stage === 'operator' && !draft.fieldId)
+      !draft ||
+      this.isLocked() ||
+      (stage === 'join' && this.conditionsState().length === 0) ||
+      (stage === 'operator' && !draft.fieldId)
     ) {
       return;
     }
@@ -813,10 +832,10 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   ): boolean {
     const draft = this.draftState();
     if (
-      !this.structuredCaretState()
-      || this.editorTextState().length > 0
-      || draft?.targetId !== conditionId
-      || draft.stage !== stage
+      !this.structuredCaretState() ||
+      this.editorTextState().length > 0 ||
+      draft?.targetId !== conditionId ||
+      draft.stage !== stage
     ) {
       return false;
     }
@@ -826,8 +845,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       case 'operator':
         return Boolean(draft.operatorId);
       case 'value':
-        return draft.value !== undefined
-          && (!Array.isArray(draft.value) || draft.value.length > 0);
+        return draft.value !== undefined && (!Array.isArray(draft.value) || draft.value.length > 0);
       case 'join':
         return Boolean(draft.join);
     }
@@ -840,7 +858,8 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   protected fieldElementData(condition: CxQueryFieldCondition): CxQueryElementData {
     const presentation = this.presentationCondition(condition);
-    const label = this.fieldForCondition(presentation)?.label ?? (presentation.fieldId || 'Unknown field');
+    const label =
+      this.fieldForCondition(presentation)?.label ?? (presentation.fieldId || 'Unknown field');
     return {
       kind: 'field',
       label,
@@ -853,7 +872,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   protected operatorElementData(condition: CxQueryFieldCondition): CxQueryElementData {
     const presentation = this.presentationCondition(condition);
-    const label = this.operatorForCondition(presentation)?.label ?? (presentation.operatorId || 'Unknown operator');
+    const label =
+      this.operatorForCondition(presentation)?.label ??
+      (presentation.operatorId || 'Unknown operator');
     return {
       kind: 'operator',
       label,
@@ -932,10 +953,6 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     return this.normalizedActiveSuggestionIndex() === index;
   }
 
-  protected suggestionAriaSelected(suggestion: CxQueryFieldSuggestion): string {
-    return String(Boolean(suggestion.selected));
-  }
-
   protected showSuggestionCheckbox(suggestion: CxQueryFieldSuggestion): boolean {
     return suggestion.kind === 'value' && this.valueModeForDraft() === 'multiple';
   }
@@ -997,9 +1014,11 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (draft.stage === 'join') {
       return this.conditionsState().length > 0;
     }
-    return draft.stage === 'value'
-      && this.valueModeForDraft(draft) === 'multiple'
-      && this.multipleSelectionCount() > 0;
+    return (
+      draft.stage === 'value' &&
+      this.valueModeForDraft(draft) === 'multiple' &&
+      this.multipleSelectionCount() > 0
+    );
   }
 
   protected finishQuery(): void {
@@ -1135,9 +1154,11 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   private queryNavigationTargets(field: HTMLElement): HTMLElement[] {
-    return Array.from(field.querySelectorAll<HTMLElement>(
-      '.cx-query-element:not(:disabled), .cx-query-field__join:not(:disabled), .cx-query-field__editor:not(:disabled)',
-    ));
+    return Array.from(
+      field.querySelectorAll<HTMLElement>(
+        '.cx-query-element:not(:disabled), .cx-query-field__join:not(:disabled), .cx-query-field__editor:not(:disabled)',
+      ),
+    );
   }
 
   private navigationDescriptors(): CxQueryFieldNavigationDescriptor[] {
@@ -1163,8 +1184,8 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (!draft?.targetId) {
       return descriptors.length - 1;
     }
-    return descriptors.findIndex(descriptor =>
-      descriptor.conditionId === draft.targetId && descriptor.part === draft.stage,
+    return descriptors.findIndex(
+      (descriptor) => descriptor.conditionId === draft.targetId && descriptor.part === draft.stage,
     );
   }
 
@@ -1175,7 +1196,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return;
     }
     const condition = descriptor.conditionId
-      ? this.conditionsState().find(item => item.id === descriptor.conditionId)
+      ? this.conditionsState().find((item) => item.id === descriptor.conditionId)
       : undefined;
     if (condition) {
       this.openConditionPart(condition, descriptor.part, true);
@@ -1187,19 +1208,23 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return false;
     }
     if (!draft.targetId) {
-      return draft.join !== undefined
-        || draft.fieldId !== undefined
-        || draft.operatorId !== undefined
-        || draft.value !== undefined;
+      return (
+        draft.join !== undefined ||
+        draft.fieldId !== undefined ||
+        draft.operatorId !== undefined ||
+        draft.value !== undefined
+      );
     }
-    const committed = this.conditionsState().find(condition => condition.id === draft.targetId);
+    const committed = this.conditionsState().find((condition) => condition.id === draft.targetId);
     if (!committed) {
       return true;
     }
-    return draft.fieldId !== committed.fieldId
-      || draft.operatorId !== committed.operatorId
-      || draft.join !== committed.join
-      || !this.queryValuesEqual(draft.value, committed.value);
+    return (
+      draft.fieldId !== committed.fieldId ||
+      draft.operatorId !== committed.operatorId ||
+      draft.join !== committed.join ||
+      !this.queryValuesEqual(draft.value, committed.value)
+    );
   }
 
   private queryValuesEqual(
@@ -1207,10 +1232,12 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     second: CxQueryFieldValue | undefined,
   ): boolean {
     if (Array.isArray(first) || Array.isArray(second)) {
-      return Array.isArray(first)
-        && Array.isArray(second)
-        && first.length === second.length
-        && first.every((value, index) => value === second[index]);
+      return (
+        Array.isArray(first) &&
+        Array.isArray(second) &&
+        first.length === second.length &&
+        first.every((value, index) => value === second[index])
+      );
     }
     return first === second;
   }
@@ -1224,14 +1251,14 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   private deleteConditionFromCaret(conditionId: string): void {
     const conditions = this.conditionsState();
-    const index = conditions.findIndex(condition => condition.id === conditionId);
+    const index = conditions.findIndex((condition) => condition.id === conditionId);
     if (index < 0) {
       return;
     }
     const previous = conditions[index - 1];
     const next = conditions[index + 1];
     this.closeEditor(false);
-    this.emitValue(conditions.filter(condition => condition.id !== conditionId));
+    this.emitValue(conditions.filter((condition) => condition.id !== conditionId));
     if (previous) {
       this.navigateToDescriptor({
         conditionId: previous.id,
@@ -1263,7 +1290,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     }
     const maxScrollLeft = Math.max(segments.scrollWidth - segments.clientWidth, 0);
     const tolerance = 1;
-    this.hasHiddenQueryBeforeState.set(maxScrollLeft > tolerance && segments.scrollLeft > tolerance);
+    this.hasHiddenQueryBeforeState.set(
+      maxScrollLeft > tolerance && segments.scrollLeft > tolerance,
+    );
     this.hasHiddenQueryAfterState.set(
       maxScrollLeft > tolerance && segments.scrollLeft < maxScrollLeft - tolerance,
     );
@@ -1271,14 +1300,15 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   private selectField(fieldId: string): void {
     const draft = this.draftState();
-    const field = this.fieldsState().find(item => item.id === fieldId);
+    const field = this.fieldsState().find((item) => item.id === fieldId);
     if (!draft || !field || field.disabled) {
       return;
     }
     const sameField = draft.fieldId === fieldId;
-    const nextOperatorId = sameField && field.operators.some(operator => operator.id === draft.operatorId)
-      ? draft.operatorId
-      : undefined;
+    const nextOperatorId =
+      sameField && field.operators.some((operator) => operator.id === draft.operatorId)
+        ? draft.operatorId
+        : undefined;
     this.draftState.set({
       ...draft,
       stage: 'operator',
@@ -1293,7 +1323,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   private selectOperator(operatorId: string): void {
     const draft = this.draftState();
     const field = this.fieldForDraft(draft);
-    const operator = field?.operators.find(item => item.id === operatorId);
+    const operator = field?.operators.find((item) => item.id === operatorId);
     if (!draft || !field || !operator || operator.disabled) {
       return;
     }
@@ -1325,14 +1355,18 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (source?.kind !== 'options') {
       return;
     }
-    const option = source.options.find(item => item.id === valueId) ?? this.knownValueOptionsState().get(draft.fieldId ?? '')?.get(valueId);
+    const option =
+      source.options.find((item) => item.id === valueId) ??
+      this.knownValueOptionsState()
+        .get(draft.fieldId ?? '')
+        ?.get(valueId);
     if (option?.disabled) {
       return;
     }
     if (this.valueModeForDraft(draft) === 'multiple') {
       const selected = this.draftSelectedValues(draft);
       const nextValues = selected.includes(valueId)
-        ? selected.filter(id => id !== valueId)
+        ? selected.filter((id) => id !== valueId)
         : [...selected, valueId];
       this.draftState.set({ ...draft, value: nextValues });
       this.editorTextState.set('');
@@ -1390,7 +1424,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return;
     }
     const current = this.conditionsState();
-    const targetIndex = draft.targetId ? current.findIndex(condition => condition.id === draft.targetId) : -1;
+    const targetIndex = draft.targetId
+      ? current.findIndex((condition) => condition.id === draft.targetId)
+      : -1;
     if (targetIndex < 0 && current.length > 0 && !draft.join) {
       return;
     }
@@ -1403,7 +1439,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     };
     const editingExisting = targetIndex >= 0;
     const next = editingExisting
-      ? current.map((item, index) => index === targetIndex ? condition : item)
+      ? current.map((item, index) => (index === targetIndex ? condition : item))
       : [...current, condition];
     this.emitValue(next);
     if (editingExisting || finishQuery) {
@@ -1423,9 +1459,11 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   private hasFooterAction(): boolean {
-    return Boolean(this.currentSuggestionsError())
-      || this.isQueryFinishable()
-      || this.canRemoveCurrentCondition();
+    return (
+      Boolean(this.currentSuggestionsError()) ||
+      this.isQueryFinishable() ||
+      this.canRemoveCurrentCondition()
+    );
   }
 
   private closeEditor(focus: boolean): void {
@@ -1554,13 +1592,17 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   private editPreviousCondition(beforeConditionId?: string): void {
     const conditions = this.conditionsState();
     const beforeIndex = beforeConditionId
-      ? conditions.findIndex(condition => condition.id === beforeConditionId)
+      ? conditions.findIndex((condition) => condition.id === beforeConditionId)
       : conditions.length;
     if (beforeIndex <= 0) {
       return;
     }
     const condition = conditions[beforeIndex - 1];
-    this.openConditionPart(condition, this.conditionNeedsValue(condition) ? 'value' : 'operator', true);
+    this.openConditionPart(
+      condition,
+      this.conditionNeedsValue(condition) ? 'value' : 'operator',
+      true,
+    );
   }
 
   private buildSuggestions(): readonly CxQueryFieldSuggestion[] {
@@ -1569,7 +1611,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return [];
     }
     if (draft.stage === 'field') {
-      return this.filterOptions(this.fieldsState(), this.editorTextState()).map(field => ({
+      return this.filterOptions(this.fieldsState(), this.editorTextState()).map((field) => ({
         key: `field:${field.id}`,
         kind: 'field',
         id: field.id,
@@ -1581,7 +1623,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     }
     if (draft.stage === 'operator') {
       const field = this.fieldForDraft(draft);
-      return this.filterOptions(field?.operators ?? [], this.editorTextState()).map(operator => ({
+      return this.filterOptions(field?.operators ?? [], this.editorTextState()).map((operator) => ({
         key: `operator:${operator.id}`,
         kind: 'operator',
         id: operator.id,
@@ -1592,14 +1634,16 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       }));
     }
     if (draft.stage === 'join') {
-      return this.filterOptions(CX_QUERY_FIELD_JOIN_OPTIONS, this.editorTextState()).map(option => ({
-        key: `join:${option.id}`,
-        kind: 'join',
-        id: option.id,
-        label: option.label,
-        description: option.description,
-        selected: draft.join === option.id,
-      }));
+      return this.filterOptions(CX_QUERY_FIELD_JOIN_OPTIONS, this.editorTextState()).map(
+        (option) => ({
+          key: `join:${option.id}`,
+          kind: 'join',
+          id: option.id,
+          label: option.label,
+          description: option.description,
+          selected: draft.join === option.id,
+        }),
+      );
     }
 
     const source = this.valueSourceForDraft(draft);
@@ -1613,11 +1657,12 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       if (source.error?.trim()) {
         return [];
       }
-      const options = source.filterMode === 'manual'
-        ? source.options
-        : this.filterOptions(source.options, this.editorTextState());
+      const options =
+        source.filterMode === 'manual'
+          ? source.options
+          : this.filterOptions(source.options, this.editorTextState());
       const selectedIds = this.draftSelectedValues(draft);
-      const suggestions: CxQueryFieldSuggestion[] = options.map(option => ({
+      const suggestions: CxQueryFieldSuggestion[] = options.map((option) => ({
         key: `value:${option.id}`,
         kind: 'value',
         id: option.id,
@@ -1634,24 +1679,29 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (!query || customValue === undefined) {
       return [];
     }
-    return [{
-      key: `custom:${query}`,
-      kind: 'custom',
-      id: query,
-      label: `Use “${query}”`,
-    }];
+    return [
+      {
+        key: `custom:${query}`,
+        kind: 'custom',
+        id: query,
+        label: `Use “${query}”`,
+      },
+    ];
   }
 
-  private filterOptions<T extends CxQueryFieldOption>(options: readonly T[], query: string): readonly T[] {
+  private filterOptions<T extends CxQueryFieldOption>(
+    options: readonly T[],
+    query: string,
+  ): readonly T[] {
     const normalized = query.trim().toLocaleLowerCase();
     if (!normalized) {
       return options;
     }
     return options
       .map((option, index) => ({ option, index, score: this.optionMatchScore(option, normalized) }))
-      .filter(entry => entry.score < Number.POSITIVE_INFINITY)
+      .filter((entry) => entry.score < Number.POSITIVE_INFINITY)
       .sort((a, b) => a.score - b.score || a.index - b.index)
-      .map(entry => entry.option);
+      .map((entry) => entry.option);
   }
 
   private optionMatchScore(option: CxQueryFieldOption, query: string): number {
@@ -1659,7 +1709,7 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (label.startsWith(query)) {
       return 0;
     }
-    if (label.split(/\s+/).some(word => word.startsWith(query))) {
+    if (label.split(/\s+/).some((word) => word.startsWith(query))) {
       return 1;
     }
     if (label.includes(query)) {
@@ -1680,17 +1730,20 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     }
     const enabled = suggestions
       .map((suggestion, index) => ({ suggestion, index }))
-      .filter(entry => !entry.suggestion.disabled)
-      .map(entry => entry.index);
+      .filter((entry) => !entry.suggestion.disabled)
+      .map((entry) => entry.index);
     if (enabled.length === 0) {
       this.activeSuggestionIndexState.set(-1);
       return;
     }
     const current = this.normalizedActiveSuggestionIndex();
     const position = enabled.indexOf(current);
-    const nextPosition = position < 0
-      ? delta === 1 ? 0 : enabled.length - 1
-      : (position + delta + enabled.length) % enabled.length;
+    const nextPosition =
+      position < 0
+        ? delta === 1
+          ? 0
+          : enabled.length - 1
+        : (position + delta + enabled.length) % enabled.length;
     this.activeSuggestionIndexState.set(enabled[nextPosition]);
     this.scrollActiveSuggestionIntoView();
   }
@@ -1701,7 +1754,9 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       if (index < 0) {
         return;
       }
-      const option = this.popoverRef?.surfaceElement()?.querySelector<HTMLElement>(`#${this.suggestionDomId(index)}`);
+      const option = this.popoverRef
+        ?.surfaceElement()
+        ?.querySelector<HTMLElement>(`#${this.suggestionDomId(index)}`);
       option?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     });
   }
@@ -1709,21 +1764,25 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   private setActiveSuggestionToFirst(preferSelected = false): void {
     const suggestions = this.suggestions$();
     const selectedIndex = preferSelected
-      ? suggestions.findIndex(suggestion => suggestion.selected && !suggestion.disabled)
+      ? suggestions.findIndex((suggestion) => suggestion.selected && !suggestion.disabled)
       : -1;
-    const index = selectedIndex >= 0
-      ? selectedIndex
-      : suggestions.findIndex(suggestion => !suggestion.disabled);
+    const index =
+      selectedIndex >= 0
+        ? selectedIndex
+        : suggestions.findIndex((suggestion) => !suggestion.disabled);
     this.activeSuggestionIndexState.set(index);
     this.scrollActiveSuggestionIntoView();
   }
 
   private setActiveSuggestionToKey(key: string): void {
     const suggestions = this.suggestions$();
-    const requestedIndex = suggestions.findIndex(suggestion => suggestion.key === key && !suggestion.disabled);
-    const index = requestedIndex >= 0
-      ? requestedIndex
-      : suggestions.findIndex(suggestion => !suggestion.disabled);
+    const requestedIndex = suggestions.findIndex(
+      (suggestion) => suggestion.key === key && !suggestion.disabled,
+    );
+    const index =
+      requestedIndex >= 0
+        ? requestedIndex
+        : suggestions.findIndex((suggestion) => !suggestion.disabled);
     this.activeSuggestionIndexState.set(index);
     this.scrollActiveSuggestionIntoView();
   }
@@ -1734,12 +1793,17 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (current >= 0 && current < suggestions.length && !suggestions[current].disabled) {
       return current;
     }
-    return suggestions.findIndex(suggestion => !suggestion.disabled);
+    return suggestions.findIndex((suggestion) => !suggestion.disabled);
   }
 
   private presentationCondition(condition: CxQueryFieldCondition): CxQueryFieldCondition {
     const draft = this.draftState();
-    if (!draft || draft.targetId !== condition.id || draft.stage === 'field' || draft.stage === 'join') {
+    if (
+      !draft ||
+      draft.targetId !== condition.id ||
+      draft.stage === 'field' ||
+      draft.stage === 'join'
+    ) {
       return condition;
     }
     return {
@@ -1751,19 +1815,23 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
   }
 
   private fieldForCondition(condition: CxQueryFieldCondition): CxQueryFieldDefinition | undefined {
-    return this.fieldsState().find(field => field.id === condition.fieldId);
+    return this.fieldsState().find((field) => field.id === condition.fieldId);
   }
 
   private operatorForCondition(condition: CxQueryFieldCondition): CxQueryFieldOperator | undefined {
-    return this.fieldForCondition(condition)?.operators.find(operator => operator.id === condition.operatorId);
+    return this.fieldForCondition(condition)?.operators.find(
+      (operator) => operator.id === condition.operatorId,
+    );
   }
 
   private fieldForDraft(draft = this.draftState()): CxQueryFieldDefinition | undefined {
-    return this.fieldsState().find(field => field.id === draft?.fieldId);
+    return this.fieldsState().find((field) => field.id === draft?.fieldId);
   }
 
   private operatorForDraft(draft = this.draftState()): CxQueryFieldOperator | undefined {
-    return this.fieldForDraft(draft)?.operators.find(operator => operator.id === draft?.operatorId);
+    return this.fieldForDraft(draft)?.operators.find(
+      (operator) => operator.id === draft?.operatorId,
+    );
   }
 
   private valueSourceForDraft(draft = this.draftState()): CxQueryFieldValueDefinition | undefined {
@@ -1784,7 +1852,12 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   private scalarEditorText(draft: CxQueryFieldDraft): string {
     const source = this.valueSourceForDraft(draft);
-    if (!source || source.kind === 'options' || draft.value === undefined || Array.isArray(draft.value)) {
+    if (
+      !source ||
+      source.kind === 'options' ||
+      draft.value === undefined ||
+      Array.isArray(draft.value)
+    ) {
       return '';
     }
     return String(draft.value);
@@ -1813,13 +1886,16 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return [];
     }
     const values = Array.isArray(value) ? value : [String(value)];
-    const field = this.fieldsState().find(item => item.id === fieldId);
+    const field = this.fieldsState().find((item) => item.id === fieldId);
     const source = field?.value;
     if (source?.kind !== 'options') {
-      return values.map(item => String(item));
+      return values.map((item) => String(item));
     }
     const known = this.knownValueOptionsState().get(fieldId);
-    return values.map(id => source.options.find(option => option.id === id)?.label ?? known?.get(id)?.label ?? id);
+    return values.map(
+      (id) =>
+        source.options.find((option) => option.id === id)?.label ?? known?.get(id)?.label ?? id,
+    );
   }
 
   private isDraftValueComplete(draft: CxQueryFieldDraft, mode: CxQueryFieldValueMode): boolean {
@@ -1869,17 +1945,30 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
       return true;
     }
     if (mode === 'multiple') {
-      if (field.value.kind !== 'options' || !Array.isArray(condition.value) || condition.value.length === 0) {
+      if (
+        field.value.kind !== 'options' ||
+        !Array.isArray(condition.value) ||
+        condition.value.length === 0
+      ) {
         return false;
       }
-      return field.value.filterMode === 'manual'
-        || condition.value.every(id => field.value.kind === 'options' && field.value.options.some(option => option.id === id));
+      return (
+        field.value.filterMode === 'manual' ||
+        condition.value.every(
+          (id) =>
+            field.value.kind === 'options' &&
+            field.value.options.some((option) => option.id === id),
+        )
+      );
     }
     if (Array.isArray(condition.value) || condition.value === undefined) {
       return false;
     }
     if (field.value.kind === 'number') {
-      return typeof condition.value === 'number' && this.isNumberWithinConstraints(condition.value, field.value);
+      return (
+        typeof condition.value === 'number' &&
+        this.isNumberWithinConstraints(condition.value, field.value)
+      );
     }
     if (typeof condition.value !== 'string' || !condition.value.trim()) {
       return false;
@@ -1887,9 +1976,11 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     if (field.value.kind === 'date') {
       return this.isDateWithinConstraints(condition.value, field.value);
     }
-    return field.value.kind !== 'options'
-      || field.value.filterMode === 'manual'
-      || field.value.options.some(option => option.id === condition.value);
+    return (
+      field.value.kind !== 'options' ||
+      field.value.filterMode === 'manual' ||
+      field.value.options.some((option) => option.id === condition.value)
+    );
   }
 
   private isNumberWithinConstraints(
@@ -1934,14 +2025,16 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     date.setUTCHours(0, 0, 0, 0);
     date.setUTCFullYear(year, month - 1, day);
     if (
-      date.getUTCFullYear() !== year
-      || date.getUTCMonth() !== month - 1
-      || date.getUTCDate() !== day
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
     ) {
       return false;
     }
-    return (source.min === undefined || value >= source.min)
-      && (source.max === undefined || value <= source.max);
+    return (
+      (source.min === undefined || value >= source.min) &&
+      (source.max === undefined || value <= source.max)
+    );
   }
 
   private emitValue(value: readonly CxQueryFieldCondition[]): void {
@@ -1952,7 +2045,12 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
 
   private emitManualValueSearch(query: string, draft = this.draftState()): void {
     const source = this.valueSourceForDraft(draft);
-    if (draft?.stage === 'value' && draft.fieldId && source?.kind === 'options' && source.filterMode === 'manual') {
+    if (
+      draft?.stage === 'value' &&
+      draft.fieldId &&
+      source?.kind === 'options' &&
+      source.filterMode === 'manual'
+    ) {
       this.valueSearch.emit({ fieldId: draft.fieldId, query });
     }
   }
@@ -1972,10 +2070,13 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     this.knownValueOptionsState.set(next);
   }
 
-  private normalizeConditions(value: readonly CxQueryFieldCondition[]): readonly CxQueryFieldCondition[] {
+  private normalizeConditions(
+    value: readonly CxQueryFieldCondition[],
+  ): readonly CxQueryFieldCondition[] {
     const seenIds = new Set<string>();
     return value.map((condition, index) => {
-      const requestedId = condition.id?.trim() || `query-condition-${this.instanceId}-external-${index + 1}`;
+      const requestedId =
+        condition.id?.trim() || `query-condition-${this.instanceId}-external-${index + 1}`;
       let id = requestedId;
       let suffix = index + 1;
       while (seenIds.has(id)) {
@@ -1987,23 +2088,27 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
         fieldId: condition.fieldId ?? '',
         operatorId: condition.operatorId ?? '',
         value: this.cloneValue(condition.value),
-        join: index === 0
-          ? undefined
-          : condition.join === 'and' || condition.join === 'or'
-            ? condition.join
-            : undefined,
+        join:
+          index === 0
+            ? undefined
+            : condition.join === 'and' || condition.join === 'or'
+              ? condition.join
+              : undefined,
       };
     });
   }
 
-  private normalizeJoins(value: readonly CxQueryFieldCondition[]): readonly CxQueryFieldCondition[] {
+  private normalizeJoins(
+    value: readonly CxQueryFieldCondition[],
+  ): readonly CxQueryFieldCondition[] {
     return value.map((condition, index) => ({
       ...condition,
-      join: index === 0
-        ? undefined
-        : condition.join === 'and' || condition.join === 'or'
-          ? condition.join
-          : undefined,
+      join:
+        index === 0
+          ? undefined
+          : condition.join === 'and' || condition.join === 'or'
+            ? condition.join
+            : undefined,
     }));
   }
 
@@ -2029,16 +2134,24 @@ export class CxQueryFieldComponent implements AfterViewInit, AfterViewChecked, O
     });
   }
 
-  private measureOverlay(rect: DOMRect, viewport: CxFloatingSurfaceViewport): CxFloatingSurfaceRequest {
+  private measureOverlay(
+    rect: DOMRect,
+    viewport: CxFloatingSurfaceViewport,
+  ): CxFloatingSurfaceRequest {
     const viewportMaxWidth = Math.max(viewport.width - 16, 0);
-    const width = Math.floor(Math.min(
-      Math.max(rect.width, CX_QUERY_FIELD_POPOVER_MIN_WIDTH),
-      CX_QUERY_FIELD_POPOVER_MAX_WIDTH,
-      viewportMaxWidth,
-    ));
-    const stateHeight = this.currentSuggestionsLoading() || this.currentSuggestionsError() || this.suggestions$().length === 0
-      ? 132
-      : 0;
+    const width = Math.floor(
+      Math.min(
+        Math.max(rect.width, CX_QUERY_FIELD_POPOVER_MIN_WIDTH),
+        CX_QUERY_FIELD_POPOVER_MAX_WIDTH,
+        viewportMaxWidth,
+      ),
+    );
+    const stateHeight =
+      this.currentSuggestionsLoading() ||
+      this.currentSuggestionsError() ||
+      this.suggestions$().length === 0
+        ? 132
+        : 0;
     const footerHeight = this.hasFooterAction() ? CX_QUERY_FIELD_OPTION_HEIGHT : 0;
     const estimatedContentHeight = Math.min(
       36 + this.suggestions$().length * CX_QUERY_FIELD_OPTION_HEIGHT + stateHeight + footerHeight,

@@ -61,7 +61,7 @@
 
 .cx-menu__option-wrap:hover .cx-menu__trailing-actions,
 .cx-menu__option-wrap:focus-within .cx-menu__trailing-actions,
-.cx-menu__trailing-actions:has(button[aria-expanded='true']) {
+.cx-menu__trailing-actions:has(button[aria-expanded="true"]) {
   opacity: 1;
   pointer-events: auto;
 }
@@ -88,13 +88,15 @@
 // A portaled popover supplies the radius that keeps its framing lane even.
 // Standalone menus keep their ordinary group radius through the fallback.
 .cx-menu__group:first-child {
-  border-top-left-radius: var(--cx-popover-inner-radius, var(--radius-md));
-  border-top-right-radius: var(--cx-popover-inner-radius, var(--radius-md));
+  border-top-left-radius: calc(var(--radius-lg) - var(--surface-separation));
+  border-top-right-radius: calc(var(--radius-lg) - var(--surface-separation));
 }
 
 .cx-menu__group:last-child {
-  border-bottom-right-radius: var(--cx-popover-inner-radius, var(--radius-md));
-  border-bottom-left-radius: var(--cx-popover-inner-radius, var(--radius-md));
+  border-bottom-right-radius: calc(
+    var(--radius-lg) - var(--surface-separation)
+  );
+  border-bottom-left-radius: calc(var(--radius-lg) - var(--surface-separation));
 }
 
 .cx-menu__group--heading {

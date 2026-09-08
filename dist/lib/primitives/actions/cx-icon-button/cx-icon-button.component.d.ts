@@ -2,7 +2,7 @@ import { EventEmitter, OnDestroy } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import { type CxButtonMood, type CxButtonSize } from '../cx-button';
 import * as i0 from "@angular/core";
-export type CxIconButtonVariant = 'default' | 'transparent';
+export type CxIconButtonVariant = 'default' | 'transparent' | 'emphasis';
 export declare class CxIconButtonComponent implements OnDestroy {
     icon: CxIconName;
     ariaLabel: string;

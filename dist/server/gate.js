@@ -1,9 +1,11 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { readCookie, serializeCookie, validateCookieName } from "./cookies.js";
 import { errorEnvelope, HttpError } from "./errors.js";
 import { createBoundedRateLimiter } from "./rate-limit.js";
 import { hasNoStoreCacheDirective, isAssetRequestPath } from "./security.js";
 import { createHmacTokenCodec, randomBase64UrlIdentifier, sha256Hex, } from "./signing.js";
+const globalTokenStyles = readFileSync(new URL("./global-tokens.css", import.meta.url), "utf8");
 export const DEFAULT_SITE_GATE_PUBLIC_PATHS = Object.freeze([
     "/healthz",
     "/cx-build.json",
@@ -1331,36 +1333,38 @@ function escapeHtml(value) {
 function renderGatePage({ failed, gatePath, siteName, }) {
     const name = escapeHtml(siteName);
     return `<!doctype html>
-<html lang="en">
+<html lang="en" class="theme-night" data-cx-keyboard-navigation>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>${name}</title>
 <style>
+  ${globalTokenStyles}
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   body {
-    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
-    background: #0b0c0e; color: #e9eaec;
-    font: 16px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: var(--space-lg);
+    background: var(--surface); color: var(--ink);
+    font: var(--font-size-body)/var(--line-height-body) var(--font-family-base);
   }
   main { width: 100%; max-width: 22rem; }
-  h1 { margin: 0 0 8px; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
-  p { margin: 0 0 24px; color: #9aa0a6; font-size: 0.9375rem; }
-  label { display: block; margin-bottom: 8px; font-size: 0.8125rem; color: #9aa0a6; }
-  input, button { width: 100%; font: inherit; border-radius: 8px; }
+  h1 { margin: 0 0 var(--space-sm); font-size: var(--font-size-title-2); font-weight: var(--font-weight-bold); }
+  p { margin: 0 0 var(--space-lg); color: var(--opacity-high); font-size: var(--font-size-body); }
+  label { display: block; margin-bottom: var(--space-sm); font-size: var(--font-size-body-sm); color: var(--opacity-high); }
+  input, button { width: 100%; font: inherit; border-radius: var(--radius-sm); corner-shape: var(--corner-shape); }
   input {
-    padding: 10px 12px; color: #e9eaec; background: #141619;
-    border: 1px solid #2a2d33;
+    padding: var(--space-sm); min-height: var(--controller-size); color: var(--ink); background: var(--surface-alt);
+    border: var(--line);
   }
-  input:focus-visible { outline: 2px solid #5b8def; outline-offset: 1px; border-color: transparent; }
+  input:focus-visible { outline: var(--outline-tab); outline-offset: var(--outline-tab-offset); border-color: transparent; }
   button {
-    margin-top: 16px; padding: 10px 12px; font-weight: 550; cursor: pointer;
-    color: #0b0c0e; background: #e9eaec; border: 1px solid transparent;
+    margin-top: var(--space-md); padding: var(--space-sm); min-height: var(--controller-size); font-weight: var(--font-weight-medium); cursor: pointer;
+    color: var(--on-emphasis); background: var(--emphasis); border: var(--border-width) solid transparent;
   }
-  button:hover { background: #ffffff; }
-  .error { margin: 0 0 16px; color: #f2857f; font-size: 0.875rem; }
+  button:hover { background: color-mix(in srgb, var(--emphasis) 88%, var(--on-emphasis) 12%); }
+  button:focus-visible { outline: var(--outline-tab); outline-offset: var(--outline-tab-offset); }
+  .error { margin: 0 0 var(--space-md); color: var(--danger); font-size: var(--font-size-body); }
 </style>
 </head>
 <body>

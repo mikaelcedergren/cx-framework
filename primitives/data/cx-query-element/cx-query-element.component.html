@@ -1,6 +1,8 @@
 <button
   type="button"
   class="cx-query-element"
+  [class.cx-query-element--small]="size === 'small'"
+  [class.cx-query-element--large]="size === 'large'"
   [class.cx-query-element--insert]="kind === 'insert'"
   [class.cx-query-element--field]="kind === 'field'"
   [class.cx-query-element--operator]="kind === 'operator'"
@@ -23,10 +25,7 @@
         <span class="cx-query-element__muted">{{ valuesPrefix }}</span>
       }
       @for (value of values; track $index) {
-        <span
-          class="cx-query-element__value"
-          [class.cx-query-element__value--empty]="!value"
-        >
+        <span class="cx-query-element__value" [class.cx-query-element__value--empty]="!value">
           @if (value) {
             {{ value }}
           } @else {

@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: block;
@@ -10,16 +10,34 @@
 }
 
 .cx-phone-field--small {
-  --cx-phone-field-font-size: var(--font-size-body-sm);
-  --cx-phone-field-country-width: 74px;
+  .cx-phone-field__country {
+    flex: 0 0 74px;
+  }
+
+  .cx-phone-field__country-select {
+    font-size: var(--font-size-body-sm);
+  }
+
+  .cx-phone-field__field {
+    font-size: var(--font-size-body-sm);
+  }
 }
 
 .cx-phone-field--large {
-  --cx-phone-field-font-size: var(--font-size-body-lg);
-  --cx-phone-field-country-width: 94px;
+  .cx-phone-field__country {
+    flex: 0 0 94px;
+  }
+
+  .cx-phone-field__country-select {
+    font-size: var(--font-size-body-lg);
+  }
+
+  .cx-phone-field__field {
+    font-size: var(--font-size-body-lg);
+  }
 }
 
-@include field.field-header('cx-phone-field');
+@include field.field-header("cx-phone-field");
 
 .cx-phone-field__field-shell {
   box-sizing: border-box;
@@ -34,7 +52,10 @@
   background: transparent;
 }
 
-@include field.field-shell-state('.cx-phone-field__field-shell', '.cx-phone-field__field');
+@include field.field-shell-state(
+  ".cx-phone-field__field-shell",
+  ".cx-phone-field__field"
+);
 
 .cx-phone-field--small .cx-phone-field__field-shell {
   min-height: var(--controller-size-small);
@@ -45,7 +66,9 @@
   border-radius: var(--radius-xl);
 }
 
-.cx-phone-field__field-shell:has(.cx-phone-field__country-select:focus-visible) {
+.cx-phone-field__field-shell:has(
+  .cx-phone-field__country-select:focus-visible
+) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
@@ -53,7 +76,7 @@
 .cx-phone-field__country {
   position: relative;
   display: inline-flex;
-  flex: 0 0 var(--cx-phone-field-country-width, 84px);
+  flex: 0 0 84px;
   min-width: 0;
   align-items: center;
 }
@@ -68,7 +91,7 @@
   color: var(--ink);
   cursor: pointer;
   font: inherit;
-  font-size: var(--cx-phone-field-font-size, var(--font-size-body));
+  font-size: var(--font-size-body);
   line-height: var(--line-height-control);
   outline: 0;
 }
@@ -102,7 +125,7 @@
   background: transparent;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-phone-field-font-size, var(--font-size-body));
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-control);
 }
@@ -141,4 +164,4 @@
   color: var(--ink);
 }
 
-@include field.field-messages('cx-phone-field');
+@include field.field-messages("cx-phone-field");

@@ -7,7 +7,7 @@ import { CxBadgeComponent } from '../../display/cx-badge';
 import { createCountdownState } from '../shared/countdown-state';
 import { createDelayedLoadingState } from '../shared/delayed-loading-state';
 
-export type CxIconButtonVariant = 'default' | 'transparent';
+export type CxIconButtonVariant = 'default' | 'transparent' | 'emphasis';
 
 @Component({
   selector: 'cx-icon-button',

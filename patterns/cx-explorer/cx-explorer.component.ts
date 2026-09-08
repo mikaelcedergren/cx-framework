@@ -4,7 +4,6 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostBinding,
   Input,
   OnDestroy,
   Output,
@@ -12,31 +11,28 @@ import {
   computed,
   inject,
   signal,
-} from "@angular/core";
+} from '@angular/core';
 import {
   CdkDrag,
   CdkDragHandle,
   CdkDropList,
   type CdkDragDrop,
   moveItemInArray,
-} from "@angular/cdk/drag-drop";
-import { cxIcons, type CxIconName } from "../../icons/manifest";
-import { CxButtonComponent } from "../../primitives/actions/cx-button";
-import { CxIconButtonComponent } from "../../primitives/actions/cx-icon-button";
-import {
-  CX_TAG_COLOR_PICKER_OPTIONS,
-  type CxTagColor,
-} from "../../primitives/display/cx-tag";
-import { CxSearchFieldComponent } from "../../primitives/inputs/cx-search-field";
-import { CxIconComponent } from "../../primitives/media/cx-icon";
+} from '@angular/cdk/drag-drop';
+import { cxIcons, type CxIconName } from '../../icons/manifest';
+import { CxButtonComponent } from '../../primitives/actions/cx-button';
+import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
+import { CX_TAG_COLOR_PICKER_OPTIONS, type CxTagColor } from '../../primitives/display/cx-tag';
+import { CxSearchFieldComponent } from '../../primitives/inputs/cx-search-field';
+import { CxIconComponent } from '../../primitives/media/cx-icon';
 import {
   CxMenuComponent,
   CxMenuTriggerDirective,
   type CxMenuItem,
-} from "../../primitives/overlay/cx-menu";
-import { CxPopoverComponent } from "../../primitives/overlay/cx-popover";
-import { CxTooltipDirective } from "../../primitives/overlay/cx-tooltip";
-import { CxFloatingSurfaceController } from "../../primitives/overlay/floating-surface-controller";
+} from '../../primitives/overlay/cx-menu';
+import { CxPopoverComponent } from '../../primitives/overlay/cx-popover';
+import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
+import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
 
 /** A selectable content entry. Icon and color are its visual identity. */
 export interface CxExplorerItem {
@@ -59,7 +55,7 @@ export type CxExplorerFolderChange = { id: string; name: string };
 
 /** A consumer-added menu entry was chosen on a folder or item row. */
 export type CxExplorerMenuAction = {
-  kind: "folder" | "item";
+  kind: 'folder' | 'item';
   id: string;
   actionId: string;
 };
@@ -68,22 +64,23 @@ export type CxExplorerMenuAction = {
  * Built-in row actions own this id space so consumer-added menu entries can
  * never collide with them.
  */
-const RESERVED_MENU_PREFIX = "cx-explorer:";
+const RESERVED_MENU_PREFIX = 'cx-explorer:';
 const MENU_RENAME = `${RESERVED_MENU_PREFIX}rename`;
 const MENU_STYLE = `${RESERVED_MENU_PREFIX}style`;
 const MENU_DELETE = `${RESERVED_MENU_PREFIX}delete`;
 
-const DEFAULT_ITEM_ICON: CxIconName = "document";
+const DEFAULT_ITEM_ICON: CxIconName = 'document';
 const PICKER_ESTIMATED_HEIGHT = 332;
 const FOLDER_CREATE_RENAME_TIMEOUT_MS = 30_000;
-const EXPANDED_FOLDER_STORAGE_PREFIX = "cx-explorer.expanded-folder.";
+const EXPANDED_FOLDER_STORAGE_PREFIX = 'cx-explorer.expanded-folder.';
 const EXPLORER_DEFAULT_WIDTH = 260;
 const EXPLORER_RESIZE_STEP = 8;
 const EXPLORER_RESIZE_LARGE_STEP = 32;
 
 /** The complete library, kept in sync with the generated icon manifest. */
-export const CX_EXPLORER_DEFAULT_ITEM_ICONS: readonly CxIconName[] =
-  cxIcons.map((icon) => icon.name as CxIconName);
+export const CX_EXPLORER_DEFAULT_ITEM_ICONS: readonly CxIconName[] = cxIcons.map(
+  (icon) => icon.name as CxIconName,
+);
 
 type CxExplorerRenameTarget = { id: string };
 
@@ -95,7 +92,7 @@ type CxExplorerRenameTarget = { id: string };
  * nothing — the consumer owns persisted effects.
  */
 @Component({
-  selector: "cx-explorer",
+  selector: 'cx-explorer',
   imports: [
     CdkDrag,
     CdkDragHandle,
@@ -109,60 +106,54 @@ type CxExplorerRenameTarget = { id: string };
     CxPopoverComponent,
     CxTooltipDirective,
   ],
-  templateUrl: "./cx-explorer.component.html",
-  styleUrl: "./cx-explorer.component.scss",
+  templateUrl: './cx-explorer.component.html',
+  styleUrl: './cx-explorer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxExplorerComponent implements OnDestroy {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
-  @ViewChild("explorerSurface", { read: ElementRef })
+  @ViewChild('explorerSurface', { read: ElementRef })
   private readonly explorerSurface?: ElementRef<HTMLElement>;
 
-  @ViewChild("explorerContent", { read: ElementRef })
+  @ViewChild('explorerContent', { read: ElementRef })
   private set explorerContent(contentRef: ElementRef<HTMLElement> | undefined) {
     this.contentResizeObserver?.disconnect();
     this.contentResizeObserver = undefined;
     const content = contentRef?.nativeElement;
     if (!content) {
-      this.host.nativeElement.style.removeProperty(
-        "--cx-explorer-scrollbar-gutter",
-      );
+      this.scrollbarGutter.set(0);
       return;
     }
     const syncGutter = () => {
-      const gutter = Math.max(0, content.offsetWidth - content.clientWidth);
-      this.host.nativeElement.style.setProperty(
-        "--cx-explorer-scrollbar-gutter",
-        `${gutter}px`,
-      );
+      this.scrollbarGutter.set(Math.max(0, content.offsetWidth - content.clientWidth));
     };
     syncGutter();
-    if (typeof ResizeObserver !== "undefined") {
+    if (typeof ResizeObserver !== 'undefined') {
       this.contentResizeObserver = new ResizeObserver(syncGutter);
       this.contentResizeObserver.observe(content);
     }
   }
 
+  protected readonly scrollbarGutter = signal(0);
+
   private readonly rootItemsState = signal<readonly CxExplorerItem[]>([]);
   private readonly foldersState = signal<readonly CxExplorerFolder[]>([]);
   private readonly selectedItemIdState = signal<string | undefined>(undefined);
-  private readonly itemIconsState = signal<readonly CxIconName[]>(
-    CX_EXPLORER_DEFAULT_ITEM_ICONS,
-  );
+  private readonly itemIconsState = signal<readonly CxIconName[]>(CX_EXPLORER_DEFAULT_ITEM_ICONS);
   private readonly folderMenuItemsState = signal<readonly CxMenuItem[]>([]);
   private readonly itemMenuItemsState = signal<readonly CxMenuItem[]>([]);
   private folderCreateBaseline: ReadonlySet<string> | null = null;
   private folderCreateRenameTimer: ReturnType<typeof setTimeout> | undefined;
   private contentResizeObserver?: ResizeObserver;
-  private persistenceStorageKey = "";
+  private persistenceStorageKey = '';
   /** One open folder at most; the untouched default is fully collapsed. */
   private readonly expandedFolderId = signal<string | null>(null);
 
   protected readonly renaming = signal<CxExplorerRenameTarget | null>(null);
   @ViewChild(CxPopoverComponent) private pickerPopover?: CxPopoverComponent;
 
-  protected readonly pickerSearch = signal("");
+  protected readonly pickerSearch = signal('');
   protected readonly pickerItemId = signal<string | null>(null);
   protected readonly resizing = signal(false);
   private readonly resizedWidth = signal<string | null>(null);
@@ -174,10 +165,7 @@ export class CxExplorerComponent implements OnDestroy {
     rtl: boolean;
   };
 
-  protected readonly skeletonRows = Array.from(
-    { length: 7 },
-    (_, index) => `skeleton-${index}`,
-  );
+  protected readonly skeletonRows = Array.from({ length: 7 }, (_, index) => `skeleton-${index}`);
   protected readonly pickerColors = CX_TAG_COLOR_PICKER_OPTIONS;
 
   /** Measure the swatch-led content once, then keep that width while searching. */
@@ -185,7 +173,7 @@ export class CxExplorerComponent implements OnDestroy {
     (rect) => ({
       width: rect.width,
       estimatedHeight: PICKER_ESTIMATED_HEIGHT,
-      align: "end",
+      align: 'end',
       gap: 6,
     }),
     () => this.pickerPopover?.surfaceElement(),
@@ -208,7 +196,7 @@ export class CxExplorerComponent implements OnDestroy {
   /** Persistent, browse-only selections rendered above the folder hierarchy. */
   @Input()
   public set rootItems(value: readonly CxExplorerItem[] | null | undefined) {
-    const rootItems = validateExplorerItems(value ?? [], "rootItems");
+    const rootItems = validateExplorerItems(value ?? [], 'rootItems');
     assertUniqueExplorerItemIds(rootItems, this.foldersState());
     this.rootItemsState.set(rootItems);
   }
@@ -225,7 +213,7 @@ export class CxExplorerComponent implements OnDestroy {
   @Input({ transform: booleanAttribute }) editable = true;
 
   /** Accessible name of the rail region. Name it after the content it manages. */
-  @Input() ariaLabel = "Explorer";
+  @Input() ariaLabel = 'Explorer';
 
   /** Optional width / minimum-width overrides as CSS lengths. */
   @Input()
@@ -246,10 +234,10 @@ export class CxExplorerComponent implements OnDestroy {
   @Input({ transform: booleanAttribute }) searchable = false;
 
   /** Current search query. The consumer filters its owned content. */
-  @Input() searchValue = "";
+  @Input() searchValue = '';
 
   /** Accessible name of the built-in search field. */
-  @Input() searchAriaLabel = "Search";
+  @Input() searchAriaLabel = 'Search';
 
   /**
    * Stable local key used to remember the last open folder in this browser.
@@ -257,7 +245,7 @@ export class CxExplorerComponent implements OnDestroy {
    */
   @Input()
   public set persistenceKey(value: string | null | undefined) {
-    const key = value?.trim() ?? "";
+    const key = value?.trim() ?? '';
     if (key === this.persistenceStorageKey) return;
     this.persistenceStorageKey = key;
     this.expandedFolderId.set(readExpandedFolderId(key));
@@ -265,35 +253,27 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   /** Label for the per-folder create action; also its tooltip. */
-  @Input() createItemText = "New page";
+  @Input() createItemText = 'New page';
 
   @Input()
   public set itemIcons(value: readonly CxIconName[] | null | undefined) {
     if (value !== null && value !== undefined && !Array.isArray(value)) {
-      throw new Error(
-        "[cx-explorer] itemIcons must be an array of icon names.",
-      );
+      throw new Error('[cx-explorer] itemIcons must be an array of icon names.');
     }
     const icons: readonly CxIconName[] = value ?? [];
-    this.itemIconsState.set(
-      icons.length > 0 ? [...icons] : CX_EXPLORER_DEFAULT_ITEM_ICONS,
-    );
+    this.itemIconsState.set(icons.length > 0 ? [...icons] : CX_EXPLORER_DEFAULT_ITEM_ICONS);
   }
 
   /** Extra folder menu entries, between Rename and Delete. Reported via `menuAction`. */
   @Input()
   public set folderMenuItems(value: readonly CxMenuItem[] | null | undefined) {
-    this.folderMenuItemsState.set(
-      validateExplorerMenuItems(value ?? [], "folderMenuItems"),
-    );
+    this.folderMenuItemsState.set(validateExplorerMenuItems(value ?? [], 'folderMenuItems'));
   }
 
   /** Extra item menu entries, between Icon & color and Delete. Reported via `menuAction`. */
   @Input()
   public set itemMenuItems(value: readonly CxMenuItem[] | null | undefined) {
-    this.itemMenuItemsState.set(
-      validateExplorerMenuItems(value ?? [], "itemMenuItems"),
-    );
+    this.itemMenuItemsState.set(validateExplorerMenuItems(value ?? [], 'itemMenuItems'));
   }
 
   @Output() readonly selectedItemIdChange = new EventEmitter<string>();
@@ -323,18 +303,15 @@ export class CxExplorerComponent implements OnDestroy {
       .toLowerCase()
       .split(/[\s-]+/)
       .filter(Boolean);
-    return this.itemIconsState().filter((icon) =>
-      terms.every((term) => icon.includes(term)),
-    );
+    return this.itemIconsState().filter((icon) => terms.every((term) => icon.includes(term)));
   });
 
-  @HostBinding("style.--cx-explorer-width") get widthVar(): string | null {
-    return this.resizedWidth() ?? this.width;
+  protected get resolvedWidth(): string {
+    return this.resizedWidth() ?? this.width ?? '260px';
   }
 
-  @HostBinding("style.--cx-explorer-min-width") get minWidthVar():
-    string | null {
-    return this.minWidth;
+  protected get resolvedMinWidth(): string {
+    return `min(max(200px, ${this.minWidth ?? '0px'}), 100%)`;
   }
 
   /** The item the icon & color editor is open for; closes when the item disappears. */
@@ -357,13 +334,12 @@ export class CxExplorerComponent implements OnDestroy {
 
   protected get resolvedResizeAriaLabel(): string {
     const label = this.ariaLabel.trim();
-    return label ? `Resize ${label}` : "Resize explorer";
+    return label ? `Resize ${label}` : 'Resize explorer';
   }
 
   protected get renderedWidthPx(): number {
     return Math.round(
-      this.explorerSurface?.nativeElement.getBoundingClientRect().width ??
-        EXPLORER_DEFAULT_WIDTH,
+      this.explorerSurface?.nativeElement.getBoundingClientRect().width ?? EXPLORER_DEFAULT_WIDTH,
     );
   }
 
@@ -380,12 +356,12 @@ export class CxExplorerComponent implements OnDestroy {
       handle,
       startX: event.clientX,
       startWidth: surface.getBoundingClientRect().width,
-      rtl: window.getComputedStyle(surface).direction === "rtl",
+      rtl: window.getComputedStyle(surface).direction === 'rtl',
     };
     this.resizing.set(true);
     handle.setPointerCapture(event.pointerId);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
   }
 
   protected onResizePointerMove(event: PointerEvent): void {
@@ -422,13 +398,11 @@ export class CxExplorerComponent implements OnDestroy {
     if (!surface || !this.resizable) {
       return;
     }
-    const rtl = window.getComputedStyle(surface).direction === "rtl";
-    const step = event.shiftKey
-      ? EXPLORER_RESIZE_LARGE_STEP
-      : EXPLORER_RESIZE_STEP;
+    const rtl = window.getComputedStyle(surface).direction === 'rtl';
+    const step = event.shiftKey ? EXPLORER_RESIZE_LARGE_STEP : EXPLORER_RESIZE_STEP;
     const current = surface.getBoundingClientRect().width;
-    const outwardKey = rtl ? "ArrowLeft" : "ArrowRight";
-    const inwardKey = rtl ? "ArrowRight" : "ArrowLeft";
+    const outwardKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const inwardKey = rtl ? 'ArrowRight' : 'ArrowLeft';
     let next: number;
 
     switch (event.key) {
@@ -438,10 +412,10 @@ export class CxExplorerComponent implements OnDestroy {
       case inwardKey:
         next = current - step;
         break;
-      case "Home":
+      case 'Home':
         next = 0;
         break;
-      case "End":
+      case 'End':
         next = Number.MAX_SAFE_INTEGER;
         break;
       default:
@@ -449,9 +423,7 @@ export class CxExplorerComponent implements OnDestroy {
     }
 
     event.preventDefault();
-    this.resizedWidth.set(
-      `${Math.min(Math.max(Math.round(next), 0), 100000)}px`,
-    );
+    this.resizedWidth.set(`${Math.min(Math.max(Math.round(next), 0), 100000)}px`);
     this.emitRenderedWidthAfterLayout();
   }
 
@@ -477,8 +449,8 @@ export class CxExplorerComponent implements OnDestroy {
       session.handle.releasePointerCapture(session.pointerId);
     }
     this.resizing.set(false);
-    document.body.style.removeProperty("cursor");
-    document.body.style.removeProperty("user-select");
+    document.body.style.removeProperty('cursor');
+    document.body.style.removeProperty('user-select');
   }
 
   private emitRenderedWidthAfterLayout(): void {
@@ -502,26 +474,19 @@ export class CxExplorerComponent implements OnDestroy {
     this.setExpandedFolder(this.isFolderExpanded(folder) ? null : folder.id);
   }
 
-  protected onFolderDrop(
-    event: CdkDragDrop<readonly CxExplorerFolder[]>,
-  ): void {
+  protected onFolderDrop(event: CdkDragDrop<readonly CxExplorerFolder[]>): void {
     if (!this.editable || event.previousIndex === event.currentIndex) return;
     const ids = this.foldersState().map((folder) => folder.id);
     moveItemInArray(ids, event.previousIndex, event.currentIndex);
     this.folderOrderChange.emit(ids);
   }
 
-  protected onFolderMoveByKeyboard(
-    event: Event,
-    folder: CxExplorerFolder,
-    offset: -1 | 1,
-  ): void {
+  protected onFolderMoveByKeyboard(event: Event, folder: CxExplorerFolder, offset: -1 | 1): void {
     if (!this.editable) return;
     const ids = this.foldersState().map((entry) => entry.id);
     const previousIndex = ids.indexOf(folder.id);
     const currentIndex = previousIndex + offset;
-    if (previousIndex < 0 || currentIndex < 0 || currentIndex >= ids.length)
-      return;
+    if (previousIndex < 0 || currentIndex < 0 || currentIndex >= ids.length) return;
     event.preventDefault();
     event.stopPropagation();
     moveItemInArray(ids, previousIndex, currentIndex);
@@ -539,9 +504,7 @@ export class CxExplorerComponent implements OnDestroy {
 
   protected onFolderCreate(): void {
     this.clearFolderCreateRequest();
-    this.folderCreateBaseline = new Set(
-      this.foldersState().map((folder) => folder.id),
-    );
+    this.folderCreateBaseline = new Set(this.foldersState().map((folder) => folder.id));
     this.folderCreateRenameTimer = setTimeout(
       () => this.clearFolderCreateRequest(),
       FOLDER_CREATE_RENAME_TIMEOUT_MS,
@@ -568,12 +531,12 @@ export class CxExplorerComponent implements OnDestroy {
   protected folderMenu(): readonly CxMenuItem[] {
     if (!this.editable) return this.folderMenuItemsState();
     return [
-      { id: MENU_RENAME, label: "Rename", prependIcon: "edit" },
+      { id: MENU_RENAME, label: 'Rename', prependIcon: 'edit' },
       ...this.folderMenuItemsState(),
       {
         id: MENU_DELETE,
-        label: "Delete",
-        prependIcon: "delete",
+        label: 'Delete',
+        prependIcon: 'delete',
         danger: true,
         dividerBefore: true,
       },
@@ -583,12 +546,12 @@ export class CxExplorerComponent implements OnDestroy {
   protected itemMenu(): readonly CxMenuItem[] {
     if (!this.editable) return this.itemMenuItemsState();
     return [
-      { id: MENU_STYLE, label: "Icon & color", prependIcon: "squares-rotated" },
+      { id: MENU_STYLE, label: 'Icon & color', prependIcon: 'squares-rotated' },
       ...this.itemMenuItemsState(),
       {
         id: MENU_DELETE,
-        label: "Delete",
-        prependIcon: "delete",
+        label: 'Delete',
+        prependIcon: 'delete',
         danger: true,
         dividerBefore: true,
       },
@@ -603,10 +566,7 @@ export class CxExplorerComponent implements OnDestroy {
     return this.itemMenu().length > 0;
   }
 
-  protected onFolderMenuSelect(
-    folder: CxExplorerFolder,
-    actionId: string,
-  ): void {
+  protected onFolderMenuSelect(folder: CxExplorerFolder, actionId: string): void {
     if (actionId === MENU_RENAME) {
       this.beginRename(folder.id);
       return;
@@ -615,14 +575,10 @@ export class CxExplorerComponent implements OnDestroy {
       this.folderDelete.emit(folder.id);
       return;
     }
-    this.menuAction.emit({ kind: "folder", id: folder.id, actionId });
+    this.menuAction.emit({ kind: 'folder', id: folder.id, actionId });
   }
 
-  protected onItemMenuSelect(
-    item: CxExplorerItem,
-    actionId: string,
-    row: HTMLElement,
-  ): void {
+  protected onItemMenuSelect(item: CxExplorerItem, actionId: string, row: HTMLElement): void {
     if (actionId === MENU_STYLE) {
       this.openPicker(item, row);
       return;
@@ -631,7 +587,7 @@ export class CxExplorerComponent implements OnDestroy {
       this.itemDelete.emit(item.id);
       return;
     }
-    this.menuAction.emit({ kind: "item", id: item.id, actionId });
+    this.menuAction.emit({ kind: 'item', id: item.id, actionId });
   }
 
   protected isRenaming(id: string): boolean {
@@ -647,17 +603,14 @@ export class CxExplorerComponent implements OnDestroy {
     // replaces the current name.
     afterRenderFrame(() => {
       const input = this.host.nativeElement.querySelector<HTMLInputElement>(
-        ".cx-explorer__rename-input",
+        '.cx-explorer__rename-input',
       );
       input?.focus();
       input?.select();
     });
   }
 
-  protected commitRename(
-    event: Event,
-    current: { id: string; name: string },
-  ): void {
+  protected commitRename(event: Event, current: { id: string; name: string }): void {
     if (!this.isRenaming(current.id)) return;
     this.renaming.set(null);
     const name = (event.target as HTMLInputElement).value.trim();
@@ -687,7 +640,7 @@ export class CxExplorerComponent implements OnDestroy {
   protected openPicker(item: CxExplorerItem, row: HTMLElement): void {
     this.renaming.set(null);
     this.pickerOverlay.endSession();
-    this.pickerSearch.set("");
+    this.pickerSearch.set('');
     this.pickerItemId.set(item.id);
     this.pickerOverlay.sync(row);
     // Focus follows into the editor so the keyboard path continues where the
@@ -702,17 +655,11 @@ export class CxExplorerComponent implements OnDestroy {
     this.pickerOverlay.endSession();
   }
 
-  protected isPickerIconSelected(
-    item: CxExplorerItem,
-    icon: CxIconName,
-  ): boolean {
+  protected isPickerIconSelected(item: CxExplorerItem, icon: CxIconName): boolean {
     return this.itemIcon(item) === icon;
   }
 
-  protected onPickerColor(
-    item: CxExplorerItem,
-    color: CxTagColor | undefined,
-  ): void {
+  protected onPickerColor(item: CxExplorerItem, color: CxTagColor | undefined): void {
     if ((item.color ?? undefined) === color) return;
     this.itemChange.emit({ ...item, color });
   }
@@ -724,10 +671,7 @@ export class CxExplorerComponent implements OnDestroy {
   }
 
   private focusPickerSearch(): void {
-    this.pickerPopover
-      ?.surfaceElement()
-      ?.querySelector<HTMLInputElement>("input")
-      ?.focus();
+    this.pickerPopover?.surfaceElement()?.querySelector<HTMLInputElement>('input')?.focus();
   }
 
   protected onPickerIcon(item: CxExplorerItem, icon: CxIconName): void {
@@ -758,11 +702,7 @@ export class CxExplorerComponent implements OnDestroy {
   private reconcileExpandedFolder(): void {
     const expanded = this.expandedFolderId();
     const folders = this.foldersState();
-    if (
-      !expanded ||
-      folders.length === 0 ||
-      folders.some((folder) => folder.id === expanded)
-    )
+    if (!expanded || folders.length === 0 || folders.some((folder) => folder.id === expanded))
       return;
     this.setExpandedFolder(null);
   }
@@ -771,7 +711,7 @@ export class CxExplorerComponent implements OnDestroy {
 // Post-render work (focusing an element an @if just created) has to wait for
 // the frame; environments without rAF fall back to a microtask.
 function afterRenderFrame(work: () => void): void {
-  if (typeof requestAnimationFrame === "undefined") {
+  if (typeof requestAnimationFrame === 'undefined') {
     queueMicrotask(work);
     return;
   }
@@ -779,7 +719,7 @@ function afterRenderFrame(work: () => void): void {
 }
 
 function readExpandedFolderId(key: string): string | null {
-  if (!key || typeof localStorage === "undefined") return null;
+  if (!key || typeof localStorage === 'undefined') return null;
   try {
     return localStorage.getItem(`${EXPANDED_FOLDER_STORAGE_PREFIX}${key}`);
   } catch {
@@ -788,7 +728,7 @@ function readExpandedFolderId(key: string): string | null {
 }
 
 function writeExpandedFolderId(key: string, id: string | null): void {
-  if (!key || typeof localStorage === "undefined") return;
+  if (!key || typeof localStorage === 'undefined') return;
   try {
     const storageKey = `${EXPANDED_FOLDER_STORAGE_PREFIX}${key}`;
     if (id) {
@@ -801,17 +741,15 @@ function writeExpandedFolderId(key: string, id: string | null): void {
   }
 }
 
-function validateExplorerFolders(
-  value: readonly CxExplorerFolder[],
-): readonly CxExplorerFolder[] {
+function validateExplorerFolders(value: readonly CxExplorerFolder[]): readonly CxExplorerFolder[] {
   if (!Array.isArray(value)) {
-    throw new Error("[cx-explorer] folders must be an array.");
+    throw new Error('[cx-explorer] folders must be an array.');
   }
   const folderIds = new Set<string>();
   const itemIds = new Set<string>();
   return value.map((folder, index) => {
     const path = `folders[${index}]`;
-    const id = typeof folder?.id === "string" ? folder.id.trim() : "";
+    const id = typeof folder?.id === 'string' ? folder.id.trim() : '';
     if (!id) {
       throw new Error(`[cx-explorer] ${path} requires a non-empty id.`);
     }
@@ -819,31 +757,27 @@ function validateExplorerFolders(
       throw new Error(`[cx-explorer] folder id "${id}" must be unique.`);
     }
     folderIds.add(id);
-    if (typeof folder.name !== "string") {
+    if (typeof folder.name !== 'string') {
       throw new Error(`[cx-explorer] ${path}.name must be a string.`);
     }
     if (!Array.isArray(folder.items)) {
       throw new Error(`[cx-explorer] ${path}.items must be an array.`);
     }
-    const items = folder.items.map(
-      (item: CxExplorerItem, itemIndex: number) => {
-        const itemPath = `${path}.items[${itemIndex}]`;
-        const itemId = typeof item?.id === "string" ? item.id.trim() : "";
-        if (!itemId) {
-          throw new Error(`[cx-explorer] ${itemPath} requires a non-empty id.`);
-        }
-        if (itemIds.has(itemId)) {
-          throw new Error(
-            `[cx-explorer] item id "${itemId}" must be unique across folders.`,
-          );
-        }
-        itemIds.add(itemId);
-        if (typeof item.name !== "string") {
-          throw new Error(`[cx-explorer] ${itemPath}.name must be a string.`);
-        }
-        return { ...item, id: itemId };
-      },
-    );
+    const items = folder.items.map((item: CxExplorerItem, itemIndex: number) => {
+      const itemPath = `${path}.items[${itemIndex}]`;
+      const itemId = typeof item?.id === 'string' ? item.id.trim() : '';
+      if (!itemId) {
+        throw new Error(`[cx-explorer] ${itemPath} requires a non-empty id.`);
+      }
+      if (itemIds.has(itemId)) {
+        throw new Error(`[cx-explorer] item id "${itemId}" must be unique across folders.`);
+      }
+      itemIds.add(itemId);
+      if (typeof item.name !== 'string') {
+        throw new Error(`[cx-explorer] ${itemPath}.name must be a string.`);
+      }
+      return { ...item, id: itemId };
+    });
     return { ...folder, id, items };
   });
 }
@@ -858,17 +792,15 @@ function validateExplorerItems(
   const itemIds = new Set<string>();
   return value.map((item, index) => {
     const path = `${inputName}[${index}]`;
-    const id = typeof item?.id === "string" ? item.id.trim() : "";
+    const id = typeof item?.id === 'string' ? item.id.trim() : '';
     if (!id) {
       throw new Error(`[cx-explorer] ${path} requires a non-empty id.`);
     }
     if (itemIds.has(id)) {
-      throw new Error(
-        `[cx-explorer] item id "${id}" must be unique within ${inputName}.`,
-      );
+      throw new Error(`[cx-explorer] item id "${id}" must be unique within ${inputName}.`);
     }
     itemIds.add(id);
-    if (typeof item.name !== "string") {
+    if (typeof item.name !== 'string') {
       throw new Error(`[cx-explorer] ${path}.name must be a string.`);
     }
     return { ...item, id };

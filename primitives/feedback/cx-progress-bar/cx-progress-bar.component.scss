@@ -63,7 +63,6 @@
 .cx-progress-bar__fill {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(var(--cx-progress-ratio, 0) * 100%);
   min-width: 0;
   border-radius: inherit;
   corner-shape: inherit;
@@ -76,7 +75,8 @@
 .cx-progress-bar--indeterminate .cx-progress-bar__fill {
   width: 36%;
   min-width: 72px;
-  animation: cx-progress-bar-indeterminate 1.35s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  animation: cx-progress-bar-indeterminate 1.35s cubic-bezier(0.65, 0, 0.35, 1)
+    infinite;
 }
 
 .cx-progress-bar__hint {
@@ -84,6 +84,7 @@
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body-relaxed);
+  text-align: start;
 }
 
 @media (prefers-reduced-motion: reduce) {

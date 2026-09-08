@@ -1,6 +1,6 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "Portable product framework for Angular UI, AI working rules, and Node web runtime.",
   "type": "module",
   "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
@@ -11,7 +11,8 @@
     "cx-development-favicon": "./scripts/cx-development-favicon.mjs",
     "cx-framework-skills": "./scripts/install-ai-skills.mjs",
     "cx-platform-check": "./scripts/check-product.mjs",
-    "cx-server-artifact": "./scripts/cx-server-artifact.mjs"
+    "cx-server-artifact": "./scripts/cx-server-artifact.mjs",
+    "cx-style-token-check": "./scripts/cx-style-token-check.mjs"
   },
   "main": "./dist/lib/public-api.js",
   "module": "./dist/lib/public-api.js",
@@ -309,6 +310,7 @@
     "support/",
     "tokens/",
     "scripts/check-product.mjs",
+    "scripts/cx-style-token-check.mjs",
     "scripts/cx-development-favicon.mjs",
     "scripts/cx-server-artifact.mjs",
     "scripts/install-ai-skills.mjs",

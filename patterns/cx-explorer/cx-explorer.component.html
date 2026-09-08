@@ -1,6 +1,8 @@
 <aside
   #explorerSurface
   class="cx-explorer"
+  [style.width]="resolvedWidth"
+  [style.min-width]="resolvedMinWidth"
   [class.cx-explorer--resizable]="resizable"
   [attr.aria-label]="ariaLabel"
 >
@@ -31,6 +33,7 @@
   @if (searchable) {
     <cx-search-field
       class="cx-explorer__search"
+      [style.padding-inline-end.px]="scrollbarGutter()"
       label=""
       [ariaLabel]="searchAriaLabel"
       [clearable]="true"
@@ -50,10 +53,7 @@
       @if (rootItems$().length > 0) {
         <ul class="cx-explorer__root-items">
           @for (item of rootItems$(); track item.id) {
-            <li
-              class="cx-explorer__row cx-explorer__row--root"
-              [style.--cx-explorer-accent]="itemAccent(item)"
-            >
+            <li class="cx-explorer__row cx-explorer__row--root">
               <button
                 class="cx-explorer__row-main"
                 type="button"
@@ -63,14 +63,14 @@
               >
                 <span
                   class="cx-explorer__row-icon cx-explorer__row-icon--accent"
+                  [style.color]="itemAccent(item)"
                   aria-hidden="true"
                 >
                   <cx-icon [icon]="itemIcon(item)" [size]="16" />
                 </span>
-                <span
-                  class="cx-explorer__row-label cx-explorer__row-label--root"
-                  >{{ item.name }}</span
-                >
+                <span class="cx-explorer__row-label cx-explorer__row-label--root">{{
+                  item.name
+                }}</span>
               </button>
             </li>
           }
@@ -92,10 +92,7 @@
               [cdkDragData]="folder"
               [cdkDragDisabled]="!editable || isRenaming(folder.id)"
             >
-              <div
-                class="cx-explorer__row cx-explorer__row--folder"
-                cdkDragHandle
-              >
+              <div class="cx-explorer__row cx-explorer__row--folder" cdkDragHandle>
                 @if (isRenaming(folder.id)) {
                   <span class="cx-explorer__row-icon" aria-hidden="true">
                     <cx-icon icon="folder" [size]="16" />
@@ -117,25 +114,18 @@
                     aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
                     (click)="toggleFolder(folder)"
                     (dblclick)="editable && beginRename(folder.id)"
-                    (keydown.alt.arrowup)="
-                      onFolderMoveByKeyboard($event, folder, -1)
-                    "
-                    (keydown.alt.arrowdown)="
-                      onFolderMoveByKeyboard($event, folder, 1)
-                    "
+                    (keydown.alt.arrowup)="onFolderMoveByKeyboard($event, folder, -1)"
+                    (keydown.alt.arrowdown)="onFolderMoveByKeyboard($event, folder, 1)"
                   >
                     <span class="cx-explorer__row-icon" aria-hidden="true">
                       <cx-icon icon="folder" [size]="16" />
                     </span>
-                    <span
-                      class="cx-explorer__row-label cx-explorer__row-label--folder"
-                      >{{ folder.name }}</span
-                    >
+                    <span class="cx-explorer__row-label cx-explorer__row-label--folder">{{
+                      folder.name
+                    }}</span>
                     <cx-icon
                       class="cx-explorer__chevron"
-                      [icon]="
-                        isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'
-                      "
+                      [icon]="isFolderExpanded(folder) ? 'chevron-up' : 'chevron-down'"
                       [size]="16"
                     />
                   </button>
@@ -175,37 +165,26 @@
               @if (folder.items.length > 0) {
                 <div
                   class="cx-explorer__items"
-                  [class.cx-explorer__items--expanded]="
-                    isFolderExpanded(folder)
-                  "
+                  [class.cx-explorer__items--expanded]="isFolderExpanded(folder)"
                 >
                   <ul class="cx-explorer__items-inner">
                     @for (item of folder.items; track item.id) {
-                      <li
-                        class="cx-explorer__row cx-explorer__row--item"
-                        #itemRow
-                        [style.--cx-explorer-accent]="itemAccent(item)"
-                      >
+                      <li class="cx-explorer__row cx-explorer__row--item" #itemRow>
                         <button
                           class="cx-explorer__row-main"
                           type="button"
-                          [class.cx-explorer__row-main--selected]="
-                            isSelected(item)
-                          "
-                          [attr.aria-current]="
-                            isSelected(item) ? 'true' : null
-                          "
+                          [class.cx-explorer__row-main--selected]="isSelected(item)"
+                          [attr.aria-current]="isSelected(item) ? 'true' : null"
                           (click)="onItemPressed(item)"
                         >
                           <span
                             class="cx-explorer__row-icon cx-explorer__row-icon--accent"
+                            [style.color]="itemAccent(item)"
                             aria-hidden="true"
                           >
                             <cx-icon [icon]="itemIcon(item)" [size]="16" />
                           </span>
-                          <span class="cx-explorer__row-label">{{
-                            item.name
-                          }}</span>
+                          <span class="cx-explorer__row-label">{{ item.name }}</span>
                         </button>
                         <div class="cx-explorer__row-actions">
                           @if (hasItemMenu()) {
@@ -213,9 +192,7 @@
                               [presentation]="{ kind: 'trigger' }"
                               [items]="itemMenu()"
                               ariaLabel="Page actions"
-                              (itemSelect)="
-                                onItemMenuSelect(item, $event, itemRow)
-                              "
+                              (itemSelect)="onItemMenuSelect(item, $event, itemRow)"
                             >
                               <cx-icon-button
                                 cxMenuTrigger
@@ -274,16 +251,9 @@
       [disabled]="!item.icon && !item.color"
       (pressed)="onPickerReset(item)"
     />
-    <div
-      class="cx-explorer__picker"
-      [style.--cx-explorer-accent]="itemAccent(item)"
-    >
+    <div class="cx-explorer__picker">
       <div class="cx-explorer__picker-group">
-        <div
-          class="cx-explorer__picker-swatches"
-          role="group"
-          aria-label="Color"
-        >
+        <div class="cx-explorer__picker-swatches" role="group" aria-label="Color">
           <button
             class="cx-explorer__swatch cx-explorer__swatch--none"
             type="button"
@@ -295,7 +265,9 @@
             <button
               class="cx-explorer__swatch"
               type="button"
-              [style.--cx-explorer-swatch]="swatchAccent(color)"
+              [style.background]="
+                'color-mix(in srgb, ' + swatchAccent(color) + ' 80%, var(--surface))'
+              "
               [attr.aria-label]="color"
               [attr.aria-pressed]="item.color === color"
               (click)="onPickerColor(item, color)"
@@ -319,14 +291,13 @@
               type="button"
               [attr.aria-label]="icon"
               [attr.aria-pressed]="isPickerIconSelected(item, icon)"
+              [style.color]="isPickerIconSelected(item, icon) ? itemAccent(item) : null"
               (click)="onPickerIcon(item, icon)"
             >
               <cx-icon [icon]="icon" [size]="16" />
             </button>
           } @empty {
-            <p class="cx-explorer__picker-empty" role="status">
-              No icons found
-            </p>
+            <p class="cx-explorer__picker-empty" role="status">No icons found</p>
           }
         </div>
       </div>

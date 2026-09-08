@@ -128,11 +128,12 @@
 }
 
 .cx-calendar__day--outside {
-  color: var(--opacity-mid);
+  color: var(--opacity-high);
 }
 
 .cx-calendar__day--today:not(:disabled) {
-  border-color: var(--opacity-mid);
+  border-color: var(--ink);
+  opacity: var(--opacity-disabled);
 }
 
 .cx-calendar__day--selected {
@@ -147,11 +148,19 @@
 
 .cx-calendar__day--range {
   border-radius: 0;
-  background: color-mix(in srgb, var(--choice-control-selected) 22%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--choice-control-selected) 22%,
+    transparent
+  );
 }
 
 .cx-calendar__day--range:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--choice-control-selected) 38%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--choice-control-selected) 38%,
+    transparent
+  );
 }
 
 .cx-calendar__day--range-start,
@@ -178,8 +187,9 @@
 }
 
 .cx-calendar__day:disabled {
-  color: var(--opacity-mid);
-  -webkit-text-fill-color: var(--opacity-mid);
+  color: var(--ink);
+  -webkit-text-fill-color: var(--ink);
+  opacity: var(--opacity-disabled);
 }
 
 .cx-calendar--disabled,

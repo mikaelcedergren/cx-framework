@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: block;
@@ -10,14 +10,26 @@
 }
 
 .cx-text-field--small {
-  --cx-text-field-font-size: var(--font-size-body-sm);
+  .cx-text-field__affix {
+    font-size: var(--font-size-body-sm);
+  }
+
+  .cx-text-field__field {
+    font-size: var(--font-size-body-sm);
+  }
 }
 
 .cx-text-field--large {
-  --cx-text-field-font-size: var(--font-size-body-lg);
+  .cx-text-field__affix {
+    font-size: var(--font-size-body-lg);
+  }
+
+  .cx-text-field__field {
+    font-size: var(--font-size-body-lg);
+  }
 }
 
-@include field.field-header('cx-text-field');
+@include field.field-header("cx-text-field");
 
 .cx-text-field__field-shell {
   box-sizing: border-box;
@@ -32,8 +44,11 @@
   background: transparent;
 }
 
-@include field.field-shell-state('.cx-text-field__field-shell', '.cx-text-field__field');
-@include field.field-shell-interaction('.cx-text-field__field-shell');
+@include field.field-shell-state(
+  ".cx-text-field__field-shell",
+  ".cx-text-field__field"
+);
+@include field.field-shell-interaction(".cx-text-field__field-shell");
 
 .cx-text-field--small .cx-text-field__field-shell {
   min-height: var(--controller-size-small);
@@ -95,7 +110,7 @@
   flex: 0 0 auto;
   align-items: center;
   color: var(--opacity-high);
-  font-size: var(--cx-text-field-font-size, var(--font-size-body));
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-control);
   white-space: nowrap;
@@ -111,7 +126,7 @@
   background: transparent;
   color: var(--ink);
   font-family: inherit;
-  font-size: var(--cx-text-field-font-size, var(--font-size-body));
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-control);
 }
@@ -124,6 +139,9 @@
   outline: 0;
 }
 
-@include field.field-shell-inline-edit('.cx-text-field__field-shell', '.cx-text-field__field');
+@include field.field-shell-inline-edit(
+  ".cx-text-field__field-shell",
+  ".cx-text-field__field"
+);
 
-@include field.field-messages('cx-text-field');
+@include field.field-messages("cx-text-field");

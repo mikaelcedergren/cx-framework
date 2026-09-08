@@ -5,25 +5,20 @@
 }
 
 .cx-labeled-row {
-  --cx-labeled-row-label-width: 160px;
+  grid-template-columns: 160px minmax(0, 1fr);
 
   display: grid;
   width: 100%;
-  grid-template-columns: var(--cx-labeled-row-label-width) minmax(0, 1fr);
   column-gap: var(--space-sm);
   align-items: baseline;
 }
 
 .cx-labeled-row--small {
-  --cx-labeled-row-label-width: 120px;
+  grid-template-columns: 120px minmax(0, 1fr);
 }
 
 .cx-labeled-row--large {
-  --cx-labeled-row-label-width: 200px;
-}
-
-.cx-labeled-row--no-label {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 200px minmax(0, 1fr);
 }
 
 // A direct parent cx-labeled-row-group owns the label column. The host and the
@@ -38,13 +33,10 @@
 
 :host(.cx-labeled-row--grouped) .cx-labeled-row {
   grid-column: 1 / -1;
-}
-
-:host(.cx-labeled-row--grouped) .cx-labeled-row:not(.cx-labeled-row--no-label) {
   grid-template-columns: subgrid;
   // A subgrid's own gap wins over the parent grid's within its tracks, so the
-  // group's gutter is restated here through the property the group defines.
-  column-gap: var(--cx-labeled-row-group-column-gap, var(--space-sm));
+  // group and row use the same global spacing role.
+  column-gap: var(--space-md);
   row-gap: var(--space-2xs);
 }
 
@@ -74,19 +66,11 @@
 }
 
 .cx-labeled-row__info-trigger {
-  --cx-icon-button-transparent-color: var(--opacity-high);
-  --cx-icon-button-transparent-hover-background: var(--opacity-low);
-
   display: inline-flex;
   flex: 0 0 auto;
 }
 
 .cx-labeled-row__info-content {
-  --font-size-body: var(--font-size-body-sm);
-  --font-size-title-1: var(--font-size-body);
-  --font-size-title-2: var(--font-size-body);
-  --font-size-title-3: var(--font-size-body-sm);
-
   box-sizing: border-box;
   width: min(280px, calc(100vw - (var(--space-md) * 2)));
   max-width: 100%;
@@ -106,6 +90,9 @@
 }
 
 .cx-labeled-row__content {
+  // Keep content in the final track even when the label is absent. The same
+  // placement follows the row or group when its narrow layout has one track.
+  grid-column: -2 / -1;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -156,21 +143,21 @@
 // plus ~140px of value space. Narrow surfaces such as the detail panel keep
 // the horizontal layout down to their minimum width.
 @container (max-width: 300px) {
-  .cx-labeled-row:not(.cx-labeled-row--no-label, .cx-labeled-row--small, .cx-labeled-row--large) {
+  .cx-labeled-row:not(.cx-labeled-row--small, .cx-labeled-row--large) {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-2xs);
   }
 }
 
 @container (max-width: 260px) {
-  .cx-labeled-row--small:not(.cx-labeled-row--no-label) {
+  .cx-labeled-row--small {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-2xs);
   }
 }
 
 @container (max-width: 340px) {
-  .cx-labeled-row--large:not(.cx-labeled-row--no-label) {
+  .cx-labeled-row--large {
     grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-2xs);
   }

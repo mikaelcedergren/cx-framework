@@ -1,19 +1,12 @@
 :host {
   display: inline-block;
-  width: var(--cx-image-width, auto);
-  height: var(--cx-image-height, auto);
-  max-width: var(--cx-image-max-width, none);
-  max-height: var(--cx-image-max-height, none);
   overflow: hidden;
-  border-radius: var(--cx-image-border-radius, var(--radius-lg));
-  corner-shape: var(--cx-image-corner-shape, var(--corner-shape, round));
 }
 
 .cx-image {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: var(--cx-image-object-fit, cover);
 }
 
 :host(.cx-image-host--clickable) .cx-image {

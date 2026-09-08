@@ -7,6 +7,12 @@ description: Use automatically to implement approved, scoped work after clear ac
 
 Use this skill as the finished-product engineering lens. Execute the approved scope autonomously through implementation, verification, and cleanup without broadening the outcome.
 
+## Required styling contract
+
+[MUST] Before writing or changing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This is required for every styling task, including wrappers, pages, and runtime styling.
+
+[MUST] Before handing off styling work, check the changed styles against those rules and run the consuming product's token check. For CSS-based products, run the token check from the consuming product's documented verification commands; surface missing enforcement rather than claiming compliance. Verify purpose, close alternatives, and explicit user approval separately; an automated pass does not establish them.
+
 ## Operating mode
 
 - Start only after clear action language such as `implement`, `do it`, `apply it`, `fix it`, `build it`, or `go ahead`.

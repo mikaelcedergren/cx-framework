@@ -1,8 +1,8 @@
-import path from 'node:path';
-import os from 'node:os';
-import { createHash, randomUUID } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import path from "node:path";
+import os from "node:os";
+import { createHash, randomUUID } from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import {
   access,
   cp,
@@ -15,41 +15,48 @@ import {
   rm,
   symlink,
   writeFile,
-} from 'node:fs/promises';
-import { spawn } from 'node:child_process';
-import * as sass from 'sass';
-import { assertComponentAuthorityCurrent } from './generate-component-authority.mjs';
+} from "node:fs/promises";
+import { spawn } from "node:child_process";
+import * as sass from "sass";
+import { compileGlobalTokens } from "./compile-global-tokens.mjs";
+import { assertComponentAuthorityCurrent } from "./generate-component-authority.mjs";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const frameworkRoot = path.resolve(scriptDir, '..');
-const distRoot = path.join(frameworkRoot, 'dist');
+const frameworkRoot = path.resolve(scriptDir, "..");
+const distRoot = path.join(frameworkRoot, "dist");
 const ngcPath = path.join(
   frameworkRoot,
-  'node_modules',
-  '@angular',
-  'compiler-cli',
-  'bundles',
-  'src',
-  'bin',
-  'ngc.js',
+  "node_modules",
+  "@angular",
+  "compiler-cli",
+  "bundles",
+  "src",
+  "bin",
+  "ngc.js",
 );
-const tscPath = path.join(frameworkRoot, 'node_modules', 'typescript', 'bin', 'tsc');
+const tscPath = path.join(
+  frameworkRoot,
+  "node_modules",
+  "typescript",
+  "bin",
+  "tsc",
+);
 const publicationLockRoot = path.join(
   os.tmpdir(),
-  `cx-framework-publish-${createHash('sha256').update(frameworkRoot).digest('hex').slice(0, 16)}.lock`,
+  `cx-framework-publish-${createHash("sha256").update(frameworkRoot).digest("hex").slice(0, 16)}.lock`,
 );
 
 // ngc inlines each component's `styleUrl` verbatim; it does not run a stylesheet
 // preprocessor. Build from an isolated source copy so tracked SCSS is never
 // replaced, even briefly, by generated CSS.
-const styleSourceDirs = ['primitives', 'patterns'];
+const styleSourceDirs = ["primitives", "patterns"];
 const stagingExcludes = new Set([
-  'dist',
-  'node_modules',
-  'out-tsc',
-  '.framework-build.status.json',
+  "dist",
+  "node_modules",
+  "out-tsc",
+  ".framework-build.status.json",
 ]);
-const publicationPrefix = '.framework-build-publish-';
+const publicationPrefix = ".framework-build-publish-";
 const publicationLockTimeoutMs = 30_000;
 const publicationLockPollMs = 50;
 
@@ -57,19 +64,19 @@ function run(command, args, cwd) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
-      stdio: 'inherit',
+      stdio: "inherit",
       env: process.env,
     });
 
-    child.on('error', reject);
-    child.on('close', (code) => {
+    child.on("error", reject);
+    child.on("close", (code) => {
       if (code === 0) {
         resolve(undefined);
         return;
       }
       reject(
         new Error(
-          `Command failed with exit code ${code ?? 'unknown'}: ${command} ${args.join(' ')}`,
+          `Command failed with exit code ${code ?? "unknown"}: ${command} ${args.join(" ")}`,
         ),
       );
     });
@@ -89,7 +96,7 @@ async function collectComponentStyles(dir) {
     const entryPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       found.push(...(await collectComponentStyles(entryPath)));
-    } else if (entry.isFile() && entry.name.endsWith('.component.scss')) {
+    } else if (entry.isFile() && entry.name.endsWith(".component.scss")) {
       found.push(entryPath);
     }
   }
@@ -106,7 +113,7 @@ async function compileComponentStyles(root) {
   for (const file of files) {
     try {
       const css = sass.compile(file, {
-        style: 'compressed',
+        style: "compressed",
         loadPaths: [root],
       }).css;
       await writeFile(file, css);
@@ -124,12 +131,12 @@ export async function withStagingFramework(
   runInStaging,
   {
     sourceRoot = frameworkRoot,
-    nodeModulesRoot = path.join(sourceRoot, 'node_modules'),
-    stagingPrefix = path.join(os.tmpdir(), 'cx-framework-build-'),
+    nodeModulesRoot = path.join(sourceRoot, "node_modules"),
+    stagingPrefix = path.join(os.tmpdir(), "cx-framework-build-"),
   } = {},
 ) {
   const stagingParent = await mkdtemp(stagingPrefix);
-  const stagingRoot = path.join(stagingParent, 'framework');
+  const stagingRoot = path.join(stagingParent, "framework");
   try {
     await cp(sourceRoot, stagingRoot, {
       recursive: true,
@@ -137,7 +144,7 @@ export async function withStagingFramework(
         const relative = path.relative(sourceRoot, source);
         const rootName = relative.split(path.sep)[0];
         return (
-          relative === '' ||
+          relative === "" ||
           (!stagingExcludes.has(rootName) &&
             !rootName.startsWith(publicationPrefix))
         );
@@ -145,8 +152,8 @@ export async function withStagingFramework(
     });
     await symlink(
       nodeModulesRoot,
-      path.join(stagingRoot, 'node_modules'),
-      'dir',
+      path.join(stagingRoot, "node_modules"),
+      "dir",
     );
     return await runInStaging(stagingRoot);
   } finally {
@@ -162,7 +169,7 @@ async function acquirePublicationLock(lockRoot, timeoutMs, pollMs) {
       const identity = await lstat(lockRoot);
       try {
         await writeFile(
-          path.join(lockRoot, 'owner.json'),
+          path.join(lockRoot, "owner.json"),
           `${JSON.stringify({ pid: process.pid, startedAt: new Date().toISOString() })}\n`,
         );
       } catch (error) {
@@ -173,7 +180,7 @@ async function acquirePublicationLock(lockRoot, timeoutMs, pollMs) {
         release: () => releasePublicationLock(lockRoot, identity),
       };
     } catch (error) {
-      if (!(error && typeof error === 'object' && error.code === 'EEXIST')) {
+      if (!(error && typeof error === "object" && error.code === "EEXIST")) {
         throw error;
       }
       if (Date.now() - startedAt >= timeoutMs) {
@@ -206,7 +213,7 @@ async function releasePublicationLock(lockRoot, identity) {
       );
     }
     throw new Error(
-      'The framework publication lock was replaced while owned; the replacement was preserved.',
+      "The framework publication lock was replaced while owned; the replacement was preserved.",
     );
   }
   await rm(quarantineRoot, { recursive: true, force: true });
@@ -230,8 +237,8 @@ async function restorePublishedDirectories(published) {
 function publicationRollbackError(errors) {
   const error = new AggregateError(
     errors,
-    'Framework publication failed and its previous outputs could not be fully restored. ' +
-      'Recovery copies were preserved in the publication staging directory.',
+    "Framework publication failed and its previous outputs could not be fully restored. " +
+      "Recovery copies were preserved in the publication staging directory.",
   );
   error.preservePublicationArtifacts = true;
   return error;
@@ -280,19 +287,21 @@ export async function publishBuildOutputs(
   } = {},
 ) {
   if (!stagedServerRoot) {
-    throw new Error('Framework publication requires the staged Node runtime output.');
+    throw new Error(
+      "Framework publication requires the staged Node runtime output.",
+    );
   }
   const publicationRoot = await mkdtemp(
     path.join(publicationParent, publicationPrefix),
   );
-  const preparedDistRoot = path.join(publicationRoot, 'dist');
+  const preparedDistRoot = path.join(publicationRoot, "dist");
   let publicationLock;
   let preservePublicationArtifacts = false;
   try {
-    await cp(stagedLibRoot, path.join(preparedDistRoot, 'lib'), {
+    await cp(stagedLibRoot, path.join(preparedDistRoot, "lib"), {
       recursive: true,
     });
-    await cp(stagedServerRoot, path.join(preparedDistRoot, 'server'), {
+    await cp(stagedServerRoot, path.join(preparedDistRoot, "server"), {
       recursive: true,
     });
 
@@ -305,12 +314,12 @@ export async function publishBuildOutputs(
       {
         nextRoot: preparedDistRoot,
         targetRoot: targetDistRoot,
-        backupRoot: path.join(publicationRoot, 'previous-dist'),
+        backupRoot: path.join(publicationRoot, "previous-dist"),
       },
     ]);
   } catch (error) {
     preservePublicationArtifacts = Boolean(
-      error && typeof error === 'object' && error.preservePublicationArtifacts,
+      error && typeof error === "object" && error.preservePublicationArtifacts,
     );
     if (preservePublicationArtifacts && error instanceof Error) {
       error.message = `${error.message} Recovery directory: ${publicationRoot}.`;
@@ -336,21 +345,25 @@ async function buildFramework() {
   await withStagingFramework(async (stagingRoot) => {
     await compileComponentStyles(stagingRoot);
     await run(
-      'node',
+      "node",
       [
         ngcPath,
-        '-p',
-        'tsconfig.lib.json',
-        '--sourceMap',
-        'false',
-        '--inlineSources',
-        'false',
+        "-p",
+        "tsconfig.lib.json",
+        "--sourceMap",
+        "false",
+        "--inlineSources",
+        "false",
       ],
       stagingRoot,
     );
-    await run('node', [tscPath, '-p', 'tsconfig.server.json'], stagingRoot);
-    const stagedLibRoot = path.join(stagingRoot, 'out-tsc', 'lib');
-    const stagedServerRoot = path.join(stagingRoot, 'out-tsc', 'server');
+    await run("node", [tscPath, "-p", "tsconfig.server.json"], stagingRoot);
+    const stagedLibRoot = path.join(stagingRoot, "out-tsc", "lib");
+    const stagedServerRoot = path.join(stagingRoot, "out-tsc", "server");
+    await writeFile(
+      path.join(stagedServerRoot, "global-tokens.css"),
+      compileGlobalTokens(),
+    );
     await rewriteJsModuleSpecifiers(stagedLibRoot);
     await rewriteJsModuleSpecifiers(stagedServerRoot);
     await publishBuildOutputs(stagedLibRoot, { stagedServerRoot });
@@ -367,14 +380,14 @@ async function rewriteJsModuleSpecifiers(root) {
       continue;
     }
 
-    if (entry.isFile() && entry.name.endsWith('.js')) {
+    if (entry.isFile() && entry.name.endsWith(".js")) {
       await rewriteJsFileSpecifiers(entryPath);
     }
   }
 }
 
 async function rewriteJsFileSpecifiers(filePath) {
-  const source = await readFile(filePath, 'utf8');
+  const source = await readFile(filePath, "utf8");
   const fileDir = path.dirname(filePath);
   const next = source
     .replace(
@@ -411,7 +424,7 @@ function resolveJsSpecifier(fileDir, specifier) {
     return `${specifier}.js`;
   }
 
-  if (fileExistsSync(path.join(absoluteTarget, 'index.js'))) {
+  if (fileExistsSync(path.join(absoluteTarget, "index.js"))) {
     return `${specifier}/index.js`;
   }
 

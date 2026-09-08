@@ -11,12 +11,54 @@ This folder is the machine-readable web-product contract authored by Cortex and 
   Faunapoolen is the sole current product-skin exception and still consumes cx-framework.
 - `web-standard.json` owns mutable toolchain, canonical-command, and pnpm workspace-policy facts.
 - `cx-platform-check` validates a repository against both files.
+- `cx-platform-check` also runs the [style token check](#style-token-check) on owned source.
 - `server/product-manifest` loads the sealed runtime copy of `cx-product.json`, validates this full
   schema and its compatibility rules without a dependency, and returns a deeply frozen typed
   value for each web or worker process.
 
 Product manifests live at `<repo>/cx-product.json`. The schema path may point into the installed
 package for editor support, but validation is always local and makes no network request.
+
+## Style token check
+
+`cx-style-token-check` enforces the mechanically detectable part of `tokens.direct-global` in
+[the shared token rules](../ai/design/03-ux-rules.md#tokens-and-color). It is dependency-free and
+ships with the package. `cx-platform-check` runs it automatically; it is also available directly:
+
+```sh
+pnpm exec cx-style-token-check
+pnpm exec cx-style-token-check --base <change-start-commit>
+pnpm exec cx-style-token-check --all
+```
+
+The default compares the working tree, including staged and untracked source, with `HEAD`.
+Use `--base` for a task spanning commits or the pull request's base commit in CI. An unavailable
+base fails the check. `--all` audits existing source; a product without Git or before its first commit also receives a full
+audit. Unchanged findings in a change check remain violations, not approved exceptions. Their
+migration needs its own scope; do not use them as examples for new work.
+
+The optional repository-root `style-token-policy.json` declares exact `sourceRoots` and
+`globalTokenFiles` paths. Without it, the checker examines the repository and recognises the
+installed package's global tokens. It excludes dependencies, generated output, private data,
+tests, and fixtures. List every owned UI source root, including inline styles, examples, and
+runtime styling; this is an ownership declaration, never a per-file suppression list.
+
+```json
+{
+  "sourceRoots": ["src"],
+  "globalTokenFiles": ["src/styles/tokens.css"]
+}
+```
+
+Only root/theme declarations in approved global token files introduce recognised global names.
+The checker rejects local declarations (including literal and calculated values), non-global
+`var()` references, custom-property bindings, and common runtime writes. A component variable in
+an unapproved `:root` still fails. Approved global semantic aliases pass. New global names and
+changes to the ownership declaration still require review and the approval in `tokens.new-global`.
+
+This is static source analysis, not a CSS evaluator. Review generated or dynamically assembled
+styles and indirect runtime writes explicitly. It does not decide token purpose, colour similarity,
+accessibility, or whether the user approved a change. Passing it never replaces those judgments.
 
 ## Hermetic E2E modules
 

@@ -95,7 +95,7 @@ purpose → role → information → component role → local implementation →
 
 ## Semantic tokens and themes
 
-[MUST] Use the consuming product's semantic tokens for their documented roles instead of raw visual values. Token names and resolved values may differ by platform; their design meaning remains stable.
+[MUST] Before selecting or changing styling values, apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global`. Read the consuming product's token definitions and documented purposes; names and resolved values may differ by platform.
 
 [MUST] Keep semantic intent distinct:
 
@@ -151,7 +151,7 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Never use a utility to patch, override, or reach inside a sealed component from outside. A component defect or gap is fixed in the component's owning layer, or logged for its owner.
 
-[MUST] Use only utilities whose values resolve to semantic tokens. Do not introduce raw values, one-off classes, or inline styles to escape the utility set; a missing value is a token or utility gap to surface, not a license to hardcode.
+[MUST] Keep utilities within the token-selection contract in `RULE-ID: tokens.semantic` and the direct-use contract in `RULE-ID: tokens.direct-global`. A permitted direct value never authorises a utility or inline style that patches a shared component from outside.
 
 [SHOULD] Treat more than three utilities on one element as a design smell: the composition is trying to be a component or pattern. Stop, use or propose the owning construct, and log the gap where the product tracks them.
 

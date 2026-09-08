@@ -16,6 +16,7 @@ export interface CxQueryElementData {
     ariaLabel?: string;
 }
 export declare class CxQueryElementComponent {
+    size: 'small' | 'default' | 'large';
     protected kind: CxQueryElementKind;
     protected label: string;
     protected values: readonly string[];
@@ -35,6 +36,6 @@ export declare class CxQueryElementComponent {
     protected onPressed(event: MouseEvent): void;
     private defaultLabelFor;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxQueryElementComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxQueryElementComponent, "cx-query-element", never, { "data": { "alias": "data"; "required": false; }; }, { "pressed": "pressed"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxQueryElementComponent, "cx-query-element", never, { "size": { "alias": "size"; "required": false; }; "data": { "alias": "data"; "required": false; }; }, { "pressed": "pressed"; }, never, never, true, never>;
 }
 //# sourceMappingURL=cx-query-element.component.d.ts.map

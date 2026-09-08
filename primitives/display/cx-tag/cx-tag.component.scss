@@ -15,7 +15,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: 0 var(--space-xs);
-  padding-inline-end: var(--cx-tag-padding-inline-end, var(--space-xs));
+  padding-inline-end: var(--space-xs);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: var(--opacity-low);
@@ -40,7 +40,7 @@
 /* Hover strengthens the tint while keeping the semantic ink colour. Filling
    the chip with a raw palette hue made light hues fail text contrast. */
 .cx-tag--interactive:has(.cx-tag__body:hover) {
-  background: color-mix(in srgb, var(--cx-tag-accent, var(--ink)) 18%, var(--surface));
+  background: color-mix(in srgb, var(--ink) 18%, var(--surface));
   color: var(--ink);
 }
 
@@ -160,10 +160,12 @@
 }
 
 .cx-tag--blue {
-  --cx-tag-accent: var(--blue);
-
   background: var(--blue-opacity);
   color: var(--blue);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--blue) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--blue {
@@ -171,10 +173,12 @@
 }
 
 .cx-tag--cyan {
-  --cx-tag-accent: var(--cyan);
-
   background: var(--cyan-opacity);
   color: var(--cyan);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--cyan) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--cyan {
@@ -182,10 +186,12 @@
 }
 
 .cx-tag--lime {
-  --cx-tag-accent: var(--lime);
-
   background: var(--lime-opacity);
   color: var(--lime);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--lime) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--lime {
@@ -193,10 +199,12 @@
 }
 
 .cx-tag--green {
-  --cx-tag-accent: var(--green);
-
   background: var(--green-opacity);
   color: var(--green);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--green) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--green {
@@ -204,10 +212,12 @@
 }
 
 .cx-tag--yellow {
-  --cx-tag-accent: var(--yellow);
-
   background: var(--yellow-opacity);
   color: var(--yellow);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--yellow) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--yellow {
@@ -215,10 +225,12 @@
 }
 
 .cx-tag--orange {
-  --cx-tag-accent: var(--orange);
-
   background: var(--orange-opacity);
   color: var(--orange);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--orange) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--orange {
@@ -226,10 +238,12 @@
 }
 
 .cx-tag--tangerine {
-  --cx-tag-accent: var(--tangerine);
-
   background: var(--tangerine-opacity);
   color: var(--tangerine);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--tangerine) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--tangerine {
@@ -237,10 +251,12 @@
 }
 
 .cx-tag--red {
-  --cx-tag-accent: var(--red);
-
   background: var(--red-opacity);
   color: var(--red);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--red) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--red {
@@ -248,10 +264,12 @@
 }
 
 .cx-tag--pink {
-  --cx-tag-accent: var(--pink);
-
   background: var(--pink-opacity);
   color: var(--pink);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--pink) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--pink {
@@ -259,10 +277,12 @@
 }
 
 .cx-tag--purple {
-  --cx-tag-accent: var(--purple);
-
   background: var(--purple-opacity);
   color: var(--purple);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--purple) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--purple {
@@ -270,10 +290,12 @@
 }
 
 .cx-tag--violet {
-  --cx-tag-accent: var(--violet);
-
   background: var(--violet-opacity);
   color: var(--violet);
+
+  &.cx-tag--interactive:has(.cx-tag__body:hover) {
+    background: color-mix(in srgb, var(--violet) 18%, var(--surface));
+  }
 }
 
 .cx-tag--outline.cx-tag--violet {

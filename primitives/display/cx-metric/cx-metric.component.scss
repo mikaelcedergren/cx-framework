@@ -29,7 +29,7 @@
   overflow-wrap: anywhere;
 }
 
-.cx-metric__value-row > [slot='trend'] {
+.cx-metric__value-row > [slot="trend"] {
   flex: 0 0 auto;
 }
 
@@ -50,7 +50,7 @@
 }
 
 :host(.cx-metric--default) .cx-metric__value {
-  font-size: var(--controller-size);
+  font-size: 32px;
 }
 
 :host(.cx-metric--large) {
@@ -64,5 +64,5 @@
 }
 
 :host(.cx-metric--large) .cx-metric__value {
-  font-size: calc(var(--controller-size) * 1.5);
+  font-size: 48px;
 }

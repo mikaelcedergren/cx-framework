@@ -5,7 +5,6 @@
 .cx-popover {
   // Keep nested surfaces concentric so the framing lane stays visually even
   // through every corner instead of snapping the inner curve to the radius scale.
-  --cx-popover-inner-radius: calc(var(--radius-lg) - var(--surface-separation));
 
   position: fixed;
   z-index: var(--z-index-popover);
@@ -61,7 +60,7 @@
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: hidden;
-  border-radius: var(--cx-popover-inner-radius);
+  border-radius: calc(var(--radius-lg) - var(--surface-separation));
   background: var(--surface-alt);
   padding: 0;
   overscroll-behavior: contain;
@@ -97,7 +96,7 @@
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
-  border-radius: var(--cx-popover-inner-radius);
+  border-radius: calc(var(--radius-lg) - var(--surface-separation));
   background: var(--surface);
   overscroll-behavior: contain;
 }

@@ -1,4 +1,4 @@
-@use '../shared/field-shell' as field;
+@use "../shared/field-shell" as field;
 
 :host {
   display: block;
@@ -16,7 +16,7 @@
   gap: var(--space-xs);
 }
 
-@include field.field-header('cx-code-field', 0);
+@include field.field-header("cx-code-field", 0);
 
 .cx-code-field--disabled {
   opacity: var(--opacity-disabled, 0.45);
@@ -32,13 +32,15 @@
 }
 
 .cx-code-field__cell {
-  --cx-code-field-cell-size: calc((100cqw - (var(--space-sm) * 5)) / 6);
-
   position: relative;
   display: inline-flex;
   width: 100%;
   min-width: 0;
-  height: clamp(44px, calc(var(--cx-code-field-cell-size) * 1.1667), 56px);
+  height: clamp(
+    44px,
+    calc(calc((100cqw - (var(--space-sm) * 5)) / 6) * 1.1667),
+    56px
+  );
   align-items: center;
   justify-content: center;
   border: var(--line);
@@ -49,7 +51,11 @@
   caret-color: var(--primary);
   cursor: text;
   font-family: var(--font-family-mono);
-  font-size: clamp(var(--font-size-title-2), calc(var(--cx-code-field-cell-size) * 0.5), var(--font-size-title-1));
+  font-size: clamp(
+    var(--font-size-title-2),
+    calc(calc((100cqw - (var(--space-sm) * 5)) / 6) * 0.5),
+    var(--font-size-title-1)
+  );
   font-weight: var(--font-weight-medium);
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -62,7 +68,8 @@
     background-color var(--motion-fast) ease;
 }
 
-.cx-code-field:not(.cx-code-field--error) .cx-code-field__cell:not(:disabled):hover {
+.cx-code-field:not(.cx-code-field--error)
+  .cx-code-field__cell:not(:disabled):hover {
   border-color: var(--opacity-mid);
 }
 
@@ -85,4 +92,4 @@
   caret-color: var(--danger);
 }
 
-@include field.field-messages('cx-code-field', 0);
+@include field.field-messages("cx-code-field", 0);

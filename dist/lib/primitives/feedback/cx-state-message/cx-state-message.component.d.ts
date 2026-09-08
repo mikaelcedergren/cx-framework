@@ -45,8 +45,7 @@ export declare class CxStateMessageComponent implements AfterViewChecked {
      * A top-aligned mark reads as dropped unless its ink starts on the heading's cap
      * line. Both offsets are real and neither is knowable from CSS: an icon carries
      * its own air inside its box, and that air differs per glyph, while the heading
-     * keeps half its leading above the caps. Publish the difference so the layout can
-     * lift the mark by exactly that much.
+     * keeps half its leading above the caps. Apply that difference directly to the horizontal mark’s top margin.
      */
     private syncIconInkOffset;
     /** Blank space between the icon box's top edge and the first painted pixel of its glyph. */

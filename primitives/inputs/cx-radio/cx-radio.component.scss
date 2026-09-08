@@ -34,7 +34,7 @@
 }
 
 .cx-radio--disabled {
-  opacity: 0.4;
+  opacity: var(--opacity-disabled);
   cursor: default;
   pointer-events: none;
   user-select: none;
@@ -146,6 +146,7 @@
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
+  text-align: start;
 }
 
 .cx-radio-field__error {

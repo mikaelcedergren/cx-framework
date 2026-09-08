@@ -23,51 +23,75 @@
 // padding helpers but no margin or gap helpers — reach for cx-stack /
 // cx-inline / cx-grid when you need gap between children.
 
-@use 'sass:map';
-@use '../tokens/spacing-scale' as space;
-@use '../tokens/breakpoints-scale' as breakpoints;
+@use "sass:map";
+@use "../tokens/spacing-scale" as space;
+@use "../tokens/breakpoints-scale" as breakpoints;
 
 // < $mobile is the phone range; $mobile and up is desktop (tokens/_breakpoints.scss).
 $mobile-max: breakpoints.$mobile - 1px;
 
 // Type ramp — each size pairs a font-size token with its line-height token.
 $text-sizes: (
-  'display': ('size': var(--font-size-display), 'line': var(--line-height-display)),
-  'title-1': ('size': var(--font-size-title-1), 'line': var(--line-height-heading)),
-  'title-2': ('size': var(--font-size-title-2), 'line': var(--line-height-heading)),
-  'title-3': ('size': var(--font-size-title-3), 'line': var(--line-height-heading)),
-  'body-lg': ('size': var(--font-size-body-lg), 'line': var(--line-height-body)),
-  'body': ('size': var(--font-size-body), 'line': var(--line-height-body)),
-  'body-sm': ('size': var(--font-size-body-sm), 'line': var(--line-height-small)),
-  'body-xs': ('size': var(--font-size-body-xs), 'line': var(--line-height-small)),
+  "display": (
+    "size": var(--font-size-display),
+    "line": var(--line-height-display),
+  ),
+  "title-1": (
+    "size": var(--font-size-title-1),
+    "line": var(--line-height-heading),
+  ),
+  "title-2": (
+    "size": var(--font-size-title-2),
+    "line": var(--line-height-heading),
+  ),
+  "title-3": (
+    "size": var(--font-size-title-3),
+    "line": var(--line-height-heading),
+  ),
+  "body-lg": (
+    "size": var(--font-size-body-lg),
+    "line": var(--line-height-body),
+  ),
+  "body": (
+    "size": var(--font-size-body),
+    "line": var(--line-height-body),
+  ),
+  "body-sm": (
+    "size": var(--font-size-body-sm),
+    "line": var(--line-height-small),
+  ),
+  "body-xs": (
+    "size": var(--font-size-body-xs),
+    "line": var(--line-height-small),
+  ),
 );
 
 $font-weights: (
-  'regular': var(--font-weight-regular),
-  'medium': var(--font-weight-medium),
-  'bold': var(--font-weight-bold),
+  "regular": var(--font-weight-regular),
+  "medium": var(--font-weight-medium),
+  "bold": var(--font-weight-bold),
 );
 
 // Semantic text colours. 'muted' is the system's high-opacity ink for
 // secondary text.
 $text-colors: (
-  'ink': var(--ink),
-  'muted': var(--opacity-high),
-  'primary': var(--primary),
-  'accent': var(--accent),
-  'success': var(--success),
-  'warning': var(--warning),
-  'danger': var(--danger),
-  'info': var(--info),
-  'link': var(--link),
+  "ink": var(--ink),
+  "muted": var(--opacity-high),
+  "primary": var(--primary),
+  "accent": var(--accent),
+  "success": var(--success),
+  "warning": var(--warning),
+  "danger": var(--danger),
+  "info": var(--info),
+  "link": var(--link),
 );
 
 // Content measure — max width of a centred content column.
 $measures: (
-  'sm': var(--measure-sm),
-  'md': var(--measure-md),
-  'lg': var(--measure-lg),
-  'xl': var(--measure-xl),
+  "sm": var(--measure-sm),
+  "md": var(--measure-md),
+  "lg": var(--measure-lg),
+  "xl": var(--measure-xl),
 );
 
 @layer cx-utilities {
@@ -128,8 +152,8 @@ $measures: (
   // Typography — font size paired with its line-height; weight is separate.
   @each $name, $ramp in $text-sizes {
     .cx-text-#{$name} {
-      font-size: map.get($ramp, 'size');
-      line-height: map.get($ramp, 'line');
+      font-size: map.get($ramp, "size");
+      line-height: map.get($ramp, "line");
     }
   }
 
@@ -287,7 +311,7 @@ $measures: (
   // The default clears the masthead's content-sized height with air to spare;
   // a page with taller chrome sets --cx-scroll-offset once on its root.
   .cx-scroll-target {
-    scroll-margin-block-start: var(--cx-scroll-offset, calc(var(--space-2xl) + var(--space-md)));
+    scroll-margin-block-start: calc(var(--space-2xl) + var(--space-md));
   }
 
   // Screen-reader-only — visually hidden, still read aloud. For skip links and

@@ -11,7 +11,7 @@
 
 .cx-file-upload__button {
   width: 100%;
-  --cx-button-width: 100%;
+  width: 100%;
 }
 
 .cx-file-upload__selected {
@@ -72,7 +72,7 @@
 }
 
 .cx-file-upload__zone--disabled:hover {
-  border-color: var(--opacity-mid);
+  border-color: var(--opacity-high);
   background: transparent;
 }
 
@@ -92,6 +92,7 @@
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-body);
+  text-align: start;
 }
 
 .cx-file-upload__zone-action {
@@ -120,7 +121,7 @@
 
 .cx-file-upload__row-icon {
   flex: 0 0 auto;
-  color: var(--opacity-mid);
+  color: var(--opacity-high);
 }
 
 .cx-file-upload__row-name {

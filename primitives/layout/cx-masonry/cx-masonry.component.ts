@@ -4,9 +4,9 @@ import { type CxLayoutGap } from '../layout.types';
 @Component({
   selector: 'cx-masonry',
   host: {
-    '[style.--cx-masonry-columns]': 'normalizedColumns',
-    '[style.--cx-masonry-columns-mobile]': 'normalizedColumnsMobile',
-    '[style.--cx-masonry-gap]': 'resolvedGap',
+    '[attr.data-columns]': 'normalizedColumns',
+    '[attr.data-columns-mobile]': 'normalizedColumnsMobile',
+    '[attr.data-gap]': 'gap',
   },
   templateUrl: './cx-masonry.component.html',
   styleUrl: './cx-masonry.component.scss',
@@ -30,10 +30,6 @@ export class CxMasonryComponent {
       return '1';
     }
     return `${this.clampColumns(this.columnsMobile, 1)}`;
-  }
-
-  protected get resolvedGap(): string {
-    return `var(--space-${this.gap})`;
   }
 
   private clampColumns(value: number, fallback: number): number {

@@ -14,28 +14,6 @@ const CX_CHART_PALETTE = [
     '--pink',
     '--purple',
 ];
-const CX_CHART_COLOR_FALLBACKS = {
-    '--violet': '#3057f2',
-    '--blue': '#057dff',
-    '--cyan': '#00ccc5',
-    '--green': '#37c45b',
-    '--yellow': '#edc31c',
-    '--orange': '#ff980a',
-    '--red': '#ff4043',
-    '--pink': '#f2559c',
-    '--purple': '#ae4ede',
-    '--primary': '#057dff',
-    '--accent': '#00ccc5',
-    '--success': '#37c45b',
-    '--warning': '#ff980a',
-    '--danger': '#ff4043',
-    '--info': '#057dff',
-    '--ink': '#1f1f1f',
-    '--opacity-high': 'rgb(22 24 29 / 62%)',
-    '--opacity-mid': 'rgb(22 24 29 / 10%)',
-    '--surface': '#ffffff',
-    '--line': 'rgb(22 24 29 / 10%)',
-};
 export class CxChartComponent {
     static agModulePromise;
     static agModulesRegistered = false;
@@ -219,7 +197,7 @@ export class CxChartComponent {
             label: {
                 enabled: chart.showAxes,
                 color: textColor,
-                fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+                fontFamily: this.token('--font-family-base', 'sans-serif'),
                 fontSize: 12,
             },
         };
@@ -233,7 +211,7 @@ export class CxChartComponent {
                     enabled: chart.showAxes && !!chart.xAxisLabel,
                     text: chart.xAxisLabel,
                     color: textColor,
-                    fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+                    fontFamily: this.token('--font-family-base', 'sans-serif'),
                     fontSize: 12,
                 },
             },
@@ -249,7 +227,7 @@ export class CxChartComponent {
                     enabled: chart.showAxes && !!chart.yAxisLabel,
                     text: chart.yAxisLabel,
                     color: textColor,
-                    fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+                    fontFamily: this.token('--font-family-base', 'sans-serif'),
                     fontSize: 12,
                 },
             },
@@ -266,7 +244,7 @@ export class CxChartComponent {
                 },
                 label: {
                     color: this.token('--opacity-high'),
-                    fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+                    fontFamily: this.token('--font-family-base', 'sans-serif'),
                     fontSize: 12,
                 },
                 paddingX: 12,
@@ -292,7 +270,7 @@ export class CxChartComponent {
             params: {
                 backgroundColor: 'transparent',
                 chartBackgroundColor: 'transparent',
-                fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+                fontFamily: this.token('--font-family-base', 'sans-serif'),
                 fontSize: 12,
                 foregroundColor: this.token('--ink'),
                 textColor: this.token('--opacity-high'),
@@ -306,7 +284,7 @@ export class CxChartComponent {
         };
     }
     colorsForChart() {
-        const palette = CX_CHART_PALETTE.map(tokenName => this.token(tokenName));
+        const palette = CX_CHART_PALETTE.map((tokenName) => this.token(tokenName));
         return palette;
     }
     colorFor(index, explicit, colors) {
@@ -314,16 +292,18 @@ export class CxChartComponent {
         if (explicitColor?.startsWith('--')) {
             return this.token(explicitColor);
         }
-        return explicitColor || colors[index % colors.length] || CX_CHART_COLOR_FALLBACKS['--primary'];
+        return explicitColor || colors[index % colors.length] || this.token('--primary');
     }
     hasRenderableData(chart) {
         if (!chart.labels.length || !chart.series.length) {
             return false;
         }
-        return chart.series.some(series => series.data.length > 0);
+        return chart.series.some((series) => series.data.length > 0);
     }
     normalizeType(value) {
-        return value === 'line' || value === 'area' || value === 'pie' || value === 'doughnut' ? value : 'bar';
+        return value === 'line' || value === 'area' || value === 'pie' || value === 'doughnut'
+            ? value
+            : 'bar';
     }
     normalizeHeight(value) {
         if (!Number.isFinite(value)) {
@@ -335,7 +315,7 @@ export class CxChartComponent {
         const parsed = Number(value);
         return Number.isFinite(parsed) ? parsed : 0;
     }
-    token(name, fallback = CX_CHART_COLOR_FALLBACKS[name] ?? '') {
+    token(name, fallback = 'transparent') {
         if (typeof getComputedStyle !== 'function') {
             return fallback;
         }

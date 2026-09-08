@@ -14,12 +14,79 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.10.5
+
+- `cx-wizard-dialog` now hides its top-right close button by default. Set
+  `wizard.dismissible: true` to show it. Cancel and Escape behavior are unchanged.
+
+- `CxTableRow` adds optional `selectionDisabled` and `disabled` flags, both off by default.
+  `selectionDisabled` keeps the checkbox visible but unavailable; activation and row menus still work.
+  `disabled` dims the whole row and disables selection, activation, menus and keyboard focus.
+  Select all changes only eligible visible rows and is disabled when none are eligible.
+  Disabled and off-page selections remain untouched, including when already selected by the owner;
+  changing either flag does not emit a selection change. Supply explanatory status as cell content.
+  Disabling a row closes its open menus. Existing consumers need no changes.
+
+- The shared AI styling contract now requires direct global token use. Developer reads it before
+  styling and verifies it before handoff; Designer, Custodian, and Cleaner use the same rules.
+  Read `tokens.direct-global`, `tokens.semantic`, and `tokens.new-global` in `ai/design/03-ux-rules.md`.
+  Component, wrapper, literal, derived, and runtime intermediates have no automatic exception.
+- `cx-platform-check` now includes the new `cx-style-token-check` command. Declare all owned UI
+  roots and any product-owned global token definition files in `style-token-policy.json`; use
+  `--base <change-start-commit>` for committed changes and `--all` for an existing-source audit.
+  See `platform/README.md` for coverage and review responsibilities. The complete shared owner migration removes the old styling hooks; use the migration below.
+
+### Direct global tokens: consumer migration
+
+- All component, page, wrapper, and runtime styling custom properties have been removed. Do not
+  recreate them in a consumer, add fallback aliases, or rename them into root tokens.
+- Replace page-gap/page-measure and article-base/article-measure declarations with the final
+  `gap`, `max-width`, `font-size`, or `max-inline-size` on the consumer-owned native content element,
+  using an existing global token for its documented role. `.cx-article` uses the large-body token;
+  its large editorial variant retains the fluid display heading. Use embed ratio classes or set
+  `aspect-ratio` directly. Respect the default full-width product-page role.
+- Remove icon-button color/background, shortcut color, tag padding, popover radius, and other
+  component styling hooks. Use the owning component's supported semantic API and baseline.
+  Transparent icon buttons and shortcut keys inherit ordinary text color; they expose no private
+  style channel. Icon buttons offer `variant="emphasis"` with the default mood for opaque neutral
+  controls over media; lightbox navigation uses it to preserve contrast. A native button fills
+  its host, so containers can set normal host width.
+- Detail-panel and explorer `width`, `minWidth`, resize behavior, and width outputs remain public.
+  They now set actual width. Detail panels still fill mobile frames. Progress, tab and button-group
+  indicators, toast timers, images, and badge masks set their final properties directly.
+- `cx-query-element` accepts `size: 'small' | 'default' | 'large'` (default: `default`). Query fields
+  forward their existing size automatically. Consumers composing query fields need no change.
+- Disabled controls use `--opacity-disabled` once, including groups. Supporting text/icons use
+  `--opacity-high`; `--opacity-mid` remains a structural color. Metric values retain their sizing
+  directly because controller tokens do not describe typography. No new global tokens were added.
+- The icon source index and Node access gate now receive CSS compiled from the canonical global
+  token source. The gate's built `dist/server/global-tokens.css` must ship with its Node runtime;
+  it requires no Angular imports or runtime Sass. Chart colors resolve the active global theme,
+  without a second fallback palette.
+- Run `cx-style-token-check --all` over every owned source root, then review token purpose and
+  close literal matches manually. Verify affected controls, page widths, disabled states, themes,
+  and responsive panels in the rendered product. A green change-only check does not clear old debt.
+
 ## 0.10.4
 
+- `cx-labeled-row` keeps its label column when `label` is empty or whitespace-only.
+  Content remains aligned in both standalone rows and row groups, including their narrow
+  layouts. Use an empty label for continuation content; it no longer makes a row full width.
+  Give projected controls their own accessible name when the visible label is omitted.
+
+- `cx-language-selector` is a compact public-site language picker with flags and optional
+  recommendations. Without a value, it matches the browser language and then falls back to the
+  first supplied locale. Search appears automatically only when more than eight locales are
+  available. It owns this experience independently from `cx-dropdown`.
 - `cx-card` reserves the natural width of header metadata and the menu before allocating
   space to the heading. Short tags remain readable with their normal gaps; oversized
   metadata moves the action group to a separate row and stays within the card. Keep using
   the existing `meta` slot and `menuItems`; no consumer API or tag styling changes are needed.
+- `cx-dropdown` now treats `searchable` and `creatable` as independent choices. A creatable
+  dropdown no longer gains a search field unless `searchable` is also true. When both are on,
+  the search text is still emitted with `create`; without search, `create` emits an empty string
+  so the consumer can open an unfilled creation flow. Option descriptions now align at the far
+  edge for easier scanning.
 
 ## 0.10.3
 

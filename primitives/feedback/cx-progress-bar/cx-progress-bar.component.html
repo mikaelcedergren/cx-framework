@@ -20,7 +20,6 @@
   <div
     class="cx-progress-bar__track"
     role="progressbar"
-    [style.--cx-progress-ratio]="progressRatio()"
     aria-valuemin="0"
     [attr.aria-valuemax]="max$()"
     [attr.aria-valuenow]="indeterminate ? null : normalizedValue$()"
@@ -29,7 +28,11 @@
     [attr.aria-label]="visibleLabel() ? null : resolvedAriaLabel()"
     [attr.aria-describedby]="visibleHint() ? hintId : null"
   >
-    <span class="cx-progress-bar__fill" aria-hidden="true"></span>
+    <span
+      class="cx-progress-bar__fill"
+      [style.width.%]="indeterminate ? null : progressRatio() * 100"
+      aria-hidden="true"
+    ></span>
   </div>
 
   @if (visibleHint(); as hintText) {

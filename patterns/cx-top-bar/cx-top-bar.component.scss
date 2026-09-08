@@ -60,8 +60,8 @@
 }
 
 .cx-top-bar__description--editable {
-  padding: 2px 6px;
-  margin-left: -6px;
+  padding: var(--space-2xs) var(--space-sm);
+  margin-left: calc(-1 * var(--space-sm));
   border-radius: var(--radius-sm);
   cursor: text;
   outline: none;

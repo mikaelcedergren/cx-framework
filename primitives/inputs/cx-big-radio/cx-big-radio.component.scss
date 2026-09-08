@@ -43,7 +43,7 @@
 }
 
 .cx-big-radio--disabled {
-  opacity: 0.4;
+  opacity: var(--opacity-disabled);
   cursor: default;
   pointer-events: none;
   user-select: none;
@@ -95,7 +95,8 @@
     background-color var(--motion-base) var(--ease-out);
 }
 
-.cx-big-radio:hover:not(.cx-big-radio--selected):not(.cx-big-radio--disabled) .cx-big-radio__control {
+.cx-big-radio:hover:not(.cx-big-radio--selected):not(.cx-big-radio--disabled)
+  .cx-big-radio__control {
   border-color: var(--opacity-mid);
   background: var(--opacity-mid);
 }

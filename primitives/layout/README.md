@@ -2,20 +2,20 @@
 
 How to arrange things on screen in the Cortex framework. Five primitive components handle the common arrangements, a small set of utility classes handle one-off spacing, and `.cx-page` is the frame a screen sits in.
 
-The guiding rule: **components own the padding inside themselves; containers own the gaps between things.** A card or button never sets its own outside spacing — the layout container it sits in decides that. That is what lets any component drop cleanly into any layout. So you build screens by *composing these containers*, not by writing `display: flex` or adding margins.
+The guiding rule: **components own the padding inside themselves; containers own the gaps between things.** A card or button never sets its own outside spacing — the layout container it sits in decides that. That is what lets any component drop cleanly into any layout. So you build screens by _composing these containers_, not by writing `display: flex` or adding margins.
 
 ## Pick by what you need
 
-| You want… | Use |
-| --- | --- |
-| things in a vertical column | `cx-stack` |
-| things in a horizontal row | `cx-inline` |
-| equal-width columns / a card grid | `cx-grid` |
-| columns of items with different heights (a note or image wall) | `cx-masonry` |
-| two groups pushed to opposite ends (one fills, one hugs) | `cx-split` |
-| a little padding on your *own* wrapper element | `cx-p-*` utility classes |
-| to show or hide by screen size | `cx-hide-mobile` / `cx-hide-desktop` |
-| the outer frame of a page | `.cx-page` |
+| You want…                                                      | Use                                  |
+| -------------------------------------------------------------- | ------------------------------------ |
+| things in a vertical column                                    | `cx-stack`                           |
+| things in a horizontal row                                     | `cx-inline`                          |
+| equal-width columns / a card grid                              | `cx-grid`                            |
+| columns of items with different heights (a note or image wall) | `cx-masonry`                         |
+| two groups pushed to opposite ends (one fills, one hugs)       | `cx-split`                           |
+| a little padding on your _own_ wrapper element                 | `cx-p-*` utility classes             |
+| to show or hide by screen size                                 | `cx-hide-mobile` / `cx-hide-desktop` |
+| the outer frame of a page                                      | `.cx-page`                           |
 
 If you're reaching for a margin or a hand-written `display: flex`, stop — one of the above already does it, with consistent spacing.
 
@@ -35,12 +35,12 @@ All five are invisible wrappers — no background, border, or colour of their ow
 
 Children stacked top to bottom with an even gap.
 
-| prop | type | default |
-| --- | --- | --- |
-| `gap` | gap step | `md` |
-| `gapMobile` | gap step | — |
-| `align` | `start \| center \| end \| stretch` | `stretch` |
-| `justify` | `start \| center \| end \| between` | `start` |
+| prop        | type                                | default   |
+| ----------- | ----------------------------------- | --------- |
+| `gap`       | gap step                            | `md`      |
+| `gapMobile` | gap step                            | —         |
+| `align`     | `start \| center \| end \| stretch` | `stretch` |
+| `justify`   | `start \| center \| end \| between` | `start`   |
 
 ```html
 <cx-stack gap="md">
@@ -54,13 +54,13 @@ Children stacked top to bottom with an even gap.
 
 Children side by side. They stay on one line by default; set `wrap` to `true` when they should wrap as space tightens.
 
-| prop | type | default |
-| --- | --- | --- |
-| `gap` | gap step | `sm` |
-| `gapMobile` | gap step | — |
-| `align` | `start \| center \| end \| stretch` | `center` |
-| `justify` | `start \| center \| end \| between` | `start` |
-| `wrap` | boolean | `false` |
+| prop        | type                                | default  |
+| ----------- | ----------------------------------- | -------- |
+| `gap`       | gap step                            | `sm`     |
+| `gapMobile` | gap step                            | —        |
+| `align`     | `start \| center \| end \| stretch` | `center` |
+| `justify`   | `start \| center \| end \| between` | `start`  |
+| `wrap`      | boolean                             | `false`  |
 
 ```html
 <cx-inline gap="sm" [wrap]="true">
@@ -74,14 +74,14 @@ Children side by side. They stay on one line by default; set `wrap` to `true` wh
 
 A grid of equal-width columns.
 
-| prop | type | default |
-| --- | --- | --- |
-| `columns` | number 1–12 | `3` |
-| `columnsMobile` | number 1–12 | — |
-| `gap` | gap step | `md` |
-| `gapMobile` | gap step | — |
-| `columnGap` / `rowGap` | gap step | falls back to `gap` |
-| `align` | `start \| center \| end \| stretch` | `stretch` |
+| prop                   | type                                | default             |
+| ---------------------- | ----------------------------------- | ------------------- |
+| `columns`              | number 1–12                         | `3`                 |
+| `columnsMobile`        | number 1–12                         | —                   |
+| `gap`                  | gap step                            | `md`                |
+| `gapMobile`            | gap step                            | —                   |
+| `columnGap` / `rowGap` | gap step                            | falls back to `gap` |
+| `align`                | `start \| center \| end \| stretch` | `stretch`           |
 
 `columns` and `columnsMobile` are numbers, so bind them: `[columns]="3"`.
 
@@ -95,13 +95,13 @@ A grid of equal-width columns.
 
 ### cx-masonry — packed columns
 
-Items of varying height packed into columns without uniform row gaps — a Keep-style note wall. Items flow *down* each column in turn, so reading order runs down columns rather than across rows; use `cx-grid` when order or equal heights matter. Defaults to a single column on mobile.
+Items of varying height packed into columns without uniform row gaps — a Keep-style note wall. Items flow _down_ each column in turn, so reading order runs down columns rather than across rows; use `cx-grid` when order or equal heights matter. Defaults to a single column on mobile.
 
-| prop | type | default |
-| --- | --- | --- |
-| `columns` | number 1–12 | `3` |
-| `columnsMobile` | number 1–12 | `1` |
-| `gap` | gap step | `md` |
+| prop            | type        | default |
+| --------------- | ----------- | ------- |
+| `columns`       | number 1–12 | `3`     |
+| `columnsMobile` | number 1–12 | `1`     |
+| `gap`           | gap step    | `md`    |
 
 ```html
 <cx-masonry [columns]="4" gap="md">
@@ -115,13 +115,13 @@ Items of varying height packed into columns without uniform row gaps — a Keep-
 
 A start group that fills the space and an end group that hugs its content, pushed to opposite ends. Content goes in the `[start]` and `[end]` slots.
 
-| prop | type | default |
-| --- | --- | --- |
-| `gap` | gap step | `md` |
-| `gapMobile` | gap step | — |
-| `align` | `start \| center \| end \| stretch` | `center` |
-| `startWidth` | `auto \| sm \| md \| lg` | `auto` |
-| `wrap` | boolean | `false` |
+| prop         | type                                | default  |
+| ------------ | ----------------------------------- | -------- |
+| `gap`        | gap step                            | `md`     |
+| `gapMobile`  | gap step                            | —        |
+| `align`      | `start \| center \| end \| stretch` | `center` |
+| `startWidth` | `auto \| sm \| md \| lg`            | `auto`   |
+| `wrap`       | boolean                             | `false`  |
 
 Set `wrap` when the end group holds controls rather than a button or two. A
 search field and a dropdown squeezed into the space a long heading leaves over
@@ -150,10 +150,10 @@ One breakpoint: **mobile is below 720px**; desktop is 720px and up (the `--break
 
 ## Utility classes
 
-Single-purpose helpers for the raw elements and wrappers *you* write — not for patching a component from outside. They live in the low-priority `cx-utilities` cascade layer, so a component's own styles always win: a utility can only style your own elements. Every value is a token reference.
+Single-purpose helpers for the raw elements and wrappers _you_ write — not for patching a component from outside. They live in the low-priority `cx-utilities` cascade layer, so a component's own styles always win: a utility can only style your own elements. Every value is a token reference.
 
 - **Padding** — `cx-p-{step}` (all sides), `cx-px-` / `cx-py-` (axes), `cx-pt-` / `cx-pr-` / `cx-pb-` / `cx-pl-` (one side). Steps are the spacing scale: `cx-p-md`, `cx-px-sm`, …
-- **Type size** — `cx-text-{display | title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size *and* its matching line-height. `display` is reserved for a marketing or editorial hero's primary headline.
+- **Type size** — `cx-text-{display | title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size _and_ its matching line-height. `display` is reserved for a marketing or editorial hero's primary headline.
 - **Font weight** — `cx-font-{regular | medium | bold}`.
 - **Text colour** — `cx-text-{ink | muted | primary | accent | success | warning | danger | info | link}`. `cx-text-muted` is the high-opacity ink for secondary text.
 - **Text align** — `cx-text-start` / `-center` / `-end`; `cx-truncate` (one-line clipping without a browser tooltip). Pair `cx-truncate` with `cxTooltip` overflow mode when revealing the complete text is useful; never add a native `title` tooltip.
@@ -164,7 +164,7 @@ There are deliberately **no margin or gap utilities** — gap belongs to the lay
 
 ## Article
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for larger landing copy and a fluid display `h1`) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The block scales from `--cx-article-base`; the large variant's primary hero heading follows the shared display token.
+Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for larger landing copy and a fluid display `h1`) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The normal reading body uses `--font-size-body-lg`; the large variant's primary hero heading follows the shared display token.
 
 Native article elements need no classes. Three explicit roles cover meaning HTML does not provide on its own:
 
@@ -186,16 +186,16 @@ Inline `code` is the technical-reference treatment: mono type on a quiet backgro
 </div>
 ```
 
-| class | role |
-| --- | --- |
-| `cx-page` | the frame (full-height flex column) |
-| `cx-page__content` | the padded, gapped content column |
-| `cx-page__content--fill` / `cx-page__fill` | a block that grows to fill the remaining height |
-| `cx-page__notice` | full-bleed strip above the content |
-| `cx-page__loading` | centred loading area |
-| `cx-page--bounded` | clip overflow to the viewport (for inner scroll regions) |
+| class                                      | role                                                     |
+| ------------------------------------------ | -------------------------------------------------------- |
+| `cx-page`                                  | the frame (full-height flex column)                      |
+| `cx-page__content`                         | the padded, gapped content column                        |
+| `cx-page__content--fill` / `cx-page__fill` | a block that grows to fill the remaining height          |
+| `cx-page__notice`                          | full-bleed strip above the content                       |
+| `cx-page__loading`                         | centred loading area                                     |
+| `cx-page--bounded`                         | clip overflow to the viewport (for inner scroll regions) |
 
-The global `--gutter-page` token keeps page content and shared chrome aligned, while the frame exposes `--cx-page-gap` and `--cx-page-measure` for intentional page-level configuration. Authenticated product pages keep the default full-width measure and cap only an inner reading block. Use `--cx-page-measure` only for a surface whose page-level role is explicitly bounded, rather than as local polish.
+The global `--gutter-page` token keeps page content and shared chrome aligned. Page content uses the global spacing roles directly. Authenticated product pages keep the default full-width measure and cap only an inner reading block. When an explicitly bounded page needs a maximum width, set `max-width` directly on its owned `.cx-page__content` element with an existing measure token. Do not introduce a page, article, or wrapper variable.
 
 ## A composed screen
 

@@ -3,6 +3,10 @@
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  checkStyleTokens,
+  formatStyleTokenIssue,
+} from "./cx-style-token-check.mjs";
 import { parseWorkspaceContract } from "./workspace-contract.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
@@ -67,6 +71,9 @@ export async function checkProduct({
     workspaceManifest,
     issues,
   });
+
+  const tokenCheck = await checkStyleTokens({ root: projectRoot });
+  issues.push(...tokenCheck.issues.map(formatStyleTokenIssue));
 
   return { issues, manifest, projectRoot, standard };
 }

@@ -5,21 +5,13 @@
 }
 
 .cx-explorer {
-  --cx-explorer-row-height: calc(
-    var(--controller-size-small) + var(--space-sm) * 2
-  );
-  --cx-explorer-subrow-height: calc(
-    var(--controller-size-small) + var(--space-xs) * 2
-  );
-  --cx-explorer-row-gap: 1px;
   // Folder grouping carries the hierarchy; rows share one icon rail so nested
   // content keeps the full useful width.
-  --cx-explorer-rail: 0;
 
   display: flex;
   position: relative;
-  width: var(--cx-explorer-width, 260px);
-  min-width: min(max(200px, var(--cx-explorer-min-width, 0px)), 100%);
+  width: 260px;
+  min-width: min(max(200px, 0px), 100%);
   max-width: 100%;
   height: 100%;
   min-height: 100%;
@@ -102,7 +94,7 @@
   box-sizing: border-box;
   width: 100%;
   flex: 0 0 auto;
-  padding-inline-end: var(--cx-explorer-scrollbar-gutter, 0px);
+  padding-inline-end: 0px;
 }
 
 .cx-explorer__skeleton {
@@ -117,7 +109,7 @@
 
 .cx-explorer__skeleton-row {
   display: block;
-  height: var(--cx-explorer-row-height);
+  height: calc(var(--controller-size-small) + var(--space-sm) * 2);
   border-radius: var(--radius-sm);
   background: linear-gradient(
     90deg,
@@ -150,7 +142,7 @@
 }
 
 .cx-explorer__root-items {
-  gap: var(--cx-explorer-row-gap);
+  gap: var(--space-2xs);
   list-style: none;
 }
 
@@ -162,7 +154,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: var(--cx-explorer-row-gap);
+  gap: var(--space-2xs);
 }
 
 .cx-explorer__folder.cdk-drag-preview {
@@ -203,7 +195,7 @@
 .cx-explorer__row-main {
   display: flex;
   min-width: 0;
-  min-height: var(--cx-explorer-row-height);
+  min-height: calc(var(--controller-size-small) + var(--space-sm) * 2);
   flex: 1 1 auto;
   align-items: center;
   gap: var(--space-sm);
@@ -237,7 +229,7 @@
 }
 
 .cx-explorer__row--item .cx-explorer__row-main {
-  min-height: var(--cx-explorer-subrow-height);
+  min-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
   padding-block: var(--space-xs);
 }
 
@@ -253,7 +245,7 @@
 // The identity accent: the closed color union maps 1:1 onto palette tokens,
 // falling back to the row's own ink when no color is set.
 .cx-explorer__row-icon--accent {
-  color: var(--cx-explorer-accent, currentColor);
+  color: inherit;
 }
 
 // Folders carry one fixed identity hue: purple marks structure, so item
@@ -357,7 +349,7 @@
 
 .cx-explorer__rename-input {
   min-width: 0;
-  min-height: var(--cx-explorer-subrow-height);
+  min-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
   flex: 1 1 auto;
   margin: 0;
   padding: var(--space-xs);
@@ -389,9 +381,9 @@
   display: flex;
   min-height: 0;
   margin: 0;
-  padding: 0 0 0 var(--cx-explorer-rail);
+  padding: 0 0 0 0;
   flex-direction: column;
-  gap: var(--cx-explorer-row-gap);
+  gap: var(--space-2xs);
   list-style: none;
   overflow: hidden;
   visibility: hidden;
@@ -443,18 +435,17 @@
   padding: 0;
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--cx-explorer-swatch) 80%, var(--surface));
+
   cursor: pointer;
 }
 
 .cx-explorer__swatch--none {
   // The "no color" choice shows the neutral ink the icon actually falls back to.
-  --cx-explorer-swatch: var(--ink);
   background: color-mix(in srgb, var(--ink) 30%, var(--surface));
 }
 
 .cx-explorer__swatch:hover {
-  border-color: var(--opacity-strong);
+  border-color: var(--opacity-mid);
 }
 
 .cx-explorer__swatch[aria-pressed="true"] {
@@ -510,7 +501,7 @@
 
 .cx-explorer__picker-icon[aria-pressed="true"] {
   background: var(--opacity-low);
-  color: var(--cx-explorer-accent, var(--ink));
+  color: inherit;
 }
 
 .cx-explorer__picker-icon:focus-visible {

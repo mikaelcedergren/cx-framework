@@ -7,6 +7,12 @@ description: Use automatically to validate an existing user-facing design brief,
 
 Use this skill as the design-quality guardian. Evaluate existing work; do not create the solution. If the user also requests changes, finish the review and hand solution work to the owning skill.
 
+## Required styling contract
+
+[MUST] Before reviewing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This is required for every styling task, including wrappers, pages, and runtime styling.
+
+[MUST] At the relevant gate, inspect direct token use and the token-check evidence as well as visual purpose. Flag violations; a visually matching result does not excuse them.
+
 ## Operating mode
 
 - Establish the user's goal, the artifact's maturity, and the next gate before judging it.

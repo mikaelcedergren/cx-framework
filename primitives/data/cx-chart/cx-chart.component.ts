@@ -11,11 +11,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import type {
-  AgChartInstance,
-  AgChartOptions,
-  AgChartTheme,
-} from 'ag-charts-community';
+import type { AgChartInstance, AgChartOptions, AgChartTheme } from 'ag-charts-community';
 
 export type CxChartType = 'bar' | 'line' | 'area' | 'pie' | 'doughnut';
 
@@ -72,29 +68,6 @@ const CX_CHART_PALETTE = [
   '--purple',
 ] as const;
 
-const CX_CHART_COLOR_FALLBACKS: Record<string, string> = {
-  '--violet': '#3057f2',
-  '--blue': '#057dff',
-  '--cyan': '#00ccc5',
-  '--green': '#37c45b',
-  '--yellow': '#edc31c',
-  '--orange': '#ff980a',
-  '--red': '#ff4043',
-  '--pink': '#f2559c',
-  '--purple': '#ae4ede',
-  '--primary': '#057dff',
-  '--accent': '#00ccc5',
-  '--success': '#37c45b',
-  '--warning': '#ff980a',
-  '--danger': '#ff4043',
-  '--info': '#057dff',
-  '--ink': '#1f1f1f',
-  '--opacity-high': 'rgb(22 24 29 / 62%)',
-  '--opacity-mid': 'rgb(22 24 29 / 10%)',
-  '--surface': '#ffffff',
-  '--line': 'rgb(22 24 29 / 10%)',
-};
-
 @Component({
   selector: 'cx-chart',
   templateUrl: './cx-chart.component.html',
@@ -134,7 +107,9 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
     this.chartState.set(value ?? undefined);
   }
 
-  protected readonly chart$ = computed<CxResolvedChart>(() => this.normalizeChart(this.chartState()));
+  protected readonly chart$ = computed<CxResolvedChart>(() =>
+    this.normalizeChart(this.chartState()),
+  );
   protected readonly hasData$ = computed(() => this.hasRenderableData(this.chart$()));
   protected readonly emptyText$ = computed(() => this.chart$().emptyText);
   protected readonly ariaLabel$ = computed(() => this.chart$().ariaLabel);
@@ -287,7 +262,9 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private buildAxes(chart: CxResolvedChart): NonNullable<Extract<AgChartOptions, { axes?: unknown }>['axes']> {
+  private buildAxes(
+    chart: CxResolvedChart,
+  ): NonNullable<Extract<AgChartOptions, { axes?: unknown }>['axes']> {
     const textColor = this.token('--opacity-high');
     const lineColor = this.token('--opacity-mid');
     const axisBase = {
@@ -296,7 +273,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
       label: {
         enabled: chart.showAxes,
         color: textColor,
-        fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+        fontFamily: this.token('--font-family-base', 'sans-serif'),
         fontSize: 12,
       },
     };
@@ -311,7 +288,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
           enabled: chart.showAxes && !!chart.xAxisLabel,
           text: chart.xAxisLabel,
           color: textColor,
-          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontFamily: this.token('--font-family-base', 'sans-serif'),
           fontSize: 12,
         },
       },
@@ -327,7 +304,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
           enabled: chart.showAxes && !!chart.yAxisLabel,
           text: chart.yAxisLabel,
           color: textColor,
-          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontFamily: this.token('--font-family-base', 'sans-serif'),
           fontSize: 12,
         },
       },
@@ -345,7 +322,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
         },
         label: {
           color: this.token('--opacity-high'),
-          fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+          fontFamily: this.token('--font-family-base', 'sans-serif'),
           fontSize: 12,
         },
         paddingX: 12,
@@ -373,7 +350,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
       params: {
         backgroundColor: 'transparent',
         chartBackgroundColor: 'transparent',
-        fontFamily: this.token('--font-family-base', "'Inter', sans-serif"),
+        fontFamily: this.token('--font-family-base', 'sans-serif'),
         fontSize: 12,
         foregroundColor: this.token('--ink'),
         textColor: this.token('--opacity-high'),
@@ -388,7 +365,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
   }
 
   private colorsForChart(): string[] {
-    const palette = CX_CHART_PALETTE.map(tokenName => this.token(tokenName));
+    const palette = CX_CHART_PALETTE.map((tokenName) => this.token(tokenName));
     return palette;
   }
 
@@ -397,18 +374,20 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
     if (explicitColor?.startsWith('--')) {
       return this.token(explicitColor);
     }
-    return explicitColor || colors[index % colors.length] || CX_CHART_COLOR_FALLBACKS['--primary'];
+    return explicitColor || colors[index % colors.length] || this.token('--primary');
   }
 
   private hasRenderableData(chart: CxResolvedChart): boolean {
     if (!chart.labels.length || !chart.series.length) {
       return false;
     }
-    return chart.series.some(series => series.data.length > 0);
+    return chart.series.some((series) => series.data.length > 0);
   }
 
   private normalizeType(value: CxChartType | undefined): CxChartType {
-    return value === 'line' || value === 'area' || value === 'pie' || value === 'doughnut' ? value : 'bar';
+    return value === 'line' || value === 'area' || value === 'pie' || value === 'doughnut'
+      ? value
+      : 'bar';
   }
 
   private normalizeHeight(value: number | undefined): number | undefined {
@@ -423,7 +402,7 @@ export class CxChartComponent implements AfterViewInit, OnDestroy {
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
-  private token(name: string, fallback = CX_CHART_COLOR_FALLBACKS[name] ?? ''): string {
+  private token(name: string, fallback = 'transparent'): string {
     if (typeof getComputedStyle !== 'function') {
       return fallback;
     }

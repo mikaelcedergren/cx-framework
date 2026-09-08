@@ -204,14 +204,20 @@ check:
 
 The installed dependency is deliberately narrower. Its `files` allowlist carries immutable
 `dist/`, public AI/assets/styles/tokens/support/platform resources, including the self-contained component authority, the two package documents, and
-the four package commands (`cx-development-favicon`, `cx-framework-skills`, `cx-platform-check`, and
-`cx-server-artifact`)
+the five package commands (`cx-development-favicon`, `cx-framework-skills`, `cx-platform-check`,
+`cx-style-token-check`, and `cx-server-artifact`)
 plus their private, non-exported `workspace-contract.mjs` parser helper. Raw Angular and Node
 TypeScript, workbench source, root TypeScript entry files, build scripts, and tsconfigs remain in
 the generated repository for local rebuild checks but never enter a consumer or server artifact. This distinction
 applies to both packed installs and Git dependencies.
 
 The package exports `@mikaelcedergren/cx-framework/ai` as the AI entry point for `ai/design/00-start-here.md`; the complete `ai/*` tree remains available for task-local retrieval and skill-relative references. The portable design-system application contract lives at `ai/design/02-design-system.md`, never as a second root-level copy. Component-family terms in this tree are semantic roles: an agent inspects the consuming product's own design system and public APIs, then uses the best available component, configuration, or composition. The portable tree never maps those roles to `cx-*` names or depends on `support/` metadata.
+
+The direct-global-token rules and their required skill references ship in that same AI tree.
+The installed `cx-style-token-check` command and its automatic `cx-platform-check` integration
+provide downstream enforcement; see [the check contract](platform/README.md#style-token-check).
+Package verification must prove both accepted global aliases and rejected intermediate variables
+through the exported checker, not merely confirm that the files were copied.
 
 Codex discovers repository skills only under `.agents/skills`, not inside installed dependencies. The package therefore exposes the dependency-free `cx-framework-skills` command. From a consuming repository root, `pnpm exec cx-framework-skills` creates symlinked discovery folders that point to the installed package's `ai/skills/*`. If the dependency belongs to a nested workspace, invoke that package's command with `--root` pointing to the repository root. The command exposes the complete portable set, preserves unrelated skills, and refuses to overwrite any existing local skill.
 

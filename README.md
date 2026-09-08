@@ -553,7 +553,10 @@ Then imports can stay short:
 @use "styles/page";
 ```
 
-Use semantic tokens by purpose. Do not hardcode token values or rename tokens into local aliases just to make nicer names.
+Before styling, apply `tokens.direct-global`, `tokens.semantic`, and `tokens.new-global` in
+[the shared token rules](ai/design/03-ux-rules.md#tokens-and-color), using [the concrete token
+purposes](tokens/README.md). Run [the packaged style token check](platform/README.md#style-token-check)
+before completing styling work.
 
 ### Theme profiles
 

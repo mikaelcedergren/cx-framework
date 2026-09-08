@@ -187,7 +187,6 @@ export declare class CxQueryFieldComponent implements AfterViewInit, AfterViewCh
     protected draftJoinLabel(): string;
     protected isConditionInvalid(conditionId: string): boolean;
     protected isSuggestionActive(index: number): boolean;
-    protected suggestionAriaSelected(suggestion: CxQueryFieldSuggestion): string;
     protected showSuggestionCheckbox(suggestion: CxQueryFieldSuggestion): boolean;
     protected isMultipleValueStage(): boolean;
     protected onSuggestionPointerDown(event: PointerEvent): void;
