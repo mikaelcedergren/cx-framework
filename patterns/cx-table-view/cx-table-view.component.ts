@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
   computed,
+  contentChildren,
   signal,
 } from '@angular/core';
 import {
@@ -19,6 +20,7 @@ import {
 import { type CxToggleChipGroupOption } from '../../primitives/inputs/cx-toggle-chip-group';
 import {
   CxTableComponent,
+  CxTableCellDirective,
   type CxTableColumn,
   type CxTableDensity,
   type CxTableRowActivation,
@@ -55,12 +57,13 @@ export type CxTableViewPaginationMode = 'none' | 'pages';
 
 @Component({
   selector: 'cx-table-view',
-  imports: [CommonModule, CxActionBarComponent, CxFilterBarComponent, CxPaginationComponent, CxTableComponent],
+  imports: [CommonModule, CxActionBarComponent, CxFilterBarComponent, CxPaginationComponent, CxTableComponent, CxTableCellDirective],
   templateUrl: './cx-table-view.component.html',
   styleUrl: './cx-table-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxTableViewComponent {
+  protected readonly customCells = contentChildren(CxTableCellDirective, { descendants: true });
   private readonly columnsState = signal<readonly CxTableColumn[]>([]);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
 
@@ -156,7 +159,8 @@ export class CxTableViewComponent {
   @Output() readonly thenByDirectionChange = new EventEmitter<CxTableSortDirection>();
   @Output() readonly visibleColumnIdsChange = new EventEmitter<string[]>();
   @Output() readonly pinnedColumnIdsChange = new EventEmitter<string[]>();
-  @Output() readonly exportTable = new EventEmitter<void>();
+  @Input() actions: CxMenuItem[] = [];
+  @Output() readonly actionSelect = new EventEmitter<string>();
   @Output() readonly resetTable = new EventEmitter<void>();
   @Output() readonly sortChange = new EventEmitter<CxTableSort | undefined>();
   @Output() readonly columnOrderChange = new EventEmitter<string[]>();
@@ -168,6 +172,11 @@ export class CxTableViewComponent {
   @Output() readonly pageChange = new EventEmitter<CxPaginationPage>();
   @Output() readonly actionBarDeselectAll = new EventEmitter<void>();
   @Output() readonly actionBarAction = new EventEmitter<string>();
+
+  /** Consumer-triggered filter/query transition, including loss confirmation. */
+  public requestModeSwitch(): void {
+    this.filterBar?.requestModeSwitch();
+  }
 
   protected get hasHeading(): boolean {
     return this.heading.trim().length > 0;

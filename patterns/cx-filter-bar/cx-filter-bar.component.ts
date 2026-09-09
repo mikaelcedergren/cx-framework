@@ -529,8 +529,9 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   @Output() readonly visibleColumnIdsChange = new EventEmitter<string[]>();
   @Output() readonly pinnedColumnIdsChange = new EventEmitter<string[]>();
   @Output() readonly filterPopoverOpenChange = new EventEmitter<boolean>();
-  @Output() readonly exportTable = new EventEmitter<void>();
-  @Output() readonly resetTable = new EventEmitter<void>();
+  /** Consumer-owned menu entries. An empty list hides the actions menu. */
+  @Input() actions: CxMenuItem[] = [];
+  @Output() readonly actionSelect = new EventEmitter<string>();
 
   protected readonly mode$ = this.modeState.asReadonly();
   protected readonly quickFilters$ = this.quickFiltersState.asReadonly();
@@ -711,15 +712,6 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
   protected readonly savedViewIcon$ = computed<CxIconName>(() =>
     this.activeSavedViewIdState() ? 'saved-view-on' : 'saved-view',
   );
-  protected readonly overflowItems$ = computed<CxMenuItem[]>(() => {
-    const switchLabel = this.modeState() === 'filters' ? 'Switch to query mode' : 'Switch to filter mode';
-    const switchIcon = this.modeState() === 'filters' ? 'query' : 'filters';
-    return [
-      { id: 'switch-mode', label: switchLabel, prependIcon: switchIcon },
-      { id: 'export-table', label: 'Export table', prependIcon: 'export' },
-      { id: 'reset-table', label: 'Reset view', prependIcon: 'reset', dividerBefore: true },
-    ];
-  });
   protected readonly displayOptions = DISPLAY_OPTIONS;
   ngAfterViewInit(): void {
     if (typeof ResizeObserver === 'undefined') {
@@ -1070,21 +1062,6 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.propertiesPopoverOpenState.set(false);
   }
 
-  protected onOverflowItemSelect(itemId: string): void {
-    if (itemId === 'export-table') {
-      this.exportTable.emit();
-      return;
-    }
-    if (itemId === 'switch-mode') {
-      this.requestModeSwitch();
-      return;
-    }
-    if (itemId === 'reset-table') {
-      this.resetTable.emit();
-      this.invalidateSavedViewSelection();
-    }
-  }
-
   protected queryConditionFieldLabel(condition: CxQueryFieldCondition): string {
     return this.resolvedQueryFields$().find(field => field.id === condition.fieldId)?.label
       ?? condition.fieldId;
@@ -1414,7 +1391,8 @@ export class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     this.invalidateSavedViewSelection();
   }
 
-  private requestModeSwitch(): void {
+  /** Requests the alternate filter/query mode, preserving the translation confirmation. */
+  public requestModeSwitch(): void {
     if (this.modeState() === 'filters') {
       const translatedQuery = this.filtersToQueryConditionsState();
       if (translatedQuery !== undefined && this.queryFieldsState().length > 0) {

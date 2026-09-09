@@ -109,18 +109,20 @@
       />
     </div>
 
+    @if (actions.length) {
     <cx-menu
       [presentation]="{ kind: 'trigger' }"
-      [items]="overflowItems$()"
+      [items]="actions"
       (openChange)="onOverflowOpenChange($event)"
-      (itemSelect)="onOverflowItemSelect($event)"
+      (itemSelect)="actionSelect.emit($event)"
     >
       <cx-icon-button
         cxMenuTrigger
         icon="menu-vertical"
-        ariaLabel="Table actions" variant="transparent"
+        ariaLabel="View actions" variant="transparent"
       />
     </cx-menu>
+    }
   </div>
 
 </div>

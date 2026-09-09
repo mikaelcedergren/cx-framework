@@ -23,6 +23,12 @@
     [class.cx-text-area__shell--inline-edit]="variant === 'inline-edit' || variant === 'title'"
     [class.cx-text-area__shell--focus-ring]="focusVariant === 'ring'"
   >
+    <ng-container #headerOutlet />
+    <ng-template #headerTemplate>
+      <div class="cx-text-area__toolbar" [inert]="disabled$()">
+        <ng-content select="[slot=header]" />
+      </div>
+    </ng-template>
     <div
       class="cx-text-area__editor"
       [class.cx-text-area__editor--with-gutter]="showGutter$()"

@@ -1,7 +1,13 @@
 @use "tokens/breakpoints" as bp;
 
-:host {
+cx-utility-bar {
   display: contents;
+}
+
+// Fixed black is intentional here: theme-dependent ink can turn white on this bar.
+cx-utility-bar .cx-utility-bar__content a:any-link,
+cx-utility-bar .cx-utility-bar__actions a:any-link {
+  color: #000;
 }
 
 .cx-utility-bar {

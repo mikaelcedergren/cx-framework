@@ -57,8 +57,8 @@
         (thenByDirectionChange)="thenByDirectionChange.emit($event)"
         (visibleColumnIdsChange)="visibleColumnIdsChange.emit($event)"
         (pinnedColumnIdsChange)="pinnedColumnIdsChange.emit($event)"
-        (exportTable)="exportTable.emit()"
-        (resetTable)="resetTable.emit()"
+        [actions]="actions"
+        (actionSelect)="actionSelect.emit($event)"
       />
     }
   </div>
@@ -99,7 +99,14 @@
       (rowActivate)="rowActivate.emit($event)"
       (selectedRowIdsChange)="selectedRowIdsChange.emit($event)"
       (rowMenuItemSelect)="rowMenuItemSelect.emit($event)"
-    />
+    >
+      @for (definition of customCells(); track definition) {
+        <ng-template [cxTableCell]="definition.cxTableCell" let-row let-column="column" let-cell="cell">
+          <ng-container [ngTemplateOutlet]="definition.template"
+            [ngTemplateOutletContext]="{ $implicit: row, row: row, column: column, cell: cell }" />
+        </ng-template>
+      }
+    </cx-table>
   </div>
 
   @if (showPagination) {

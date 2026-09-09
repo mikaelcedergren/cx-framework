@@ -1,3 +1,4 @@
+import { CxTableCellDirective } from './cx-table-cell.directive';
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -13,6 +14,7 @@ import {
   afterNextRender,
   afterRenderEffect,
   computed,
+  contentChildren,
   inject,
   signal,
 } from '@angular/core';
@@ -107,6 +109,11 @@ export type CxTableSeverityCell =
     };
 
 export type CxTableCell =
+  | {
+      kind: 'custom';
+      /** Plain value for accessible row naming and consumer-owned sorting/filtering. */
+      value: string;
+    }
   | {
       kind: 'text';
       value: string;
@@ -900,6 +907,16 @@ export class CxTableComponent implements OnDestroy {
 
   protected trackRow(index: number, row: CxTableRow): string {
     return row.id ?? `${index}`;
+  }
+
+  private readonly cellTemplates = contentChildren(CxTableCellDirective, { descendants: true });
+
+  protected customCellTemplate(columnId: string) {
+    const templates = this.cellTemplates().filter(template => template.cxTableCell === columnId);
+    if (templates.length !== 1) {
+      throw new Error(`cx-table: custom column "${columnId}" requires exactly one ng-template[cxTableCell].`);
+    }
+    return templates[0].template;
   }
 
   protected cellFor(row: CxTableRow, columnId: string): CxTableCell | undefined {
@@ -2264,10 +2281,10 @@ export class CxTableComponent implements OnDestroy {
     return role ? CX_TABLE_INTERACTIVE_ROLES.has(role) : false;
   }
 
-  private keyTextCell(row: CxTableRow): Extract<CxTableCell, { kind: 'text' }> | undefined {
+  private keyTextCell(row: CxTableRow): Extract<CxTableCell, { kind: 'text' | 'custom' }> | undefined {
     const keyColumn = this.columns$().find((column) => column.key);
     const keyCell = keyColumn ? row.cells[keyColumn.id] : undefined;
-    return keyCell?.kind === 'text' && keyCell.value.trim() ? keyCell : undefined;
+    return (keyCell?.kind === 'text' || keyCell?.kind === 'custom') && keyCell.value.trim() ? keyCell : undefined;
   }
 
   private updateDragPreview(clientX: number, clientY: number, label: string): void {

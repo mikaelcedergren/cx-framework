@@ -1,3 +1,7 @@
 {
-  "locked": []
+  "locked": [
+    "cx-card",
+    "cx-dropdown",
+    "cx-icon"
+  ]
 }

@@ -370,6 +370,13 @@
       "path": "primitives/data/cx-query-field/cx-query-field.component.ts"
     },
     {
+      "name": "cx-table-cell",
+      "selectors": ["ng-template[cxTableCell]"],
+      "area": "primitive",
+      "category": "data",
+      "path": "primitives/data/cx-table/cx-table-cell.directive.ts"
+    },
+    {
       "name": "cx-table",
       "selectors": [
         "cx-table"

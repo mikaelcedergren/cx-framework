@@ -50,6 +50,10 @@ export type CxTableSeverityCell = {
     kev?: boolean;
 };
 export type CxTableCell = {
+    kind: 'custom';
+    /** Plain value for accessible row naming and consumer-owned sorting/filtering. */
+    value: string;
+} | {
     kind: 'text';
     value: string;
     prependIcon?: CxIconName;
@@ -269,6 +273,8 @@ export declare class CxTableComponent implements OnDestroy {
     protected selectionLabel(row: CxTableRow): string;
     protected trackColumn(index: number, column: CxTableColumn): string;
     protected trackRow(index: number, row: CxTableRow): string;
+    private readonly cellTemplates;
+    protected customCellTemplate(columnId: string): import("@angular/core").TemplateRef<import("./cx-table-cell.directive").CxTableCellContext>;
     protected cellFor(row: CxTableRow, columnId: string): CxTableCell | undefined;
     protected progressPercent(value: number): string;
     protected rowKind(row: CxTableRow): CxTableRowKind;
@@ -391,7 +397,7 @@ export declare class CxTableComponent implements OnDestroy {
     private keyTextCell;
     private updateDragPreview;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxTableComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableComponent, "cx-table", never, { "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyState": { "alias": "emptyState"; "required": false; }; "emptyStateAction": { "alias": "emptyStateAction"; "required": false; }; "noMatchesState": { "alias": "noMatchesState"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; }, { "activeRowIdChange": "activeRowIdChange"; "emptyStateActionSelect": "emptyStateActionSelect"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "rowActivate": "rowActivate"; "columnOrderChange": "columnOrderChange"; "sortChange": "sortChange"; "filterValuesChange": "filterValuesChange"; "resetTable": "resetTable"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "columnHeaderMenuOpenChange": "columnHeaderMenuOpenChange"; "columnPinChange": "columnPinChange"; "columnVisibilityChange": "columnVisibilityChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxTableComponent, "cx-table", never, { "density": { "alias": "density"; "required": false; }; "rowActivation": { "alias": "rowActivation"; "required": false; }; "showHeaders": { "alias": "showHeaders"; "required": false; }; "columnsResizable": { "alias": "columnsResizable"; "required": false; }; "columnsReorderable": { "alias": "columnsReorderable"; "required": false; }; "stickyHeader": { "alias": "stickyHeader"; "required": false; }; "zebra": { "alias": "zebra"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "showRowActions": { "alias": "showRowActions"; "required": false; }; "rightClickMenu": { "alias": "rightClickMenu"; "required": false; }; "emptyState": { "alias": "emptyState"; "required": false; }; "emptyStateAction": { "alias": "emptyStateAction"; "required": false; }; "noMatchesState": { "alias": "noMatchesState"; "required": false; }; "selectionMode": { "alias": "selectionMode"; "required": false; }; "columns": { "alias": "columns"; "required": false; }; "rows": { "alias": "rows"; "required": false; }; "activeRowId": { "alias": "activeRowId"; "required": false; }; "selectedRowIds": { "alias": "selectedRowIds"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "sort": { "alias": "sort"; "required": false; }; }, { "activeRowIdChange": "activeRowIdChange"; "emptyStateActionSelect": "emptyStateActionSelect"; "selectedRowIdsChange": "selectedRowIdsChange"; "rowMenuItemSelect": "rowMenuItemSelect"; "rowActivate": "rowActivate"; "columnOrderChange": "columnOrderChange"; "sortChange": "sortChange"; "filterValuesChange": "filterValuesChange"; "resetTable": "resetTable"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "columnHeaderMenuOpenChange": "columnHeaderMenuOpenChange"; "columnPinChange": "columnPinChange"; "columnVisibilityChange": "columnVisibilityChange"; }, ["cellTemplates"], never, true, never>;
 }
 export {};
 //# sourceMappingURL=cx-table.component.d.ts.map

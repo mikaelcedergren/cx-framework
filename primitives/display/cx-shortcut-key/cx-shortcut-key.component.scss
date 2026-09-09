@@ -17,7 +17,7 @@
   justify-content: center;
   border-radius: var(--radius-xs);
   border: var(--line);
-  color: inherit;
+  color: var(--opacity-high);
   box-sizing: border-box;
 }
 
@@ -32,12 +32,12 @@
 
 .cx-shortcut-key__icon {
   display: inline-flex;
-  color: inherit;
+  color: var(--opacity-high);
 }
 
 .cx-shortcut-key__text {
   display: block;
-  color: inherit;
+  color: var(--opacity-high);
   font-size: var(--font-size-body-xs);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-small);

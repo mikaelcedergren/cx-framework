@@ -2,9 +2,16 @@ import { AfterContentChecked, EventEmitter, OnChanges, OnDestroy, SimpleChanges 
 import { type CxIconName } from '../../icons/manifest';
 import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
 import * as i0 from "@angular/core";
-export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss';
+export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss' | 'retry';
 export type CxWizardDialogSize = 'default' | 'large';
 export type CxWizardDialogStepStatus = 'default' | 'success';
+export interface CxWizardDialogProcessing {
+    /** Unique for each occurrence and retry; retain it while updating that work's result. */
+    id: string;
+    state: 'pending' | 'success' | 'danger';
+    heading: string;
+    description?: string;
+}
 export interface CxWizardDialogStep {
     id: string;
     name: string;
@@ -21,6 +28,8 @@ export interface CxWizardDialogData {
     size?: CxWizardDialogSize;
     loadingActionId?: CxWizardDialogAction | string;
     feedbackVisible?: boolean;
+    /** A temporary screen outside steps. Clear it and update index on processingComplete. */
+    processing?: CxWizardDialogProcessing;
     /** Shows the top-right close button. Off by default; Cancel and Escape are unaffected. */
     dismissible?: boolean;
 }
@@ -33,6 +42,9 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     private readonly stepTemplates;
     private overlayHandle?;
     private requestedOpen;
+    private processingRun?;
+    private processingTimer?;
+    private readonly processingContent?;
     private readonly feedbackContent?;
     private readonly dialogBackdrop?;
     private readonly stepContent?;
@@ -50,6 +62,7 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     protected readonly isFirstStep$: import("@angular/core").Signal<boolean>;
     protected readonly isLastStep$: import("@angular/core").Signal<boolean>;
     protected readonly showFeedback$: import("@angular/core").Signal<boolean>;
+    protected readonly processing$: import("@angular/core").Signal<CxWizardDialogProcessing | undefined>;
     protected readonly isLarge$: import("@angular/core").Signal<boolean>;
     protected readonly dismissible$: import("@angular/core").Signal<boolean>;
     protected readonly primaryLabel$: import("@angular/core").Signal<string>;
@@ -59,6 +72,8 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     protected readonly currentInfoDescription$: import("@angular/core").Signal<string | undefined>;
     loading: boolean;
     confirmLabel: string;
+    /** Disables Continue or Confirm and its keyboard shortcut without blocking Back or Cancel. */
+    primaryDisabled: boolean;
     set wizard(value: CxWizardDialogData | null | undefined);
     set open(value: boolean);
     get open(): boolean;
@@ -66,6 +81,8 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     /** Synchronous request emitted before a user dismissal would close this wizard. */
     readonly dismissRequest: EventEmitter<CxDismissRequest>;
     readonly action: EventEmitter<CxWizardDialogAction>;
+    /** Once per successful occurrence, after at least two seconds on screen. */
+    readonly processingComplete: EventEmitter<string>;
     ngOnChanges(_changes: SimpleChanges): void;
     ngAfterContentChecked(): void;
     ngOnDestroy(): void;
@@ -78,6 +95,12 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     protected onFeedbackClose(): void;
     protected onSecondaryAction(): void;
     protected onPrimaryAction(): void;
+    protected onProcessingAction(action: 'retry' | 'back'): void;
+    private syncProcessing;
+    private completeProcessing;
+    private cancelProcessing;
+    private focusProcessingAfterRender;
+    private focusProcessing;
     private closeFromUser;
     private requestDismiss;
     private syncOpen;
@@ -87,6 +110,6 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     private clampIndex;
     private normalizeWizard;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxWizardDialogComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxWizardDialogComponent, "cx-wizard-dialog", never, { "loading": { "alias": "loading"; "required": false; }; "confirmLabel": { "alias": "confirmLabel"; "required": false; }; "wizard": { "alias": "wizard"; "required": false; }; "open": { "alias": "open"; "required": false; }; }, { "openChange": "openChange"; "dismissRequest": "dismissRequest"; "action": "action"; }, ["stepTemplates"], ["[cxWizardDialogFeedback], [slot=feedback]", "[cxWizardDialogSecondaryAction], [slot=secondary-action]", "[cxWizardDialogInfo], [slot=info]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxWizardDialogComponent, "cx-wizard-dialog", never, { "loading": { "alias": "loading"; "required": false; }; "confirmLabel": { "alias": "confirmLabel"; "required": false; }; "primaryDisabled": { "alias": "primaryDisabled"; "required": false; }; "wizard": { "alias": "wizard"; "required": false; }; "open": { "alias": "open"; "required": false; }; }, { "openChange": "openChange"; "dismissRequest": "dismissRequest"; "action": "action"; "processingComplete": "processingComplete"; }, ["stepTemplates"], ["[cxWizardDialogProcessing], [slot=processing]", "[cxWizardDialogFeedback], [slot=feedback]", "[cxWizardDialogSecondaryAction], [slot=secondary-action]", "[cxWizardDialogInfo], [slot=info]"], true, never>;
 }
 //# sourceMappingURL=cx-wizard-dialog.component.d.ts.map

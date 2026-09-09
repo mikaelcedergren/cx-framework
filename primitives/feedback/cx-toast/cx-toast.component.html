@@ -10,8 +10,6 @@
     [class.cx-toast--danger]="mood === 'danger'"
     [class.cx-toast--multiline]="isMultiline"
     [class.cx-toast--timed]="effectiveTimed"
-    [style.transform]="'scaleX(' + timerProgress$() + ')'"
-    [style.transition-duration.ms]="timerTransition$()"
     role="status"
     [attr.aria-live]="mood === 'danger' ? 'assertive' : 'polite'"
     (pointerenter)="onPointerEnter()"
@@ -84,7 +82,12 @@
     }
 
     @if (effectiveTimed) {
-      <span class="cx-toast__timer" aria-hidden="true"></span>
+      <span
+        class="cx-toast__timer"
+        [style.transform]="'scaleX(' + timerProgress$() + ')'"
+        [style.transition-duration.ms]="timerTransition$()"
+        aria-hidden="true"
+      ></span>
     }
   </div>
 }

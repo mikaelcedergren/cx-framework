@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 132,
-  "catalogSha256": "f25f52f2333419f95625dd9d0cc47e638073d55b88136339f39b08e97769a79b",
+  "componentCount": 133,
+  "catalogSha256": "ff06b4d419dad3a05c7597dc59cc817d3bc52b09d3034fe74b1252aaf5d70e42",
   "components": [
     {
       "name": "cx-account-control",
@@ -4626,6 +4626,15 @@
         "symbol": "CxFilterBarComponent",
         "inputs": [
           {
+            "binding": "actions",
+            "member": "actions",
+            "type": "CxMenuItem[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "decorator"
+          },
+          {
             "binding": "columnOptions",
             "member": "columnOptions",
             "type": "CxFilterBarColumnOption[] | undefined",
@@ -4880,6 +4889,12 @@
         ],
         "outputs": [
           {
+            "binding": "actionSelect",
+            "member": "actionSelect",
+            "type": "string",
+            "source": "decorator"
+          },
+          {
             "binding": "activeSavedViewIdChange",
             "member": "activeSavedViewIdChange",
             "type": "string | undefined",
@@ -4889,12 +4904,6 @@
             "binding": "displayModeChange",
             "member": "displayModeChange",
             "type": "CxFilterBarDisplayMode",
-            "source": "decorator"
-          },
-          {
-            "binding": "exportTable",
-            "member": "exportTable",
-            "type": "void",
             "source": "decorator"
           },
           {
@@ -4964,12 +4973,6 @@
             "source": "decorator"
           },
           {
-            "binding": "resetTable",
-            "member": "resetTable",
-            "type": "void",
-            "source": "decorator"
-          },
-          {
             "binding": "savedViewSelect",
             "member": "savedViewSelect",
             "type": "string",
@@ -5022,11 +5025,11 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "15b1e2c90ceff14c4c832a6fd344f51d0969c774e4c1b741d90fd22e8bfa0745"
+          "sha256": "5bc931c4ce558233c21c9317ca33a61d38b71f9a7b48add20c93f99f13954df0"
         },
         "template": {
           "kind": "external",
-          "sha256": "f38a7587adf36aeba17883c537d1e0793b13f300c4f6b09d41d62c4c873b154a"
+          "sha256": "a0e6b6994b06ec0a456bb5155ee227bea8f084ea83a6fbf3c5bc1222aedafc14"
         },
         "styles": [
           {
@@ -5970,7 +5973,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "7609b7a88f839b607aed01a928449712c8f6622526f3364c421c4178a5226952"
+            "sha256": "0f5b1cd1554275dc2f3b82ffced8174712e26296eb74e4eac842fd709ddd6162"
           }
         ]
       }
@@ -10244,7 +10247,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "038a3f5f587ecb1275bc4dc7718c051be8ce04fd5a6005d032e8c59f561e2724"
+            "sha256": "433f18576a3d420bfcc75868f59ac14d31720a8121361c191316befa54997162"
           }
         ]
       }
@@ -11337,11 +11340,11 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "3b8f243b598996274dfcffac1c56fe13eb927656210c678885d01a776ba8abe5"
+          "sha256": "89641992a92e83498ed06e8d7604bd30ed872799dc36a37e6ad1ecd1c8eff44b"
         },
         "template": {
           "kind": "external",
-          "sha256": "f0afb89dfccc2435cc2ccb3e2d3a1522633f439bdc6296690b4e8e7457f53c97"
+          "sha256": "c7d589a5d60ccf9977fd8a075224a94fc3e4f8ebd14b3448819f3a96630eae10"
         },
         "styles": [
           {
@@ -11869,19 +11872,54 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "b0865356cd1ca21238037d3703005d8e62719be348251872a11c2142d1b01350"
+          "sha256": "146d5880a86b3c7ee51eb95e63452ceb7b72eae6628a166b2cf92e654af2ff3f"
         },
         "template": {
           "kind": "external",
-          "sha256": "ba09f6d8d16d72d99ddc217bb093b07b7aaebad820ca60875f1b6c594b68d53a"
+          "sha256": "278f5f27adf8c6efe569d467641c1a4abaea04dd7971ee73ef37e723034ecfe8"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "beee53d86499878e8717c2c8046a7e5dd788840005ecd9216597821928298bcf"
+            "sha256": "7a9879155fd17e47e2f438b83c81ba37e874d811e4128dbb04896134d332c308"
           }
         ]
+      }
+    },
+    {
+      "name": "cx-table-cell",
+      "area": "primitive",
+      "category": "data",
+      "kind": "directive",
+      "selectors": [
+        "ng-template[cxTableCell]"
+      ],
+      "publicApi": {
+        "symbol": "CxTableCellDirective",
+        "inputs": [
+          {
+            "binding": "cxTableCell",
+            "member": "cxTableCell",
+            "type": "string",
+            "required": true,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "3a0a4f065d916c5d95126de7d62fc868a8fa8c069631a516c2055f0f1df1b446"
+        },
+        "template": {
+          "kind": "none",
+          "sha256": null
+        },
+        "styles": []
       }
     },
     {
@@ -11902,6 +11940,15 @@
             "required": false,
             "transform": null,
             "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "actions",
+            "member": "actions",
+            "type": "CxMenuItem[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
             "source": "decorator"
           },
           {
@@ -12351,6 +12398,12 @@
             "source": "decorator"
           },
           {
+            "binding": "actionSelect",
+            "member": "actionSelect",
+            "type": "string",
+            "source": "decorator"
+          },
+          {
             "binding": "activeRowIdChange",
             "member": "activeRowIdChange",
             "type": "string | undefined",
@@ -12378,12 +12431,6 @@
             "binding": "emptyStateActionSelect",
             "member": "emptyStateActionSelect",
             "type": "CxTableEmptyStateAction",
-            "source": "decorator"
-          },
-          {
-            "binding": "exportTable",
-            "member": "exportTable",
-            "type": "void",
             "source": "decorator"
           },
           {
@@ -12540,11 +12587,11 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "05ba6162f9a9f81b0f7561f28f0c914c31a1bf29016bf15570c864758ae0f396"
+          "sha256": "c52e695dd81f3ea9ed2b9064f501c62cbdff5a8c01779761a08cd4b56cf7171e"
         },
         "template": {
           "kind": "external",
-          "sha256": "4d7ef6c19d1e6538ea4c40ce4015545db2194db734cf083bc9de31c832a9c4cd"
+          "sha256": "1c182f58dbadc7c5c5357227ee462cf42494eda2304d56bdaf3cce106264bcbb"
         },
         "styles": [
           {
@@ -13188,20 +13235,25 @@
           }
         ]
       },
-      "contentProjection": [],
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[slot=header]"
+        }
+      ],
       "evidence": {
         "source": {
-          "sha256": "5d7a2baf41840094b92e1282bc099c26ed7b6a593686acff92afa4b0c273927c"
+          "sha256": "f9d1b1be394e9edc0683b4d98efba070f9d763871c8e048d908152f933d91720"
         },
         "template": {
           "kind": "external",
-          "sha256": "5adc61e63036fa06b7b290f5816aa665d10329fb2481dc82ca563fdc29602519"
+          "sha256": "7ac2fe6f85d8bcaa7b9537430df6c489c1c9e925d4aa0d16232a9e1195abafb2"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "169a17e34be5572065fcf18cdc0d80372b93732c458b5845e33aae1aab2713ad"
+            "sha256": "cbba5b885129cd229011587509cfabaf8a8a4ae91aaf9c2f3321dcdff0e5ee48"
           }
         ]
       }
@@ -13787,7 +13839,7 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "51d3a889706537d3109b87dd29e71b2063e173d0329bb834771349eed92c4ae8"
+          "sha256": "f7127d87679759b18ac8d488a0bb0ba86fe5dc4a4f61d07706bc85926e6d1edb"
         },
         "styles": [
           {
@@ -14630,7 +14682,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "935e150e5e84a02bedadfa6a30e4c28d454d7ef31ac83684ce282f83f5b13dfd"
+          "sha256": "6914c4c871450cd6f60d4449bd8bd5d6d392ecbf7dd274373e7162980b6376dc"
         },
         "template": {
           "kind": "external",
@@ -14640,7 +14692,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "5c760cfcea5d0b17a63ec683ba7d0e1339d954a000ca753ea31e478c4a92987a"
+            "sha256": "e40853a4d1df7eaeaf1c4b7e8e456a318f651a944a282a9a115de5627be22986"
           }
         ]
       }
@@ -14805,6 +14857,15 @@
             "source": "decorator"
           },
           {
+            "binding": "primaryDisabled",
+            "member": "primaryDisabled",
+            "type": "boolean",
+            "required": false,
+            "transform": null,
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "wizard",
             "member": "wizard",
             "type": "CxWizardDialogData | null | undefined",
@@ -14832,30 +14893,40 @@
             "member": "openChange",
             "type": "boolean",
             "source": "decorator"
+          },
+          {
+            "binding": "processingComplete",
+            "member": "processingComplete",
+            "type": "string",
+            "source": "decorator"
           }
         ]
       },
       "contentProjection": [
         {
           "ordinal": 1,
-          "selector": "[cxWizardDialogFeedback], [slot=feedback]"
+          "selector": "[cxWizardDialogProcessing], [slot=processing]"
         },
         {
           "ordinal": 2,
-          "selector": "[cxWizardDialogSecondaryAction], [slot=secondary-action]"
+          "selector": "[cxWizardDialogFeedback], [slot=feedback]"
         },
         {
           "ordinal": 3,
+          "selector": "[cxWizardDialogSecondaryAction], [slot=secondary-action]"
+        },
+        {
+          "ordinal": 4,
           "selector": "[cxWizardDialogInfo], [slot=info]"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "45a291a4f2d8f02c7d37da7a65fe4c0bd66bb2ad331efe396a423087a98a3d73"
+          "sha256": "89fe98e968e9f7c7b1d0b800201a1fc3be350bda78948b1a1bb35e1e13993037"
         },
         "template": {
           "kind": "external",
-          "sha256": "02a7a36df110ef965148598290086e74cb25bb6ff50e7e05c0b834cbb2790dae"
+          "sha256": "a2475bfb39757c35a224163143c88dc4bf4d996850794217623148e9e5611012"
         },
         "styles": [
           {

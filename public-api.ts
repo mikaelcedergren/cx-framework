@@ -2,6 +2,7 @@ export * from './icons/manifest';
 export * from './primitives/shared/keyboard-focus';
 export * from './theme';
 export * from './typeface';
+export * from './primitives/shared/date-time';
 
 export * from './patterns/cx-account-control';
 export * from './patterns/cx-action-bar';

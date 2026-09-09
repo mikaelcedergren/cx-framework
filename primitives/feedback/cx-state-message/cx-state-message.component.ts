@@ -25,40 +25,12 @@ export type CxStateMessageLayout = 'vertical' | 'horizontal';
 /** A state message answers with solid buttons; transparency is not one of its choices. */
 export type CxStateMessageAction = Omit<CxFeedbackAction, 'transparent'>;
 
-const CX_STATE_MESSAGE_PRESETS: Record<
-  Exclude<CxStateMessageState, 'default'>,
-  {
-    heading: string;
-    description: string;
-    icon: CxIconName;
-  }
-> = {
-  pending: {
-    heading: 'Working on it',
-    description: "Hold tight while we get this ready. We'll let you know when it's done.",
-    icon: 'spinner',
-  },
-  success: {
-    heading: 'All done',
-    description: 'Everything went through. You can move on to the next step.',
-    icon: 'check',
-  },
-  scheduled: {
-    heading: 'Scheduled',
-    description:
-      'This will run automatically at the scheduled time. You can cancel it if plans change.',
-    icon: 'schedule',
-  },
-  danger: {
-    heading: 'Something went wrong',
-    description: 'Try again, or reach out to support if it keeps happening.',
-    icon: 'error',
-  },
-};
-
-const CX_STATE_MESSAGE_STATE_ACTIONS: Partial<Record<CxStateMessageState, CxStateMessageAction>> = {
-  success: { text: 'Continue' },
-  danger: { text: 'Try again' },
+const CX_STATE_MESSAGE_ICONS: Record<CxStateMessageState, CxIconName> = {
+  default: 'placeholder',
+  pending: 'spinner',
+  success: 'check',
+  scheduled: 'schedule',
+  danger: 'error',
 };
 
 @Component({
@@ -105,25 +77,15 @@ export class CxStateMessageComponent implements AfterViewChecked {
 
   /** The state carries the mark that matches it; an icon of the consumer's own always wins. */
   protected get resolvedIcon(): CxIconName {
-    return this.icon ?? this.resolvedPreset?.icon ?? 'placeholder';
+    return this.icon ?? CX_STATE_MESSAGE_ICONS[this.state];
   }
 
   protected get resolvedHeading(): string {
-    const heading = this.heading.trim();
-    if (heading) {
-      return heading;
-    }
-    const preset = this.resolvedPreset;
-    return preset?.heading ?? '';
+    return this.heading.trim();
   }
 
   protected get resolvedDescription(): string {
-    const description = this.description?.trim();
-    if (description) {
-      return description;
-    }
-    const preset = this.resolvedPreset;
-    return preset?.description ?? '';
+    return this.description?.trim() ?? '';
   }
 
   protected get hasHeading(): boolean {
@@ -143,10 +105,7 @@ export class CxStateMessageComponent implements AfterViewChecked {
   }
 
   protected get visibleAction(): CxStateMessageAction | undefined {
-    return (
-      this.visibleActionFor(this.action) ??
-      this.visibleActionFor(CX_STATE_MESSAGE_STATE_ACTIONS[this.state])
-    );
+    return this.visibleActionFor(this.action);
   }
 
   protected get visibleSecondaryAction(): CxStateMessageAction | undefined {
@@ -155,14 +114,6 @@ export class CxStateMessageComponent implements AfterViewChecked {
 
   protected hasActions(): boolean {
     return this.visibleAction !== undefined || this.visibleSecondaryAction !== undefined;
-  }
-
-  private get resolvedPreset():
-    (typeof CX_STATE_MESSAGE_PRESETS)[keyof typeof CX_STATE_MESSAGE_PRESETS] | undefined {
-    if (this.state === 'default') {
-      return undefined;
-    }
-    return CX_STATE_MESSAGE_PRESETS[this.state];
   }
 
   private visibleActionFor(

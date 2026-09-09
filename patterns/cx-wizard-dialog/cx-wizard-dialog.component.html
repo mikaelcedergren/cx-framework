@@ -8,16 +8,31 @@
     <section
       class="cx-wizard-dialog"
       [class.cx-wizard-dialog--large]="isLarge$()"
-      [class.cx-wizard-dialog--feedback]="showFeedback$()"
+      [class.cx-wizard-dialog--feedback]="showFeedback$() || !!processing$()"
       cdkTrapFocus
       [cdkTrapFocusAutoCapture]="true"
       role="dialog"
       aria-modal="true"
-      [attr.aria-labelledby]="showFeedback$() ? null : titleId"
+      [attr.aria-labelledby]="showFeedback$() || processing$() ? null : titleId"
+      [attr.aria-label]="processing$()?.heading ?? null"
       (click)="$event.stopPropagation()"
       (keydown)="onDialogKeydown($event)"
     >
-      @if (showFeedback$()) {
+      @if (processing$(); as processing) {
+        <div #processingContent class="cx-wizard-dialog__feedback" tabindex="-1" [attr.aria-label]="processing.heading">
+          <ng-content select="[cxWizardDialogProcessing], [slot=processing]">
+            <cx-state-message
+              [state]="processing.state === 'danger' ? 'danger' : 'pending'"
+              [heading]="processing.heading"
+              [description]="processing.description"
+              [action]="processing.state === 'danger' ? { text: 'Try again' } : undefined"
+              [secondaryAction]="processing.state === 'danger' ? { text: 'Back' } : undefined"
+              (action)="onProcessingAction('retry')"
+              (secondaryAction)="onProcessingAction('back')"
+            />
+          </ng-content>
+        </div>
+      } @else if (showFeedback$()) {
         <div class="cx-wizard-dialog__feedback">
           <div #feedbackContent class="cx-wizard-dialog__feedback-content">
             <ng-content select="[cxWizardDialogFeedback], [slot=feedback]" />
@@ -107,7 +122,7 @@
                 mood="primary"
                 [appendIcon]="isLastStep$() ? undefined : 'arrow-right'"
                 [loading]="loadingActionId$() === 'confirm'"
-                [disabled]="isLoading$()"
+                [disabled]="primaryDisabled || isLoading$()"
                 (pressed)="onPrimaryAction()"
               />
             </div>

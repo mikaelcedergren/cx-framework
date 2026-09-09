@@ -14,6 +14,51 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.11.0
+
+- `formatCxDateTime` provides the shared activity, calendar, and absolute date-display contract.
+  Angular views use `CxDateTimeService` for labels that refresh as time passes. Replace product-local
+  relative-date formatters with these package-root exports; keep date controls and
+  precision-dependent records absolute. See [date and time](DATE-TIME.md).
+
+- `cx-text-area` accepts optional `[slot=header]` content inside the field above its writing area.
+  Supply buttons, information, or editing controls through this slot; their actions stay consumer-owned.
+  An omitted or empty slot has no header element, spacing, or divider, including when conditional
+  content disappears. The field's `disabled` state also makes header controls inert.
+  No visibility prop is needed. Formatting commands remain separate from the slot itself.
+
+- `cx-state-message`: states no longer inject default headings, descriptions or actions. Supply content and recovery actions explicitly. State styling and indicators remain; empty content stays absent across every state.
+
+- `cx-wizard-dialog`: `primaryDisabled` disables the primary action and its shortcut without blocking Back or Cancel. Recovery actions can remain inside a state message.
+
+- `cx-table` adds `kind: 'custom'` cells with a plain `value` and a column-keyed `ng-template[cxTableCell]`. Import `CxTableCellDirective`; the context exposes row, column and cell. These templates also project through `cx-table-view`. Disabled rows make custom content inert.
+- `cx-filter-bar` and `cx-table-view` replace filter-bar export/reset intents with consumer-owned `actions: CxMenuItem[]` and `actionSelect`. The default list is empty. Supply every desired entry, including Export, Reset view and any mode-switch action, and handle it in the page. There are no reserved ids. Call public `requestModeSwitch()` for the safe filter/query transition. The table's filtered-empty `resetTable` event remains a separate recovery intent.
+
+- `cx-wizard-dialog` accepts optional `wizard.processing` with a unique `id` per attempt,
+  `state: 'pending' | 'success' | 'danger'`, `heading`, and optional `description`.
+  It shows a temporary screen outside `steps`, with a minimum two-second display on each occurrence.
+  The app starts work immediately, updates only the matching attempt, and handles
+  `processingComplete(id)` by clearing `processing` and advancing `index` (or showing final feedback).
+  The completion event fires once after success and the minimum duration. Keep the same id while
+  resolving an attempt; use a new id for every retry. Removing processing, closing, or destroying
+  the wizard cancels its timer. Do not change the current step while processing is active.
+  Failure shows immediately and never advances. Default recovery emits `retry` or `back` through
+  `action`; retry starts a new attempt, and back clears processing without decrementing the index.
+  Optional `[cxWizardDialogProcessing]` / `[slot=processing]` content replaces the built-in
+  state message. Custom content owns its recovery actions and should keep `pending` visible even
+  after work succeeds until `processingComplete`. Processing and final feedback are mutually exclusive.
+
+- `cx-utility-bar` owns black link text for native links in its content and action slots in every
+  theme and interaction state. Remove consumer colour overrides; keep ordinary link affordances.
+
+- `cx-toast`: timed notifications keep their full width and centered position while only the
+  countdown bar shrinks. Entry and exit use the normal slide motion. No consumer changes are needed.
+
+- `cx-kpi` now uses the same corner radius as `cx-card`. No consumer changes are needed.
+
+- `cx-shortcut-key` icons and text use the shared supporting-text opacity. No consumer changes
+  are needed.
+
 ## 0.10.6
 
 - `cx-server-artifact` accepts the published `cx-style-token-check` command introduced in 0.10.5.

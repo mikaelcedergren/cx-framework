@@ -8,6 +8,7 @@ The portable design guidance and skills under `../ai/` do not read this metadata
 - `components/authority.json`: generated, self-contained public contract for every registry entry, including selector and class identity, input/output bindings and types, content-projection selectors, defaults/transforms, and exact source/template/style digests
 - `components/guidance.json`: complete, substantive exact-component guidance for people choosing and using the Cortex components; every key must resolve through the registry
 - `components/locks.json`: a sorted list of registry components the user has locked as read-only source; only the workbench Lock switch writes it, and Cortex's source-side lock guard fails closed when this authority cannot be trusted
+- `DATE-TIME.md`: the shared date formatter and Angular clock API, with links to the portable date-display rules
 - `UPGRADES.md`: version-by-version record of public API, default, and behaviour changes for agents upgrading a consuming product; usage only, never internals or visual refinement
 - `validation/visibility.rules.json`: the executable, framework-wide critical contract that no user-facing element renders without visible purpose
 

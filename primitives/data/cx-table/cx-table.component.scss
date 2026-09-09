@@ -342,7 +342,8 @@
   flex: 0 1 auto;
 }
 
-.cx-table__measure-target > .cx-table__text {
+.cx-table__measure-target > .cx-table__text,
+.cx-table__measure-target > .cx-table__custom {
   flex: 1 1 auto;
 }
 

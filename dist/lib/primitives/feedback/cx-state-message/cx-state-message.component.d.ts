@@ -36,7 +36,6 @@ export declare class CxStateMessageComponent implements AfterViewChecked {
     protected get visibleAction(): CxStateMessageAction | undefined;
     protected get visibleSecondaryAction(): CxStateMessageAction | undefined;
     protected hasActions(): boolean;
-    private get resolvedPreset();
     private visibleActionFor;
     protected resolveActionMood(action: CxStateMessageAction): CxButtonMood;
     protected onActionPressed(action: CxStateMessageAction): void;

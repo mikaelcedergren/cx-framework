@@ -184,8 +184,9 @@ export declare class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     readonly visibleColumnIdsChange: EventEmitter<string[]>;
     readonly pinnedColumnIdsChange: EventEmitter<string[]>;
     readonly filterPopoverOpenChange: EventEmitter<boolean>;
-    readonly exportTable: EventEmitter<void>;
-    readonly resetTable: EventEmitter<void>;
+    /** Consumer-owned menu entries. An empty list hides the actions menu. */
+    actions: CxMenuItem[];
+    readonly actionSelect: EventEmitter<string>;
     protected readonly mode$: import("@angular/core").Signal<CxFilterBarMode>;
     protected readonly quickFilters$: import("@angular/core").Signal<CxButtonGroupOption[]>;
     protected readonly selectedQuickFilterId$: import("@angular/core").Signal<string | undefined>;
@@ -263,7 +264,6 @@ export declare class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     protected readonly hasColumnControls$: import("@angular/core").Signal<boolean>;
     protected readonly resolvedSavedViews$: import("@angular/core").Signal<CxMenuItem[]>;
     protected readonly savedViewIcon$: import("@angular/core").Signal<CxIconName>;
-    protected readonly overflowItems$: import("@angular/core").Signal<CxMenuItem[]>;
     protected readonly displayOptions: CxButtonGroupOption[];
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
@@ -306,7 +306,6 @@ export declare class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     protected onQueryConditionsChange(value: readonly CxQueryFieldCondition[]): void;
     protected onSavedViewSelect(itemId: string): void;
     protected onSavedViewsOpenChange(open: boolean): void;
-    protected onOverflowItemSelect(itemId: string): void;
     protected queryConditionFieldLabel(condition: CxQueryFieldCondition): string;
     protected queryConditionOperatorLabel(condition: CxQueryFieldCondition): string;
     protected queryConditionValueLabel(condition: CxQueryFieldCondition): string;
@@ -341,7 +340,8 @@ export declare class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     protected onEscapeKey(): void;
     protected onWindowResize(): void;
     private applyMode;
-    private requestModeSwitch;
+    /** Requests the alternate filter/query mode, preserving the translation confirmation. */
+    requestModeSwitch(): void;
     private resolveQueryToFilterTranslation;
     private applyQueryTranslation;
     invalidateSavedViewSelection(): void;
@@ -370,7 +370,7 @@ export declare class CxFilterBarComponent implements AfterViewInit, OnDestroy {
     private measureActiveFilterTags;
     private scheduleFilterFocus;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxFilterBarComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxFilterBarComponent, "cx-filter-bar", never, { "queryAriaLabel": { "alias": "queryAriaLabel"; "required": false; }; "filterSearchAriaLabel": { "alias": "filterSearchAriaLabel"; "required": false; }; "columnSearchAriaLabel": { "alias": "columnSearchAriaLabel"; "required": false; }; "mode": { "alias": "mode"; "required": false; }; "quickFilters": { "alias": "quickFilters"; "required": false; }; "selectedQuickFilterId": { "alias": "selectedQuickFilterId"; "required": false; }; "toggleFilters": { "alias": "toggleFilters"; "required": false; }; "selectedToggleFilterIds": { "alias": "selectedToggleFilterIds"; "required": false; }; "filters": { "alias": "filters"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "showActiveFilters": { "alias": "showActiveFilters"; "required": false; }; "queryValue": { "alias": "queryValue"; "required": false; }; "queryFields": { "alias": "queryFields"; "required": false; }; "queryConditions": { "alias": "queryConditions"; "required": false; }; "queryToFilterTranslation": { "alias": "queryToFilterTranslation"; "required": false; }; "filtersToQueryConditions": { "alias": "filtersToQueryConditions"; "required": false; }; "savedViews": { "alias": "savedViews"; "required": false; }; "displayMode": { "alias": "displayMode"; "required": false; }; "groupByOptions": { "alias": "groupByOptions"; "required": false; }; "groupBy": { "alias": "groupBy"; "required": false; }; "sortOptions": { "alias": "sortOptions"; "required": false; }; "sortBy": { "alias": "sortBy"; "required": false; }; "sortDirection": { "alias": "sortDirection"; "required": false; }; "thenBy": { "alias": "thenBy"; "required": false; }; "thenByDirection": { "alias": "thenByDirection"; "required": false; }; "columnOptions": { "alias": "columnOptions"; "required": false; }; "visibleColumnIds": { "alias": "visibleColumnIds"; "required": false; }; "pinnedColumnIds": { "alias": "pinnedColumnIds"; "required": false; }; }, { "modeChange": "modeChange"; "selectedQuickFilterIdChange": "selectedQuickFilterIdChange"; "selectedToggleFilterIdsChange": "selectedToggleFilterIdsChange"; "filterValuesChange": "filterValuesChange"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "queryValueChange": "queryValueChange"; "queryConditionsChange": "queryConditionsChange"; "queryValueSearch": "queryValueSearch"; "queryValueRetry": "queryValueRetry"; "savedViewSelect": "savedViewSelect"; "activeSavedViewIdChange": "activeSavedViewIdChange"; "displayModeChange": "displayModeChange"; "groupByChange": "groupByChange"; "sortByChange": "sortByChange"; "sortDirectionChange": "sortDirectionChange"; "thenByChange": "thenByChange"; "thenByDirectionChange": "thenByDirectionChange"; "visibleColumnIdsChange": "visibleColumnIdsChange"; "pinnedColumnIdsChange": "pinnedColumnIdsChange"; "filterPopoverOpenChange": "filterPopoverOpenChange"; "exportTable": "exportTable"; "resetTable": "resetTable"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxFilterBarComponent, "cx-filter-bar", never, { "queryAriaLabel": { "alias": "queryAriaLabel"; "required": false; }; "filterSearchAriaLabel": { "alias": "filterSearchAriaLabel"; "required": false; }; "columnSearchAriaLabel": { "alias": "columnSearchAriaLabel"; "required": false; }; "mode": { "alias": "mode"; "required": false; }; "quickFilters": { "alias": "quickFilters"; "required": false; }; "selectedQuickFilterId": { "alias": "selectedQuickFilterId"; "required": false; }; "toggleFilters": { "alias": "toggleFilters"; "required": false; }; "selectedToggleFilterIds": { "alias": "selectedToggleFilterIds"; "required": false; }; "filters": { "alias": "filters"; "required": false; }; "filterValues": { "alias": "filterValues"; "required": false; }; "showActiveFilters": { "alias": "showActiveFilters"; "required": false; }; "queryValue": { "alias": "queryValue"; "required": false; }; "queryFields": { "alias": "queryFields"; "required": false; }; "queryConditions": { "alias": "queryConditions"; "required": false; }; "queryToFilterTranslation": { "alias": "queryToFilterTranslation"; "required": false; }; "filtersToQueryConditions": { "alias": "filtersToQueryConditions"; "required": false; }; "savedViews": { "alias": "savedViews"; "required": false; }; "displayMode": { "alias": "displayMode"; "required": false; }; "groupByOptions": { "alias": "groupByOptions"; "required": false; }; "groupBy": { "alias": "groupBy"; "required": false; }; "sortOptions": { "alias": "sortOptions"; "required": false; }; "sortBy": { "alias": "sortBy"; "required": false; }; "sortDirection": { "alias": "sortDirection"; "required": false; }; "thenBy": { "alias": "thenBy"; "required": false; }; "thenByDirection": { "alias": "thenByDirection"; "required": false; }; "columnOptions": { "alias": "columnOptions"; "required": false; }; "visibleColumnIds": { "alias": "visibleColumnIds"; "required": false; }; "pinnedColumnIds": { "alias": "pinnedColumnIds"; "required": false; }; "actions": { "alias": "actions"; "required": false; }; }, { "modeChange": "modeChange"; "selectedQuickFilterIdChange": "selectedQuickFilterIdChange"; "selectedToggleFilterIdsChange": "selectedToggleFilterIdsChange"; "filterValuesChange": "filterValuesChange"; "filterQueryChange": "filterQueryChange"; "filterLoadMore": "filterLoadMore"; "queryValueChange": "queryValueChange"; "queryConditionsChange": "queryConditionsChange"; "queryValueSearch": "queryValueSearch"; "queryValueRetry": "queryValueRetry"; "savedViewSelect": "savedViewSelect"; "activeSavedViewIdChange": "activeSavedViewIdChange"; "displayModeChange": "displayModeChange"; "groupByChange": "groupByChange"; "sortByChange": "sortByChange"; "sortDirectionChange": "sortDirectionChange"; "thenByChange": "thenByChange"; "thenByDirectionChange": "thenByDirectionChange"; "visibleColumnIdsChange": "visibleColumnIdsChange"; "pinnedColumnIdsChange": "pinnedColumnIdsChange"; "filterPopoverOpenChange": "filterPopoverOpenChange"; "actionSelect": "actionSelect"; }, never, never, true, never>;
 }
 export {};
 //# sourceMappingURL=cx-filter-bar.component.d.ts.map

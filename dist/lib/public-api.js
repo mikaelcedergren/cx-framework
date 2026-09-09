@@ -2,6 +2,7 @@ export * from './icons/manifest.js';
 export * from './primitives/shared/keyboard-focus.js';
 export * from './theme.js';
 export * from './typeface.js';
+export * from './primitives/shared/date-time/index.js';
 export * from './patterns/cx-account-control/index.js';
 export * from './patterns/cx-action-bar/index.js';
 export * from './patterns/cx-chat-message/index.js';

@@ -132,6 +132,24 @@
   ".cx-text-area__field"
 );
 
+.cx-text-area__toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-bottom: var(--line);
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  overflow-wrap: anywhere;
+}
+
+.cx-text-area--large .cx-text-area__toolbar,
+.cx-text-area--document .cx-text-area__toolbar {
+  padding: var(--space-md);
+}
+
 .cx-text-area__editor {
   display: grid;
   grid-template-columns: 0px minmax(0, 1fr);

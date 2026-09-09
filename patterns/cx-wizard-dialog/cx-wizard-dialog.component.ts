@@ -35,9 +35,17 @@ import { CxWizardDialogStepDirective } from './cx-wizard-dialog-step.directive';
 
 let cxWizardDialogId = 0;
 
-export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss';
+export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss' | 'retry';
 export type CxWizardDialogSize = 'default' | 'large';
 export type CxWizardDialogStepStatus = 'default' | 'success';
+
+export interface CxWizardDialogProcessing {
+  /** Unique for each occurrence and retry; retain it while updating that work's result. */
+  id: string;
+  state: 'pending' | 'success' | 'danger';
+  heading: string;
+  description?: string;
+}
 
 export interface CxWizardDialogStep {
   id: string;
@@ -56,6 +64,8 @@ export interface CxWizardDialogData {
   size?: CxWizardDialogSize;
   loadingActionId?: CxWizardDialogAction | string;
   feedbackVisible?: boolean;
+  /** A temporary screen outside steps. Clear it and update index on processingComplete. */
+  processing?: CxWizardDialogProcessing;
   /** Shows the top-right close button. Off by default; Cancel and Escape are unaffected. */
   dismissible?: boolean;
 }
@@ -91,6 +101,11 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   private readonly stepTemplates = contentChildren(CxWizardDialogStepDirective);
   private overlayHandle?: CxOverlayStateHandle;
   private requestedOpen = false;
+  private processingRun?: { id: string; stepId: string; elapsed: boolean; emitted: boolean };
+  private processingTimer?: ReturnType<typeof setTimeout>;
+
+  @ViewChild('processingContent', { read: ElementRef })
+  private readonly processingContent?: ElementRef<HTMLElement>;
 
   @ViewChild('feedbackContent', { read: ElementRef })
   private readonly feedbackContent?: ElementRef<HTMLElement>;
@@ -133,6 +148,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     () => this.steps$().length === 0 || this.currentStepIndex$() === this.steps$().length - 1,
   );
   protected readonly showFeedback$ = computed(() => this.wizard$().feedbackVisible === true);
+  protected readonly processing$ = computed(() => this.wizard$().processing);
   protected readonly isLarge$ = computed(() => this.wizard$().size === 'large');
   protected readonly dismissible$ = computed(() => this.wizard$().dismissible === true);
   protected readonly primaryLabel$ = computed(() => {
@@ -155,10 +171,13 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
 
   @Input() loading = false;
   @Input() confirmLabel = '';
+  /** Disables Continue or Confirm and its keyboard shortcut without blocking Back or Cancel. */
+  @Input() primaryDisabled = false;
 
   @Input()
   public set wizard(value: CxWizardDialogData | null | undefined) {
     const previousStepId = this.currentStep$()?.id;
+    const previousProcessing = this.processing$();
     const activeElement = this.document.activeElement;
     const focusedInOutgoingStep =
       this.openState() &&
@@ -170,8 +189,13 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     const nextStepId = nextWizard.steps[nextWizard.index ?? 0]?.id;
 
     this.wizardState.set(nextWizard);
-    if (focusedInOutgoingStep && nextStepId && nextStepId !== previousStepId) {
+    this.syncProcessing();
+    if (nextStepId && ((focusedInOutgoingStep && nextStepId !== previousStepId) ||
+      (previousProcessing && !nextWizard.processing))) {
       this.focusStepAfterRender(nextStepId);
+    }
+    if (previousProcessing?.state !== nextWizard.processing?.state && nextWizard.processing?.state === 'danger') {
+      this.focusProcessingAfterRender(nextWizard.processing.id);
     }
   }
 
@@ -188,6 +212,8 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   /** Synchronous request emitted before a user dismissal would close this wizard. */
   @Output() readonly dismissRequest = new EventEmitter<CxDismissRequest>();
   @Output() readonly action = new EventEmitter<CxWizardDialogAction>();
+  /** Once per successful occurrence, after at least two seconds on screen. */
+  @Output() readonly processingComplete = new EventEmitter<string>();
 
   public ngOnChanges(_changes: SimpleChanges): void {
     this.syncOpen(this.requestedOpen);
@@ -200,6 +226,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   public ngOnDestroy(): void {
+    this.cancelProcessing();
     this.releaseOverlay();
   }
 
@@ -221,7 +248,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   protected onDialogKeydown(event: KeyboardEvent): void {
-    if (event.isComposing || this.isLoading$()) {
+    if (event.isComposing || this.isLoading$() || this.processing$()) {
       return;
     }
 
@@ -252,6 +279,10 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   protected onSecondaryAction(): void {
+    if (this.processing$()) {
+      this.onProcessingAction('back');
+      return;
+    }
     if (this.isLoading$()) {
       return;
     }
@@ -269,7 +300,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   }
 
   protected onPrimaryAction(): void {
-    if (this.isLoading$()) {
+    if (this.primaryDisabled || this.isLoading$() || this.processing$()) {
       return;
     }
 
@@ -279,6 +310,62 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     }
 
     this.action.emit('continue');
+  }
+
+  protected onProcessingAction(action: 'retry' | 'back'): void {
+    if (this.processing$()?.state === 'danger') {
+      this.action.emit(action);
+    }
+  }
+
+  private syncProcessing(): void {
+    const processing = this.processing$();
+    if (!this.openState() || !processing) {
+      this.cancelProcessing();
+      return;
+    }
+    const stepId = this.currentStep$()!.id;
+    if (this.processingRun?.id !== processing.id || this.processingRun.stepId !== stepId) {
+      this.cancelProcessing();
+      const run = { id: processing.id, stepId, elapsed: false, emitted: false };
+      this.processingRun = run;
+      // Begin the minimum display time only once the new screen has rendered.
+      afterNextRender(() => {
+        if (this.processingRun !== run) return;
+        this.processingTimer = setTimeout(() => {
+          if (this.processingRun !== run) return;
+          run.elapsed = true;
+          this.completeProcessing();
+        }, 2000);
+        this.focusProcessing(run.id);
+      }, { injector: this.injector });
+    }
+    // Defer outputs until bindings have settled, including synchronous work results.
+    afterNextRender(() => this.completeProcessing(), { injector: this.injector });
+  }
+
+  private completeProcessing(): void {
+    const run = this.processingRun;
+    if (!run || !this.openState() || !run.elapsed || run.emitted ||
+      this.processing$()?.id !== run.id || this.processing$()?.state !== 'success') return;
+    run.emitted = true;
+    this.processingComplete.emit(run.id);
+  }
+
+  private cancelProcessing(): void {
+    clearTimeout(this.processingTimer);
+    this.processingTimer = undefined;
+    this.processingRun = undefined;
+  }
+
+  private focusProcessingAfterRender(id: string): void {
+    afterNextRender(() => this.focusProcessing(id), { injector: this.injector });
+  }
+
+  private focusProcessing(id: string): void {
+    if (this.openState() && this.processing$()?.id === id && this.overlayState.isTopmost(this.overlayHandle)) {
+      this.processingContent?.nativeElement.focus({ preventScroll: true });
+    }
   }
 
   private closeFromUser(): void {
@@ -309,6 +396,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
     }
 
     this.openState.set(nextOpen);
+    this.syncProcessing();
   }
 
   private focusStepAfterRender(expectedStepId: string): void {
@@ -416,6 +504,11 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
       0,
       Math.min(Math.trunc(value.index ?? 0), Math.max(steps.length - 1, 0)),
     );
+
+    if (value.processing && (!value.processing.id.trim() || !value.processing.heading.trim() ||
+      !['pending', 'success', 'danger'].includes(value.processing.state) || !steps.length || value.feedbackVisible)) {
+      throw new Error('[cx-wizard-dialog] processing requires an id, heading, valid state and current step, and cannot coexist with feedback.');
+    }
 
     return {
       ...value,

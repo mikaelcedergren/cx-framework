@@ -1,13 +1,19 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
+  EmbeddedViewRef,
   EventEmitter,
   Input,
   Output,
+  TemplateRef,
   ViewChild,
+  ViewContainerRef,
+  afterNextRender,
   afterRenderEffect,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import { marked } from 'marked';
@@ -100,6 +106,16 @@ export class CxTextAreaComponent {
 
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLTextAreaElement>;
+
+  @ViewChild('headerTemplate', { static: true })
+  private readonly headerTemplate!: TemplateRef<unknown>;
+
+  @ViewChild('headerOutlet', { read: ViewContainerRef, static: true })
+  private readonly headerOutlet!: ViewContainerRef;
+
+  private headerView?: EmbeddedViewRef<unknown>;
+  private headerElement?: HTMLElement;
+  private headerObserver?: MutationObserver;
 
   @Input() label = 'Label';
   @Input() ariaLabel: string | undefined;
@@ -367,6 +383,26 @@ export class CxTextAreaComponent {
   }
 
   constructor() {
+    afterNextRender(() => {
+      this.headerView = this.headerOutlet.createEmbeddedView(this.headerTemplate);
+      this.headerView.detectChanges();
+      this.headerElement = this.headerView.rootNodes.find((node) => node instanceof HTMLElement);
+      this.headerObserver = new MutationObserver(() => this.syncHeaderVisibility());
+      this.headerObserver.observe(this.headerElement!, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['hidden'],
+      });
+      this.syncHeaderVisibility();
+    });
+    inject(DestroyRef).onDestroy(() => {
+      this.headerObserver?.disconnect();
+      // Detached views are retained so conditional projected content can return.
+      if (this.headerView && !this.headerView.destroyed) this.headerView.destroy();
+    });
+
     afterRenderEffect((onCleanup) => {
       this.valueState();
       this.sizingState();
@@ -380,6 +416,24 @@ export class CxTextAreaComponent {
       const frame = requestAnimationFrame(() => this.resizeField());
       onCleanup(() => cancelAnimationFrame(frame));
     });
+  }
+
+  private syncHeaderVisibility(): void {
+    if (!this.headerView || !this.headerElement || this.headerView.destroyed) return;
+    const hasContent = this.hasHeaderContent(this.headerElement);
+    const attached = this.headerOutlet.indexOf(this.headerView) !== -1;
+    // Projection stays owned and checked by the consumer while the empty header
+    // view is detached. Reinsert that same view without recreating its controls.
+    if (hasContent && !attached) this.headerOutlet.insert(this.headerView);
+    else if (!hasContent && attached) this.headerOutlet.detach(0);
+  }
+
+  private hasHeaderContent(node: Node): boolean {
+    if (node.nodeType === Node.TEXT_NODE) return !!node.textContent?.trim();
+    if (!(node instanceof Element) || node.hasAttribute('hidden')) return false;
+    if (node.matches('script, style, template')) return false;
+    if (node.matches('svg, img, canvas, video, audio, iframe, input, select, textarea')) return true;
+    return Array.from(node.childNodes).some((child) => this.hasHeaderContent(child));
   }
 
   public focus(): void {

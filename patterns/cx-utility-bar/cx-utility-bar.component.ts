@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  ViewEncapsulation,
   booleanAttribute,
 } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
@@ -39,6 +40,8 @@ const THEME_MENU_ITEMS: readonly CxMenuItem[] = CX_THEMES.map((theme, index) => 
   templateUrl: './cx-utility-bar.component.html',
   styleUrl: './cx-utility-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Projected native links belong to the bar but carry the consumer's scope id.
+  encapsulation: ViewEncapsulation.None,
 })
 export class CxUtilityBarComponent {
   private static instanceCounter = 0;
