@@ -1,47 +1,63 @@
-<div class="cx-list-item">
+<div class="cx-list-item" [class.cx-list-item--with-icon]="icon">
   <div class="cx-list-item__row">
-    @if (expandable) {
-      <button
-        type="button"
-        class="cx-list-item__body"
-        [disabled]="disabled"
-        [attr.aria-expanded]="expandable ? expanded$() : null"
-        [attr.aria-controls]="expandable ? contentId : null"
-        (click)="onActivate()"
-      >
-        <ng-container [ngTemplateOutlet]="body" />
-      </button>
-    } @else if (resolvedHref; as href) {
-      <a
-        class="cx-list-item__body"
-        [attr.href]="disabled ? null : href"
-        [attr.role]="disabled ? 'link' : null"
-        [attr.target]="disabled ? null : target?.trim() || null"
-        [attr.rel]="disabled ? null : resolvedRel"
-        [attr.aria-disabled]="disabled ? 'true' : null"
-        [attr.tabindex]="disabled ? '-1' : null"
-        (click)="onLinkClick($event)"
-      >
-        <ng-container [ngTemplateOutlet]="body" />
-      </a>
-    } @else if (interactive) {
-      <button
-        type="button"
-        class="cx-list-item__body"
-        [disabled]="disabled"
-        (click)="onActivate()"
-      >
-        <ng-container [ngTemplateOutlet]="body" />
-      </button>
-    } @else {
-      <div class="cx-list-item__body cx-list-item__body--static">
-        <ng-container [ngTemplateOutlet]="body" />
-      </div>
-    }
+    <div class="cx-list-item__header">
+      @if (icon) {
+        <cx-icon class="cx-list-item__icon" [icon]="icon" [size]="16" />
+      }
 
-    <span class="cx-list-item__actions">
-      <ng-content select="[actions]" />
-    </span>
+      @if (expandable || (interactive && !resolvedHref)) {
+        <button
+          type="button"
+          class="cx-list-item__heading cx-list-item__heading--interactive"
+          [disabled]="disabled"
+          [attr.aria-expanded]="expandable ? expanded$() : null"
+          [attr.aria-controls]="expandable ? contentId : null"
+          [attr.aria-describedby]="description ? descriptionId : null"
+          [cxTooltip]="heading"
+          [cxTooltipOverflow]="true"
+          data-cx-tooltip-overflow
+          (click)="onActivate()"
+        >{{ heading }}</button>
+      } @else if (resolvedHref; as href) {
+        <a
+          class="cx-list-item__heading cx-list-item__heading--interactive"
+          [attr.href]="disabled ? null : href"
+          [attr.role]="disabled ? 'link' : null"
+          [attr.target]="disabled ? null : target?.trim() || null"
+          [attr.rel]="disabled ? null : resolvedRel"
+          [attr.aria-disabled]="disabled ? 'true' : null"
+          [attr.tabindex]="disabled ? '-1' : null"
+          [attr.aria-describedby]="description ? descriptionId : null"
+          [cxTooltip]="heading"
+          [cxTooltipOverflow]="true"
+          data-cx-tooltip-overflow
+          (click)="onLinkClick($event)"
+        >{{ heading }}</a>
+      } @else {
+        <span
+          class="cx-list-item__heading"
+          [cxTooltip]="heading"
+          [cxTooltipOverflow]="true"
+          data-cx-tooltip-overflow
+        >{{ heading }}</span>
+      }
+
+      @if (meta) {
+        <span class="cx-list-item__meta">{{ meta }}</span>
+      }
+
+      <span class="cx-list-item__actions" [inert]="disabled">
+        <ng-content select="[actions]" />
+      </span>
+
+      @if (expandable) {
+        <cx-icon class="cx-list-item__chevron" icon="chevron-down" [size]="16" />
+      }
+    </div>
+
+    @if (description) {
+      <div class="cx-list-item__description" [id]="descriptionId">{{ description }}</div>
+    }
   </div>
 
   @if (expandable) {
@@ -60,32 +76,3 @@
     </div>
   }
 </div>
-
-<ng-template #body>
-  @if (prependIcon) {
-    <cx-icon class="cx-list-item__icon" [icon]="prependIcon" [size]="16" />
-  }
-
-  <span class="cx-list-item__text">
-    <span class="cx-list-item__main">
-      <span
-        class="cx-list-item__heading"
-        [cxTooltip]="heading"
-        [cxTooltipOverflow]="true"
-        data-cx-tooltip-overflow
-      >{{ heading }}</span>
-
-      @if (meta) {
-        <span class="cx-list-item__meta">{{ meta }}</span>
-      }
-    </span>
-
-    @if (description) {
-      <span class="cx-list-item__description">{{ description }}</span>
-    }
-  </span>
-
-  @if (expandable) {
-    <cx-icon class="cx-list-item__chevron" icon="chevron-down" [size]="16" />
-  }
-</ng-template>

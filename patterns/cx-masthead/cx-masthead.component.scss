@@ -205,24 +205,68 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: var(--controller-size);
-  height: var(--controller-size);
+  width: var(--controller-size-large);
+  height: var(--controller-size-large);
+  /* Align the visible icon to the page gutter while retaining its full touch target. */
+  margin-inline-end: calc(
+    (var(--icon-size-lg) - var(--controller-size-large)) / 2
+  );
+  padding: 0;
   flex: 0 0 auto;
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--ink);
   cursor: pointer;
-  transition: background-color var(--motion-fast) ease;
-}
-
-.cx-masthead__toggle:hover {
-  background: var(--opacity-low);
 }
 
 .cx-masthead__toggle:focus-visible {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
+}
+
+.cx-masthead__toggle-icon {
+  position: relative;
+  display: block;
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+  flex: 0 0 auto;
+}
+
+.cx-masthead__toggle-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: calc(var(--border-width) * 2);
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  transform: translateY(-50%);
+  transform-origin: center;
+  transition:
+    transform calc(var(--motion-slow) * 2) var(--ease-out-in),
+    opacity calc(var(--motion-base) * 2) var(--ease-out-in);
+}
+
+.cx-masthead__toggle-line:first-child {
+  transform: translateY(calc(-50% - var(--space-xs) - var(--space-2xs)));
+}
+
+.cx-masthead__toggle-line:last-child {
+  transform: translateY(calc(-50% + var(--space-xs) + var(--space-2xs)));
+}
+
+.cx-masthead__toggle--open .cx-masthead__toggle-line:first-child {
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.cx-masthead__toggle--open .cx-masthead__toggle-line:nth-child(2) {
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0);
+}
+
+.cx-masthead__toggle--open .cx-masthead__toggle-line:last-child {
+  transform: translateY(-50%) rotate(-45deg);
 }
 
 /* ---- Collapsed-navigation panel ---- */
@@ -270,6 +314,10 @@
  */
 
 @container (max-width: #{breakpoints.$mobile - 1px}) {
+  .cx-masthead__inner {
+    padding-block: var(--space-sm);
+  }
+
   .cx-masthead__nav {
     display: none;
   }
@@ -309,7 +357,8 @@
   .cx-masthead__panel,
   .cx-masthead__panel-inner,
   .cx-masthead__link,
-  .cx-masthead__toggle {
+  .cx-masthead__toggle,
+  .cx-masthead__toggle-line {
     transition: none;
   }
 }

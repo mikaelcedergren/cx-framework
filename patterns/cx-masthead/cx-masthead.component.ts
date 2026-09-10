@@ -1,5 +1,15 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  signal,
+  viewChild,
+  type ElementRef,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
 import { type CxIconName } from '../../icons/manifest';
 import { CxIconComponent } from '../../primitives/media/cx-icon';
@@ -79,7 +89,7 @@ export class CxMastheadComponent {
   @Input() variant: CxMastheadVariant = 'default';
   /** Sticks the component host to the top of its scroll container. */
   @Input({ transform: booleanAttribute }) sticky = false;
-  /** Accessible label for the collapsed-navigation toggle. */
+  /** Optional toggle label override; otherwise announces Open menu or Close menu. */
   @Input() menuAriaLabel: string | undefined;
 
   /** Emits when a navigation item is activated. */
@@ -87,6 +97,7 @@ export class CxMastheadComponent {
 
   protected readonly panelId = `cx-masthead-panel-${nextPanelId++}`;
   protected readonly menuOpen = signal(false);
+  private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
 
   protected hasDefaultBrand(): boolean {
     return Boolean(this.heading?.trim() || this.logo || this.logoSrc);
@@ -97,7 +108,7 @@ export class CxMastheadComponent {
   }
 
   protected resolvedMenuAriaLabel(): string {
-    return this.menuAriaLabel?.trim() || 'Menu';
+    return this.menuAriaLabel?.trim() || (this.menuOpen() ? 'Close menu' : 'Open menu');
   }
 
   protected toggleMenu(): void {
@@ -106,6 +117,16 @@ export class CxMastheadComponent {
 
   protected closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  protected onMenuEscape(event: Event): void {
+    const toggle = this.menuToggle()?.nativeElement;
+    if (event.defaultPrevented || !this.menuOpen() || !toggle?.getClientRects().length) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.closeMenu();
+    toggle.focus({ preventScroll: true });
   }
 
   protected onItemClick(event: MouseEvent, item: CxMastheadItem): void {

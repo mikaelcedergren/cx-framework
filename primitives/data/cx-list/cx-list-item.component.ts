@@ -9,7 +9,6 @@ import {
   type OnChanges,
   type SimpleChanges,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
@@ -30,7 +29,7 @@ export interface CxListItemContext {
 
 @Component({
   selector: 'cx-list-item',
-  imports: [NgTemplateOutlet, CxIconComponent, CxTooltipDirective],
+  imports: [CxIconComponent, CxTooltipDirective],
   templateUrl: './cx-list-item.component.html',
   styleUrl: './cx-list-item.component.scss',
   host: {
@@ -61,7 +60,7 @@ export class CxListItemComponent implements OnChanges {
   @Input() description: string | undefined;
   /** Short trailing value such as a count, status word, or timestamp. */
   @Input() meta: string | undefined;
-  @Input() prependIcon: CxIconName | undefined;
+  @Input() icon: CxIconName | undefined;
   /**
    * Turns the row body into a button that emits `pressed`. Ignored when the
    * row is `expandable`, because a row cannot both navigate away and open.
@@ -82,6 +81,7 @@ export class CxListItemComponent implements OnChanges {
   @Output() readonly expandToggle = new EventEmitter<string>();
 
   protected readonly contentId = `cx-list-item-content-${(nextListItemId += 1)}`;
+  protected readonly descriptionId = `${this.contentId}-description`;
   protected readonly expanded$ = this.expandedState.asReadonly();
   protected readonly context$ = this.contextState.asReadonly();
 

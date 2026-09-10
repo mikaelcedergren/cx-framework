@@ -5,9 +5,6 @@
 }
 
 .cx-explorer {
-  // Folder grouping carries the hierarchy; rows share one icon rail so nested
-  // content keeps the full useful width.
-
   display: flex;
   position: relative;
   width: 260px;
@@ -231,6 +228,8 @@
 .cx-explorer__row--item .cx-explorer__row-main {
   min-height: calc(var(--controller-size-small) + var(--space-xs) * 2);
   padding-block: var(--space-xs);
+  // Align the nested icon with the folder label while keeping full-width rows.
+  padding-inline-start: var(--space-xl);
 }
 
 .cx-explorer__row-icon {

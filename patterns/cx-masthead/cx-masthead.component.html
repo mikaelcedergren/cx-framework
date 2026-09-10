@@ -43,14 +43,21 @@
 
       @if (items.length) {
         <button
+          #menuToggle
           class="cx-masthead__toggle"
+          [class.cx-masthead__toggle--open]="menuOpen()"
           type="button"
           [attr.aria-expanded]="menuOpen()"
           [attr.aria-controls]="panelId"
           [attr.aria-label]="resolvedMenuAriaLabel()"
           (click)="toggleMenu()"
+          (keydown.escape)="onMenuEscape($event)"
         >
-          <cx-icon [icon]="menuOpen() ? 'cross-circle' : 'menu-horizontal'" [size]="20" />
+          <span class="cx-masthead__toggle-icon" aria-hidden="true">
+            <span class="cx-masthead__toggle-line"></span>
+            <span class="cx-masthead__toggle-line"></span>
+            <span class="cx-masthead__toggle-line"></span>
+          </span>
         </button>
       }
     </div>
@@ -61,6 +68,8 @@
       class="cx-masthead__panel"
       [class.cx-masthead__panel--open]="menuOpen()"
       [id]="panelId"
+      [inert]="!menuOpen()"
+      (keydown.escape)="onMenuEscape($event)"
     >
       <div class="cx-masthead__panel-inner">
         <nav class="cx-masthead__panel-nav" aria-label="Primary">

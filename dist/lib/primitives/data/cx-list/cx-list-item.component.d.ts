@@ -25,7 +25,7 @@ export declare class CxListItemComponent implements OnChanges {
     description: string | undefined;
     /** Short trailing value such as a count, status word, or timestamp. */
     meta: string | undefined;
-    prependIcon: CxIconName | undefined;
+    icon: CxIconName | undefined;
     /**
      * Turns the row body into a button that emits `pressed`. Ignored when the
      * row is `expandable`, because a row cannot both navigate away and open.
@@ -43,6 +43,7 @@ export declare class CxListItemComponent implements OnChanges {
     /** Raised on user activation so the parent list can close its other rows. */
     readonly expandToggle: EventEmitter<string>;
     protected readonly contentId: string;
+    protected readonly descriptionId: string;
     protected readonly expanded$: import("@angular/core").Signal<boolean>;
     protected readonly context$: import("@angular/core").Signal<CxListItemContext>;
     ngOnChanges(_changes: SimpleChanges): void;
@@ -59,7 +60,7 @@ export declare class CxListItemComponent implements OnChanges {
     protected onLinkClick(event: MouseEvent): void;
     private warnInvalidCombinations;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxListItemComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxListItemComponent, "cx-list-item", never, { "itemId": { "alias": "itemId"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "meta": { "alias": "meta"; "required": false; }; "prependIcon": { "alias": "prependIcon"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; }, { "pressed": "pressed"; "expandedChange": "expandedChange"; "expandToggle": "expandToggle"; }, never, ["[actions]", "*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxListItemComponent, "cx-list-item", never, { "itemId": { "alias": "itemId"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "meta": { "alias": "meta"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; }, { "pressed": "pressed"; "expandedChange": "expandedChange"; "expandToggle": "expandToggle"; }, never, ["[actions]", "*"], true, never>;
     static ngAcceptInputType_interactive: unknown;
     static ngAcceptInputType_expandable: unknown;
     static ngAcceptInputType_disabled: unknown;

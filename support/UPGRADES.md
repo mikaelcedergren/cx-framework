@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.12.0
+
+- `cx-masthead`: the mobile toggle now animates between a hamburger and an X and respects reduced motion. Escape from the toggle or open navigation closes the panel and returns focus to the toggle. Closed links are immediately inert. Leave `menuAriaLabel` empty for the default “Open menu” / “Close menu” labels, or supply a custom label used in both states. No additional markup or styling is needed.
+
+- `cx-list-item`: rename `prependIcon` to `icon`. The centered header now contains the icon, heading, meta, actions, and a far-right expansion chevron. Descriptions span beneath the whole header and indent only when an icon is present. Disabled items also make slotted actions inert. No alignment overrides are needed.
+
 ## 0.11.0
 
 - `formatCxDateTime` provides the shared activity, calendar, and absolute date-display contract.
