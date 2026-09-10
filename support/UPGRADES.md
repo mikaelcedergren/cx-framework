@@ -14,6 +14,10 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.12.1
+
+- `cx-lightbox`: images now use their natural size within responsive viewport margins, replacing the fixed 1120px width cap. Larger images scale down to fit; smaller images are never enlarged. Supply the full-resolution image source through `images`; no new inputs or consumer styling are required.
+
 ## 0.12.0
 
 - `cx-masthead`: the mobile toggle now animates between a hamburger and an X and respects reduced motion. Escape from the toggle or open navigation closes the panel and returns focus to the toggle. Closed links are immediately inert. Leave `menuAriaLabel` empty for the default “Open menu” / “Close menu” labels, or supply a custom label used in both states. No additional markup or styling is needed.
