@@ -1,4 +1,7 @@
-<header class="cx-masthead" [class.cx-masthead--frosted]="variant === 'frosted'">
+<header
+  class="cx-masthead"
+  [class.cx-masthead--frosted]="variant === 'frosted'"
+>
   <div class="cx-masthead__inner">
     <div class="cx-masthead__brand">
       <ng-content select="[brand], [cxMastheadBrand]" />
@@ -30,7 +33,10 @@
           <ul class="cx-masthead__links">
             @for (item of items; track item.id) {
               <li class="cx-masthead__links-item">
-                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
+                <ng-container
+                  [ngTemplateOutlet]="navLink"
+                  [ngTemplateOutletContext]="{ $implicit: item }"
+                />
               </li>
             }
           </ul>
@@ -47,11 +53,11 @@
           class="cx-masthead__toggle"
           [class.cx-masthead__toggle--open]="menuOpen()"
           type="button"
+          aria-haspopup="dialog"
           [attr.aria-expanded]="menuOpen()"
           [attr.aria-controls]="panelId"
           [attr.aria-label]="resolvedMenuAriaLabel()"
           (click)="toggleMenu()"
-          (keydown.escape)="onMenuEscape($event)"
         >
           <span class="cx-masthead__toggle-icon" aria-hidden="true">
             <span class="cx-masthead__toggle-line"></span>
@@ -62,29 +68,52 @@
       }
     </div>
   </div>
-
-  @if (items.length) {
-    <div
-      class="cx-masthead__panel"
-      [class.cx-masthead__panel--open]="menuOpen()"
-      [id]="panelId"
-      [inert]="!menuOpen()"
-      (keydown.escape)="onMenuEscape($event)"
-    >
-      <div class="cx-masthead__panel-inner">
-        <nav class="cx-masthead__panel-nav" aria-label="Primary">
-          <ul class="cx-masthead__panel-links">
-            @for (item of items; track item.id) {
-              <li class="cx-masthead__links-item">
-                <ng-container [ngTemplateOutlet]="navLink" [ngTemplateOutletContext]="{ $implicit: item }" />
-              </li>
-            }
-          </ul>
-        </nav>
-      </div>
-    </div>
-  }
 </header>
+
+@if (items.length) {
+  <div
+    #drawerOverlay
+    class="cx-masthead__overlay"
+    [class.cx-masthead__overlay--open]="menuOpen()"
+    [inert]="!menuOpen()"
+    [attr.aria-hidden]="menuOpen() ? null : 'true'"
+    (click)="onBackdrop($event)"
+  >
+    <section
+      class="cx-masthead__drawer"
+      [id]="panelId"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="panelId + '-heading'"
+      [cdkTrapFocus]="trapsFocus()"
+    >
+      <div class="cx-masthead__drawer-header">
+        <span class="cx-masthead__drawer-heading" [id]="panelId + '-heading'"
+          >Menu</span
+        >
+        <cx-icon-button
+          icon="remove"
+          ariaLabel="Close menu"
+          variant="transparent"
+          size="large"
+          (pressed)="closeMenu()"
+        />
+      </div>
+      <nav class="cx-masthead__drawer-nav" aria-label="Primary">
+        <ul class="cx-masthead__drawer-links">
+          @for (item of items; track item.id) {
+            <li class="cx-masthead__links-item">
+              <ng-container
+                [ngTemplateOutlet]="navLink"
+                [ngTemplateOutletContext]="{ $implicit: item }"
+              />
+            </li>
+          }
+        </ul>
+      </nav>
+    </section>
+  </div>
+}
 
 <ng-template #brandContent>
   @if (logoSrc) {
@@ -93,7 +122,9 @@
     <cx-icon class="cx-masthead__logo-icon" [icon]="logo" [size]="24" />
   }
   @if (heading) {
-    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{ heading }}</span>
+    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{
+      heading
+    }}</span>
   }
 </ng-template>
 

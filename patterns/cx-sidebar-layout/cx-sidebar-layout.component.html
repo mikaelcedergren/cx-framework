@@ -1,11 +1,22 @@
 <div class="cx-sidebar-layout">
+  @if (mobilePlacement === "after") {
+    <ng-container *ngTemplateOutlet="contentRegion" />
+    <ng-container *ngTemplateOutlet="sidebarRegion" />
+  } @else {
+    <ng-container *ngTemplateOutlet="sidebarRegion" />
+    <ng-container *ngTemplateOutlet="contentRegion" />
+  }
+</div>
+
+<ng-template #sidebarRegion>
   <div class="cx-sidebar-layout__sidebar">
     <div class="cx-sidebar-layout__sticky">
       <ng-content select="[sidebar]" />
     </div>
   </div>
-
+</ng-template>
+<ng-template #contentRegion>
   <div class="cx-sidebar-layout__content">
     <ng-content />
   </div>
-</div>
+</ng-template>

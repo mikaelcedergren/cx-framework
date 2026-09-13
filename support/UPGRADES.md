@@ -14,6 +14,25 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## Unreleased
+
+## 0.13.0
+
+- `cx-masthead` now opens its mobile navigation in a right-side modal drawer over a
+  dimmed page. It traps focus, locks page scrolling, and closes on Escape, backdrop,
+  close button, destination selection, or a return to desktop width. The drawer is
+  opaque for both header variants. Existing inputs, slots, and item outputs stay the same.
+
+- `cx-sidebar-layout` adds `mobilePlacement="before" | "after"` (default `before`).
+  Use `after` for a summary that follows primary content on narrow layouts. Document reading
+  order follows this choice. Desktop placement, the 280px column and existing sticky behavior
+  are unchanged; existing consumers need no changes.
+
+- `aqua` is now a dark ocean theme with blue actions, turquoise accents, peach links, and
+  dark labels on bright filled controls. Its complete palette and alternate shades are tuned
+  for dark surfaces. Consumers using Aqua adopt this appearance automatically; use semantic
+  tokens and review any image or logo that assumed a light background. No API changes are needed.
+
 ## 0.12.1
 
 - `cx-lightbox`: images now use their natural size within responsive viewport margins, replacing the fixed 1120px width cap. Larger images scale down to fit; smaller images are never enlarged. Supply the full-resolution image source through `images`; no new inputs or consumer styling are required.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 133,
-  "catalogSha256": "ea55917cb2a89abe1f4a8447395578738fb03ab4ea590efa428bbf21740f9344",
+  "catalogSha256": "7426ce9aa185112b68213a320cc28b22f6268adc071d7d003764ee7d42bab8f5",
   "components": [
     {
       "name": "cx-account-control",
@@ -7082,7 +7082,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "''",
+            "defaultValue": "\"\"",
             "source": "decorator"
           },
           {
@@ -7145,7 +7145,7 @@
             "type": "CxMastheadVariant",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": "\"default\"",
             "source": "decorator"
           }
         ],
@@ -7170,17 +7170,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "348a80d6b60d6588a0f67afcddb9f485d62f7fba508f3de491076165d9f6e27e"
+          "sha256": "2e83cad643d657d70a1dafae3c20c3eead4911d58f1b0d9f67bee955246b3ece"
         },
         "template": {
           "kind": "external",
-          "sha256": "2148eff314cd3471ed73ba50095129240204fd870b1d4fc950742d82b53918ca"
+          "sha256": "bca6ed4c20821ff4327bf90f588e5346c84d60c67ed29e633f959930b7d98091"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "e6e7169cf094b2eb729ace4d64cb30f1d721d07966fd06f4d372192deba2cf8c"
+            "sha256": "dd1a184aa7c71bda46d13c5c7aef7b4821b49edb5a9f05f379c70c48fe830ba4"
           }
         ]
       }
@@ -10390,6 +10390,15 @@
         "symbol": "CxSidebarLayoutComponent",
         "inputs": [
           {
+            "binding": "mobilePlacement",
+            "member": "mobilePlacement",
+            "type": "CxSidebarLayoutMobilePlacement",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "placement",
             "member": "placement",
             "type": "CxSidebarLayoutPlacement",
@@ -10413,17 +10422,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "a2d2bfb567c460f98fa958eb642480b2885e46684ff64b4c11f22764bf3ef2a2"
+          "sha256": "981a1e9c979b6e40ef3a7c2b3d305f1d07c08f27809ec66c3b8219b54f9a3c2d"
         },
         "template": {
           "kind": "external",
-          "sha256": "a1385f14b4fc78a8628a59099f8098c86de52115b8e7cd5600935afd22bca916"
+          "sha256": "8c223a96719207fca3e1ade495d748753e927bb9644108518da9bb33994b2b67"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "21c5bb196cddb310a29165bc4329309c74b3014752f7e01bd6e6c805227ed732"
+            "sha256": "b7e25b48f00dbb7bb502671b05cb2104978321f0cc2519c020662949e7e795bd"
           }
         ]
       }

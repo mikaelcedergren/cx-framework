@@ -1,8 +1,8 @@
-import { EventEmitter } from '@angular/core';
-import { type IsActiveMatchOptions } from '@angular/router';
-import { type CxIconName } from '../../icons/manifest';
+import { OnDestroy, EventEmitter } from "@angular/core";
+import { type IsActiveMatchOptions } from "@angular/router";
+import { type CxIconName } from "../../icons/manifest";
 import * as i0 from "@angular/core";
-export type CxMastheadVariant = 'default' | 'frosted';
+export type CxMastheadVariant = "default" | "frosted";
 export type CxMastheadItem = {
     id: string;
     label: string;
@@ -35,7 +35,21 @@ export type CxMastheadItem = {
  * narrow container width it collapses its links behind a menu toggle, so it can
  * sit on any page width without overflowing.
  */
-export declare class CxMastheadComponent {
+export declare class CxMastheadComponent implements OnDestroy {
+    private readonly document;
+    private readonly host;
+    private readonly overlayState;
+    private overlayHandle?;
+    private portaledOverlay?;
+    private resizeObserver?;
+    private focusPending;
+    private readonly focusListener;
+    private readonly drawerOverlay;
+    protected readonly trapsFocus: import("@angular/core").WritableSignal<boolean>;
+    constructor();
+    ngOnDestroy(): void;
+    private closeWhenExpanded;
+    private keepFocusInside;
     private itemsValue;
     /** Brand title shown next to the logo, e.g. a name or product wordmark. */
     heading: string;
@@ -70,7 +84,7 @@ export declare class CxMastheadComponent {
     protected resolvedMenuAriaLabel(): string;
     protected toggleMenu(): void;
     protected closeMenu(): void;
-    protected onMenuEscape(event: Event): void;
+    protected onBackdrop(event: MouseEvent): void;
     protected onItemClick(event: MouseEvent, item: CxMastheadItem): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMastheadComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;

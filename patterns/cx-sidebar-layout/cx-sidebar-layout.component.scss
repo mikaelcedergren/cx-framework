@@ -117,6 +117,22 @@
     padding: var(--space-md) 0 0;
   }
 
+  :host([data-mobile-placement="after"]) > .cx-sidebar-layout {
+    grid-template-areas:
+      "content"
+      "sidebar";
+  }
+
+  :host([data-mobile-placement="after"]) .cx-sidebar-layout__sidebar {
+    padding: var(--space-md) 0 0;
+    border-block-end: 0;
+    border-block-start: var(--line);
+  }
+
+  :host([data-mobile-placement="after"]) .cx-sidebar-layout__content {
+    padding: 0 0 var(--space-md);
+  }
+
   .cx-sidebar-layout:not(
       :has(> .cx-sidebar-layout__sidebar .cx-sidebar-layout__sticky:not(:empty))
     )

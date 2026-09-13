@@ -143,52 +143,39 @@
     --placeholder: rgb(244 247 252 / 30%);
 }
 
-/* Aqua is a green room with a blue door.
-
-   Blue stays the forward action, because that is the one role a visitor has to
-   recognise without being taught, and sea green becomes the supporting
-   emphasis — so the green is everywhere the eye rests and the blue is where the
-   hand goes. Everything that is not a control carries the green: the paper, the
-   borders, the muted text, even the shadows.
-
-   Success moves off green and onto lime for the reason given in _scheme.scss —
-   with a green accent this close to it, the healthy state has to be a visibly
-   different green.
-
-   The paper is tinted rather than white, and the two planes sit twice as far
-   apart as Light's, so a full-bleed band or a card reads as a plane instead of
-   a rounding error. The neutrals carry 12% of the accent instead of the 8% of
-   primary Light uses: on a page built from borders and muted text, that tint is
-   what makes the whole surface belong to one colour rather than to grey. */
+/* Aqua uses deep ocean surfaces with blue actions, turquoise accents, and
+   warm peach links. The bright palette carries dark labels on filled controls. */
 :root.theme-aqua {
+    color-scheme: dark;
+
     --primary: var(--blue);
     --primary-opacity: var(--blue-opacity);
     --primary-alt: var(--blue-alt);
 
-    --accent: var(--green);
-    --accent-opacity: var(--green-opacity);
-    --accent-alt: var(--green-alt);
+    --accent: var(--cyan);
+    --accent-opacity: var(--cyan-opacity);
+    --accent-alt: var(--cyan-alt);
 
-    --surface: #fbfefd;
-    --surface-alt: #eaf3ef;
+    --surface: #001e29;
+    --surface-alt: #00131a;
 
-    --ink: #10231e;
-    --on-ink: #ffffff;
+    --ink: #ffffff;
+    --on-ink: #00131a;
     --emphasis: #fff;
     --on-emphasis: #171717;
     --utility-bar-surface: var(--yellow);
     --on-utility-bar: var(--on-emphasis);
 
-    --opacity-high: color-mix(in srgb, rgb(14 33 28 / 62%) 88%, color-mix(in srgb, var(--green) 62%, transparent) 12%);
-    --opacity-mid: color-mix(in srgb, rgb(14 33 28 / 10%) 88%, color-mix(in srgb, var(--green) 10%, transparent) 12%);
-    --opacity-low: color-mix(in srgb, rgb(14 33 28 / 4%) 88%, color-mix(in srgb, var(--green) 4%, transparent) 12%);
-    --opacity-darken: rgb(14 33 28 / 2%);
+    --opacity-high: rgb(255 255 255 / 70%);
+    --opacity-mid: rgb(255 255 255 / 14%);
+    --opacity-low: rgb(255 255 255 / 6%);
+    --opacity-darken: rgb(0 0 0 / 8%);
     --opacity-disabled: 0.55;
-    --overlay-backdrop: rgb(4 20 16 / 80%);
+    --overlay-backdrop: rgb(0 12 18 / 80%);
 
-    --success: var(--lime);
-    --success-opacity: var(--lime-opacity);
-    --success-alt: var(--lime-alt);
+    --success: var(--green);
+    --success-opacity: var(--green-opacity);
+    --success-alt: var(--green-alt);
 
     --warning: var(--orange);
     --warning-opacity: var(--orange-opacity);
@@ -202,8 +189,8 @@
     --info-opacity: var(--blue-opacity);
     --info-alt: var(--blue-alt);
 
-    --link: var(--blue);
-    --placeholder: rgb(14 33 28 / 42%);
+    --link: var(--tangerine);
+    --placeholder: rgb(255 255 255 / 55%);
 }
 
 :root.theme-high-contrast {
