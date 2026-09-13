@@ -16,6 +16,22 @@ apply a version whose section is missing.
 
 ## Unreleased
 
+## 0.13.1
+
+- The web-platform toolchain now requires Playwright `1.62.0`. Update every JavaScript
+  Playwright dependency and Cortex's Python binding together, refresh lockfiles, and install
+  the matching Chromium binary in the default shared cache. This adopts the upstream Node 26
+  loader fix for `DEP0205`. As of 2026-09-13, `1.62.0` is the newest release published for both
+  bindings; JavaScript-only `1.63.0` cannot yet be the shared pin.
+  Keep Playwright configuration and test imports consistently ESM: declare `"type": "module"`
+  in their owning package when using `.ts` configuration files that import the framework's
+  ESM-only helpers. Cortex now declares this explicitly at its root. The synchronous loader
+  otherwise treats that unmarked TypeScript entrypoint as CommonJS.
+  The shared E2E runner consumes the leading package-script `--`, keeping commands such as
+  `pnpm test:e2e:polish -- tests/e2e/example.spec.ts` limited to the requested files. Playwright
+  1.62 no longer treats arguments after its own `--` as test filters. Additional separators
+  are rejected to avoid silently broadening a focused test run.
+
 ## 0.13.0
 
 - `cx-masthead` now opens its mobile navigation in a right-side modal drawer over a

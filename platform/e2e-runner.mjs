@@ -783,7 +783,13 @@ export function resolveE2EExecutables(repoRoot) {
 }
 
 export function validatePlaywrightArguments(args) {
-  for (const argument of args) {
+  // Package scripts forward their leading separator; Playwright 1.62 treats it
+  // as the end of test filters, so consume it at the wrapper boundary.
+  const playwrightArgs = args[0] === "--" ? args.slice(1) : args;
+  for (const argument of playwrightArgs) {
+    if (argument === "--") {
+      throw new Error("E2E accepts -- only before all Playwright arguments.");
+    }
     if (
       typeof argument !== "string" ||
       argument.includes("\0") ||
@@ -797,7 +803,7 @@ export function validatePlaywrightArguments(args) {
       );
     }
   }
-  return Object.freeze([...args]);
+  return Object.freeze([...playwrightArgs]);
 }
 
 function validateConfiguration(configured, repoRoot, context) {
