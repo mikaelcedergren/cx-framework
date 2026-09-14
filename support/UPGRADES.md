@@ -16,6 +16,17 @@ apply a version whose section is missing.
 
 ## Unreleased
 
+## 0.14.0
+
+- `cx-development-favicon` now preserves the production logo and overlays a small amber dot at
+  the top right. Replace `mark`, `favicon`, and `maskIcon` with an `icons` array containing each
+  production `source` and development `file`/`href`; retain the `index` pair. Use the production
+  artwork directly, including its original colors and transparency. Add `media` to variants that
+  have a production media condition, such as Wargr's dark favicon. Remove obsolete development
+  mask assets and any extraction-only source marks, then regenerate with `--apply`.
+  Development pages no longer declare monochrome Safari mask icons. Production icons, touch
+  icons, and manifests remain unchanged. See the development favicon contract in `README.md`.
+
 ## 0.13.1
 
 - The web-platform toolchain now requires Playwright `1.62.0`. Update every JavaScript

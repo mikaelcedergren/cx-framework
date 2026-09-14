@@ -594,52 +594,47 @@ Do not draw one-off app icons when a framework icon exists. If a reusable icon i
 
 ## Development favicons
 
-Use `cx-development-favicon` when a product needs its development tabs to remain visibly distinct
-from published tabs in Safari and Chromium browsers. The command owns one fixed visual language:
-the product mark becomes `#ff980a`, moves away from the top-right corner, and receives the shared
-notched-corner shape. Products may choose only how their existing mark is extracted; they cannot
-customise the environment colour, geometry, or placement.
+Use `cx-development-favicon` to distinguish development tabs with a small amber dot in the
+top-right corner of the production logo. The command embeds the original PNG or SVG bytes at
+their original canvas proportions, preserving color and transparency. It never traces, recolors,
+crops, or shrinks the logo. The dot's color, size, and position are shared and not configurable.
 
 Create `cx-development-favicon.json` at the consuming repository root:
 
 ```json
 {
-  "mark": {
-    "source": "public/assets/favicon-32.png",
-    "mode": "alpha",
-    "threshold": 64
-  },
+  "icons": [
+    {
+      "source": "public/assets/favicon-32.png",
+      "file": "public/assets/favicon-development.svg",
+      "href": "/assets/favicon-development.svg"
+    }
+  ],
   "index": {
     "production": "src/index.html",
     "development": "src/index.development.html"
-  },
-  "favicon": {
-    "file": "public/assets/favicon-development.svg",
-    "href": "/assets/favicon-development.svg"
-  },
-  "maskIcon": {
-    "file": "public/assets/favicon-development-mask.svg",
-    "href": "/assets/favicon-development-mask.svg"
   }
 }
 ```
 
-PNG marks use one explicit extraction mode: `alpha`, `dark`, `light`, or `non-white`, with an
-integer threshold from 1 through 255. A vector mark instead uses a strict SVG containing only
-`currentColor`/`none` self-closing paths and omits `mode` and `threshold`.
+Use the exact production artwork as `source`. For a separate dark appearance, add a second icon
+with its own source, output file, URL, and `"media": "(prefers-color-scheme: dark)"`. Keep the
+production variants' order and media conditions. SVG source images must be self-contained.
+For an additional icon set selected by the app at runtime, omit `index` to generate and check
+only the assets. Use the same output filename in each folder when the app switches icon folders.
 
-Generate the two SVG assets and derived development index explicitly, then keep the read-only check
-in the product's canonical gate:
+Generate the SVG assets and derived development index, then keep the read-only check in the
+product's canonical gate:
 
 ```sh
 pnpm exec cx-development-favicon --apply
 pnpm exec cx-development-favicon
 ```
 
-The generated development index replaces only ordinary favicon and Safari mask links. It retains
-the production index's touch icon, manifest, metadata, and application markup byte-for-byte, and
-the production index continues to reference only the published favicon set. Configure the local
-Angular build to use the generated file as `index.html`; production keeps the source index.
+The development index replaces ordinary favicon links and removes monochrome Safari mask links,
+which cannot represent the original logo colors plus an amber dot. Touch icons, manifests,
+metadata, and application markup stay byte-for-byte unchanged. Production retains its original
+favicon links and assets. Configure only the local Angular build to use the generated index.
 
 ## AI design docs
 
