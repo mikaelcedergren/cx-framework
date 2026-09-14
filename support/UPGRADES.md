@@ -16,6 +16,12 @@ apply a version whose section is missing.
 
 ## Unreleased
 
+## 0.14.1
+
+- `cx-development-favicon` wraps long generated icon links to match the shared HTML formatting
+  contract. Regenerate development assets with `--apply`; icon appearance and configuration are
+  unchanged from 0.14.0.
+
 ## 0.14.0
 
 - `cx-development-favicon` now preserves the production logo and overlays a small amber dot at

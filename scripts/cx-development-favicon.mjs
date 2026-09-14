@@ -298,10 +298,23 @@ function relTokens(linkTag) {
 
 function developmentIconLinks(config, indentation, newline) {
   return [
-    ...config.icons.map(
-      (icon) =>
-        `${indentation}<link rel="icon" type="image/svg+xml" href="${icon.href}"${icon.media ? ` media="${escapeAttribute(icon.media)}"` : ""} />`,
-    ),
+    ...config.icons.map((icon) => {
+      const attributes = [
+        'rel="icon"',
+        'type="image/svg+xml"',
+        `href="${icon.href}"`,
+        ...(icon.media ? [`media="${escapeAttribute(icon.media)}"`] : []),
+      ];
+      const line = `${indentation}<link ${attributes.join(" ")} />`;
+      // Generated HTML follows the product family's 100-column formatting contract.
+      return line.length <= 100
+        ? line
+        : [
+            `${indentation}<link`,
+            ...attributes.map((attribute) => `${indentation}  ${attribute}`),
+            `${indentation}/>`,
+          ].join(newline);
+    }),
     "",
   ].join(newline);
 }
