@@ -14,6 +14,11 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.3
+
+- `cx-hero` body content now uses the shared large reading measure, giving longer supporting copy
+  more room before it wraps. No consumer changes are needed.
+
 ## 0.16.2
 
 - `cx-hero` now gives its heading and body more breathing room and adds an opt-in `fadeBottom`
