@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.1
+
+- `cx-hero` now waits until projected content has rendered before validating required cover or
+  split media. Server-rendered and prerendered consumers no longer receive a false missing-media
+  error for valid heroes. No consumer changes are needed.
+
 ## 0.16.0
 
 - Editorial and public-page headings now use bold weight consistently across every semantic

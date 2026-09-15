@@ -52,9 +52,6 @@ export class CxHeroComponent {
     }
     ngAfterContentInit() {
         this.contentReady = true;
-        if (this.resolvedHeading()) {
-            this.validateComposition();
-        }
     }
     resolvedHeading() {
         return this.heading.trim();

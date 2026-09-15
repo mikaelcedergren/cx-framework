@@ -94,9 +94,6 @@ export class CxHeroComponent implements AfterContentInit {
 
   public ngAfterContentInit(): void {
     this.contentReady = true;
-    if (this.resolvedHeading()) {
-      this.validateComposition();
-    }
   }
 
   protected resolvedHeading(): string {
