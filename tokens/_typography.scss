@@ -20,7 +20,7 @@
   --typeface-condensed: 'Archivo Narrow', sans-serif;
   --typeface-slab: 'Zilla Slab', serif;
 
-  // The one role that varies — what .cx-article headings and cx-font-serif
+  // The one role that varies — what .cx-editorial headings and cx-font-serif
   // render in. A consuming product overrides this single token to pick its
   // face, and should point it at a --typeface-* entry rather than naming a
   // font directly, so it inherits whatever that voice resolves to.
@@ -38,9 +38,16 @@
   --font-size-body-sm: 12px;
   --font-size-body-xs: 10px;
 
+  // Editorial roles are deliberately separate from application typography.
+  // An article, landing page, or public information page opts into these as
+  // one reading system; product UI continues to use the fixed scale above.
+  --font-size-editorial-body: 18px;
+  --font-size-editorial-lead: 22px;
+
   --font-weight-regular: 450;
   --font-weight-medium: 550;
   --font-weight-bold: 700;
+  --font-weight-editorial-heading: 400;
 
   --line-height-display: 1.05;
   --line-height-heading: 1.2;
@@ -48,5 +55,7 @@
   --line-height-body-relaxed: 1.4;
   --line-height-control: 1.1;
   --line-height-body-lg: 1.8;
+  --line-height-editorial-body: 1.65;
+  --line-height-editorial-lead: 1.5;
   --line-height-small: 1.2;
 }

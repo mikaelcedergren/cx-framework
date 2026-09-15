@@ -18,11 +18,10 @@ export interface CxMarkdownLinkClick {
 
 /**
  * `default` — compact UI markdown (notes, inline copy).
- * `article` — editorial reading treatment via the global `.cx-article` styling
- * (serif headings, reading measure). Use for long-form bodies.
+ * `editorial` — the shared article and public-page reading treatment. Use when
+ * reading is the surface's primary task, never for ordinary product UI.
  */
-export type CxMarkdownVariant = 'default' | 'article';
-export type CxMarkdownAlign = 'center' | 'start';
+export type CxMarkdownVariant = 'default' | 'editorial';
 
 @Component({
   selector: 'cx-markdown',
@@ -42,7 +41,6 @@ export class CxMarkdownComponent {
   }
 
   @Input() variant: CxMarkdownVariant = 'default';
-  @Input() align: CxMarkdownAlign = 'center';
 
   protected readonly renderedMarkdown$ = computed(() => {
     const raw = this.markdownState().trim();

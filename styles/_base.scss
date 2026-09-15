@@ -46,7 +46,7 @@ body {
 
 // Containers own the gaps: text blocks carry no outer margin of their own, so a
 // raw <p> or heading composes cleanly inside cards, stacks, and grids. Editorial
-// surfaces (.cx-article, the markdown preview/editor) re-add flow margins where
+// surfaces (.cx-editorial, the markdown preview/editor) re-add flow margins where
 // prose wants them.
 h1,
 h2,

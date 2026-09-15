@@ -82,6 +82,18 @@ The base type scale is:
 
 Display type and `--line-height-display` belong to the primary headline of a marketing or editorial hero. Ordinary page titles, section headings, dialogs, and application UI use the fixed title scale. Body text is the default component text; smaller sizes are reserved for labels, help, metadata, captions, badges, shortcuts, and other genuinely secondary information.
 
+Editorial typography is a separate shared reading system:
+
+| Token                             | Value | Purpose |
+| --------------------------------- | ----: | ------- |
+| `--font-size-editorial-body`      |  18px | Article, landing-page, and public information body copy |
+| `--font-size-editorial-lead`      |  22px | The opening paragraph immediately after an editorial `h1` |
+| `--font-weight-editorial-heading` |   400 | Real, unsynthesised weight for the editorial heading face |
+| `--line-height-editorial-body`    |  1.65 | Sustained reading rhythm |
+| `--line-height-editorial-lead`    |   1.5 | Opening editorial summary rhythm |
+
+These roles belong only to the shared editorial mode. Application UI, components, controls, dialogs, assistant answers, and operational data keep the fixed product scale above. Consumers opt into editorial typography as one system; they do not select these tokens element by element.
+
 ## Theme character
 
 A theme is a complete visual profile. Components keep the same roles, states, behavior, target sizes, and content hierarchy while the profile resolves shared tokens differently.

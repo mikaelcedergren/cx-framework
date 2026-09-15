@@ -93,6 +93,7 @@
         @if (showMarkdownPreview$()) {
           <div
             class="cx-text-area__markdown"
+            [class.cx-editorial]="presentation === 'document'"
             [innerHTML]="renderedMarkdown$()"
             (click)="onPreviewClick($event)"
           ></div>

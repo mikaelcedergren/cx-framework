@@ -16,6 +16,21 @@ apply a version whose section is missing.
 
 ## Unreleased
 
+## 0.15.0
+
+- Editorial typography is now one explicit system for articles, marketing landing pages, and public
+  information pages. Replace `.cx-article` and its `--lg` / `--start` modifiers with
+  `.cx-editorial`; the single class now provides a fluid display heading, 18px reading body, 22px
+  opening lead, and complete `h1`–`h6` hierarchy. Use semantic `small` for supporting text and
+  `dfn` for explained terms. The content follows its container's placement; add the ordinary
+  `cx-center-inline` layout utility only when a standalone reading column should be centred.
+  Import `styles/editorial` instead of `styles/article`.
+- `cx-markdown` renames `variant="article"` to `variant="editorial"` and removes `align`.
+  Use normal container layout for placement. Default markdown remains application typography;
+  document-mode Markdown authoring and preview now match the published editorial scale.
+- Portable copy guidance now treats `rhythm` and `silent` as common filler in operational copy.
+  Remove them when they do not add concrete meaning; authored editorial content is unaffected.
+
 ## 0.14.1
 
 - `cx-development-favicon` wraps long generated icon links to match the shared HTML formatting

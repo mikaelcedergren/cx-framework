@@ -1,0 +1,47 @@
+// Editorial typography.
+//
+// Wrap an authored content stream on an article, landing page, or public
+// information page in `.cx-editorial`. One opt-in owns its responsive headline,
+// readable body, semantic hierarchy, measure, and prose rhythm. Application UI
+// keeps the ordinary type scale and never uses this wrapper.
+//
+// Global (not component-scoped) on purpose: an article is usually injected via
+// [innerHTML] (markdown, CMS), which Angular's view encapsulation never tags —
+// component-scoped descendant rules would silently miss it.
+//
+// An article is a content stream, so blocks own their vertical margins. This is the
+// one place margin is the right tool — the "containers own gap" rule is about
+// composing UI, not flowing text.
+//
+// The element rules live in the `cx-editorial-type` mixin so document-mode
+// authoring and rendered editorial content share one definition.
+
+@use "editorial-type";
+@forward "editorial-type";
+
+.cx-editorial {
+  max-inline-size: var(--measure-md);
+  color: var(--ink);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-editorial-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-editorial-body);
+  overflow-wrap: anywhere;
+
+  @include editorial-type.cx-editorial-type;
+
+  // The two largest headings carry the product's editorial face. Lower levels
+  // return to the base sans so deep document structure remains easy to scan.
+  h1,
+  h2 {
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-editorial-heading);
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-family-base);
+  }
+}

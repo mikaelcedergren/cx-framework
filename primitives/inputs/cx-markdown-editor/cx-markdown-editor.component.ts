@@ -36,7 +36,7 @@ async function loadEngine(): Promise<MarkdownEditorEngine> {
 
 /**
  * `default` — compact UI markdown scale (notes, inline surfaces).
- * `document` — editorial reading scale shared with `.cx-article`.
+ * `document` — editorial reading scale shared with `.cx-editorial`.
  */
 export type CxMarkdownEditorPresentation = 'default' | 'document';
 export type CxMarkdownEditorLayout = 'default' | 'fill';
@@ -168,10 +168,8 @@ export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
     this.view?.focus();
   }
 
-  // Document mode edits inside the real `.cx-article` contract — the display
-  // serif headings and reading scale come from the global article styles, not
-  // a local imitation. `--start` keeps the article on the editor's own edge so
-  // the placeholder overlay lines up with the caret.
+  // Document mode edits inside the real `.cx-editorial` contract so authoring
+  // and published content keep the same hierarchy and reading rhythm.
   private editorAttributes(): Record<string, string> {
     const attributes: Record<string, string> = {
       role: 'textbox',
@@ -179,7 +177,7 @@ export class CxMarkdownEditorComponent implements AfterViewInit, OnDestroy {
       'aria-label': this.ariaLabelState ?? 'Editor',
     };
     if (this.presentationState === 'document') {
-      attributes['class'] = 'cx-article cx-article--start';
+      attributes['class'] = 'cx-editorial';
     }
     return attributes;
   }

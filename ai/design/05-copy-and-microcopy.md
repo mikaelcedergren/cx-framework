@@ -28,7 +28,7 @@ RULE-ID: copy.no-blame SCOPE: copy TYPE: MUST TOPIC: trust RULE: Describe the st
 
 RULE-ID: copy.opt-out-neutral SCOPE: opt-out-copy TYPE: MUST TOPIC: trust RULE: Keep refusal and opt-out wording neutral. DESCRIPTION: Never shame, guilt, threaten, or coerce someone into staying, consenting, subscribing, or enabling a feature.
 
-RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Remove filler, apology, and performative politeness. DESCRIPTION: Words such as `just`, `simply`, `easily`, `please`, `oops`, and `sorry` rarely improve operational clarity.
+RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Remove filler, apology, and performative politeness. DESCRIPTION: Words such as `just`, `simply`, `easily`, `please`, `oops`, `sorry`, `rhythm`, and `silent` rarely improve operational clarity.
 
 RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every piece of interface text from the fewest words that stay unambiguous; extra words are an explicit product decision, never a default. DESCRIPTION: Applies to all UI copy — menu items, buttons, calls to action, dialog primaries, labels, headings, hints, and empty states. Add a noun, qualifier, or explanation only when the product owner decides the extra information earns its place; never speculatively or out of habit.
 

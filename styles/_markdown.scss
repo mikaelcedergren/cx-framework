@@ -6,15 +6,8 @@
 // descendant selectors to require that attribute — but innerHTML-injected
 // elements never receive it, so component-scoped rules would silently miss.
 
-@use 'article';
 @use 'markdown-type';
 
 .cx-text-area__markdown {
   @include markdown-type.cx-markdown-type;
-}
-
-// Document mode shares the editorial type scale (styles/_article.scss)
-// instead of duplicating it.
-.cx-text-area--document .cx-text-area__markdown {
-  @include article.cx-editorial-type;
 }

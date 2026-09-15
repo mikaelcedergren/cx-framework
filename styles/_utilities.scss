@@ -219,7 +219,7 @@ $measures: (
 
   // Measure without the centring — caps line length and stays at the start
   // edge. Capping and centring are different intentions; the plain
-  // cx-measure-* welds them, these split them (mirroring .cx-article--start).
+  // cx-measure-* welds them, these split placement from the editorial measure.
   @each $name, $measure in $measures {
     .cx-measure-#{$name}-start {
       max-inline-size: $measure;

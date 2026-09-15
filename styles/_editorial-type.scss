@@ -1,10 +1,10 @@
 // Editorial type scale as a CSS-less mixin.
 //
 // `cx-editorial-type` holds the element rules shared by every editorial
-// surface: `.cx-article` (styles/_article.scss), the document-mode
+// surface: `.cx-editorial` (styles/_editorial.scss), the document-mode
 // markdown preview, and the document-mode markdown editor. It lives in its own
 // partial so component stylesheets can @use it without re-emitting the global
-// `.cx-article` CSS that _article.scss produces.
+// `.cx-editorial` CSS that _editorial.scss produces.
 //
 // The mixin is base-agnostic: every size is em-relative, so it scales off
 // whatever font-size the host element sets.
@@ -22,7 +22,8 @@
   h2,
   h3,
   h4,
-  h5 {
+  h5,
+  h6 {
     margin: 1.6em 0 0.5em;
     color: var(--ink);
     font-weight: var(--font-weight-bold);
@@ -30,8 +31,8 @@
   }
 
   h1 {
-    font-size: 4em;
-    line-height: 1.1;
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-display);
   }
 
   h2 {
@@ -51,6 +52,10 @@
     font-size: 1.1111em;
   }
 
+  h6 {
+    font-size: 1em;
+  }
+
   p,
   ul,
   ol,
@@ -59,18 +64,21 @@
     margin: 0 0 1em;
   }
 
-  .cx-article__ingress {
+  h1 + p {
     margin-bottom: 1.25em;
-    font-size: 1.2222em;
-    line-height: 1.5;
+    font-size: var(--font-size-editorial-lead);
+    line-height: var(--line-height-editorial-lead);
   }
 
-  .cx-article__discreet {
+  small {
     color: var(--opacity-high);
+    font-size: 0.875em;
+    line-height: 1.4;
   }
 
-  .cx-article__keyword {
+  dfn {
     border-radius: var(--radius-xs);
+    font-style: normal;
     text-decoration-line: underline;
     text-decoration-style: dotted;
     text-decoration-thickness: var(--border-width);

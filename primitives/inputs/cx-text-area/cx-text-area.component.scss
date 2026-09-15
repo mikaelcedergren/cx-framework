@@ -69,34 +69,34 @@
 
 .cx-text-area--document {
   .cx-text-area__gutter {
-    line-height: var(--line-height-body-lg);
+    line-height: var(--line-height-editorial-body);
   }
 
   .cx-text-area__gutter-row {
-    min-height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+    min-height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
   }
 
   .cx-text-area__highlight-line {
-    height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+    height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
   }
 
   .cx-text-area__range-mirror {
-    font-size: var(--font-size-body-lg);
-    line-height: var(--line-height-body-lg);
+    font-size: var(--font-size-editorial-body);
+    line-height: var(--line-height-editorial-body);
   }
 
   .cx-text-area__range-line {
-    min-height: calc(var(--font-size-body-lg) * var(--line-height-body-lg));
+    min-height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
   }
 
   .cx-text-area__field {
-    font-size: var(--font-size-body-lg);
-    line-height: var(--line-height-body-lg);
+    font-size: var(--font-size-editorial-body);
+    line-height: var(--line-height-editorial-body);
   }
 
   .cx-text-area__markdown {
-    font-size: var(--font-size-body-lg);
-    line-height: var(--line-height-body-lg);
+    font-size: var(--font-size-editorial-body);
+    line-height: var(--line-height-editorial-body);
   }
 }
 

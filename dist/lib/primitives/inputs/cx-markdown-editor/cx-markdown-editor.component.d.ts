@@ -2,7 +2,7 @@ import { AfterViewInit, EventEmitter, OnDestroy } from '@angular/core';
 import * as i0 from "@angular/core";
 /**
  * `default` — compact UI markdown scale (notes, inline surfaces).
- * `document` — editorial reading scale shared with `.cx-article`.
+ * `document` — editorial reading scale shared with `.cx-editorial`.
  */
 export type CxMarkdownEditorPresentation = 'default' | 'document';
 export type CxMarkdownEditorLayout = 'default' | 'fill';

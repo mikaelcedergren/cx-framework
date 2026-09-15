@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 133,
-  "catalogSha256": "7426ce9aa185112b68213a320cc28b22f6268adc071d7d003764ee7d42bab8f5",
+  "catalogSha256": "96491f117b8d833af88b6db8ba794a14ae09db4ae53c70893ba5e8ab5f402704",
   "components": [
     {
       "name": "cx-account-control",
@@ -6842,15 +6842,6 @@
         "symbol": "CxMarkdownComponent",
         "inputs": [
           {
-            "binding": "align",
-            "member": "align",
-            "type": "CxMarkdownAlign",
-            "required": false,
-            "transform": null,
-            "defaultValue": "'center'",
-            "source": "decorator"
-          },
-          {
             "binding": "markdown",
             "member": "markdown",
             "type": "string | undefined",
@@ -6881,11 +6872,11 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "61383c40ff1c5688d86808f00aa88c316c12f5818511f1aba389e64daa7e197f"
+          "sha256": "1b855117823aceed1c574f11a468b917576bbff22685cc9b5efd26c320a97ba5"
         },
         "template": {
           "kind": "external",
-          "sha256": "012d6fe91cdd611f08ce050057ee39a95926e5c82e4ac5f9d9e3ab7fbd8d53ed"
+          "sha256": "b9892ce15a2b7c01cecccad790f18ef0fe5132cded2e4f60894242d56a6deeed"
         },
         "styles": [
           {
@@ -6986,7 +6977,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "666874497216240c32a2eda1d01e50212d12734b451f43010d66ac936f3467ba"
+          "sha256": "7cad79d383940f161df1464e9da1bf00edf6017c696ad9471b13674125e5a074"
         },
         "template": {
           "kind": "external",
@@ -6996,7 +6987,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "8c2bc03a2f2c7186074c721144f1bcc45137f920f84f5e4b752f4ccc51af25af"
+            "sha256": "026be0da559aa941ca614b5e8953188d8114ed17c55a96fc9d1da5be8354cd22"
           }
         ]
       }
@@ -13256,13 +13247,13 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "7ac2fe6f85d8bcaa7b9537430df6c489c1c9e925d4aa0d16232a9e1195abafb2"
+          "sha256": "4f9ee1372a58cca743577829b20c51624ac05a7b21d67cf4f0811ccca69b823f"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "cbba5b885129cd229011587509cfabaf8a8a4ae91aaf9c2f3321dcdff0e5ee48"
+            "sha256": "a14ed25bc5e5e41f5fea48e65683d00c3c7e7ae24aeb21f16cb110ecce2e865e"
           }
         ]
       }

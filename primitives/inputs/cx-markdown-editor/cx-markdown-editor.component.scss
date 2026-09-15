@@ -52,7 +52,7 @@ cx-markdown-editor .ProseMirror {
 }
 
 // The compact UI markdown scale belongs to the default presentation only —
-// document mode gets its type from the global `.cx-article` contract (the
+// document mode gets its type from the global `.cx-editorial` contract (the
 // component puts that class on the ProseMirror root). The presentation guard
 // adds no specificity, so the editor's shared structural rules apply equally.
 cx-markdown-editor:where(:not(.cx-markdown-editor-host--document))
@@ -67,13 +67,13 @@ cx-markdown-editor .cx-markdown-editor__placeholder {
   line-height: var(--line-height-body);
 }
 
-// Match the article base (see styles/_article.scss) so the
+// Match the editorial base so the
 // placeholder overlay sits exactly where the first paragraph renders.
 cx-markdown-editor.cx-markdown-editor-host--document,
 cx-markdown-editor.cx-markdown-editor-host--document
   .cx-markdown-editor__placeholder {
-  font-size: var(--font-size-body-lg);
-  line-height: 1.6;
+  font-size: var(--font-size-editorial-body);
+  line-height: var(--line-height-editorial-body);
 }
 
 cx-markdown-editor.cx-markdown-editor-host--disabled .ProseMirror {

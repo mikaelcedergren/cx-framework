@@ -162,17 +162,13 @@ Single-purpose helpers for the raw elements and wrappers _you_ write — not for
 
 There are deliberately **no margin or gap utilities** — gap belongs to the layout primitives above.
 
-## Article
+## Editorial
 
-Utilities and primitives are for UI. For a stream of editorial content — an article body, landing copy, markdown or CMS output — wrap it in `.cx-article` (add `.cx-article--lg` for larger landing copy and a fluid display `h1`) and its semantic headings, paragraphs, lists, quotations, figures, code, and tables get a reading-optimised treatment. The article keeps an independent five-level heading scale: `h1` and `h2` use the display face, while `h3` through `h5` use the base sans. The normal reading body uses `--font-size-body-lg`; the large variant's primary hero heading follows the shared display token.
+Utilities and primitives are for product UI. When the surface is an article, marketing landing page, or public information page whose primary task is reading or persuasion, wrap each authored content stream in `.cx-editorial` and write semantic HTML. That one opt-in owns the responsive display `h1`, 18px reading body, lead paragraph, six-level heading hierarchy, measure, lists, quotations, figures, code, and tables. Never assemble an editorial page from type-size or weight utilities, and never use `.cx-editorial` for cards, forms, dialogs, assistant answers, operational tables, or other typical UI.
 
-Native article elements need no classes. Three explicit roles cover meaning HTML does not provide on its own:
+The paragraph immediately following an `h1` becomes the 22px lead automatically. Use `small` for supporting text and `dfn` for an explained term; pair an interactive `dfn` with the shared `cxTooltip` trigger or `cx-tooltip` composition wrapper. `h1` and `h2` use the product's editorial heading face at its real 400 weight, while `h3` through `h6` use the base sans at bold weight.
 
-- `.cx-article__ingress` — the opening summary or lead paragraph
-- `.cx-article__discreet` — supporting text in the secondary foreground colour
-- `.cx-article__keyword` — a dotted-underlined term; pair it with the shared `cxTooltip` trigger or `cx-tooltip` composition wrapper
-
-Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored article sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. Articles centre within an open reading canvas by default. Add `.cx-article--start` when the article is embedded beside navigation or another fixed column and must share that content column's start edge. The `cx-markdown` equivalent is `variant="article" align="start"`.
+Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored editorial sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. The content stream keeps the medium reading measure and follows its container's placement. Use the ordinary `cx-center-inline` layout utility when a standalone article should sit in the middle of an open canvas. For trusted Markdown, choose `variant="editorial"`; default Markdown remains compact application typography.
 
 ## The page frame
 

@@ -530,8 +530,8 @@ Use package subpaths in global styles:
 @use "@mikaelcedergren/cx-framework/styles/fonts";
 @use "@mikaelcedergren/cx-framework/styles/base";
 @use "@mikaelcedergren/cx-framework/styles/page";
-@use "@mikaelcedergren/cx-framework/styles/article";
 @use "@mikaelcedergren/cx-framework/styles/markdown";
+@use "@mikaelcedergren/cx-framework/styles/editorial";
 @use "@mikaelcedergren/cx-framework/styles/utilities";
 ```
 
