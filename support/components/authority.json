@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 135,
-  "catalogSha256": "2a97e64c6fd35f96d732ef69eb68852a7b00e1888308d1bde8303985e71a1d2b",
+  "catalogSha256": "e285262e0b953772c44a5b1ec1ebc5e79abf84684043e9c94b6650f225277dbf",
   "components": [
     {
       "name": "cx-account-control",
@@ -5244,6 +5244,15 @@
             "source": "decorator"
           },
           {
+            "binding": "fadeBottom",
+            "member": "fadeBottom",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "heading",
             "member": "heading",
             "type": "string",
@@ -5297,17 +5306,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "59eaf29c4cc907b7373deb7a147694009b30786af7bde2dd05a4960d41daf8e2"
+          "sha256": "1771cf1c41502d71442a8c9024797a502e7abb2c56bc9f0fe5dc536d82562c86"
         },
         "template": {
           "kind": "external",
-          "sha256": "9a3c4a5ae8dff61b431ae44d463287cb75eb77287ad1f49c5365229a28cc64ee"
+          "sha256": "ba8fa1e80ce625539917ff1d3b3b42a3c0db3a70d037e89a0f3d886b3b965e24"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "09f655c261bdcf96be887b9ccf61b02ad52b1be53c388071fb74a3c9b3cfe59a"
+            "sha256": "8b60d12431cacdb2beea173ece4e881898eb249af59e451408cc492adc0dc2f8"
           }
         ]
       }

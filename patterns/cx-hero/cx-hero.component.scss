@@ -35,7 +35,7 @@ cx-hero .cx-hero__copy {
 cx-hero .cx-hero__message {
   display: grid;
   min-width: 0;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 cx-hero .cx-hero__heading {
@@ -153,6 +153,24 @@ cx-hero .cx-hero--cover::after {
   z-index: -1;
   inset: 0;
   background: color-mix(in srgb, var(--overlay-backdrop) 72%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+cx-hero .cx-hero--cover.cx-hero--fade-bottom::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface) 0%, transparent) 50%,
+    color-mix(in srgb, var(--surface) 4%, transparent) 58%,
+    color-mix(in srgb, var(--surface) 12%, transparent) 66%,
+    color-mix(in srgb, var(--surface) 28%, transparent) 75%,
+    color-mix(in srgb, var(--surface) 50%, transparent) 84%,
+    color-mix(in srgb, var(--surface) 76%, transparent) 92%,
+    var(--surface) 100%
+  );
   content: "";
   pointer-events: none;
 }

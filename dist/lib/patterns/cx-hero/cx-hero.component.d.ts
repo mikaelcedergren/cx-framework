@@ -28,11 +28,14 @@ export declare class CxHeroComponent implements AfterContentInit {
     /** Coarse vertical crop position for cover media. */
     set mediaPosition(value: CxHeroMediaPosition);
     get mediaPosition(): CxHeroMediaPosition;
+    /** Smoothly blends the lower half of cover media into the default surface. */
+    fadeBottom: boolean;
     ngAfterContentInit(): void;
     protected resolvedHeading(): string;
     private validateComposition;
     private hasProjectedMedia;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxHeroComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
+    static ngAcceptInputType_fadeBottom: unknown;
 }
 //# sourceMappingURL=cx-hero.component.d.ts.map

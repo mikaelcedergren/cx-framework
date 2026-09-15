@@ -6,6 +6,7 @@ import {
   Input,
   ViewEncapsulation,
   afterEveryRender,
+  booleanAttribute,
   inject,
 } from "@angular/core";
 
@@ -92,6 +93,9 @@ export class CxHeroComponent implements AfterContentInit {
     return this.mediaPositionValue;
   }
 
+  /** Smoothly blends the lower half of cover media into the default surface. */
+  @Input({ transform: booleanAttribute }) fadeBottom = false;
+
   public ngAfterContentInit(): void {
     this.contentReady = true;
   }
@@ -101,6 +105,10 @@ export class CxHeroComponent implements AfterContentInit {
   }
 
   private validateComposition(): void {
+    if (this.fadeBottom && this.variantValue !== "cover") {
+      throw new Error('[cx-hero] fadeBottom requires variant="cover".');
+    }
+
     if (this.variantValue === "split" && this.alignValue !== "start") {
       throw new Error('[cx-hero] split variant requires align="start".');
     }

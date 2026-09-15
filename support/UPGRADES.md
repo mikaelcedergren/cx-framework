@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.2
+
+- `cx-hero` now gives its heading and body more breathing room and adds an opt-in `fadeBottom`
+  cover treatment. The fade begins halfway down the background, blends smoothly into the default
+  surface, and remains off by default.
+
 ## 0.16.1
 
 - `cx-hero` now waits until projected content has rendered before validating required cover or
