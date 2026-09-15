@@ -1,0 +1,23 @@
+<a
+  class="cx-store-button"
+  [class.cx-store-button--large]="size === 'large'"
+  [href]="href"
+  [attr.aria-label]="accessibleName"
+  [attr.lang]="resolvedLanguage"
+>
+  <span
+    class="cx-store-button__artwork"
+    [style.aspect-ratio]="artwork.aspectRatio"
+  >
+    <img
+      [src]="artwork.src"
+      [attr.width]="artwork.width"
+      [attr.height]="artwork.height"
+      [style.height.%]="artwork.imageHeightPercent"
+      [style.top.%]="artwork.imageTopPercent"
+      [style.left.%]="artwork.imageLeftPercent"
+      alt=""
+      draggable="false"
+    />
+  </span>
+</a>

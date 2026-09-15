@@ -14,7 +14,20 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
-## Unreleased
+## 0.16.0
+
+- Editorial and public-page headings now use bold weight consistently across every semantic
+  heading level, from `h1` through `h6`.
+- Added `cx-hero`, the shared page-introduction pattern for public, editorial, and marketing
+  surfaces. Supply the required `heading`, choose `variant="cover"` (default), `split`, or
+  `stacked`, and project optional context, body, actions, meta, and media. Split and cover require
+  media; split requires start alignment. Cover treats media as decorative, adds its own readable
+  scrim, and supports top, centre, or bottom crop positioning.
+- Added `cx-store-button`, a standalone link using official App Store (default) or Google Play
+  artwork. Supply a matching HTTPS app-listing `href`; choose `store="google-play"` for Android.
+  Optional `size` is `default` or `large`, `language` is `en` or `sv`, and `appName` adds
+  context for screen readers. Omitted language follows the page, with English for unsupported
+  languages. It opens in the same tab and has no loading, disabled, or custom-label states.
 
 ## 0.15.0
 

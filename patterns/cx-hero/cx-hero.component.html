@@ -1,0 +1,37 @@
+@if (resolvedHeading(); as title) {
+  <header
+    class="cx-hero"
+    [class.cx-hero--stacked]="variant === 'stacked'"
+    [class.cx-hero--split]="variant === 'split'"
+    [class.cx-hero--cover]="variant === 'cover'"
+    [class.cx-hero--center]="align === 'center'"
+  >
+    <div class="cx-hero__copy">
+      <div class="cx-hero__context">
+        <ng-content select="[context], [cxHeroContext]" />
+      </div>
+
+      <div class="cx-hero__message">
+        <h1 class="cx-hero__heading">{{ title }}</h1>
+        <div class="cx-hero__body">
+          <ng-content select="[body], [cxHeroBody]" />
+        </div>
+      </div>
+
+      <div class="cx-hero__actions">
+        <ng-content select="[actions], [cxHeroActions]" />
+      </div>
+
+      <div class="cx-hero__meta">
+        <ng-content select="[meta], [cxHeroMeta]" />
+      </div>
+    </div>
+
+    <div
+      class="cx-hero__media"
+      [attr.aria-hidden]="variant === 'cover' ? 'true' : null"
+    >
+      <ng-content select="[media], [cxHeroMedia]" />
+    </div>
+  </header>
+}

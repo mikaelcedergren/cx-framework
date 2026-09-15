@@ -1,0 +1,229 @@
+@use "../../tokens/breakpoints-scale" as breakpoints;
+
+cx-hero {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+cx-hero .cx-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2xl);
+  overflow: clip;
+  padding: var(--space-2xl) var(--gutter-page);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+cx-hero .cx-hero__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(100%, var(--measure-md));
+  min-width: 0;
+  align-content: center;
+  justify-self: start;
+  gap: var(--space-lg);
+}
+
+cx-hero .cx-hero__message {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-md);
+}
+
+cx-hero .cx-hero__heading {
+  max-width: 16ch;
+  color: var(--ink);
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-editorial-heading);
+  line-height: var(--line-height-display);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+cx-hero .cx-hero__context,
+cx-hero .cx-hero__actions,
+cx-hero .cx-hero__meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+cx-hero .cx-hero__context {
+  gap: var(--space-sm);
+  color: var(--accent);
+  font-size: var(--font-size-body-lg);
+  line-height: var(--line-height-body);
+}
+
+cx-hero .cx-hero__body {
+  display: grid;
+  max-width: var(--measure-sm);
+  min-width: 0;
+  gap: var(--space-sm);
+  color: var(--opacity-high);
+  font-size: var(--font-size-editorial-lead);
+  line-height: var(--line-height-editorial-lead);
+}
+
+cx-hero .cx-hero__actions {
+  gap: var(--space-sm);
+}
+
+cx-hero .cx-hero__meta {
+  gap: var(--space-md);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-small);
+}
+
+cx-hero .cx-hero__context:empty,
+cx-hero .cx-hero__body:empty,
+cx-hero .cx-hero__actions:empty,
+cx-hero .cx-hero__meta:empty,
+cx-hero .cx-hero__media:empty {
+  display: none;
+}
+
+cx-hero .cx-hero__media {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-media-lg);
+}
+
+cx-hero .cx-hero__media > [media],
+cx-hero .cx-hero__media > [cxHeroMedia] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+cx-hero .cx-hero--center .cx-hero__copy {
+  justify-self: center;
+  text-align: center;
+}
+
+cx-hero .cx-hero--center .cx-hero__heading,
+cx-hero .cx-hero--center .cx-hero__body {
+  margin-inline: auto;
+}
+
+cx-hero .cx-hero--center .cx-hero__context,
+cx-hero .cx-hero--center .cx-hero__actions,
+cx-hero .cx-hero--center .cx-hero__meta {
+  justify-content: center;
+}
+
+cx-hero .cx-hero--stacked .cx-hero__media {
+  max-width: var(--measure-xl);
+  justify-self: center;
+}
+
+cx-hero .cx-hero--split {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+cx-hero .cx-hero--split .cx-hero__copy {
+  justify-self: end;
+}
+
+cx-hero .cx-hero--cover {
+  min-height: clamp(
+    calc(var(--space-2xl) * 6),
+    60svh,
+    calc(var(--space-2xl) * 10)
+  );
+}
+
+cx-hero .cx-hero--cover::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: color-mix(in srgb, var(--overlay-backdrop) 72%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+cx-hero .cx-hero--cover .cx-hero__copy {
+  color: var(--on-ink);
+}
+
+cx-hero .cx-hero--cover .cx-hero__heading {
+  color: var(--on-ink);
+}
+
+cx-hero .cx-hero--cover .cx-hero__context {
+  color: color-mix(in srgb, var(--on-ink) 90%, transparent);
+}
+
+cx-hero .cx-hero--cover .cx-hero__body {
+  color: color-mix(in srgb, var(--on-ink) 86%, transparent);
+}
+
+cx-hero .cx-hero--cover .cx-hero__meta {
+  color: color-mix(in srgb, var(--on-ink) 70%, transparent);
+}
+
+cx-hero .cx-hero--cover .cx-hero__media {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-none);
+  background: var(--surface-alt);
+}
+
+cx-hero .cx-hero--cover .cx-hero__media > [media],
+cx-hero .cx-hero--cover .cx-hero__media > [cxHeroMedia] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+cx-hero[data-media-position="top"] .cx-hero--cover .cx-hero__media > [media],
+cx-hero[data-media-position="top"]
+  .cx-hero--cover
+  .cx-hero__media
+  > [cxHeroMedia] {
+  object-position: center top;
+}
+
+cx-hero[data-media-position="center"] .cx-hero--cover .cx-hero__media > [media],
+cx-hero[data-media-position="center"]
+  .cx-hero--cover
+  .cx-hero__media
+  > [cxHeroMedia] {
+  object-position: center center;
+}
+
+cx-hero[data-media-position="bottom"] .cx-hero--cover .cx-hero__media > [media],
+cx-hero[data-media-position="bottom"]
+  .cx-hero--cover
+  .cx-hero__media
+  > [cxHeroMedia] {
+  object-position: center bottom;
+}
+
+@container (max-width: #{breakpoints.$mobile - 1px}) {
+  cx-hero .cx-hero--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  cx-hero .cx-hero--split .cx-hero__copy {
+    justify-self: start;
+  }
+}

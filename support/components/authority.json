@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 133,
-  "catalogSha256": "96491f117b8d833af88b6db8ba794a14ae09db4ae53c70893ba5e8ab5f402704",
+  "componentCount": 135,
+  "catalogSha256": "8c78c07d55ad195edb4f04525c112a2dc19d5d78efba1ef7c58faf232c8ec40d",
   "components": [
     {
       "name": "cx-account-control",
@@ -5219,6 +5219,95 @@
             "ordinal": 1,
             "kind": "external",
             "sha256": "ea92f4a116c88b4ba84dbc7e16590b9b514087a925a7a9dc5a41da89bbcfd704"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-hero",
+      "area": "pattern",
+      "category": "cx-hero",
+      "kind": "component",
+      "selectors": [
+        "cx-hero"
+      ],
+      "publicApi": {
+        "symbol": "CxHeroComponent",
+        "inputs": [
+          {
+            "binding": "align",
+            "member": "align",
+            "type": "CxHeroAlign",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "heading",
+            "member": "heading",
+            "type": "string",
+            "required": true,
+            "transform": null,
+            "defaultValue": "\"\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "mediaPosition",
+            "member": "mediaPosition",
+            "type": "CxHeroMediaPosition",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "variant",
+            "member": "variant",
+            "type": "CxHeroVariant",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[context], [cxHeroContext]"
+        },
+        {
+          "ordinal": 2,
+          "selector": "[body], [cxHeroBody]"
+        },
+        {
+          "ordinal": 3,
+          "selector": "[actions], [cxHeroActions]"
+        },
+        {
+          "ordinal": 4,
+          "selector": "[meta], [cxHeroMeta]"
+        },
+        {
+          "ordinal": 5,
+          "selector": "[media], [cxHeroMedia]"
+        }
+      ],
+      "evidence": {
+        "source": {
+          "sha256": "3c3b59fbca0937c931e900a92356965b1713c94a1ff54e7be19286be7469d68d"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "9a3c4a5ae8dff61b431ae44d463287cb75eb77287ad1f49c5365229a28cc64ee"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "09f655c261bdcf96be887b9ccf61b02ad52b1be53c388071fb74a3c9b3cfe59a"
           }
         ]
       }
@@ -11478,6 +11567,83 @@
             "ordinal": 1,
             "kind": "external",
             "sha256": "1744640b895073a3cc65c7fa673f21c6656d914b36d080218c05cda08eef80d2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-store-button",
+      "area": "primitive",
+      "category": "actions",
+      "kind": "component",
+      "selectors": [
+        "cx-store-button"
+      ],
+      "publicApi": {
+        "symbol": "CxStoreButtonComponent",
+        "inputs": [
+          {
+            "binding": "appName",
+            "member": "appName",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "href",
+            "member": "href",
+            "type": "string",
+            "required": true,
+            "transform": null,
+            "defaultValue": "\"\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "language",
+            "member": "language",
+            "type": "CxStoreButtonLanguage | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": "undefined",
+            "source": "decorator"
+          },
+          {
+            "binding": "size",
+            "member": "size",
+            "type": "CxStoreButtonSize",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "store",
+            "member": "store",
+            "type": "CxStoreButtonStore",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"app-store\"",
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "744cf37707ab7425277ef390a48bb370e8fdb66e0e4e38e67b4afc0e9f12302e"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "48eefdc6389acfa09e78625436e930ec3d948b71a18502da81e9d18d271d00c0"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "5b4d49570505c49b244f37ca931da88db3f80c3eebdbf615fee8f7f8c08968ba"
           }
         ]
       }

@@ -1,0 +1,42 @@
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
+.cx-store-button {
+  display: inline-flex;
+  padding: calc(var(--controller-size-large) / 4);
+  cursor: pointer;
+  text-decoration: none;
+  // Clear space belongs to the badge; the page still owns gaps between components.
+  outline: none;
+}
+
+.cx-store-button:focus-visible {
+  outline: calc(var(--border-width) * 2) solid var(--primary);
+  outline-offset: var(--space-2xs);
+}
+
+.cx-store-button__artwork {
+  position: relative;
+  display: block;
+  height: var(--controller-size-large);
+  flex: 0 0 auto;
+}
+
+.cx-store-button__artwork img {
+  position: absolute;
+  display: block;
+  width: auto;
+  max-width: none;
+  pointer-events: none;
+}
+
+.cx-store-button--large {
+  padding: calc((var(--controller-size-large) + var(--space-md)) / 4);
+}
+
+.cx-store-button--large .cx-store-button__artwork {
+  height: calc(var(--controller-size-large) + var(--space-md));
+}
