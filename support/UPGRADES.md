@@ -14,6 +14,19 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.9
+
+- `cx-masthead` navigation now keeps the ink colour in normal, visited,
+  hovered, and active states. Hover uses a quiet background; the current
+  destination remains bold. No consumer changes are required.
+- Transparent and frosted mastheads now ease the tint, border, and blur
+  together in both directions. Reduced-motion preferences disable the
+  transition. No consumer changes are required.
+- The existing optional `actions` slot supports a primary CTA. Project
+  `<cx-button actions mood="primary" text="Contact" href="/contact" />`
+  with your own label and destination, or handle `pressed` for a command.
+  It stays visible beside the mobile menu toggle. No new prop is needed.
+
 ## 0.16.8
 
 - `cx-masthead` adds `variant="transparent"`, `overlay`, and `frostOnScroll`.

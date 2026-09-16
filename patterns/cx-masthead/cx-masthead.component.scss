@@ -23,9 +23,10 @@ cx-masthead.cx-masthead-host--sticky {
   background: var(--surface);
   box-sizing: border-box;
   transition:
-    background-color var(--motion-base) ease,
-    border-color var(--motion-base) ease,
-    backdrop-filter var(--motion-base) ease;
+    background-color var(--motion-slow) var(--ease-out-in),
+    border-color var(--motion-slow) var(--ease-out-in),
+    -webkit-backdrop-filter var(--motion-slow) var(--ease-out-in),
+    backdrop-filter var(--motion-slow) var(--ease-out-in);
 }
 
 .cx-masthead--transparent {
@@ -37,6 +38,12 @@ cx-masthead.cx-masthead-host--sticky {
 @supports (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
+  .cx-masthead--transparent {
+    // Keep matching filter functions so frost eases in and out, including Safari.
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+
   .cx-masthead--frosted {
     background: color-mix(in srgb, var(--ink) 12%, transparent);
     -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 12));
@@ -183,7 +190,7 @@ cx-masthead.cx-masthead-host--sticky {
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--opacity-high);
+  color: var(--ink);
   font: inherit;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
@@ -192,11 +199,15 @@ cx-masthead.cx-masthead-host--sticky {
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--motion-fast) ease;
+  transition: background-color var(--motion-fast) ease;
+}
+
+.cx-masthead__link:is(:link, :visited, :hover, :active) {
+  color: var(--ink);
 }
 
 .cx-masthead__link:hover {
-  color: var(--ink);
+  background: var(--opacity-low);
 }
 
 .cx-masthead__link:focus-visible {
@@ -210,12 +221,10 @@ cx-masthead.cx-masthead-host--sticky {
 }
 
 .cx-masthead__link--active {
-  color: var(--ink);
   font-weight: var(--font-weight-bold);
 }
 
 .cx-masthead__link--disabled {
-  color: var(--ink);
   cursor: default;
   pointer-events: none;
   opacity: var(--opacity-disabled);
@@ -375,10 +384,6 @@ cx-masthead.cx-masthead-host--sticky {
   font-size: var(--font-size-title-3);
   white-space: normal;
   overflow-wrap: anywhere;
-}
-
-.cx-masthead__drawer .cx-masthead__link:hover {
-  background: var(--opacity-low);
 }
 
 /* ---- Collapse below the available inline width ----
