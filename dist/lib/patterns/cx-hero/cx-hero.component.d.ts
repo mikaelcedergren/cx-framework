@@ -19,6 +19,8 @@ export declare class CxHeroComponent implements AfterContentInit {
     constructor();
     /** Required page heading. Empty text removes the whole hero. */
     heading: string;
+    /** Utility classes applied directly to the heading; empty keeps the default. */
+    headingClass: string;
     /** Responsive composition. Split and cover require projected media. */
     set variant(value: CxHeroVariant);
     get variant(): CxHeroVariant;
@@ -35,7 +37,7 @@ export declare class CxHeroComponent implements AfterContentInit {
     private validateComposition;
     private hasProjectedMedia;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxHeroComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "headingClass": { "alias": "headingClass"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
     static ngAcceptInputType_fadeBottom: unknown;
 }
 //# sourceMappingURL=cx-hero.component.d.ts.map

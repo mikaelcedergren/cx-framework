@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.7
+
+- `cx-hero` adds `headingClass`, a space-separated string of utility classes
+  applied directly to its h1. Use `headingClass="cx-font-regular"` for a regular
+  heading. Omit it or pass an empty string to retain the existing default.
+  Supporting copy and hero structure are unaffected.
+
 ## 0.16.6
 
 - All utility declarations now use `!important` within the `cx-utilities` layer.

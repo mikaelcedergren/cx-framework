@@ -13,7 +13,7 @@
       </div>
 
       <div class="cx-hero__message">
-        <h1 class="cx-hero__heading">{{ title }}</h1>
+        <h1 class="cx-hero__heading" [class]="headingClass">{{ title }}</h1>
         <div class="cx-hero__body">
           <ng-content select="[body], [cxHeroBody]" />
         </div>

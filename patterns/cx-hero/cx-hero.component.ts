@@ -62,6 +62,9 @@ export class CxHeroComponent implements AfterContentInit {
   /** Required page heading. Empty text removes the whole hero. */
   @Input({ required: true }) heading = "";
 
+  /** Utility classes applied directly to the heading; empty keeps the default. */
+  @Input() headingClass = "";
+
   /** Responsive composition. Split and cover require projected media. */
   @Input()
   public set variant(value: CxHeroVariant) {
