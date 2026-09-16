@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.5
+
+- `cx-hero` cover now pairs its image scrim and opaque text with the active theme's
+  surface and ink. Light themes use a light scrim; dark themes use a dark scrim.
+  This also keeps the optional surface fade and missing-image state coherent.
+  Cover media also stays within the hero height when its intrinsic image is taller.
+  No consumer changes are needed.
+
 ## 0.16.4
 
 - `cx-hero` now lets its body use the full shared large reading measure instead of constraining that

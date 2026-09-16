@@ -152,7 +152,7 @@ cx-hero .cx-hero--cover::after {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: color-mix(in srgb, var(--overlay-backdrop) 72%, transparent);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
   content: "";
   pointer-events: none;
 }
@@ -175,29 +175,20 @@ cx-hero .cx-hero--cover.cx-hero--fade-bottom::before {
   pointer-events: none;
 }
 
-cx-hero .cx-hero--cover .cx-hero__copy {
-  color: var(--on-ink);
-}
-
-cx-hero .cx-hero--cover .cx-hero__heading {
-  color: var(--on-ink);
-}
-
-cx-hero .cx-hero--cover .cx-hero__context {
-  color: color-mix(in srgb, var(--on-ink) 90%, transparent);
-}
-
-cx-hero .cx-hero--cover .cx-hero__body {
-  color: color-mix(in srgb, var(--on-ink) 86%, transparent);
-}
-
+// Cover uses the same surface/ink pair as projected controls and the optional fade.
+// Keep text opaque so bright and dark photographs cannot weaken its contrast.
+cx-hero .cx-hero--cover .cx-hero__copy,
+cx-hero .cx-hero--cover .cx-hero__heading,
+cx-hero .cx-hero--cover .cx-hero__context,
+cx-hero .cx-hero--cover .cx-hero__body,
 cx-hero .cx-hero--cover .cx-hero__meta {
-  color: color-mix(in srgb, var(--on-ink) 70%, transparent);
+  color: var(--ink);
 }
 
 cx-hero .cx-hero--cover .cx-hero__media {
   position: absolute;
   z-index: -2;
+  grid-template-rows: minmax(0, 1fr);
   inset: 0;
   height: 100%;
   overflow: hidden;

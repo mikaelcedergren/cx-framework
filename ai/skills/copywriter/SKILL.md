@@ -45,7 +45,11 @@ When tone or wording judgment is not settled by the copy rules, `../../profile/d
 ## Copy standard
 
 - Apply `RULE-ID: copy.reader-language` before drafting user-facing text.
+- Apply `RULE-ID: copy.concrete-meaning` while drafting and before handing over wording; ask “What does the reader learn from this?” in the actual surrounding context.
+- Apply `RULE-ID: copy.first-read-understanding` while drafting and before handing over wording; judge the effort required from the intended reader, not just accuracy or word count.
+- Apply `RULE-ID: copy.no-convention-explanation` before drafting or retaining instructional copy; remove narration of already understandable interactions and return unclear control design to `designer`.
 - Apply `RULE-ID: content.scannable` and `RULE-ID: copy.concise`; lead with the point and make the structure understandable before close reading.
+- Apply `RULE-ID: copy.paragraph-flow` to body text longer than 120 characters; use the meaning and flow examples in `05-copy-and-microcopy.md` when calibrating wording.
 - Prefer the plainest accurate word.
 - Use one term for one concept and match the product's existing domain language.
 - Use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action.
@@ -61,8 +65,8 @@ When tone or wording judgment is not settled by the copy rules, `../../profile/d
 2. Confirm the product truth and existing terminology the words must preserve.
 3. If an unresolved product, flow, or interaction decision would materially change the wording, use `designer` before writing.
 4. Search the AI design package for the relevant topic or component.
-5. Draft the shortest specific wording that tells the user what the object, action, state, consequence, or recovery path is.
-6. Stress-test fit, scannability, chunking, adjacent repetition, ambiguity, tone, neighboring terminology, long values, and failure states that are in scope.
+5. Draft specific wording the intended reader can understand on the first read, using the fewest words that make the relevant object, action, state, consequence, or recovery path clear.
+6. Stress-test concrete meaning in context, first-read understanding, and paragraph flow using `copy.concrete-meaning`, `copy.first-read-understanding`, and `copy.paragraph-flow`, alongside fit, scannability, chunking, adjacent repetition, ambiguity, tone, neighboring terminology, long values, and failure states that are in scope.
 7. Use `custodian` when the finalized wording needs an acceptance verdict.
 8. Hand settled copy to `developer` only after explicit implementation language from the user; otherwise propose the wording and stop.
 

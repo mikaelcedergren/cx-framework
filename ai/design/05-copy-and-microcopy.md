@@ -14,6 +14,12 @@ RULE-ID: copy.terminology SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use one estab
 
 RULE-ID: copy.plain-language SCOPE: copy TYPE: SHOULD TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 
+RULE-ID: copy.concrete-meaning SCOPE: copy TYPE: MUST TOPIC: copy RULE: Ask “Is this clearly understood, or is it too vague?” and identify what the reader learns from the words in their surrounding context; replace vague claims with known facts, remove text that adds nothing useful, and ask when missing facts prevent accurate wording. DESCRIPTION: Plain words can still say almost nothing. Name the relevant object, action, state, consequence, or useful fact when context does not already establish it. Never invent specifics to make a claim sound meaningful; copy.truth and copy.unknown-behavior govern product uncertainty.
+
+RULE-ID: copy.first-read-understanding SCOPE: copy TYPE: MUST TOPIC: copy RULE: Ask “Will the intended reader understand this on the first read, without having to translate, reread, or infer missing connections?” Judge understanding from the whole interface, including its labels, surrounding context, and conventions familiar to that audience; apply copy.no-convention-explanation before adding instructions. If wording remains hard to understand, rewrite with familiar words, a logical order, and explicit connections between ideas; explain necessary unfamiliar terms and use a concrete example when it makes an abstract point easier to grasp. Keep the words needed for understanding even when that makes the text longer. DESCRIPTION: Specific, accurate wording can still demand too much effort. Judge understanding from the reader's knowledge, not the writer's familiarity; never make the reader untangle compressed explanations. This applies at every text length and preserves product truth.
+
+RULE-ID: copy.no-convention-explanation SCOPE: product-interface-copy TYPE: MUST TOPIC: guidance RULE: Omit instructions that explain an established UI convention when the control, its label, and surrounding context already make its use clear to the intended audience. Add explanation only for a specific uncertainty, unfamiliar behavior, or consequence the interface does not communicate. If the control is hard to recognise or use, correct its presentation and interaction before adding instructions; preserve necessary labels, accessible names, and consequence or recovery information. DESCRIPTION: Ask “What uncertainty remains after looking at the interface?” Familiarity depends on the audience and the actual presentation, not merely the component's name. This rule governs copy inside the product interface, not an explicitly requested tutorial or component reference; design corrections remain subject to the accepted scope and owning component's authority.
+
 RULE-ID: copy.reader-language SCOPE: copy TYPE: MUST TOPIC: copy RULE: Write for the reader instead of mirroring the underlying data model. DESCRIPTION: Convert field names, enum values, status tokens, and key-value structures into natural language. EXCEPT: Preserve structured representation when the surface intentionally presents data in that form.
 
 RULE-ID: copy.component-guidance.reader-language SCOPE: component-usage-guidance TYPE: MUST TOPIC: guidance RULE: Explain when and how to use a component in plain language. DESCRIPTION: Write for a designer or product author choosing a component. Describe its purpose, suitable situations, and important user-facing behavior without selectors, properties, events, code structure, or implementation instructions; keep technical contracts in the API reference.
@@ -21,6 +27,8 @@ RULE-ID: copy.component-guidance.reader-language SCOPE: component-usage-guidance
 RULE-ID: copy.sentence-case SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
 
 RULE-ID: copy.concise SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Keep operational copy short and scannable as accuracy allows. DESCRIPTION: Lead with the point and use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action; a reading surface may remain long when reading is the task.
+
+RULE-ID: copy.paragraph-flow SCOPE: body-copy TYPE: MUST TOPIC: voice RULE: For body text longer than 120 characters, write connected prose with a natural rhythm; use commas and connecting words to join closely related thoughts where this improves flow, vary sentence length, and retain sentence breaks when the thought changes or needs emphasis. Avoid a succession of clipped sentences and preserve grammatical sentence boundaries rather than creating comma splices or run-on sentences. DESCRIPTION: Apply the threshold to the body text block, including spaces, not to each sentence or to unrelated interface labels combined. Short sentences remain useful for emphasis; clarity does not require making every sentence short or joining every sentence into one.
 
 RULE-ID: copy.warmth SCOPE: learning-copy TYPE: MAY TOPIC: voice RULE: Use restrained warmth on learning and first-use surfaces. DESCRIPTION: Onboarding, setup guidance, and first-use empty states may be kind and conversational without becoming cute, jokey, or vague.
 
@@ -30,9 +38,30 @@ RULE-ID: copy.opt-out-neutral SCOPE: opt-out-copy TYPE: MUST TOPIC: trust RULE: 
 
 RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Remove filler, apology, and performative politeness. DESCRIPTION: Words such as `just`, `simply`, `easily`, `please`, `oops`, `sorry`, `rhythm`, and `silent` rarely improve operational clarity.
 
-RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every piece of interface text from the fewest words that stay unambiguous; extra words are an explicit product decision, never a default. DESCRIPTION: Applies to all UI copy — menu items, buttons, calls to action, dialog primaries, labels, headings, hints, and empty states. Add a noun, qualifier, or explanation only when the product owner decides the extra information earns its place; never speculatively or out of habit.
+RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every piece of interface text from the fewest words that satisfy copy.first-read-understanding; retain words needed for understanding, while optional elaboration remains an explicit product decision, never a default. DESCRIPTION: Applies to all UI copy — menu items, buttons, calls to action, dialog primaries, labels, headings, hints, and empty states. A necessary noun, qualifier, connection, or explanation earns its place by reducing the reader's effort; do not add optional detail speculatively or out of habit.
 
 RULE-ID: copy.no-context-restatement SCOPE: copy TYPE: MUST TOPIC: copy RULE: Do not restate context the surface already establishes. DESCRIPTION: Applies to all UI copy. A row or card menu says `Edit` and `Delete` — the row is the object. A page-level call to action says `New` — the page heading names what is created. A form dialog's primary says `Add` or `Save` — the dialog heading names the entity. Labels, hints, and headings follow the same principle: never repeat what the page, section, or component around them has already said. Words survive only when they add information the surface does not carry: a different object or destination (`Open report`, `Move to pending`), a resulting state (`Create draft`), genuinely mixed targets (a global surface such as a command palette), or the final destructive commit, which copy.buttons.destructive governs. EXCEPT: A field label or picker placeholder naming its own value per copy.labels.object and copy.pickers.placeholder is establishing context, not restating it — a `Reminder` field label inside a `New reminder` dialog is correct.
+
+### Meaning and flow examples
+
+These examples illustrate `copy.concrete-meaning`, `copy.first-read-understanding`, and `copy.paragraph-flow`; concrete replacements assume the described behavior is known to be true.
+
+| Vague                       | Concrete                        |
+| --------------------------- | ------------------------------- |
+| Stay on top of what matters | See tasks due today             |
+| Manage your preferences     | Choose which emails you receive |
+
+Accurate but harder to decode: “Folder permissions govern contained files.”
+
+Easier to understand: “Files use the same access settings as their folder.”
+
+Clipped body text: “Generate fake paragraphs for a design that needs text. They read like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from Send.”
+
+Connected body text: “Generate fake paragraphs for a design that needs text, written like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from Send.”
+
+An `Edit` action in an identified row already has a clear object. Repeating the row’s name adds no meaning; `copy.no-context-restatement` still applies.
+
+For `copy.no-convention-explanation`, omit “Use the tabs to switch between sections,” “Select a checkbox to choose an item,” and “Click Save to save your changes” when the labelled controls already communicate these actions. Keep “Changes apply to everyone in this workspace” when true and otherwise unclear, because the control alone does not communicate that consequence.
 
 ## Buttons and actions
 

@@ -83,6 +83,8 @@ Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integri
 
 Apply `RULE-ID: system.no-empty-chrome` to every control, optional wrapper, overlay, container, and surface in scope.
 
+Apply `RULE-ID: copy.no-convention-explanation` to instructional copy in scope. Flag explanations that only narrate an already understandable interaction; distinguish missing information from an unclear control when recommending the correction.
+
 Classify each material relationship internally as `Pass`, `Concern`, or `Unknown`. A concern becomes a finding only when it is observed or well-supported by evidence. An unknown follows the `Unverified` rules above; do not fill it with the behavior that would make the design seem sensible. A direct contradiction between a surface's promise, contents, and observed behavior is a design error, even when each element looks plausible in isolation.
 
 ## Mandatory final rendered-UI review
