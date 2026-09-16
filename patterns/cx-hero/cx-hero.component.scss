@@ -32,6 +32,12 @@ cx-hero .cx-hero__copy {
   gap: var(--space-lg);
 }
 
+cx-hero .cx-hero--under-masthead {
+  padding-top: calc(
+    var(--space-2xl) + var(--controller-size-large) + var(--space-md) * 2
+  );
+}
+
 cx-hero .cx-hero__message {
   display: grid;
   min-width: 0;
@@ -228,6 +234,12 @@ cx-hero[data-media-position="bottom"]
 }
 
 @container (max-width: #{breakpoints.$mobile - 1px}) {
+  cx-hero .cx-hero--under-masthead {
+    padding-top: calc(
+      var(--space-2xl) + var(--controller-size-large) + var(--space-sm) * 2
+    );
+  }
+
   cx-hero .cx-hero--split {
     grid-template-columns: minmax(0, 1fr);
   }

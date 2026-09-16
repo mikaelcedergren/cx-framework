@@ -13,6 +13,7 @@ import {
   signal,
   viewChild,
   ElementRef,
+  ViewEncapsulation,
 } from "@angular/core";
 import {
   RouterLink,
@@ -30,7 +31,7 @@ import { CxTooltipDirective } from "../../primitives/overlay/cx-tooltip";
 
 const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
 
-export type CxMastheadVariant = "default" | "frosted";
+export type CxMastheadVariant = "default" | "frosted" | "transparent";
 
 export type CxMastheadItem = {
   id: string;
@@ -78,8 +79,13 @@ let nextPanelId = 0;
   ],
   templateUrl: "./cx-masthead.component.html",
   styleUrl: "./cx-masthead.component.scss",
+  // Brand slots are authored by the consumer; style their direct root alongside
+  // the built-in brand. Every selector belongs to the masthead, including its portal.
+  encapsulation: ViewEncapsulation.None,
   host: {
-    "[class.cx-masthead-host--sticky]": "sticky",
+    "[class.cx-masthead-host--sticky]": "sticky || frostOnScroll",
+    "[class.cx-masthead-host--overlay]": "overlay",
+    "[style.margin-block-end.px]": "overlay ? -headerHeight() : null",
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -90,6 +96,17 @@ export class CxMastheadComponent implements OnDestroy {
   private overlayHandle?: CxOverlayStateHandle;
   private portaledOverlay?: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  private scrollTarget?: HTMLElement | Document;
+  protected readonly headerHeight = signal(0);
+  protected readonly scrolled = signal(false);
+  private readonly scrollListener = () => {
+    const target = this.scrollTarget;
+    const top =
+      target === this.document
+        ? (this.document.scrollingElement?.scrollTop ?? 0)
+        : ((target as HTMLElement | undefined)?.scrollTop ?? 0);
+    this.scrolled.set(top > 0);
+  };
   private focusPending = false;
   private readonly focusListener = () => this.keepFocusInside();
   private readonly drawerOverlay =
@@ -99,11 +116,16 @@ export class CxMastheadComponent implements OnDestroy {
   constructor() {
     afterEveryRender(() => {
       if (!this.resizeObserver && typeof ResizeObserver !== "undefined") {
-        this.resizeObserver = new ResizeObserver(() =>
-          this.closeWhenExpanded(),
-        );
-        this.resizeObserver.observe(this.host.nativeElement);
+        const header =
+          this.host.nativeElement.querySelector<HTMLElement>(".cx-masthead")!;
+        this.resizeObserver = new ResizeObserver(() => {
+          this.headerHeight.set(header.getBoundingClientRect().height);
+          this.closeWhenExpanded();
+        });
+        this.resizeObserver.observe(header);
+        this.headerHeight.set(header.getBoundingClientRect().height);
       }
+      this.syncScrollTarget();
       this.closeWhenExpanded();
       const root = this.drawerOverlay()?.nativeElement;
       if (this.portaledOverlay && this.portaledOverlay !== root) {
@@ -131,6 +153,46 @@ export class CxMastheadComponent implements OnDestroy {
     this.closeMenu();
     this.resizeObserver?.disconnect();
     this.portaledOverlay?.remove();
+    this.scrollTarget?.removeEventListener("scroll", this.scrollListener);
+  }
+
+  private syncScrollTarget(): void {
+    let target: HTMLElement | Document | undefined;
+    if (this.frostOnScroll && this.host.nativeElement.getClientRects().length) {
+      target = this.document;
+      for (
+        let parent = this.host.nativeElement.parentElement;
+        parent &&
+        parent !== this.document.body &&
+        parent !== this.document.documentElement;
+        parent = parent.parentElement
+      ) {
+        if (
+          /^(auto|scroll|hidden|overlay)$/.test(
+            this.document.defaultView!.getComputedStyle(parent).overflowY,
+          )
+        ) {
+          target = parent;
+          break;
+        }
+      }
+    }
+    if (target !== this.scrollTarget) {
+      this.scrollTarget?.removeEventListener("scroll", this.scrollListener);
+      this.scrollTarget = target;
+      target?.addEventListener("scroll", this.scrollListener, {
+        passive: true,
+      });
+    }
+    this.scrollListener();
+  }
+
+  protected surfaceVariant(): CxMastheadVariant {
+    return this.frostOnScroll
+      ? this.scrolled()
+        ? "frosted"
+        : "transparent"
+      : this.variant;
   }
 
   private closeWhenExpanded(): void {
@@ -182,6 +244,10 @@ export class CxMastheadComponent implements OnDestroy {
   @Input() variant: CxMastheadVariant = "default";
   /** Sticks the component host to the top of its scroll container. */
   @Input({ transform: booleanAttribute }) sticky = false;
+  /** Overlaps the next sibling without moving content when its surface changes. */
+  @Input({ transform: booleanAttribute }) overlay = false;
+  /** Pins the masthead, transparent at the scroll origin and frosted after scrolling. */
+  @Input({ transform: booleanAttribute }) frostOnScroll = false;
   /** Optional toggle label override; otherwise announces Open menu or Close menu. */
   @Input() menuAriaLabel: string | undefined;
 

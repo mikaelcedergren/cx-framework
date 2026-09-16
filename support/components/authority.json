@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 135,
-  "catalogSha256": "21e9e0fd1e1ee7bad4227b35af1a0f81c5e95eacc800583248aea4ca00b9c930",
+  "catalogSha256": "ae48c1cfc5d518f07c4e902c91d6c14a00301483a5577160659331849ee93acf",
   "components": [
     {
       "name": "cx-account-control",
@@ -5280,6 +5280,15 @@
             "source": "decorator"
           },
           {
+            "binding": "underMasthead",
+            "member": "underMasthead",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "variant",
             "member": "variant",
             "type": "CxHeroVariant",
@@ -5315,17 +5324,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "8d476424c52ea27e41126f50615aa92da112b0f49fe415415b07c7c73fb0fe7c"
+          "sha256": "61cf49e8194e2fb45465ebfd4bf897e159745efe426c83cc9f6419981a0ae3b9"
         },
         "template": {
           "kind": "external",
-          "sha256": "5681b360a05fb9d0733fdb1807e8ee5755ae92b9bd1f0ca7443541a32e74c9a8"
+          "sha256": "3d3d1bc86150f83def0c9360f571041ed824255752b637737c63877a91f42c2c"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "29007dc1015f006974e11e10d25090f1ac859fb675b636ff96143137148d82c6"
+            "sha256": "d61ef10e57f46befeed72d4eef488f5f4b6e52c6674581760e714b03ba34f4fb"
           }
         ]
       }
@@ -7175,6 +7184,15 @@
         "symbol": "CxMastheadComponent",
         "inputs": [
           {
+            "binding": "frostOnScroll",
+            "member": "frostOnScroll",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "heading",
             "member": "heading",
             "type": "string",
@@ -7229,6 +7247,15 @@
             "source": "decorator"
           },
           {
+            "binding": "overlay",
+            "member": "overlay",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "sticky",
             "member": "sticky",
             "type": "boolean",
@@ -7268,17 +7295,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "2e83cad643d657d70a1dafae3c20c3eead4911d58f1b0d9f67bee955246b3ece"
+          "sha256": "edc8f2208a9338944727e2fa92b1faab644121efc53aa777edbbfd3020c58575"
         },
         "template": {
           "kind": "external",
-          "sha256": "bca6ed4c20821ff4327bf90f588e5346c84d60c67ed29e633f959930b7d98091"
+          "sha256": "c4f166d547e5873b6fec82ab39d592001733cb8fb49ce16347c0ff96375a27fb"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "dd1a184aa7c71bda46d13c5c7aef7b4821b49edb5a9f05f379c70c48fe830ba4"
+            "sha256": "257226801833a5a97efe22732d5087eaf9b3f1617e754bfafda200440db9198e"
           }
         ]
       }

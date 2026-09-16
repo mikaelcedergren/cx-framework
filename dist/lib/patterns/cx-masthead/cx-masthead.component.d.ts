@@ -2,7 +2,7 @@ import { OnDestroy, EventEmitter } from "@angular/core";
 import { type IsActiveMatchOptions } from "@angular/router";
 import { type CxIconName } from "../../icons/manifest";
 import * as i0 from "@angular/core";
-export type CxMastheadVariant = "default" | "frosted";
+export type CxMastheadVariant = "default" | "frosted" | "transparent";
 export type CxMastheadItem = {
     id: string;
     label: string;
@@ -42,12 +42,18 @@ export declare class CxMastheadComponent implements OnDestroy {
     private overlayHandle?;
     private portaledOverlay?;
     private resizeObserver?;
+    private scrollTarget?;
+    protected readonly headerHeight: import("@angular/core").WritableSignal<number>;
+    protected readonly scrolled: import("@angular/core").WritableSignal<boolean>;
+    private readonly scrollListener;
     private focusPending;
     private readonly focusListener;
     private readonly drawerOverlay;
     protected readonly trapsFocus: import("@angular/core").WritableSignal<boolean>;
     constructor();
     ngOnDestroy(): void;
+    private syncScrollTarget;
+    protected surfaceVariant(): CxMastheadVariant;
     private closeWhenExpanded;
     private keepFocusInside;
     private itemsValue;
@@ -70,6 +76,10 @@ export declare class CxMastheadComponent implements OnDestroy {
     variant: CxMastheadVariant;
     /** Sticks the component host to the top of its scroll container. */
     sticky: boolean;
+    /** Overlaps the next sibling without moving content when its surface changes. */
+    overlay: boolean;
+    /** Pins the masthead, transparent at the scroll origin and frosted after scrolling. */
+    frostOnScroll: boolean;
     /** Optional toggle label override; otherwise announces Open menu or Close menu. */
     menuAriaLabel: string | undefined;
     /** Emits when a navigation item is activated. */
@@ -87,7 +97,9 @@ export declare class CxMastheadComponent implements OnDestroy {
     protected onBackdrop(event: MouseEvent): void;
     protected onItemClick(event: MouseEvent, item: CxMastheadItem): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMastheadComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "overlay": { "alias": "overlay"; "required": false; }; "frostOnScroll": { "alias": "frostOnScroll"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;
     static ngAcceptInputType_sticky: unknown;
+    static ngAcceptInputType_overlay: unknown;
+    static ngAcceptInputType_frostOnScroll: unknown;
 }
 //# sourceMappingURL=cx-masthead.component.d.ts.map

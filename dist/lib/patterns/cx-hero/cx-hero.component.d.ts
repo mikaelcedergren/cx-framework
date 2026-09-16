@@ -32,12 +32,15 @@ export declare class CxHeroComponent implements AfterContentInit {
     get mediaPosition(): CxHeroMediaPosition;
     /** Smoothly blends the lower half of cover media into the default surface. */
     fadeBottom: boolean;
+    /** Reserves space for an overlapping masthead while media extends behind it. */
+    underMasthead: boolean;
     ngAfterContentInit(): void;
     protected resolvedHeading(): string;
     private validateComposition;
     private hasProjectedMedia;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxHeroComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "headingClass": { "alias": "headingClass"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "headingClass": { "alias": "headingClass"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; "underMasthead": { "alias": "underMasthead"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
     static ngAcceptInputType_fadeBottom: unknown;
+    static ngAcceptInputType_underMasthead: unknown;
 }
 //# sourceMappingURL=cx-hero.component.d.ts.map

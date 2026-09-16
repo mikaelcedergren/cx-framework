@@ -1,6 +1,7 @@
 <header
   class="cx-masthead"
-  [class.cx-masthead--frosted]="variant === 'frosted'"
+  [class.cx-masthead--frosted]="surfaceVariant() === 'frosted'"
+  [class.cx-masthead--transparent]="surfaceVariant() === 'transparent'"
 >
   <div class="cx-masthead__inner">
     <div class="cx-masthead__brand">

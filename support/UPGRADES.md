@@ -14,6 +14,21 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.8
+
+- `cx-masthead` adds `variant="transparent"`, `overlay`, and `frostOnScroll`.
+  Scroll frost includes sticky positioning and overrides `variant` until disabled;
+  it follows the nearest scroll container, clearing the frost and visible border
+  at the top. `overlay` overlaps the next sibling by the measured header height.
+  Place `cx-hero` with `underMasthead` immediately after it, at the same width and
+  without a gap, to reserve responsive navigation clearance inside the hero.
+  Brand links now retain ink in their hover, active, and visited states.
+
+- `cx-masthead` now caps its height at 80px on desktop and 64px on narrow
+  screens. Keep projected branding and actions within the 48px content row.
+  The frosted variant uses a 12% ink tint with stronger backdrop blur and
+  foreground colours; check it over your page imagery in each supported theme.
+
 ## 0.16.7
 
 - `cx-hero` adds `headingClass`, a space-separated string of utility classes

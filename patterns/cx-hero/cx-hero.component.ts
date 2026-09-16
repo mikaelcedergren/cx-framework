@@ -99,6 +99,9 @@ export class CxHeroComponent implements AfterContentInit {
   /** Smoothly blends the lower half of cover media into the default surface. */
   @Input({ transform: booleanAttribute }) fadeBottom = false;
 
+  /** Reserves space for an overlapping masthead while media extends behind it. */
+  @Input({ transform: booleanAttribute }) underMasthead = false;
+
   public ngAfterContentInit(): void {
     this.contentReady = true;
   }

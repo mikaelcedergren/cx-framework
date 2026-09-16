@@ -1,10 +1,15 @@
 @use "../../tokens/breakpoints-scale" as breakpoints;
 
-:host {
+cx-masthead {
   display: block;
 }
 
-:host(.cx-masthead-host--sticky) {
+cx-masthead.cx-masthead-host--overlay {
+  position: relative;
+  z-index: var(--z-index-sticky);
+}
+
+cx-masthead.cx-masthead-host--sticky {
   position: sticky;
   top: 0;
   z-index: var(--z-index-sticky);
@@ -17,15 +22,25 @@
   border-bottom: var(--line);
   background: var(--surface);
   box-sizing: border-box;
+  transition:
+    background-color var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    backdrop-filter var(--motion-base) ease;
+}
+
+.cx-masthead--transparent {
+  background: transparent;
+  // Keep the same geometry as the frosted state without drawing a dividing line.
+  border-bottom-color: transparent;
 }
 
 @supports (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
   .cx-masthead--frosted {
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
-    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 4));
-    backdrop-filter: blur(calc(var(--frost-softness) * 4));
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 12));
+    backdrop-filter: blur(calc(var(--frost-softness) * 12));
   }
 }
 
@@ -33,6 +48,10 @@
   display: flex;
   width: 100%;
   min-width: 0;
+  // Include the masthead's bottom border in the total height limit.
+  max-height: calc(
+    var(--controller-size-large) + var(--space-md) * 2 - var(--border-width)
+  );
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
@@ -51,6 +70,13 @@
 
 .cx-masthead__brand:empty {
   display: none;
+}
+
+.cx-masthead__brand,
+.cx-masthead__brand > [brand],
+.cx-masthead__brand > [cxMastheadBrand],
+.cx-masthead__home:is(:link, :visited, :hover, :active) {
+  color: var(--ink);
 }
 
 .cx-masthead__home {
@@ -368,6 +394,9 @@
 
 @container (max-width: #{breakpoints.$mobile - 1px}) {
   .cx-masthead__inner {
+    max-height: calc(
+      var(--controller-size-large) + var(--space-sm) * 2 - var(--border-width)
+    );
     padding-block: var(--space-sm);
   }
 
@@ -381,6 +410,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cx-masthead,
   .cx-masthead__overlay,
   .cx-masthead__drawer,
   .cx-masthead__link,
