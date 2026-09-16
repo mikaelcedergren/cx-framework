@@ -1,21 +1,14 @@
 // Cortex utility classes.
 //
-// A curated set of single-purpose helpers for the raw elements and wrappers
-// you write yourself — spacing, typography, colour, sizing, visibility. They
-// are NOT for patching a sealed cx-* component from outside. Design rule (must):
-// no global utility patches to fix a component from outside — fix the component
-// itself.
+// Single-purpose, token-backed overrides. Apply a class directly to the element
+// whose presentation should change. Important declarations in the cx-utilities
+// layer take precedence over ordinary component, editorial, and inline styles.
+// They do not target descendants or change CSS inheritance: a class on a
+// component host cannot override an explicitly styled internal child.
 //
-// Utilities are the system's escape hatch, not its building material. The
-// authoring hierarchy is: component first, layout primitive second, utility
-// last — a utility is only correct when no component or primitive expresses
-// the intent. If one element needs more than ~3 utilities, that is a missing
-// component or pattern: stop and log the gap instead of stacking classes.
-//
-// They live in the low-priority `cx-utilities` cascade layer, so any unlayered
-// style — every cx-* component, plus your own app CSS — always wins over a
-// utility. A utility can style your own <p> or <div>, but it cannot override a
-// component's internals; to affect a component, wrap it.
+// Prefer component APIs and layout primitives for composition; utilities express
+// deliberate exceptions. Within this layer, direction-specific padding follows
+// all-sides padding, and explicit weights follow font-family defaults.
 //
 // Every value is a token reference, so there are no magic numbers and a token
 // change flows through automatically. Spacing follows the system model
@@ -99,35 +92,35 @@ $measures: (
   // direction wins at equal specificity within the layer.
   @each $step, $token in space.$scale {
     .cx-p-#{$step} {
-      padding: $token;
+      padding: $token !important;
     }
   }
 
   @each $step, $token in space.$scale {
     .cx-px-#{$step} {
-      padding-inline: $token;
+      padding-inline: $token !important;
     }
 
     .cx-py-#{$step} {
-      padding-block: $token;
+      padding-block: $token !important;
     }
   }
 
   @each $step, $token in space.$scale {
     .cx-pt-#{$step} {
-      padding-top: $token;
+      padding-top: $token !important;
     }
 
     .cx-pr-#{$step} {
-      padding-right: $token;
+      padding-right: $token !important;
     }
 
     .cx-pb-#{$step} {
-      padding-bottom: $token;
+      padding-bottom: $token !important;
     }
 
     .cx-pl-#{$step} {
-      padding-left: $token;
+      padding-left: $token !important;
     }
   }
 
@@ -137,83 +130,83 @@ $measures: (
   // default serif ships a single weight; an explicit weight utility after it
   // still wins.
   .cx-font-sans {
-    font-family: var(--font-family-base);
+    font-family: var(--font-family-base) !important;
   }
 
   .cx-font-serif {
-    font-family: var(--font-family-heading);
-    font-weight: var(--font-weight-regular);
+    font-family: var(--font-family-heading) !important;
+    font-weight: var(--font-weight-regular) !important;
   }
 
   .cx-font-mono {
-    font-family: var(--font-family-mono);
+    font-family: var(--font-family-mono) !important;
   }
 
   // Typography — font size paired with its line-height; weight is separate.
   @each $name, $ramp in $text-sizes {
     .cx-text-#{$name} {
-      font-size: map.get($ramp, "size");
-      line-height: map.get($ramp, "line");
+      font-size: map.get($ramp, "size") !important;
+      line-height: map.get($ramp, "line") !important;
     }
   }
 
   @each $name, $weight in $font-weights {
     .cx-font-#{$name} {
-      font-weight: $weight;
+      font-weight: $weight !important;
     }
   }
 
   // Text colour — semantic, theme-aware tokens.
   @each $name, $color in $text-colors {
     .cx-text-#{$name} {
-      color: $color;
+      color: $color !important;
     }
   }
 
   // Line height — the semantic leading tokens, for the rare case where a size's
   // paired leading is wrong (e.g. a tightened display line outside an article).
   .cx-leading-heading {
-    line-height: var(--line-height-heading);
+    line-height: var(--line-height-heading) !important;
   }
 
   .cx-leading-body {
-    line-height: var(--line-height-body);
+    line-height: var(--line-height-body) !important;
   }
 
   .cx-leading-small {
-    line-height: var(--line-height-small);
+    line-height: var(--line-height-small) !important;
   }
 
   // Headline wrapping — evens out multi-line headings so no line strands a
   // single word. For headings and short standalone lines, not body copy.
   .cx-text-balance {
-    text-wrap: balance;
+    text-wrap: balance !important;
   }
 
   // Text alignment + truncation.
   .cx-text-start {
-    text-align: start;
+    text-align: start !important;
   }
 
   .cx-text-center {
-    text-align: center;
+    text-align: center !important;
   }
 
   .cx-text-end {
-    text-align: end;
+    text-align: end !important;
   }
 
   .cx-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 
   // Sizing — content measure (capped + centred), plus raw-page helpers.
   @each $name, $measure in $measures {
     .cx-measure-#{$name} {
-      max-inline-size: $measure;
-      margin-inline: auto;
+      max-inline-size: $measure !important;
+      margin-inline: auto !important;
     }
   }
 
@@ -222,8 +215,8 @@ $measures: (
   // cx-measure-* welds them, these split placement from the editorial measure.
   @each $name, $measure in $measures {
     .cx-measure-#{$name}-start {
-      max-inline-size: $measure;
-      margin-inline: 0;
+      max-inline-size: $measure !important;
+      margin-inline: 0 !important;
     }
   }
 
@@ -231,20 +224,22 @@ $measures: (
   // keeps a page gutter of air against the viewport edge. Full-bleed sections that need their
   // content aligned with this column pad with --gutter-centered instead.
   .cx-container {
-    inline-size: 100%;
-    max-inline-size: calc(var(--measure-xl) + (var(--gutter-page) * 2));
-    margin-inline: auto;
-    padding-inline: var(--gutter-page);
+    inline-size: 100% !important;
+    max-inline-size: calc(
+      var(--measure-xl) + (var(--gutter-page) * 2)
+    ) !important;
+    margin-inline: auto !important;
+    padding-inline: var(--gutter-page) !important;
   }
 
   // Surface backgrounds — the two semantic canvases, for section bands on
   // public pages. Anything richer than a flat canvas is a card's job.
   .cx-bg-surface {
-    background-color: var(--surface);
+    background-color: var(--surface) !important;
   }
 
   .cx-bg-surface-alt {
-    background-color: var(--surface-alt);
+    background-color: var(--surface-alt) !important;
   }
 
   // Full-bleed — breaks a section out of a centred content column to run the
@@ -252,58 +247,58 @@ $measures: (
   // --gutter-centered. Only valid inside a column centred in the viewport
   // (public-page shells); next to a side nav the arithmetic is wrong by design.
   .cx-full-bleed {
-    inline-size: 100vw;
-    margin-inline: calc(50% - 50vw);
-    padding-inline: var(--gutter-centered);
+    inline-size: 100vw !important;
+    margin-inline: calc(50% - 50vw) !important;
+    padding-inline: var(--gutter-centered) !important;
   }
 
   // Corner radius — for raw media and wrappers you author yourself (an <img>,
   // an inline illustration); components round their own corners.
   .cx-rounded-sm {
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-sm) !important;
   }
 
   .cx-rounded-md {
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-md) !important;
   }
 
   .cx-rounded-lg {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-lg) !important;
   }
 
   .cx-rounded-xl {
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-xl) !important;
   }
 
   .cx-w-full {
-    inline-size: 100%;
+    inline-size: 100% !important;
   }
 
   .cx-min-h-screen {
-    min-block-size: 100svh;
+    min-block-size: 100svh !important;
   }
 
   .cx-fill {
-    flex: 1 1 auto;
-    min-inline-size: 0;
-    min-block-size: 0;
+    flex: 1 1 auto !important;
+    min-inline-size: 0 !important;
+    min-block-size: 0 !important;
   }
 
   .cx-center-inline {
-    margin-inline: auto;
+    margin-inline: auto !important;
   }
 
   // Responsive visibility — across the single mobile breakpoint. Apply to your
-  // own wrapper; a layered utility cannot override a component's :host display.
+  // target element; explicit visibility utilities also override host display.
   @media (max-width: $mobile-max) {
     .cx-hide-mobile {
-      display: none;
+      display: none !important;
     }
   }
 
   @media (min-width: breakpoints.$mobile) {
     .cx-hide-desktop {
-      display: none;
+      display: none !important;
     }
   }
 
@@ -311,21 +306,23 @@ $measures: (
   // The default clears the masthead's content-sized height with air to spare;
   // a page with taller chrome sets --cx-scroll-offset once on its root.
   .cx-scroll-target {
-    scroll-margin-block-start: calc(var(--space-2xl) + var(--space-md));
+    scroll-margin-block-start: calc(
+      var(--space-2xl) + var(--space-md)
+    ) !important;
   }
 
   // Screen-reader-only — visually hidden, still read aloud. For skip links and
   // text labels on icon-only affordances you author yourself.
   .cx-sr-only {
-    position: absolute;
-    overflow: hidden;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    border: 0;
-    margin: -1px;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    position: absolute !important;
+    overflow: hidden !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    margin: -1px !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
   }
 }
 

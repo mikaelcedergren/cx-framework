@@ -150,7 +150,7 @@ One breakpoint: **mobile is below 720px**; desktop is 720px and up (the `--break
 
 ## Utility classes
 
-Single-purpose helpers for the raw elements and wrappers _you_ write — not for patching a component from outside. They live in the low-priority `cx-utilities` cascade layer, so a component's own styles always win: a utility can only style your own elements. Every value is a token reference.
+Single-purpose, token-backed overrides applied directly to an element. Declarations use `!important` in the `cx-utilities` cascade layer, so an explicit utility wins over ordinary component, editorial, and inline styles. Prefer supported component props for normal configuration. Utilities do not reach into descendants: a weight class on a component host does not replace an internal heading’s explicit weight. Avoid conflicting utilities for the same property; class attribute order does not determine precedence.
 
 - **Padding** — `cx-p-{step}` (all sides), `cx-px-` / `cx-py-` (axes), `cx-pt-` / `cx-pr-` / `cx-pb-` / `cx-pl-` (one side). Steps are the spacing scale: `cx-p-md`, `cx-px-sm`, …
 - **Type size** — `cx-text-{display | title-1 | title-2 | title-3 | body-lg | body | body-sm | body-xs}`. Sets the font size _and_ its matching line-height. `display` is reserved for a marketing or editorial hero's primary headline.

@@ -149,7 +149,7 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Follow the authoring hierarchy: component first, layout primitive second, utility last. Reach for a utility only when no supported component, pattern, or layout capability expresses the intent.
 
-[MUST] Never use a utility to patch, override, or reach inside a sealed component from outside. A component defect or gap is fixed in the component's owning layer, or logged for its owner.
+[MUST] Follow the consuming system’s documented utility precedence. An explicit utility may override presentation on the element carrying that class when the system supports it. Do not use descendant selectors or DOM manipulation to reach inside a sealed component. A component defect or missing internal styling capability is fixed in its owning layer, or logged for its owner.
 
 [MUST] Keep utilities within the token-selection contract in `RULE-ID: tokens.semantic` and the direct-use contract in `RULE-ID: tokens.direct-global`. A permitted direct value never authorises a utility or inline style that patches a shared component from outside.
 

@@ -14,6 +14,15 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.6
+
+- All utility declarations now use `!important` within the `cx-utilities` layer.
+  Explicit utilities override ordinary component, editorial, and inline styles
+  on the same element. Review existing utility classes that were previously
+  overridden, including responsive visibility. Remove classes whose effects
+  are not intended. Padding direction and explicit font-weight precedence remain
+  unchanged within the utility layer. Utilities do not target internal children.
+
 ## 0.16.5
 
 - `cx-hero` cover now pairs its image scrim and opaque text with the active theme's
