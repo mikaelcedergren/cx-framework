@@ -84,6 +84,7 @@ cx-masthead.cx-masthead-host--sticky {
 .cx-masthead__brand > [cxMastheadBrand],
 .cx-masthead__home:is(:link, :visited, :hover, :active) {
   color: var(--ink);
+  text-decoration: none;
 }
 
 .cx-masthead__home {
@@ -199,15 +200,11 @@ cx-masthead.cx-masthead-host--sticky {
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--motion-fast) ease;
 }
 
 .cx-masthead__link:is(:link, :visited, :hover, :active) {
   color: var(--ink);
-}
-
-.cx-masthead__link:hover {
-  background: var(--opacity-low);
+  text-decoration: none;
 }
 
 .cx-masthead__link:focus-visible {

@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.11
+
+- `cx-masthead` menu items retain ink colour without underlines or hover backgrounds in all
+  link states. The current destination stays bold, and keyboard focus remains visible. Brand
+  links also retain their component-owned decoration. No consumer markup changes are required.
+
 ## 0.16.10
 
 - `cx-store-button` adds boolean `disabled` and `comingSoon` inputs. Both remove navigation and
