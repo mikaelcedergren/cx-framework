@@ -14,6 +14,15 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.12
+
+- `cx-image` adds optional descriptor fields `loading` (`eager` or `lazy`, default `eager`),
+  `fetchPriority` (`auto`, `high`, or `low`, default `auto`), `srcset`, `sizes`, and positive
+  integer `intrinsicWidth`/`intrinsicHeight`. These map to native image attributes; the existing
+  token-sized width/height and boolean component `loading` spinner state keep their meanings.
+  Set native lazy loading for below-the-fold content, retain eager loading for lead imagery,
+  and supply source pixel dimensions to reserve aspect ratio. Existing consumers need no changes.
+
 ## 0.16.11
 
 - `cx-masthead` menu items retain ink colour without underlines or hover backgrounds in all

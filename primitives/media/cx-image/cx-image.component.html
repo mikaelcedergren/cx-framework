@@ -6,6 +6,12 @@
   <img
     class="cx-image"
     [style.object-fit]="hostObjectFit"
+    [attr.loading]="image$().loading"
+    [attr.fetchpriority]="image$().fetchPriority"
+    [attr.width]="image$().intrinsicWidth ?? null"
+    [attr.height]="image$().intrinsicHeight ?? null"
+    [attr.srcset]="image$().srcset || null"
+    [attr.sizes]="image$().sizes || null"
     [src]="image$().src"
     [alt]="image$().alt"
     (load)="onImageLoad()"
@@ -13,7 +19,11 @@
     (click)="onClick()"
   />
 } @else if (showFallback$()) {
-  <div class="cx-image__fallback" role="img" [attr.aria-label]="fallbackText$() || null">
+  <div
+    class="cx-image__fallback"
+    role="img"
+    [attr.aria-label]="fallbackText$() || null"
+  >
     <cx-icon icon="image" [size]="24" />
     @if (fallbackText$()) {
       <span>{{ fallbackText$() }}</span>

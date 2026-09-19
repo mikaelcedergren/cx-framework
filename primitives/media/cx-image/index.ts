@@ -1,1 +1,1 @@
-export * from './cx-image.component';
+export * from "./cx-image.component";

@@ -1,1 +1,1 @@
-export * from './cx-image.component.js';
+export * from "./cx-image.component.js";
