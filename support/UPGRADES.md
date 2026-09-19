@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.15
+
+- `cx-masthead` keeps its original mobile toggle above the navigation drawer and
+  backdrop, animating it into the sole close button. The visible Menu heading is
+  removed. Keyboard focus includes this toggle and the links; no markup changes
+  are required.
+
 ## 0.16.14
 
 - `cx-hero` removes its automatic cover scrim. The new `overlayOpacity` input is a

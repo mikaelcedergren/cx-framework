@@ -20,7 +20,6 @@ import {
   RouterLinkActive,
   type IsActiveMatchOptions,
 } from "@angular/router";
-import { CxIconButtonComponent } from "../../primitives/actions/cx-icon-button";
 import {
   CxOverlayStateService,
   type CxOverlayStateHandle,
@@ -28,6 +27,7 @@ import {
 import { type CxIconName } from "../../icons/manifest";
 import { CxIconComponent } from "../../primitives/media/cx-icon";
 import { CxTooltipDirective } from "../../primitives/overlay/cx-tooltip";
+import { CxHostVisibilityObserver } from "../../primitives/shared/host-visibility";
 
 const DEFAULT_ACTIVE_OPTIONS: { exact: boolean } = { exact: true };
 
@@ -70,7 +70,6 @@ let nextPanelId = 0;
   selector: "cx-masthead",
   imports: [
     A11yModule,
-    CxIconButtonComponent,
     NgTemplateOutlet,
     CxIconComponent,
     CxTooltipDirective,
@@ -94,7 +93,15 @@ export class CxMastheadComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly overlayState = inject(CxOverlayStateService);
   private overlayHandle?: CxOverlayStateHandle;
-  private portaledOverlay?: HTMLElement;
+  private portaledMenu?: HTMLElement;
+  private closingAnimationsPending = false;
+  private readonly positionListener = () => this.syncMenuPosition();
+  private readonly visibilityObserver = new CxHostVisibilityObserver(
+    this.host.nativeElement,
+    (visible) => {
+      if (!visible) this.finishClose();
+    },
+  );
   private resizeObserver?: ResizeObserver;
   private scrollTarget?: HTMLElement | Document;
   protected readonly headerHeight = signal(0);
@@ -109,8 +116,22 @@ export class CxMastheadComponent implements OnDestroy {
   };
   private focusPending = false;
   private readonly focusListener = () => this.keepFocusInside();
+  private readonly closingKeyListener = (event: KeyboardEvent) => {
+    if (
+      event.key === "Tab" &&
+      this.menuClosing() &&
+      this.overlayState.isTopmost(this.overlayHandle)
+    ) {
+      event.preventDefault();
+      this.menuToggle()?.nativeElement.focus({ preventScroll: true });
+    }
+  };
   private readonly drawerOverlay =
     viewChild<ElementRef<HTMLElement>>("drawerOverlay");
+  private readonly menuSurface =
+    viewChild<ElementRef<HTMLElement>>("menuSurface");
+  private readonly menuSlot = viewChild<ElementRef<HTMLElement>>("menuSlot");
+  protected readonly menuClosing = signal(false);
   protected readonly trapsFocus = signal(false);
 
   constructor() {
@@ -127,18 +148,12 @@ export class CxMastheadComponent implements OnDestroy {
       }
       this.syncScrollTarget();
       this.closeWhenExpanded();
-      const root = this.drawerOverlay()?.nativeElement;
-      if (this.portaledOverlay && this.portaledOverlay !== root) {
-        this.portaledOverlay.remove();
-        this.portaledOverlay = undefined;
-      }
-      if (root && root.parentElement !== this.document.body) {
-        // Portal while closed so opening preserves the CSS transition's starting state.
-        this.document.body.appendChild(root);
-        this.portaledOverlay = root;
-      }
+      const root = this.menuSurface()?.nativeElement;
+      if (this.portaledMenu && this.portaledMenu !== root) this.finishClose();
+      this.syncMenuPosition();
       const ownsFocus =
-        this.menuOpen() && this.overlayState.isTopmost(this.overlayHandle);
+        (this.menuOpen() || this.menuClosing()) &&
+        this.overlayState.isTopmost(this.overlayHandle);
       this.trapsFocus.set(ownsFocus);
       if (ownsFocus && this.focusPending) {
         this.focusPending = false;
@@ -146,13 +161,24 @@ export class CxMastheadComponent implements OnDestroy {
           ?.querySelector<HTMLButtonElement>("button")
           ?.focus({ preventScroll: true });
       }
+      if (this.menuClosing() && !this.closingAnimationsPending) {
+        this.closingAnimationsPending = true;
+        // Keep the same button above the departing drawer until its X has
+        // finished becoming a hamburger, including reduced-motion (no animations).
+        void Promise.allSettled(
+          root
+            ?.getAnimations({ subtree: true })
+            .map((animation) => animation.finished) ?? [],
+        ).then(() => {
+          if (this.menuClosing()) this.finishClose();
+        });
+      }
     });
   }
 
   ngOnDestroy(): void {
-    this.closeMenu();
+    this.finishClose();
     this.resizeObserver?.disconnect();
-    this.portaledOverlay?.remove();
     this.scrollTarget?.removeEventListener("scroll", this.scrollListener);
   }
 
@@ -197,19 +223,34 @@ export class CxMastheadComponent implements OnDestroy {
 
   private closeWhenExpanded(): void {
     if (
-      this.menuOpen() &&
-      !this.menuToggle()?.nativeElement.getClientRects().length
+      this.portaledMenu &&
+      !this.menuSlot()?.nativeElement.getClientRects().length
     )
-      this.closeMenu();
+      this.finishClose();
+  }
+
+  private syncMenuPosition(): void {
+    if (!this.portaledMenu) return;
+    const slot = this.menuSlot()?.nativeElement;
+    const toggle = this.menuToggle()?.nativeElement;
+    if (!slot?.getClientRects().length || !toggle) {
+      this.finishClose();
+      return;
+    }
+    const rect = slot.getBoundingClientRect();
+    toggle.style.top = `${rect.top}px`;
+    toggle.style.left = `${rect.left}px`;
   }
 
   private keepFocusInside(): void {
-    const root = this.drawerOverlay()?.nativeElement;
+    const root = this.menuSurface()?.nativeElement;
     if (
-      this.menuOpen() &&
+      (this.menuOpen() || this.menuClosing()) &&
       root &&
       this.overlayState.isTopmost(this.overlayHandle) &&
-      !root.contains(this.document.activeElement)
+      (this.menuClosing()
+        ? this.document.activeElement !== this.menuToggle()?.nativeElement
+        : !root.contains(this.document.activeElement))
     ) {
       root
         .querySelector<HTMLButtonElement>("button")
@@ -235,7 +276,7 @@ export class CxMastheadComponent implements OnDestroy {
   @Input()
   public set items(value: CxMastheadItem[]) {
     this.itemsValue = validateMastheadItems(value);
-    if (!this.itemsValue.length) this.closeMenu();
+    if (!this.itemsValue.length) this.finishClose();
   }
   public get items(): CxMastheadItem[] {
     return this.itemsValue;
@@ -277,27 +318,70 @@ export class CxMastheadComponent implements OnDestroy {
   }
 
   protected toggleMenu(): void {
+    if (this.menuClosing()) return;
     if (this.menuOpen()) {
       this.closeMenu();
       return;
     }
     this.overlayHandle = this.overlayState.capture({
       owner: this.menuToggle()?.nativeElement,
-      surface: () => this.drawerOverlay()?.nativeElement,
-      isActive: () => this.menuOpen(),
+      surface: () => this.menuSurface()?.nativeElement,
+      isActive: () => this.menuOpen() || this.menuClosing(),
       onEscape: () => this.closeMenu(),
     });
+    const root = this.menuSurface()!.nativeElement;
+    // Lift the actual control and drawer together out of sticky/frosted stacking
+    // contexts. The empty slot preserves the header's geometry and button position.
+    root.classList.add("cx-masthead__menu--portaled");
+    this.document.body.appendChild(root);
+    this.portaledMenu = root;
+    this.syncMenuPosition();
+    this.document.addEventListener("scroll", this.positionListener, true);
+    this.document.defaultView?.addEventListener(
+      "resize",
+      this.positionListener,
+    );
+    this.visibilityObserver.start();
+    // Establish the closed styles after reparenting before starting both animations.
+    this.drawerOverlay()!.nativeElement.getBoundingClientRect();
     this.menuOpen.set(true);
     this.focusPending = true;
     this.document.addEventListener("focusin", this.focusListener);
+    this.document.addEventListener("keydown", this.closingKeyListener);
   }
 
   protected closeMenu(): void {
+    if (!this.menuOpen()) return;
+    this.menuClosing.set(true);
+    this.menuOpen.set(false);
+    this.focusPending = false;
+  }
+
+  private finishClose(): void {
+    this.document.removeEventListener("scroll", this.positionListener, true);
+    this.document.defaultView?.removeEventListener(
+      "resize",
+      this.positionListener,
+    );
+    this.visibilityObserver.stop();
+    if (this.portaledMenu) {
+      const slot = this.menuSlot()?.nativeElement;
+      if (slot) slot.appendChild(this.portaledMenu);
+      else this.portaledMenu.remove();
+      this.portaledMenu.classList.remove("cx-masthead__menu--portaled");
+      this.portaledMenu = undefined;
+    }
+    const toggle = this.menuToggle()?.nativeElement;
+    toggle?.style.removeProperty("top");
+    toggle?.style.removeProperty("left");
     this.overlayState.release(this.overlayHandle);
     this.overlayHandle = undefined;
     this.document.removeEventListener("focusin", this.focusListener);
+    this.document.removeEventListener("keydown", this.closingKeyListener);
     this.trapsFocus.set(false);
     this.menuOpen.set(false);
+    this.menuClosing.set(false);
+    this.closingAnimationsPending = false;
     this.focusPending = false;
   }
 

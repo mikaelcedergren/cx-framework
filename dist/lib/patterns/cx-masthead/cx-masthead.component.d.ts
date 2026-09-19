@@ -40,7 +40,10 @@ export declare class CxMastheadComponent implements OnDestroy {
     private readonly host;
     private readonly overlayState;
     private overlayHandle?;
-    private portaledOverlay?;
+    private portaledMenu?;
+    private closingAnimationsPending;
+    private readonly positionListener;
+    private readonly visibilityObserver;
     private resizeObserver?;
     private scrollTarget?;
     protected readonly headerHeight: import("@angular/core").WritableSignal<number>;
@@ -48,13 +51,18 @@ export declare class CxMastheadComponent implements OnDestroy {
     private readonly scrollListener;
     private focusPending;
     private readonly focusListener;
+    private readonly closingKeyListener;
     private readonly drawerOverlay;
+    private readonly menuSurface;
+    private readonly menuSlot;
+    protected readonly menuClosing: import("@angular/core").WritableSignal<boolean>;
     protected readonly trapsFocus: import("@angular/core").WritableSignal<boolean>;
     constructor();
     ngOnDestroy(): void;
     private syncScrollTarget;
     protected surfaceVariant(): CxMastheadVariant;
     private closeWhenExpanded;
+    private syncMenuPosition;
     private keepFocusInside;
     private itemsValue;
     /** Brand title shown next to the logo, e.g. a name or product wordmark. */
@@ -94,6 +102,7 @@ export declare class CxMastheadComponent implements OnDestroy {
     protected resolvedMenuAriaLabel(): string;
     protected toggleMenu(): void;
     protected closeMenu(): void;
+    private finishClose;
     protected onBackdrop(event: MouseEvent): void;
     protected onItemClick(event: MouseEvent, item: CxMastheadItem): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMastheadComponent, never>;

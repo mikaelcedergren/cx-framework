@@ -229,16 +229,49 @@ cx-masthead.cx-masthead-host--sticky {
 
 /* ---- Collapsed-navigation toggle ---- */
 
-.cx-masthead__toggle {
+.cx-masthead__toggle-slot {
   display: none;
-  align-items: center;
-  justify-content: center;
   width: var(--controller-size-large);
   height: var(--controller-size-large);
+  flex: 0 0 auto;
   /* Align the visible icon to the page gutter while retaining its full touch target. */
   margin-inline-end: calc(
     (var(--icon-size-lg) - var(--controller-size-large)) / 2
   );
+}
+
+.cx-masthead__menu {
+  display: contents;
+}
+
+.cx-masthead__menu--portaled {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  pointer-events: none;
+}
+
+.cx-masthead__menu--portaled .cx-masthead__toggle {
+  position: fixed;
+  z-index: var(--z-index-sticky);
+  pointer-events: auto;
+}
+
+.cx-masthead__menu--closing {
+  pointer-events: auto;
+}
+
+.cx-masthead__menu--closing .cx-masthead__toggle {
+  pointer-events: none;
+}
+
+.cx-masthead__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--controller-size-large);
+  height: var(--controller-size-large);
   padding: 0;
   flex: 0 0 auto;
   border: 0;
@@ -302,7 +335,6 @@ cx-masthead.cx-masthead-host--sticky {
 .cx-masthead__overlay {
   position: fixed;
   inset: 0;
-  z-index: var(--z-index-dialog);
   display: flex;
   justify-content: flex-end;
   background: var(--overlay-backdrop);
@@ -344,24 +376,13 @@ cx-masthead.cx-masthead-host--sticky {
   transform: translateX(0);
 }
 
-.cx-masthead__drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  flex: 0 0 auto;
-}
-
-.cx-masthead__drawer-heading {
-  font-size: var(--font-size-title-2);
-  font-weight: var(--font-weight-bold);
-}
-
 .cx-masthead__drawer-nav {
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
   padding: var(--space-xs);
+  // Keep long labels out of the floating toggle's touch target.
+  padding-inline-end: calc(var(--controller-size-large) + var(--space-sm));
 }
 
 .cx-masthead__drawer-links {
@@ -406,7 +427,7 @@ cx-masthead.cx-masthead-host--sticky {
     display: none;
   }
 
-  .cx-masthead__toggle {
+  .cx-masthead__toggle-slot {
     display: inline-flex;
   }
 }

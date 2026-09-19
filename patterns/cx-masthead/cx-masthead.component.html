@@ -49,72 +49,69 @@
       </div>
 
       @if (items.length) {
-        <button
-          #menuToggle
-          class="cx-masthead__toggle"
-          [class.cx-masthead__toggle--open]="menuOpen()"
-          type="button"
-          aria-haspopup="dialog"
-          [attr.aria-expanded]="menuOpen()"
-          [attr.aria-controls]="panelId"
-          [attr.aria-label]="resolvedMenuAriaLabel()"
-          (click)="toggleMenu()"
-        >
-          <span class="cx-masthead__toggle-icon" aria-hidden="true">
-            <span class="cx-masthead__toggle-line"></span>
-            <span class="cx-masthead__toggle-line"></span>
-            <span class="cx-masthead__toggle-line"></span>
-          </span>
-        </button>
+        <div #menuSlot class="cx-masthead__toggle-slot">
+          <div
+            #menuSurface
+            class="cx-masthead__menu"
+            [id]="panelId"
+            [class.cx-masthead__menu--closing]="menuClosing()"
+            [attr.role]="menuOpen() || menuClosing() ? 'dialog' : null"
+            [attr.aria-modal]="menuOpen() || menuClosing() ? 'true' : null"
+            [attr.aria-label]="menuOpen() || menuClosing() ? 'Menu' : null"
+            [cdkTrapFocus]="trapsFocus()"
+          >
+            <button
+              #menuToggle
+              class="cx-masthead__toggle"
+              [class.cx-masthead__toggle--open]="menuOpen()"
+              type="button"
+              aria-haspopup="dialog"
+              [attr.aria-expanded]="menuOpen()"
+              [attr.aria-controls]="panelId"
+              [attr.aria-label]="resolvedMenuAriaLabel()"
+              [attr.aria-disabled]="menuClosing() ? 'true' : null"
+              (click)="toggleMenu()"
+            >
+              <span class="cx-masthead__toggle-icon" aria-hidden="true">
+                <span class="cx-masthead__toggle-line"></span>
+                <span class="cx-masthead__toggle-line"></span>
+                <span class="cx-masthead__toggle-line"></span>
+              </span>
+            </button>
+            <div
+              #drawerOverlay
+              class="cx-masthead__overlay"
+              [class.cx-masthead__overlay--open]="menuOpen()"
+              [inert]="!menuOpen()"
+              [attr.aria-hidden]="menuOpen() ? null : 'true'"
+              (click)="onBackdrop($event)"
+            >
+              <section
+                class="cx-masthead__drawer"
+                [style.padding-block-start]="
+                  'max(' + headerHeight() + 'px, env(safe-area-inset-top))'
+                "
+              >
+                <nav class="cx-masthead__drawer-nav" aria-label="Primary">
+                  <ul class="cx-masthead__drawer-links">
+                    @for (item of items; track item.id) {
+                      <li class="cx-masthead__links-item">
+                        <ng-container
+                          [ngTemplateOutlet]="navLink"
+                          [ngTemplateOutletContext]="{ $implicit: item }"
+                        />
+                      </li>
+                    }
+                  </ul>
+                </nav>
+              </section>
+            </div>
+          </div>
+        </div>
       }
     </div>
   </div>
 </header>
-
-@if (items.length) {
-  <div
-    #drawerOverlay
-    class="cx-masthead__overlay"
-    [class.cx-masthead__overlay--open]="menuOpen()"
-    [inert]="!menuOpen()"
-    [attr.aria-hidden]="menuOpen() ? null : 'true'"
-    (click)="onBackdrop($event)"
-  >
-    <section
-      class="cx-masthead__drawer"
-      [id]="panelId"
-      role="dialog"
-      aria-modal="true"
-      [attr.aria-labelledby]="panelId + '-heading'"
-      [cdkTrapFocus]="trapsFocus()"
-    >
-      <div class="cx-masthead__drawer-header">
-        <span class="cx-masthead__drawer-heading" [id]="panelId + '-heading'"
-          >Menu</span
-        >
-        <cx-icon-button
-          icon="remove"
-          ariaLabel="Close menu"
-          variant="transparent"
-          size="large"
-          (pressed)="closeMenu()"
-        />
-      </div>
-      <nav class="cx-masthead__drawer-nav" aria-label="Primary">
-        <ul class="cx-masthead__drawer-links">
-          @for (item of items; track item.id) {
-            <li class="cx-masthead__links-item">
-              <ng-container
-                [ngTemplateOutlet]="navLink"
-                [ngTemplateOutletContext]="{ $implicit: item }"
-              />
-            </li>
-          }
-        </ul>
-      </nav>
-    </section>
-  </div>
-}
 
 <ng-template #brandContent>
   @if (logoSrc) {
