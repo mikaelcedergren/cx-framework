@@ -84,7 +84,6 @@ let nextPanelId = 0;
   host: {
     "[class.cx-masthead-host--sticky]": "sticky || frostOnScroll",
     "[class.cx-masthead-host--overlay]": "overlay",
-    "[style.margin-block-end.px]": "overlay ? -headerHeight() : null",
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

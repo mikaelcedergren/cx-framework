@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.17
+
+- `cx-masthead` overlay now starts above the following content from the first paint,
+  including prerendered pages before JavaScript loads. It no longer shifts the page
+  after measuring the header. Sticky positioning, scroll frost, and the mobile menu
+  retain their behavior. No consumer markup changes are required.
+
 ## 0.16.16
 
 - `cx-masthead` keeps its closed navigation drawer within the overlay bounds so

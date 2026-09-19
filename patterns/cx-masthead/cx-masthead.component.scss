@@ -5,6 +5,8 @@ cx-masthead {
 }
 
 cx-masthead.cx-masthead-host--overlay {
+  // Overlay takes no flow space, including before hydration measures the header.
+  block-size: 0;
   position: relative;
   z-index: var(--z-index-sticky);
 }
