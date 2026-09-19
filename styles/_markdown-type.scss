@@ -80,10 +80,7 @@
     border-left: calc(var(--border-width) * 2) solid var(--opacity-mid);
     color: var(--opacity-high);
   }
-  a,
-  a:visited,
-  a:hover,
-  a:active {
+  :where(a, a:visited, a:hover, a:active) {
     color: inherit;
     text-decoration: underline;
   }

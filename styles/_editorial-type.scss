@@ -111,10 +111,7 @@
     color: var(--primary);
   }
 
-  a,
-  a:visited,
-  a:hover,
-  a:active {
+  :where(a, a:visited, a:hover, a:active) {
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 2px;

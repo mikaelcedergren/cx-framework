@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.13
+
+- Ordinary link styles now have low specificity so button links retain their component colours
+  and unadorned labels inside editorial and markdown content, including hover and active states.
+  Prose links still inherit their surrounding colour and remain underlined. No API changes.
+
 ## 0.16.12
 
 - `cx-image` adds optional descriptor fields `loading` (`eager` or `lazy`, default `eager`),

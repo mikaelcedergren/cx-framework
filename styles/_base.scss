@@ -78,10 +78,7 @@ select {
   font-family: inherit;
 }
 
-a,
-a:visited,
-a:hover,
-a:active {
+:where(a, a:visited, a:hover, a:active) {
   color: inherit;
   text-decoration: underline;
 }
