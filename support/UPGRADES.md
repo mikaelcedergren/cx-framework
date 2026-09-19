@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.14
+
+- `cx-hero` removes its automatic cover scrim. The new `overlayOpacity` input is a
+  percentage from 0 to 100, default 0: images are untreated unless explicitly chosen.
+  It blends toward the active theme's surface, darkening in dark themes and lightening
+  in light themes, without fading the content. Nonzero values require `variant="cover"`.
+  Set an explicit percentage if an overlay is wanted; no consumer override is needed.
+- `fadeBottom` remains independent: its smooth blend starts halfway down the image
+  and reaches the background colour at the bottom.
+
 ## 0.16.13
 
 - Ordinary link styles now have low specificity so button links retain their component colours

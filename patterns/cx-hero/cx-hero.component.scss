@@ -154,12 +154,11 @@ cx-hero .cx-hero--cover {
   );
 }
 
-cx-hero .cx-hero--cover::after {
+cx-hero .cx-hero__overlay {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  content: "";
+  background: var(--surface);
   pointer-events: none;
 }
 
@@ -182,7 +181,7 @@ cx-hero .cx-hero--cover.cx-hero--fade-bottom::before {
 }
 
 // Cover uses the same surface/ink pair as projected controls and the optional fade.
-// Keep text opaque so bright and dark photographs cannot weaken its contrast.
+// The overlay affects media only; projected content keeps its own opacity.
 cx-hero .cx-hero--cover .cx-hero__copy,
 cx-hero .cx-hero--cover .cx-hero__heading,
 cx-hero .cx-hero--cover .cx-hero__context,

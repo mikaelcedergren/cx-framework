@@ -8,6 +8,13 @@
     [class.cx-hero--fade-bottom]="fadeBottom"
     [class.cx-hero--under-masthead]="underMasthead"
   >
+    @if (variant === "cover" && overlayOpacity > 0) {
+      <div
+        class="cx-hero__overlay"
+        aria-hidden="true"
+        [style.opacity]="overlayOpacity / 100"
+      ></div>
+    }
     <div class="cx-hero__copy">
       <div class="cx-hero__context">
         <ng-content select="[context], [cxHeroContext]" />

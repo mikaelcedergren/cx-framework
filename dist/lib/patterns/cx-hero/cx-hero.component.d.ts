@@ -15,6 +15,7 @@ export declare class CxHeroComponent implements AfterContentInit {
     private contentReady;
     private variantValue;
     private alignValue;
+    private overlayOpacityValue;
     private mediaPositionValue;
     constructor();
     /** Required page heading. Empty text removes the whole hero. */
@@ -30,6 +31,9 @@ export declare class CxHeroComponent implements AfterContentInit {
     /** Coarse vertical crop position for cover media. */
     set mediaPosition(value: CxHeroMediaPosition);
     get mediaPosition(): CxHeroMediaPosition;
+    /** Theme-surface overlay percentage. Zero leaves cover media untreated. */
+    set overlayOpacity(value: number);
+    get overlayOpacity(): number;
     /** Smoothly blends the lower half of cover media into the default surface. */
     fadeBottom: boolean;
     /** Reserves space for an overlapping masthead while media extends behind it. */
@@ -39,7 +43,7 @@ export declare class CxHeroComponent implements AfterContentInit {
     private validateComposition;
     private hasProjectedMedia;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxHeroComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "headingClass": { "alias": "headingClass"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; "underMasthead": { "alias": "underMasthead"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxHeroComponent, "cx-hero", never, { "heading": { "alias": "heading"; "required": true; }; "headingClass": { "alias": "headingClass"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "align": { "alias": "align"; "required": false; }; "mediaPosition": { "alias": "mediaPosition"; "required": false; }; "overlayOpacity": { "alias": "overlayOpacity"; "required": false; }; "fadeBottom": { "alias": "fadeBottom"; "required": false; }; "underMasthead": { "alias": "underMasthead"; "required": false; }; }, {}, never, ["[context], [cxHeroContext]", "[body], [cxHeroBody]", "[actions], [cxHeroActions]", "[meta], [cxHeroMeta]", "[media], [cxHeroMedia]"], true, never>;
     static ngAcceptInputType_fadeBottom: unknown;
     static ngAcceptInputType_underMasthead: unknown;
 }

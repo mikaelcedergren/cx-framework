@@ -49,6 +49,7 @@ export class CxHeroComponent implements AfterContentInit {
 
   private variantValue: CxHeroVariant = "cover";
   private alignValue: CxHeroAlign = "start";
+  private overlayOpacityValue = 0;
   private mediaPositionValue: CxHeroMediaPosition = "center";
 
   constructor() {
@@ -96,6 +97,20 @@ export class CxHeroComponent implements AfterContentInit {
     return this.mediaPositionValue;
   }
 
+  /** Theme-surface overlay percentage. Zero leaves cover media untreated. */
+  @Input()
+  public set overlayOpacity(value: number) {
+    if (!Number.isFinite(value) || value < 0 || value > 100) {
+      throw new Error(
+        "[cx-hero] overlayOpacity must be a number from 0 to 100.",
+      );
+    }
+    this.overlayOpacityValue = value;
+  }
+  public get overlayOpacity(): number {
+    return this.overlayOpacityValue;
+  }
+
   /** Smoothly blends the lower half of cover media into the default surface. */
   @Input({ transform: booleanAttribute }) fadeBottom = false;
 
@@ -111,6 +126,10 @@ export class CxHeroComponent implements AfterContentInit {
   }
 
   private validateComposition(): void {
+    if (this.overlayOpacity > 0 && this.variantValue !== "cover") {
+      throw new Error('[cx-hero] overlayOpacity requires variant="cover".');
+    }
+
     if (this.fadeBottom && this.variantValue !== "cover") {
       throw new Error('[cx-hero] fadeBottom requires variant="cover".');
     }
