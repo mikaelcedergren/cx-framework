@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.16
+
+- `cx-masthead` keeps its closed navigation drawer within the overlay bounds so
+  frosted mobile headers cannot create horizontal page scrolling. No consumer
+  changes are required.
+
 ## 0.16.15
 
 - `cx-masthead` keeps its original mobile toggle above the navigation drawer and

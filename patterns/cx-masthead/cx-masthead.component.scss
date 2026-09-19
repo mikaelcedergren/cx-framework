@@ -336,6 +336,7 @@ cx-masthead.cx-masthead-host--sticky {
   position: fixed;
   inset: 0;
   display: flex;
+  overflow: clip;
   justify-content: flex-end;
   background: var(--overlay-backdrop);
   visibility: hidden;
