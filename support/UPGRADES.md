@@ -14,6 +14,19 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.10
+
+- `cx-store-button` adds boolean `disabled` and `comingSoon` inputs. Both remove navigation and
+  keyboard activation; `comingSoon` also shows a localised note inside the component. `href` may
+  now be omitted in either unavailable state. Supplied URLs remain validated, and available links
+  still require a matching store URL. Use `comingSoon` for upcoming apps instead of proxy links.
+- Ordinary text links now inherit their surrounding text colour in every theme and retain an
+  underline across normal, visited, hovered, and active states. This includes editorial and
+  compact/document markdown surfaces. Remove consumer colour resets intended to hide link colour;
+  component controls keep their own semantic styles.
+- The owner-approved 2.2em editorial level-two headings are retained, including document-mode
+  markdown. No consumer markup changes are required.
+
 ## 0.16.9
 
 - `cx-masthead` navigation now keeps the ink colour in normal, visited,

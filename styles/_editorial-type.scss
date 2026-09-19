@@ -111,8 +111,11 @@
     color: var(--primary);
   }
 
-  a {
-    color: var(--link);
+  a,
+  a:visited,
+  a:hover,
+  a:active {
+    color: inherit;
     text-decoration: underline;
     text-underline-offset: 2px;
   }

@@ -1,14 +1,32 @@
 # Store button
 
-A standalone link to an available App Store or Google Play listing. It does not use or extend Button.
+A standalone app-store badge with available, disabled, and coming-soon states. It does not use or extend Button.
 
-- Required `href`: an HTTPS listing at `apps.apple.com` or `play.google.com/store/apps/details?id=…`, matching `store`. Tracking query parameters are preserved. Invalid destinations fail explicitly; they never become inert badges or generic links.
+- `href`: required for an available link; may be omitted when `disabled` or `comingSoon`. When supplied, it must be an HTTPS listing at `apps.apple.com` or `play.google.com/store/apps/details?id=…`, matching `store`. Tracking query parameters are preserved. Invalid supplied destinations fail explicitly, including in unavailable states.
 - `store`: `app-store` (default) or `google-play`.
 - `size`: `default` (48px painted badge) or `large` (64px with the current tokens). Natural width, no shrinking or stretching.
 - `language`: optional `en` or `sv`. Omission reads the document language, then Angular's locale. Unsupported page languages use English. Localized artwork and accessible wording change together.
 - `appName`: optional accessible-name suffix. It never replaces the official visible wording.
 
-Native same-tab link semantics preserve browser menus, modifier clicks and device store handoff. There are no loading, disabled, custom-label, colour, target or event options. Only mount it for an available listing. The page owns availability and wrapping: place App Store first, with Google Play at the same painted height. Use the existing Inline with wrapping enabled for a pair.
+Native same-tab link semantics preserve browser menus, modifier clicks and device store handoff. There are no loading, custom-label, colour, target or event options. The page owns availability and wrapping: place App Store first, with Google Play at the same painted height. Use the existing Inline with wrapping enabled for a pair.
+
+## Availability
+
+- `disabled`: boolean, default `false`. Makes the badge inactive. The component removes the
+  destination, excludes the link from Tab navigation, announces `aria-disabled`, and dims the
+  artwork with the shared disabled-visibility token. No pointer, keyboard, modifier-click, or
+  context-menu navigation is possible without a destination.
+- `comingSoon`: boolean, default `false`. Implies the same unavailable state and adds a readable
+  “Coming soon” caption (“Kommer snart” in Swedish) inside the component, below the artwork.
+  It takes precedence over `disabled="false"`. The accessible name identifies the upcoming store
+  and optional app name. The original artwork is not rewritten or overprinted.
+- An empty URL is valid only while unavailable. A supplied URL must always match the selected
+  store. Returning to availability requires a valid URL.
+
+```html
+<cx-store-button comingSoon appName="My app" />
+<cx-store-button disabled href="https://apps.apple.com/app/id123456789" />
+```
 
 ## Artwork and geometry
 

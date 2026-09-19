@@ -1,11 +1,11 @@
-import { OnChanges } from "@angular/core";
+import { OnChanges, OnInit } from "@angular/core";
 import * as i0 from "@angular/core";
 export type CxStoreButtonStore = "app-store" | "google-play";
 export type CxStoreButtonSize = "default" | "large";
 export type CxStoreButtonLanguage = "en" | "sv";
 /** Validates the destination without requesting the listing or changing the supplied URL. */
 export declare function isCxStoreButtonHref(href: string, store: CxStoreButtonStore): boolean;
-export declare class CxStoreButtonComponent implements OnChanges {
+export declare class CxStoreButtonComponent implements OnChanges, OnInit {
     private readonly document;
     private readonly locale;
     href: string;
@@ -13,6 +13,9 @@ export declare class CxStoreButtonComponent implements OnChanges {
     size: CxStoreButtonSize;
     language: CxStoreButtonLanguage | undefined;
     appName: string;
+    disabled: boolean;
+    comingSoon: boolean;
+    ngOnInit(): void;
     ngOnChanges(): void;
     protected get resolvedLanguage(): CxStoreButtonLanguage;
     protected get artwork(): {
@@ -48,8 +51,12 @@ export declare class CxStoreButtonComponent implements OnChanges {
         readonly imageTopPercent: -15.104166666666666;
         readonly imageLeftPercent: 0;
     };
+    protected get unavailable(): boolean;
+    protected get comingSoonLabel(): string;
     protected get accessibleName(): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxStoreButtonComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxStoreButtonComponent, "cx-store-button", never, { "href": { "alias": "href"; "required": true; }; "store": { "alias": "store"; "required": false; }; "size": { "alias": "size"; "required": false; }; "language": { "alias": "language"; "required": false; }; "appName": { "alias": "appName"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxStoreButtonComponent, "cx-store-button", never, { "href": { "alias": "href"; "required": false; }; "store": { "alias": "store"; "required": false; }; "size": { "alias": "size"; "required": false; }; "language": { "alias": "language"; "required": false; }; "appName": { "alias": "appName"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "comingSoon": { "alias": "comingSoon"; "required": false; }; }, {}, never, never, true, never>;
+    static ngAcceptInputType_disabled: unknown;
+    static ngAcceptInputType_comingSoon: unknown;
 }
 //# sourceMappingURL=cx-store-button.component.d.ts.map

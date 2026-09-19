@@ -30,7 +30,7 @@ Use `mood` for semantic intent. Use `color` only when hue itself is user-facing 
 
 The built-in theme defaults map `--primary` to blue in Light and Aqua and violet in Dark and
 Night. Aqua is a dark ocean profile: deep blue-green surfaces, white text, blue actions,
-turquoise accents, and peach links. Its full palette is tuned for dark surfaces, with lighter
+and turquoise accents. Its full palette is tuned for dark surfaces, with lighter
 alternate shades and dark text on filled controls. Success uses leaf green, distinct from the
 turquoise accent. Other themes retain their own palette and semantic mappings.
 
@@ -48,6 +48,10 @@ Surface and ink roles are:
 - `--opacity-disabled`: disabled visibility
 - `--utility-bar-surface` and `--on-utility-bar`: the utility-bar plane and its content
 - `--overlay-backdrop`: dimming backdrop for modal and navigation overlays
+
+Ordinary text links inherit their surrounding text colour in every theme. An underline identifies
+them as links, including their visited, hover, and active states. Component controls retain their
+own semantic styles.
 
 Do not stack surfaces to fake depth. Floating surfaces use deliberate contrast and elevation; grounded regions use spacing, opacity, and restrained boundaries.
 

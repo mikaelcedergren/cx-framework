@@ -1,7 +1,11 @@
 <a
   class="cx-store-button"
   [class.cx-store-button--large]="size === 'large'"
-  [href]="href"
+  [class.cx-store-button--unavailable]="unavailable"
+  [attr.href]="unavailable ? null : href"
+  [attr.role]="unavailable ? 'link' : null"
+  [attr.aria-disabled]="unavailable ? 'true' : null"
+  [attr.tabindex]="unavailable ? -1 : null"
   [attr.aria-label]="accessibleName"
   [attr.lang]="resolvedLanguage"
 >
@@ -20,4 +24,9 @@
       draggable="false"
     />
   </span>
+  @if (comingSoon) {
+    <span class="cx-store-button__availability" aria-hidden="true">{{
+      comingSoonLabel
+    }}</span>
+  }
 </a>

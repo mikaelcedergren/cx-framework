@@ -6,6 +6,9 @@
 
 .cx-store-button {
   display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
   padding: calc(var(--controller-size-large) / 4);
   cursor: pointer;
   text-decoration: none;
@@ -39,4 +42,19 @@
 
 .cx-store-button--large .cx-store-button__artwork {
   height: calc(var(--controller-size-large) + var(--space-md));
+}
+
+.cx-store-button--unavailable {
+  cursor: default;
+}
+
+.cx-store-button--unavailable .cx-store-button__artwork {
+  opacity: var(--opacity-disabled);
+}
+
+.cx-store-button__availability {
+  color: var(--ink);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-body);
 }

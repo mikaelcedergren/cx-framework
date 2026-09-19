@@ -5,7 +5,9 @@ import {
   Input,
   LOCALE_ID,
   OnChanges,
+  OnInit,
   inject,
+  booleanAttribute,
 } from "@angular/core";
 import { STORE_BUTTON_ARTWORK } from "./store-button-artwork";
 
@@ -57,20 +59,29 @@ const LABELS = {
   styleUrl: "./cx-store-button.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CxStoreButtonComponent implements OnChanges {
+export class CxStoreButtonComponent implements OnChanges, OnInit {
   private readonly document = inject(DOCUMENT);
   private readonly locale = inject(LOCALE_ID);
 
-  @Input({ required: true }) href = "";
+  @Input() href = "";
   @Input() store: CxStoreButtonStore = "app-store";
   @Input() size: CxStoreButtonSize = "default";
   @Input() language: CxStoreButtonLanguage | undefined = undefined;
   @Input() appName = "";
+  @Input({ transform: booleanAttribute }) disabled = false;
+  @Input({ transform: booleanAttribute }) comingSoon = false;
+
+  ngOnInit(): void {
+    this.ngOnChanges();
+  }
 
   ngOnChanges(): void {
-    if (!isCxStoreButtonHref(this.href, this.store)) {
+    if (
+      (this.href !== "" || !this.unavailable) &&
+      !isCxStoreButtonHref(this.href, this.store)
+    ) {
       throw new Error(
-        "cx-store-button: href must be an HTTPS app listing URL for the selected store.",
+        "cx-store-button: href must be a matching HTTPS app listing URL; omit it only when disabled or comingSoon.",
       );
     }
     if (this.size !== "default" && this.size !== "large") {
@@ -97,8 +108,18 @@ export class CxStoreButtonComponent implements OnChanges {
     return STORE_BUTTON_ARTWORK[this.store][this.resolvedLanguage];
   }
 
+  protected get unavailable(): boolean {
+    return this.disabled || this.comingSoon;
+  }
+
+  protected get comingSoonLabel(): string {
+    return this.resolvedLanguage === "sv" ? "Kommer snart" : "Coming soon";
+  }
+
   protected get accessibleName(): string {
-    const label = LABELS[this.resolvedLanguage][this.store];
+    const label = this.comingSoon
+      ? `${this.comingSoonLabel} ${this.resolvedLanguage === "sv" ? "på" : "on"} ${this.store === "app-store" ? "App Store" : "Google Play"}`
+      : LABELS[this.resolvedLanguage][this.store];
     return this.appName.trim() ? `${label} — ${this.appName.trim()}` : label;
   }
 }

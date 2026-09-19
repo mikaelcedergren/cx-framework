@@ -82,7 +82,8 @@ a,
 a:visited,
 a:hover,
 a:active {
-  color: var(--link);
+  color: inherit;
+  text-decoration: underline;
 }
 
 :focus-visible {
