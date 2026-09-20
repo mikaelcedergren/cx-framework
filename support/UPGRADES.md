@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.18
+
+- Toolchain: use Node 26.5.0 exactly on every Mac. Set `.nvmrc` and all `engines.node` declarations
+  to `26.5.0`, require that version through root `devEngines.runtime` with `name: "node"` and
+  `onFail: "error"`, and enable `engineStrict: true` in `pnpm-workspace.yaml`. The platform checker
+  rejects drift, and pnpm stops before scripts on another runtime. Install the pinned Node before
+  refreshing dependencies. This source update does not change or restart an installed service.
+
 ## 0.16.17
 
 - `cx-masthead` overlay now starts above the following content from the first paint,

@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "toolchain": {
     "nodeMajor": 26,
-    "nodeEngine": ">=26 <27",
+    "nodeVersion": "26.5.0",
+    "nodeEngine": "26.5.0",
     "nodeTypes": "^26.0.0",
     "corepackVersion": "0.35.0",
     "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
@@ -11,6 +12,7 @@
     "playwright": "1.62.0"
   },
   "pnpmWorkspace": {
+    "engineStrict": true,
     "autoInstallPeers": false,
     "dedupePeerDependents": false,
     "enableGlobalVirtualStore": false,

@@ -1,6 +1,6 @@
 # Server artifact contract
 
-`cx-server-artifact` is the framework-owned builder for every web product's immutable Node 26
+`cx-server-artifact` is the framework-owned builder for every web product's immutable Node 26.5.0
 release artifact. `server-ops` owns staging, sealing, isolation, activation, and rollback; this CLI
 owns only the portable product build placed in the empty directory it receives.
 
@@ -49,7 +49,7 @@ repository instead of sharing one mutable projection across unrelated products.
 must never repair dependencies implicitly while a check, build, E2E controller, or release command
 is already running.
 
-The root pins Node `>=26 <27` and the exact integrity-qualified pnpm `11.23.0` package-manager
+The root pins Node `26.5.0` and the exact integrity-qualified pnpm `11.23.0` package-manager
 identity declared by `platform/web-standard.json`. The integrity suffix is part of the contract,
 not optional metadata. A web product that builds server artifacts also declares exact
 `pnpm: 11.23.0` as a root development dependency, so its installed package and canonical

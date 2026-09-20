@@ -31,6 +31,7 @@ export function parseWorkspaceContract(
       "dangerouslyAllowAllBuilds",
     ),
     dedupePeerDependents: optionalBooleanSetting(lines, "dedupePeerDependents"),
+    engineStrict: optionalBooleanSetting(lines, "engineStrict"),
     enableGlobalVirtualStore: optionalBooleanSetting(
       lines,
       "enableGlobalVirtualStore",

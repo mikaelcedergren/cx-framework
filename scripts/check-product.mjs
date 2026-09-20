@@ -216,14 +216,28 @@ function validateToolchain({
 }) {
   if (!isRecord(packageJson) || !isRecord(standard?.toolchain)) return;
   const toolchain = standard.toolchain;
-  if (nodeVersion.trim() !== String(toolchain.nodeMajor)) {
-    issues.push(`.nvmrc must contain ${toolchain.nodeMajor}.`);
+  if (nodeVersion.trim() !== toolchain.nodeVersion) {
+    issues.push(`.nvmrc must contain ${toolchain.nodeVersion}.`);
   }
   if (packageJson.packageManager !== toolchain.packageManager) {
     issues.push(`packageManager must be ${toolchain.packageManager}.`);
   }
   if (packageJson.engines?.node !== toolchain.nodeEngine) {
     issues.push(`engines.node must be ${toolchain.nodeEngine}.`);
+  }
+
+  const runtime = packageJson.devEngines?.runtime;
+  if (
+    runtime?.name !== "node" ||
+    runtime?.version !== toolchain.nodeVersion ||
+    runtime?.onFail !== "error"
+  ) {
+    issues.push(
+      `devEngines.runtime must require node ${toolchain.nodeVersion} with onFail: error.`,
+    );
+  }
+  if (workspaceManifest?.engineStrict !== true) {
+    issues.push("pnpm-workspace.yaml must set engineStrict: true.");
   }
 
   for (const { relativePath, value } of packageJsons) {

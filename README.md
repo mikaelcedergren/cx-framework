@@ -15,7 +15,7 @@ Use it for:
 - design tokens, global styles, fonts, icons, and utility styles
 - portable AI design guidance
 - portable agent skills for design, copy, review, and implementation
-- Node 26 primitives for predictable web servers, storage, jobs, sessions, and static delivery
+- Node 26.5.0 primitives for predictable web servers, storage, jobs, sessions, and static delivery
 
 Product-specific runtime rules, domain behavior, routes, data models, secrets, and local safety rules belong in the consuming app, not in this package.
 
@@ -179,7 +179,7 @@ that bypasses it. Host retention policy must keep diagnostics separate from auth
 
 ## Node web runtime
 
-Server entrypoints are ESM-only, require Node 26, and resolve only under Node's package conditions.
+Server entrypoints are ESM-only, require Node 26.5.0, and resolve only under Node's package conditions.
 Browser-oriented TypeScript resolution and CommonJS reject them, so importing server code cannot
 quietly enlarge a browser bundle. Import the smallest owner for the work:
 

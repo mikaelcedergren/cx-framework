@@ -4,7 +4,7 @@ This file is for maintainers of the source framework.
 
 The package is exported to the GitHub package repo `mikaelcedergren/cx-framework`, published for
 personal app installs as `@mikaelcedergren/cx-framework`. It delivers Cortex's Angular UI,
-portable AI guidance, product manifest tooling, and Node 26 web-runtime contracts together.
+portable AI guidance, product manifest tooling, and Node 26.5.0 web-runtime contracts together.
 
 ## Improvement loop
 
@@ -104,7 +104,7 @@ adding it; never make every server artifact carry a UI library.
 
 The Node runtime adds no framework-owned production dependency. Express, compression, SQLite
 drivers, and product adapters remain injected by consumers. `@types/node` is a direct development
-dependency used to compile the strict Node 26 source and package fixtures; it contributes no
+dependency used to compile the strict Node 26.5.0 source and package fixtures; it contributes no
 runtime JavaScript. Node exports use explicit nested `node` conditions and ESM imports so they fail
 closed through CommonJS and browser resolution. The listener subpath awaits the consumer's injected
 Express-compatible application and turns both synchronous listen failures and asynchronous bind

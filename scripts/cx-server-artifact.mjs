@@ -37,8 +37,7 @@ const PNPM_PACKAGE_NAME = "pnpm";
 const PNPM_CLI_RELATIVE_PATH = "bin/pnpm.mjs";
 const PACKAGE_MANAGER =
   "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af";
-const NODE_ENGINE = ">=26 <27";
-const NODE_MAJOR = 26;
+const NODE_ENGINE = "26.5.0";
 const FRAMEWORK_PACKAGE_NAME = "@mikaelcedergren/cx-framework";
 const FRAMEWORK_PACKAGE_PATH_PARTS = Object.freeze([
   "node_modules",
@@ -114,7 +113,7 @@ const RUNTIME_PACKAGE_FIELDS = [
 ];
 
 function printHelp() {
-  console.log(`Build one self-contained Node 26 server artifact.
+  console.log(`Build one self-contained Node 26.5.0 server artifact.
 
 Usage:
   cx-server-artifact --package <exact-workspace-package-name>
@@ -425,10 +424,9 @@ function assertPackageName(value) {
 }
 
 function assertNodeVersion() {
-  const major = Number(process.versions.node.split(".", 1)[0]);
-  if (major !== NODE_MAJOR) {
+  if (process.versions.node !== NODE_ENGINE) {
     throw new Error(
-      `cx-server-artifact requires Node ${NODE_MAJOR}; found ${process.versions.node}.`,
+      `cx-server-artifact requires Node ${NODE_ENGINE}; found ${process.versions.node}.`,
     );
   }
 }

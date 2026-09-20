@@ -1,5 +1,6 @@
 autoInstallPeers: false
 dedupePeerDependents: false
+engineStrict: true
 enableGlobalVirtualStore: false
 resolvePeersFromWorkspaceRoot: false
 strictDepBuilds: true
