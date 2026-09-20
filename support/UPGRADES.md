@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.19
+
+- Modal overlays lock the document scroller without moving sticky navigation offscreen.
+  `cx-masthead` keeps its mobile close button visible when opened after scrolling.
+  No consumer markup changes are required.
+
 ## 0.16.18
 
 - Toolchain: use Node 26.5.0 exactly on every Mac. Set `.nvmrc` and all `engines.node` declarations

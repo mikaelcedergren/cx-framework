@@ -47,7 +47,7 @@ export declare class CxOverlayStateService {
     private readonly stackVersion;
     private nextId;
     private modalDepth;
-    private previousBodyOverflow;
+    private previousRootOverflow;
     private activationTarget?;
     private readonly managedLayerElements;
     private readonly originalLayerStyles;

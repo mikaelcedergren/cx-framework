@@ -14,7 +14,7 @@ export class CxOverlayStateService {
     ...(ngDevMode ? [{ debugName: "stackVersion" }] : /* istanbul ignore next */ []));
     nextId = 0;
     modalDepth = 0;
-    previousBodyOverflow = '';
+    previousRootOverflow = '';
     activationTarget;
     managedLayerElements = new Set();
     originalLayerStyles = new WeakMap();
@@ -58,8 +58,10 @@ export class CxOverlayStateService {
             released: false,
         };
         if (kind === 'modal' && this.modalDepth === 0) {
-            this.previousBodyOverflow = this.document.body.style.overflow;
-            this.document.body.style.overflow = 'hidden';
+            // Lock the document scroller. Locking body creates a nearer scrolling
+            // ancestor that pulls document-sticky headers offscreen on scrolled pages.
+            this.previousRootOverflow = this.document.documentElement.style.overflow;
+            this.document.documentElement.style.overflow = 'hidden';
         }
         if (kind === 'modal') {
             this.modalDepth += 1;
@@ -105,8 +107,8 @@ export class CxOverlayStateService {
             this.modalDepth = Math.max(0, this.modalDepth - 1);
         }
         if (handle.kind === 'modal' && this.modalDepth === 0) {
-            this.document.body.style.overflow = this.previousBodyOverflow;
-            this.previousBodyOverflow = '';
+            this.document.documentElement.style.overflow = this.previousRootOverflow;
+            this.previousRootOverflow = '';
         }
         if (wasTop && handle.restoreFocus) {
             const exposedTop = this.topmostActiveHandle();
