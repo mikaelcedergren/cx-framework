@@ -44,6 +44,7 @@ When tone or wording judgment is not settled by the copy rules, `../../profile/d
 
 ## Copy standard
 
+- [MUST] Read and apply `RULE-ID: copy.sentence-case` before drafting copy and perform its capitalization check before handing over wording.
 - Apply `RULE-ID: copy.reader-language` before drafting user-facing text.
 - Apply `RULE-ID: copy.concrete-meaning` while drafting and before handing over wording; ask “What does the reader learn from this?” in the actual surrounding context.
 - Apply `RULE-ID: copy.first-read-understanding` while drafting and before handing over wording; judge the effort required from the intended reader, not just accuracy or word count.

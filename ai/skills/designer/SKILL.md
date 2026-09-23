@@ -83,6 +83,7 @@ For a named component role or pattern, discover how the consuming product curren
 
 Design for a finished product, never a proof of concept.
 
+- [MUST] Read and apply `RULE-ID: copy.sentence-case` when proposing interface copy and perform its capitalization check before handing off the brief.
 - Remove unnecessary complexity before adding polish.
 - Preserve the user's mental model over implementation structure.
 - Make hierarchy clear enough to scan without decoding.

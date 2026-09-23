@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.20
+
+- Portable AI copy guidance: review interface wording against `copy.sentence-case` in
+  `ai/design/05-copy-and-microcopy.md`. Menu, feature, and status terms no longer inherit
+  their standalone label's initial capital inside sentences. The designer, copywriter,
+  developer, and custodian skills now explicitly apply the rule before handoff.
+
 ## 0.16.19
 
 - Modal overlays lock the document scroller without moving sticky navigation offscreen.

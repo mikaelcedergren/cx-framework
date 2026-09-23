@@ -10,7 +10,7 @@ RULE-ID: copy.truth SCOPE: copy TYPE: MUST TOPIC: trust RULE: Preserve known pro
 
 RULE-ID: copy.unknown-behavior SCOPE: copy TYPE: MUST TOPIC: trust RULE: Treat unknown behavior as a product question. DESCRIPTION: Do not hide unresolved meaning behind generic or confident wording.
 
-RULE-ID: copy.terminology SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use one established term for one concept. DESCRIPTION: Prefer the consuming product's domain language and do not switch synonyms unless they represent different things.
+RULE-ID: copy.terminology SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use one established term for one concept and apply copy.sentence-case when placing it in a sentence. DESCRIPTION: Prefer the consuming product's domain language and do not switch synonyms unless they represent different things. Preserving terminology preserves the word and meaning, not the initial capital of a standalone label.
 
 RULE-ID: copy.plain-language SCOPE: copy TYPE: SHOULD TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 
@@ -24,7 +24,7 @@ RULE-ID: copy.reader-language SCOPE: copy TYPE: MUST TOPIC: copy RULE: Write for
 
 RULE-ID: copy.component-guidance.reader-language SCOPE: component-usage-guidance TYPE: MUST TOPIC: guidance RULE: Explain when and how to use a component in plain language. DESCRIPTION: Write for a designer or product author choosing a component. Describe its purpose, suitable situations, and important user-facing behavior without selectors, properties, events, code structure, or implementation instructions; keep technical contracts in the API reference.
 
-RULE-ID: copy.sentence-case SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use sentence case for interface text. DESCRIPTION: Capitalize the first word and proper nouns unless a product name or local language convention requires otherwise.
+RULE-ID: copy.sentence-case SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use sentence case for all interface copy. Capitalize the first word of each sentence or standalone label; keep ordinary words lowercase elsewhere, including feature, page, menu, tab, action, status, and content names. Preserve established proper names and brand spelling, conventional acronyms, and capitalization required by the language. Never infer proper-name status from a word's appearance in the interface or its existing capitalization. Before handoff, check every capital beyond sentence or label starts against these permitted reasons and correct unsupported capitals. DESCRIPTION: A menu label's initial capital belongs to its position, not to the thing it names. Referring to a control or destination does not create an exception. Established spelling also preserves a brand's internal capitals or lowercase initial.
 
 RULE-ID: copy.concise SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: Keep operational copy short and scannable as accuracy allows. DESCRIPTION: Lead with the point and use the fewest words that preserve meaning, consequence, constraint, recovery, and the next useful action; a reading surface may remain long when reading is the task.
 
@@ -42,6 +42,24 @@ RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every
 
 RULE-ID: copy.no-context-restatement SCOPE: copy TYPE: MUST TOPIC: copy RULE: Do not restate context the surface already establishes. DESCRIPTION: Applies to all UI copy. A row or card menu says `Edit` and `Delete` — the row is the object. A page-level call to action says `New` — the page heading names what is created. A form dialog's primary says `Add` or `Save` — the dialog heading names the entity. Labels, hints, and headings follow the same principle: never repeat what the page, section, or component around them has already said. Words survive only when they add information the surface does not carry: a different object or destination (`Open report`, `Move to pending`), a resulting state (`Create draft`), genuinely mixed targets (a global surface such as a command palette), or the final destructive commit, which copy.buttons.destructive governs. EXCEPT: A field label or picker placeholder naming its own value per copy.labels.object and copy.pickers.placeholder is establishing context, not restating it — a `Reminder` field label inside a `New reminder` dialog is correct.
 
+### Sentence case examples
+
+These examples illustrate `copy.sentence-case`; the same ordinary word changes case with its position, while established names and acronyms retain their spelling.
+
+| Context                        | Use                  | Avoid                |
+| ------------------------------ | -------------------- | -------------------- |
+| Standalone menu label          | Brief                | brief                |
+| Empty state for briefs         | No brief yet         | No Brief yet         |
+| Action on a brief              | Create brief         | Create Brief         |
+| Settings for briefs            | Brief settings       | Brief Settings       |
+| Reference to the settings menu | Open settings        | Open Settings        |
+| Report status                  | Your report is ready | Your Report is ready |
+| Action changing a status       | Mark as done         | Mark as Done         |
+| Established product name       | Open Foundry         | Open foundry         |
+| Established company name       | Connect to Apple     | Connect to apple     |
+| Brand with a lowercase initial | iPhone settings      | IPhone settings      |
+| Conventional acronym           | Your API key         | Your Api key         |
+
 ### Meaning and flow examples
 
 These examples illustrate `copy.concrete-meaning`, `copy.first-read-understanding`, and `copy.paragraph-flow`; concrete replacements assume the described behavior is known to be true.
@@ -55,13 +73,13 @@ Accurate but harder to decode: “Folder permissions govern contained files.”
 
 Easier to understand: “Files use the same access settings as their folder.”
 
-Clipped body text: “Generate fake paragraphs for a design that needs text. They read like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from Send.”
+Clipped body text: “Generate fake paragraphs for a design that needs text. They read like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from the send button.”
 
-Connected body text: “Generate fake paragraphs for a design that needs text, written like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from Send.”
+Connected body text: “Generate fake paragraphs for a design that needs text, written like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from the send button.”
 
 An `Edit` action in an identified row already has a clear object. Repeating the row’s name adds no meaning; `copy.no-context-restatement` still applies.
 
-For `copy.no-convention-explanation`, omit “Use the tabs to switch between sections,” “Select a checkbox to choose an item,” and “Click Save to save your changes” when the labelled controls already communicate these actions. Keep “Changes apply to everyone in this workspace” when true and otherwise unclear, because the control alone does not communicate that consequence.
+For `copy.no-convention-explanation`, omit “Use the tabs to switch between sections,” “Select a checkbox to choose an item,” and “Click save to save your changes” when the labelled controls already communicate these actions. Keep “Changes apply to everyone in this workspace” when true and otherwise unclear, because the control alone does not communicate that consequence.
 
 ## Buttons and actions
 

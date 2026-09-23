@@ -53,6 +53,8 @@ When calibrating severity or separating defects from taste, load `../../profile/
 
 ## Review method
 
+[MUST] Read and apply `RULE-ID: copy.sentence-case` when reviewing interface copy; perform its capitalization check on the actual wording and flag violations.
+
 1. Identify the goal, artifact type, maturity, and decision being requested.
 2. Establish what the evidence can and cannot verify.
 3. Search only the rules relevant to the reachable behavior in scope.

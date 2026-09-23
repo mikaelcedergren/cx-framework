@@ -78,6 +78,7 @@ Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-fac
 
 ## User-facing implementation
 
+- [MUST] Read and apply `RULE-ID: copy.sentence-case` when implementing interface copy and perform its capitalization check on the final wording before handoff.
 - Use `designer` when an unresolved product, flow, interaction, or visual decision would materially change the build.
 - Use `copywriter` when exact user-facing wording is unresolved.
 - Discover the consuming product's system before choosing implementation: read its local instructions and design-system documentation, then inspect dependencies, public APIs, imports, and established nearby usage.

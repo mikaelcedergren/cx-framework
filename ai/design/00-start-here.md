@@ -44,7 +44,7 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 - Before proposing, writing, changing, or reviewing styles: read `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in `03-ux-rules.md` and the consuming product's token purposes. This applies to components, wrappers, pages, and runtime styling alike.
 - Cross-cutting behavior, accessibility, layout, feedback, forms, navigation, or state: search `03-ux-rules.md` by `TOPIC:`, `SCOPE:`, or keyword.
 - A named component family such as buttons, dialogs, or tabs: treat the name as a semantic role, inspect the consuming product's local components and established usage, then search `04-component-rules.md` by `COMPONENT:` for applicable role behavior. Never infer a selector, import, property name, or code structure from the portable term.
-- Labels, buttons, guidance, validation, errors, empty states, dates, or tone: search `05-copy-and-microcopy.md`.
+- Labels, buttons, guidance, validation, errors, empty states, dates, or tone: read `RULE-ID: copy.sentence-case` in `05-copy-and-microcopy.md` before drafting, implementing, or reviewing copy, then search that file for the other relevant rules.
 - Generic validation or request-failure wording: use `06-fallback-copy.md` only after product-specific copy is impossible.
 
 [NOTE] Useful searches to run from this directory:
