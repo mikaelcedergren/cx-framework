@@ -5,6 +5,7 @@
     [class.cx-hero--split]="variant === 'split'"
     [class.cx-hero--cover]="variant === 'cover'"
     [class.cx-hero--center]="align === 'center'"
+    [class.cx-hero--parallax]="parallax"
     [class.cx-hero--fade-bottom]="fadeBottom"
     [class.cx-hero--under-masthead]="underMasthead"
   >
@@ -38,6 +39,7 @@
 
     <div
       class="cx-hero__media"
+      [cxParallax]="parallax"
       [attr.aria-hidden]="variant === 'cover' ? 'true' : null"
     >
       <ng-content select="[media], [cxHeroMedia]" />

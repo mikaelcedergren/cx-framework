@@ -92,6 +92,13 @@
       "path": "patterns/cx-filter-bar/cx-filter-bar.component.ts"
     },
     {
+      "name": "cx-parallax",
+      "selectors": ["[cxParallax]"],
+      "area": "pattern",
+      "category": "cx-hero",
+      "path": "patterns/cx-hero/cx-parallax.directive.ts"
+    },
+    {
       "name": "cx-hero",
       "selectors": ["cx-hero"],
       "area": "pattern",

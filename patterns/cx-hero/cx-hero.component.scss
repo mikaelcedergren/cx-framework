@@ -40,6 +40,12 @@ cx-hero .cx-hero--under-masthead {
 
 cx-hero .cx-hero__message {
   display: grid;
+  width: 100%;
+  // Measure both heading and body in the heading face: the body gets two
+  // additional characters of room, independent of its smaller type size.
+  max-width: 18ch;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-display);
   min-width: 0;
   gap: var(--space-lg);
 }
@@ -73,9 +79,11 @@ cx-hero .cx-hero__context {
 
 cx-hero .cx-hero__body {
   display: grid;
-  max-width: var(--measure-lg);
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   gap: var(--space-sm);
+  font-family: var(--font-family-base);
   color: var(--opacity-high);
   font-size: var(--font-size-editorial-lead);
   line-height: var(--line-height-editorial-lead);
@@ -120,6 +128,10 @@ cx-hero .cx-hero__media > [cxHeroMedia] {
 cx-hero .cx-hero--center .cx-hero__copy {
   justify-self: center;
   text-align: center;
+}
+
+cx-hero .cx-hero--center .cx-hero__message {
+  justify-self: center;
 }
 
 cx-hero .cx-hero--center .cx-hero__heading,

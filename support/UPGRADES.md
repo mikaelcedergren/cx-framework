@@ -14,6 +14,27 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.24
+
+- Parallax now uses image-relative travel from -6% to +6%, a 1.14 crop scale,
+  and cubic-bezier(0.25, 0.2, 0.75, 0.8) pacing. Keep decorative layers sized to
+  their clipping parent; remove fixed overscan. The directive owns the media
+  transform animation. Existing boolean activation props are unchanged.
+
+## 0.16.23
+
+- `cx-hero` adds opt-in `[parallax]="true"` for cover media. It moves the image
+  by 6% of its height in either direction with a 1.14 crop scale and steady
+  cubic-bezier pacing, leaves foreground content still, and
+  disables movement for reduced-motion preferences. Other variants reject it.
+- Hero body text now stays within a measure slightly wider than the heading,
+  instead of spanning the full copy region. No consumer override is needed.
+- `CxParallaxDirective` exposes `[cxParallax]="true"` for decorative background
+  layers outside heroes. Place the layer inside a stationary clipping parent,
+  sized to fill that parent; keep foreground text as a sibling. The directive
+  owns the media transform animation and cleans up when disabled,
+  hidden, or destroyed. Do not apply it to foreground content.
+
 ## 0.16.22
 
 - `cx-card` adds `variant="frosted"` for a theme-aware translucent surface with

@@ -10,6 +10,8 @@ import {
   inject,
 } from "@angular/core";
 
+import { CxParallaxDirective } from "./cx-parallax.directive";
+
 export type CxHeroVariant = "cover" | "split" | "stacked";
 export type CxHeroAlign = "start" | "center";
 export type CxHeroMediaPosition = "top" | "center" | "bottom";
@@ -31,6 +33,7 @@ const HERO_MEDIA_POSITIONS: readonly CxHeroMediaPosition[] = [
  */
 @Component({
   selector: "cx-hero",
+  imports: [CxParallaxDirective],
   templateUrl: "./cx-hero.component.html",
   styleUrl: "./cx-hero.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -114,6 +117,9 @@ export class CxHeroComponent implements AfterContentInit {
   /** Smoothly blends the lower half of cover media into the default surface. */
   @Input({ transform: booleanAttribute }) fadeBottom = false;
 
+  /** Gently moves cover media while foreground content stays still. */
+  @Input({ transform: booleanAttribute }) parallax = false;
+
   /** Reserves space for an overlapping masthead while media extends behind it. */
   @Input({ transform: booleanAttribute }) underMasthead = false;
 
@@ -128,6 +134,10 @@ export class CxHeroComponent implements AfterContentInit {
   private validateComposition(): void {
     if (this.overlayOpacity > 0 && this.variantValue !== "cover") {
       throw new Error('[cx-hero] overlayOpacity requires variant="cover".');
+    }
+
+    if (this.parallax && this.variantValue !== "cover") {
+      throw new Error('[cx-hero] parallax requires variant="cover".');
     }
 
     if (this.fadeBottom && this.variantValue !== "cover") {

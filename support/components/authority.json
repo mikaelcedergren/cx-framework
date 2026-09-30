@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 135,
-  "catalogSha256": "84f38f416815515f1c4585f8d0b3d4962c6f6753b197224f5aac99c6fb030a29",
+  "componentCount": 136,
+  "catalogSha256": "42734ef24a3a55d68a7e3430c2281b3ddb2574c4060f643076f412615a427d35",
   "components": [
     {
       "name": "cx-account-control",
@@ -5316,6 +5316,15 @@
             "source": "decorator"
           },
           {
+            "binding": "parallax",
+            "member": "parallax",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
             "binding": "underMasthead",
             "member": "underMasthead",
             "type": "boolean",
@@ -5360,17 +5369,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "45b0435d9efec74b99a1dabb9e811f6ba726f504db1c1be33edb8df1ad257c97"
+          "sha256": "531a1fd12fa59d1e034cbcf45ce3e1930fdb12881654b47b4889416eda3a6de2"
         },
         "template": {
           "kind": "external",
-          "sha256": "751c67d8e31441f32cb21c90a522c5894aae15374fd4d3b1f746c8baa0028fd8"
+          "sha256": "73406208bfc135d6c22d7cb33523247fed7fe429c83d6e68af3f31ca790847e1"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "c6f98c2c206390e4b84c4773959a19e3bd3d3560e37e11736eb2300f7e023dcf"
+            "sha256": "1ebd433774d859a77675e401491b40245314eb033fb2ad0245f67b7a3648676c"
           }
         ]
       }
@@ -8400,6 +8409,41 @@
             "sha256": "a06617b7e8644d872550d9e58852148103056d37e3362464123f26fdf5eae13f"
           }
         ]
+      }
+    },
+    {
+      "name": "cx-parallax",
+      "area": "pattern",
+      "category": "cx-hero",
+      "kind": "directive",
+      "selectors": [
+        "[cxParallax]"
+      ],
+      "publicApi": {
+        "symbol": "CxParallaxDirective",
+        "inputs": [
+          {
+            "binding": "cxParallax",
+            "member": "cxParallax",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "signal"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "2f7567fef13da3b1005c41c4787ae328f8e54f70d64a3e11a6b18370a1703225"
+        },
+        "template": {
+          "kind": "none",
+          "sha256": null
+        },
+        "styles": []
       }
     },
     {
