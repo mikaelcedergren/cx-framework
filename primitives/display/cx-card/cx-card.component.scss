@@ -52,7 +52,8 @@
   outline: none;
 }
 
-:host(.cx-card-host--interactive) :is(.cx-card__header, .cx-card__viewport, .cx-card__footer) {
+:host(.cx-card-host--interactive)
+  :is(.cx-card__header, .cx-card__viewport, .cx-card__footer) {
   pointer-events: none;
 }
 
@@ -68,24 +69,51 @@
   pointer-events: auto;
 }
 
-:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover) {
+:host(.cx-card-host--interactive:not(.cx-card-host--frosted))
+  .cx-card:has(.cx-card__activation:hover) {
   background-color: var(--opacity-low);
 }
 
-:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
+:host(.cx-card-host--interactive:not(.cx-card-host--frosted))
+  .cx-card:has(.cx-card__activation:active) {
   background-color: var(--opacity-darken);
 }
 
 // An outlined card remains one transparent plane in every interaction state.
 // Its border carries hover and press feedback instead of introducing a fill.
-:host(.cx-card-host--interactive.cx-card-host--border) .cx-card:has(.cx-card__activation:hover) {
+:host(.cx-card-host--interactive.cx-card-host--border)
+  .cx-card:has(.cx-card__activation:hover) {
   border-color: var(--border-hover);
   background-color: transparent;
 }
 
-:host(.cx-card-host--interactive.cx-card-host--border) .cx-card:has(.cx-card__activation:active) {
+:host(.cx-card-host--interactive.cx-card-host--border)
+  .cx-card:has(.cx-card__activation:active) {
   border-color: var(--border-active);
   background-color: transparent;
+}
+
+// Keep glass on the owning card plane in every state. Without backdrop-filter,
+// the normal surface is opaque so the card still reads as a bounded object.
+:host(.cx-card-host--frosted) .cx-card {
+  border: var(--line);
+  background-color: var(--surface);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  :host(.cx-card-host--frosted) .cx-card {
+    background-color: color-mix(in srgb, var(--ink) 12%, transparent);
+    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 12));
+    backdrop-filter: blur(calc(var(--frost-softness) * 12));
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :host(.cx-card-host--frosted) .cx-card {
+    background-color: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 // Pointer only: on touch the hover state sticks after a tap, which would leave
@@ -110,7 +138,8 @@
   }
 }
 
-:host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:focus-visible) {
+:host(.cx-card-host--interactive)
+  .cx-card:has(.cx-card__activation:focus-visible) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
 }
@@ -150,7 +179,9 @@
   box-sizing: border-box;
 }
 
-.cx-card__header:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *, .cx-card__menu)) {
+.cx-card__header:not(
+  :has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *, .cx-card__menu)
+) {
   display: none;
 }
 
@@ -233,7 +264,9 @@
   display: none;
 }
 
-.cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(.cx-card__content:empty):has(.cx-card__footer:empty) {
+.cx-card:not(:has(.cx-card__heading, .cx-card__icon, .cx-card__meta > *)):has(
+    .cx-card__content:empty
+  ):has(.cx-card__footer:empty) {
   display: none;
 }
 
@@ -254,7 +287,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: inherit;
   transition: max-height var(--motion-base) var(--ease-out-in);
 }
 
@@ -271,7 +304,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: inherit;
   background: transparent;
   padding: var(--space-sm);
   box-sizing: border-box;
@@ -286,7 +319,11 @@
 
 // Fade the content itself so transparent cards never need a painted fade tile.
 .cx-card__viewport--clamped {
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 48px),
+    transparent
+  );
   mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent);
 }
 
@@ -298,7 +335,7 @@
   justify-content: center;
   padding: 0 var(--space-sm);
   border: 0;
-  border-radius: var(--radius-lg);
+  border-radius: inherit;
   background: transparent;
   color: var(--opacity-high);
   cursor: pointer;
@@ -326,7 +363,7 @@
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
-.cx-card__expand[aria-expanded='true'] .cx-card__expand-chevron {
+.cx-card__expand[aria-expanded="true"] .cx-card__expand-chevron {
   transform: rotate(180deg);
 }
 

@@ -1,3 +1,4 @@
+<div #viewport class="cx-steps__viewport">
 @if (steps$(); as steps) {
 @if (steps.length > 0) {
 <ol class="cx-steps__list" aria-label="Steps">
@@ -51,4 +52,24 @@
   }
 </ol>
 }
+}
+
+</div>
+@if (density === 'auto' && steps$().length) {
+  <div class="cx-steps__measure" aria-hidden="true" inert>
+    <div #measureList class="cx-steps__measure-list">
+      @for (step of steps$(); track $index) {
+        <div class="cx-steps__measure-item" [class.cx-step--danger]="isDanger(step)">
+          <span class="cx-steps__measure-number"></span>
+          <span class="cx-steps__measure-name">
+            <span>{{ step.name }}</span>
+            @if (badgeText(step); as badge) {
+              <span class="cx-step__badge">{{ badge }}</span>
+            }
+          </span>
+          @if (!$last) { <span class="cx-steps__measure-divider"></span> }
+        </div>
+      }
+    </div>
+  </div>
 }

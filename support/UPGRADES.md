@@ -14,6 +14,32 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.22
+
+- `cx-card` adds `variant="frosted"` for a theme-aware translucent surface with
+  backdrop blur. Browsers without blur support and reduced-transparency settings
+  use an opaque theme surface. Existing variants retain their appearance.
+- `cx-card` adds `borderRadius`: use `'default'` (the unchanged theme radius),
+  `'none'` (square), or a finite non-negative number in pixels, such as
+  `[borderRadius]="24"`. The setting also controls content clipping and activation
+  corners. No migration is required for existing consumers.
+
+- `cx-wizard-dialog` now uses shared `cx-steps` and defaults `wizard.stepsDensity`
+  to `auto`: full labels when they fit on one line, compact otherwise. Set
+  `stepsDensity: 'default'` to always show labels or `'compact'` to always keep
+  only the current label visible. No new setting is needed for automatic sizing.
+- `cx-steps` adds `density="auto"`; its existing default remains `default`.
+  Compact connectors can shorten as space tightens. Rows that still do not fit
+  scroll horizontally and reveal the current step. Hidden labels retain tooltips
+  and accessible names. `CxStep.status` also accepts `success` for explicit
+  completion independently of the current index; `pending` still prevents
+  automatic completion.
+
+- `cx-big-checkbox` and `cx-big-radio` now fill their allocated height in
+  stretching layouts, including the default `cx-grid` alignment. Content stays
+  top-aligned; standalone cards and non-stretch alignment keep their natural
+  height. No consumer changes are required.
+
 ## 0.16.21
 
 - The editorial typeface now uses Literata with real weights 200–900 instead of

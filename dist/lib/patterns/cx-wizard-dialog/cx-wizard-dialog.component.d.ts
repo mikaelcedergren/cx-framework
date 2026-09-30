@@ -1,5 +1,6 @@
 import { AfterContentChecked, EventEmitter, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { type CxIconName } from '../../icons/manifest';
+import { type CxStepsDensity, type CxStep } from '../../primitives/display/cx-steps';
 import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
 import * as i0 from "@angular/core";
 export type CxWizardDialogAction = 'cancel' | 'back' | 'continue' | 'confirm' | 'close' | 'dismiss' | 'retry';
@@ -26,6 +27,8 @@ export interface CxWizardDialogData {
     steps: readonly CxWizardDialogStep[];
     index?: number;
     size?: CxWizardDialogSize;
+    /** Auto keeps labels on one row, switching to compact when they no longer fit. */
+    stepsDensity?: CxStepsDensity;
     loadingActionId?: CxWizardDialogAction | string;
     feedbackVisible?: boolean;
     /** A temporary screen outside steps. Clear it and update index on processingComplete. */
@@ -54,6 +57,7 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     protected readonly isOpen$: import("@angular/core").Signal<boolean>;
     protected readonly wizard$: import("@angular/core").Signal<CxWizardDialogData>;
     protected readonly steps$: import("@angular/core").Signal<readonly CxWizardDialogStep[]>;
+    protected readonly progressSteps$: import("@angular/core").Signal<readonly CxStep[]>;
     protected readonly currentStepIndex$: import("@angular/core").Signal<number>;
     protected readonly currentStep$: import("@angular/core").Signal<CxWizardDialogStep | undefined>;
     protected readonly activeTemplate$: import("@angular/core").Signal<import("@angular/core").TemplateRef<unknown> | null>;
@@ -86,9 +90,6 @@ export declare class CxWizardDialogComponent implements AfterContentChecked, OnC
     ngOnChanges(_changes: SimpleChanges): void;
     ngAfterContentChecked(): void;
     ngOnDestroy(): void;
-    protected isActiveStep(index: number): boolean;
-    protected isCompletedStep(step: CxWizardDialogStep, index: number): boolean;
-    protected isConnectorComplete(index: number): boolean;
     protected onBackdropClick(event: MouseEvent): void;
     protected onDialogKeydown(event: KeyboardEvent): void;
     protected onDismiss(): void;

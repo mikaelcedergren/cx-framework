@@ -1,5 +1,6 @@
 :host {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .cx-big-checkbox {

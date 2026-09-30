@@ -1,4 +1,4 @@
-<div class="cx-card">
+<div class="cx-card" [style.border-radius]="resolvedBorderRadius">
   @if (resolvedHref; as href) {
     <a
       class="cx-card__activation"
@@ -73,7 +73,9 @@
     [style.maxHeight.px]="viewportMaxHeight()"
     [attr.role]="hasTabs ? 'tabpanel' : null"
     [attr.aria-labelledby]="hasTabs ? selectedTabButtonId : null"
-    [attr.aria-label]="hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null"
+    [attr.aria-label]="
+      hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null
+    "
     [attr.tabindex]="hasTabs ? '0' : null"
     (focusin)="onViewportFocusIn($event)"
   >
@@ -91,7 +93,11 @@
       [attr.aria-label]="expandAriaLabel()"
       (click)="toggleExpanded()"
     >
-      <cx-icon class="cx-card__expand-chevron" icon="chevron-down" [size]="16" />
+      <cx-icon
+        class="cx-card__expand-chevron"
+        icon="chevron-down"
+        [size]="16"
+      />
     </button>
   }
 

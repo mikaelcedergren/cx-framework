@@ -45,32 +45,12 @@
       } @else {
         <div class="cx-wizard-dialog__main">
           <header class="cx-wizard-dialog__steps-header">
-            <ol class="cx-wizard-dialog__steps" aria-label="Steps">
-              @for (step of steps$(); track step.id; let index = $index) {
-                <li
-                  class="cx-wizard-dialog__step"
-                  [class.cx-wizard-dialog__step--active]="isActiveStep(index)"
-                  [class.cx-wizard-dialog__step--complete]="isCompletedStep(step, index)"
-                  [attr.aria-current]="isActiveStep(index) ? 'step' : null"
-                >
-                  <span class="cx-wizard-dialog__step-marker">
-                    @if (isCompletedStep(step, index)) {
-                      <cx-icon icon="check" [size]="12" />
-                    } @else {
-                      {{ index + 1 }}
-                    }
-                  </span>
-                  <span class="cx-wizard-dialog__step-label">{{ step.name }}</span>
-                  @if (index < steps$().length - 1) {
-                    <span
-                      class="cx-wizard-dialog__step-separator"
-                      [class.cx-wizard-dialog__step-separator--complete]="isConnectorComplete(index)"
-                      aria-hidden="true"
-                    ></span>
-                  }
-                </li>
-              }
-            </ol>
+            <cx-steps
+              [steps]="progressSteps$()"
+              [index]="currentStepIndex$()"
+              [density]="wizard$().stepsDensity ?? 'auto'"
+              layout="fill"
+            />
           </header>
 
           <div class="cx-wizard-dialog__content-shell">

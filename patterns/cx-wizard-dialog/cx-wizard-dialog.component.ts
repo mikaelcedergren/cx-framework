@@ -22,6 +22,7 @@ import {
 import { type CxIconName } from '../../icons/manifest';
 import { CxButtonComponent } from '../../primitives/actions/cx-button';
 import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
+import { CxStepsComponent, type CxStepsDensity, type CxStep } from '../../primitives/display/cx-steps';
 import { CxShortcutKeyComponent } from '../../primitives/display/cx-shortcut-key';
 import { CxDismissRequest, type CxDismissReason } from '../../primitives/overlay/dismiss-request';
 import {
@@ -62,6 +63,8 @@ export interface CxWizardDialogData {
   steps: readonly CxWizardDialogStep[];
   index?: number;
   size?: CxWizardDialogSize;
+  /** Auto keeps labels on one row, switching to compact when they no longer fit. */
+  stepsDensity?: CxStepsDensity;
   loadingActionId?: CxWizardDialogAction | string;
   feedbackVisible?: boolean;
   /** A temporary screen outside steps. Clear it and update index on processingComplete. */
@@ -84,6 +87,7 @@ const EMPTY_WIZARD: CxWizardDialogData = {
     A11yModule,
     CxButtonComponent,
     CxShortcutKeyComponent,
+    CxStepsComponent,
     CxStateMessageComponent,
     CxIconButtonComponent,
     CxIconComponent,
@@ -126,6 +130,9 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   protected readonly isOpen$ = this.openState.asReadonly();
   protected readonly wizard$ = this.wizardState.asReadonly();
   protected readonly steps$ = computed(() => this.wizard$().steps);
+  protected readonly progressSteps$ = computed<readonly CxStep[]>(() =>
+    this.steps$().map(step => ({ name: step.name, status: step.status === 'success' ? 'success' : undefined })),
+  );
   protected readonly currentStepIndex$ = computed(() => this.clampIndex(this.wizard$().index ?? 0));
   protected readonly currentStep$ = computed<CxWizardDialogStep | undefined>(
     () => this.steps$()[this.currentStepIndex$()],
@@ -228,18 +235,6 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
   public ngOnDestroy(): void {
     this.cancelProcessing();
     this.releaseOverlay();
-  }
-
-  protected isActiveStep(index: number): boolean {
-    return index === this.currentStepIndex$();
-  }
-
-  protected isCompletedStep(step: CxWizardDialogStep, index: number): boolean {
-    return step.status === 'success' || index < this.currentStepIndex$();
-  }
-
-  protected isConnectorComplete(index: number): boolean {
-    return this.currentStepIndex$() > index;
   }
 
   protected onBackdropClick(event: MouseEvent): void {
@@ -515,6 +510,7 @@ export class CxWizardDialogComponent implements AfterContentChecked, OnChanges, 
       steps,
       index,
       size: value.size === 'large' ? 'large' : 'default',
+      stepsDensity: value.stepsDensity ?? 'auto',
       dismissible: value.dismissible === true,
     };
   }

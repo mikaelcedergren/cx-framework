@@ -1,3 +1,4 @@
+import { AfterViewInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import * as i0 from "@angular/core";
 export interface CxStep {
     name: string;
@@ -5,11 +6,26 @@ export interface CxStep {
     status?: CxStepStatus;
     mood?: CxStepMood;
 }
-export type CxStepStatus = 'pending';
+export type CxStepStatus = 'pending' | 'success';
 export type CxStepMood = 'default' | 'danger';
-export type CxStepsDensity = 'default' | 'compact';
+export type CxStepsDensity = 'default' | 'compact' | 'auto';
 export type CxStepsLayout = 'default' | 'fill';
-export declare class CxStepsComponent {
+export declare class CxStepsComponent implements AfterViewInit, OnChanges, OnDestroy {
+    private readonly document;
+    private readonly compactState;
+    private resizeObserver?;
+    private frame?;
+    private viewReady;
+    private revealCurrent;
+    private measureElement?;
+    private viewport?;
+    private set measureList(value);
+    ngAfterViewInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
+    ngOnDestroy(): void;
+    protected isCompact(): boolean;
+    private scheduleLayout;
+    private syncLayout;
     private readonly stepsState;
     set steps(value: readonly CxStep[] | undefined);
     get steps(): readonly CxStep[];

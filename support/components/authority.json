@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 135,
-  "catalogSha256": "8fc3f4b3e988dcd9015b177935912904b62bd2a9ac3ef5102bbd599b6a6350b7",
+  "catalogSha256": "84f38f416815515f1c4585f8d0b3d4962c6f6753b197224f5aac99c6fb030a29",
   "components": [
     {
       "name": "cx-account-control",
@@ -784,7 +784,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "ebe85fdc9a7670cc5d5d338c7e336a75b558553987c07909eee283b54115bcdc"
+            "sha256": "bcb808e5f28d60bf24ff6bb40316d8261cd081165568a59623bf4f8b5a10e679"
           }
         ]
       }
@@ -888,7 +888,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d6340366dff9cdb59ff437550501ec96c4184f701087e15ba66dff89879f4686"
+            "sha256": "23d1cd525bf461f6c95a2ce3f06954b26042841fa66da89698d85dba08958ebf"
           }
         ]
       }
@@ -1531,6 +1531,15 @@
             "source": "decorator"
           },
           {
+            "binding": "borderRadius",
+            "member": "borderRadius",
+            "type": "CxCardBorderRadius",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          },
+          {
             "binding": "expandable",
             "member": "expandable",
             "type": "boolean",
@@ -1590,7 +1599,7 @@
             "type": "CxCardMood",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": "\"default\"",
             "source": "decorator"
           },
           {
@@ -1653,7 +1662,7 @@
             "type": "CxCardVariant",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": "\"default\"",
             "source": "decorator"
           }
         ],
@@ -1694,17 +1703,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "e522b58d094f5e5652b204f17a88e9ff356703dc84a473bcf0686425aa9cde99"
+          "sha256": "7d92bb797a7f4831c4fa59a5bb1d59fa3c0ff6765e1341fb5048353e80d74aaa"
         },
         "template": {
           "kind": "external",
-          "sha256": "6fda46fc7bdc3712db2db7e8402889f6d5b9190409b842b7e73128541da810a1"
+          "sha256": "e4dd6246105691f6a7e6a27fa10b14409b7c108364ff363412a1207aa2dc426c"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "0ba62832f426eeb58d147964079b977a9c02f92b21c2c79a1cfc8a7c38313a33"
+            "sha256": "d373d6202c28d752bf4a208df1898f54d5728c9ecea08c455e2c0fc2a232c906"
           }
         ]
       }
@@ -11628,17 +11637,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "d084b18c4df61aa2c19161826b9942aaed280b777503dd53292d08ac9ee10807"
+          "sha256": "d95dc02adc8f7cfacefa9e582677f6904886c063db26bc90da2077bad38f43a4"
         },
         "template": {
           "kind": "external",
-          "sha256": "26df085d09dd5c8b2c0f2fd93780031528b1aa4e3468fa80c7b093272281f48e"
+          "sha256": "975584455a401a846df87b3f6368c2f8a6859e903109d977b97278e0395a2ac4"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "1744640b895073a3cc65c7fa673f21c6656d914b36d080218c05cda08eef80d2"
+            "sha256": "ce48d9641878acc734ab75b7a0fce2a8bedbca4a78bb77164198a655af4829a4"
           }
         ]
       }
@@ -15182,17 +15191,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "89fe98e968e9f7c7b1d0b800201a1fc3be350bda78948b1a1bb35e1e13993037"
+          "sha256": "69f974d2c9b46092b6000181a55f4489be110b1fad7962e50ed0382bf21efeaf"
         },
         "template": {
           "kind": "external",
-          "sha256": "a2475bfb39757c35a224163143c88dc4bf4d996850794217623148e9e5611012"
+          "sha256": "678c495bf04a9476ce100c1d48672ed02b33dd1ad619243a7d4d764049607a37"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "139fdac10307608c4327619fc50c45167ef765283d170ae07d964bcccd54c561"
+            "sha256": "aafcca86398587dca7df25ecd1666446d41623fe39f3a5789dbee36865580b5b"
           }
         ]
       }
