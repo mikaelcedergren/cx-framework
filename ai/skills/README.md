@@ -16,13 +16,13 @@ Route by the user's current verb and the artifact's stage:
 
 - exploration, product direction, UX ambiguity, or a design brief → `designer`
 - requested replacement wording → `copywriter`
-- review, audit, approval, or readiness verdict → `custodian`
+- review, audit, approval, readiness verdict, or implemented-feature completion → `custodian`
 - explicit implementation of a settled outcome → `developer`
 - repository or workspace cleanup, optimization, maintenance, or structural sanity check → `cleaner`
 
-Do not run the entire lifecycle automatically for a task that starts at a later settled stage. Switch roles only when unresolved product direction, wording, evidence, or implementation genuinely requires it. Implementation still starts only after explicit action language.
+Do not restart settled design stages for a task that starts later in the lifecycle. The final Custodian review is mandatory under `RULE-ID: delivery.custodian-review`, including work that starts directly in Developer; it needs no separate user request. Other role changes depend on unresolved product direction, wording, evidence, or implementation. Implementation still starts only after explicit action language.
 
-`Blocked` and `Unverified` do not progress to implementation. `Needs changes` progresses only after resolution or explicit user acceptance of the named residual risk; `Polish` and `Pass` may proceed. Rule strength and verdict severity are separate: a violated `must` is binding but becomes `Blocked` only when its user impact makes the next gate unsafe, misleading, inaccessible, or wasteful.
+`Blocked` and `Unverified` do not progress to implementation. `Needs changes` progresses only after resolution or explicit user acceptance of the named residual risk; `Polish` and `Pass` may proceed through intermediate gates; only `Pass` supports unqualified feature completion after Custodian reviews the current finished output. Rule strength and verdict severity are separate: a violated `must` is binding but becomes `Blocked` only when its user impact makes the next gate unsafe, misleading, inaccessible, or wasteful.
 
 ## Boundaries
 

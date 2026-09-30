@@ -6,9 +6,13 @@ This folder is the **portable design spec** for products on any implementation p
 
 [MUST] Treat these rules as the default design judgment within their scope. Let a consuming product's own constraints, or an explicit decision from the user or accountable product owner, take precedence over them. Apply that decision only to the context it addresses, preserve every unaffected rule, and briefly surface any material consequence without continuing to argue against it.
 
+[MUST] Acknowledge an explicit human decision and apply it within its intended scope without requiring the human to defend it or obtain the AI's agreement. Product constraints must be documented, established in the current context, or explicitly supplied by a human; never invent constraints to justify departing from a rule.
+
+[MUST] Carry an approved decision forward throughout its stated scope. Do not repeatedly ask for approval or repeat a material consequence already acknowledged. Revisit the decision only when new information materially changes the situation.
+
 The portable design spec uses four explicit levels:
 
-- `[MUST]` is mandatory inside its stated scope. If compliance is impossible or conflicts with another `[MUST]` at the same authority, surface the conflict instead of improvising.
+- `[MUST]` is mandatory as the baseline inside its stated scope, subject to the product constraints and explicit human decisions above. If an unresolved conflict remains between applicable `[MUST]` rules at the same authority, or compliance is impossible without an authorized departure, surface the conflict instead of improvising.
 - `[SHOULD]` is the strong default. Depart only when a concrete product reason makes the default worse, and state the reason.
 - `[MAY]` is explicitly permitted and entirely optional. It is not a recommendation or a weaker obligation.
 - `[NOTE]` provides context, rationale, navigation, or examples. It is non-normative and cannot override a rule.
@@ -25,7 +29,7 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 
 [MUST] Apply guidance in this order:
 
-1. The user's current goal, intended outcome, and explicitly fixed constraints. A proposed interface choice is not a constraint merely because it appears in a request or prototype, even when described declaratively; treat it as a candidate unless the user expressly makes it non-negotiable.
+1. The user's current goal, intended outcome, and explicit decisions. An explicit visual correction or settled visual direction is a constraint in the task it addresses; ordinary instructions about placement, grouping, visible wording, or removal do not need the words ‘fixed’ or ‘non-negotiable’. Distinguish those decisions from exploratory suggestions and interface choices merely inherited from a reference, prototype, or existing screen, which remain candidates for critique. Surface a material conflict with product truth or the local system instead of silently redesigning a settled choice.
 2. The consuming product's local instructions, product truth, design-system contract, and documented component capabilities.
 3. The platform-neutral design-system use contract in `02-design-system.md`.
 4. The portable UX, component-role, and copy rules in this spec.
@@ -38,6 +42,8 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 [MUST] Start with the task, not the documents:
 
 - Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, `RULE-ID: layout.start-alignment`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
+- Before choosing components or handing off a user-facing design: complete the **Required relationship and attention check** in `02-design-system.md`; repeat it against the finished output during implementation and review.
+- Feature completion: apply `RULE-ID: delivery.custodian-review` in `03-ux-rules.md` and use `../skills/custodian/SKILL.md` before reporting the feature done.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `03-ux-rules.md`.
 - Any component choice, mention, or implementation: read `RULE-ID: system.component-terms`, `RULE-ID: system.component-resolution`, `RULE-ID: system.use-existing`, `RULE-ID: system.default-first`, `RULE-ID: system.component-state-contract`, and `RULE-ID: system.shared-owner` in `03-ux-rules.md`, then inspect the consuming product's own design system before choosing an implementation.
 - Design-system discovery, tokens, ownership, supported configuration, composition, theming, or layout foundations: read the matching section of `02-design-system.md`.

@@ -8,7 +8,7 @@ Portable cross-cutting rules. Search by `RULE-ID:`, `SCOPE:`, `TYPE:`, `TOPIC:`,
 
 RULE-ID: system.mental-model SCOPE: global TYPE: MUST TOPIC: system RULE: Organize the experience around the user's mental model. DESCRIPTION: Product structure, naming, grouping, and sequence must not expose internal ownership or backend shape.
 
-RULE-ID: system.semantic-coherence SCOPE: global TYPE: MUST TOPIC: system RULE: Make the interface's purpose, visible structure, and behavior form one coherent model. DESCRIPTION: A locally plausible element is still wrong when its name, contents, grouping, scope, persistence, or consequence contradicts the user's task or the surrounding surface. Treat interface choices inherited from a request, prototype, or component inventory as hypotheses unless product truth explicitly fixes them; their presence is not evidence of user value.
+RULE-ID: system.semantic-coherence SCOPE: global TYPE: MUST TOPIC: system RULE: Make the interface's purpose, visible structure, and behavior form one coherent model. DESCRIPTION: A locally plausible element is still wrong when its name, contents, grouping, scope, persistence, or consequence contradicts the user's task or the surrounding surface. Treat interface choices inherited from a request, prototype, or component inventory as hypotheses unless product truth or an explicit owner decision fixes them under the precedence in 00-start-here.md; their presence is not evidence of user value.
 
 RULE-ID: system.use-existing SCOPE: design-system TYPE: MUST TOPIC: system RULE: Start with the consuming product's established tokens, components, patterns, and documented behavior. DESCRIPTION: Inspect the local system before choosing an implementation; familiar supported pieces reduce drift and transfer learned behavior across the product.
 
@@ -19,6 +19,8 @@ RULE-ID: system.component-terms SCOPE: design-system TYPE: MUST TOPIC: component
 RULE-ID: system.component-resolution SCOPE: design-system TYPE: MUST TOPIC: components RULE: Resolve every component role through the consuming product's established design system before creating custom UI. DESCRIPTION: Inspect local instructions, design-system documentation, dependencies, supported components, and nearby established use; follow this order without skipping a stage: (1) choose the closest existing component, (2) use a supported configuration, (3) use a supported composition, (4) adapt the design to the system's available capabilities, and (5) create the smallest custom solution only as a last resort while preserving local tokens, states, interaction behavior, accessibility, and visual character.
 
 RULE-ID: system.shared-owner SCOPE: design-system TYPE: MUST TOPIC: components RULE: Put repeatable behavior in the nearest available shared owner when the accepted scope permits it. DESCRIPTION: Prefer improving the consuming product's owning component or pattern over creating a private feature substitute; when that owner is unavailable or outside scope, surface the gap and continue only through the fallback order in `RULE-ID: system.component-resolution`.
+
+RULE-ID: system.one-task-one-owner SCOPE: design-system TYPE: SHOULD TOPIC: reuse RULE: Reuse one shared task owner across entry points, with common content, behavior, validation, state transitions, loading and error states, outcomes, and canonical state. Vary the surrounding title, supporting copy, actions, placement, size, or dismissal behavior only to fit the local mental model; create a task variant only when intent, consequence, permissions, or required behavior differs. DESCRIPTION: Create and edit can share a form while keeping distinct headings and completion actions; a table header, filter panel, and active-filter tag can share one filter editor; a page, dialog, and detail panel can present the same entity task. A different location or container alone does not justify a fork.
 
 RULE-ID: system.sealed-components SCOPE: design-system TYPE: MUST TOPIC: components RULE: Keep component internals sealed from consumers. DESCRIPTION: Consumers control placement and composition, not internal templates, styles, padding, or state logic.
 
@@ -34,7 +36,7 @@ RULE-ID: system.public-api-minimal SCOPE: design-system-component TYPE: MUST TOP
 
 RULE-ID: system.default-normal SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make the default state represent normal product use. DESCRIPTION: Defaults should not be maximal demos or unusually intrusive examples.
 
-RULE-ID: system.reachable-states SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states.
+RULE-ID: system.reachable-states SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Define every state the component can actually reach. DESCRIPTION: Account for relevant default, hover, focus, active, selected, disabled, loading, empty, success, warning, and error behavior without inventing impossible states. Handling a state does not require a separate visible surface; success may return to the ordinary usable state when its outcome is already clear.
 
 RULE-ID: system.component-state-contract SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Use each component's supported state presentation as a complete contract. DESCRIPTION: Activate documented loading, selected, on or off, disabled, success, error, and other states without consumer-authored changes to the component's label, icons, structure, feedback, or state treatment, and do not narrate or duplicate state the component already communicates; if a required state is missing, surface the gap to the owning design system instead of improvising a local substitute.
 
@@ -43,6 +45,12 @@ RULE-ID: system.no-empty-chrome SCOPE: global TYPE: MUST TOPIC: state RULE: No u
 RULE-ID: system.invalid-combinations SCOPE: design-system-component TYPE: MUST TOPIC: state RULE: Make invalid supported-option combinations fail clearly at the owning component. DESCRIPTION: Do not silently render broken or misleading chrome.
 
 RULE-ID: system.visual-behavior-contract SCOPE: global TYPE: MUST TOPIC: consistency RULE: Make elements that look alike behave alike. DESCRIPTION: Visual similarity teaches a behavioral expectation that must transfer across the product.
+
+RULE-ID: system.task-value SCOPE: product-interface TYPE: SHOULD TOPIC: system RULE: Evaluate each control, message, field, and visual element against the user's current task: establish what it helps the user understand, decide, or do, whether its wording and appearance predict its behavior, and what useful information or ability would be lost without it. Keep useful elements, revise misleading ones, remove unnecessary ones, and surface unknown product behavior instead of inventing a justification. DESCRIPTION: Apply this review to the complete interface, including elements inherited from a request or an earlier design; `system.semantic-coherence` and `surfaces.light-first` own the binding requirements for coherence and visible additions.
+
+## Completion review
+
+RULE-ID: delivery.custodian-review SCOPE: feature-completion TYPE: MUST TOPIC: quality RULE: Automatically obtain Custodian review of the current finished output after implementation and verification, and require Pass before an unqualified feature-completion claim. DESCRIPTION: This review is automatic after implementation and verification; no separate user request is needed. Review the current delivered result and relevant evidence, including rendered UI and observed interactions when the feature has an interface. A plan, self-assessment, passing build, or test suite alone is not completion approval. Resolve findings through the owning skill and re-review affected output; a material change invalidates its earlier verdict. Missing required evidence leaves the feature unverified, not done.
 
 ## Accessibility and perception
 
@@ -70,7 +78,7 @@ RULE-ID: accessibility.no-flashing SCOPE: motion TYPE: MUST TOPIC: accessibility
 
 ## Interaction, trust, and state
 
-RULE-ID: interaction.visible-response SCOPE: interactive TYPE: MUST TOPIC: feedback RULE: Give every user action a perceivable response. DESCRIPTION: Feedback may be immediate state, progress, navigation, or a message, but the product must not feel silent or broken.
+RULE-ID: interaction.visible-response SCOPE: interactive TYPE: MUST TOPIC: feedback RULE: Give every user action a perceivable response without duplicating an outcome already communicated. DESCRIPTION: Immediate state, progress, navigation, resulting content, or reliable browser or operating-system feedback can provide the response; apply `RULE-ID: feedback.sufficient` before adding a message.
 
 RULE-ID: interaction.data-change SCOPE: data-change TYPE: MUST TOPIC: trust RULE: Make the intent and outcome of every data change visible. DESCRIPTION: Before an edit, move, toggle, or automated choice acts, users must understand what will change; afterward, show the resulting state.
 
@@ -102,13 +110,19 @@ RULE-ID: interaction.passive SCOPE: global TYPE: MUST TOPIC: interaction RULE: K
 
 RULE-ID: interaction.hover SCOPE: interactive TYPE: MUST TOPIC: interaction RULE: Apply hover treatment only to interactive elements. DESCRIPTION: Hover on passive content creates a false affordance.
 
+RULE-ID: interaction.cursor SCOPE: pointer-interface TYPE: MUST TOPIC: interaction RULE: Use only a hand cursor for elements that allow interaction and the normal arrow cursor for elements that do not; do not use any other cursor shape. DESCRIPTION: Apply the same distinction to text fields, drag handles, resize controls, and unavailable elements. Text-selection, grab, resize, busy, and prohibited cursor shapes are excluded; communicate those roles and states through the element's visible presentation and behavior.
+
 RULE-ID: interaction.primary-region SCOPE: action-region TYPE: MUST TOPIC: interaction RULE: Use at most one primary forward action in one action region. DESCRIPTION: A page may contain distinct regions with their own local action hierarchy; unrelated actions must not compete as peers.
 
 RULE-ID: interaction.secondary-utilities-overflow SCOPE: secondary-action TYPE: MUST TOPIC: hierarchy RULE: Put occasional utility actions such as copy or export inside the overflow menu instead of presenting them as persistent buttons beside it. DESCRIPTION: Keep visible action space for the current primary task; expose a secondary utility directly only when the product explicitly identifies it as a frequent primary task.
 
 RULE-ID: interaction.automation-control SCOPE: automated-action TYPE: MUST TOPIC: trust RULE: Let users inspect, adjust, or reverse meaningful automated choices. DESCRIPTION: Automation should reduce work without making consequential decisions mysterious.
 
+RULE-ID: interaction.repeat-action SCOPE: interactive TYPE: MUST TOPIC: interaction RULE: Reuse an available, understandable original control for repeating or retrying the same action. DESCRIPTION: Add a separate action only when it serves a distinct outcome, scope, or necessary recovery path; another location or a new success message alone does not justify a duplicate control.
+
 ## Layout, density, and surfaces
+
+RULE-ID: layout.relationships SCOPE: layout TYPE: MUST TOPIC: layout RULE: Keep information, controls, and actions together according to what they affect. DESCRIPTION: Use proximity and alignment to make the relationship visible; preserve the group when space requires wrapping, and do not separate related parts merely because they are different component types.
 
 RULE-ID: layout.normal-flow SCOPE: layout TYPE: SHOULD TOPIC: layout RULE: Use normal document flow before manual layering. DESCRIPTION: Grid, flex, intrinsic sizing, and component-owned layout adapt more reliably than magic offsets.
 
@@ -119,6 +133,8 @@ RULE-ID: layout.z-index SCOPE: layout TYPE: MUST TOPIC: layout RULE: Use defined
 RULE-ID: layout.component-spacing SCOPE: design-system TYPE: MUST TOPIC: layout RULE: Let components own internal padding and containers own surrounding layout. DESCRIPTION: Containers control gaps, margins, width, placement, and page composition.
 
 RULE-ID: layout.start-alignment SCOPE: layout TYPE: SHOULD TOPIC: layout RULE: Align ordinary content to the block start and direction-aware inline start by default. DESCRIPTION: A shared starting edge gives related elements a stable visual origin for scanning, comparison, and wrapping; choose center, end, baseline, or distributed alignment only when it materially improves the content's meaning, comparison, or operation, because available space or visual symmetry alone does not justify the departure.
+
+RULE-ID: layout.complete-arrangement SCOPE: layout TYPE: SHOULD TOPIC: layout RULE: Review the complete arrangement: align related fields, size repeated controls consistently, and make visually connected elements form a continuous structure. DESCRIPTION: Judge relationships across the whole group rather than each element in isolation; preserve the separation and internal insets required by `layout.breathing-room`.
 
 RULE-ID: layout.breathing-room SCOPE: layout TYPE: MUST TOPIC: density RULE: Preserve visible breathing room between distinct adjacent elements. DESCRIPTION: Choose a tokenized gap by relationship and visual weight; a declared gap does not satisfy this rule when independently perceivable elements still render as touching or near-touching. EXCEPT: Parts may meet only when contact itself communicates a documented connected composite or an intentional continuous structure such as a table grid, chart, or full-bleed surface; text and controls within that structure still require deliberate internal insets.
 
@@ -132,11 +148,13 @@ RULE-ID: layout.no-page-horizontal-scroll SCOPE: page-layout TYPE: MUST TOPIC: l
 
 RULE-ID: layout.supported-viewports SCOPE: page-layout TYPE: MUST TOPIC: layout RULE: Support the consuming product's documented viewport range. DESCRIPTION: Do not invent a new minimum width or responsive tier inside a feature.
 
+RULE-ID: layout.desktop-target SCOPE: desktop-layout TYPE: SHOULD TOPIC: layout RULE: Optimize desktop layouts for a 1920 × 1080 display, accounting for the usable application area after browser or operating-system chrome and display scaling. DESCRIPTION: Use 1080p as the desktop design target, not a fixed page size or minimum viewport; `layout.supported-viewports` still governs adaptation to other sizes, and `typography.size-ladder` governs text and control sizing.
+
 RULE-ID: layout.stability SCOPE: dynamic-layout TYPE: SHOULD TOPIC: layout RULE: Keep existing content visually stable during loading and updates. DESCRIPTION: Reserve known space and avoid unexpected shifts around the user's reading position.
 
 RULE-ID: density.data-not-chrome SCOPE: data-display TYPE: SHOULD TOPIC: density RULE: Separate information density from interface density. DESCRIPTION: Dense data can remain readable without giving every value a box, icon, tag, or tooltip.
 
-RULE-ID: content.scannable SCOPE: product-interface TYPE: MUST TOPIC: hierarchy RULE: Make operational interfaces scannable before they are exhaustive. DESCRIPTION: Lead with the point, group related information, keep labels and text blocks brief, and reveal supporting detail only when it helps the task, consequence, recovery, or accessibility; when additional explanation has no demonstrated value, omit it.
+RULE-ID: content.scannable SCOPE: product-interface TYPE: MUST TOPIC: hierarchy RULE: Make operational interfaces scannable before they are exhaustive; retain optional text, feedback, controls, and containers only when removing them would harm successful use or necessary understanding. DESCRIPTION: Lead with the point, group related information, keep labels and text blocks brief, and reveal supporting detail only when it helps the task, consequence, recovery, or accessibility; when additional explanation has no demonstrated value, omit it. Before retaining optional text, feedback, a control, or a container, identify the uncertainty it resolves or task it enables; remove it when its absence changes neither successful use nor necessary understanding.
 
 RULE-ID: content.body-is-primary SCOPE: product-interface TYPE: MUST TOPIC: hierarchy RULE: Treat body content as primary content, never as supporting text to de-emphasize. DESCRIPTION: The content a surface exists to show keeps the default type size and the prominent text color. Supporting data means metadata in a footer, a side note, or a hint, and is signalled by the muted color and by placement, not by shrinking it; body text under a heading is content, not supporting data.
 
@@ -174,27 +192,41 @@ RULE-ID: typography.editorial-mode SCOPE: page-content TYPE: MUST TOPIC: typogra
 
 ## Forms and validation behavior
 
+RULE-ID: forms.interaction-baseline SCOPE: forms TYPE: MUST TOPIC: forms RULE: Use the forms and validation rules as the baseline for every form, and specify any context-required deviation explicitly before implementing it. DESCRIPTION: Guide users when something needs attention and otherwise leave the interaction quiet; an assumed special case is not an exception.
+
+RULE-ID: forms.action-scope SCOPE: forms TYPE: MUST TOPIC: layout RULE: Place an action affecting one field beside that field within the same labeled row; place actions committing or cancelling the whole form after the complete form. DESCRIPTION: Determine placement from the action's scope, not its button type; field-specific actions remain with their field even inside a larger form. Preserve this grouping when a narrow layout requires wrapping, using the consuming product's supported composition.
+
 RULE-ID: forms.horizontal-layout SCOPE: forms TYPE: SHOULD TOPIC: layout RULE: Arrange form controls as horizontal labeled rows by default. DESCRIPTION: Keep labels in one stable leading column with their controls beside them so related fields scan quickly; use the consuming product's established labeled-row pattern when it exists. EXCEPT: Stack a label above its control when the product explicitly requires a vertical form or a documented narrow-layout constraint makes the horizontal row unreadable.
 
 RULE-ID: forms.label SCOPE: form-control TYPE: MUST TOPIC: forms RULE: Give every form control a persistent accessible label. DESCRIPTION: The control must remain understandable when empty, populated, focused, or reporting an error.
 
-RULE-ID: forms.validation-timing SCOPE: forms TYPE: SHOULD TOPIC: validation RULE: Validate after meaningful interaction rather than on every keystroke. DESCRIPTION: Blur is a useful default when the control has a natural blur moment.
+RULE-ID: forms.validation-timing SCOPE: forms TYPE: MUST TOPIC: validation RULE: Validate a field when the user leaves it, not while they are typing; keep an existing error visible during correction and validate again when they leave the field. DESCRIPTION: Let the user finish before judging their input. An empty required field follows the same timing as any other invalid value; `forms.submit-validation` governs validation when the user moves the form forward.
 
-RULE-ID: forms.submit-validation SCOPE: forms TYPE: MUST TOPIC: validation RULE: Validate all relevant fields on submit. DESCRIPTION: Show the complete current error set and move attention to the first error when necessary.
+RULE-ID: forms.submit-validation SCOPE: forms TYPE: MUST TOPIC: validation RULE: Validate the whole form when the user takes the action that moves it forward, and show every known error subject to `forms.error-priority`; if the first invalid field is offscreen, scroll it into view and focus it. Let users correct errors in any order. DESCRIPTION: Submit-time feedback reveals all areas needing attention without forcing a correction sequence or showing every competing message for one area.
 
-RULE-ID: forms.local-error SCOPE: form-control TYPE: MUST TOPIC: validation RULE: Keep field-specific validation next to its field. DESCRIPTION: Form-level feedback is for request, permission, conflict, timeout, or service failures that do not belong to one input.
+RULE-ID: forms.local-error SCOPE: form-control TYPE: MUST TOPIC: validation RULE: Show a field-specific error directly below its field whenever possible, otherwise in the nearest clearly associated location, and expose that association to screen readers. Put failures affecting the whole form at the top of the form. DESCRIPTION: An empty required field needs the same local correction guidance as another invalid value. Request, permission, conflict, timeout, or service failures belong at form level only when they do not belong to one input; `accessibility.color-independent` and `copy.errors.problem-fix` govern perceivable meaning and recovery wording.
 
-RULE-ID: forms.clear-resolved-error SCOPE: form-control TYPE: MUST TOPIC: validation RULE: Remove an error when its condition is no longer true. DESCRIPTION: Stale errors make corrected input look broken.
+RULE-ID: forms.clear-resolved-error SCOPE: form-control TYPE: MUST TOPIC: validation RULE: Remove an error when validation confirms that its condition is no longer true. DESCRIPTION: Recheck at the moments defined by `forms.validation-timing` and `forms.submit-validation`; do not clear an error merely because typing resumed or leave it visible after a successful recheck.
 
-RULE-ID: forms.forgiving-input SCOPE: form-control TYPE: SHOULD TOPIC: forms RULE: Accept reasonable human input formats and normalize internally. DESCRIPTION: Do not force users to reproduce storage formatting when the intended value is unambiguous.
+RULE-ID: forms.error-priority SCOPE: validation-area TYPE: MUST TOPIC: validation RULE: Show only the highest-priority error in one area, then reveal the next relevant error after it is resolved. DESCRIPTION: Give the user one clear correction at a time within an area; errors in different fields remain visible together under `forms.submit-validation`. EXCEPT: Show multiple errors in one area when they identify separate, independently actionable problems the user needs to see together, such as different lines in a code block; connect each message to its specific input location.
 
-RULE-ID: forms.submit-reachable SCOPE: forms TYPE: MUST TOPIC: forms RULE: Keep submission reachable when submit-time feedback is the recovery path. DESCRIPTION: Do not strand the user behind an unexplained disabled button. EXCEPT: Disable submission while a duplicate request is already processing or when action would be unsafe.
+RULE-ID: forms.valid-state SCOPE: form-control TYPE: MUST TOPIC: feedback RULE: Leave valid fields in their normal state; do not add success borders, checkmarks, or messages merely to confirm that a value is correct. DESCRIPTION: The normal field state means no correction is needed; extra feedback is reserved for information that needs attention.
+
+RULE-ID: forms.hint-error-priority SCOPE: form-control TYPE: MUST TOPIC: validation RULE: Show supporting hint text only while its field has no error; replace the hint with the error message while invalid and restore it when the error is resolved. DESCRIPTION: Correction guidance takes priority over routine supporting text; retain any information needed to fix the value in the error itself.
+
+RULE-ID: forms.forgiving-input SCOPE: form-control TYPE: MUST TOPIC: forms RULE: Accept and normalize familiar input formats when their meaning is unambiguous; never silently change the user's intended value, and explain what needs correction when interpretation is uncertain. DESCRIPTION: Phone numbers may include spaces, and dates may use familiar separators when the date remains unambiguous. Flexible input does not change the product's date-display or storage contract.
+
+RULE-ID: forms.submit-reachable SCOPE: forms TYPE: MUST TOPIC: forms RULE: Keep the action that moves a form forward available while the form is incomplete so the user can trigger validation and learn what needs fixing. DESCRIPTION: An incomplete or invalid field is a reason to show recovery guidance, not to hide it behind a disabled action. EXCEPT: Prevent a duplicate request while submission is processing, and keep an action unavailable when invoking it would be unsafe beyond ordinary validation failure.
+
+RULE-ID: forms.submitting SCOPE: forms TYPE: MUST TOPIC: feedback RULE: After validation passes and the form is sent, visibly show processing and prevent duplicate submission until the request finishes. DESCRIPTION: Use the action's supported loading state under `system.component-state-contract`; failure recovery preserves entered values under `interaction.preserve-work`.
 
 RULE-ID: forms.selection-pattern SCOPE: choice-control TYPE: MUST TOPIC: forms RULE: Match the control to the selection model. DESCRIPTION: Use checkboxes for multi-select, radios for a short single-select set, and a picker or select for larger sets.
 
 RULE-ID: forms.choice-label-scope SCOPE: checkbox-radio-switch TYPE: MUST TOPIC: accessibility RULE: Give each individual choice its own adjacent label and label a collection separately only when the collection needs a group name. DESCRIPTION: A checkbox, radio option, or switch label explains that control and shares its activation target; a group label names the decision represented by multiple options and must not duplicate a standalone control label.
 
 ## Loading and feedback behavior
+
+RULE-ID: feedback.sufficient SCOPE: feedback TYPE: MUST TOPIC: feedback RULE: Count existing control, content, browser, and operating-system feedback; add a message only when that feedback leaves a user need unanswered. DESCRIPTION: Count perceivable feedback already provided by the control, resulting content, browser, or operating system. Do not repeat clear success or add reassurance for hypothetical uncertainty; retain truthful activity, actionable failures, and necessary recovery when existing feedback does not cover them.
 
 RULE-ID: feedback.unknown-progress SCOPE: loading TYPE: SHOULD TOPIC: feedback RULE: Use activity feedback when duration cannot be measured. DESCRIPTION: A spinner or equivalent activity state communicates work without pretending to know completion.
 
@@ -226,7 +258,9 @@ RULE-ID: navigation.information-scent SCOPE: navigation-label TYPE: MUST TOPIC: 
 
 RULE-ID: data.user-importance SCOPE: data-display TYPE: MUST TOPIC: data-display RULE: Order information by user importance rather than storage order. DESCRIPTION: Lead with the human-recognizable name or label, current state, or signal that changes what the user should do now. Keep opaque internal identifiers secondary unless people genuinely use them for lookup, disambiguation, support, audit, or communication.
 
-RULE-ID: content.truncation SCOPE: content-display TYPE: MAY TOPIC: hierarchy RULE: Allow intentional truncation for secondary or supporting text. DESCRIPTION: Treat truncation as a defect only when it hides task-primary information, an action, state, consequence, required recovery, or otherwise harms task success or accessibility.
+RULE-ID: content.truncation SCOPE: content-display TYPE: MAY TOPIC: hierarchy RULE: Choose intentional truncation or wrapping for secondary or supporting text according to the context and what people need to read. DESCRIPTION: content.truncation-disclosure governs the indication and access to full content. Treat truncation as a defect only when it hides task-primary information, an action, state, consequence, required recovery, or otherwise harms task success or accessibility.
+
+RULE-ID: content.truncation-disclosure SCOPE: truncated-content TYPE: MUST TOPIC: hierarchy RULE: Indicate truncated text with an ellipsis and keep the full content accessible through the established disclosure pattern. DESCRIPTION: copy.ellipsis distinguishes this display treatment from authored punctuation; tooltips.overflow governs clipped-text previews when the disclosure uses a tooltip.
 
 RULE-ID: data.consistent-order SCOPE: data-display TYPE: SHOULD TOPIC: data-display RULE: Keep comparable views in the same information order. DESCRIPTION: Stable ordering improves scanning, comparison, and learned behavior.
 

@@ -1,88 +1,98 @@
 <div class="cx-filter-bar" [class.cx-filter-bar--query]="mode$() === 'query'">
-  <div class="cx-filter-bar__left">
-    @if (mode$() === 'filters') {
-      @if (filters$().length > 0) {
-        <div class="cx-filter-bar__filter-trigger" #filterTriggerAnchor>
-          <cx-icon-button
-            icon="filters"
-            [ariaLabel]="filterButtonAriaLabel$()"
-            mood="default"
-            [badgeValue]="activeFilterCount$() > 0 ? '' : undefined"
-            (pressed)="toggleFilterPopover()"
+  <div class="cx-filter-bar__refinements">
+    <div class="cx-filter-bar__left">
+      @if (mode$() === "filters") {
+        @if (filters$().length > 0) {
+          <div class="cx-filter-bar__filter-trigger" #filterTriggerAnchor>
+            <cx-icon-button
+              icon="filters"
+              [ariaLabel]="filterButtonAriaLabel$()"
+              mood="default"
+              [badgeValue]="activeFilterCount$() > 0 ? '' : undefined"
+              (pressed)="toggleFilterPopover()"
+            />
+          </div>
+        }
+
+        @if (quickFilters$().length > 0) {
+          <!-- Quick filters stay small on purpose: they are a compact scope strip, not primary controls. -->
+          <cx-button-group
+            size="small"
+            [availableValues]="quickFilters$()"
+            [value]="selectedQuickFilterId$()"
+            (valueChange)="onQuickFilterSelect($event)"
+          />
+        }
+
+        @if (toggleFilters$().length > 0) {
+          <!-- Same scope strip as the quick filters, so the same small size. -->
+          <cx-toggle-chip-group
+            size="small"
+            selection="multiple"
+            [availableValues]="toggleFilters$()"
+            [selectedValues]="selectedToggleFilterIds$()"
+            (selectedValuesChange)="onToggleFilterSelect($event)"
+          />
+        }
+      } @else {
+        <div class="cx-filter-bar__query">
+          <cx-query-field
+            label=""
+            [ariaLabel]="queryAriaLabel"
+            [fields]="resolvedQueryFields$()"
+            [value]="resolvedQueryConditions$()"
+            [growVertically]="false"
+            (valueChange)="onQueryConditionsChange($event)"
+            (valueSearch)="queryValueSearch.emit($event)"
+            (valueRetry)="queryValueRetry.emit($event)"
           />
         </div>
       }
+    </div>
 
-      @if (quickFilters$().length > 0) {
-        <!-- Quick filters stay small on purpose: they are a compact scope strip, not primary controls. -->
-        <cx-button-group
-          size="small"
-          [availableValues]="quickFilters$()"
-          [value]="selectedQuickFilterId$()"
-          (valueChange)="onQuickFilterSelect($event)"
-        />
-      }
-
-      @if (toggleFilters$().length > 0) {
-        <!-- Same scope strip as the quick filters, so the same small size. -->
-        <cx-toggle-chip-group
-          size="small"
-          selection="multiple"
-          [availableValues]="toggleFilters$()"
-          [selectedValues]="selectedToggleFilterIds$()"
-          (selectedValuesChange)="onToggleFilterSelect($event)"
-        />
-      }
-    } @else {
-      <div class="cx-filter-bar__query">
-        <cx-query-field
-          label=""
-          [ariaLabel]="queryAriaLabel"
-          [fields]="resolvedQueryFields$()"
-          [value]="resolvedQueryConditions$()"
-          [growVertically]="false"
-          (valueChange)="onQueryConditionsChange($event)"
-          (valueSearch)="queryValueSearch.emit($event)"
-          (valueRetry)="queryValueRetry.emit($event)"
-        />
+    @if (
+      mode$() === "filters" &&
+      showActiveFilters$() &&
+      activeFilterTags$().length > 0
+    ) {
+      <div class="cx-filter-bar__active-filters" #activeFiltersRegion>
+        @if (hiddenActiveFilterCount$() > 0) {
+          <button
+            #activeFilterOverflowAnchor
+            type="button"
+            class="cx-filter-bar__active-filters-more"
+            [attr.aria-label]="moreActiveFiltersLabel$()"
+            [attr.aria-expanded]="overflowFilterPopoverOpen$()"
+            [attr.aria-controls]="
+              overflowFilterPopoverOpen$() ? overflowFilterDialogId : null
+            "
+            (click)="onMoreActiveFiltersPressed()"
+          >
+            +{{ hiddenActiveFilterCount$() }}
+          </button>
+        }
+        <!-- Reversed on purpose: row-reverse renders DOM order right-to-left, so
+             this keeps the visual order matching the filter list. -->
+        @for (tag of activeFilterTagsRow$(); track tag.id; let index = $index) {
+          <cx-tag
+            #activeFilterTag
+            class="cx-filter-bar__active-filter"
+            [class.cx-filter-bar__active-filter--hidden]="
+              isActiveFilterTagHidden(index)
+            "
+            [text]="tag.text"
+            [interactive]="true"
+            [ariaLabel]="activeFilterTagAriaLabel(tag.text)"
+            [expanded]="isTagFilterOpen(tag.id)"
+            [controls]="isTagFilterOpen(tag.id) ? tagFilterDialogId : undefined"
+            [dismissible]="true"
+            (pressed)="onActiveFilterTagPressed(tag.id)"
+            (dismiss)="onActiveFilterDismiss(tag.id)"
+          />
+        }
       </div>
     }
   </div>
-
-  @if (mode$() === 'filters' && showActiveFilters$() && activeFilterTags$().length > 0) {
-    <div class="cx-filter-bar__active-filters" #activeFiltersRegion>
-      @if (hiddenActiveFilterCount$() > 0) {
-        <button
-          #activeFilterOverflowAnchor
-          type="button"
-          class="cx-filter-bar__active-filters-more"
-          [attr.aria-label]="moreActiveFiltersLabel$()"
-          [attr.aria-expanded]="overflowFilterPopoverOpen$()"
-          [attr.aria-controls]="overflowFilterPopoverOpen$() ? overflowFilterDialogId : null"
-          (click)="onMoreActiveFiltersPressed()"
-        >
-          +{{ hiddenActiveFilterCount$() }}
-        </button>
-      }
-      <!-- Reversed on purpose: row-reverse renders DOM order right-to-left, so
-           this keeps the visual order matching the filter list. -->
-      @for (tag of activeFilterTagsRow$(); track tag.id; let index = $index) {
-        <cx-tag
-          #activeFilterTag
-          class="cx-filter-bar__active-filter"
-          [class.cx-filter-bar__active-filter--hidden]="isActiveFilterTagHidden(index)"
-          [text]="tag.text"
-          [interactive]="true"
-          [ariaLabel]="activeFilterTagAriaLabel(tag.text)"
-          [expanded]="isTagFilterOpen(tag.id)"
-          [controls]="isTagFilterOpen(tag.id) ? tagFilterDialogId : undefined"
-          [dismissible]="true"
-          (pressed)="onActiveFilterTagPressed(tag.id)"
-          (dismiss)="onActiveFilterDismiss(tag.id)"
-        />
-      }
-    </div>
-  }
 
   <div class="cx-filter-bar__right">
     @if (savedViews$().length > 0) {
@@ -96,7 +106,8 @@
         <cx-icon-button
           cxMenuTrigger
           [icon]="savedViewIcon$()"
-          ariaLabel="Saved views" variant="transparent"
+          ariaLabel="Saved views"
+          variant="transparent"
         />
       </cx-menu>
     }
@@ -104,27 +115,32 @@
     <div class="cx-filter-bar__properties-trigger" #propertiesTriggerAnchor>
       <cx-icon-button
         icon="properties"
-        ariaLabel="Table properties" variant="transparent"
+        ariaLabel="Table properties"
+        variant="transparent"
         (pressed)="togglePropertiesPopover()"
       />
     </div>
 
+    <div class="cx-filter-bar__actions">
+      <ng-content select="[filter-bar-actions]" />
+    </div>
+
     @if (actions.length) {
-    <cx-menu
-      [presentation]="{ kind: 'trigger' }"
-      [items]="actions"
-      (openChange)="onOverflowOpenChange($event)"
-      (itemSelect)="actionSelect.emit($event)"
-    >
-      <cx-icon-button
-        cxMenuTrigger
-        icon="menu-vertical"
-        ariaLabel="View actions" variant="transparent"
-      />
-    </cx-menu>
+      <cx-menu
+        [presentation]="{ kind: 'trigger' }"
+        [items]="actions"
+        (openChange)="onOverflowOpenChange($event)"
+        (itemSelect)="actionSelect.emit($event)"
+      >
+        <cx-icon-button
+          cxMenuTrigger
+          icon="menu-vertical"
+          ariaLabel="View actions"
+          variant="transparent"
+        />
+      </cx-menu>
     }
   </div>
-
 </div>
 
 <cx-popover
@@ -144,12 +160,19 @@
   (backdropPressed)="closeFloatingPopovers()"
 >
   @if (activeFilterCount$() > 0) {
-    <button actions type="button" class="cx-filter-bar__filter-clear" (click)="clearAllFilters()">
+    <button
+      actions
+      type="button"
+      class="cx-filter-bar__filter-clear"
+      (click)="clearAllFilters()"
+    >
       Clear all
     </button>
   }
 
-  <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--filters">
+  <div
+    class="cx-filter-bar__popover-content cx-filter-bar__popover-content--filters"
+  >
     <cx-tabs
       class="cx-filter-bar__filter-tabs"
       ariaLabel="Filter views"
@@ -164,7 +187,9 @@
       class="cx-filter-bar__filter-view"
       [id]="filterListPanelId"
       role="tabpanel"
-      [attr.aria-labelledby]="filterListPanelId + '-tab-' + (filterView$() === 'recommended' ? 0 : 1)"
+      [attr.aria-labelledby]="
+        filterListPanelId + '-tab-' + (filterView$() === 'recommended' ? 0 : 1)
+      "
     >
       <cx-text-field
         #filterSearchControl
@@ -205,13 +230,21 @@
                    renders neither; the tag popover has no such chrome. -->
               <ng-container
                 [ngTemplateOutlet]="columnFilterEditor"
-                [ngTemplateOutletContext]="{ filter, label: '', showClear: false }"
+                [ngTemplateOutletContext]="{
+                  filter,
+                  label: '',
+                  showClear: false,
+                }"
               />
             }
           </cx-expansion-panel>
         } @empty {
           <div class="cx-filter-bar__filter-empty" role="status">
-            {{ filterSearchValue$().trim() ? 'No matching filters' : 'No recommended filters' }}
+            {{
+              filterSearchValue$().trim()
+                ? "No matching filters"
+                : "No recommended filters"
+            }}
           </div>
         }
       </div>
@@ -221,7 +254,12 @@
 
 <cx-popover
   #tagFilterPopover
-  [open]="tagFilter$() !== undefined && tagFilterMetrics$() !== undefined && mode$() === 'filters' && showActiveFilters$()"
+  [open]="
+    tagFilter$() !== undefined &&
+    tagFilterMetrics$() !== undefined &&
+    mode$() === 'filters' &&
+    showActiveFilters$()
+  "
   [showBackdrop]="true"
   [left]="tagFilterMetrics$()?.left"
   [top]="tagFilterMetrics$()?.top"
@@ -241,7 +279,11 @@
            Clear action because nothing around it does. -->
       <ng-container
         [ngTemplateOutlet]="columnFilterEditor"
-        [ngTemplateOutletContext]="{ filter, label: filter.label, showClear: true }"
+        [ngTemplateOutletContext]="{
+          filter,
+          label: filter.label,
+          showClear: true,
+        }"
       />
     </div>
   }
@@ -249,7 +291,12 @@
 
 <cx-popover
   #activeFilterOverflowPopover
-  [open]="overflowFilterPopoverOpen$() && hiddenActiveFilters$().length > 0 && mode$() === 'filters' && showActiveFilters$()"
+  [open]="
+    overflowFilterPopoverOpen$() &&
+    hiddenActiveFilters$().length > 0 &&
+    mode$() === 'filters' &&
+    showActiveFilters$()
+  "
   [showBackdrop]="true"
   heading="More active filters"
   [left]="overflowFilterMetrics$()?.left"
@@ -308,36 +355,63 @@
   (secondary)="keepQueryMode()"
 >
   <div body class="cx-filter-bar__translation">
-    <div class="cx-filter-bar__translation-query" aria-label="Query translation preview">
-      @for (condition of resolvedQueryConditions$(); track condition.id; let first = $first) {
+    <div
+      class="cx-filter-bar__translation-query"
+      aria-label="Query translation preview"
+    >
+      @for (
+        condition of resolvedQueryConditions$();
+        track condition.id;
+        let first = $first
+      ) {
         @if (!first) {
           <span
             class="cx-filter-bar__translation-token cx-filter-bar__translation-token--join"
-            [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'join')"
-          >{{ (condition.join ?? 'and').toUpperCase() }}</span>
+            [class.cx-filter-bar__translation-token--unsupported]="
+              queryTranslationPartUnsupported(condition.id, 'join')
+            "
+            >{{ (condition.join ?? "and").toUpperCase() }}</span
+          >
         }
         <span
           class="cx-filter-bar__translation-token"
-          [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'field')"
-        >{{ queryConditionFieldLabel(condition) }}</span>
+          [class.cx-filter-bar__translation-token--unsupported]="
+            queryTranslationPartUnsupported(condition.id, 'field')
+          "
+          >{{ queryConditionFieldLabel(condition) }}</span
+        >
         <span
           class="cx-filter-bar__translation-token"
-          [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'operator')"
-        >{{ queryConditionOperatorLabel(condition) }}</span>
+          [class.cx-filter-bar__translation-token--unsupported]="
+            queryTranslationPartUnsupported(condition.id, 'operator')
+          "
+          >{{ queryConditionOperatorLabel(condition) }}</span
+        >
         @if (queryConditionHasValue(condition)) {
           <span
             class="cx-filter-bar__translation-token"
-            [class.cx-filter-bar__translation-token--unsupported]="queryTranslationPartUnsupported(condition.id, 'value')"
-          >{{ queryConditionValueLabel(condition) }}</span>
+            [class.cx-filter-bar__translation-token--unsupported]="
+              queryTranslationPartUnsupported(condition.id, 'value')
+            "
+            >{{ queryConditionValueLabel(condition) }}</span
+          >
         }
       }
     </div>
 
-    <p class="cx-filter-bar__translation-summary">{{ queryTranslationSummary$() }}</p>
+    <p class="cx-filter-bar__translation-summary">
+      {{ queryTranslationSummary$() }}
+    </p>
 
     @if (pendingQueryTranslationState(); as translation) {
-      <ul class="cx-filter-bar__translation-issues" aria-label="Conditions that will be removed">
-        @for (issue of translation.issues; track issue.conditionId + '-' + issue.part) {
+      <ul
+        class="cx-filter-bar__translation-issues"
+        aria-label="Conditions that will be removed"
+      >
+        @for (
+          issue of translation.issues;
+          track issue.conditionId + "-" + issue.part
+        ) {
           <li>
             <strong>{{ queryTranslationIssueLabel(issue) }}</strong>
             <span>{{ issue.reason }}</span>
@@ -351,7 +425,12 @@
 <!-- One editor wiring for every surface in this bar: the definition, the
      current value and the three outputs can never drift between them. Only
      the surrounding chrome differs, through label and showClear. -->
-<ng-template #columnFilterEditor let-filter="filter" let-label="label" let-showClear="showClear">
+<ng-template
+  #columnFilterEditor
+  let-filter="filter"
+  let-label="label"
+  let-showClear="showClear"
+>
   <cx-column-filter-editor
     class="cx-filter-bar__filter-editor"
     [label]="label"
@@ -381,8 +460,12 @@
   surfaceVariant="grouped"
   (backdropPressed)="closeFloatingPopovers()"
 >
-  <div class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties">
-    <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
+  <div
+    class="cx-filter-bar__popover-content cx-filter-bar__popover-content--properties"
+  >
+    <section
+      class="cx-filter-bar__properties-section cx-filter-bar__properties-island"
+    >
       <cx-option-group label="Display" />
       <div class="cx-filter-bar__properties-section-body">
         <cx-button-group
@@ -397,7 +480,9 @@
     </section>
 
     @if (hasGroupByControls$()) {
-      <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
+      <section
+        class="cx-filter-bar__properties-section cx-filter-bar__properties-island"
+      >
         <cx-option-group label="Group by" />
         <div class="cx-filter-bar__properties-section-body">
           <cx-dropdown
@@ -413,62 +498,72 @@
 
     @if (hasSortControls$()) {
       <div class="cx-filter-bar__properties-island">
-      <section class="cx-filter-bar__properties-section">
-        <cx-option-group label="Sort by" />
-        <div class="cx-filter-bar__properties-section-body">
-          <div class="cx-filter-bar__sort-row">
-            <cx-dropdown
-              class="cx-filter-bar__sort-select"
-              label=""
-              ariaLabel="Sort by"
-              placeholder="Select column"
-              [availableValues]="sortOptions$()"
-              [value]="sortBy$()"
-              (valueChange)="onSortByValueChange($event)"
-            />
-            <cx-tooltip [text]="directionTooltip(sortDirection$())" position="top">
-              <cx-icon-button
-                [icon]="directionIcon(sortDirection$())"
-                ariaLabel="Toggle primary sort direction" variant="transparent"
-                [disabled]="!hasActivePrimarySort()"
-                (pressed)="toggleSortDirection()"
+        <section class="cx-filter-bar__properties-section">
+          <cx-option-group label="Sort by" />
+          <div class="cx-filter-bar__properties-section-body">
+            <div class="cx-filter-bar__sort-row">
+              <cx-dropdown
+                class="cx-filter-bar__sort-select"
+                label=""
+                ariaLabel="Sort by"
+                placeholder="Select column"
+                [availableValues]="sortOptions$()"
+                [value]="sortBy$()"
+                (valueChange)="onSortByValueChange($event)"
               />
-            </cx-tooltip>
+              <cx-tooltip
+                [text]="directionTooltip(sortDirection$())"
+                position="top"
+              >
+                <cx-icon-button
+                  [icon]="directionIcon(sortDirection$())"
+                  ariaLabel="Toggle primary sort direction"
+                  variant="transparent"
+                  [disabled]="!hasActivePrimarySort()"
+                  (pressed)="toggleSortDirection()"
+                />
+              </cx-tooltip>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      @if (hasThenByControls$()) {
-      <section class="cx-filter-bar__properties-section">
-        <cx-option-group label="Then by" />
-        <div class="cx-filter-bar__properties-section-body">
-          <div class="cx-filter-bar__sort-row">
-            <cx-dropdown
-              class="cx-filter-bar__sort-select"
-              label=""
-              ariaLabel="Then by"
-              placeholder="Select column"
-              [availableValues]="sortOptions$()"
-              [value]="thenBy$()"
-              (valueChange)="onThenByValueChange($event)"
-            />
-            <cx-tooltip [text]="directionTooltip(thenByDirection$())" position="top">
-              <cx-icon-button
-                [icon]="directionIcon(thenByDirection$())"
-                ariaLabel="Toggle secondary sort direction" variant="transparent"
-                [disabled]="!hasActiveSecondarySort()"
-                (pressed)="toggleThenByDirection()"
-              />
-            </cx-tooltip>
-          </div>
-        </div>
-      </section>
-      }
+        @if (hasThenByControls$()) {
+          <section class="cx-filter-bar__properties-section">
+            <cx-option-group label="Then by" />
+            <div class="cx-filter-bar__properties-section-body">
+              <div class="cx-filter-bar__sort-row">
+                <cx-dropdown
+                  class="cx-filter-bar__sort-select"
+                  label=""
+                  ariaLabel="Then by"
+                  placeholder="Select column"
+                  [availableValues]="sortOptions$()"
+                  [value]="thenBy$()"
+                  (valueChange)="onThenByValueChange($event)"
+                />
+                <cx-tooltip
+                  [text]="directionTooltip(thenByDirection$())"
+                  position="top"
+                >
+                  <cx-icon-button
+                    [icon]="directionIcon(thenByDirection$())"
+                    ariaLabel="Toggle secondary sort direction"
+                    variant="transparent"
+                    [disabled]="!hasActiveSecondarySort()"
+                    (pressed)="toggleThenByDirection()"
+                  />
+                </cx-tooltip>
+              </div>
+            </div>
+          </section>
+        }
       </div>
     }
 
     @if (hasColumnControls$()) {
-      <section class="cx-filter-bar__properties-section cx-filter-bar__properties-island">
+      <section
+        class="cx-filter-bar__properties-section cx-filter-bar__properties-island"
+      >
         <cx-option-group label="Columns">
           <button
             actions
@@ -502,7 +597,9 @@
                   [icon]="'pin'"
                   [iconSelected]="'pin-off'"
                   [selected]="isColumnPinned(column.id)"
-                  [ariaLabel]="isColumnPinned(column.id) ? 'Unpin column' : 'Pin column'"
+                  [ariaLabel]="
+                    isColumnPinned(column.id) ? 'Unpin column' : 'Pin column'
+                  "
                   size="small"
                   [disabled]="!canPinColumn(column.id)"
                   (selectedChange)="togglePinnedColumn(column.id)"

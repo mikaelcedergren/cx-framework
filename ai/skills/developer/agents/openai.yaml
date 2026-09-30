@@ -1,6 +1,6 @@
 interface:
   display_name: "Developer"
   short_description: "Scoped, verified implementation"
-  default_prompt: "Use $developer to implement an approved scope, preserve existing work, fix the owning layer, and verify claims proportionally to risk."
+  default_prompt: "Use $developer to implement an approved scope, preserve existing work, fix the owning layer, verify claims proportionally to risk, and obtain Custodian review of the finished output before declaring the feature complete."
 policy:
   allow_implicit_invocation: true

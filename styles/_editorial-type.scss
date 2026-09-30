@@ -6,8 +6,7 @@
 // partial so component stylesheets can @use it without re-emitting the global
 // `.cx-editorial` CSS that _editorial.scss produces.
 //
-// The mixin is base-agnostic: every size is em-relative, so it scales off
-// whatever font-size the host element sets.
+// Headings use the shared title scale; prose spacing follows the host's type size.
 
 @mixin cx-editorial-type {
   > :first-child {
@@ -37,23 +36,14 @@
 
   h2 {
     margin-top: 1em;
-    font-size: 2.2em;
+    font-size: var(--font-size-title-2);
   }
 
-  h3 {
-    font-size: 1.5556em;
-  }
-
-  h4 {
-    font-size: 1.3333em;
-  }
-
-  h5 {
-    font-size: 1.1111em;
-  }
-
+  h3,
+  h4,
+  h5,
   h6 {
-    font-size: 1em;
+    font-size: var(--font-size-title-3);
   }
 
   p,
@@ -92,7 +82,7 @@
   }
 
   li {
-    margin-bottom: 0.4em;
+    margin-bottom: var(--space-xs);
   }
 
   li:last-child {

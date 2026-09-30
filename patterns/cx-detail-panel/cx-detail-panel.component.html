@@ -37,10 +37,21 @@
         [cxTooltipOverflow]="true"
       >
         @if (icon; as iconName) {
-          <cx-icon class="cx-detail-panel__heading-icon" [icon]="iconName" [size]="24" [mood]="mood" />
+          <cx-icon
+            class="cx-detail-panel__heading-icon"
+            [icon]="iconName"
+            [size]="24"
+            [mood]="mood"
+          />
         }
         @if (normalizedHeading) {
-          <h2 class="cx-detail-panel__heading" [id]="headingId" data-cx-tooltip-overflow>{{ normalizedHeading }}</h2>
+          <h2
+            class="cx-detail-panel__heading"
+            [id]="headingId"
+            data-cx-tooltip-overflow
+          >
+            {{ normalizedHeading }}
+          </h2>
         }
       </div>
     }
@@ -86,7 +97,9 @@
     [attr.id]="hasTabs ? tabPanelId : null"
     [attr.role]="hasTabs ? 'tabpanel' : null"
     [attr.aria-labelledby]="hasTabs ? selectedTabButtonId : null"
-    [attr.aria-label]="hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null"
+    [attr.aria-label]="
+      hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null
+    "
     [attr.tabindex]="hasTabs ? '0' : null"
   >
     <div class="cx-detail-panel__content">
@@ -100,13 +113,21 @@
         <ng-content select="[detail-panel-footer]" />
       </div>
 
-      <cx-icon-button
-        class="cx-detail-panel__footer-close"
-        icon="arrow-right"
-        [ariaLabel]="resolvedCloseAriaLabel"
-        mood="default"
-        (pressed)="dismiss()"
-      />
+      @if (footerMode === "custom") {
+        <div
+          class="cx-detail-panel__footer-slot cx-detail-panel__footer-slot--end"
+        >
+          <ng-content select="[detail-panel-footer-end]" />
+        </div>
+      } @else {
+        <cx-icon-button
+          class="cx-detail-panel__footer-close"
+          icon="arrow-right"
+          [ariaLabel]="resolvedCloseAriaLabel"
+          mood="default"
+          (pressed)="dismiss()"
+        />
+      }
     </footer>
   }
 </aside>

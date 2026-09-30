@@ -88,6 +88,9 @@ Display type and `--line-height-display` belong to the primary headline of a mar
 
 Editorial typography is a separate shared reading system:
 
+`--typeface-editorial` uses Literata, the default for `--font-family-heading`.
+Its self-hosted variable face supplies weights 200–900 and optical sizes 7–72.
+
 | Token                             | Value | Purpose                                                   |
 | --------------------------------- | ----: | --------------------------------------------------------- |
 | `--font-size-editorial-body`      |  18px | Article, landing-page, and public information body copy   |

@@ -15,34 +15,41 @@ import {
   ViewChild,
   inject,
   signal,
-} from '@angular/core';
-import { type CxIconName } from '../../icons/manifest';
-import { CxIconButtonComponent } from '../../primitives/actions/cx-icon-button';
-import { CxIconComponent, type CxIconMood } from '../../primitives/media/cx-icon';
+} from "@angular/core";
+import { type CxIconName } from "../../icons/manifest";
+import { CxIconButtonComponent } from "../../primitives/actions/cx-icon-button";
+import {
+  CxIconComponent,
+  type CxIconMood,
+} from "../../primitives/media/cx-icon";
 import {
   CxMenuComponent,
   CxMenuTriggerDirective,
   type CxMenuItem,
-} from '../../primitives/overlay/cx-menu';
-import { CxTooltipDirective } from '../../primitives/overlay/cx-tooltip';
-import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
+} from "../../primitives/overlay/cx-menu";
+import { CxTooltipDirective } from "../../primitives/overlay/cx-tooltip";
+import { CxDismissRequest } from "../../primitives/overlay/dismiss-request";
 import {
   CxOverlayStateService,
   type CxOverlayStateHandle,
-} from '../../primitives/overlay/overlay-state';
-import { CxTabsComponent, type CxTabItem } from '../../primitives/navigation/cx-tabs';
-import { isHostVisible } from '../../primitives/shared/host-visibility';
-import { CxDetailPanelSectionComponent } from './cx-detail-panel-section.component';
+} from "../../primitives/overlay/overlay-state";
+import {
+  CxTabsComponent,
+  type CxTabItem,
+} from "../../primitives/navigation/cx-tabs";
+import { isHostVisible } from "../../primitives/shared/host-visibility";
+import { CxDetailPanelSectionComponent } from "./cx-detail-panel-section.component";
 
 const DETAIL_PANEL_DISMISS_FALLBACK_BUFFER_MS = 50;
 const DETAIL_PANEL_RESIZE_STEP = 8;
 const DETAIL_PANEL_RESIZE_LARGE_STEP = 32;
 
-export type CxDetailPanelVariant = 'floating' | 'fixed';
+export type CxDetailPanelVariant = "floating" | "fixed";
+export type CxDetailPanelFooterMode = "default" | "custom";
 export type CxDetailPanelMood = CxIconMood;
 
 @Component({
-  selector: 'cx-detail-panel',
+  selector: "cx-detail-panel",
   imports: [
     CxIconButtonComponent,
     CxIconComponent,
@@ -51,8 +58,8 @@ export type CxDetailPanelMood = CxIconMood;
     CxTabsComponent,
     CxTooltipDirective,
   ],
-  templateUrl: './cx-detail-panel.component.html',
-  styleUrl: './cx-detail-panel.component.scss',
+  templateUrl: "./cx-detail-panel.component.html",
+  styleUrl: "./cx-detail-panel.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
@@ -73,17 +80,17 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   @ContentChildren(CxDetailPanelSectionComponent, { read: ElementRef })
   private readonly contentSections?: QueryList<ElementRef<HTMLElement>>;
 
-  @ViewChild('contentViewport', { read: ElementRef })
+  @ViewChild("contentViewport", { read: ElementRef })
   private readonly contentViewport?: ElementRef<HTMLElement>;
 
-  @ViewChild('panelSurface', { read: ElementRef })
+  @ViewChild("panelSurface", { read: ElementRef })
   private readonly panelSurface?: ElementRef<HTMLElement>;
 
   @Input() icon: CxIconName | undefined;
   /** Colors the header icon; every other part of the header stays ink. */
-  @Input() mood: CxDetailPanelMood = 'default';
-  @Input() heading = '';
-  @Input() variant: CxDetailPanelVariant = 'floating';
+  @Input() mood: CxDetailPanelMood = "default";
+  @Input() heading = "";
+  @Input() variant: CxDetailPanelVariant = "floating";
   @Input()
   public set menuItems(value: readonly CxMenuItem[] | undefined) {
     this.menuItemsValue = validateDetailPanelMenuItems(value);
@@ -115,11 +122,12 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   /** Lets the user drag the panel's start edge to change its width. */
   @Input({ transform: booleanAttribute }) resizable = true;
   /**
-   * Renders the footer bar and its close button. Turning it off removes the
-   * panel's only pointer-reachable exit; Escape and an enabled outside click
-   * remain the dismissal paths.
+   * Renders the selected footer mode. When hidden, consumers must provide a
+   * visible close control elsewhere; Escape and enabled outside dismissal remain.
    */
   @Input({ transform: booleanAttribute }) footer = true;
+  /** Default supplies the close arrow; custom uses both supplied action slots. */
+  @Input() footerMode: CxDetailPanelFooterMode = "default";
   /**
    * Also dismiss on a click outside the panel after any owned overlay closes.
    * A successful dismissal lets that pointer action continue to its outside
@@ -150,7 +158,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
 
   constructor() {
     this.overlayHandle = this.overlayState.capture({
-      kind: 'transient',
+      kind: "transient",
       restoreFocus: true,
       surface: () => this.panelSurface?.nativeElement,
       layerSurfaces: () => [this.host.nativeElement],
@@ -178,17 +186,17 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
 
   public ngAfterViewChecked(): void {}
 
-  @HostBinding('style.width') get resolvedWidth(): string {
-    return `min(max(380px, ${this.minWidth ?? '0px'}, ${this.resizedWidth$() ?? this.width ?? '450px'}), 100%)`;
+  @HostBinding("style.width") get resolvedWidth(): string {
+    return `min(max(380px, ${this.minWidth ?? "0px"}, ${this.resizedWidth$() ?? this.width ?? "450px"}), 100%)`;
   }
 
-  @HostBinding('class.cx-detail-panel-host--floating')
+  @HostBinding("class.cx-detail-panel-host--floating")
   protected get floatingHostClass(): boolean {
-    return this.variant === 'floating';
+    return this.variant === "floating";
   }
 
   protected get isFixed(): boolean {
-    return this.variant === 'fixed';
+    return this.variant === "fixed";
   }
 
   protected get hasTabs(): boolean {
@@ -210,7 +218,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     }
     return this.normalizedHeading
       ? `Actions for ${this.normalizedHeading}`
-      : 'Detail panel actions';
+      : "Detail panel actions";
   }
 
   protected get resolvedTabsAriaLabel(): string {
@@ -218,15 +226,21 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     if (label) {
       return label;
     }
-    return this.normalizedHeading ? `${this.normalizedHeading} sections` : 'Detail sections';
+    return this.normalizedHeading
+      ? `${this.normalizedHeading} sections`
+      : "Detail sections";
   }
 
   protected get resolvedCloseAriaLabel(): string {
-    return this.normalizedHeading ? `Close ${this.normalizedHeading}` : 'Close detail panel';
+    return this.normalizedHeading
+      ? `Close ${this.normalizedHeading}`
+      : "Close detail panel";
   }
 
   protected get resolvedResizeAriaLabel(): string {
-    return this.normalizedHeading ? `Resize ${this.normalizedHeading}` : 'Resize detail panel';
+    return this.normalizedHeading
+      ? `Resize ${this.normalizedHeading}`
+      : "Resize detail panel";
   }
 
   protected get renderedWidthPx(): number {
@@ -234,7 +248,12 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
 
   protected onResizePointerDown(event: PointerEvent): void {
-    if (!this.resizable || !event.isPrimary || event.button !== 0 || this.closing$()) {
+    if (
+      !this.resizable ||
+      !event.isPrimary ||
+      event.button !== 0 ||
+      this.closing$()
+    ) {
       return;
     }
     event.preventDefault();
@@ -245,12 +264,12 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
       handle,
       startX: event.clientX,
       startWidth: this.host.nativeElement.getBoundingClientRect().width,
-      rtl: window.getComputedStyle(this.host.nativeElement).direction === 'rtl',
+      rtl: window.getComputedStyle(this.host.nativeElement).direction === "rtl",
     };
     this.resizing$.set(true);
     handle.setPointerCapture(event.pointerId);
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
   }
 
   protected onResizePointerMove(event: PointerEvent): void {
@@ -287,11 +306,14 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     if (!this.resizable) {
       return;
     }
-    const rtl = window.getComputedStyle(this.host.nativeElement).direction === 'rtl';
-    const step = event.shiftKey ? DETAIL_PANEL_RESIZE_LARGE_STEP : DETAIL_PANEL_RESIZE_STEP;
+    const rtl =
+      window.getComputedStyle(this.host.nativeElement).direction === "rtl";
+    const step = event.shiftKey
+      ? DETAIL_PANEL_RESIZE_LARGE_STEP
+      : DETAIL_PANEL_RESIZE_STEP;
     const current = this.host.nativeElement.getBoundingClientRect().width;
-    const outwardKey = rtl ? 'ArrowRight' : 'ArrowLeft';
-    const inwardKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const outwardKey = rtl ? "ArrowRight" : "ArrowLeft";
+    const inwardKey = rtl ? "ArrowLeft" : "ArrowRight";
     let next: number;
 
     switch (event.key) {
@@ -301,10 +323,10 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
       case inwardKey:
         next = current - step;
         break;
-      case 'Home':
+      case "Home":
         next = 0;
         break;
-      case 'End':
+      case "End":
         next = Number.MAX_SAFE_INTEGER;
         break;
       default:
@@ -312,7 +334,9 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     }
 
     event.preventDefault();
-    this.resizedWidth$.set(`${Math.min(Math.max(Math.round(next), 0), 100000)}px`);
+    this.resizedWidth$.set(
+      `${Math.min(Math.max(Math.round(next), 0), 100000)}px`,
+    );
     this.emitRenderedWidthAfterLayout();
   }
 
@@ -338,8 +362,8 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
       session.handle.releasePointerCapture(session.pointerId);
     }
     this.resizing$.set(false);
-    document.body.style.removeProperty('cursor');
-    document.body.style.removeProperty('user-select');
+    document.body.style.removeProperty("cursor");
+    document.body.style.removeProperty("user-select");
   }
 
   private emitRenderedWidthAfterLayout(): void {
@@ -354,11 +378,15 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
       (tab) => tab.id.trim() === this.selectedTabId && !tab.disabled,
     );
     const resolvedIndex =
-      selectedIndex >= 0 ? selectedIndex : normalizedTabs.findIndex((tab) => !tab.disabled);
-    return resolvedIndex >= 0 ? `${this.tabPanelId}-tab-${resolvedIndex}` : null;
+      selectedIndex >= 0
+        ? selectedIndex
+        : normalizedTabs.findIndex((tab) => !tab.disabled);
+    return resolvedIndex >= 0
+      ? `${this.tabPanelId}-tab-${resolvedIndex}`
+      : null;
   }
 
-  @HostListener('document:mousedown', ['$event'])
+  @HostListener("document:mousedown", ["$event"])
   protected onDocumentMousedown(event: MouseEvent): void {
     if (!this.dismissOnClickOutside || this.closing$()) {
       return;
@@ -368,17 +396,22 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     if (!isHostVisible(this.host.nativeElement)) return;
     if (!this.overlayState.isTopmost(this.overlayHandle)) return;
     if (this.host.nativeElement.contains(target)) return;
-    if (!this.dismiss(false)) {
+    if (!this.requestDismiss(false)) {
       event.preventDefault();
       event.stopPropagation();
     }
   }
 
-  protected dismiss(restoreFocus = true): boolean {
+  /** Custom close controls use the same guarded dismissal and focus lifecycle. */
+  public dismiss(): boolean {
+    return this.requestDismiss();
+  }
+
+  private requestDismiss(restoreFocus = true): boolean {
     if (this.closing$()) {
       return false;
     }
-    const request = new CxDismissRequest('dismiss');
+    const request = new CxDismissRequest("dismiss");
     this.dismissRequest.emit(request);
     if (request.defaultPrevented) {
       return false;
@@ -386,7 +419,10 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     const activeElement = document.activeElement;
     // Blur only panel-owned focus so in-progress field edits commit without
     // perturbing a control that already owns focus elsewhere.
-    if (activeElement instanceof HTMLElement && this.host.nativeElement.contains(activeElement)) {
+    if (
+      activeElement instanceof HTMLElement &&
+      this.host.nativeElement.contains(activeElement)
+    ) {
       activeElement.blur();
     }
     this.restoreFocusOnDismiss = restoreFocus;
@@ -430,7 +466,9 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     this.dismissMeasureFrame = window.requestAnimationFrame(() => {
       this.dismissMeasureFrame = undefined;
       const surface = this.panelSurface?.nativeElement;
-      const animationMs = surface ? maximumAnimationTimeMs(window.getComputedStyle(surface)) : 0;
+      const animationMs = surface
+        ? maximumAnimationTimeMs(window.getComputedStyle(surface))
+        : 0;
       this.dismissFallbackTimer = window.setTimeout(
         () => this.completeDismiss(),
         animationMs + DETAIL_PANEL_DISMISS_FALLBACK_BUFFER_MS,
@@ -480,13 +518,13 @@ function maximumAnimationTimeMs(style: CSSStyleDeclaration): number {
 }
 
 function parseCssTimes(value: string): number[] {
-  const times = value.split(',').map((part) => {
+  const times = value.split(",").map((part) => {
     const normalized = part.trim();
     const numeric = Number.parseFloat(normalized);
     if (!Number.isFinite(numeric)) {
       return 0;
     }
-    return normalized.endsWith('ms') ? numeric : numeric * 1000;
+    return normalized.endsWith("ms") ? numeric : numeric * 1000;
   });
   return times.length > 0 ? times : [0];
 }
@@ -498,10 +536,10 @@ function validateDetailPanelMenuItems(
     return undefined;
   }
   if (!Array.isArray(value)) {
-    throw new Error('[cx-detail-panel] menuItems must be an array.');
+    throw new Error("[cx-detail-panel] menuItems must be an array.");
   }
 
-  validateDetailPanelMenuLevel(value, 'menuItems', new Set<string>());
+  validateDetailPanelMenuLevel(value, "menuItems", new Set<string>());
   return [...value];
 }
 
@@ -513,7 +551,7 @@ function validateDetailPanelMenuLevel(
   const labels = new Set<string>();
   items.forEach((item, index) => {
     const itemPath = `${path}[${index}]`;
-    const id = typeof item?.id === 'string' ? item.id.trim() : '';
+    const id = typeof item?.id === "string" ? item.id.trim() : "";
     if (!id) {
       throw new Error(`[cx-detail-panel] ${itemPath} requires a non-empty id.`);
     }
@@ -522,7 +560,7 @@ function validateDetailPanelMenuLevel(
     }
     ids.add(id);
 
-    const label = typeof item?.label === 'string' ? item.label.trim() : '';
+    const label = typeof item?.label === "string" ? item.label.trim() : "";
     const labelKey = label.toLowerCase();
     if (labels.has(labelKey)) {
       throw new Error(
@@ -533,31 +571,37 @@ function validateDetailPanelMenuLevel(
 
     if (item.items !== undefined) {
       if (!Array.isArray(item.items)) {
-        throw new Error(`[cx-detail-panel] ${itemPath}.items must be an array.`);
+        throw new Error(
+          `[cx-detail-panel] ${itemPath}.items must be an array.`,
+        );
       }
       validateDetailPanelMenuLevel(item.items, `${itemPath}.items`, ids);
     }
   });
 }
 
-function validateDetailPanelTabs(value: readonly CxTabItem[]): readonly CxTabItem[] {
+function validateDetailPanelTabs(
+  value: readonly CxTabItem[],
+): readonly CxTabItem[] {
   if (!Array.isArray(value)) {
-    throw new Error('[cx-detail-panel] tabs must be an array.');
+    throw new Error("[cx-detail-panel] tabs must be an array.");
   }
 
   const ids = new Set<string>();
   const labels = new Set<string>();
   value.forEach((tab, index) => {
-    const id = typeof tab?.id === 'string' ? tab.id.trim() : '';
+    const id = typeof tab?.id === "string" ? tab.id.trim() : "";
     if (!id) {
-      throw new Error(`[cx-detail-panel] tab at index ${index} requires a non-empty id.`);
+      throw new Error(
+        `[cx-detail-panel] tab at index ${index} requires a non-empty id.`,
+      );
     }
     if (ids.has(id)) {
       throw new Error(`[cx-detail-panel] tab id "${id}" must be unique.`);
     }
     ids.add(id);
 
-    const label = typeof tab?.label === 'string' ? tab.label.trim() : '';
+    const label = typeof tab?.label === "string" ? tab.label.trim() : "";
     const labelKey = label.toLowerCase();
     if (labels.has(labelKey)) {
       throw new Error(`[cx-detail-panel] tab label "${label}" must be unique.`);

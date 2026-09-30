@@ -62,6 +62,8 @@ The same design thinking can survive different code structures. What must transf
 
 `RULE-ID: interaction.visible-response` and `RULE-ID: interaction.truthful-state` own feedback integrity. Visible, local feedback reduces more uncertainty than a silent speed improvement. Activity fits unknown progress, determinate progress fits measured work, and clear words fit failure or recovery.
 
+The response belongs to the whole experience, including the browser or operating system. `RULE-ID: feedback.sufficient` owns the sufficiency decision: a clear outcome can finish the interaction without another authored message. More reassurance can create more reading without removing any uncertainty.
+
 Manufactured progress, certainty, capability, or outcome may make an interface feel reassuring briefly, but it breaks the truthful state on which trust depends.
 
 ## Safety follows consequence

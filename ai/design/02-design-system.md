@@ -53,6 +53,21 @@ purpose → role → information → component role → local implementation →
 
 [NOTE] Beginning from a favorite style, a copied implementation, or an assumed component name starts at the wrong layer.
 
+## Required relationship and attention check
+
+[MUST] Before selecting components and again before handing off a design, apply the following check to each material task group. Keep a compact decision record in working notes or the existing brief; this is not a new user-facing checklist or approval step.
+
+| Check         | Decision to establish                                                                                                        | Owning rules                                                                                           |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Relationship  | What does each action affect, and which field owns each hint? Keep that group together.                                      | `RULE-ID: layout.relationships`, `RULE-ID: forms.action-scope`, `RULE-ID: field-hints.start-alignment` |
+| Feedback      | What already communicates activity, completion, or failure, including the surrounding platform? Identify any remaining need. | `RULE-ID: interaction.visible-response`, `RULE-ID: feedback.sufficient`                                |
+| Removal       | What would the user lose if each optional text, control, or container disappeared? No loss means remove it. Check the visible words against their surrounding context as well as removing whole elements. | `RULE-ID: content.scannable`, `RULE-ID: copy.minimal-first`, `RULE-ID: copy.no-context-restatement` |
+| Repeat action | Can the original available control already repeat or retry the same action?                                                  | `RULE-ID: interaction.repeat-action`                                                                   |
+
+[MUST] Evaluate these checks on an assembled visual arrangement with the actual visible labels and hint text, not only a list of components or intentions. A compact spatial sketch in the working notes is enough; no extra user-facing deliverable is required. For a field and its action, show their order, shared row, input/button alignment, and the hint’s attachment to the field. Align the action with the input box, not the combined height of input and hint. Use `RULE-ID: copy.labels.object` and `RULE-ID: copy.buttons.object` to trim wording in that visible context.
+
+[MUST] Resolve failed checks before handoff. An unknown that could change the experience remains unresolved; do not invent a need to justify an optional element. Reapply the check to the actual rendered result during implementation and Custodian's completion review, because a clean brief does not establish a clean interface.
+
 ## Ownership and composition
 
 [MUST] A shared component owns its internal structure, presentation, internal spacing, reachable states, and interaction behavior. A container owns placement, width, surrounding gap, and page composition.

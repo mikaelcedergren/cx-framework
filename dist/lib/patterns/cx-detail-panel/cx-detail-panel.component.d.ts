@@ -1,11 +1,12 @@
-import { AfterViewChecked, EventEmitter, OnDestroy } from '@angular/core';
-import { type CxIconName } from '../../icons/manifest';
-import { type CxIconMood } from '../../primitives/media/cx-icon';
-import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
-import { CxDismissRequest } from '../../primitives/overlay/dismiss-request';
-import { type CxTabItem } from '../../primitives/navigation/cx-tabs';
+import { AfterViewChecked, EventEmitter, OnDestroy } from "@angular/core";
+import { type CxIconName } from "../../icons/manifest";
+import { type CxIconMood } from "../../primitives/media/cx-icon";
+import { type CxMenuItem } from "../../primitives/overlay/cx-menu";
+import { CxDismissRequest } from "../../primitives/overlay/dismiss-request";
+import { type CxTabItem } from "../../primitives/navigation/cx-tabs";
 import * as i0 from "@angular/core";
-export type CxDetailPanelVariant = 'floating' | 'fixed';
+export type CxDetailPanelVariant = "floating" | "fixed";
+export type CxDetailPanelFooterMode = "default" | "custom";
 export type CxDetailPanelMood = CxIconMood;
 export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     private static nextId;
@@ -42,11 +43,12 @@ export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestr
     /** Lets the user drag the panel's start edge to change its width. */
     resizable: boolean;
     /**
-     * Renders the footer bar and its close button. Turning it off removes the
-     * panel's only pointer-reachable exit; Escape and an enabled outside click
-     * remain the dismissal paths.
+     * Renders the selected footer mode. When hidden, consumers must provide a
+     * visible close control elsewhere; Escape and enabled outside dismissal remain.
      */
     footer: boolean;
+    /** Default supplies the close arrow; custom uses both supplied action slots. */
+    footerMode: CxDetailPanelFooterMode;
     /**
      * Also dismiss on a click outside the panel after any owned overlay closes.
      * A successful dismissal lets that pointer action continue to its outside
@@ -93,7 +95,9 @@ export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestr
     private emitRenderedWidthAfterLayout;
     protected get selectedTabButtonId(): string | null;
     protected onDocumentMousedown(event: MouseEvent): void;
-    protected dismiss(restoreFocus?: boolean): boolean;
+    /** Custom close controls use the same guarded dismissal and focus lifecycle. */
+    dismiss(): boolean;
+    private requestDismiss;
     protected onDismissAnimationEnd(event: AnimationEvent): void;
     ngOnDestroy(): void;
     protected onMenuItemSelect(id: string): void;
@@ -103,7 +107,7 @@ export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestr
     private completeDismiss;
     private clearDismissSchedule;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxDetailPanelComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxDetailPanelComponent, "cx-detail-panel", never, { "icon": { "alias": "icon"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "footer": { "alias": "footer"; "required": false; }; "dismissOnClickOutside": { "alias": "dismissOnClickOutside"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; }, { "dismissed": "dismissed"; "dismissRequest": "dismissRequest"; "menuItemSelect": "menuItemSelect"; "selectedTabIdChange": "selectedTabIdChange"; "widthChange": "widthChange"; }, ["contentSections"], ["cx-status-tag[detail-panel-status]", "*", "[detail-panel-footer]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxDetailPanelComponent, "cx-detail-panel", never, { "icon": { "alias": "icon"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "footer": { "alias": "footer"; "required": false; }; "footerMode": { "alias": "footerMode"; "required": false; }; "dismissOnClickOutside": { "alias": "dismissOnClickOutside"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; }, { "dismissed": "dismissed"; "dismissRequest": "dismissRequest"; "menuItemSelect": "menuItemSelect"; "selectedTabIdChange": "selectedTabIdChange"; "widthChange": "widthChange"; }, ["contentSections"], ["cx-status-tag[detail-panel-status]", "*", "[detail-panel-footer]", "[detail-panel-footer-end]"], true, never>;
     static ngAcceptInputType_resizable: unknown;
     static ngAcceptInputType_footer: unknown;
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 135,
-  "catalogSha256": "0d7a472d785705e5f3a4b0b8989a2c7380a10146a427b856d29927d4598403b8",
+  "catalogSha256": "8fc3f4b3e988dcd9015b177935912904b62bd2a9ac3ef5102bbd599b6a6350b7",
   "components": [
     {
       "name": "cx-account-control",
@@ -3047,12 +3047,21 @@
             "source": "decorator"
           },
           {
+            "binding": "footerMode",
+            "member": "footerMode",
+            "type": "CxDetailPanelFooterMode",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          },
+          {
             "binding": "heading",
             "member": "heading",
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "''",
+            "defaultValue": "\"\"",
             "source": "decorator"
           },
           {
@@ -3097,7 +3106,7 @@
             "type": "CxDetailPanelMood",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": "\"default\"",
             "source": "decorator"
           },
           {
@@ -3142,7 +3151,7 @@
             "type": "CxDetailPanelVariant",
             "required": false,
             "transform": null,
-            "defaultValue": "'floating'",
+            "defaultValue": "\"floating\"",
             "source": "decorator"
           },
           {
@@ -3200,21 +3209,25 @@
         {
           "ordinal": 3,
           "selector": "[detail-panel-footer]"
+        },
+        {
+          "ordinal": 4,
+          "selector": "[detail-panel-footer-end]"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "6b04d5ebcdfacd5caffba4bfd814a71af931bcea10ddfd8bf9190acb2321ad59"
+          "sha256": "ad202c1784dfd9648ad5392158f1a3d4c3a8cb7b3aa3658361443b8258543b28"
         },
         "template": {
           "kind": "external",
-          "sha256": "b05e9e54a67295c1dbff89ad9cce43b613eaba6e172ba0e6d1ab1fd424720c0d"
+          "sha256": "f4f2176f1bb9d9fac650a66ee320840255320fbc53e615c17186235b05ef7b02"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "038be447e4e1bd1169980fbb48a39614eb728419cd6391ed37adc48a127f106a"
+            "sha256": "cc271d44df9d9d662995259ffabeeec16000f78f28636324c5b3a18c1801e368"
           }
         ]
       }
@@ -5022,20 +5035,25 @@
           }
         ]
       },
-      "contentProjection": [],
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[filter-bar-actions]"
+        }
+      ],
       "evidence": {
         "source": {
           "sha256": "5bc931c4ce558233c21c9317ca33a61d38b71f9a7b48add20c93f99f13954df0"
         },
         "template": {
           "kind": "external",
-          "sha256": "a0e6b6994b06ec0a456bb5155ee227bea8f084ea83a6fbf3c5bc1222aedafc14"
+          "sha256": "0378aea1acbfc522f7b5fa0283d3eeca8483cf1520d070553b30d3568dbac59b"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "0f3cdfa3a984b3681c642ad705d3a83688691a344cf3f6ea16c8cc68f75ff3bd"
+            "sha256": "7d5887d9e9564e3fcb60e149a18750961435a9aeeab9b9d72508f9aa48abd75f"
           }
         ]
       }
@@ -12821,6 +12839,10 @@
         {
           "ordinal": 1,
           "selector": "[actions], [cxTableViewActions]"
+        },
+        {
+          "ordinal": 2,
+          "selector": "[filter-bar-actions]"
         }
       ],
       "evidence": {
@@ -12829,7 +12851,7 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "1c182f58dbadc7c5c5357227ee462cf42494eda2304d56bdaf3cce106264bcbb"
+          "sha256": "fb3896b5ea033712d7fa87794b2026ae21ec1080e5794b7957af20802c563499"
         },
         "styles": [
           {

@@ -38,7 +38,9 @@
         [pinnedColumnIds]="pinnedColumnIds"
         (modeChange)="filterBarModeChange.emit($event)"
         (selectedQuickFilterIdChange)="selectedQuickFilterIdChange.emit($event)"
-        (selectedToggleFilterIdsChange)="selectedToggleFilterIdsChange.emit($event)"
+        (selectedToggleFilterIdsChange)="
+          selectedToggleFilterIdsChange.emit($event)
+        "
         (filterValuesChange)="onFilterValuesChange($event)"
         (filterQueryChange)="filterQueryChange.emit($event)"
         (filterLoadMore)="filterLoadMore.emit($event)"
@@ -49,7 +51,11 @@
         (queryValueRetry)="queryValueRetry.emit($event)"
         (savedViewSelect)="savedViewSelect.emit($event)"
         (activeSavedViewIdChange)="activeSavedViewIdChange.emit($event)"
-        (displayModeChange)="densityChange.emit($event === 'comfortable' ? 'comfortable' : 'compact')"
+        (displayModeChange)="
+          densityChange.emit(
+            $event === 'comfortable' ? 'comfortable' : 'compact'
+          )
+        "
         (groupByChange)="groupByChange.emit($event)"
         (sortByChange)="sortByChange.emit($event)"
         (sortDirectionChange)="sortDirectionChange.emit($event)"
@@ -59,7 +65,12 @@
         (pinnedColumnIdsChange)="pinnedColumnIdsChange.emit($event)"
         [actions]="actions"
         (actionSelect)="actionSelect.emit($event)"
-      />
+      >
+        <ng-content
+          select="[filter-bar-actions]"
+          ngProjectAs="[filter-bar-actions]"
+        />
+      </cx-filter-bar>
     }
   </div>
 
@@ -101,9 +112,21 @@
       (rowMenuItemSelect)="rowMenuItemSelect.emit($event)"
     >
       @for (definition of customCells(); track definition) {
-        <ng-template [cxTableCell]="definition.cxTableCell" let-row let-column="column" let-cell="cell">
-          <ng-container [ngTemplateOutlet]="definition.template"
-            [ngTemplateOutletContext]="{ $implicit: row, row: row, column: column, cell: cell }" />
+        <ng-template
+          [cxTableCell]="definition.cxTableCell"
+          let-row
+          let-column="column"
+          let-cell="cell"
+        >
+          <ng-container
+            [ngTemplateOutlet]="definition.template"
+            [ngTemplateOutletContext]="{
+              $implicit: row,
+              row: row,
+              column: column,
+              cell: cell,
+            }"
+          />
         </ng-template>
       }
     </cx-table>

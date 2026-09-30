@@ -12,6 +12,8 @@ This file is the last-resort wording catalog in the framework spec.
 
 [MUST] Never let fallback wording invent policy, capability, validation limits, supported formats, permission models, or recovery.
 
+[NOTE] `RULE-ID: copy.errors.problem-fix` governs whether a recovery sentence is useful, including every `Try again` pattern below. A failure alone is not evidence that retrying could help.
+
 [NOTE] Before using a pattern:
 
 1. [MUST] Confirm what the product actually knows.
@@ -120,6 +122,12 @@ This file is the last-resort wording catalog in the framework spec.
 | Known uniqueness requirement | `Name must be unique. Use a different name.` |
 | Known character restriction | `Name contains unsupported characters. Remove [known unsupported characters].` |
 
+### Regular expression
+
+[MAY] Use `Enter a valid regex pattern.` when the pattern is invalid and no more specific correction is known.
+
+[NOTE] Apply `RULE-ID: copy.errors.field` and `RULE-ID: copy.errors.problem-fix` when the cause is known; for example, `Add the missing closing bracket.`
+
 ### Number or range
 
 [MAY] Use an exact-matching fallback from this table.
@@ -128,7 +136,7 @@ This file is the last-resort wording catalog in the framework spec.
 | --- | --- |
 | Invalid number | `Enter a valid number.` |
 | Known range | `Enter a number between [known minimum] and [known maximum].` |
-| Known minimum | `Enter a number of at least [known minimum].` |
+| Known minimum | `Enter [known minimum] or a higher number.` |
 | Known maximum | `Enter a number no greater than [known maximum].` |
 | Whole number required | `Enter a whole number.` |
 

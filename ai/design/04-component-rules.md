@@ -96,7 +96,7 @@ RULE-ID: detail-panels.header-order SCOPE: component COMPONENT: detail-panels TY
 
 RULE-ID: detail-panels.entity-actions SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep every entity action menu aligned to one shared action contract. DESCRIPTION: The table-row overflow menu, source context menu, other source menu, and detail-panel overflow menu must match exactly in action set, order, availability, disabled state, and danger treatment; opening details is source activation rather than an action-menu command, and consumers never define a panel-only copy.
 
-RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: The main status belongs only in the header; supporting metadata, navigation, and passive copy belong in content, while ordinary entity actions belong in the shared entity menu. EXCEPT: A pinned panel-wide task may add persistent completion controls only when they must remain reachable while the task body scrolls.
+RULE-ID: detail-panels.footer-default SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: interaction RULE: Keep the footer close-only by default. DESCRIPTION: Use supported slots for persistent task controls. Custom footers may arrange Close and Edit, retaining a visible close control with normal panel dismissal. The panel owns spacing, alignment, and wrapping. Keep status in the header, supporting information in the body, and other actions in the entity menu.
 
 RULE-ID: detail-panels.frame SCOPE: component COMPONENT: detail-panels TYPE: MUST TOPIC: layout RULE: Use a quiet framing plane behind the panel's separate content surfaces. DESCRIPTION: The header, bounded content sections, and footer read as distinct surfaces while the frame creates one coherent vertical structure through the consuming product's semantic surface roles.
 
@@ -110,9 +110,11 @@ RULE-ID: detail-panels.dismissal-scroll SCOPE: component COMPONENT: detail-panel
 
 RULE-ID: labeled-rows.scope SCOPE: component COMPONENT: labeled-rows TYPE: SHOULD TOPIC: layout RULE: Use the consuming product's established labeled-row component or pattern for forms or compact label-value rows that benefit from one stable leading label column. DESCRIPTION: It aligns related values for scanning and comparison; apply `RULE-ID: forms.horizontal-layout` to form orientation, and apply `RULE-ID: forms.choice-label-scope` when a row contains a checkbox, radio group, or switch. Do not wrap arbitrary page content or content without a label-value relationship.
 
-## Field hints
+## Form fields
 
-RULE-ID: field-hints.start-alignment SCOPE: component COMPONENT: form-fields TYPE: MUST TOPIC: layout RULE: Align field hints to the start edge of their field. DESCRIPTION: Hints establish their own alignment instead of inheriting centered or end alignment from a surrounding surface.
+RULE-ID: form-fields.optional-placement SCOPE: component COMPONENT: form-fields TYPE: MUST TOPIC: layout RULE: Place the optional-field indicator beneath the label in a horizontal form layout and at the far right of the label row in a vertical layout. DESCRIPTION: `copy.labels.optional` owns the wording and the distinction between optional and required fields; keep the indicator visibly associated with its label.
+
+RULE-ID: field-hints.start-alignment SCOPE: component COMPONENT: form-fields TYPE: MUST TOPIC: layout RULE: Attach field-specific guidance to its field as a hint aligned to the field's start edge. DESCRIPTION: Use the field's supported hint and association instead of an independent page paragraph; preserve the relationship in horizontal and wrapped layouts, and include hints only when `RULE-ID: copy.helper.behavior` establishes their value.
 
 ## State messages
 
@@ -186,7 +188,9 @@ RULE-ID: tables.findability SCOPE: component COMPONENT: tables TYPE: SHOULD TOPI
 
 RULE-ID: tables.sorting SCOPE: component COMPONENT: tables TYPE: SHOULD TOPIC: data-display RULE: Make meaningful columns sortable and choose a useful default order. DESCRIPTION: Preserve the user's chosen sort when the surrounding task continues.
 
-RULE-ID: tables.column-order SCOPE: component COMPONENT: tables TYPE: MUST TOPIC: layout RULE: Order columns by decision value: state first, entity second, supporting info next, time last. DESCRIPTION: When rows carry a wrong-or-right signal such as status or severity, that column leads the row; the entity it judges comes immediately after; remaining attributes follow; timestamps such as created or last seen close the row. The reading order always answers what is wrong or right, which entity it concerns, what else matters, and when it happened.
+RULE-ID: tables.column-order SCOPE: component COMPONENT: tables TYPE: MUST TOPIC: layout RULE: Order columns by decision value: state first, entity second, supporting info next, time last. DESCRIPTION: When rows carry a wrong-or-right signal such as status or severity, that column leads the row; the entity it judges comes immediately after; remaining attributes follow; timestamps such as created or last seen close the row. The reading order always answers what is wrong or right, which entity it concerns, what else matters, and when it happened. This rule governs reading order; tables.column-space-priority governs which columns yield space.
+
+RULE-ID: tables.column-space-priority SCOPE: component COMPONENT: tables TYPE: MUST TOPIC: layout RULE: Allocate column space by information priority: protect compact leading state indicators, then primary identifying text, then a trailing date or time, then other supporting columns from left to right; shrink and truncate lower-priority columns first, and reserve only the space compact values need to remain readable. DESCRIPTION: A trailing date or time outranks supporting details, never the primary identifying text, so it yields first in a table containing only primary text and a date or time. Without a trailing date or time, text columns yield from right to left. Higher priority means greater protection from truncation, not an automatically wider column, equal widths, or a universal percentage. The trailing date or time is the last information column, even when row actions follow it; selection and action controls remain usable and do not participate in the information ranking. Apply content.truncation and content.truncation-disclosure to preserve task-critical information and access to clipped content; tables.status still requires important row state to remain recognizable.
 
 RULE-ID: tables.status SCOPE: component COMPONENT: tables TYPE: MUST TOPIC: state RULE: Make important row state visible at a glance. DESCRIPTION: Do not bury active, failed, scheduled, or archived state only in details.
 
@@ -233,6 +237,8 @@ RULE-ID: wizard-dialogs.step-focus SCOPE: component COMPONENT: wizard-dialogs TY
 RULE-ID: wizard-dialogs.progress SCOPE: component COMPONENT: wizard-dialogs TYPE: SHOULD TOPIC: navigation RULE: Show current position and remaining shape. DESCRIPTION: Condense the indicator when every step label would no longer fit or help.
 
 RULE-ID: wizard-dialogs.back SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: navigation RULE: Let users move back without losing entered information. DESCRIPTION: Revisiting an earlier choice must preserve compatible later input and clearly reset data that no longer applies.
+
+RULE-ID: wizard-dialogs.actions SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: navigation RULE: In a multi-step flow, place `Cancel` before `Continue` on the first screen, `Back` before `Continue` on intermediate screens, and `Back` before the actual committing action on the last screen. DESCRIPTION: The secondary action precedes the forward action in the footer; in a left-to-right interface they sit left and right respectively. Label the final action under copy.buttons.action, such as `Start scan` or `Create report`, rather than leaving a generic confirmation label.
 
 RULE-ID: wizard-dialogs.finish SCOPE: component COMPONENT: wizard-dialogs TYPE: MUST TOPIC: interaction RULE: Make the final step's outcome explicit before commitment. DESCRIPTION: No additional hidden action should occur after the user completes the visible sequence.
 

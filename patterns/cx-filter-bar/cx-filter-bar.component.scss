@@ -7,10 +7,25 @@
   position: relative;
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
   box-sizing: border-box;
+}
+
+.cx-filter-bar__refinements {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 24rem;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.cx-filter-bar__refinements:not(
+  :has(.cx-filter-bar__left > *, .cx-filter-bar__active-filters)
+) {
+  display: none;
 }
 
 .cx-filter-bar__left,
@@ -21,10 +36,17 @@
   gap: var(--space-sm);
 }
 
-/* Quick filters keep priority: the left group never shrinks in filters mode.
-   The active-filters region is the only flexible part of the row. */
+/* Active tags yield first; refinement controls wrap only when the group itself
+   exceeds the available row, never because tags claim its space. */
 .cx-filter-bar__left {
   flex: 0 0 auto;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.cx-filter-bar__refinements:has(.cx-filter-bar__active-filters)
+  .cx-filter-bar__left {
+  max-width: calc(100% - var(--space-md) - var(--controller-size));
 }
 
 .cx-filter-bar--query .cx-filter-bar__left {
@@ -32,7 +54,17 @@
 }
 
 .cx-filter-bar__right {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 100%;
+  margin-inline-start: auto;
+}
+
+/* Display contents lets projected controls wrap with the built-in controls;
+   an empty slot contributes neither a flex item nor a gap. */
+.cx-filter-bar__actions {
+  display: contents;
 }
 
 /* Row-reverse plus wrap keeps every tag in normal flow: tags that no longer
@@ -41,7 +73,7 @@
    pill is first in DOM, which row-reverse places rightmost. */
 .cx-filter-bar__active-filters {
   display: flex;
-  min-width: 0;
+  min-width: var(--controller-size);
   /* Basis auto (not 0) so the row claims its content width inside
      shrink-to-fit containers; grow/shrink still fit it to definite widths. */
   flex: 1 1 auto;

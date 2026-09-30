@@ -12,6 +12,10 @@ RULE-ID: copy.unknown-behavior SCOPE: copy TYPE: MUST TOPIC: trust RULE: Treat u
 
 RULE-ID: copy.terminology SCOPE: copy TYPE: MUST TOPIC: copy RULE: Use one established term for one concept and apply copy.sentence-case when placing it in a sentence. DESCRIPTION: Prefer the consuming product's domain language and do not switch synonyms unless they represent different things. Preserving terminology preserves the word and meaning, not the initial capital of a standalone label.
 
+RULE-ID: copy.us-english SCOPE: english-copy TYPE: MUST TOPIC: copy RULE: Use US English spelling, grammar, and vocabulary for English-language copy. DESCRIPTION: Keep established proper names and quoted source text intact; this language choice does not override explicit date, time, unit, or other formatting contracts.
+
+RULE-ID: copy.contractions SCOPE: copy TYPE: MUST TOPIC: voice RULE: Write words in full rather than using contractions, such as `do not` instead of `don't`. DESCRIPTION: Apply the length threshold to one continuous guidance block, not to separate labels or unrelated messages combined. EXCEPT: Familiar contractions are allowed in operational UI copy, including validation, errors, status messages, and fallback patterns; do not expand a chosen contraction in these messages solely to satisfy this rule. Contractions are also allowed in descriptive guidance longer than 40 words; at exactly 40 words or fewer, descriptive guidance uses the full forms.
+
 RULE-ID: copy.plain-language SCOPE: copy TYPE: SHOULD TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 
 RULE-ID: copy.concrete-meaning SCOPE: copy TYPE: MUST TOPIC: copy RULE: Ask “Is this clearly understood, or is it too vague?” and identify what the reader learns from the words in their surrounding context; replace vague claims with known facts, remove text that adds nothing useful, and ask when missing facts prevent accurate wording. DESCRIPTION: Plain words can still say almost nothing. Name the relevant object, action, state, consequence, or useful fact when context does not already establish it. Never invent specifics to make a claim sound meaningful; copy.truth and copy.unknown-behavior govern product uncertainty.
@@ -41,6 +45,8 @@ RULE-ID: copy.no-filler SCOPE: operational-copy TYPE: SHOULD TOPIC: voice RULE: 
 RULE-ID: copy.minimal-first SCOPE: copy TYPE: MUST TOPIC: copy RULE: Start every piece of interface text from the fewest words that satisfy copy.first-read-understanding; retain words needed for understanding, while optional elaboration remains an explicit product decision, never a default. DESCRIPTION: Applies to all UI copy — menu items, buttons, calls to action, dialog primaries, labels, headings, hints, and empty states. A necessary noun, qualifier, connection, or explanation earns its place by reducing the reader's effort; do not add optional detail speculatively or out of habit.
 
 RULE-ID: copy.no-context-restatement SCOPE: copy TYPE: MUST TOPIC: copy RULE: Do not restate context the surface already establishes. DESCRIPTION: Applies to all UI copy. A row or card menu says `Edit` and `Delete` — the row is the object. A page-level call to action says `New` — the page heading names what is created. A form dialog's primary says `Add` or `Save` — the dialog heading names the entity. Labels, hints, and headings follow the same principle: never repeat what the page, section, or component around them has already said. Words survive only when they add information the surface does not carry: a different object or destination (`Open report`, `Move to pending`), a resulting state (`Create draft`), genuinely mixed targets (a global surface such as a command palette), or the final destructive commit, which copy.buttons.destructive governs. EXCEPT: A field label or picker placeholder naming its own value per copy.labels.object and copy.pickers.placeholder is establishing context, not restating it — a `Reminder` field label inside a `New reminder` dialog is correct.
+
+RULE-ID: copy.ellipsis SCOPE: copy TYPE: MUST TOPIC: copy RULE: Do not write ellipses into authored messages; reserve them for indicating displayed text that has been truncated. DESCRIPTION: An authored `Loading...` is not truncation. Apply content.truncation to decide between wrapping and clipping and content.truncation-disclosure to preserve access to the full content.
 
 ### Sentence case examples
 
@@ -73,9 +79,9 @@ Accurate but harder to decode: “Folder permissions govern contained files.”
 
 Easier to understand: “Files use the same access settings as their folder.”
 
-Clipped body text: “Generate fake paragraphs for a design that needs text. They read like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from the send button.”
+Clipped body text: “Generate fake paragraphs for a design that needs text. They read like office emails I would send if I did not need the job. Pick how many you want, copy them, and keep me away from the send button.”
 
-Connected body text: “Generate fake paragraphs for a design that needs text, written like office emails I’d send if I didn’t need the job. Pick how many you want, copy them, and keep me away from the send button.”
+Connected body text: “Generate fake paragraphs for a design that needs text, written like office emails I would send if I did not need the job. Pick how many you want, copy them, and keep me away from the send button.”
 
 An `Edit` action in an identified row already has a clear object. Repeating the row’s name adds no meaning; `copy.no-context-restatement` still applies.
 
@@ -83,11 +89,11 @@ For `copy.no-convention-explanation`, omit “Use the tabs to switch between sec
 
 ## Buttons and actions
 
-RULE-ID: copy.buttons.action SCOPE: button-label TYPE: MUST TOPIC: copy RULE: Label a button with the action it performs. DESCRIPTION: Button text names the result of activation rather than the current state or a generic confirmation.
+RULE-ID: copy.buttons.action SCOPE: button-label TYPE: MUST TOPIC: copy RULE: Label a button with the action it performs, not a generic `OK`, `Submit`, or `Confirm`. DESCRIPTION: Button text names the result of activation rather than the current state. Use concise actions such as `Delete`, `Save`, or `Start scan`; copy.buttons.object governs when the object adds meaning.
 
-RULE-ID: copy.buttons.object SCOPE: button-label TYPE: SHOULD TOPIC: copy RULE: Name the action's object only when it removes real ambiguity. DESCRIPTION: `Send invitation` earns its noun on a surface that could send several things; where the surface already names the object copy.no-context-restatement applies, and concise conventional actions such as `Cancel`, `Back`, and `Continue` never need invented objects.
+RULE-ID: copy.buttons.object SCOPE: button-label TYPE: SHOULD TOPIC: copy RULE: Name the action's object only when it removes real ambiguity. DESCRIPTION: `Send invitation` earns its noun on a surface that could send several things; where the surface already names the object copy.no-context-restatement applies. Do not append a fixed output format or processing detail unless it distinguishes a user choice or a consequence needed before acting. Concise conventional actions such as `Cancel`, `Back`, and `Continue` never need invented objects.
 
-RULE-ID: copy.buttons.destructive SCOPE: button-label TYPE: MUST TOPIC: trust RULE: Name destructive action explicitly. DESCRIPTION: The final action must say what will be deleted, removed, discarded, or ended.
+RULE-ID: copy.buttons.destructive SCOPE: button-label TYPE: MUST TOPIC: trust RULE: Name the destructive action explicitly and make its target clear through the button and its surrounding context. DESCRIPTION: `Delete` is sufficient when the target is already unmistakable. Apply copy.buttons.object when the button needs an object to remove ambiguity; never require it solely because this is the final destructive action. Preserve the consequence information required by interaction.consequence.
 
 RULE-ID: copy.buttons.pairs SCOPE: action-group TYPE: SHOULD TOPIC: copy RULE: Give paired actions distinct outcomes. DESCRIPTION: Use a safe exit plus the real action rather than ambiguous `No` and `Yes` labels.
 
@@ -97,7 +103,9 @@ RULE-ID: copy.confirmation.alignment SCOPE: confirmation-dialog TYPE: MUST TOPIC
 
 ## Labels, placeholders, and help
 
-RULE-ID: copy.labels.object SCOPE: form-label TYPE: MUST TOPIC: forms RULE: Make a field label name the value or choice. DESCRIPTION: The label must keep the empty control understandable without turning into an instruction sentence.
+RULE-ID: copy.labels.object SCOPE: form-label TYPE: MUST TOPIC: forms RULE: Make a field label name the value or choice. DESCRIPTION: The label must keep the empty control understandable without turning into an instruction sentence. Prefer the familiar object name; omit entry mechanics or format qualifiers already made clear by the field and its useful hint. Keep any qualifier needed to distinguish actual values or choices.
+
+RULE-ID: copy.labels.optional SCOPE: form-label TYPE: MUST TOPIC: forms RULE: Mark optional fields with the word `Optional` and leave required fields visually unmarked; do not use an asterisk or another required-field indicator. DESCRIPTION: Unmarked fields are required by default; preserve programmatic required state for assistive technology. `form-fields.optional-placement` owns indicator placement, `forms.label` keeps labels persistent and accessible, and `forms.local-error` governs feedback when required information is missing.
 
 RULE-ID: copy.typed-fields.no-placeholder SCOPE: typed-field TYPE: MUST TOPIC: forms RULE: Do not use placeholders in typed fields. DESCRIPTION: Text, email, phone, search, number, password, textarea, and editable text controls stay empty with persistent labels; examples and constraints belong in helper text.
 
@@ -109,11 +117,11 @@ RULE-ID: copy.helper.prevent SCOPE: helper-text TYPE: MUST TOPIC: validation RUL
 
 ## Validation and errors
 
-RULE-ID: copy.errors.problem-fix SCOPE: error-message TYPE: MUST TOPIC: errors RULE: State the problem and the available recovery. DESCRIPTION: The user should know what failed and what they can do next; omit a recovery only when none exists.
+RULE-ID: copy.errors.problem-fix SCOPE: error-message TYPE: MUST TOPIC: errors RULE: Explain what is wrong or what needs to change; include a next step only when it adds useful information, and suggest retrying only when known behavior supports it. DESCRIPTION: A direct correction such as `Enter a whole number.` can be sufficient. `Name is too long. Use 50 characters or fewer.` adds a useful known limit; appending `Shorten it.` merely repeats the obvious. Do not require a separate problem sentence or recovery sentence when the message is already understandable in context.
 
 RULE-ID: copy.errors.specific SCOPE: error-message TYPE: MUST TOPIC: errors RULE: Name the real failed object or condition. DESCRIPTION: `Error`, `Invalid`, and `Something went wrong` are not sufficient on their own.
 
-RULE-ID: copy.errors.field SCOPE: field-error TYPE: SHOULD TOPIC: validation RULE: Name the expected field value or correction. DESCRIPTION: Prefer `Enter a valid email address` to a bare judgment such as `Invalid email`.
+RULE-ID: copy.errors.field SCOPE: field-error TYPE: MUST TOPIC: validation RULE: Name the expected field value or correction. DESCRIPTION: Prefer `Enter a valid email address` to a bare judgment such as `Invalid email`.
 
 RULE-ID: copy.errors.request SCOPE: request-error TYPE: MUST TOPIC: errors RULE: Describe request-level failure without pretending to know its cause. DESCRIPTION: Distinguish known timeout, permission, conflict, unavailable service, and unknown failure only when the product has that evidence.
 
@@ -137,7 +145,7 @@ RULE-ID: copy.missing.pending SCOPE: missing-value TYPE: MUST TOPIC: data-displa
 
 RULE-ID: copy.missing.not-applicable SCOPE: missing-value TYPE: MUST TOPIC: data-display RULE: Use `N/A` only when the field does not apply. DESCRIPTION: Prefer a contextual word over an unexplained dash.
 
-RULE-ID: copy.status.success SCOPE: status-message TYPE: SHOULD TOPIC: feedback RULE: Confirm meaningful success in one short sentence. DESCRIPTION: Confirm what completed when the user needs confidence; do not celebrate routine noise.
+RULE-ID: copy.status.success SCOPE: status-message TYPE: SHOULD TOPIC: feedback RULE: When success needs an additional message under `RULE-ID: feedback.sufficient`, confirm what completed in one short sentence. DESCRIPTION: Existing control, content, browser, or operating-system feedback may already establish completion; routine success does not automatically need authored copy.
 
 RULE-ID: copy.status.waiting SCOPE: status-message TYPE: SHOULD TOPIC: feedback RULE: Name long-running work when the wait is meaningful. DESCRIPTION: Use the real activity, such as saving, syncing, importing, or deleting, without promising duration.
 

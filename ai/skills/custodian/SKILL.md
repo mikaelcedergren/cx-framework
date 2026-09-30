@@ -1,6 +1,6 @@
 ---
 name: custodian
-description: Use automatically to validate an existing user-facing design brief, UX/UI proposal, implementation, or release candidate before it progresses. Review goals, mental model, design-system fit, accessibility, reachable states, microcopy, interaction quality, and supporting evidence. Trigger when asked to review, validate, approve, sanity-check, critique, audit, or decide whether existing work is ready. Do not use to create, rewrite, redesign, or implement the solution; hand that work to the owning skill after review.
+description: Use automatically to validate an existing user-facing design brief, UX/UI proposal, implementation, or release candidate before it progresses. Review goals, mental model, design-system fit, accessibility, reachable states, microcopy, interaction quality, and supporting evidence. Trigger automatically before an implemented feature is declared complete or ready to use, and when asked to review, validate, approve, sanity-check, critique, audit, or decide whether existing work is ready. Do not use to create, rewrite, redesign, or implement the solution; hand that work to the owning skill after review.
 ---
 
 # Custodian
@@ -51,6 +51,14 @@ Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-fac
 
 When calibrating severity or separating defects from taste, load `../../profile/design-lead-profile.md` whole and weigh consequence the way that designer would. The profile is non-normative and carries the lowest authority: it cannot create a finding, downgrade a rule violation, or override any binding source; it only shapes judgment where the rules leave room.
 
+## Automatic completion gate
+
+Apply `RULE-ID: delivery.custodian-review` after a feature's implementation and verification, even when the user did not separately request review. Inspect the actual current output against the accepted outcome. For an interface, use the mandatory final rendered-UI review below; for output without an interface, inspect the relevant artifacts and behavioral evidence without inventing a screen requirement.
+
+Identify the version or current artifact reviewed, coverage, verdict, and unresolved findings in the working record. Review in a distinct reviewer pass; a separate agent may perform it when available, but is not required. Tests and the maker's assurances support evidence and never substitute for the review. Route corrections to the owning skill and re-review affected output after changes. Do not let an earlier brief approval or a stale screenshot approve later implementation.
+
+Only `Pass` supports an unqualified completion claim. `Blocked`, `Unverified`, `Needs changes`, and `Polish` leave completion open; explicitly accepted limitations must remain disclosed rather than being relabelled as a pass. Keep the user-facing result brief.
+
 ## Review method
 
 [MUST] Read and apply `RULE-ID: copy.sentence-case` when reviewing interface copy; perform its capitalization check on the actual wording and flag violations.
@@ -58,7 +66,7 @@ When calibrating severity or separating defects from taste, load `../../profile/
 1. Identify the goal, artifact type, maturity, and decision being requested.
 2. Establish what the evidence can and cannot verify.
 3. Search only the rules relevant to the reachable behavior in scope.
-4. Run the independent semantic coherence gate below.
+4. Run the independent semantic coherence gate below and the **Required relationship and attention check** in `../../design/02-design-system.md` against the artifact. Inspect actual grouping, field hints, existing platform feedback, optional elements, and repeated actions; do not accept the maker's check record as proof.
 5. Find root issues and consolidate related symptoms.
 6. Choose the verdict against the next gate, not an imagined final release.
 7. For an implementation or release-candidate gate, complete the mandatory final rendered-UI review below.
@@ -97,9 +105,9 @@ For every rendered implementation or release-candidate gate, inspect the actual 
 2. Inspect every important interaction state at the same viewport, including applicable detail panels, popovers, menus, expanded rows, dialogs, loading, empty, and error states.
 3. After corrections, capture matching after screenshots and compare them directly with the before set at the same viewport.
 4. Re-run all eight lenses on the after set:
-   - **Necessity:** Reject information, labels, containers, explanations, and controls that do not improve understanding or action. Detect repeated information expressed in slightly different forms.
+   - **Necessity:** Apply `RULE-ID: content.scannable`, `RULE-ID: feedback.sufficient`, and `RULE-ID: interaction.repeat-action`. Reject information, labels, containers, explanations, and controls that do not improve understanding or action, including success feedback already supplied by the browser or operating system and another control for an action the original still performs.
    - **Hierarchy and scannability:** Apply `RULE-ID: content.scannable`; make the point and most important actions apparent before close reading, and reject competing emphasis, unnecessary heading levels, or text blocks longer than the task requires.
-   - **Grouping:** Group by meaning and task. Apply `RULE-ID: surfaces.one-boundary` when reviewing container composition.
+   - **Grouping:** Apply `RULE-ID: layout.relationships`, `RULE-ID: forms.action-scope`, and `RULE-ID: field-hints.start-alignment`; check that actions and hints stay with what they affect. Apply `RULE-ID: surfaces.one-boundary` when reviewing container composition.
    - **Affordance:** Apply `RULE-ID: surfaces.light-first`; keep interactive elements discoverable and read-only information non-editable without turning every action into a button.
    - **Semantic cues:** Use icons, typography, status treatment, and restrained color only when they improve recognition or scanning. Reject decoration without meaning.
    - **Spacing:** Apply `RULE-ID: layout.breathing-room`; check rhythm, alignment, density, and consistency across siblings.

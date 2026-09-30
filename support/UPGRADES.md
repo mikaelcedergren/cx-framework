@@ -14,6 +14,34 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.21
+
+- The editorial typeface now uses Literata with real weights 200–900 instead of
+  DM Serif Display. Re-copy the package's `fonts/*.woff2` assets and remove
+  `DMSerifDisplay.woff2`. Existing `--typeface-editorial` and
+  `--font-family-heading` selections inherit the new face without markup changes.
+
+- Editorial `h2` uses `--font-size-title-2`; `h3` through `h6` use
+  `--font-size-title-3`. List-item spacing uses `--space-xs`. Consumers inherit
+  this shared scale and should remove any local compensation for the previous
+  relative heading sizes.
+
+- `cx-filter-bar` and `cx-table-view` add the optional `[filter-bar-actions]` slot
+  after Table properties and before the kebab. Project buttons or other controls
+  directly; the bar owns spacing and wrapping, with no gap when empty. The existing
+  `actions` menu input and table view's `[actions]` heading slot are unchanged.
+  `showFilterBar=false` hides the new table-view slot together with the bar.
+
+- `cx-detail-panel` adds `footerMode="default" | "custom"` (default: `default`).
+  Default keeps the close arrow at the end. Custom replaces it with the supplied
+  end controls. The existing `[detail-panel-footer]` slot remains the start group;
+  use the new `[detail-panel-footer-end]` slot only in custom mode. Project controls directly
+  so the panel owns grouping and wrapping. `footer=false` hides both slots.
+- Custom footers must include a visible close control. Bind it to the panel's
+  public `dismiss()` method, which preserves `dismissRequest`, Escape layering,
+  closing animation, `dismissed`, and focus return. Do not remove the panel
+  directly from a custom Close button. `dismiss()` returns whether closing began.
+
 ## 0.16.20
 
 - Portable AI copy guidance: review interface wording against `copy.sentence-case` in

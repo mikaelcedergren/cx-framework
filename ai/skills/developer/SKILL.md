@@ -30,8 +30,9 @@ Use this skill as the finished-product engineering lens. Execute the approved sc
 - Do not bypass a `Blocked` Custodian verdict.
 - Do not progress an `Unverified` gate as approved work; gather the required evidence and return it to `custodian`.
 - Resolve `Needs changes` before normal progression unless the user explicitly accepts the named residual risk.
-- `Polish` and `Pass` may progress.
-- Use `custodian` for requested approval or readiness review; Developer does not grade its own work.
+- `Polish` and `Pass` may progress through intermediate gates; `Polish` is not final completion.
+- Apply `RULE-ID: delivery.custodian-review`: automatically use `custodian` after implementation and verification, before calling a feature done or ready to use. Developer does not grade its own work.
+- Give Custodian the accepted outcome, current delivered output, and verification evidence. Fix in-scope findings without another permission request, then return the affected output for review. Missing evidence remains `Unverified`; unresolved findings remain open unless the user explicitly accepts the named limitation.
 
 ## AI design package
 
@@ -62,6 +63,8 @@ Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-fac
 3. Preserve the accepted semantic contract across the visible promise, relevant capabilities, state owner, effect lifetime, reachable behavior, and documentation.
 4. Verify each important claim with evidence proportional to its risk.
 5. Reread the touched area, remove duplication or dead work, and check an adjacent edge case before handoff.
+6. For user-facing work, apply the **Required relationship and attention check** in `../../design/02-design-system.md` to the accepted brief before implementation and to the actual rendered result before review. Preserve its decisions; do not add extra copy, actions, or feedback merely because implementation supports them.
+7. Complete the Custodian review required by the quality-gate contract before the final completion response; re-review any output materially changed after a verdict.
 
 ## Engineering guardrails
 
@@ -110,7 +113,7 @@ Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-fac
 - For user-facing controls, verify the actual read and write owner, the result after revisit or reload when persistence matters, recovery where applicable, and the absence of unintended entity or system writes.
 - A passing build is not browser verification.
 - When local authority defines a served delivery target, verify that target's build identity against the released source before claiming completion; an isolated preview is not delivery.
-- Use browser verification when rendered behavior, layout, interaction, responsive behavior, or accessibility confidence is below 90%.
+- Use browser verification for uncertain rendered behavior, layout, interaction, responsive behavior, or accessibility. Confidence never exempts user-facing feature completion from Custodian's mandatory final rendered-UI review.
 - Do not claim verification that did not run or evidence that was not observed.
 - If a check cannot run, say what blocked it and what was verified instead.
 

@@ -17,7 +17,7 @@ Use this skill as the product-design lens. Resolve the experience and prepare a 
 
 - Talk like a designer, not a code explainer.
 - Establish the user's goal, primary task, product context, and current design stage before proposing direction.
-- Preserve requested outcomes and real constraints, not unexamined interface prescriptions. Unless the user expressly says a proposed UI choice is fixed or non-negotiable, challenge it as design material even when the request says the interface “shows,” “uses,” or “includes” it.
+- Apply the precedence in `00-start-here.md`: preserve explicit visual corrections and settled visual direction; critique inherited or exploratory interface choices. Do not reopen the user’s settled placement, grouping, visible wording, or removals merely to apply another preference.
 - Flag what feels wrong, unclear, noisy, inconsistent, fragile, inaccessible, or unfinished while shaping the solution.
 - Make assumptions and unresolved product decisions explicit; do not quietly choose product meaning.
 - Do not edit or implement while the user is discussing, exploring options, or asking for judgment.
@@ -56,14 +56,14 @@ When the task requires design judgment rather than a rule lookup — exploring a
 1. Define the user goal, primary task, mental model, and constraints.
 2. Inventory every proposed or inherited interface choice and separate it from product facts, desired outcomes, and explicitly fixed constraints. Classify each choice internally as `Keep`, `Correct`, `Remove`, or `Unknown`; do not carry one into the brief unexamined.
 3. Inspect the consuming product's local instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage before proposing new structure or components.
-4. Run the semantic coherence gate below against the input before resolving information architecture, flow, behavior, hierarchy, and affordance.
-5. Declare the hierarchy: primary task or focal information, primary action when one exists, secondary actions, supporting information, and what remains hidden until relevant.
-6. Define reachable states, accessibility expectations, and copy needs.
-7. Run the gate again against the draft, remove unnecessary complexity, and record any decision still blocking the next gate.
+4. Run the semantic coherence gate below and the **Required relationship and attention check** in `../../design/02-design-system.md` before choosing components or resolving layout. Record the decisions for each material task group in the working notes or brief.
+5. Draft the assembled visual arrangement with actual visible wording, as required by that check. Establish the primary task, alignment, proximity, and hierarchy before adding supporting elements. Do not substitute a component inventory or “keep it simple” prose for the composition.
+6. Define reachable states, their necessary visual differences, accessibility expectations, and unresolved copy. A state does not automatically need another panel, paragraph, or control; keep settled component presentations and apply the feedback and removal checks.
+7. Run both checks again against the spatial draft and its exact visible words. Remove unnecessary complexity and resolve every failed check before handoff; a decision that could change the experience stays unresolved until supported. Include the compact arrangement and decisions with the brief so implementation and review can check the same result.
 
 ## Semantic coherence gate
 
-Run this gate once on the input and again before handoff. Evaluate every material surface and control internally; do not turn the gate into user-facing checklist output. A component, label, layout, or behavior included in a request, prototype, or existing implementation is a design hypothesis unless the user expressly makes it non-negotiable. Declarative wording does not make it fixed. Its presence, technical availability, or possible future usefulness is not evidence that it belongs. Surface any semantic conflict that remains inside a fixed constraint.
+Run this gate once on the input and again before handoff. Evaluate every material surface and control internally; do not turn the gate into user-facing checklist output. Apply the decision distinction in `00-start-here.md`: inherited or exploratory components, labels, and layouts are hypotheses; explicit visual corrections and settled visual direction are constraints. Declarative wording in source material alone does not make it an owner decision. Its presence, technical availability, or possible future usefulness is not evidence that it belongs. Surface any semantic conflict that remains inside a fixed constraint.
 
 - **Purpose and element:** Every item supports an evidenced user question, decision, or action. If removing an optional control, heading, explanation, or wrapper loses nothing in the supported task, remove it.
 - **Need for instructions:** Apply `RULE-ID: copy.no-convention-explanation` before specifying helper text. Ask “What uncertainty remains after looking at the interface?” and assess whether it comes from missing information or an unclear control.
@@ -75,7 +75,7 @@ Run this gate once on the input and again before handoff. Evaluate every materia
 
 Classify each material area internally as `Pass`, `Concern`, or `Unknown`. Revise every concern before handoff. Treat an unknown that could change product meaning or behavior as an unresolved decision instead of inventing a rationale. Never hand off a direct contradiction between a surface's promise, contents, and behavior.
 
-For optional interface choices, lack of demonstrated value resolves to `Remove`, not `Keep` or a speculative rationale. Do not call an interface choice required unless the user expressly fixed it or a binding product or component contract requires it. When a material input choice is corrected or removed, name that correction briefly in the design response so the rejected assumption cannot silently return downstream.
+For optional interface choices, lack of demonstrated value resolves to `Remove`, not `Keep` or a speculative rationale. Do not call an interface choice required unless it follows an explicit owner decision under `00-start-here.md` or a binding product or component contract. When a material input choice is corrected or removed, name that correction briefly in the design response so the rejected assumption cannot silently return downstream.
 
 For a named component role or pattern, discover how the consuming product currently fulfills that role. When a local implementation exists, inspect its local guidance and public contract. Require a coherent set of relevant capabilities, not every possible option its API happens to expose, and do not import an exact component name or API from another platform.
 
@@ -130,7 +130,7 @@ Before the build gate, make the brief concrete:
 - relevant capability families and deliberately separate peer functions
 - reachable states and recovery paths
 - accessibility expectations
-- copy needs or settled wording
+- the compact visual arrangement with exact visible labels, actions, and hints; identify unresolved wording rather than filling the layout with explanatory copy
 - visual risks and unresolved product decisions
 - rationale for major design decisions, tied to the user goal, risk addressed, and accepted tradeoff; omit settled system defaults
 
