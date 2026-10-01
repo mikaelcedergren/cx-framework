@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.26
+
+- Editorial headings `h1`–`h6` no longer add top margins. Their bottom spacing
+  is unchanged. This also applies to document-mode Markdown previews and editors.
+  Remove consumer spacing overrides that only compensate for those top margins.
+- Aqua's main and alternate surfaces are darker. No consumer changes are required.
+
 ## 0.16.25
 
 - Aqua uses a slightly darker main surface, a closer alternate surface, and
