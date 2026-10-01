@@ -14,6 +14,11 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.25
+
+- Aqua uses a slightly darker main surface, a closer alternate surface, and
+  tangerine accents. No consumer changes are required.
+
 ## 0.16.24
 
 - Parallax now uses image-relative travel from -6% to +6%, a 1.14 crop scale,

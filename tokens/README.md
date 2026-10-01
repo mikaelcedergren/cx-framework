@@ -30,9 +30,10 @@ Use `mood` for semantic intent. Use `color` only when hue itself is user-facing 
 
 The built-in theme defaults map `--primary` to blue in Light and Aqua and violet in Dark and
 Night. Aqua is a dark ocean profile: deep blue-green surfaces, white text, blue actions,
-and turquoise accents. Its full palette is tuned for dark surfaces, with lighter
+and tangerine accents. Its alternate surface is slightly darker than the main surface.
+Its full palette is tuned for dark surfaces, with lighter
 alternate shades and dark text on filled controls. Success uses leaf green, distinct from the
-turquoise accent. Other themes retain their own palette and semantic mappings.
+tangerine accent. Other themes retain their own palette and semantic mappings.
 
 Surface and ink roles are:
 

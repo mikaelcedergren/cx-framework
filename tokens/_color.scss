@@ -143,7 +143,7 @@
     --placeholder: rgb(244 247 252 / 30%);
 }
 
-/* Aqua uses deep ocean surfaces with blue actions, turquoise accents, and
+/* Aqua uses deep ocean surfaces with blue actions, tangerine accents, and
    warm peach links. The bright palette carries dark labels on filled controls. */
 :root.theme-aqua {
     color-scheme: dark;
@@ -152,12 +152,12 @@
     --primary-opacity: var(--blue-opacity);
     --primary-alt: var(--blue-alt);
 
-    --accent: var(--cyan);
-    --accent-opacity: var(--cyan-opacity);
-    --accent-alt: var(--cyan-alt);
+    --accent: var(--tangerine);
+    --accent-opacity: var(--tangerine-opacity);
+    --accent-alt: var(--tangerine-alt);
 
-    --surface: #001e29;
-    --surface-alt: #00131a;
+    --surface: #001c26;
+    --surface-alt: #001922;
 
     --ink: #ffffff;
     --on-ink: #00131a;
