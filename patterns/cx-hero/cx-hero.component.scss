@@ -16,7 +16,10 @@ cx-hero .cx-hero {
   align-items: center;
   gap: var(--space-2xl);
   overflow: clip;
-  padding: var(--space-2xl) var(--gutter-page);
+  padding-block: var(--space-2xl);
+  // Match a cx-container in the same region, including narrower embedded heroes.
+  // Cover media remains attached to the full header bounds.
+  padding-inline: max(var(--gutter-page), calc((100% - var(--measure-xl)) / 2));
   background: var(--surface);
   color: var(--ink);
 }

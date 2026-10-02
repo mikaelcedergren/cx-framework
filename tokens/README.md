@@ -58,6 +58,22 @@ Do not stack surfaces to fake depth. Floating surfaces use deliberate contrast a
 
 ## Spacing and type
 
+Page content uses `--measure-xl` (1180px), with `--gutter-page` providing a
+minimum 24px inset on desktop and 16px on phones. `cx-container` centres that
+content frame. Heroes use the same frame inside their available region while
+cover backgrounds remain full bleed. Do not add a second width or gutter wrapper
+around a hero to align it with ordinary page sections.
+
+Reading width is independent of page alignment: `cx-editorial` caps prose at
+`--measure-md` (640px) without centring it. Keep that narrower reading column at
+the page frame's start edge unless the composition deliberately centres it.
+Hero headlines and introductions retain their own shorter line lengths.
+`--measure-sm` (360px) and `--measure-lg` (960px) support smaller content groups.
+
+For a section that breaks out of a viewport-centred column, `cx-full-bleed` uses
+`--gutter-centered` to return its content to the same page edges. This helper is
+viewport-relative; embedded regions use their own available width instead.
+
 The spacing scale follows a 4px rhythm:
 
 | Token         | Value |

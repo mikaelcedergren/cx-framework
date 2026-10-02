@@ -1,4 +1,4 @@
-@use 'breakpoints-scale' as bp;
+@use "breakpoints-scale" as bp;
 
 :root {
   --icon-size-sm: 16px;
@@ -21,7 +21,10 @@
   /* Page gutter — horizontal air between content and the viewport edge. The centred variant
      pads a full-bleed section so its content lines up with a cx-container column. */
   --gutter-page: var(--space-lg);
-  --gutter-centered: max(var(--gutter-page), calc(((100vw - var(--measure-xl)) / 2) + var(--gutter-page)));
+  --gutter-centered: max(
+    var(--gutter-page),
+    calc((100vw - var(--measure-xl)) / 2)
+  );
 }
 
 @media (max-width: #{bp.$mobile - 1px}) {

@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.27
+
+- All `cx-hero` variants now align their content with a `cx-container` in the
+  same available region. Cover backgrounds remain full width; centred copy and
+  existing text measures are unchanged. Remove consumer wrappers that constrain
+  a hero only to reproduce the page width or gutters. Keep deliberate containing
+  regions only where the whole hero belongs in a smaller layout.
+- `--gutter-centered` now matches the page container without an extra gutter.
+  Remove offsets that compensated for that discrepancy in full-bleed sections.
+
 ## 0.16.26
 
 - Editorial headings `h1`–`h6` no longer add top margins. Their bottom spacing
