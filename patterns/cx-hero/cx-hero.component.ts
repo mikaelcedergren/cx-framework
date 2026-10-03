@@ -10,8 +10,6 @@ import {
   inject,
 } from "@angular/core";
 
-import { CxParallaxDirective } from "./cx-parallax.directive";
-
 export type CxHeroVariant = "cover" | "split" | "stacked";
 export type CxHeroAlign = "start" | "center";
 export type CxHeroMediaPosition = "top" | "center" | "bottom";
@@ -33,7 +31,6 @@ const HERO_MEDIA_POSITIONS: readonly CxHeroMediaPosition[] = [
  */
 @Component({
   selector: "cx-hero",
-  imports: [CxParallaxDirective],
   templateUrl: "./cx-hero.component.html",
   styleUrl: "./cx-hero.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -14,6 +14,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.30
+
+- Hero parallax now starts from the exact resting crop and uses a CSS scroll
+  timeline, with no JavaScript handover. Movement begins as the hero scrolls past
+  the top of its scroll container and reaches 6% at exit. Browsers without
+  scroll-timeline support show the same cropped image without movement. No
+  consumer markup changes are required.
+
 ## 0.16.29
 
 - Hero parallax now reserves its cover crop from the first render, avoiding a

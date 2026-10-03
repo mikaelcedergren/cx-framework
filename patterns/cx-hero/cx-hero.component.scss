@@ -229,6 +229,33 @@ cx-hero .cx-hero--cover.cx-hero--parallax .cx-hero__media {
   transform: scale(1.14);
 }
 
+// The clipping frame owns the timeline so moving the image cannot feed back
+// into its progress. The initial keyframe matches the unanimated crop exactly:
+// movement starts only as the frame crosses the top of its scroll viewport.
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    cx-hero .cx-hero--cover.cx-hero--parallax {
+      view-timeline: --cx-hero-parallax block;
+      view-timeline-inset: 0;
+    }
+
+    cx-hero .cx-hero--cover.cx-hero--parallax .cx-hero__media {
+      animation: cx-hero-parallax auto cubic-bezier(0.25, 0.2, 0.75, 0.8) both;
+      animation-timeline: --cx-hero-parallax;
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
+  }
+}
+
+@keyframes cx-hero-parallax {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 6%;
+  }
+}
+
 cx-hero[data-media-position="top"] .cx-hero--cover .cx-hero__media > [media],
 cx-hero[data-media-position="top"]
   .cx-hero--cover
