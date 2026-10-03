@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.29
+
+- Hero parallax now reserves its cover crop from the first render, avoiding a
+  delayed zoom when a page appears. Reduced motion disables scrolling movement
+  while preserving that crop. No consumer changes are required.
+
 ## 0.16.28
 
 - Editorial body text now uses a 1.5 line height through its dedicated

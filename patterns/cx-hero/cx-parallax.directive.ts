@@ -11,8 +11,8 @@ import {
 } from "@angular/core";
 
 /** Gentle motion for a decorative media layer inside a stationary clipping parent.
- * Size the layer to its parent; a 1.14 scale covers the full -6% to +6% travel.
- * Owns the layer's transform animation; foreground content stays outside it.
+ * The hero reserves a 1.14 scale in CSS to cover the full -6% to +6% travel.
+ * Owns translation only, so initialization and pauses never change the crop.
  */
 @Directive({ selector: "[cxParallax]" })
 export class CxParallaxDirective {
@@ -30,7 +30,12 @@ export class CxParallaxDirective {
       const win = layer.ownerDocument.defaultView!;
       this.zone.runOutsideAngular(() => {
         const preference = win.matchMedia("(prefers-reduced-motion: reduce)");
-        let visible = false;
+        const bounds = frame.getBoundingClientRect();
+        let visible =
+          bounds.width > 0 &&
+          bounds.height > 0 &&
+          bounds.bottom > 0 &&
+          bounds.top < win.innerHeight;
         let listening = false;
         let animation = 0;
         let motion: Animation | undefined;
@@ -69,10 +74,7 @@ export class CxParallaxDirective {
               });
               win.addEventListener("resize", schedule, { passive: true });
               motion = layer.animate(
-                [
-                  { transform: "translateY(-6%) scale(1.14)" },
-                  { transform: "translateY(6%) scale(1.14)" },
-                ],
+                [{ translate: "0 -6%" }, { translate: "0 6%" }],
                 {
                   duration: 1000,
                   easing: "cubic-bezier(0.25, 0.2, 0.75, 0.8)",
@@ -81,8 +83,10 @@ export class CxParallaxDirective {
               );
               // Scroll owns time; the animation never plays on its own.
               motion.pause();
-              layer.style.willChange = "transform";
+              layer.style.willChange = "translate";
               listening = true;
+              // Set the scroll position before the new animation can paint.
+              update();
             }
             schedule();
           } else {
@@ -96,6 +100,7 @@ export class CxParallaxDirective {
         const resize = new ResizeObserver(() => {
           if (listening) schedule();
         });
+        sync();
         intersection.observe(frame);
         resize.observe(frame);
         preference.addEventListener("change", sync);

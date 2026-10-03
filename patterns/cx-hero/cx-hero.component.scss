@@ -223,6 +223,12 @@ cx-hero .cx-hero--cover .cx-hero__media > [cxHeroMedia] {
   object-fit: cover;
 }
 
+// Reserve the parallax crop before browser motion starts, including prerendered
+// pages. Pausing motion or reducing it must not change the image's scale.
+cx-hero .cx-hero--cover.cx-hero--parallax .cx-hero__media {
+  transform: scale(1.14);
+}
+
 cx-hero[data-media-position="top"] .cx-hero--cover .cx-hero__media > [media],
 cx-hero[data-media-position="top"]
   .cx-hero--cover
