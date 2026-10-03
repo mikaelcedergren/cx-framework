@@ -12,7 +12,7 @@ export declare class CxUtilityBarComponent {
     heading: string;
     visible: boolean;
     themeMode: CxUtilityBarThemeMode | undefined;
-    readonly themeModeChange: EventEmitter<"light" | "dark" | "night" | "aqua" | "high-contrast" | "wireframe" | "legacy">;
+    readonly themeModeChange: EventEmitter<"light" | "dark" | "night" | "aqua" | "estuary" | "high-contrast" | "wireframe" | "legacy">;
     protected resolvedHeading(): string;
     protected themeIcon(mode: CxUtilityBarThemeMode): CxIconName;
     protected themeTriggerLabel(mode: CxUtilityBarThemeMode): string;

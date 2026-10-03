@@ -134,3 +134,17 @@ Semantic circles and pills stay round regardless of the rectangular corner profi
 Use named shadows only for real elevation: low for raised controls, mid for menus and popovers, and high for dialogs and strong overlays. Motion uses named tokens, clarifies change, and never moves the page around someone who is reading.
 
 Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours, type, density, control sizes, and motion, then changes only visual character: conventional round corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost, and crisp shadows. It is a transition profile, never a component variant.
+
+## Estuary
+
+Estuary is a light coastal profile: `--surface` is `#F2F6F6`, `--surface-alt`
+is navy `#102F42`, which also anchors text and primary actions. Forest green
+`#14785E` supplies supporting accent. It uses the existing elegant sans-serif
+heading face, restrained round corners, and subtle shadows. Its complete palette
+includes accessible status colours; success uses leaf green separately from the accent.
+
+Select `estuary` through the existing shared theme registry. It uses the same
+document-level theme mechanism as the other appearances.
+Component structure, page layout and overlay behaviour do not change. The navy
+alternate plane requires deliberate light foregrounds in authored compositions;
+components that pair `--surface-alt` with `--ink` are not automatically inverted.

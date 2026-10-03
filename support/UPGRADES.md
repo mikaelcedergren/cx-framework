@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.33
+
+- Adds `estuary` to the existing shared theme registry. Theme
+  selectors using `CX_THEMES` discover it; consumers maintaining their own
+  finite theme lists should include the new appearance before Legacy.
+  Estuary is light-only, with a pale main surface and navy alternate surface.
+  Use deliberate light foregrounds on navy compositions; existing components
+  do not invert their text or controls automatically. No component APIs, layout
+  or theme-scoping behaviour changes.
+
 ## 0.16.32
 
 - Aqua's accent now uses the existing soft lime palette, including its hover and

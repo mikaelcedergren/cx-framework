@@ -21,6 +21,11 @@ export declare const CX_THEMES: readonly [{
     readonly icon: "aqua-mode";
     readonly group: "appearance";
 }, {
+    readonly id: "estuary";
+    readonly label: "Estuary";
+    readonly icon: "aqua-mode";
+    readonly group: "appearance";
+}, {
     readonly id: "high-contrast";
     readonly label: "High contrast";
     readonly icon: "high-contrast-mode";
@@ -40,7 +45,7 @@ export declare const CX_THEMES: readonly [{
 export declare function cxThemeStartsGroup(index: number): boolean;
 export type CxThemeDefinition = (typeof CX_THEMES)[number];
 export type CxThemeMode = CxThemeDefinition['id'];
-export declare const CX_THEME_LABELS: Readonly<Record<"light" | "dark" | "night" | "aqua" | "high-contrast" | "wireframe" | "legacy", "Light" | "Dark" | "Night" | "Aqua" | "High contrast" | "Wireframe" | "Legacy">>;
-export declare const CX_THEME_ICONS: Readonly<Record<"light" | "dark" | "night" | "aqua" | "high-contrast" | "wireframe" | "legacy", "aqua-mode" | "browser-window" | "dark-mode" | "high-contrast-mode" | "history" | "light-mode" | "night-mode">>;
+export declare const CX_THEME_LABELS: Readonly<Record<"light" | "dark" | "night" | "aqua" | "estuary" | "high-contrast" | "wireframe" | "legacy", "Light" | "Dark" | "Night" | "Aqua" | "Estuary" | "High contrast" | "Wireframe" | "Legacy">>;
+export declare const CX_THEME_ICONS: Readonly<Record<"light" | "dark" | "night" | "aqua" | "estuary" | "high-contrast" | "wireframe" | "legacy", "aqua-mode" | "browser-window" | "dark-mode" | "high-contrast-mode" | "history" | "light-mode" | "night-mode">>;
 export declare function isCxThemeMode(value: unknown): value is CxThemeMode;
 //# sourceMappingURL=theme.d.ts.map

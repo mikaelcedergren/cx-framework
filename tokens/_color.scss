@@ -288,3 +288,30 @@
     --link: var(--ink);
     --placeholder: rgb(0 0 0 / 50%);
 }
+
+:root.theme-estuary {
+  color-scheme: light;
+  --surface: #f2f6f6;
+  --surface-alt: #102f42;
+  --ink: #102f42;
+  --on-ink: #ffffff;
+  --emphasis: #ffffff;
+  --on-emphasis: #102f42;
+  --on-utility-bar: var(--surface);
+  --primary: #102f42;
+  --primary-alt: #1d475b;
+  --primary-opacity: rgb(16 47 66 / 12%);
+  --accent: var(--green);
+  --accent-alt: var(--green-alt);
+  --accent-opacity: var(--green-opacity);
+  --success: var(--lime);
+  --success-alt: var(--lime-alt);
+  --success-opacity: var(--lime-opacity);
+  --opacity-high: #506776;
+  --opacity-mid: rgb(16 47 66 / 20%);
+  --opacity-low: rgb(16 47 66 / 6%);
+  --opacity-darken: rgb(0 0 0 / 6%);
+  --placeholder: #506776;
+  --overlay-backdrop: rgb(12 41 57 / 70%);
+  --link: var(--accent);
+}
