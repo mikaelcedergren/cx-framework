@@ -1,4 +1,21 @@
-@if (loading) {
+<ng-template #content><ng-content /></ng-template>
+@if (reserveText.trim()) {
+  <div class="cx-skeleton-loader__text">
+    <span class="cx-skeleton-loader__reserve" aria-hidden="true">{{
+      reserveText
+    }}</span>
+    @if (loading) {
+      <span
+        class="cx-skeleton-loader__text-placeholder"
+        aria-hidden="true"
+      ></span>
+    } @else {
+      <div class="cx-skeleton-loader__text-content">
+        <ng-container *ngTemplateOutlet="content" />
+      </div>
+    }
+  </div>
+} @else if (loading) {
   <div
     class="cx-skeleton-loader"
     [class.cx-skeleton-loader--frozen]="skeleton.frozen"
@@ -28,5 +45,5 @@
     }
   </div>
 } @else {
-  <ng-content />
+  <ng-container *ngTemplateOutlet="content" />
 }

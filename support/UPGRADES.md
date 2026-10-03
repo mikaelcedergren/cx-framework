@@ -14,6 +14,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.31
+
+- `cx-skeleton-loader` adds `reserveText` for late-arriving text. Supply a localized
+  representative string and keep the loader mounted across loading, success and
+  failure. It reserves the same responsive text footprint in every state using
+  inherited typography; larger results remain readable and can grow.
+- In hero body or metadata slots, use this text reservation instead of inserting
+  async rows after first paint. Parallax cannot prevent content-driven resizing.
+  Existing block skeletons retain their presentation.
+
 ## 0.16.30
 
 - Hero parallax now starts from the exact resting crop and uses a CSS scroll

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { NgTemplateOutlet } from "@angular/common";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
-export type CxSkeletonLoaderShape = 'table' | 'list' | 'chart' | 'blocks';
-export type CxSkeletonLoaderRowHeight = '16' | '32' | '64' | '128' | '256';
-export type CxSkeletonLoaderRowWidth = '50' | '100';
-export type CxSkeletonLoaderGap = '4' | '8' | '16';
-export type CxSkeletonLoaderMargin = '0' | '16';
+export type CxSkeletonLoaderShape = "table" | "list" | "chart" | "blocks";
+export type CxSkeletonLoaderRowHeight = "16" | "32" | "64" | "128" | "256";
+export type CxSkeletonLoaderRowWidth = "50" | "100";
+export type CxSkeletonLoaderGap = "4" | "8" | "16";
+export type CxSkeletonLoaderMargin = "0" | "16";
 
 export interface CxSkeletonLoaderCell {
   height?: CxSkeletonLoaderRowHeight;
@@ -36,20 +37,24 @@ export class CxSkeletonLoader {
     const rows = Array.from({ length: rowCount }, () => ({
       cells: Array.from({ length: columnCount }, () => ({})),
     }));
-    return CxSkeletonLoader.of(rows, '8', '16');
+    return CxSkeletonLoader.of(rows, "8", "16");
   }
 
   public static ofList(itemCount = 3, groupCount = 0): CxSkeletonLoader {
     const rows: CxSkeletonLoaderRow[] = [];
-    for (let groupIndex = 0; groupIndex < Math.max(groupCount, 1); groupIndex += 1) {
+    for (
+      let groupIndex = 0;
+      groupIndex < Math.max(groupCount, 1);
+      groupIndex += 1
+    ) {
       if (groupCount > 0) {
-        rows.push({ width: '50', cells: [{}] });
+        rows.push({ width: "50", cells: [{}] });
       }
       for (let itemIndex = 0; itemIndex < itemCount; itemIndex += 1) {
         rows.push({ cells: [{}] });
       }
     }
-    return CxSkeletonLoader.of(rows, '8', '16');
+    return CxSkeletonLoader.of(rows, "8", "16");
   }
 
   public static ofChart(): CxSkeletonLoader {
@@ -57,26 +62,30 @@ export class CxSkeletonLoader {
       [
         {
           cells: [
-            { height: '32' },
-            { height: '32' },
-            { height: '64' },
-            { height: '128' },
-            { height: '32' },
-            { height: '16' },
-            { height: '64' },
+            { height: "32" },
+            { height: "32" },
+            { height: "64" },
+            { height: "128" },
+            { height: "32" },
+            { height: "16" },
+            { height: "64" },
           ],
         },
       ],
-      '8',
-      '16',
+      "8",
+      "16",
     );
   }
 
-  public static ofBlocks(rowCount = 2, columnCount = 1, height: CxSkeletonLoaderRowHeight = '128'): CxSkeletonLoader {
+  public static ofBlocks(
+    rowCount = 2,
+    columnCount = 1,
+    height: CxSkeletonLoaderRowHeight = "128",
+  ): CxSkeletonLoader {
     const rows = Array.from({ length: rowCount }, () => ({
       cells: Array.from({ length: columnCount }, () => ({ height })),
     }));
-    return CxSkeletonLoader.of(rows, '8', '16');
+    return CxSkeletonLoader.of(rows, "8", "16");
   }
 
   public withRows(rows: readonly CxSkeletonLoaderRow[]): CxSkeletonLoader {
@@ -99,13 +108,14 @@ export class CxSkeletonLoader {
 const DEFAULT_SKELETON = CxSkeletonLoader.ofTable();
 
 @Component({
-  selector: 'cx-skeleton-loader',
-  templateUrl: './cx-skeleton-loader.component.html',
-  styleUrl: './cx-skeleton-loader.component.scss',
+  selector: "cx-skeleton-loader",
+  imports: [NgTemplateOutlet],
+  templateUrl: "./cx-skeleton-loader.component.html",
+  styleUrl: "./cx-skeleton-loader.component.scss",
   host: {
-    role: 'status',
-    '[attr.aria-busy]': 'loading ? "true" : "false"',
-    'aria-label': 'Loading',
+    "[attr.role]": 'loading ? "status" : null',
+    "[attr.aria-busy]": 'loading ? "true" : "false"',
+    "[attr.aria-label]": 'loading ? "Loading" : null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -124,16 +134,23 @@ export class CxSkeletonLoaderComponent {
 
   @Input() loading = true;
 
+  /** Localized representative text that reserves wrapping space in every state.
+   * Use inline text content with the same typography. Larger results may grow;
+   * the reservation never clips content or guesses an unknown final size.
+   * Empty keeps the existing block skeleton presentation.
+   */
+  @Input() reserveText = "";
+
   protected rows(): readonly CxSkeletonLoaderRow[] {
     return this.skeleton.rows;
   }
 
   protected rowWidth(row: CxSkeletonLoaderRow): CxSkeletonLoaderRowWidth {
-    return row.width ?? '100';
+    return row.width ?? "100";
   }
 
   protected cellHeight(cell: CxSkeletonLoaderCell): CxSkeletonLoaderRowHeight {
-    return cell.height ?? '32';
+    return cell.height ?? "32";
   }
 
   protected animationDelay(rowIndex: number, cellIndex: number): number {

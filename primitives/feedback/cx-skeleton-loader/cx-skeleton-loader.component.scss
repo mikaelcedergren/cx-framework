@@ -99,3 +99,29 @@
     animation: none;
   }
 }
+
+// Both layers participate in the same grid track. Keeping the measuring text
+// after loading prevents shorter results and error messages from collapsing it.
+.cx-skeleton-loader__text {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cx-skeleton-loader__reserve,
+.cx-skeleton-loader__text-content,
+.cx-skeleton-loader__text-placeholder {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.cx-skeleton-loader__reserve {
+  visibility: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+.cx-skeleton-loader__text-placeholder {
+  border-radius: var(--radius-sm);
+  background: var(--opacity-low);
+}
