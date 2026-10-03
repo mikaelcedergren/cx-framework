@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.32
+
+- Aqua's accent now uses the existing soft lime palette, including its hover and
+  tinted states. Consumers using the accent role inherit the change without
+  markup or API changes.
+
 ## 0.16.31
 
 - `cx-skeleton-loader` adds `reserveText` for late-arriving text. Supply a localized
