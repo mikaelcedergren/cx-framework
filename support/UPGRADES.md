@@ -14,6 +14,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.28
+
+- Editorial body text now uses a 1.5 line height through its dedicated
+  `--line-height-editorial-body` token. Other typography roles are unchanged.
+  No consumer changes are required.
+
 ## 0.16.27
 
 - All `cx-hero` variants now align their content with a `cx-container` in the

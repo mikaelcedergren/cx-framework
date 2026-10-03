@@ -113,7 +113,7 @@ Its self-hosted variable face supplies weights 200–900 and optical sizes 7–7
 | `--font-size-editorial-body`      |  18px | Article, landing-page, and public information body copy   |
 | `--font-size-editorial-lead`      |  22px | The opening paragraph immediately after an editorial `h1` |
 | `--font-weight-editorial-heading` |   700 | Bold weight for editorial and public-page headings        |
-| `--line-height-editorial-body`    |  1.65 | Sustained reading rhythm                                  |
+| `--line-height-editorial-body`    |   1.5 | Sustained reading rhythm                                  |
 | `--line-height-editorial-lead`    |   1.5 | Opening editorial summary rhythm                          |
 
 These roles belong only to the shared editorial mode. Application UI, components, controls, dialogs, assistant answers, and operational data keep the fixed product scale above. Consumers opt into editorial typography as one system; they do not select these tokens element by element.
