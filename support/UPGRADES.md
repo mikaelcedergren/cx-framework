@@ -14,6 +14,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.35
+
+- Editorial content now fills its container. `.cx-editorial` no longer caps prose
+  at the medium reading measure. When a composition needs a narrower reading
+  column, constrain the containing layout explicitly. Document previews and
+  editorial Markdown inherit this change without API or markup changes.
+
 ## 0.16.34
 
 - Estuary's hue palette now uses pastel fills with slightly deeper pastel hover

@@ -2,8 +2,8 @@
 //
 // Wrap an authored content stream on an article, landing page, or public
 // information page in `.cx-editorial`. One opt-in owns its responsive headline,
-// readable body, semantic hierarchy, measure, and prose rhythm. Application UI
-// keeps the ordinary type scale and never uses this wrapper.
+// readable body, semantic hierarchy, and prose rhythm. The container owns width.
+// Application UI keeps the ordinary type scale and never uses this wrapper.
 //
 // Global (not component-scoped) on purpose: an article is usually injected via
 // [innerHTML] (markdown, CMS), which Angular's view encapsulation never tags —
@@ -20,7 +20,7 @@
 @forward "editorial-type";
 
 .cx-editorial {
-  max-inline-size: var(--measure-md);
+  inline-size: 100%;
   color: var(--ink);
   font-family: var(--font-family-base);
   font-size: var(--font-size-editorial-body);

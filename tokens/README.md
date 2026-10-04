@@ -64,9 +64,9 @@ content frame. Heroes use the same frame inside their available region while
 cover backgrounds remain full bleed. Do not add a second width or gutter wrapper
 around a hero to align it with ordinary page sections.
 
-Reading width is independent of page alignment: `cx-editorial` caps prose at
-`--measure-md` (640px) without centring it. Keep that narrower reading column at
-the page frame's start edge unless the composition deliberately centres it.
+`cx-editorial` fills its container without imposing a maximum width. The containing
+layout owns reading width and placement; use a measure on that container when the
+composition calls for a narrower column, such as `--measure-md` (640px).
 Hero headlines and introductions retain their own shorter line lengths.
 `--measure-sm` (360px) and `--measure-lg` (960px) support smaller content groups.
 

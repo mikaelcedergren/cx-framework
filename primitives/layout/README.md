@@ -164,11 +164,11 @@ There are deliberately **no margin or gap utilities** — gap belongs to the lay
 
 ## Editorial
 
-Utilities and primitives are for product UI. When the surface is an article, marketing landing page, or public information page whose primary task is reading or persuasion, wrap each authored content stream in `.cx-editorial` and write semantic HTML. That one opt-in owns the responsive display `h1`, 18px reading body, lead paragraph, six-level heading hierarchy, measure, lists, quotations, figures, code, and tables. Never assemble an editorial page from type-size or weight utilities, and never use `.cx-editorial` for cards, forms, dialogs, assistant answers, operational tables, or other typical UI.
+Utilities and primitives are for product UI. When the surface is an article, marketing landing page, or public information page whose primary task is reading or persuasion, wrap each authored content stream in `.cx-editorial` and write semantic HTML. That one opt-in owns the responsive display `h1`, 18px reading body, lead paragraph, six-level heading hierarchy, lists, quotations, figures, code, and tables. Never assemble an editorial page from type-size or weight utilities, and never use `.cx-editorial` for cards, forms, dialogs, assistant answers, operational tables, or other typical UI.
 
 The paragraph immediately following an `h1` becomes the 22px lead automatically. Use `small` for supporting text and `dfn` for an explained term; pair an interactive `dfn` with the shared `cxTooltip` trigger or `cx-tooltip` composition wrapper. `h1` and `h2` use the product's editorial heading face at its real 400 weight, while `h3` through `h6` use the base sans at bold weight.
 
-Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored editorial sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. The content stream keeps the medium reading measure and follows its container's placement. Use the ordinary `cx-center-inline` layout utility when a standalone article should sit in the middle of an open canvas. For trusted Markdown, choose `variant="editorial"`; default Markdown remains compact application typography.
+Inline `code` is the technical-reference treatment: mono type on a quiet background. Use `cx-divider` between hand-authored editorial sections; a semantic `hr` receives the same visual weight in Markdown or CMS output. The content stream fills its container without imposing a maximum width. Its containing layout owns width and placement, including any deliberate reading measure. For trusted Markdown, choose `variant="editorial"`; default Markdown remains compact application typography.
 
 ## The page frame
 
