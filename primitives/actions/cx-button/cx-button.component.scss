@@ -68,7 +68,7 @@
 
 .cx-button--accent {
   background: var(--accent);
-  color: var(--surface);
+  color: var(--on-ink);
 }
 
 .cx-button:is(:hover, .cx-button--hover).cx-button--accent:not(

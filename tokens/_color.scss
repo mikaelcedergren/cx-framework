@@ -294,16 +294,16 @@
   --surface: #f2f6f6;
   --surface-alt: #102f42;
   --ink: #102f42;
-  --on-ink: #ffffff;
+  --on-ink: var(--ink);
   --emphasis: #ffffff;
   --on-emphasis: #102f42;
-  --on-utility-bar: var(--surface);
-  --primary: #102f42;
-  --primary-alt: #1d475b;
-  --primary-opacity: rgb(16 47 66 / 12%);
-  --accent: var(--green);
-  --accent-alt: var(--green-alt);
-  --accent-opacity: var(--green-opacity);
+  --on-utility-bar: var(--ink);
+  --primary: var(--green);
+  --primary-alt: var(--green-alt);
+  --primary-opacity: var(--green-opacity);
+  --accent: var(--tangerine);
+  --accent-alt: var(--tangerine-alt);
+  --accent-opacity: var(--tangerine-opacity);
   --success: var(--lime);
   --success-alt: var(--lime-alt);
   --success-opacity: var(--lime-opacity);
@@ -313,5 +313,5 @@
   --opacity-darken: rgb(0 0 0 / 6%);
   --placeholder: #506776;
   --overlay-backdrop: rgb(12 41 57 / 70%);
-  --link: var(--accent);
+  --link: var(--ink);
 }

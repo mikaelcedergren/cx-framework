@@ -14,6 +14,17 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.16.34
+
+- Estuary's hue palette now uses pastel fills with slightly deeper pastel hover
+  shades. Use the existing `ink` role for authored text on those fills; hues no
+  longer provide readable text on the pale main surface. Primary actions use pastel green,
+  accent uses pastel tangerine, and `on-ink` matches navy `ink`.
+  The main surface and navy alternate surface are unchanged.
+  Inspect component foreground choices when applying this palette.
+- Filled accent buttons now use `on-ink` for their labels and icons, matching
+  the other filled colour buttons in every theme. No API or markup changes.
+
 ## 0.16.33
 
 - Adds `estuary` to the existing shared theme registry. Theme

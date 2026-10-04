@@ -138,13 +138,20 @@ Legacy is the final theme in every theme selector. It inherits Light's palette, 
 ## Estuary
 
 Estuary is a light coastal profile: `--surface` is `#F2F6F6`, `--surface-alt`
-is navy `#102F42`, which also anchors text and primary actions. Forest green
-`#14785E` supplies supporting accent. It uses the existing elegant sans-serif
-heading face, restrained round corners, and subtle shadows. Its complete palette
-includes accessible status colours; success uses leaf green separately from the accent.
+is navy `#102F42`, which also anchors text. Pastel green `#A4E2C6` supplies
+primary actions, with pastel tangerine `#F3C6B0` as the supporting accent. It uses
+the existing elegant sans-serif heading face, restrained round corners, and subtle shadows. Its pastel palette uses
+navy `--ink` for readable content on hue fills; success uses soft lime separately
+from the green primary. Alternate hue shades remain pastel for hover states. Use
+`cx-text-ink` on authored text that sits on a pastel fill. `--on-ink` resolves to
+the same navy as `--ink`, so controls that consume it have dark labels.
 
 Select `estuary` through the existing shared theme registry. It uses the same
 document-level theme mechanism as the other appearances.
 Component structure, page layout and overlay behaviour do not change. The navy
 alternate plane requires deliberate light foregrounds in authored compositions;
 components that pair `--surface-alt` with `--ink` are not automatically inverted.
+
+Pastel hues are intended as fills, not text on the pale main surface. Components
+retain their existing foreground bindings; those using `--surface` for a label
+do not follow `--on-ink`. Ordinary links retain the dark ink role.
