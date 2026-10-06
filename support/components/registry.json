@@ -498,6 +498,13 @@
       "path": "primitives/feedback/cx-progress-bar/cx-progress-bar.component.ts"
     },
     {
+      "name": "cx-countdown-ring",
+      "selectors": ["cx-countdown-ring"],
+      "area": "primitive",
+      "category": "feedback",
+      "path": "primitives/feedback/cx-countdown-ring/cx-countdown-ring.component.ts"
+    },
+    {
       "name": "cx-spinner",
       "selectors": ["cx-spinner"],
       "area": "primitive",

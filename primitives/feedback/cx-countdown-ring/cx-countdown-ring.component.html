@@ -1,0 +1,19 @@
+<svg class="cx-countdown-ring__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <g transform="rotate(-90 12 12)">
+    @for (segment of segmentArcs$(); track segment.index) {
+      <circle
+        class="cx-countdown-ring__segment"
+        [class.cx-countdown-ring__segment--filled]="segment.filled"
+        cx="12"
+        cy="12"
+        r="9.25"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="butt"
+        pathLength="100"
+        [attr.stroke-dasharray]="segment.dash"
+        [attr.stroke-dashoffset]="segment.offset"
+      />
+    }
+  </g>
+</svg>

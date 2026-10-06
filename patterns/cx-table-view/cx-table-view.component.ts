@@ -65,6 +65,9 @@ export type CxTableViewPaginationMode = 'none' | 'pages';
 export class CxTableViewComponent {
   protected readonly customCells = contentChildren(CxTableCellDirective, { descendants: true });
   private readonly columnsState = signal<readonly CxTableColumn[]>([]);
+  private readonly columnOptionsState = signal<CxFilterBarColumnOption[]>([]);
+  private readonly visibleColumnIdsState = signal<string[]>([]);
+  private readonly pinnedColumnIdsState = signal<string[]>([]);
   private readonly filterValuesState = signal<CxColumnFilterValueMap>({});
 
   @ViewChild(CxFilterBarComponent)
@@ -95,9 +98,27 @@ export class CxTableViewComponent {
   @Input() sortDirection: CxTableSortDirection = 'asc';
   @Input() thenBy: string | undefined = 'none';
   @Input() thenByDirection: CxTableSortDirection = 'asc';
-  @Input() columnOptions: CxFilterBarColumnOption[] = [];
-  @Input() visibleColumnIds: string[] = [];
-  @Input() pinnedColumnIds: string[] = [];
+  @Input()
+  public set columnOptions(value: CxFilterBarColumnOption[]) {
+    this.columnOptionsState.set(value);
+  }
+  public get columnOptions(): CxFilterBarColumnOption[] {
+    return this.columnOptionsState();
+  }
+  @Input()
+  public set visibleColumnIds(value: string[]) {
+    this.visibleColumnIdsState.set(value);
+  }
+  public get visibleColumnIds(): string[] {
+    return this.visibleColumnIdsState();
+  }
+  @Input()
+  public set pinnedColumnIds(value: string[]) {
+    this.pinnedColumnIdsState.set(value);
+  }
+  public get pinnedColumnIds(): string[] {
+    return this.pinnedColumnIdsState();
+  }
   @Input()
   public set columns(value: readonly CxTableColumn[] | undefined) {
     this.columnsState.set(value ?? []);
@@ -204,7 +225,8 @@ export class CxTableViewComponent {
     ),
   );
 
-  protected get visibleColumns(): CxTableColumn[] {
+  // Keep the composed table's columns stable during its own interaction updates.
+  protected readonly visibleColumns$ = computed<CxTableColumn[]>(() => {
     const pinnedIds = new Set(this.pinnedColumnIds);
     const columnOptionsById = new Map(this.columnOptions.map(option => [option.id, option]));
     if (this.visibleColumnIds.length === 0) {
@@ -224,7 +246,7 @@ export class CxTableViewComponent {
         pinnable: this.columnIsPinnable(column, columnOptionsById),
         hideable: this.columnIsHideable(column, columnOptionsById),
       }));
-  }
+  });
 
   private columnIsPinnable(column: CxTableColumn, columnOptionsById: Map<string, CxFilterBarColumnOption>): boolean {
     const option = columnOptionsById.get(column.id);

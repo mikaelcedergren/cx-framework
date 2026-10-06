@@ -14,6 +14,81 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.0
+
+- `cx-hero` separates composition from framing. Rename old `variant="cover|split|stacked"`
+  to `layout="cover|split|stacked"`. The default is now `stacked`; existing cover
+  heroes that omitted the old prop must explicitly set `layout="cover"`.
+  New `variant="flush"` fills one half of a split hero, with `mediaSide="start|end"`
+  choosing the desktop image side. Mobile remains copy-first. The optional
+  `caption` slot stays beneath meaningful media and is unavailable on covers.
+  Button sizes and existing alignment, overlay, fade and masthead options remain.
+  Parallax travel increases modestly from 6% to 8%, retaining a static crop when
+  reduced motion is requested.
+
+- `cx-card` adds `variant="discreet"`: transparent at rest, with a soft shadow on
+  interactive hover or keyboard focus and no scaling. The new `padding` presets
+  `md`, `lg`, `xl`, and `2xl` give 16, 24, 32, and 64px outer insets across
+  every variant. Omit it to keep existing spacing. Keep a visible action cue
+  in interactive discreet cards, including for touch users.
+- `cx-card.borderRadius` also accepts `xs`, `sm`, `md`, `lg`, `xl`, and `2xl`.
+  Existing `default`, `none`, and custom pixel numbers remain supported. Inner
+  clipping now subtracts padding and border from the outer radius instead of
+  repeating it; projected elements still own their own corners.
+
+- `cx-spinner` now represents indeterminate loading only. Replace countdown uses
+  of `<cx-spinner [segments]="total" [value]="left">` with
+  `<cx-countdown-ring [segments]="total" [remaining]="left">` and import
+  `CxCountdownRingComponent`. Size, mood, and accessible label remain available.
+  The ring defaults to six segments and zero remaining, owns no timer, and requires
+  whole numbers: segments greater than zero and remaining between zero and segments.
+  Pieces empty clockwise by default; set `direction="counterclockwise"` to reverse
+  the order while keeping the same remaining count.
+
+- `cx-table` content-sized columns now fit the widest complete header or cell,
+  including its own spacing and controls. Manual resizing still takes priority,
+  so users can narrow a column and keep that width through view updates.
+  Double-click its divider or press Enter on it to fit again. No API changes.
+
+- `cx-table-view` keeps column resize and reorder gestures active while the
+  table updates. Column visibility, pinning and configuration still refresh
+  when their inputs change. `cx-table` resize handles use their full hit area
+  inside each header cell, including sticky headers and the final column.
+  No API changes or consumer workarounds are needed.
+
+- `cx-phone-field` now displays the supplied country code on first render and
+  keeps selection aligned when the code or its available options change,
+  including custom codes. No API changes; remove delayed country-code
+  assignments or consumer selection workarounds.
+
+- `cx-date-picker` and `cx-time-field` now fill their container width by default,
+  like text fields and dropdowns. Use the containing layout to choose a narrow
+  or wide field; remove fixed-width or internal stretch workarounds. Time
+  segments stay together at the start and the clear action stays at the end.
+  No new input or markup is required.
+
+- `cx-avatar` now keeps its visible surface at the selected square size,
+  including inside a badge. Initials, photos, and the fallback icon no longer
+  shrink or change its shape. No API or consumer markup changes.
+
+- `cx-account-control` with `collapsed=true` now owns a compact square trigger
+  in both top bars and navigation rails. Hidden names and chevrons no longer
+  reserve space. Remove consumer width workarounds; the tooltip and account
+  menu remain available. No API changes.
+
+- `cx-filter-bar` and `cx-table-view` now accept `[filter-bar-controls]` for
+  quick filters, search, or other view controls beside the filter/query control,
+  before active filter tags and the right-hand tools. Empty controls take no
+  space, and `showFilterBar=false` hides them with the bar. The consumer owns
+  their state and applies them to the rows. `cx-table-view` no longer accepts
+  the leading `[actions]` / `[cxTableViewActions]` heading slot; move view
+  controls to `[filter-bar-controls]` and collection actions to the existing
+  trailing `[filter-bar-actions]` slot. The `actions` menu input is unchanged.
+
+- In `cx-markdown-editor`, Backspace in an empty list item now leaves one list
+  level, including numbered and checkbox lists. Backspace immediately after a
+  Markdown conversion still restores its literal syntax. No API changes.
+
 ## 0.16.35
 
 - Editorial content now fills its container. `.cx-editorial` no longer caps prose

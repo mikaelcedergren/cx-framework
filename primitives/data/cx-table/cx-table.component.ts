@@ -1898,36 +1898,35 @@ export class CxTableComponent implements OnDestroy {
     // kinds are included automatically because the actual DOM is measured —
     // no per-kind branches, no pixel allowances.
     const selector = `[data-column-id="${this.escapeColumnId(columnId)}"]`;
-    let maxContentWidth = 0;
-    let paddedCell: HTMLElement | undefined;
+    let maxCellWidth = 0;
+    const measureCell = (cell: HTMLElement, content: HTMLElement): void => {
+      const cellStyles = window.getComputedStyle(cell);
+      const horizontalPadding =
+        (Number.parseFloat(cellStyles.paddingLeft) || 0) +
+        (Number.parseFloat(cellStyles.paddingRight) || 0);
+      maxCellWidth = Math.max(
+        maxCellWidth,
+        this.measureNaturalContentWidth(content) + horizontalPadding,
+      );
+    };
 
     const headerCell = table.querySelector(`th${selector}`) as HTMLElement | null;
     const headerContent = headerCell?.querySelector(
       '.cx-table__head-content',
     ) as HTMLElement | null;
-    if (headerContent) {
-      maxContentWidth = Math.max(maxContentWidth, this.measureNaturalContentWidth(headerContent));
-      paddedCell = headerCell ?? undefined;
+    if (headerCell && headerContent) {
+      measureCell(headerCell, headerContent);
     }
 
     table.querySelectorAll(`td${selector}`).forEach((node) => {
       const cell = node as HTMLElement;
       const content = cell.querySelector('.cx-table__measure-target') as HTMLElement | null;
       if (content) {
-        maxContentWidth = Math.max(maxContentWidth, this.measureNaturalContentWidth(content));
-        paddedCell = cell;
+        measureCell(cell, content);
       }
     });
 
-    // The cell's real computed padding, not a constant mirroring the CSS.
-    let horizontalPadding = 0;
-    if (paddedCell && typeof window !== 'undefined') {
-      const cellStyles = window.getComputedStyle(paddedCell);
-      horizontalPadding =
-        (Number.parseFloat(cellStyles.paddingLeft) || 0) +
-        (Number.parseFloat(cellStyles.paddingRight) || 0);
-    }
-    return this.clampColumnWidth(maxContentWidth + horizontalPadding);
+    return this.clampColumnWidth(maxCellWidth);
   }
 
   /**

@@ -65,6 +65,7 @@
 
   @if (isOpen$()) {
     <cx-popover
+      #popover
       [open]="true"
       [showBackdrop]="true"
       [surfaceId]="surfaceId"
@@ -106,6 +107,7 @@
 
               @if (allDayEnabled) {
                 <cx-checkbox
+                  class="cx-date-picker__all-day"
                   text="All day"
                   [selected]="effectiveAllDay$()"
                   [disabled]="disabled"

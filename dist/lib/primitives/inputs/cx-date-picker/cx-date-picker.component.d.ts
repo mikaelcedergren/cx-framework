@@ -17,6 +17,7 @@ export declare class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     protected readonly messagesId: string;
     protected readonly surfaceId: string;
     private readonly fieldRef?;
+    private readonly popoverRef?;
     label: string;
     hint: string | undefined;
     optional: boolean;

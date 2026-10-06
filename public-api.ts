@@ -86,6 +86,7 @@ export * from './primitives/feedback/cx-skeleton-loader';
 export * from './primitives/feedback/cx-state-message';
 export * from './primitives/feedback/cx-progress-bar';
 export * from './primitives/feedback/cx-spinner';
+export * from './primitives/feedback/cx-countdown-ring';
 export * from './primitives/feedback/cx-toast';
 export * from './primitives/feedback/cx-validation-message';
 

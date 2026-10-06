@@ -25,9 +25,11 @@ import {
 
 export type CxCardMood =
   "default" | "primary" | "accent" | "info" | "success" | "warning" | "danger";
-export type CxCardVariant = "default" | "border" | "frosted";
-/** Theme corners, square corners, or a custom non-negative radius in pixels. */
-export type CxCardBorderRadius = "default" | "none" | number;
+export type CxCardVariant = "default" | "border" | "frosted" | "discreet";
+export type CxCardPadding = "default" | "md" | "lg" | "xl" | "2xl";
+/** Theme corners, square corners, shared radius presets, or a custom non-negative radius in pixels. */
+export type CxCardBorderRadius =
+  "default" | "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | number;
 
 // Overflow below this many pixels is not worth an expand control: the fade would
 // hide more than the expansion reveals. Roughly one body line of text.
@@ -47,6 +49,8 @@ let nextCardContentId = 0;
   templateUrl: "./cx-card.component.html",
   styleUrl: "./cx-card.component.scss",
   host: {
+    "[attr.data-padding]": "padding",
+    "[class.cx-card-host--discreet]": 'variant === "discreet"',
     "[class.cx-card-host--frosted]": 'variant === "frosted"',
     "[class.cx-card-host--border]": 'variant === "border"',
     "[class.cx-card-host--interactive]": "activatable",
@@ -82,7 +86,9 @@ export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() icon: CxIconName | undefined;
   @Input() mood: CxCardMood = "default";
   @Input() variant: CxCardVariant = "default";
-  /** Use the theme radius, square corners, or a non-negative pixel value. */
+  /** Preset outer inset; default preserves the original section spacing. */
+  @Input() padding: CxCardPadding = "default";
+  /** Use the theme radius, a shared preset, square corners, or a non-negative pixel value. */
   @Input() borderRadius: CxCardBorderRadius = "default";
   /** Action mode. The card exposes a real button surface and emits pressed. */
   @Input({ transform: booleanAttribute }) interactive = false;
@@ -139,22 +145,42 @@ export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
       );
     }
     if (
-      this.borderRadius !== "default" &&
-      this.borderRadius !== "none" &&
+      !["default", "none", "xs", "sm", "md", "lg", "xl", "2xl"].includes(
+        String(this.borderRadius),
+      ) &&
       (typeof this.borderRadius !== "number" ||
         !Number.isFinite(this.borderRadius) ||
         this.borderRadius < 0)
     ) {
       throw new Error(
-        "cx-card borderRadius must be default, none, or a finite non-negative pixel value.",
+        "cx-card borderRadius must be default, none, xs, sm, md, lg, xl, 2xl, or a finite non-negative pixel value.",
       );
+    }
+    if (!["default", "md", "lg", "xl", "2xl"].includes(this.padding)) {
+      throw new Error("cx-card padding must be default, md, lg, xl, or 2xl.");
     }
     this.syncContentObserver();
   }
 
   protected get resolvedBorderRadius(): string | null {
     if (this.borderRadius === "default") return null;
-    return this.borderRadius === "none" ? "0px" : `${this.borderRadius}px`;
+    if (this.borderRadius === "none") return "0px";
+    return typeof this.borderRadius === "number"
+      ? `${this.borderRadius}px`
+      : `var(--radius-${this.borderRadius})`;
+  }
+
+  protected get resolvedInnerBorderRadius(): string {
+    const outer = this.resolvedBorderRadius ?? "var(--radius-lg)";
+    const inset =
+      this.padding === "default"
+        ? "var(--surface-separation)"
+        : `var(--space-${this.padding})`;
+    const border =
+      this.variant === "border" || this.variant === "frosted"
+        ? "var(--border-width)"
+        : "0px";
+    return `max(0px, calc(${outer} - ${inset} - ${border}))`;
   }
 
   public ngAfterViewInit(): void {

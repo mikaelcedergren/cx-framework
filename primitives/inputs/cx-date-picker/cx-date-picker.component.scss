@@ -1,13 +1,15 @@
 @use '../shared/field-shell' as field;
 
 :host {
-  display: inline-flex;
-  max-width: 100%;
+  display: block;
+  min-width: 0;
+  width: 100%;
 }
 
 .cx-date-picker {
-  display: inline-flex;
-  max-width: 100%;
+  display: flex;
+  min-width: 0;
+  width: 100%;
   flex-direction: column;
   gap: var(--space-xs);
 }
@@ -16,8 +18,8 @@
 
 .cx-date-picker__field {
   display: inline-flex;
-  width: calc(var(--controller-size) * 8);
-  max-width: 100%;
+  min-width: 0;
+  width: 100%;
   height: var(--controller-size);
   align-items: center;
   gap: var(--space-xs);
@@ -160,4 +162,8 @@
 .cx-date-picker__time {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.cx-date-picker__all-day {
+  flex: 0 0 auto;
 }

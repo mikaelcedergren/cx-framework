@@ -2,29 +2,31 @@
   display: inline-flex;
   flex: 0 0 auto;
   container-type: inline-size;
-  width: 32px;
-  height: 32px;
 }
 
-:host(.cx-avatar-host--small) {
-  width: 24px;
-  height: 24px;
+:host,
+.cx-avatar {
+  width: var(--controller-size);
+  height: var(--controller-size);
+  aspect-ratio: 1 / 1;
 }
 
-:host(.cx-avatar-host--default) {
-  width: 32px;
-  height: 32px;
+:host(.cx-avatar-host--small),
+:host(.cx-avatar-host--small) .cx-avatar {
+  width: var(--controller-size-small);
+  height: var(--controller-size-small);
 }
 
-:host(.cx-avatar-host--large) {
-  width: 48px;
-  height: 48px;
+:host(.cx-avatar-host--large),
+:host(.cx-avatar-host--large) .cx-avatar {
+  width: var(--controller-size-large);
+  height: var(--controller-size-large);
 }
 
 .cx-avatar {
   display: flex;
-  width: 100%;
-  height: 100%;
+  // The projected surface owns its size; the badge wraps that square.
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   overflow: hidden;

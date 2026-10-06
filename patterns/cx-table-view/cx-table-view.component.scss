@@ -10,7 +10,7 @@
   gap: var(--space-md);
 }
 
-// Heading, projected controls and the filter bar share one row while they fit.
+// Heading and the filter bar share one row while they fit.
 //
 // Wrapping rather than shrinking is deliberate. Form controls squeezed into the
 // space a long heading leaves over are worse than useless — a dropdown clips its
@@ -34,14 +34,6 @@
   line-height: var(--line-height-body);
 }
 
-.cx-table-view__actions {
-  display: inline-flex;
-  min-width: 0;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
 // The bar takes what is left of the row and wraps to a full-width line of its
 // own once that is narrower than its basis, where it lays out as it always has.
 .cx-table-view__filters {
@@ -49,10 +41,10 @@
   flex: 1 1 24rem;
 }
 
-// No heading, nothing projected and no filter bar leaves no empty row.
+// No heading and no filter bar leaves no empty row.
 .cx-table-view__header:not(
-    :has(.cx-table-view__heading, .cx-table-view__actions > *, .cx-table-view__filters)
-  ) {
+  :has(.cx-table-view__heading, .cx-table-view__filters)
+) {
   display: none;
 }
 

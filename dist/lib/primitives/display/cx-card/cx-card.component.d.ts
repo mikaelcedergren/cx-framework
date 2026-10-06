@@ -4,9 +4,10 @@ import { type CxTabItem } from "../../navigation/cx-tabs";
 import { type CxMenuItem } from "../../overlay/cx-menu";
 import * as i0 from "@angular/core";
 export type CxCardMood = "default" | "primary" | "accent" | "info" | "success" | "warning" | "danger";
-export type CxCardVariant = "default" | "border" | "frosted";
-/** Theme corners, square corners, or a custom non-negative radius in pixels. */
-export type CxCardBorderRadius = "default" | "none" | number;
+export type CxCardVariant = "default" | "border" | "frosted" | "discreet";
+export type CxCardPadding = "default" | "md" | "lg" | "xl" | "2xl";
+/** Theme corners, square corners, shared radius presets, or a custom non-negative radius in pixels. */
+export type CxCardBorderRadius = "default" | "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | number;
 export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
     private warnedInvalidActivation;
     private warnedInvalidExpansion;
@@ -22,7 +23,9 @@ export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDest
     icon: CxIconName | undefined;
     mood: CxCardMood;
     variant: CxCardVariant;
-    /** Use the theme radius, square corners, or a non-negative pixel value. */
+    /** Preset outer inset; default preserves the original section spacing. */
+    padding: CxCardPadding;
+    /** Use the theme radius, a shared preset, square corners, or a non-negative pixel value. */
     borderRadius: CxCardBorderRadius;
     /** Action mode. The card exposes a real button surface and emits pressed. */
     interactive: boolean;
@@ -48,6 +51,7 @@ export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDest
     readonly selectedTabIdChange: EventEmitter<string>;
     ngOnChanges(_changes: SimpleChanges): void;
     protected get resolvedBorderRadius(): string | null;
+    protected get resolvedInnerBorderRadius(): string;
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
     protected get resolvedHref(): string | undefined;
@@ -72,7 +76,7 @@ export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDest
     protected resolvedMenuAriaLabel(): string;
     protected onMenuItemSelect(itemId: string): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxCardComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxCardComponent, "cx-card", never, { "heading": { "alias": "heading"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "previewHeight": { "alias": "previewHeight"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; }, { "menuItemSelect": "menuItemSelect"; "pressed": "pressed"; "selectedTabIdChange": "selectedTabIdChange"; }, never, ["[slot=meta], [cxCardMeta]", "*", "[slot=footer], [cxCardFooter]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxCardComponent, "cx-card", never, { "heading": { "alias": "heading"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "previewHeight": { "alias": "previewHeight"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; }, { "menuItemSelect": "menuItemSelect"; "pressed": "pressed"; "selectedTabIdChange": "selectedTabIdChange"; }, never, ["[slot=meta], [cxCardMeta]", "*", "[slot=footer], [cxCardFooter]"], true, never>;
     static ngAcceptInputType_interactive: unknown;
     static ngAcceptInputType_expandable: unknown;
 }

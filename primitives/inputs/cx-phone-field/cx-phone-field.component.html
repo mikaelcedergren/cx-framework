@@ -29,11 +29,10 @@
         autocomplete="tel-country-code"
         name="country-code"
         [disabled]="disabled || loading"
-        [value]="countryCode$()"
         (change)="onCountryCodeChange($event)"
       >
         @for (option of countryCodeOptions$(); track option.code) {
-          <option [value]="option.code">{{ option.label }}</option>
+          <option [value]="option.code" [selected]="option.code === countryCode$()">{{ option.label }}</option>
         }
       </select>
       <cx-icon class="cx-phone-field__country-icon" icon="chevron-down" [size]="12" />

@@ -67,6 +67,7 @@
   <div
     #cardViewport
     class="cx-card__viewport"
+    [style.border-radius]="resolvedInnerBorderRadius"
     [id]="contentId"
     [class.cx-card__viewport--expandable]="expansionEnabled"
     [class.cx-card__viewport--clamped]="clamped()"

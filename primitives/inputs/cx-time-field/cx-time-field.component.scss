@@ -1,16 +1,14 @@
 @use '../shared/field-shell' as field;
 
 :host {
-  display: inline-flex;
+  display: block;
   min-width: 0;
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
 }
 
 .cx-time-field {
   min-width: 0;
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
 }
 
 @include field.field-header('cx-time-field');
@@ -33,11 +31,12 @@
 
 .cx-time-field__field-shell {
   box-sizing: border-box;
-  display: inline-flex;
-  width: max-content;
+  display: flex;
+  min-width: 0;
+  width: 100%;
   min-height: var(--controller-size);
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--space-sm);
   padding: 0 var(--space-sm);
   border: var(--line);
@@ -69,6 +68,7 @@
 
 .cx-time-field__segments {
   display: inline-flex;
+  flex: 1 1 auto;
   min-width: 0;
   align-items: center;
   gap: var(--space-sm);

@@ -122,6 +122,12 @@
 
 .cx-side-nav__collapse-toggle {
   flex: 0 0 auto;
+  opacity: 0.2;
+}
+
+.cx-side-nav:hover .cx-side-nav__collapse-toggle,
+.cx-side-nav__collapse-toggle:focus-within {
+  opacity: 1;
 }
 
 /* The flyout host renders no box of its own — its popover is fixed-positioned.

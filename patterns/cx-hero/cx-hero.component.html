@@ -1,15 +1,17 @@
 @if (resolvedHeading(); as title) {
   <header
     class="cx-hero"
-    [class.cx-hero--stacked]="variant === 'stacked'"
-    [class.cx-hero--split]="variant === 'split'"
-    [class.cx-hero--cover]="variant === 'cover'"
+    [class.cx-hero--stacked]="layout === 'stacked'"
+    [class.cx-hero--split]="layout === 'split'"
+    [class.cx-hero--cover]="layout === 'cover'"
+    [class.cx-hero--flush]="variant === 'flush'"
+    [class.cx-hero--media-start]="mediaSide === 'start'"
     [class.cx-hero--center]="align === 'center'"
     [class.cx-hero--parallax]="parallax"
     [class.cx-hero--fade-bottom]="fadeBottom"
     [class.cx-hero--under-masthead]="underMasthead"
   >
-    @if (variant === "cover" && overlayOpacity > 0) {
+    @if (layout === "cover" && overlayOpacity > 0) {
       <div
         class="cx-hero__overlay"
         aria-hidden="true"
@@ -37,11 +39,16 @@
       </div>
     </div>
 
-    <div
+    <figure
       class="cx-hero__media"
-      [attr.aria-hidden]="variant === 'cover' ? 'true' : null"
+      [attr.aria-hidden]="layout === 'cover' ? 'true' : null"
     >
-      <ng-content select="[media], [cxHeroMedia]" />
-    </div>
+      <div class="cx-hero__visual">
+        <ng-content select="[media], [cxHeroMedia]" />
+      </div>
+      <figcaption class="cx-hero__caption">
+        <ng-content select="[caption], [cxHeroCaption]" />
+      </figcaption>
+    </figure>
   </header>
 }

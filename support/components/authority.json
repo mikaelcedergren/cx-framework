@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 136,
-  "catalogSha256": "65d10eb5fcf69ccb8c9f60a1ad1b4859b7c31e42540c0602677027f6ee3f766c",
+  "componentCount": 137,
+  "catalogSha256": "73eed348247e2f6fee636620721b987035d72c5ffdbc80a4ac18d5d3433ab8f7",
   "components": [
     {
       "name": "cx-account-control",
@@ -70,17 +70,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "fb7791198d77c67f21c34162e904086dc2068c84b86a034727438e5850447ba9"
+          "sha256": "ec87e7bf482c59dc13d17685d4f0cb3076437f1fe96fc923915267fe8ad70bb2"
         },
         "template": {
           "kind": "external",
-          "sha256": "fdb0645b3ac57a781872ed7450c0dd794bca3f3cc9f12f38f5e32806e721324c"
+          "sha256": "05ac9d613e94f059c50e46323ad9b90d915034669734fb466131ef49fad9c7b3"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a74d248059331f6a2a51408f9ced459d3474ef641072a42fc03f23818fde061d"
+            "sha256": "e447376e1d0f41f491793a1deac27c5c0127c9a7edadf5e67124b51322e4c782"
           }
         ]
       }
@@ -466,7 +466,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d6d57913adb236b921c08700e9d3e995000736e71fe10e315583df067f3858be"
+            "sha256": "422fb9667b894a62d84e387b399bdfd2f708095f9d85a95966e8a1b446a2b3fe"
           }
         ]
       }
@@ -1603,6 +1603,15 @@
             "source": "decorator"
           },
           {
+            "binding": "padding",
+            "member": "padding",
+            "type": "CxCardPadding",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          },
+          {
             "binding": "previewHeight",
             "member": "previewHeight",
             "type": "number",
@@ -1703,17 +1712,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "7d92bb797a7f4831c4fa59a5bb1d59fa3c0ff6765e1341fb5048353e80d74aaa"
+          "sha256": "f9a3c031764a15408694e08fb3649b4834195c99aab7cdc13c34cab194d842d4"
         },
         "template": {
           "kind": "external",
-          "sha256": "e4dd6246105691f6a7e6a27fa10b14409b7c108364ff363412a1207aa2dc426c"
+          "sha256": "12b8ea89e5eb5a44a317cad2f8eadd57d766085f23c0f55b4993630af8476200"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d373d6202c28d752bf4a208df1898f54d5728c9ecea08c455e2c0fc2a232c906"
+            "sha256": "ed7850d1fc38c5569f5b9860866c03aad6977756ddefd11afab2ac77dab8dc35"
           }
         ]
       }
@@ -2565,6 +2574,92 @@
       }
     },
     {
+      "name": "cx-countdown-ring",
+      "area": "primitive",
+      "category": "feedback",
+      "kind": "component",
+      "selectors": [
+        "cx-countdown-ring"
+      ],
+      "publicApi": {
+        "symbol": "CxCountdownRingComponent",
+        "inputs": [
+          {
+            "binding": "ariaLabel",
+            "member": "ariaLabel",
+            "type": "string | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "direction",
+            "member": "direction",
+            "type": "CxCountdownRingDirection",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "mood",
+            "member": "mood",
+            "type": "CxCountdownRingMood",
+            "required": false,
+            "transform": null,
+            "defaultValue": "'default'",
+            "source": "decorator"
+          },
+          {
+            "binding": "remaining",
+            "member": "remaining",
+            "type": "number",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "segments",
+            "member": "segments",
+            "type": "number",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "size",
+            "member": "size",
+            "type": "CxCountdownRingSize | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "f58f8d89846727c4809b16c94919ebd1ca1fc9168cfdb4a544383c9bd69ad954"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "c02b19dbb8c4f8569ee14ba8e461b45e6be9777a53976f5f6c82280668319f07"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "deb8dd6786a29dd4087b3636988e926f0a63fa4fee5831e3a53d0186635eda57"
+          }
+        ]
+      }
+    },
+    {
       "name": "cx-date-picker",
       "area": "primitive",
       "category": "inputs",
@@ -2762,17 +2857,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "e9073d98105eb047d427390eacad71f67b542c0a7c3267276a3aaa9880fb6057"
+          "sha256": "5b61f8edb4726fa90e72979b20338f69cafeea87a6590e1dff6e604f3c426649"
         },
         "template": {
           "kind": "external",
-          "sha256": "c13e0e2e52d8423bcb3010e9cac54c80287658551e4880aa5e87c459da3a4c08"
+          "sha256": "0b1df69c04eff8d2805d1f679ee1678df7a3e3717ff12cbf185d92495069b918"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "95dd8c105a37eb39d4be366299ca4121ff7d1e9afb84b372ed2b91255695054d"
+            "sha256": "e52a8a9b2b2d6263961738f6306213cf3fda0f6f2a937ac32b4dd49fa6fa0fa1"
           }
         ]
       }
@@ -5047,6 +5142,10 @@
       "contentProjection": [
         {
           "ordinal": 1,
+          "selector": "[filter-bar-controls]"
+        },
+        {
+          "ordinal": 2,
           "selector": "[filter-bar-actions]"
         }
       ],
@@ -5056,13 +5155,13 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "0378aea1acbfc522f7b5fa0283d3eeca8483cf1520d070553b30d3568dbac59b"
+          "sha256": "ade8a2f5691294f051e1756789384c6345723fee53d3041accbbfdc63d80bbd8"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "7d5887d9e9564e3fcb60e149a18750961435a9aeeab9b9d72508f9aa48abd75f"
+            "sha256": "9190d89eec9fdb2f0034e77e4c22c915f88993d5eb83b294bc01ec7a975c3f49"
           }
         ]
       }
@@ -5145,7 +5244,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "f5953059ca780e0ca260ae2f36c2087194542f17768d6857f805c096b39cdaa8"
+            "sha256": "aa9fb5c2d55a1b5b95e53bb00a8d1507b16b254208253d0bccb2d601e135635c"
           }
         ]
       }
@@ -5298,9 +5397,27 @@
             "source": "decorator"
           },
           {
+            "binding": "layout",
+            "member": "layout",
+            "type": "CxHeroLayout",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "mediaPosition",
             "member": "mediaPosition",
             "type": "CxHeroMediaPosition",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "mediaSide",
+            "member": "mediaSide",
+            "type": "CxHeroMediaSide",
             "required": false,
             "transform": null,
             "defaultValue": null,
@@ -5365,21 +5482,25 @@
         {
           "ordinal": 5,
           "selector": "[media], [cxHeroMedia]"
+        },
+        {
+          "ordinal": 6,
+          "selector": "[caption], [cxHeroCaption]"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "ff3870daa14d03b8001284fb374a082b8f46d05c5d053ab2bdd5bc5a77ebb704"
+          "sha256": "cb6c212ffb508e76d9f94f2c7d24c0e81a26c839ec6f37e472ba0858d8645cd9"
         },
         "template": {
           "kind": "external",
-          "sha256": "b38fa51d0cc3af676ced4fb7e76c780d63a5820709ce30e16c7a6faa9c132cce"
+          "sha256": "1e2a1b46c1b13eec65f3340777d4dbb955ca716099714af730b9e6ec1e12435a"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "49568fa8b95c50b3d5819341298bc1ef98f9ae938c4e7036abf206bc5f2a4332"
+            "sha256": "bd106f9a025c3e870e443ec39478804c0100ead8e69b121acba0012b25a0aa6a"
           }
         ]
       }
@@ -8759,7 +8880,7 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "f656a1a1b00eea1d3172b27f868ef5ef98403bd096161fac2e0c0dc6b1de3459"
+          "sha256": "9de88c3036c0bfaf8b1572754148ecbc252b95910f419bc905fc4c67a3817ede"
         },
         "styles": [
           {
@@ -10578,7 +10699,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "24573f6c85f9e5086b0d1bc28a9778be4ef628989bca71904fa353747dd73422"
+            "sha256": "43cf684374eba92a5f2781f462eeb0bdd4db7579b090c3eba52119852b2dc071"
           }
         ]
       }
@@ -10998,27 +11119,9 @@
             "source": "decorator"
           },
           {
-            "binding": "segments",
-            "member": "segments",
-            "type": "number | null | undefined",
-            "required": false,
-            "transform": null,
-            "defaultValue": null,
-            "source": "decorator"
-          },
-          {
             "binding": "size",
             "member": "size",
             "type": "CxSpinnerSize | undefined",
-            "required": false,
-            "transform": null,
-            "defaultValue": null,
-            "source": "decorator"
-          },
-          {
-            "binding": "value",
-            "member": "value",
-            "type": "number | undefined",
             "required": false,
             "transform": null,
             "defaultValue": null,
@@ -11030,17 +11133,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "e4d45c643993f98f6f3c50c1b9697a3dfd35d1e30e61824a634e63cc469b4d38"
+          "sha256": "1f6c978bcce943e3c1baaef49921b43e3b6e135ab610903323e73c1ed4fabfea"
         },
         "template": {
           "kind": "external",
-          "sha256": "9e2df604f32925a438136c911e7f6e0ee157ca76dbd22ce15e2a53ff8c98d1c4"
+          "sha256": "fdec86d2c10957f4f7ea761d1e85340a7126f5384108dbcc234340d216aeb2ad"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "e0a6b786176d535bb7d3821c851d5eed03de5e3b6a7a0ee9b956ca28e9697067"
+            "sha256": "895b26aee538e0dc497827058e533c6720d093c4da323b280b09720e002262ba"
           }
         ]
       }
@@ -12190,17 +12293,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "146d5880a86b3c7ee51eb95e63452ceb7b72eae6628a166b2cf92e654af2ff3f"
+          "sha256": "01b8c989eec120d89f0bd3dfc5391236a1b925abb74dd7f84bba828f43d1914e"
         },
         "template": {
           "kind": "external",
-          "sha256": "278f5f27adf8c6efe569d467641c1a4abaea04dd7971ee73ef37e723034ecfe8"
+          "sha256": "fe5652c701cb6730694d78e1948f8ce0d8f60ea4f28e5261862d1942c4f3e37c"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "7a9879155fd17e47e2f438b83c81ba37e874d811e4128dbb04896134d332c308"
+            "sha256": "9b48e89447dc6b7da1f621318aa4b42fdb3fb0488c9b449011069a42dffa6604"
           }
         ]
       }
@@ -12284,7 +12387,7 @@
             "type": "CxFilterBarColumnOption[]",
             "required": false,
             "transform": null,
-            "defaultValue": "[]",
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -12446,7 +12549,7 @@
             "type": "string[]",
             "required": false,
             "transform": null,
-            "defaultValue": "[]",
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -12689,7 +12792,7 @@
             "type": "string[]",
             "required": false,
             "transform": null,
-            "defaultValue": "[]",
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -12900,7 +13003,7 @@
       "contentProjection": [
         {
           "ordinal": 1,
-          "selector": "[actions], [cxTableViewActions]"
+          "selector": "[filter-bar-controls]"
         },
         {
           "ordinal": 2,
@@ -12909,17 +13012,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "c52e695dd81f3ea9ed2b9064f501c62cbdff5a8c01779761a08cd4b56cf7171e"
+          "sha256": "7a18101ab032b7c6ab8ace056f98b15eb01ab673f653242f7134796ee1d57460"
         },
         "template": {
           "kind": "external",
-          "sha256": "fb3896b5ea033712d7fa87794b2026ae21ec1080e5794b7957af20802c563499"
+          "sha256": "559c1f160057561f0594b257d5d45205b8bed683894d52283b799828c1734944"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "e4d16092a178c66c1282952729e0b5e10c09257bdb91551070c68525d105d5d1"
+            "sha256": "bd5dbc4158775f5bde9c62ae329f8410c84d8d209e0e0c536f41f608abc03472"
           }
         ]
       }
@@ -14047,7 +14150,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "14a0d1783662c63bab116499a58e0d6b8ac1eb3fdba667cd92df3ba7fb093a04"
+            "sha256": "ab139e92484c8ec8d67233b6ffaacc99eac94f8e7fce8ab16f248091f69e1844"
           }
         ]
       }

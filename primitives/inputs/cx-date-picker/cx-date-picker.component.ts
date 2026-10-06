@@ -67,12 +67,17 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly openState = signal(false);
   private readonly focusedState = signal(false);
-  protected readonly overlay = new CxFloatingSurfaceController(rect => this.measureOverlay(rect));
+  protected readonly overlay = new CxFloatingSurfaceController(
+    () => this.measureOverlay(),
+    () => this.popoverRef?.surfaceElement(),
+  );
   protected readonly labelId = `cx-date-picker-label-${CxDatePickerComponent.nextId}`;
   protected readonly messagesId = `cx-date-picker-messages-${CxDatePickerComponent.nextId}`;
   protected readonly surfaceId = `cx-date-picker-surface-${CxDatePickerComponent.nextId++}`;
   @ViewChild('field', { read: ElementRef })
   private readonly fieldRef?: ElementRef<HTMLElement>;
+  @ViewChild('popover')
+  private readonly popoverRef?: CxPopoverComponent;
 
   @Input() label = 'Date';
   @Input() hint: string | undefined;
@@ -342,11 +347,12 @@ export class CxDatePickerComponent implements AfterViewInit, OnDestroy {
     this.valueChange.emit(nextValue);
   }
 
-  private measureOverlay(_rect: DOMRect): CxFloatingSurfaceRequest {
+  private measureOverlay(): CxFloatingSurfaceRequest {
     const controllerSize = this.readLengthToken('--controller-size', 32);
     const viewportPadding = this.readLengthToken('--space-md', 16);
     const gap = this.readLengthToken('--space-sm', 8);
     return {
+      // Placement estimate only; the rendered content determines the surface width.
       width: controllerSize * 9.25,
       estimatedHeight: this.timeEnabled ? controllerSize * 12.25 : controllerSize * 9.5,
       align: 'start',

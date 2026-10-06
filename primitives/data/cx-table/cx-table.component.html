@@ -55,6 +55,7 @@
                   hasColumnHeaderMenu(column) || columnsReorderable || columnsResizable
                 "
                 [class.cx-table__head-cell--end]="column.align === 'end'"
+                [class.cx-table__head-cell--resizable]="columnsResizable"
                 [class.cx-table__head-cell--pinned]="isColumnEffectivelyPinned(column)"
                 [class.cx-table__head-cell--last-pinned]="isLastPinnedColumn(column)"
                 [class.cx-table__head-cell--dragging]="draggingColumnId$() === column.id"

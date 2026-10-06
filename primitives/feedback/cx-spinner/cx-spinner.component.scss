@@ -68,15 +68,6 @@
     cx-spinner-arc-pulse 1.4s ease-in-out infinite;
 }
 
-.cx-spinner__segment {
-  opacity: 0.18;
-  transition: opacity var(--motion-slow) ease;
-}
-
-.cx-spinner__segment--filled {
-  opacity: 1;
-}
-
 @keyframes cx-spinner-spin {
   from {
     transform: rotate(0deg);
@@ -107,9 +98,5 @@
 @media (prefers-reduced-motion: reduce) {
   .cx-spinner__arc {
     animation: none;
-  }
-
-  .cx-spinner__segment {
-    transition: none;
   }
 }

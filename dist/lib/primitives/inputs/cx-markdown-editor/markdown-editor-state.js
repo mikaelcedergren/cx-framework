@@ -183,7 +183,18 @@ function buildKeymap() {
         'Mod-z': undo,
         'Shift-Mod-z': redo,
         'Mod-y': redo,
-        Backspace: undoInputRule,
+        Backspace: chainCommands(undoInputRule, (state, dispatch) => {
+            const $cursor = state.selection instanceof TextSelection ? state.selection.$cursor : null;
+            // An empty item's first paragraph exits one list level. Let ordinary
+            // deletion handle text, selections, and later paragraphs within an item.
+            if (!$cursor ||
+                $cursor.parent.content.size !== 0 ||
+                $cursor.depth < 2 ||
+                $cursor.node(-1).type !== schema.nodes['list_item'] ||
+                $cursor.index(-1) !== 0)
+                return false;
+            return liftListItem(schema.nodes['list_item'])(state, dispatch);
+        }),
         'Mod-b': toggleMark(schema.marks['strong']),
         'Mod-i': toggleMark(schema.marks['em']),
         'Mod-e': toggleMark(schema.marks['code']),

@@ -80,6 +80,7 @@ export * from './primitives/feedback/cx-skeleton-loader/index.js';
 export * from './primitives/feedback/cx-state-message/index.js';
 export * from './primitives/feedback/cx-progress-bar/index.js';
 export * from './primitives/feedback/cx-spinner/index.js';
+export * from './primitives/feedback/cx-countdown-ring/index.js';
 export * from './primitives/feedback/cx-toast/index.js';
 export * from './primitives/feedback/cx-validation-message/index.js';
 export * from './primitives/inputs/cx-checkbox/index.js';

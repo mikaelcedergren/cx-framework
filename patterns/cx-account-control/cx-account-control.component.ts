@@ -18,6 +18,7 @@ const ACCOUNT_CONTROL_MENU_ITEMS: CxMenuItem[] = [
   imports: [CxMenuComponent, CxMenuTriggerDirective, CxTooltipDirective, CxIconComponent, CxAvatarComponent],
   templateUrl: './cx-account-control.component.html',
   styleUrl: './cx-account-control.component.scss',
+  host: { '[class.cx-account-control-host--collapsed]': 'collapsed' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxAccountControlComponent {
@@ -27,9 +28,9 @@ export class CxAccountControlComponent {
   @Input() username = 'Wolfie';
   @Input() disabled = false;
   /**
-   * Rail presentation: only the avatar stays visible and the username moves
-   * into an instant tooltip on the right. Bind it to the surrounding
-   * navigation's collapsed state; the menu keeps working from the avatar.
+   * Avatar-only presentation: the control owns its compact width and the
+   * username moves into an instant tooltip. Also bind this to a navigation
+   * rail's collapsed state; the same account menu remains available.
    */
   @Input() collapsed = false;
 

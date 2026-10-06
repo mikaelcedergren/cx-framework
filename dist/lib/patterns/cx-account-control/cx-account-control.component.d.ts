@@ -7,9 +7,9 @@ export declare class CxAccountControlComponent {
     username: string;
     disabled: boolean;
     /**
-     * Rail presentation: only the avatar stays visible and the username moves
-     * into an instant tooltip on the right. Bind it to the surrounding
-     * navigation's collapsed state; the menu keeps working from the avatar.
+     * Avatar-only presentation: the control owns its compact width and the
+     * username moves into an instant tooltip. Also bind this to a navigation
+     * rail's collapsed state; the same account menu remains available.
      */
     collapsed: boolean;
     set menuItems(value: CxMenuItem[] | undefined);

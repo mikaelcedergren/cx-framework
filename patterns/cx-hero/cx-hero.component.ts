@@ -10,11 +10,13 @@ import {
   inject,
 } from "@angular/core";
 
-export type CxHeroVariant = "cover" | "split" | "stacked";
+export type CxHeroLayout = "cover" | "split" | "stacked";
+export type CxHeroVariant = "default" | "flush";
+export type CxHeroMediaSide = "start" | "end";
 export type CxHeroAlign = "start" | "center";
 export type CxHeroMediaPosition = "top" | "center" | "bottom";
 
-const HERO_VARIANTS: readonly CxHeroVariant[] = ["cover", "split", "stacked"];
+const HERO_LAYOUTS: readonly CxHeroLayout[] = ["cover", "split", "stacked"];
 const HERO_ALIGNMENTS: readonly CxHeroAlign[] = ["start", "center"];
 const HERO_MEDIA_POSITIONS: readonly CxHeroMediaPosition[] = [
   "top",
@@ -38,7 +40,9 @@ const HERO_MEDIA_POSITIONS: readonly CxHeroMediaPosition[] = [
   // beneath cx-hero and never reach into another component's internals.
   encapsulation: ViewEncapsulation.None,
   host: {
+    "[attr.data-layout]": "layout",
     "[attr.data-variant]": "variant",
+    "[attr.data-media-side]": "mediaSide",
     "[attr.data-align]": "align",
     "[attr.data-media-position]": "mediaPosition",
   },
@@ -47,7 +51,7 @@ export class CxHeroComponent implements AfterContentInit {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private contentReady = false;
 
-  private variantValue: CxHeroVariant = "cover";
+  private layoutValue: CxHeroLayout = "stacked";
   private alignValue: CxHeroAlign = "start";
   private overlayOpacityValue = 0;
   private mediaPositionValue: CxHeroMediaPosition = "center";
@@ -68,11 +72,32 @@ export class CxHeroComponent implements AfterContentInit {
 
   /** Responsive composition. Split and cover require projected media. */
   @Input()
+  public set layout(value: CxHeroLayout) {
+    this.layoutValue = validateOption("layout", value, HERO_LAYOUTS);
+  }
+  public get layout(): CxHeroLayout {
+    return this.layoutValue;
+  }
+
+  private variantValue: CxHeroVariant = "default";
+  private mediaSideValue: CxHeroMediaSide = "end";
+
+  /** Framing. Flush fills one half of a split hero to its outer edges. */
+  @Input()
   public set variant(value: CxHeroVariant) {
-    this.variantValue = validateOption("variant", value, HERO_VARIANTS);
+    this.variantValue = validateOption("variant", value, ["default", "flush"]);
   }
   public get variant(): CxHeroVariant {
     return this.variantValue;
+  }
+
+  /** Desktop media side for split layouts. Narrow layouts always lead with copy. */
+  @Input()
+  public set mediaSide(value: CxHeroMediaSide) {
+    this.mediaSideValue = validateOption("mediaSide", value, ["start", "end"]);
+  }
+  public get mediaSide(): CxHeroMediaSide {
+    return this.mediaSideValue;
   }
 
   /** Copy alignment. Split heroes accept start only. */
@@ -129,35 +154,51 @@ export class CxHeroComponent implements AfterContentInit {
   }
 
   private validateComposition(): void {
-    if (this.overlayOpacity > 0 && this.variantValue !== "cover") {
-      throw new Error('[cx-hero] overlayOpacity requires variant="cover".');
+    if (this.variant === "flush" && this.layout !== "split") {
+      throw new Error('[cx-hero] variant="flush" requires layout="split".');
+    }
+    if (this.mediaSide === "start" && this.layout !== "split") {
+      throw new Error('[cx-hero] mediaSide="start" requires layout="split".');
+    }
+    const caption = this.host.nativeElement.querySelector(".cx-hero__caption");
+    if (
+      caption &&
+      (caption.childElementCount || caption.textContent?.trim()) &&
+      (this.layout === "cover" || !this.hasProjectedMedia())
+    ) {
+      throw new Error(
+        "[cx-hero] caption requires meaningful media in a stacked or split layout.",
+      );
+    }
+    if (this.overlayOpacity > 0 && this.layoutValue !== "cover") {
+      throw new Error('[cx-hero] overlayOpacity requires layout="cover".');
     }
 
-    if (this.parallax && this.variantValue !== "cover") {
-      throw new Error('[cx-hero] parallax requires variant="cover".');
+    if (this.parallax && this.layoutValue !== "cover") {
+      throw new Error('[cx-hero] parallax requires layout="cover".');
     }
 
-    if (this.fadeBottom && this.variantValue !== "cover") {
-      throw new Error('[cx-hero] fadeBottom requires variant="cover".');
+    if (this.fadeBottom && this.layoutValue !== "cover") {
+      throw new Error('[cx-hero] fadeBottom requires layout="cover".');
     }
 
-    if (this.variantValue === "split" && this.alignValue !== "start") {
-      throw new Error('[cx-hero] split variant requires align="start".');
+    if (this.layoutValue === "split" && this.alignValue !== "start") {
+      throw new Error('[cx-hero] split layout requires align="start".');
     }
 
     if (
-      (this.variantValue === "split" || this.variantValue === "cover") &&
+      (this.layoutValue === "split" || this.layoutValue === "cover") &&
       !this.hasProjectedMedia()
     ) {
       throw new Error(
-        `[cx-hero] ${this.variantValue} variant requires the media slot.`,
+        `[cx-hero] ${this.layoutValue} layout requires the media slot.`,
       );
     }
   }
 
   private hasProjectedMedia(): boolean {
     const media = this.host.nativeElement.querySelector<HTMLElement>(
-      ":scope > .cx-hero > .cx-hero__media",
+      ":scope > .cx-hero > .cx-hero__media > .cx-hero__visual",
     );
     return Boolean(
       media && (media.childElementCount > 0 || media.textContent?.trim()),

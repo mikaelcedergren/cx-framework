@@ -1,3 +1,6 @@
+@use "sass:map";
+@use "../../../tokens/spacing-scale" as spacing;
+
 :host {
   display: block;
 }
@@ -69,12 +72,20 @@
   pointer-events: auto;
 }
 
-:host(.cx-card-host--interactive:not(.cx-card-host--frosted))
+:host(
+    .cx-card-host--interactive:not(.cx-card-host--border):not(
+        .cx-card-host--frosted
+      ):not(.cx-card-host--discreet)
+  )
   .cx-card:has(.cx-card__activation:hover) {
   background-color: var(--opacity-low);
 }
 
-:host(.cx-card-host--interactive:not(.cx-card-host--frosted))
+:host(
+    .cx-card-host--interactive:not(.cx-card-host--border):not(
+        .cx-card-host--frosted
+      ):not(.cx-card-host--discreet)
+  )
   .cx-card:has(.cx-card__activation:active) {
   background-color: var(--opacity-darken);
 }
@@ -119,10 +130,32 @@
 // Pointer only: on touch the hover state sticks after a tap, which would leave
 // the card raised with no pointer on it.
 @media (hover: hover) {
-  :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover) {
+  :host(.cx-card-host--interactive:not(.cx-card-host--discreet))
+    .cx-card:has(.cx-card__activation:hover:not(:active)) {
     transform: scale(1.01);
     box-shadow: var(--shadow-mid);
   }
+}
+
+// Discreet cards retain one transparent plane. Only interaction earns elevation.
+:host(.cx-card-host--discreet) .cx-card {
+  background-color: transparent;
+}
+
+:host(.cx-card-host--discreet) .cx-card__footer {
+  border-top: 0;
+}
+
+@media (hover: hover) {
+  :host(.cx-card-host--discreet.cx-card-host--interactive)
+    .cx-card:has(.cx-card__activation:hover:not(:active)) {
+    box-shadow: var(--shadow-low);
+  }
+}
+
+:host(.cx-card-host--discreet.cx-card-host--interactive)
+  .cx-card:has(.cx-card__activation:focus-visible:not(:active)) {
+  box-shadow: var(--shadow-low);
 }
 
 // A press releases the lift back to rest rather than dipping below the surface.
@@ -390,5 +423,25 @@
   .cx-card__viewport,
   .cx-card__expand-chevron {
     transition: none;
+  }
+}
+
+// Presets own the total inset rather than stacking on the default section padding.
+@each $step in "md", "lg", "xl", "2xl" {
+  :host([data-padding="#{$step}"]) {
+    .cx-card {
+      padding: map.get(spacing.$scale, $step);
+    }
+
+    .cx-card__header,
+    .cx-card__tabs,
+    .cx-card__content,
+    .cx-card__footer {
+      padding: 0;
+    }
+
+    .cx-card__footer {
+      padding-block-start: var(--space-sm);
+    }
   }
 }

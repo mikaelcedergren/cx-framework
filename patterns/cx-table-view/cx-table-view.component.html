@@ -3,10 +3,6 @@
     @if (hasHeading) {
       <h2 class="cx-table-view__heading">{{ heading }}</h2>
     }
-    <div class="cx-table-view__actions">
-      <ng-content select="[actions], [cxTableViewActions]" />
-    </div>
-
     @if (showFilterBar) {
       <cx-filter-bar
         class="cx-table-view__filters"
@@ -67,6 +63,10 @@
         (actionSelect)="actionSelect.emit($event)"
       >
         <ng-content
+          select="[filter-bar-controls]"
+          ngProjectAs="[filter-bar-controls]"
+        />
+        <ng-content
           select="[filter-bar-actions]"
           ngProjectAs="[filter-bar-actions]"
         />
@@ -76,7 +76,7 @@
 
   <div class="cx-table-view__surface">
     <cx-table
-      [columns]="visibleColumns"
+      [columns]="visibleColumns$()"
       [rows]="rows"
       [density]="density"
       [rowActivation]="rowActivation"
