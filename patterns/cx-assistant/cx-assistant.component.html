@@ -1,0 +1,406 @@
+<ng-template #actionList>
+  @if (choices().length) {
+    <div class="assistant__choices" aria-label="Quick actions">
+      @for (choice of choices(); track choice.id; let index = $index) {
+        <button
+          type="button"
+          class="assistant__choice"
+          [id]="id + '-choice-' + index"
+          [disabled]="choice.disabled"
+          [class.is-active]="activeChoice()?.id === choice.id"
+          (click)="choose(choice)"
+        >
+          @if (choice.icon) {
+            <cx-icon [icon]="choice.icon" />
+          }
+          <span class="assistant__choice-label">{{ choice.label }}</span>
+          @if (choice.description) {
+            <span class="assistant__choice-description">{{
+              choice.description
+            }}</span>
+          }
+        </button>
+      }
+    </div>
+  }
+</ng-template>
+<!-- One gradient definition shared by every sparkle on the page. -->
+<svg
+  class="assistant__defs"
+  width="0"
+  height="0"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <linearGradient [attr.id]="id + '-spark'" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--primary)" />
+      <stop offset="1" stop-color="var(--accent)" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<ng-template #sparkle>
+  <svg
+    class="assistant__sparkle"
+    viewBox="0 0 16 16"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      [attr.fill]="'url(#' + id + '-spark)'"
+      d="M8 0c.4 3.9 3.6 7.2 8 8-4.4.8-7.6 4.1-8 8-.4-3.9-3.6-7.2-8-8 4.4-.8 7.6-4.1 8-8Z"
+    />
+  </svg>
+</ng-template>
+
+<ng-template #pickIcon>
+  <svg
+    viewBox="0 0 16 16"
+    aria-hidden="true"
+    focusable="false"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+  >
+    <rect
+      x="1.5"
+      y="1.5"
+      width="9"
+      height="9"
+      rx="1.5"
+      stroke-dasharray="2.4 1.8"
+    />
+    <path
+      d="M7 7l6.5 2.6-2.7 1.1-1.1 2.7L7 7Z"
+      fill="currentColor"
+      stroke-linejoin="round"
+    />
+  </svg>
+</ng-template>
+
+<div
+  class="assistant__veil"
+  [class.is-visible]="open()"
+  (click)="close()"
+></div>
+
+@if (picking()) {
+  <div
+    class="assistant-picker"
+    (pointermove)="onPickMove($event)"
+    (pointerleave)="onPickLeave()"
+    (click)="onPickClick($event)"
+  >
+    @if (pickTarget(); as target) {
+      <div
+        class="assistant-picker__box"
+        [style.left.px]="target.left"
+        [style.top.px]="target.top"
+        [style.width.px]="target.width"
+        [style.height.px]="target.height"
+      >
+        <span class="assistant-picker__label">{{ target.context.label }}</span>
+      </div>
+    }
+  </div>
+}
+
+<div
+  class="assistant__anchor"
+  [class.assistant__anchor--open]="open()"
+  (pointerenter)="onPointerEnter()"
+  (pointerleave)="onPointerLeave()"
+>
+  <button
+    type="button"
+    class="assistant__hit"
+    [attr.aria-label]="'Open ' + heading()"
+    (click)="onHitClick()"
+  ></button>
+  <!-- A blurred twin of the frame's gradient, behind the box, so the glow carries the same colours. -->
+  <div
+    class="assistant__glow"
+    [class.assistant__glow--idle]="mode() === 'idle'"
+    [class.assistant__glow--ribbon]="mode() === 'ribbon'"
+    [class.assistant__glow--open]="mode() === 'open'"
+    [class.assistant__glow--thinking]="shownPhase() === 'thinking'"
+    [class.assistant__glow--motion-open]="motion() === 'open'"
+    [class.assistant__glow--motion-close]="motion() === 'close'"
+    [class.assistant__glow--motion-collapse]="motion() === 'collapse'"
+    [class.assistant__glow--motion-resize]="motion() === 'resize'"
+    [style.width.px]="geometry().width + 148"
+    [style.height.px]="geometry().height + 148"
+    [style.bottom.px]="geometry().bottom - 74"
+    [style.border-radius.px]="geometry().radius + 74"
+    aria-hidden="true"
+  >
+    <div
+      #glowBand
+      class="assistant__glow-band"
+      [style.border-radius.px]="geometry().radius + 14"
+    ></div>
+  </div>
+  <div
+    #box
+    class="assistant"
+    [class.assistant--idle]="mode() === 'idle'"
+    [class.assistant--ribbon]="mode() === 'ribbon'"
+    [class.assistant--open]="mode() === 'open'"
+    [class.assistant--picking]="picking()"
+    [class.assistant--blink]="blinking()"
+    [class.assistant--thinking]="shownPhase() === 'thinking'"
+    [class.assistant--motion-open]="motion() === 'open'"
+    [class.assistant--motion-close]="motion() === 'close'"
+    [class.assistant--motion-collapse]="motion() === 'collapse'"
+    [class.assistant--motion-resize]="motion() === 'resize'"
+    [class.assistant--moving]="moving()"
+    [style.width.px]="geometry().width"
+    [style.height.px]="geometry().height"
+    [style.bottom.px]="geometry().bottom"
+    [style.border-radius.px]="geometry().radius"
+    [attr.role]="open() ? 'dialog' : null"
+    [attr.aria-modal]="open() ? 'true' : null"
+    [attr.aria-label]="open() ? heading() : null"
+    [attr.tabindex]="open() ? -1 : null"
+    (click)="onBoxClick($event)"
+    [cdkTrapFocus]="trapsFocus()"
+  >
+    <div class="assistant__hairline" aria-hidden="true"></div>
+    <div
+      #ring
+      class="assistant__ring"
+      [class.assistant__ring--poured]="ringPoured()"
+      aria-hidden="true"
+    ></div>
+
+    @if (ribbonMounted()) {
+      <div
+        class="assistant__ribbon"
+        [class.is-leaving]="ribbonLeaving()"
+        [attr.inert]="ribbonLeaving() ? '' : null"
+        [attr.aria-hidden]="ribbonLeaving() ? 'true' : null"
+      >
+        <ng-container [ngTemplateOutlet]="sparkle" />
+        <span class="assistant__ribbon-text">
+          {{ picking() ? "Pick something on the page" : heading() }}
+        </span>
+        <cx-shortcut-key
+          class="assistant__keys"
+          [parts]="picking() ? ['Esc'] : shortcutParts"
+        />
+        @if (pick()) {
+          <span class="assistant__divider" aria-hidden="true"></span>
+          <button
+            type="button"
+            class="assistant__pick"
+            [class.is-active]="picking()"
+            [attr.aria-pressed]="picking()"
+            aria-label="Pick an element on the page"
+            (click)="togglePick($event)"
+          >
+            <ng-container [ngTemplateOutlet]="pickIcon" />
+          </button>
+        }
+      </div>
+    }
+
+    @if (windowMounted()) {
+      <div
+        #content
+        class="assistant__content"
+        [class.is-leaving]="windowLeaving()"
+        [attr.inert]="windowLeaving() ? '' : null"
+      >
+        <div class="assistant__header">
+          <span class="assistant__title">
+            @if (shownPhase() === "answered") {
+              <button
+                type="button"
+                class="assistant__back"
+                aria-label="Back"
+                (click)="back()"
+              >
+                <cx-icon icon="arrow-left" />
+              </button>
+            } @else {
+              <ng-container [ngTemplateOutlet]="sparkle" />
+            }
+            <span class="assistant__title-text">{{ heading() }}</span>
+          </span>
+          @if (activeContext(); as context) {
+            <span
+              class="assistant__chip"
+              [class.assistant__chip--picked]="selectedContext()"
+              [cxTooltip]="context.label"
+              [cxTooltipOverflow]="true"
+              >{{ context.label }}</span
+            >
+          }
+          <span class="assistant__header-actions">
+            @if (pick()) {
+              <button
+                type="button"
+                class="assistant__ghost assistant__pick"
+                aria-label="Pick an element on the page"
+                (click)="togglePick($event)"
+              >
+                <ng-container [ngTemplateOutlet]="pickIcon" />
+              </button>
+            }
+            <button
+              type="button"
+              class="assistant__ghost"
+              aria-label="Close"
+              (click)="close()"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              >
+                <path d="M4 4l8 8M12 4l-8 8" />
+              </svg>
+            </button>
+          </span>
+        </div>
+        <div class="assistant__question">
+          @if (shownPhase() === "empty" || shownPhase() === "error") {
+            <input
+              #questionInput
+              class="assistant__input"
+              [class.is-leaving]="leavingPhase() === shownPhase()"
+              type="text"
+              aria-label="Ask Assistant"
+              [attr.aria-invalid]="overInputLimit() || null"
+              [attr.aria-describedby]="overInputLimit() ? id + '-limit' : null"
+              autocomplete="off"
+              spellcheck="false"
+              [value]="query()"
+              (input)="setQuery(questionInput.value)"
+              (keydown)="inputKey($event)"
+            />
+          } @else {
+            <span
+              class="assistant__asked assistant__enter"
+              [class.assistant__asked--shimmer]="shownPhase() === 'thinking'"
+              >{{ question() }}</span
+            >
+          }
+        </div>
+        @if (shownPhase() === "empty" || shownPhase() === "error") {
+          <ng-container [ngTemplateOutlet]="actionList" />
+          @if (shownPhase() === "error") {
+            <p class="assistant__error" role="alert">{{ error() }}</p>
+          }
+        }
+        @if (shownPhase() === "answered") {
+          @if (answer(); as answer) {
+            <div
+              class="assistant__answer assistant__enter assistant__enter--late"
+              aria-live="polite"
+            >
+              <cx-markdown [markdown]="answer.text" />
+              @if (answer.stats?.length) {
+                <div class="assistant__tiles">
+                  @for (stat of answer.stats; track stat.label) {
+                    <div class="assistant__tile">
+                      <span class="assistant__tile-value">{{ stat.value }}</span
+                      ><span class="assistant__tile-label">{{
+                        stat.label
+                      }}</span>
+                    </div>
+                  }
+                </div>
+              }
+              <ng-content select="[cxAssistantAnswer]" />
+              <div class="assistant__follow-up">
+                <cx-icon icon="arrow-right" />
+                <input
+                  #followUpInput
+                  class="assistant__input assistant__input--follow-up"
+                  type="text"
+                  aria-label="Ask a follow-up"
+                  [attr.aria-invalid]="overInputLimit() || null"
+                  [attr.aria-describedby]="
+                    overInputLimit() ? id + '-limit' : null
+                  "
+                  autocomplete="off"
+                  [value]="query()"
+                  (input)="setQuery(followUpInput.value)"
+                  (keydown)="inputKey($event)"
+                />
+              </div>
+              @if (query().trim()) {
+                <ng-container [ngTemplateOutlet]="actionList" />
+              }
+            </div>
+          }
+        }
+        @if (overInputLimit()) {
+          <p class="assistant__error" [id]="id + '-limit'" role="alert">
+            Shorten your question to fit the {{ inputLimit() }}-token limit.
+          </p>
+        }
+        <div class="assistant__footer">
+          @if (shownPhase() === "thinking") {
+            <span role="status"><cx-text-shimmer text="Thinking…" /></span>
+            <span class="assistant__footer-keys"
+              ><cx-shortcut-key [parts]="['Esc']" /><span>Close</span></span
+            >
+          } @else if (shownPhase() === "answered") {
+            <span class="assistant__footer-text">{{ answer()?.source }}</span>
+            @if (answer()?.action; as action) {
+              <cx-button
+                mood="primary"
+                [text]="action.label"
+                [shortcutParts]="actionShortcut"
+                (pressed)="choose(action)"
+              />
+            } @else {
+              <button
+                type="button"
+                class="assistant__footer-ask assistant__footer-keys"
+                (click)="submit()"
+                [disabled]="!query().trim() || overInputLimit()"
+              >
+                <cx-shortcut-key [parts]="['Enter']" /><span>{{
+                  activeChoice() ? "Open" : "Ask"
+                }}</span>
+              </button>
+            }
+          } @else {
+            <span class="assistant__footer-text"
+              >Ask, find or do something</span
+            >
+            <span class="assistant__footer-keys"
+              ><button
+                type="button"
+                class="assistant__footer-ask"
+                (click)="submit()"
+                [disabled]="
+                  overInputLimit() || (!query().trim() && !activeChoice())
+                "
+              >
+                {{
+                  activeChoice()
+                    ? activeChoice()?.query !== undefined
+                      ? "Use"
+                      : "Open"
+                    : "Ask"
+                }}</button
+              ><cx-shortcut-key [parts]="['Enter']" /><cx-shortcut-key
+                [parts]="['Esc']"
+              /><span>Close</span></span
+            >
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -148,3 +148,5 @@ export * from './primitives/overlay/cx-tooltip';
 export * from './primitives/overlay/floating-surface';
 export * from './primitives/overlay/floating-surface-controller';
 export * from './primitives/overlay/overlay-state';
+
+export * from './patterns/cx-assistant';

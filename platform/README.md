@@ -11,6 +11,9 @@ This folder is the machine-readable web-product contract authored by Cortex and 
   Faunapoolen is the sole current product-skin exception and still consumes cx-framework.
 - `web-standard.json` owns mutable toolchain, canonical-command, and pnpm workspace-policy facts.
 - `cx-platform-check` validates a repository against both files.
+- Angular runtime, compiler and build dependencies must use `toolchain.angularVersion`
+  exactly in every workspace. CDK and Material use `toolchain.angularCdkVersion`.
+  Library peer declarations retain their compatible Angular major range.
 - `cx-platform-check` also runs the [style token check](#style-token-check) on owned source.
 - `server/product-manifest` loads the sealed runtime copy of `cx-product.json`, validates this full
   schema and its compatibility rules without a dependency, and returns a deeply frozen typed
@@ -90,6 +93,27 @@ Every `*-internal.mjs` subpath, the preload, the probe, and direct implementatio
 blocked by an exact package-export allowlist with no platform wildcard. This also prevents encoded
 or query-suffixed subpaths from reaching private modules. Consumers import only
 `platform/e2e-runner`; Cortex imports the source facade because it produces the package.
+
+The runner accepts `--engine=chromium` (the default) or `--engine=webkit` on macOS.
+It consumes this option itself; product configuration cannot set the browser, proxy, or launch
+options. `configure(context)` receives the selected `context.engine` to choose the suite and its
+config. Both engines retain the owned proxy, synthetic runtime, and service-worker denial.
+
+WebKit suites must use one declarative fixture adapter that imports `test as baseTest` from
+`@playwright/test`, imports `createHermeticPlaywrightTest` from the canonical runner facade,
+exports `const test = createHermeticPlaywrightTest(baseTest)`, and re-exports `expect` and
+`export type *` from `@playwright/test`. Tests import through that adapter. The source audit
+rejects an unwrapped Playwright test import before launching the controller.
+
+The shared fixture guards each context before pages are created. WebKit cannot disable raw
+peer-to-peer networking through a supported Playwright launch option, so the guard rejects
+`RTCPeerConnection`, `WebTransport`, and their unguarded worker realms with explicit isolation
+errors. Frames, popups, and contexts from `createHermeticBrowserContext` receive the same guard.
+Tests requiring these transports or browser workers are unsupported in this WebKit mode.
+Chromium retains its native transport controls. Install the browser matched to the repository's
+pinned Playwright with `pnpm exec playwright install webkit`; run Cortex's guarded suite with
+`pnpm e2e -- --engine=webkit`. This is WebKit coverage, not a claim that an installed Safari
+release has been tested.
 
 The permanent rationale and architecture live in the development root
 `WEB-ARCHITECTURE.md`. Mac mini operations remain in `server-ops` and the root server documents.

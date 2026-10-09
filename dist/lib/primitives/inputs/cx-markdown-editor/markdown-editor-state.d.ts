@@ -1,5 +1,7 @@
 import { type Node as ProseMirrorNode } from 'prosemirror-model';
-import { EditorState } from 'prosemirror-state';
+import { EditorState, type Command } from 'prosemirror-state';
+/** Move intact sibling blocks, retaining the selection's offsets and direction. */
+export declare function moveMarkdownBlock(direction: -1 | 1): Command;
 export declare function parseMarkdown(markdown: string): ProseMirrorNode;
 export declare function serializeMarkdown(doc: ProseMirrorNode): string;
 export declare function isDocEmpty(doc: ProseMirrorNode): boolean;

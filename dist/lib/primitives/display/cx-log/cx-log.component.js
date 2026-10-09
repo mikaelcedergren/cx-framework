@@ -40,10 +40,10 @@ export class CxLogComponent {
             author: entry.author ?? '',
         }));
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxLogComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "22.0.8", type: CxLogComponent, isStandalone: true, selector: "cx-log", inputs: { log: "log" }, ngImport: i0, template: "@for (entry of renderedEntries(); track index; let index = $index) {\n  <cx-log-step\n    [step]=\"entry.step\"\n    [datestamp]=\"entry.datestamp\"\n    [description]=\"entry.description\"\n    [author]=\"entry.author\"\n  />\n}\n", styles: [":host{display:flex;flex-direction:column}"], dependencies: [{ kind: "component", type: CxLogStepComponent, selector: "cx-log-step", inputs: ["step", "datestamp", "description", "author"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxLogComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "22.2.2", type: CxLogComponent, isStandalone: true, selector: "cx-log", inputs: { log: "log" }, ngImport: i0, template: "@for (entry of renderedEntries(); track index; let index = $index) {\n  <cx-log-step\n    [step]=\"entry.step\"\n    [datestamp]=\"entry.datestamp\"\n    [description]=\"entry.description\"\n    [author]=\"entry.author\"\n  />\n}\n", styles: [":host{display:flex;flex-direction:column}"], dependencies: [{ kind: "component", type: CxLogStepComponent, selector: "cx-log-step", inputs: ["step", "datestamp", "description", "author"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxLogComponent, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxLogComponent, decorators: [{
             type: Component,
             args: [{ selector: 'cx-log', imports: [CxLogStepComponent], changeDetection: ChangeDetectionStrategy.OnPush, template: "@for (entry of renderedEntries(); track index; let index = $index) {\n  <cx-log-step\n    [step]=\"entry.step\"\n    [datestamp]=\"entry.datestamp\"\n    [description]=\"entry.description\"\n    [author]=\"entry.author\"\n  />\n}\n", styles: [":host{display:flex;flex-direction:column}"] }]
         }], propDecorators: { log: [{

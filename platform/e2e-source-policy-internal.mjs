@@ -94,6 +94,7 @@ const PLAYWRIGHT_CONFIG_SHAPE_VIOLATIONS = Object.freeze([
 export function validateHermeticPlaywrightSourcePolicy({
   configPath,
   repoRoot,
+  requireGuardedTest = false,
   testDirectory,
 }) {
   const canonicalRoot = realpathSync(path.resolve(repoRoot));
@@ -183,6 +184,7 @@ export function validateHermeticPlaywrightSourcePolicy({
     executableConfig,
     repoRoot: canonicalRoot,
   });
+  let guardedTestAdapters = 0;
   for (const sourcePath of playwrightSourceGraph({
     configPath: canonicalConfig,
     lifecycleSources,
@@ -191,6 +193,9 @@ export function validateHermeticPlaywrightSourcePolicy({
   })) {
     const source = readPlaywrightPolicySource(sourcePath);
     const executableSource = maskPlaywrightNonExecutableSource(source);
+    if (requireGuardedTest && sourcePath !== canonicalConfig) {
+      guardedTestAdapters += validateGuardedTestImport(sourcePath, source);
+    }
     for (const violation of PLAYWRIGHT_SOURCE_VIOLATIONS) {
       const inspected = violation.raw ? source : executableSource;
       if (violation.pattern.test(inspected)) {
@@ -200,10 +205,44 @@ export function validateHermeticPlaywrightSourcePolicy({
       }
     }
   }
+  if (requireGuardedTest && guardedTestAdapters !== 1) {
+    throw new Error(
+      "WebKit requires exactly one canonical guarded test adapter.",
+    );
+  }
   return Object.freeze({
     configPath: canonicalConfig,
     testDirectory: canonicalTestDirectory,
   });
+}
+
+function validateGuardedTestImport(sourcePath, source) {
+  const runtimeSource = source.replace(
+    /\b(?:import|export)\s+type\s+(?:\{[^}]*\}|\*)\s+from\s*["'][^"']+["'];/gu,
+    "",
+  );
+  if (!runtimeSource.includes("@playwright/test")) return 0;
+  // Keep the boundary adapter declarative: no unwrapped test export, aliased
+  // second import, dynamic import, or extra use of the base fixture can escape it.
+  const adapter = source.match(
+    /^\s*import\s*\{\s*test\s+as\s+baseTest\s*\}\s*from\s*["']@playwright\/test["'];\s*import\s*\{\s*createHermeticPlaywrightTest\s*\}\s*from\s*(["'])([^"']+)\1;\s*export\s+const\s+test\s*=\s*createHermeticPlaywrightTest\(baseTest\);\s*export\s*\{\s*expect\s*\}\s*from\s*["']@playwright\/test["'];\s*export\s+type\s*\*\s*from\s*["']@playwright\/test["'];\s*$/u,
+  );
+  const specifier = adapter?.[2];
+  const localFacade = fileURLToPath(
+    new URL("./e2e-runner-public.mjs", import.meta.url),
+  );
+  if (
+    !adapter ||
+    (specifier !== "@mikaelcedergren/cx-framework/platform/e2e-runner" &&
+      (!specifier.startsWith(".") ||
+        realpathSync(path.resolve(path.dirname(sourcePath), specifier)) !==
+          realpathSync(localFacade)))
+  ) {
+    throw new Error(
+      `${sourcePath}: WebKit tests must import test and types through the canonical guarded test adapter.`,
+    );
+  }
+  return 1;
 }
 
 export function canonicalContainedFile(root, value, label) {

@@ -130,8 +130,8 @@ export class CxPopoverBackdropComponent {
         const openBackdrops = this.document.querySelectorAll('cx-popover-backdrop');
         return openBackdrops.item(openBackdrops.length - 1) === this.host.nativeElement;
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxPopoverBackdropComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "22.0.8", type: CxPopoverBackdropComponent, isStandalone: true, selector: "cx-popover-backdrop", outputs: { pressed: "pressed" }, ngImport: i0, template: `
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxPopoverBackdropComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "22.2.2", type: CxPopoverBackdropComponent, isStandalone: true, selector: "cx-popover-backdrop", outputs: { pressed: "pressed" }, ngImport: i0, template: `
     <div
       class="cx-popover-backdrop__surface"
       aria-hidden="true"
@@ -142,7 +142,7 @@ export class CxPopoverBackdropComponent {
     ></div>
   `, isInline: true, styles: [":host{display:contents}.cx-popover-backdrop__surface{display:block;position:fixed;inset:0;z-index:var(--z-index-popover-backdrop);background:rgba(0,0,0,0);pointer-events:auto;touch-action:none;cursor:default}"], changeDetection: i0.ChangeDetectionStrategy.OnPush });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxPopoverBackdropComponent, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxPopoverBackdropComponent, decorators: [{
             type: Component,
             args: [{ selector: 'cx-popover-backdrop', template: `
     <div

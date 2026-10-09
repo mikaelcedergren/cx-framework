@@ -1,5 +1,9 @@
 @if (hasHeading()) {
-  <div class="cx-alert__surface">
+  <div
+    class="cx-alert__surface"
+    [class.cx-alert__surface--expandable]="canExpand"
+    [class.cx-alert__surface--controls]="dismissible || canExpand"
+  >
     <div class="cx-alert__visual" aria-hidden="true">
       @if (loading) {
         <cx-spinner [mood]="mood" aria-hidden="true" />
@@ -10,30 +14,63 @@
 
     <div class="cx-alert__content">
       <div class="cx-alert__heading">{{ resolvedHeading }}</div>
-      <div class="cx-alert__description"><ng-content /></div>
     </div>
-
-    @if (visibleAction; as action) {
-      <cx-button
-        class="cx-alert__action"
-        [text]="action.text.trim()"
-        [href]="actionHref(action)"
-        [mood]="actionMood"
-        size="small"
-        [rounded]="true"
-        (pressed)="onActionSelect(action)"
-      />
+    @if (dismissible || canExpand) {
+      <div class="cx-alert__controls">
+        @if (dismissible) {
+          <cx-icon-button
+            class="cx-alert__dismiss"
+            icon="remove"
+            [ariaLabel]="dismissAriaLabel"
+            size="small"
+            [rounded]="true"
+            (pressed)="onDismiss()"
+          />
+        }
+        @if (canExpand) {
+          <cx-icon-button
+            #trigger
+            class="cx-alert__trigger"
+            [icon]="expanded$() ? 'chevron-up' : 'chevron-down'"
+            [ariaLabel]="resolvedHeading"
+            [ariaExpanded]="expanded$()"
+            [ariaControls]="bodyId"
+            variant="transparent"
+            size="small"
+            [rounded]="true"
+            (pressed)="toggle()"
+          />
+        }
+      </div>
     }
 
-    @if (dismissible) {
-      <cx-icon-button
-        class="cx-alert__dismiss"
-        icon="remove"
-        [ariaLabel]="dismissAriaLabel"
-        size="small"
-        [rounded]="true"
-        (pressed)="onDismiss()"
-      />
-    }
+    <div
+      class="cx-alert__body"
+      [class.cx-alert__body--visible]="bodyVisible"
+      [id]="bodyId"
+      [attr.inert]="bodyVisible ? null : ''"
+      [attr.aria-hidden]="bodyVisible ? null : 'true'"
+    >
+      <div #body class="cx-alert__body-clip">
+        <div
+          #description
+          class="cx-alert__description"
+          [class.cx-alert__description--present]="hasDescription()"
+        >
+          <ng-content />
+        </div>
+        @if (visibleAction; as action) {
+          <cx-button
+            class="cx-alert__action"
+            [text]="action.text.trim()"
+            [href]="actionHref(action)"
+            [mood]="actionMood"
+            size="small"
+            [rounded]="true"
+            (pressed)="onActionSelect(action)"
+          />
+        }
+      </div>
+    </div>
   </div>
 }

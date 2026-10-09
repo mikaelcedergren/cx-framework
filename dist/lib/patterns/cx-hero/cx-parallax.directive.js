@@ -96,10 +96,10 @@ export class CxParallaxDirective {
             });
         });
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxParallaxDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
-    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "22.0.8", type: CxParallaxDirective, isStandalone: true, selector: "[cxParallax]", inputs: { cxParallax: { classPropertyName: "cxParallax", publicName: "cxParallax", isSignal: true, isRequired: false, transformFunction: null } }, ngImport: i0 });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxParallaxDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "22.2.2", type: CxParallaxDirective, isStandalone: true, selector: "[cxParallax]", inputs: { cxParallax: { classPropertyName: "cxParallax", publicName: "cxParallax", isSignal: true, isRequired: false, transformFunction: null } }, ngImport: i0 });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxParallaxDirective, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxParallaxDirective, decorators: [{
             type: Directive,
             args: [{ selector: "[cxParallax]" }]
         }], ctorParameters: () => [], propDecorators: { cxParallax: [{ type: i0.Input, args: [{ isSignal: true, alias: "cxParallax", required: false }] }] } });

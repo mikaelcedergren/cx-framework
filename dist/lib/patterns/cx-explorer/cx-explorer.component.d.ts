@@ -1,9 +1,9 @@
-import { EventEmitter, OnDestroy } from '@angular/core';
-import { type CdkDragDrop } from '@angular/cdk/drag-drop';
-import { type CxIconName } from '../../icons/manifest';
-import { type CxTagColor } from '../../primitives/display/cx-tag';
-import { type CxMenuItem } from '../../primitives/overlay/cx-menu';
-import { CxFloatingSurfaceController } from '../../primitives/overlay/floating-surface-controller';
+import { EventEmitter, OnDestroy } from "@angular/core";
+import { type CdkDragDrop } from "@angular/cdk/drag-drop";
+import { type CxIconName } from "../../icons/manifest";
+import { type CxTagColor } from "../../primitives/display/cx-tag";
+import { type CxMenuItem } from "../../primitives/overlay/cx-menu";
+import { CxFloatingSurfaceController } from "../../primitives/overlay/floating-surface-controller";
 import * as i0 from "@angular/core";
 /** A selectable content entry. Icon and color are its visual identity. */
 export interface CxExplorerItem {
@@ -13,6 +13,8 @@ export interface CxExplorerItem {
     icon?: CxIconName;
     /** Identity hue from the shared palette; neutral ink when omitted. */
     color?: CxTagColor;
+    /** Item-specific actions replace itemMenuItems; built-in actions remain. */
+    menuItems?: readonly CxMenuItem[];
 }
 /** One collapsible section of the rail. Folders always render the folder icon. */
 export interface CxExplorerFolder {
@@ -20,13 +22,17 @@ export interface CxExplorerFolder {
     name: string;
     items: readonly CxExplorerItem[];
 }
+export interface CxExplorerItemOrderChange {
+    folderId: string;
+    itemIds: readonly string[];
+}
 export type CxExplorerFolderChange = {
     id: string;
     name: string;
 };
 /** A consumer-added menu entry was chosen on a folder or item row. */
 export type CxExplorerMenuAction = {
-    kind: 'folder' | 'item';
+    kind: "folder" | "item";
     id: string;
     actionId: string;
 };
@@ -47,6 +53,10 @@ export declare class CxExplorerComponent implements OnDestroy {
     private readonly explorerSurface?;
     private set explorerContent(value);
     protected readonly scrollbarGutter: import("@angular/core").WritableSignal<number>;
+    private readonly pinnedIdsState;
+    /** Ordered references to folder items; shortcuts retain the canonical identity. */
+    set pinnedItemIds(value: readonly string[]);
+    protected readonly pinnedItems: import("@angular/core").Signal<readonly CxExplorerItem[]>;
     private readonly rootItemsState;
     private readonly foldersState;
     private readonly selectedItemIdState;
@@ -114,6 +124,10 @@ export declare class CxExplorerComponent implements OnDestroy {
     readonly folderChange: EventEmitter<CxExplorerFolderChange>;
     /** Controlled folder order after a drag completes. */
     readonly folderOrderChange: EventEmitter<readonly string[]>;
+    /** Controlled item order within one folder; never moves items across folders. */
+    readonly itemOrderChange: EventEmitter<CxExplorerItemOrderChange>;
+    /** Controlled shortcut order, independent of folder item order. */
+    readonly pinnedItemOrderChange: EventEmitter<readonly string[]>;
     /** The item's icon or color changed; emits the updated item. */
     readonly itemChange: EventEmitter<CxExplorerItem>;
     /** Delete intent only — the consumer owns confirmation and the actual removal. */
@@ -148,6 +162,9 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected toggleFolder(folder: CxExplorerFolder): void;
     protected onFolderDrop(event: CdkDragDrop<readonly CxExplorerFolder[]>): void;
     protected onFolderMoveByKeyboard(event: Event, folder: CxExplorerFolder, offset: -1 | 1): void;
+    protected onItemDrop(event: CdkDragDrop<readonly CxExplorerItem[]>, folderId?: string): void;
+    protected onItemMoveByKeyboard(event: Event, item: CxExplorerItem, offset: -1 | 1, folder?: CxExplorerFolder): void;
+    private moveItem;
     protected isSelected(item: CxExplorerItem): boolean;
     protected onItemPressed(item: CxExplorerItem): void;
     protected onFolderCreate(): void;
@@ -159,9 +176,9 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected itemAccent(item: CxExplorerItem): string | null;
     protected swatchAccent(color: CxTagColor): string;
     protected folderMenu(): readonly CxMenuItem[];
-    protected itemMenu(): readonly CxMenuItem[];
+    protected itemMenu(item: CxExplorerItem): readonly CxMenuItem[];
     protected hasFolderMenu(): boolean;
-    protected hasItemMenu(): boolean;
+    protected hasItemMenu(item: CxExplorerItem): boolean;
     protected onFolderMenuSelect(folder: CxExplorerFolder, actionId: string): void;
     protected onItemMenuSelect(item: CxExplorerItem, actionId: string, row: HTMLElement): void;
     protected isRenaming(id: string): boolean;
@@ -185,7 +202,7 @@ export declare class CxExplorerComponent implements OnDestroy {
     private setExpandedFolder;
     private reconcileExpandedFolder;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxExplorerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "folders": { "alias": "folders"; "required": false; }; "rootItems": { "alias": "rootItems"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "searchable": { "alias": "searchable"; "required": false; }; "searchValue": { "alias": "searchValue"; "required": false; }; "searchAriaLabel": { "alias": "searchAriaLabel"; "required": false; }; "persistenceKey": { "alias": "persistenceKey"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "widthChange": "widthChange"; "searchValueChange": "searchValueChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "folderOrderChange": "folderOrderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "pinnedItemIds": { "alias": "pinnedItemIds"; "required": false; }; "folders": { "alias": "folders"; "required": false; }; "rootItems": { "alias": "rootItems"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "searchable": { "alias": "searchable"; "required": false; }; "searchValue": { "alias": "searchValue"; "required": false; }; "searchAriaLabel": { "alias": "searchAriaLabel"; "required": false; }; "persistenceKey": { "alias": "persistenceKey"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "widthChange": "widthChange"; "searchValueChange": "searchValueChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "folderOrderChange": "folderOrderChange"; "itemOrderChange": "itemOrderChange"; "pinnedItemOrderChange": "pinnedItemOrderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
     static ngAcceptInputType_editable: unknown;
     static ngAcceptInputType_resizable: unknown;
     static ngAcceptInputType_searchable: unknown;

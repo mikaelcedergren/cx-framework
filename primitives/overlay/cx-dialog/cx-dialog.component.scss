@@ -68,7 +68,7 @@
   flex: 0 0 auto;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md) var(--space-md) 0;
+  padding: var(--space-md);
   box-sizing: border-box;
 }
 
@@ -106,6 +106,10 @@
   line-height: var(--line-height-body);
 }
 
+.cx-dialog__header + .cx-dialog__body {
+  padding-top: 0;
+}
+
 .cx-dialog__description {
   // The dialog grows toward its max-width from content; without a measure cap a
   // long description alone would pull a text-only dialog to full width.
@@ -128,7 +132,24 @@
 }
 
 .cx-dialog__footer--single {
-  justify-content: flex-end;
+  justify-content: center;
+
+  .cx-dialog__footer-action {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .cx-dialog__footer-shortcut {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  cx-button {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 .cx-dialog__footer-action {

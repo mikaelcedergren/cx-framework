@@ -25,10 +25,10 @@ export class CxLabeledRowInfoDirective {
     syncVisibleContent() {
         this.hasVisibleContentState.set(this.element.childElementCount > 0 || this.element.textContent?.trim().length > 0);
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxLabeledRowInfoDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
-    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "14.0.0", version: "22.0.8", type: CxLabeledRowInfoDirective, isStandalone: true, selector: "[infoContent]", ngImport: i0 });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxLabeledRowInfoDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "14.0.0", version: "22.2.2", type: CxLabeledRowInfoDirective, isStandalone: true, selector: "[infoContent]", ngImport: i0 });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxLabeledRowInfoDirective, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxLabeledRowInfoDirective, decorators: [{
             type: Directive,
             args: [{
                     selector: '[infoContent]',

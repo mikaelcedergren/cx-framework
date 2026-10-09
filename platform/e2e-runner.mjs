@@ -74,6 +74,7 @@ export const E2E_STANDARD_ENVIRONMENT_KEYS = Object.freeze(
   [
     "CI",
     "CX_E2E_BASE_URL",
+    "CX_E2E_ENGINE",
     "CX_E2E_OWNER_MARKER",
     "CX_E2E_OWNER_NONCE",
     "CX_E2E_OWNER_PID",
@@ -94,6 +95,7 @@ export const E2E_CHROMIUM_NETWORK_ARGUMENTS = Object.freeze([
   "--disable-quic",
   "--force-webrtc-ip-handling-policy=disable_non_proxied_udp",
 ]);
+const WEBKIT_NETWORK_ARGUMENTS = Object.freeze([]);
 
 const CHILD_RUNTIME_IDENTITY_KEYS = Object.freeze([
   "CX_E2E_BASE_URL",
@@ -186,7 +188,7 @@ export async function runHermeticE2E(options) {
   try {
     assertProductId(productId);
     const canonicalRoot = realpathSync(path.resolve(repoRoot));
-    const args = validatePlaywrightArguments(playwrightArgs);
+    const { engine, args } = parseE2EArguments(playwrightArgs);
     const executables = resolveE2EExecutables(canonicalRoot);
     const assertNotSignaled = () => {
       if (requestedSignal) {
@@ -250,6 +252,7 @@ export async function runHermeticE2E(options) {
       });
       assertNotSignaled();
       const context = Object.freeze({
+        engine,
         baseUrl: sealedRuntime.baseUrl,
         networkGuardPath: NETWORK_GUARD_PATH,
         nodeExecutable: executables.nodeExecutable,
@@ -267,9 +270,10 @@ export async function runHermeticE2E(options) {
         throw new Error("E2E product configuration must be synchronous.");
       }
       assertNotSignaled();
-      validateConfiguration(configured, canonicalRoot, context);
+      validateConfiguration(configured, canonicalRoot, context, engine);
       const playwrightEnvironment = createPlaywrightEnvironment({
         ci: normalizedCi(process.env.CI),
+        engine,
         extras: configured.playwrightEnvironment ?? {},
         pathValue: context.pathValue,
         pnpmCliPath: context.pnpmCliPath,
@@ -443,6 +447,7 @@ export async function runHermeticE2E(options) {
 
 export function createPlaywrightEnvironment({
   ci,
+  engine = "chromium",
   extras = {},
   pathValue,
   pnpmCliPath,
@@ -451,6 +456,7 @@ export function createPlaywrightEnvironment({
 }) {
   return createHermeticEnvironment({
     ci,
+    engine: validateE2EEngine(engine),
     extras,
     label: "Playwright",
     pathValue,
@@ -565,12 +571,18 @@ export function createHermeticPlaywrightUse(runtime, options = {}) {
       );
     }
   }
+  const engine = validateE2EEngine(
+    requiredEnvironment(process.env, "CX_E2E_ENGINE"),
+  );
   return Object.freeze({
     ...options,
     baseURL: base.origin,
-    browserName: "chromium",
+    browserName: engine,
     launchOptions: Object.freeze({
-      args: E2E_CHROMIUM_NETWORK_ARGUMENTS,
+      args:
+        engine === "webkit"
+          ? WEBKIT_NETWORK_ARGUMENTS
+          : E2E_CHROMIUM_NETWORK_ARGUMENTS,
       proxy: Object.freeze({ server: proxy.origin }),
     }),
     proxy: Object.freeze({ server: proxy.origin }),
@@ -584,7 +596,49 @@ export function createHermeticBrowserContext(browser, options = {}) {
   }
   const runtime = runtimeFromEnvironment();
   const contextOptions = hermeticManualOptions(options, runtime, true);
-  return browser.newContext(contextOptions);
+  return browser.newContext(contextOptions).then(async (context) => {
+    try {
+      await guardWebKitContext(context);
+      return context;
+    } catch (error) {
+      await context.close();
+      throw error;
+    }
+  });
+}
+
+export function createHermeticPlaywrightTest(baseTest) {
+  return baseTest.extend({
+    context: async ({ context }, use) => {
+      await guardWebKitContext(context);
+      await use(context);
+    },
+  });
+}
+
+async function guardWebKitContext(context) {
+  if (process.env.CX_E2E_ENGINE !== "webkit") return;
+  runtimeFromEnvironment();
+  // WebKit has no supported launch switch equivalent to Chromium's non-proxied
+  // UDP restriction. Reject transports outside the HTTP proxy before any page
+  // script runs, including frames and popups. Workers lack a context init-script
+  // hook, so they must fail closed too rather than gain an unguarded global.
+  await context.addInitScript(() => {
+    for (const name of [
+      "RTCPeerConnection",
+      "webkitRTCPeerConnection",
+      "WebTransport",
+      "Worker",
+      "SharedWorker",
+    ]) {
+      Object.defineProperty(globalThis, name, {
+        configurable: false,
+        get() {
+          throw new Error(`E2E network isolation blocked ${name}.`);
+        },
+      });
+    }
+  });
 }
 
 export function createHermeticAPIRequestContext(request, options = {}) {
@@ -598,6 +652,7 @@ export function createHermeticAPIRequestContext(request, options = {}) {
 
 function createHermeticEnvironment({
   ci,
+  engine = "chromium",
   extras,
   label,
   pathValue,
@@ -621,6 +676,7 @@ function createHermeticEnvironment({
   return exactEnvironment(label, {
     CI: ci,
     CX_E2E_BASE_URL: runtime.baseUrl,
+    CX_E2E_ENGINE: engine,
     CX_E2E_OWNER_MARKER: runtime.markerPath,
     CX_E2E_OWNER_NONCE: runtime.ownerNonce,
     CX_E2E_OWNER_PID: String(runtime.ownerPid),
@@ -782,6 +838,38 @@ export function resolveE2EExecutables(repoRoot) {
   return Object.freeze({ nodeExecutable, playwrightCliPath, pnpmCliPath });
 }
 
+function validateE2EEngine(engine) {
+  if (engine !== "chromium" && engine !== "webkit") {
+    throw new Error("E2E engine must be chromium or webkit.");
+  }
+  // WebKit transport containment is verified on the macOS port. Other ports
+  // require their own browser proof before they can be enabled.
+  if (engine === "webkit" && process.platform !== "darwin") {
+    throw new Error("Hermetic WebKit currently requires macOS.");
+  }
+  return engine;
+}
+
+export function parseE2EArguments(args) {
+  const forwarded = validatePlaywrightArguments(args);
+  let engine = "chromium";
+  let selected = false;
+  const remaining = [];
+  for (const argument of forwarded) {
+    if (typeof argument === "string" && argument.startsWith("--engine=")) {
+      if (selected)
+        throw new Error("E2E accepts exactly one engine selection.");
+      engine = validateE2EEngine(argument.slice("--engine=".length));
+      selected = true;
+    } else if (argument === "--engine") {
+      throw new Error("Use --engine=chromium or --engine=webkit.");
+    } else {
+      remaining.push(argument);
+    }
+  }
+  return Object.freeze({ engine, args: Object.freeze(remaining) });
+}
+
 export function validatePlaywrightArguments(args) {
   // Package scripts forward their leading separator; Playwright 1.62 treats it
   // as the end of test filters, so consume it at the wrapper boundary.
@@ -806,7 +894,7 @@ export function validatePlaywrightArguments(args) {
   return Object.freeze([...playwrightArgs]);
 }
 
-function validateConfiguration(configured, repoRoot, context) {
+function validateConfiguration(configured, repoRoot, context, engine) {
   if (!configured || typeof configured !== "object") {
     throw new Error("E2E product configuration is required.");
   }
@@ -829,6 +917,7 @@ function validateConfiguration(configured, repoRoot, context) {
   const sourcePolicy = validateHermeticPlaywrightSourcePolicy({
     configPath,
     repoRoot,
+    requireGuardedTest: engine === "webkit",
     testDirectory: configured.testDirectory,
   });
   if (sourcePolicy.testDirectory !== configured.testDirectory) {

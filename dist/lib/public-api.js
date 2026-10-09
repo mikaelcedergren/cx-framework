@@ -137,3 +137,4 @@ export * from './primitives/overlay/cx-tooltip/index.js';
 export * from './primitives/overlay/floating-surface.js';
 export * from './primitives/overlay/floating-surface-controller.js';
 export * from './primitives/overlay/overlay-state.js';
+export * from './patterns/cx-assistant/index.js';

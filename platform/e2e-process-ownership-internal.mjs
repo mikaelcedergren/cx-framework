@@ -344,7 +344,12 @@ function inspectOwnedProcessGroups(runtime, lease) {
     });
 }
 
-function authenticatedProcessGroupExists(pgid, lease, receipt) {
+function authenticatedProcessGroupExists(
+  pgid,
+  lease,
+  receipt,
+  { waitingForExit = false } = {},
+) {
   if (receipt) validateProcessGroupReceiptIdentity(receipt, pgid);
   const holders = inspectLeaseHolders(lease);
   const members = inspectProcessGroupMembers(pgid);
@@ -353,15 +358,21 @@ function authenticatedProcessGroupExists(pgid, lease, receipt) {
   const leaderMatches = receipt
     ? processIdentityMatchesReceipt(leader, receipt)
     : false;
-  const allMembersAuthenticated = members.every(
-    (pid) => holders.has(pid) || processHasRunToken(pid, lease.runToken),
+  const unprovenMembers = members.filter(
+    (pid) => !holders.has(pid) && !processHasRunToken(pid, lease.runToken),
   );
   if (
-    !allMembersAuthenticated ||
-    (receipt?.state === "sealed" &&
-      members.includes(receipt.pid) &&
-      !leaderMatches)
+    receipt?.state === "sealed" &&
+    members.includes(receipt.pid) &&
+    !leaderMatches
   ) {
+    unprovenMembers.push(receipt.pid);
+  }
+  if (unprovenMembers.length > 0) {
+    if (waitingForExit) {
+      const remaining = reobserveExitedMembers(pgid, members, unprovenMembers);
+      if (remaining !== undefined) return remaining;
+    }
     throw new Error(
       `E2E process group ${pgid} contains a process without its runtime lease or run token.`,
     );
@@ -372,22 +383,46 @@ function authenticatedProcessGroupExists(pgid, lease, receipt) {
     ? inspectExactProcessIdentity(receipt.pid)
     : undefined;
   if (finalMembers.length === 0) return false;
+  const finalUnprovenMembers = finalMembers.filter(
+    (pid) => !finalHolders.has(pid) && !processHasRunToken(pid, lease.runToken),
+  );
   if (
-    finalMembers.length !== members.length ||
-    finalMembers.some((pid, index) => pid !== members[index]) ||
-    finalMembers.some(
-      (pid) =>
-        !finalHolders.has(pid) && !processHasRunToken(pid, lease.runToken),
-    ) ||
-    (receipt?.state === "sealed" &&
-      finalMembers.includes(receipt.pid) &&
-      !processIdentityMatchesReceipt(finalLeader, receipt))
+    receipt?.state === "sealed" &&
+    finalMembers.includes(receipt.pid) &&
+    !processIdentityMatchesReceipt(finalLeader, receipt)
   ) {
+    finalUnprovenMembers.push(receipt.pid);
+  }
+  const membershipChanged =
+    (!waitingForExit && finalMembers.length !== members.length) ||
+    finalMembers.some((pid) => !members.includes(pid));
+  if (membershipChanged || finalUnprovenMembers.length > 0) {
+    if (waitingForExit && !membershipChanged) {
+      const remaining = reobserveExitedMembers(
+        pgid,
+        finalMembers,
+        finalUnprovenMembers,
+      );
+      if (remaining !== undefined) return remaining;
+    }
     throw new Error(
       `E2E process group ${pgid} changed during its ownership proof.`,
     );
   }
   return true;
+}
+
+function reobserveExitedMembers(pgid, members, unprovenMembers) {
+  // A process can exit between the census and its credential/identity query.
+  // Only an observed departure may defer proof to the next bounded wait pass.
+  // A new member or an unproven process still running must fail closed.
+  const remaining = inspectProcessGroupMembers(pgid);
+  if (
+    remaining.some((pid) => !members.includes(pid)) ||
+    unprovenMembers.some((pid) => remaining.includes(pid))
+  )
+    return undefined;
+  return remaining.length > 0;
 }
 
 function signalAuthenticatedProcessGroup(pgid, signal, lease, receipt) {
@@ -406,7 +441,14 @@ async function waitForAuthenticatedProcessGroupExit(
   receipt,
 ) {
   const deadline = Date.now() + timeoutMs;
-  while (authenticatedProcessGroupExists(pgid, lease, receipt)) {
+  // Shutdown can remove members between snapshots. Authenticate every survivor
+  // and keep observing until empty or the deadline; signaling still requires
+  // identical membership across its own fresh ownership proof.
+  while (
+    authenticatedProcessGroupExists(pgid, lease, receipt, {
+      waitingForExit: true,
+    })
+  ) {
     if (Date.now() >= deadline) return false;
     await delay(20);
   }

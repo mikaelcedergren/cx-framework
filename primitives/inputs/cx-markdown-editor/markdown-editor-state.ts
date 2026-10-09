@@ -1,5 +1,5 @@
-import { baseKeymap, chainCommands, exitCode, toggleMark } from 'prosemirror-commands';
-import { history, redo, undo } from 'prosemirror-history';
+import { baseKeymap, chainCommands, exitCode, joinTextblockBackward, toggleMark } from 'prosemirror-commands';
+import { closeHistory, history, redo, undo } from 'prosemirror-history';
 import {
   InputRule,
   inputRules,
@@ -23,7 +23,7 @@ import {
   type Node as ProseMirrorNode,
 } from 'prosemirror-model';
 import { liftListItem, sinkListItem, splitListItem } from 'prosemirror-schema-list';
-import { EditorState, Plugin, TextSelection } from 'prosemirror-state';
+import { EditorState, Plugin, PluginKey, TextSelection, type Command } from 'prosemirror-state';
 
 // Extend the document model locally; the shared CommonMark parser stays unchanged.
 const schema = new Schema({
@@ -187,6 +187,36 @@ function linkInputRule(): InputRule {
   });
 }
 
+const symbolReplacements: Readonly<Record<string, string>> = {
+  '->': '→', '<-': '←', '<->': '↔', '=>': '⇒', '<=>': '⇔',
+  '!=': '≠', '<=': '≤', '>=': '≥', '+/-': '±', '...': '…',
+};
+
+function symbolInputRule(): InputRule {
+  return new InputRule(/(<->|<=>|->|<-|=>|!=|<=|>=|\+\/-|\.\.\.) $/, (state, match, start, end) => {
+    const $start = state.doc.resolve(start);
+    const prefix = $start.parent.textBetween(0, $start.parentOffset, undefined, '\ufffc');
+    // Do not replace a suffix of a longer operator, an escaped pattern, a URL,
+    // or a Markdown destination that has not yet become a link mark.
+    if (
+      /[<>=!+\-/.\\]$/.test(prefix) ||
+      /(?:https?:\/\/|www\.|mailto:)\S*$/i.test(prefix) ||
+      /\]\([^)]*$/.test(prefix)
+    ) return null;
+
+    // Inline code only becomes a mark when its closing backticks are typed.
+    // Keep patterns literal while that code span is still being written too.
+    let openTicks = 0;
+    for (const ticks of prefix.matchAll(/(?<!\\)`+/g)) {
+      if (!openTicks) openTicks = ticks[0].length;
+      else if (openTicks === ticks[0].length) openTicks = 0;
+    }
+    if (openTicks) return null;
+
+    return closeHistory(state.tr.insertText(`${symbolReplacements[match[1]]} `, start, end));
+  }, { inCodeMark: false });
+}
+
 function buildInputRules(): Plugin {
   return inputRules({
     rules: [
@@ -213,8 +243,72 @@ function buildInputRules(): Plugin {
       markInputRule(/`([^`]+)`$/, schema.marks['code']),
       markInputRule(/~~([^~]+)~~$/, schema.marks['strike']),
       linkInputRule(),
+      symbolInputRule(),
     ],
   });
+}
+
+const blockMoveHistoryKey = new PluginKey('blockMoveHistory');
+
+function blockMoveHistory(): Plugin {
+  return new Plugin({
+    key: blockMoveHistoryKey,
+    appendTransaction(transactions, _oldState, state) {
+      // Typing after a move starts its own Undo step, just like typing before it.
+      if (transactions.some(tr => tr.getMeta(blockMoveHistoryKey))) return closeHistory(state.tr);
+      return null;
+    },
+  });
+}
+
+/** Move intact sibling blocks, retaining the selection's offsets and direction. */
+export function moveMarkdownBlock(direction: -1 | 1): Command {
+  return (state, dispatch) => {
+    const selection = state.selection;
+    // Always consume the shortcut, including boundaries and unsupported
+    // selections, so the browser cannot turn it into caret navigation.
+    if (!(selection instanceof TextSelection)) return true;
+    const { $from } = selection;
+    let depth = $from.depth;
+    for (let level = depth; level > 0; level--) {
+      if ($from.node(level).type === schema.nodes['list_item']) {
+        depth = level;
+        break;
+      }
+    }
+    if (depth === 0) return true;
+    // A selection ending at the next block's boundary does not select it.
+    const $end = state.doc.resolve(selection.empty ? selection.to : selection.to - 1);
+    const parent = $from.node(depth - 1);
+    if ($end.depth < depth || $end.node(depth - 1) !== parent) return true;
+    const first = $from.index(depth - 1);
+    const last = $end.index(depth - 1);
+    const neighborIndex = direction < 0 ? first - 1 : last + 1;
+    if (neighborIndex < 0 || neighborIndex >= parent.childCount) return true;
+
+    const start = $from.before(depth);
+    const end = $end.after(depth);
+    const moved = parent.content.cut(start - $from.start(depth - 1), end - $from.start(depth - 1));
+    const neighbor = parent.child(neighborIndex);
+    const replacement = direction < 0
+      ? moved.append(Fragment.from(neighbor))
+      : Fragment.from(neighbor).append(moved);
+    const replaceFrom = direction < 0 ? first - 1 : first;
+    const replaceTo = direction < 0 ? last + 1 : last + 2;
+    if (!parent.canReplace(replaceFrom, replaceTo, replacement)) return true;
+    if (dispatch) {
+      const shift = direction * neighbor.nodeSize;
+      const tr = closeHistory(state.tr).replaceWith(
+        direction < 0 ? start - neighbor.nodeSize : start,
+        direction < 0 ? end : end + neighbor.nodeSize,
+        replacement,
+      );
+      tr.setSelection(TextSelection.create(tr.doc, selection.anchor + shift, selection.head + shift));
+      tr.setStoredMarks(state.storedMarks);
+      dispatch(tr.setMeta(blockMoveHistoryKey, true).scrollIntoView());
+    }
+    return true;
+  };
 }
 
 function buildKeymap(): Plugin {
@@ -229,16 +323,26 @@ function buildKeymap(): Plugin {
   });
   return keymap({
     'Shift-Enter': insertHardBreak,
+    'Alt-ArrowUp': moveMarkdownBlock(-1),
+    'Alt-ArrowDown': moveMarkdownBlock(1),
     'Mod-z': undo,
     'Shift-Mod-z': redo,
     'Mod-y': redo,
     Backspace: chainCommands(undoInputRule, (state, dispatch) => {
       const $cursor = state.selection instanceof TextSelection ? state.selection.$cursor : null;
+      if (!$cursor || $cursor.parent.content.size !== 0) return false;
+      const before = state.doc.resolve($cursor.before()).nodeBefore;
+      if (
+        $cursor.parent.type === schema.nodes['paragraph'] &&
+        (before?.type === schema.nodes['bullet_list'] || before?.type === schema.nodes['ordered_list'])
+      ) {
+        // Delete the blank paragraph into the last item's text. The general
+        // join command wraps it in a new item, reversing the preceding lift.
+        return joinTextblockBackward(state, dispatch);
+      }
       // An empty item's first paragraph exits one list level. Let ordinary
       // deletion handle text, selections, and later paragraphs within an item.
       if (
-        !$cursor ||
-        $cursor.parent.content.size !== 0 ||
         $cursor.depth < 2 ||
         $cursor.node(-1).type !== schema.nodes['list_item'] ||
         $cursor.index(-1) !== 0
@@ -297,6 +401,6 @@ export function isDocEmpty(doc: ProseMirrorNode): boolean {
 export function createMarkdownEditorState(markdown: string): EditorState {
   return EditorState.create({
     doc: parseMarkdown(markdown),
-    plugins: [buildInputRules(), buildKeymap(), keymap(baseKeymap), markdownPaste(), history()],
+    plugins: [buildInputRules(), buildKeymap(), keymap(baseKeymap), markdownPaste(), blockMoveHistory(), history()],
   });
 }

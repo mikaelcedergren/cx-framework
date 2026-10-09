@@ -1,0 +1,901 @@
+// Assistant owns its signature geometry and motion. Preserve these approved timings and curves.
+// Colour, type and shared spacing consume the framework tokens directly.
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  pointer-events: none;
+  color: var(--ink);
+  font-family: var(--font-family-base);
+}
+
+.assistant__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+// ---- veil and picker --------------------------------------------------------------------------
+
+.assistant__veil {
+  position: absolute;
+  inset: 0;
+  // A scrim darkens whatever theme it covers, so it is black-based rather than ink-based.
+  background: color-mix(in srgb, black 16%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 280ms ease,
+    visibility 0s linear 280ms;
+}
+
+.assistant__veil.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 280ms ease;
+}
+
+.assistant-picker {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+.assistant-picker__box {
+  position: absolute;
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  pointer-events: none;
+  transition:
+    left 120ms ease,
+    top 120ms ease,
+    width 120ms ease,
+    height 120ms ease;
+}
+
+.assistant-picker__label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  display: inline-flex;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-low);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+// ---- the box ----------------------------------------------------------------------------------
+
+.assistant__anchor {
+  position: absolute;
+  inset: 0;
+}
+
+// A passing mouse can catch the hairline without aiming at a 6px line. It ends at the stage edge
+// so it never adds scrollable overflow below the page.
+.assistant__hit {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 160px;
+  height: 28px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.assistant__anchor--open .assistant__hit {
+  display: none;
+}
+
+.assistant {
+  position: absolute;
+  left: 50%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: transparent;
+  outline: none;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  cursor: pointer;
+  transition-property:
+    width, height, bottom, border-radius, background-color, box-shadow,
+    backdrop-filter;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.34, 1.26, 0.64, 1);
+}
+
+.assistant--moving {
+  will-change: width, height, bottom;
+}
+
+.assistant--motion-open {
+  transition-duration: 560ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.assistant--motion-close {
+  transition-duration: 520ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.assistant--motion-collapse {
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+// Landing in the bar: the geometry eases in while the frost, glow, frame and content hold their
+// look, then everything flips to the plain line in the last 120ms. These live on the resting
+// state (applied in the same frame as the move starts); `:has(.assistant__content)` tells a window
+// close (520ms) from a ribbon collapse (420ms).
+.assistant--idle {
+  transition-property:
+    width, height, bottom, border-radius, background-color, box-shadow,
+    backdrop-filter;
+  transition-duration: 420ms, 420ms, 420ms, 420ms, 180ms, 180ms, 180ms;
+  transition-delay: 0s, 0s, 0s, 0s, 240ms, 240ms, 240ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.assistant--idle:has(.assistant__content) {
+  transition-duration: 520ms, 520ms, 520ms, 520ms, 180ms, 180ms, 180ms;
+  transition-delay: 0s, 0s, 0s, 0s, 340ms, 340ms, 340ms;
+}
+
+.assistant--motion-resize {
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.assistant--ribbon {
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  box-shadow: var(--shadow-mid);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+}
+
+.assistant--open {
+  cursor: default;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  box-shadow: var(--shadow-high);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+}
+
+// The idle hairline: plain ink at low opacity (owner direction), on its own layer so it can fade
+// away as the box grows instead of cutting hard into the frosted surface.
+.assistant__hairline {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.assistant--ribbon .assistant__hairline,
+.assistant--open .assistant__hairline {
+  opacity: 0;
+}
+
+// Landed, three beats so the eye knows where the assistant went: the line brightens, the
+// feature's gradient sweeps across it and out, and the highlight fades back to the plain line.
+.assistant__hairline::before,
+.assistant__hairline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+}
+
+.assistant__hairline::before {
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+.assistant__hairline::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0 18%,
+    var(--primary) 30%,
+    var(--purple) 43%,
+    var(--pink) 57%,
+    var(--accent) 70%,
+    transparent 82% 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 300% 100%;
+  background-position: 0% 0;
+}
+
+.assistant--blink .assistant__hairline::before {
+  animation: assistant-blink-highlight 1100ms ease-in-out both;
+}
+
+.assistant--blink .assistant__hairline::after {
+  animation: assistant-blink-sweep 1100ms cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+// The sweep carries a soft coloured glow around the line while the gradient is on it. It lives on
+// the box because the box clips its own children.
+.assistant--idle.assistant--blink {
+  animation: assistant-blink-glow 1100ms ease-in-out both;
+}
+
+// Shrinking into the bar: the grey line only appears at the snap, after the frame has carried the
+// feature's look through the whole move.
+.assistant--idle .assistant__hairline {
+  transition: opacity 180ms ease 240ms;
+}
+
+.assistant--idle:has(.assistant__content) .assistant__hairline {
+  transition-delay: 340ms;
+}
+
+// ---- gradient glow (behind the box) -----------------------------------------------------------
+
+// Follows the box's geometry with the same curves. The holder is 74px larger on every side and
+// masks away the box's own area; inside it a 14px coloured band sits just outside the frame and is
+// blurred wide. The blur has 60px of room to fade before the holder's edge, so the glow has no
+// visible boundary, only a soft falloff like light.
+.assistant__glow {
+  position: absolute;
+  left: 50%;
+  box-sizing: border-box;
+  padding: 74px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  mask:
+    linear-gradient(var(--ink) 0 0) content-box,
+    linear-gradient(var(--ink) 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  transition-property: width, height, bottom, border-radius, opacity;
+  transition-duration: 300ms, 300ms, 300ms, 300ms, 200ms;
+  transition-timing-function: cubic-bezier(0.34, 1.26, 0.64, 1);
+}
+
+.assistant__glow--motion-open {
+  transition-duration: 560ms, 560ms, 560ms, 560ms, 200ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.assistant__glow--motion-close {
+  transition-duration: 520ms, 520ms, 520ms, 520ms, 200ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.assistant__glow--motion-collapse {
+  transition-duration: 420ms, 420ms, 420ms, 420ms, 200ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.assistant__glow--motion-resize {
+  transition-duration: 420ms, 420ms, 420ms, 420ms, 200ms;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.assistant__glow--ribbon,
+.assistant__glow--open {
+  opacity: 0.2;
+}
+
+.assistant__glow--thinking {
+  opacity: 0.28;
+}
+
+// A 10px band blurred wide and kept faint: a breath of colour around the frame, not a light.
+.assistant__glow-band {
+  position: absolute;
+  inset: 64px;
+  overflow: hidden;
+  filter: blur(30px);
+}
+
+// Fades out at the snap, exactly like the ring.
+.assistant__glow--idle {
+  opacity: 0;
+  transition-duration: 420ms, 420ms, 420ms, 420ms, 180ms;
+  transition-delay: 0s, 0s, 0s, 0s, 240ms;
+  transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.assistant__anchor:has(.assistant__content) .assistant__glow--idle {
+  transition-duration: 520ms, 520ms, 520ms, 520ms, 180ms;
+  transition-delay: 0s, 0s, 0s, 0s, 340ms;
+}
+
+// ---- gradient ring ----------------------------------------------------------------------------
+
+// A 4px ring cut from the box edge. The colour is painted on this exact surface, so
+// its coverage always follows the box, independent of animation and viewport clipping.
+.assistant__ring {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: inherit;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  mask:
+    linear-gradient(var(--ink) 0 0) content-box,
+    linear-gradient(var(--ink) 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+
+// Both stationary surfaces paint the same angular field. Changing its angle never moves
+// an image boundary through the mask, even while the frame grows or shrinks.
+.assistant__ring,
+.assistant__glow-band {
+  background: conic-gradient(
+    from 0deg,
+    var(--primary),
+    var(--accent),
+    var(--primary),
+    var(--purple),
+    var(--pink),
+    var(--purple),
+    var(--primary)
+  );
+}
+
+.assistant__ring--poured {
+  opacity: 1;
+  animation: assistant-pour 600ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.assistant--idle .assistant__ring {
+  opacity: 0;
+  transition: opacity 180ms ease 240ms;
+}
+
+.assistant--idle:has(.assistant__content) .assistant__ring {
+  transition-delay: 340ms;
+}
+
+// ---- ribbon content ---------------------------------------------------------------------------
+
+.assistant__ribbon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  height: 52px;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+  animation: assistant-enter 260ms cubic-bezier(0.2, 0.7, 0.2, 1) 160ms
+    backwards;
+  transition: width 300ms cubic-bezier(0.34, 1.26, 0.64, 1);
+}
+
+.assistant__sparkle {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.assistant__ribbon-text {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.assistant__keys {
+  margin-left: auto;
+}
+
+.assistant__divider {
+  width: 1px;
+  height: 18px;
+  flex: 0 0 auto;
+  background: var(--opacity-mid);
+}
+
+.assistant__pick,
+.assistant__ghost {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--opacity-high);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.assistant__pick svg,
+.assistant__ghost svg {
+  width: 16px;
+  height: 16px;
+}
+
+.assistant__pick:hover,
+.assistant__ghost:hover {
+  background: var(--opacity-low);
+  color: var(--ink);
+}
+
+.assistant__pick.is-active {
+  background: var(--opacity-low);
+  color: var(--primary);
+}
+
+.assistant__pick:focus-visible,
+.assistant__ghost:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+// ---- window content ---------------------------------------------------------------------------
+
+.assistant__content {
+  display: flex;
+  box-sizing: border-box;
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
+  flex-direction: column;
+  padding: 20px;
+  animation: assistant-enter 260ms cubic-bezier(0.2, 0.7, 0.2, 1) 160ms
+    backwards;
+}
+
+.assistant__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.assistant__title {
+  min-width: 0;
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+}
+
+.assistant__title .assistant__sparkle {
+  width: 16px;
+  height: 16px;
+}
+
+// The sparkle's seat becomes a back arrow one step into the conversation.
+.assistant__back {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.assistant__back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.assistant__back:hover {
+  background: var(--opacity-low);
+}
+
+.assistant__back:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.assistant__chip {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--opacity-low);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Same recipe as a primary-mood tag: tinted primary fill, primary text.
+.assistant__chip--picked {
+  background: var(--primary-opacity);
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.assistant__header-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-left: auto;
+  gap: 4px;
+}
+
+.assistant__question {
+  display: flex;
+  box-sizing: border-box;
+  height: 36px;
+  align-items: center;
+  margin-top: var(--space-md);
+  padding: 4px 0;
+}
+
+.assistant__input,
+.assistant__asked {
+  min-width: 0;
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-title-2);
+  line-height: 28px;
+}
+
+.assistant__input {
+  outline: none;
+  caret-color: var(--primary);
+}
+
+.assistant__asked {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant__asked--shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--ink) 0 35%,
+    var(--primary) 50%,
+    var(--ink) 65% 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    assistant-enter 260ms cubic-bezier(0.2, 0.7, 0.2, 1) 40ms backwards,
+    assistant-shimmer 1.4s linear infinite;
+}
+
+.assistant__follow-up {
+  display: flex;
+  box-sizing: border-box;
+  height: 36px;
+  align-items: center;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--opacity-low);
+  gap: 10px;
+}
+
+.assistant__follow-up svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--opacity-high);
+}
+
+.assistant__input--follow-up {
+  font-size: var(--font-size-body);
+  line-height: 24px;
+}
+
+// ---- answer card ------------------------------------------------------------------------------
+
+.assistant__answer {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--opacity-low);
+  gap: var(--space-md);
+}
+
+.assistant__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.assistant__tile {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--opacity-low);
+}
+
+.assistant__tile-value {
+  font-size: var(--font-size-title-1);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.1;
+}
+
+.assistant__tile-label {
+  margin-top: 2px;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+}
+
+// The footer is the window's one distinct band: a quiet fill bleeding to the edges, carrying the
+// hint, the working line or the action for the current moment.
+// The band stops at the frame's inner edge (the 4px ring), so its fill never tints the frame and
+// its corners follow the frame's inner curve; its text keeps the content's 20px inset.
+.assistant__footer {
+  display: flex;
+  box-sizing: border-box;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--space-md) -16px -16px;
+  padding: 0 16px;
+  border-top: 1px solid var(--opacity-low);
+  border-radius: 0 0 16px 16px;
+  background: var(--opacity-low);
+  gap: var(--space-md);
+}
+
+.assistant__footer-text {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant__footer-keys {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+  line-height: 1;
+  gap: 6px;
+}
+
+.assistant__footer-keys cx-shortcut-key {
+  display: inline-flex;
+  align-items: center;
+}
+
+.assistant__footer-keys span + cx-shortcut-key {
+  margin-left: 6px;
+}
+
+// ---- cross-fades ------------------------------------------------------------------------------
+
+.assistant__enter {
+  animation: assistant-enter 260ms cubic-bezier(0.2, 0.7, 0.2, 1) 40ms backwards;
+}
+
+// The answer waits for the box to grow before it slides into place.
+.assistant__enter--late {
+  animation-delay: 240ms;
+}
+
+.is-leaving {
+  opacity: 0;
+  animation: none;
+  transition: opacity 120ms ease;
+}
+
+.assistant__content.is-leaving {
+  transition-duration: 160ms;
+  transition-delay: 200ms;
+}
+
+.assistant--idle .assistant__ribbon.is-leaving {
+  transition-duration: 160ms;
+  transition-delay: 160ms;
+}
+
+@keyframes assistant-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes assistant-pour {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes assistant-blink-highlight {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  14%,
+  78% {
+    opacity: 1;
+  }
+}
+
+@keyframes assistant-blink-glow {
+  0%,
+  14%,
+  86%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  40%,
+  60% {
+    box-shadow:
+      0 0 10px 1px color-mix(in srgb, var(--primary) 45%, transparent),
+      0 0 22px 4px color-mix(in srgb, var(--pink) 30%, transparent);
+  }
+}
+
+@keyframes assistant-blink-sweep {
+  0%,
+  14% {
+    opacity: 1;
+    background-position: 0% 0;
+  }
+
+  78%,
+  100% {
+    opacity: 1;
+    background-position: 100% 0;
+  }
+}
+
+@keyframes assistant-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // The user's motion preference overrides every signature transition, including pseudo-elements.
+  :host *,
+  :host *::before,
+  :host *::after {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.assistant__hit {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+.assistant__hit:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+.assistant__choices {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-md);
+  max-height: 280px;
+  overflow-y: auto;
+  gap: var(--space-xs);
+}
+.assistant__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.assistant__choice:hover,
+.assistant__choice.is-active {
+  background: var(--opacity-low);
+}
+.assistant__choice:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.assistant__choice:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.assistant__choice-label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.assistant__choice-description {
+  color: var(--opacity-high);
+  font-size: var(--font-size-body-sm);
+}
+.assistant__error {
+  color: var(--danger);
+  margin: var(--space-md) 0 0;
+}
+.assistant__footer-ask {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.assistant__footer-ask:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.assistant__title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.assistant__footer-ask:disabled {
+  cursor: default;
+}

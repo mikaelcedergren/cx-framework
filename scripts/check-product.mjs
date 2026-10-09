@@ -355,8 +355,9 @@ function validateToolchain({
     issues,
   });
 
-  const angularDeclarations = dependencyDeclarations.filter(({ name }) =>
-    name.startsWith("@angular/"),
+  const angularDeclarations = dependencyDeclarations.filter(
+    ({ name }) =>
+      name.startsWith("@angular/") || name === "@angular-devkit/build-angular",
   );
   if (angularDeclarations.length === 0) {
     issues.push(
@@ -364,9 +365,24 @@ function validateToolchain({
     );
   }
   for (const declaration of angularDeclarations) {
-    if (declaredMajor(declaration.declared) !== toolchain.angularMajor) {
+    // Library peers describe compatibility; installed runtime and build inputs
+    // must select the single family version, including authoring workspaces.
+    if (declaration.section === "peerDependencies") {
+      if (declaredMajor(declaration.declared) !== toolchain.angularMajor) {
+        issues.push(
+          `${declaration.relativePath} ${declaration.name} peers must use Angular major ${toolchain.angularMajor}.`,
+        );
+      }
+      continue;
+    }
+    const expectedVersion =
+      declaration.name === "@angular/cdk" ||
+      declaration.name === "@angular/material"
+        ? toolchain.angularCdkVersion
+        : toolchain.angularVersion;
+    if (declaration.declared !== expectedVersion) {
       issues.push(
-        `${declaration.relativePath} ${declaration.name} must use Angular major ${toolchain.angularMajor}.`,
+        `${declaration.relativePath} ${declaration.name} must be exactly ${expectedVersion}.`,
       );
     }
   }

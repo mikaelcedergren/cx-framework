@@ -5,6 +5,7 @@ export {
   createHermeticBrowserContext,
   createHermeticE2EChildEnvironment,
   createHermeticPlaywrightUse,
+  createHermeticPlaywrightTest,
   E2E_CHROMIUM_NETWORK_ARGUMENTS,
   E2E_DYNAMIC_PORT_RANGE,
   E2E_OWNER_MARKER_NAME,

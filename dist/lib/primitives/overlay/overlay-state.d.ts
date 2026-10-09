@@ -83,6 +83,6 @@ export declare class CxOverlayStateService {
     private tryFocus;
     private topmostActiveHandle;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxOverlayStateService, never>;
-    static ɵprov: i0.ɵɵInjectableDeclaration<CxOverlayStateService>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<any>;
 }
 //# sourceMappingURL=overlay-state.d.ts.map

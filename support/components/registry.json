@@ -1,6 +1,13 @@
 {
   "components": [
     {
+      "name": "cx-assistant",
+      "selectors": ["cx-assistant"],
+      "area": "pattern",
+      "category": "cx-assistant",
+      "path": "patterns/cx-assistant/cx-assistant.component.ts"
+    },
+    {
       "name": "cx-variant",
       "selectors": ["cx-variant"],
       "area": "tooling",

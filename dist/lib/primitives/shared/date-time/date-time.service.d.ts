@@ -7,6 +7,6 @@ export declare class CxDateTimeService {
     constructor();
     format(value: CxDateTimeValue, options?: Omit<CxDateTimeOptions, "now">): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxDateTimeService, never>;
-    static ɵprov: i0.ɵɵInjectableDeclaration<CxDateTimeService>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<any>;
 }
 //# sourceMappingURL=date-time.service.d.ts.map

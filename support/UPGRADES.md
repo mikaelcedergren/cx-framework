@@ -1,5 +1,11 @@
 # Upgrade notes for cx-framework consumers
 
+## Assistant
+
+`cx-assistant` provides an application-wide hairline, ribbon and answer window. Mount one per app. Supply `actions`, `quickActions`, `context`, and a `respond(request)` callback; handle `select` to perform actions. `query` actions prefill without sending. A `pick(element)` callback opts into contextual picking. `shortcut` defaults to true (Cmd/Ctrl+K); turn it off for additional embedded specimens. `open` supports two-way binding. `maxInputTokens` defaults to 512; UTF-8 byte length supplies a conservative token upper bound, and oversized questions stay editable without submission. The host must enforce its own request budget. Project additional answer content with `[cxAssistantAnswer]`. The component makes no network calls and owns no product data. Abort signals invalidate dismissed or superseded answers.
+
+Cortex now uses Assistant for global navigation. Launcher remains a standalone list picker; it no longer owns Cortex's Cmd/Ctrl+K interaction.
+
 This file records what changed about **using** the library, version by version, for the
 agent working in a consuming product. Read the section for every version between the one
 the product currently has and the one it is moving to.
@@ -13,6 +19,77 @@ Entries name the component, state the change, and give the action to take. Every
 version has a section, including one that only says nothing changed for consumers: a
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
+
+## 0.17.3
+
+- Assistant resolves its viewport dimensions before the first render, so its
+  initial ribbon has a valid numeric width before the resize observer runs.
+  Its border and halo now paint a synchronized conic gradient directly on their
+  own surfaces, without rotating oversized child layers. Motion keeps its angle
+  across state changes and stops in idle, static open, hidden-document and reduced-motion
+  states. No consumer changes are required.
+
+- Immediate follow-up answers clear the submitted text and keep keyboard focus in
+  the input, including when a response arrives before the transition to the waiting
+  state completes. No consumer changes are required.
+
+- The shared E2E runner supports explicit macOS WebKit selection. WebKit suites
+  must use the guarded test fixture described in [the platform contract](../platform/README.md#hermetic-e2e-modules).
+  Chromium remains the default; existing Chromium suites need no migration.
+
+## 0.17.2
+
+- The shared E2E runner handles owned processes exiting during shutdown
+  inspection. It still proves process death before removing temporary state,
+  rejects unproven surviving processes, and authenticates every signal. No
+  consumer configuration changes are needed.
+
+## 0.17.1
+
+- The web platform now requires exact Angular and CDK versions from
+  `platform/web-standard.json` in every browser and authoring workspace.
+  Update the matching runtime, compiler, CLI and build declarations and lockfiles
+  together. Browser workspaces must also declare `@angular/forms`, required by
+  the updated CDK; Node-only workspaces still declare no browser peers.
+
+- `cx-markdown-editor` converts `->`, `<-`, `<->`, `=>`, `<=>`, `!=`, `<=`,
+  `>=`, `+/-`, and `...` into Unicode symbols when followed by Space.
+  Backspace immediately restores the literal pattern; Undo/Redo is supported.
+  Code, link destinations, pasted text, and existing documents remain literal.
+  Symbols persist through the existing Markdown value; no consumer changes are required.
+
+- `cx-markdown-editor` supports Option/Alt+ArrowUp and Option/Alt+ArrowDown to
+  move paragraphs and list items among siblings. Nested children, checkbox
+  state, formatting and selection travel with the moved content. Boundaries do
+  not change indentation. Each move supports Undo/Redo and emits the usual
+  markdown value; no consumer changes are required.
+
+- `cx-explorer` adds `itemOrderChange` (`{ folderId, itemIds }`) and
+  `pinnedItemOrderChange` (`readonly string[]`). Editable folder items and pinned
+  shortcuts support dragging and Alt+ArrowUp/ArrowDown. Persist and echo each
+  order through `folders[].items` and `pinnedItemIds`; the orders are independent.
+  Folder membership and content are unchanged. Consumers using editable items
+  should handle these outputs to retain reordering.
+
+- `cx-markdown-editor` fixes repeated Backspace after exiting an empty list
+  item. The next Backspace deletes the blank paragraph and moves to the previous
+  item's text instead of recreating an empty bullet. This applies to bullet,
+  numbered, and checkbox lists; no consumer changes are needed.
+
+- `cx-explorer` adds `pinnedItemIds` (default `[]`). Supply ordered IDs of
+  existing folder items to render shortcuts above the hierarchy, separated by
+  spacing without a visible heading. Persist pins in the consumer and supply its
+  pin/unpin actions. `folders[].items[].menuItems` now optionally replaces
+  `itemMenuItems` for an individual item and its shortcut; built-in actions
+  remain. Existing consumers require no changes.
+
+- `cx-alert` adds optional `expandable` (default false), `expanded` (default
+  false), and `expandedChange`. Expansion reveals the existing description slot
+  and action together; the heading and dismiss remain visible. The whole alert
+  toggles except independent controls and text selection. Empty descriptions
+  offer no toggle. Collapsed content preserves its state and is removed from
+  keyboard and assistive technology access. Existing alerts keep their normal
+  presentation.
 
 ## 0.17.0
 

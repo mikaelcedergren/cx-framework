@@ -16,6 +16,7 @@ export interface ValidatedOwnedE2ERuntime extends OwnedE2ERuntime {
 }
 
 export interface E2ERunnerContext {
+  readonly engine: "chromium" | "webkit";
   readonly baseUrl: string;
   readonly networkGuardPath: string;
   readonly nodeExecutable: string;
@@ -78,7 +79,7 @@ export function createHermeticPlaywrightUse<
 ): Readonly<
   T & {
     readonly baseURL: string;
-    readonly browserName: "chromium";
+    readonly browserName: "chromium" | "webkit";
     readonly launchOptions: Readonly<{
       readonly args: readonly string[];
       readonly proxy: Readonly<{ readonly server: string }>;
@@ -87,6 +88,10 @@ export function createHermeticPlaywrightUse<
     readonly serviceWorkers: "block";
   }
 >;
+
+export function createHermeticPlaywrightTest<
+  T extends { extend: (...args: any[]) => any },
+>(baseTest: T): T;
 
 export function createHermeticBrowserContext<
   TBrowser extends { newContext: (...args: any[]) => any },

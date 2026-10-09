@@ -12,7 +12,7 @@ The workbench is a literal public-API inspector. It must not make a component ap
 
 - Expose every public input or prop under its exact public name or prop path, such as `mood`, `dismissible`, or `action.text`.
 - Do not expose implementation helpers, scenario presets, visual hacks, or workbench-only values as component props.
-- Keep outputs and event demonstrations outside the prop-control list.
+- Omit diagnostic readouts from component workbenches, previews, and variants, including event logs and echoes of current values or state. Let the component's visible behavior demonstrate the result; document outputs in the API reference. Add event-inspection UI only when explicitly requested.
 - Put contextual reference information in `[cxWorkbenchNote]`, not in the specimen.
 - Keep component controls in one full-width vertical stack.
 - Keep preview width, preview height, alignment, and other shell controls in the shared workbench shell.

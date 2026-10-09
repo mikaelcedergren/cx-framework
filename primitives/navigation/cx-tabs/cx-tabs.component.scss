@@ -58,7 +58,7 @@
   font-family: inherit;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
-  line-height: 1;
+  line-height: var(--line-height-control);
   margin: 0;
   outline: none;
   transition: color var(--motion-fast) ease;
@@ -96,6 +96,7 @@
 
 .cx-tabs__label {
   min-width: 0;
+  padding-block: var(--space-2xs);
   overflow: hidden;
   text-overflow: ellipsis;
 }

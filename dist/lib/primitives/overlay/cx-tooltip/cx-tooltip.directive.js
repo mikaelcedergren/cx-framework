@@ -122,10 +122,10 @@ class CxTooltipOverflowObserver {
         }
         this.measurementFrame = undefined;
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipOverflowObserver, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipOverflowObserver, providedIn: 'root' });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipOverflowObserver, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipOverflowObserver, providedIn: 'root' });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipOverflowObserver, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipOverflowObserver, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
@@ -246,10 +246,10 @@ class CxTooltipInteractionCoordinator {
             attributeFilter: ['aria-describedby'],
         });
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipInteractionCoordinator, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipInteractionCoordinator, providedIn: 'root' });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipInteractionCoordinator, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipInteractionCoordinator, providedIn: 'root' });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipInteractionCoordinator, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipInteractionCoordinator, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
@@ -987,10 +987,10 @@ export class CxTooltipDirective {
     messageText() {
         return this.cxTooltip()?.trim() ?? '';
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
-    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "22.0.8", type: CxTooltipDirective, isStandalone: true, selector: "[cxTooltip]", inputs: { cxTooltip: { classPropertyName: "cxTooltip", publicName: "cxTooltip", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipPosition: { classPropertyName: "cxTooltipPosition", publicName: "cxTooltipPosition", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipDelay: { classPropertyName: "cxTooltipDelay", publicName: "cxTooltipDelay", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipDisabled: { classPropertyName: "cxTooltipDisabled", publicName: "cxTooltipDisabled", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipOverflow: { classPropertyName: "cxTooltipOverflow", publicName: "cxTooltipOverflow", isSignal: true, isRequired: false, transformFunction: null } }, host: { listeners: { "mouseenter": "onTriggerMouseEnter()", "mouseover": "onTriggerMouseOver($event)", "mouseleave": "onTriggerMouseLeave()", "focusin": "onTriggerFocusIn($event)", "focusout": "onTriggerFocusOut($event)" } }, ngImport: i0 });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "22.2.2", type: CxTooltipDirective, isStandalone: true, selector: "[cxTooltip]", inputs: { cxTooltip: { classPropertyName: "cxTooltip", publicName: "cxTooltip", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipPosition: { classPropertyName: "cxTooltipPosition", publicName: "cxTooltipPosition", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipDelay: { classPropertyName: "cxTooltipDelay", publicName: "cxTooltipDelay", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipDisabled: { classPropertyName: "cxTooltipDisabled", publicName: "cxTooltipDisabled", isSignal: true, isRequired: false, transformFunction: null }, cxTooltipOverflow: { classPropertyName: "cxTooltipOverflow", publicName: "cxTooltipOverflow", isSignal: true, isRequired: false, transformFunction: null } }, host: { listeners: { "mouseenter": "onTriggerMouseEnter()", "mouseover": "onTriggerMouseOver($event)", "mouseleave": "onTriggerMouseLeave()", "focusin": "onTriggerFocusIn($event)", "focusout": "onTriggerFocusOut($event)" } }, ngImport: i0 });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxTooltipDirective, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxTooltipDirective, decorators: [{
             type: Directive,
             args: [{
                     selector: '[cxTooltip]',

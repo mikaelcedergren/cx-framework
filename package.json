@@ -1,6 +1,6 @@
 {
   "name": "@mikaelcedergren/cx-framework",
-  "version": "0.17.0",
+  "version": "0.17.3",
   "description": "Portable product framework for Angular UI, AI working rules, and Node web runtime.",
   "type": "module",
   "packageManager": "pnpm@11.23.0+sha512.f00082e5b283a199b74e079da28d155c008fe232f44c8a06ea7ddfa014ecf719fc362f790ecc67b28106ddac2afb24c49a9a079159da560b2ce7d1e98efd11af",
@@ -340,6 +340,7 @@
     "@angular/cdk": "^22.0.0",
     "@angular/common": "^22.0.0",
     "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
     "@angular/router": "^22.0.0",
     "ag-charts-community": "^13.3.1",
     "marked": "^18.0.7",
@@ -364,6 +365,9 @@
       "optional": true
     },
     "@angular/core": {
+      "optional": true
+    },
+    "@angular/forms": {
       "optional": true
     },
     "@angular/router": {
@@ -413,13 +417,14 @@
     }
   },
   "devDependencies": {
-    "@angular/cdk": "22.0.6",
-    "@angular/common": "22.0.8",
-    "@angular/compiler": "22.0.8",
-    "@angular/compiler-cli": "22.0.8",
-    "@angular/core": "22.0.8",
-    "@angular/platform-browser": "22.0.8",
-    "@angular/router": "22.0.8",
+    "@angular/cdk": "22.2.2",
+    "@angular/common": "22.2.2",
+    "@angular/compiler": "22.2.2",
+    "@angular/compiler-cli": "22.2.2",
+    "@angular/core": "22.2.2",
+    "@angular/forms": "22.2.2",
+    "@angular/platform-browser": "22.2.2",
+    "@angular/router": "22.2.2",
     "@types/node": "^26.0.0",
     "ag-charts-community": "^13.3.1",
     "marked": "^18.0.7",

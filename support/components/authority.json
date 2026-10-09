@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 137,
-  "catalogSha256": "73eed348247e2f6fee636620721b987035d72c5ffdbc80a4ac18d5d3433ab8f7",
+  "componentCount": 138,
+  "catalogSha256": "cca2249630bfc79dab0c67d77c6552bd7d6cfb4bdbed6408b295ede878e1173c",
   "components": [
     {
       "name": "cx-account-control",
@@ -320,12 +320,30 @@
             "source": "decorator"
           },
           {
+            "binding": "expandable",
+            "member": "expandable",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "expanded",
+            "member": "expanded",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "heading",
             "member": "heading",
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "''",
+            "defaultValue": "\"\"",
             "source": "decorator"
           },
           {
@@ -343,7 +361,7 @@
             "type": "CxAlertMood",
             "required": false,
             "transform": null,
-            "defaultValue": "'default'",
+            "defaultValue": "\"default\"",
             "source": "decorator"
           }
         ],
@@ -359,6 +377,12 @@
             "member": "dismiss",
             "type": "void",
             "source": "decorator"
+          },
+          {
+            "binding": "expandedChange",
+            "member": "expandedChange",
+            "type": "boolean",
+            "source": "decorator"
           }
         ]
       },
@@ -370,17 +394,154 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "213ff30e5dd3855d91ba55f92067c4b681f87e8f3b927f03b0f213bd620e597e"
+          "sha256": "a90843a62ed4783fa41d274758817a84c1ec6b2fbf2a8ca86ff994ce40eed9c8"
         },
         "template": {
           "kind": "external",
-          "sha256": "bb766fc8cc4d360d4fcca644455e96e369cb888bbb2bbb18820da3e76838d13d"
+          "sha256": "c8d1bee58732b70d8aeb10fff96f7459c71daa93e8bf74e37e9d913231f53b51"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d017aee07bcc0a4362269d31635baadd02d134c0d07ed0180f28bfd6c63917fc"
+            "sha256": "969d137473d77f63d4444721f426a4d074c8c3b093d235dfce47fc7afaea01c1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-assistant",
+      "area": "pattern",
+      "category": "cx-assistant",
+      "kind": "component",
+      "selectors": [
+        "cx-assistant"
+      ],
+      "publicApi": {
+        "symbol": "CxAssistantComponent",
+        "inputs": [
+          {
+            "binding": "actions",
+            "member": "actions",
+            "type": "readonly CxAssistantAction[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "signal"
+          },
+          {
+            "binding": "context",
+            "member": "context",
+            "type": "CxAssistantContext | null",
+            "required": false,
+            "transform": null,
+            "defaultValue": "null",
+            "source": "signal"
+          },
+          {
+            "binding": "heading",
+            "member": "heading",
+            "type": "string",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"Assistant\"",
+            "source": "signal"
+          },
+          {
+            "binding": "maxInputTokens",
+            "member": "maxInputTokens",
+            "type": "number",
+            "required": false,
+            "transform": null,
+            "defaultValue": "512",
+            "source": "signal"
+          },
+          {
+            "binding": "open",
+            "member": "open",
+            "type": "boolean",
+            "required": false,
+            "transform": null,
+            "defaultValue": "false",
+            "source": "model"
+          },
+          {
+            "binding": "pick",
+            "member": "pick",
+            "type": "CxAssistantPicker | null",
+            "required": false,
+            "transform": null,
+            "defaultValue": "null",
+            "source": "signal"
+          },
+          {
+            "binding": "quickActions",
+            "member": "quickActions",
+            "type": "readonly CxAssistantAction[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "signal"
+          },
+          {
+            "binding": "respond",
+            "member": "respond",
+            "type": "CxAssistantResponder | null",
+            "required": false,
+            "transform": null,
+            "defaultValue": "null",
+            "source": "signal"
+          },
+          {
+            "binding": "shortcut",
+            "member": "shortcut",
+            "type": "boolean",
+            "required": false,
+            "transform": null,
+            "defaultValue": "true",
+            "source": "signal"
+          }
+        ],
+        "outputs": [
+          {
+            "binding": "contextChange",
+            "member": "contextChange",
+            "type": "CxAssistantContext | null",
+            "source": "signal"
+          },
+          {
+            "binding": "openChange",
+            "member": "open",
+            "type": "boolean",
+            "source": "model"
+          },
+          {
+            "binding": "select",
+            "member": "select",
+            "type": "string",
+            "source": "signal"
+          }
+        ]
+      },
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[cxAssistantAnswer]"
+        }
+      ],
+      "evidence": {
+        "source": {
+          "sha256": "0f90c4af92e20bc6487a8f2f042d23e2d4d9a31df683bfad92ad477b7f99ce54"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "9e0a6736930a353d979421316c07887ab6042e782db46fce6a10b8acb9ea03f3"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "f46f04e640a73e45821755d632c0b2eb4c5828d3a4e0773358ee3a1df697164c"
           }
         ]
       }
@@ -3585,7 +3746,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "21730cdf1e39c929604f64b8280610e9107bf0b37aa638e59cf2d6cd74a6cee1"
+            "sha256": "5a154817516060755463f8d3f4d778d1d5c668490db4e30e1b46ed597beb19bf"
           }
         ]
       }
@@ -4353,7 +4514,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'Explorer'",
+            "defaultValue": "\"Explorer\"",
             "source": "decorator"
           },
           {
@@ -4362,7 +4523,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'New page'",
+            "defaultValue": "\"New page\"",
             "source": "decorator"
           },
           {
@@ -4438,6 +4599,15 @@
             "source": "decorator"
           },
           {
+            "binding": "pinnedItemIds",
+            "member": "pinnedItemIds",
+            "type": "readonly string[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "resizable",
             "member": "resizable",
             "type": "boolean",
@@ -4470,7 +4640,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'Search'",
+            "defaultValue": "\"Search\"",
             "source": "decorator"
           },
           {
@@ -4479,7 +4649,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "''",
+            "defaultValue": "\"\"",
             "source": "decorator"
           },
           {
@@ -4545,9 +4715,21 @@
             "source": "decorator"
           },
           {
+            "binding": "itemOrderChange",
+            "member": "itemOrderChange",
+            "type": "CxExplorerItemOrderChange",
+            "source": "decorator"
+          },
+          {
             "binding": "menuAction",
             "member": "menuAction",
             "type": "CxExplorerMenuAction",
+            "source": "decorator"
+          },
+          {
+            "binding": "pinnedItemOrderChange",
+            "member": "pinnedItemOrderChange",
+            "type": "readonly string[]",
             "source": "decorator"
           },
           {
@@ -4578,17 +4760,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "0ec3f4829966f92d2a507bf35b411460c8b43d931cf993cfd02fcb8b8ee88640"
+          "sha256": "aaae1e07dd6a844a7751fe1c63dfb5b875092b3f8554362c20ff2d8894383c61"
         },
         "template": {
           "kind": "external",
-          "sha256": "27bd049294ef01bb57dc24dc41e759b19bd87feb4b32899b1aa185cb292839b9"
+          "sha256": "042a3560e524b736842be69f1879f33c4ac8d0a3da788f408e0271b9be9e14da"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "bd03b5c8d1aba592480b032b94bbcd4af9531a1629b391179e89e2f0102d7099"
+            "sha256": "ebe73bafa30b86b5cf6447410294d1653804c322ecfc6a2236684f0c722e35bb"
           }
         ]
       }
@@ -13124,7 +13306,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "2566b5731f3e6262af32d44d5cd8e976adcfc7ff329ece6cd0dd6519742eee3b"
+            "sha256": "0ab1620a84d29305862f63626b8ebda1cb24369f5de4a252bf510eaa888e67f6"
           }
         ]
       }

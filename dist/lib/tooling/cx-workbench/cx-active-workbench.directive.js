@@ -20,10 +20,10 @@ export class CxActiveWorkbenchDirective {
         }
         this.container.clear();
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxActiveWorkbenchDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
-    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "16.1.0", version: "22.0.8", type: CxActiveWorkbenchDirective, isStandalone: true, selector: "[cxActiveWorkbench]", inputs: { cxActiveWorkbench: ["cxActiveWorkbench", "cxActiveWorkbench", booleanAttribute] }, ngImport: i0 });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxActiveWorkbenchDirective, deps: [], target: i0.ɵɵFactoryTarget.Directive });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "16.1.0", version: "22.2.2", type: CxActiveWorkbenchDirective, isStandalone: true, selector: "[cxActiveWorkbench]", inputs: { cxActiveWorkbench: ["cxActiveWorkbench", "cxActiveWorkbench", booleanAttribute] }, ngImport: i0 });
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.0.8", ngImport: i0, type: CxActiveWorkbenchDirective, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxActiveWorkbenchDirective, decorators: [{
             type: Directive,
             args: [{
                     selector: '[cxActiveWorkbench]',

@@ -85,6 +85,6 @@ export declare class CxNavigationRecoveryService {
     private sameOriginNavigationUrl;
     private browserView;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxNavigationRecoveryService, never>;
-    static ɵprov: i0.ɵɵInjectableDeclaration<CxNavigationRecoveryService>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<any>;
 }
 //# sourceMappingURL=cx-navigation-recovery.service.d.ts.map
