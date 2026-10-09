@@ -20,6 +20,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.4
+
+- Browser releases preserve Google's HTML ownership-verification files verbatim when
+  the generated filename and plain-text token match. These files remain covered by
+  the sealed artifact digest; normal HTML pages still require their build marker.
+  Include the downloaded file in the browser build's root assets. Release operators
+  and production servers must both update before selecting an artifact containing it.
+
 ## 0.17.3
 
 - Assistant resolves its viewport dimensions before the first render, so its

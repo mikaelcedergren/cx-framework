@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { chmodSync, lstatSync, mkdirSync, opendirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync, } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
-import { browserReleasePaths, listBrowserReleases, readActiveBrowserRelease, validateBrowserArtifact, } from "./browser-releases.js";
+import { browserReleasePaths, listBrowserReleases, readActiveBrowserRelease, stampBrowserHtmlBuildIdentity, validateBrowserArtifact, } from "./browser-releases.js";
 import { RETAINED_RELEASE_DIRECTORY_MODE, RETAINED_RELEASE_FILE_MODE, } from "./release-modes.js";
 const SYNTHETIC_RELEASE_ID = /^[a-z0-9](?:[a-z0-9._-]{0,126}[a-z0-9])?$/i;
 const SYNTHETIC_FILE_SEGMENT = /^[a-z0-9][a-z0-9._-]{0,127}$/i;
@@ -236,11 +236,7 @@ function stampSyntheticHtmlBuildId(file, buildId) {
             cause: error,
         });
     }
-    const occurrences = source.split(SYNTHETIC_BUILD_ID_PLACEHOLDER).length - 1;
-    if (occurrences !== 1) {
-        throw new Error(`Synthetic browser HTML must contain exactly one build-id placeholder: ${file}`);
-    }
-    writeFileSync(file, source.replace(SYNTHETIC_BUILD_ID_PLACEHOLDER, buildId));
+    writeFileSync(file, stampBrowserHtmlBuildIdentity(source, buildId, file));
 }
 function makeSyntheticReleaseRemovable(root) {
     const entry = lstatIfPresent(root);

@@ -10,7 +10,7 @@ import {
   readSync,
   realpathSync,
 } from "node:fs";
-import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import { HASHED_ASSET } from "./security.js";
 import { assertRetainedBrowserReleaseModes } from "./release-modes.js";
@@ -330,6 +330,14 @@ export function validateBrowserArtifact(
           record.absolutePath,
         ),
       );
+      if (
+        isGoogleSiteVerificationHtml(source, record.absolutePath) &&
+        !sourceBytes.equals(canonicalBytes)
+      ) {
+        throw new Error(
+          `Verification HTML must retain its exact UTF-8 bytes: ${record.absolutePath}`,
+        );
+      }
     }
     const digest = canonicalBytes
       ? createHash("sha256").update(canonicalBytes).digest("hex")
@@ -1004,7 +1012,7 @@ export function canonicalizeBrowserHtmlBuildIdentity(
   );
 }
 
-/** Stamp one real, direct-child-of-head build marker from the source placeholder. */
+/** Stamp a page build marker; preserve exact Google ownership-verification documents. */
 export function stampBrowserHtmlBuildIdentity(
   source: string,
   buildId: string,
@@ -1018,7 +1026,7 @@ export function stampBrowserHtmlBuildIdentity(
   );
 }
 
-/** Prove one real, direct-child-of-head build marker without changing the HTML. */
+/** Prove a page build marker or an exact Google ownership-verification document. */
 export function assertBrowserHtmlBuildIdentity(
   source: string,
   expectedBuildId: string,
@@ -1067,6 +1075,18 @@ const VOID_HTML_ELEMENTS = new Set([
 ]);
 const RAW_TEXT_HTML_ELEMENTS = new Set(["script", "style"]);
 
+// Google serves a plain-text ownership token using an .html filename. It is a sealed
+// asset, not an application page: its exact bytes participate in the artifact digest.
+function isGoogleSiteVerificationHtml(source: string, file: string): boolean {
+  const name = basename(file);
+  const token = `google-site-verification: ${name}`;
+  return (
+    /^google[0-9a-f]{16}\.html$/.test(name) &&
+    source.startsWith(token) &&
+    /^(?:\r?\n)*$/.test(source.slice(token.length))
+  );
+}
+
 function replaceBrowserHtmlBuildIdentity(
   source: string,
   expectedBuildId: string,
@@ -1082,6 +1102,7 @@ function replaceBrowserHtmlBuildIdentity(
   ) {
     throw new TypeError("Browser HTML build identity input is invalid.");
   }
+  if (isGoogleSiteVerificationHtml(source, file)) return source;
   const markers = browserHtmlBuildMarkers(source, file);
   if (markers.length !== 1) {
     throw new Error(

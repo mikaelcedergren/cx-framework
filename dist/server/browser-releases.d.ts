@@ -77,8 +77,8 @@ export declare function createRetainedBrowserAssetResolver(repoRoot: string): Re
 export declare function findRetainedBrowserAsset(repoRoot: string, requestPath: string): RetainedBrowserAsset | undefined;
 export declare function validateBrowserDirectory(browserDir: string): string;
 export declare function canonicalizeBrowserHtmlBuildIdentity(source: string, expectedBuildId: string, file: string): string;
-/** Stamp one real, direct-child-of-head build marker from the source placeholder. */
+/** Stamp a page build marker; preserve exact Google ownership-verification documents. */
 export declare function stampBrowserHtmlBuildIdentity(source: string, buildId: string, file: string): string;
-/** Prove one real, direct-child-of-head build marker without changing the HTML. */
+/** Prove a page build marker or an exact Google ownership-verification document. */
 export declare function assertBrowserHtmlBuildIdentity(source: string, expectedBuildId: string, file: string): void;
 //# sourceMappingURL=browser-releases.d.ts.map

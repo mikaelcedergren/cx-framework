@@ -17,6 +17,7 @@ import {
   browserReleasePaths,
   listBrowserReleases,
   readActiveBrowserRelease,
+  stampBrowserHtmlBuildIdentity,
   validateBrowserArtifact,
 } from "./browser-releases.js";
 import {
@@ -330,13 +331,7 @@ function stampSyntheticHtmlBuildId(file: string, buildId: string): void {
       cause: error,
     });
   }
-  const occurrences = source.split(SYNTHETIC_BUILD_ID_PLACEHOLDER).length - 1;
-  if (occurrences !== 1) {
-    throw new Error(
-      `Synthetic browser HTML must contain exactly one build-id placeholder: ${file}`,
-    );
-  }
-  writeFileSync(file, source.replace(SYNTHETIC_BUILD_ID_PLACEHOLDER, buildId));
+  writeFileSync(file, stampBrowserHtmlBuildIdentity(source, buildId, file));
 }
 
 function makeSyntheticReleaseRemovable(root: string): void {

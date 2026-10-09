@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, lstatSync, openSync, opendirSync, readSync, realpathSync, } from "node:fs";
-import { isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { HASHED_ASSET } from "./security.js";
 import { assertRetainedBrowserReleaseModes } from "./release-modes.js";
 const ACTIVATION_FILENAME = "active-release.json";
@@ -152,6 +152,10 @@ export function validateBrowserArtifact(browserDir, { expectedBuildId, maxArtifa
                 throw new Error(`Browser HTML entry is not valid UTF-8: ${record.absolutePath}`, { cause: error });
             }
             canonicalBytes = Buffer.from(canonicalizeBrowserHtmlBuildIdentity(source, expectedBuildId ?? BUILD_ID_PLACEHOLDER, record.absolutePath));
+            if (isGoogleSiteVerificationHtml(source, record.absolutePath) &&
+                !sourceBytes.equals(canonicalBytes)) {
+                throw new Error(`Verification HTML must retain its exact UTF-8 bytes: ${record.absolutePath}`);
+            }
         }
         const digest = canonicalBytes
             ? createHash("sha256").update(canonicalBytes).digest("hex")
@@ -624,11 +628,11 @@ function hashStableArtifactFile(filePath, expectedSnapshot, maximumBytes) {
 export function canonicalizeBrowserHtmlBuildIdentity(source, expectedBuildId, file) {
     return replaceBrowserHtmlBuildIdentity(source, expectedBuildId, BUILD_ID_PLACEHOLDER, file);
 }
-/** Stamp one real, direct-child-of-head build marker from the source placeholder. */
+/** Stamp a page build marker; preserve exact Google ownership-verification documents. */
 export function stampBrowserHtmlBuildIdentity(source, buildId, file) {
     return replaceBrowserHtmlBuildIdentity(source, BUILD_ID_PLACEHOLDER, buildId, file);
 }
-/** Prove one real, direct-child-of-head build marker without changing the HTML. */
+/** Prove a page build marker or an exact Google ownership-verification document. */
 export function assertBrowserHtmlBuildIdentity(source, expectedBuildId, file) {
     replaceBrowserHtmlBuildIdentity(source, expectedBuildId, expectedBuildId, file);
 }
@@ -649,6 +653,15 @@ const VOID_HTML_ELEMENTS = new Set([
     "wbr",
 ]);
 const RAW_TEXT_HTML_ELEMENTS = new Set(["script", "style"]);
+// Google serves a plain-text ownership token using an .html filename. It is a sealed
+// asset, not an application page: its exact bytes participate in the artifact digest.
+function isGoogleSiteVerificationHtml(source, file) {
+    const name = basename(file);
+    const token = `google-site-verification: ${name}`;
+    return (/^google[0-9a-f]{16}\.html$/.test(name) &&
+        source.startsWith(token) &&
+        /^(?:\r?\n)*$/.test(source.slice(token.length)));
+}
 function replaceBrowserHtmlBuildIdentity(source, expectedBuildId, replacementBuildId, file) {
     if (typeof source !== "string" ||
         typeof expectedBuildId !== "string" ||
@@ -657,6 +670,8 @@ function replaceBrowserHtmlBuildIdentity(source, expectedBuildId, replacementBui
         replacementBuildId.length === 0) {
         throw new TypeError("Browser HTML build identity input is invalid.");
     }
+    if (isGoogleSiteVerificationHtml(source, file))
+        return source;
     const markers = browserHtmlBuildMarkers(source, file);
     if (markers.length !== 1) {
         throw new Error(`HTML entry must contain exactly one real ${BUILD_ID_META_NAME} marker directly in head: ${file}`);
