@@ -38,13 +38,19 @@ Opinionated components are useful because their supported interfaces can express
 
 `RULE-ID: color.raw-hue` permits raw hue when hue itself is data or a user choice, such as a chart series, swatch, or chosen tag color. `RULE-ID: accessibility.color-independent` keeps meaning available through another perceptual channel.
 
-## Calm requires visible affordance
+## Understanding and action
+
+Clarity is the least effort needed to understand what matters and act confidently. Word count, click count, and the number of visible elements are imperfect proxies. A shorter interface that requires guessing is harder to use; a longer one that repeats what the layout already says creates unnecessary reading.
+
+Start with the person's immediate goal, what they can already know from the situation, the current interaction state, and the cost of a mistaken interpretation. Evidence can come from explicit corrections, observed behavior, supported component contracts, and the actual arrangement. Keep inference visible: an existing screen is evidence of a design, not proof of its acceptance or usability.
 
 `RULE-ID: surfaces.light-first` owns the low-noise baseline without permitting hidden interaction. Chrome earns its place by clarifying structure, action, state, or priority, while current location, selected state, keyboard focus, destructive intent, and recovery remain visibly reachable.
 
-Dense information can remain dense because the goal is to reduce interface chrome around it. Alignment, spacing, typography, and semantic weight usually establish hierarchy before another box, border, fill, icon, or label is needed.
+Alignment, proximity, placement, typography, and state can communicate relationships before another box, icon, or sentence is needed. Dense information can remain dense when it serves comparison. A subtle cue works when the intended audience can recognise its meaning in context; unfamiliarity, an ambiguous target, a hidden consequence, or a recovery decision can justify explicit wording. Essential information does not earn its place by being subtle.
 
-`RULE-ID: content.scannable` owns the operational requirement. People scan operational interfaces before they read them closely, so the point, grouping, and decision-relevant detail carry more value than exhaustive explanation. Optional information without demonstrated value adds attention cost without earning it.
+`RULE-ID: content.scannable` owns the operational requirement. Make the current task and necessary consequence prominent, useful context secondary, and occasional capabilities available when needed. Omit what serves no current or evidenced need. Under `RULE-ID: copy.no-convention-explanation`, words resolve the uncertainty left by the interface; they do not compensate for a poorly expressed relationship or repeat a clear convention.
+
+When priorities compete, first resolve authority and scope under `00-start-here.md`. Within the remaining design freedom, prefer the choice that protects necessary understanding and confident action with less interpretation and distraction. Restraint does not justify hiding saving failures; explicitness does not justify explaining familiar tabs. Consistency transfers learned meaning without imposing identical layouts on different tasks. An intentional local departure stays local; it is neither a defect to normalise nor a new universal rule. If two choices serve the need equally, the established component and its defaults avoid needless variation.
 
 ## One unit gets one boundary
 

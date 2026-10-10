@@ -5,46 +5,37 @@
 Apply these priorities in order when they conflict:
 
 1. Applicable instructions, protected ownership, data safety, security, and explicit user boundaries
-2. Honest source-of-truth and dependency direction
-3. Long-term architectural health and one canonical implementation
-4. Verified correctness and deliberate product truth
-5. Simplicity, consistency, deletion, and reduced maintenance surface
-6. Compatibility with stale internal implementation
+2. Verified correctness, reliability, and preserved product contracts
+3. Honest source-of-truth, dependency direction, and established architecture
+4. Demonstrable simplification, consistency, and performance improvements
 
 Do not use “architecture” to justify crossing an explicit scope boundary. Surface the correct owner instead.
 
 ## Core philosophy
 
 - Optimize for repository health five years from now, not for making today's command green.
-- Prefer deletion over accommodation when evidence supports removal.
-- Prefer the smallest system with the fewest concepts, paths, dependencies, and exceptions.
-- Keep one implementation for one responsibility.
+- Leave sound code unchanged when no objectively meaningful improvement is established.
+- Prefer direct simplification and proven redundancy removal within the existing architecture.
+- Respect repository boundaries and intentional reuse strategies; similarity alone does not justify consolidation.
 - Fix causes at the layer that owns them.
 - Never make an upstream or shared source behave differently for one stale consumer.
 - Migrate consumers forward instead of adding compatibility shims, aliases, wrappers, redirects, bypass flags, or restored behavior.
-- Treat existing workarounds as debt to remove, not code to improve.
-- Create abstractions only when they remove present complexity.
-- Treat breakage as information, but account for its real impact.
+- Verify ownership and intent before classifying a local implementation as a workaround.
+- Avoid stylistic preferences, speculative problems, new dependencies, unnecessary abstractions, and refactoring for its own sake.
+- Preserve UI, SEO, interfaces, and intended behavior. A product decision or substantial regression risk is a reason to report, not to improvise.
 - Use evidence over assumptions. Report uncertainty instead of inventing confidence.
 
 ## Forward-only transition closure
 
-A completed migration or replacement has one current architecture. Close it by removing the old
-implementation and every active mechanism that teaches, selects, generates, installs, validates,
-or restores it. This includes compatibility aliases, one-time import/adoption commands, feature
-gates whose decision is already permanent, historical runbooks, stale tests, old service
-definitions, obsolete generated output, and retained release targets containing superseded code.
+Prove a migration complete before removing its superseded source or instructions. Check static
+and dynamic callers, public promises, persisted data, operational selection, and recovery needs.
+Remove only what is both unnecessary and within current authority. An unused import or old name
+does not establish that a route, migration, operator, or rollback target is obsolete.
 
-Do not confuse safety with reversibility to an obsolete design:
-
-- keep authoritative data and schema history required to open it
-- keep backups and recovery built from the current architecture
-- keep current transactional deployment safeguards
-- remove source and artifacts whose only purpose is returning to the replaced architecture
-
-Use Git history for historical investigation. Current source and documentation must describe one
-truthful system. When another agent searches the checkout, it should find only the present path and
-an explicit current owner.
+Keep authoritative data, schema history required to open it, supported external contracts,
+backups, and required recovery/deployment safeguards. Changing scheduled jobs, installed services,
+or retained releases requires its own operational authority. Git history is historical evidence;
+current documentation should identify the supported path and its owner.
 
 ## Ownership model
 
@@ -92,16 +83,18 @@ If evidence remains insufficient, keep the item and report it as unverified.
 
 ## Behaviour and product truth
 
-Do not optimize for preserving obsolete internal behavior. Do protect:
+Preserve:
 
 - user-owned or persisted data
 - migrations and restore paths
 - authentication, authorization, privacy, and security boundaries
 - externally consumed APIs, integrations, feeds, routes, and public URLs
 - deliberate product behavior and visual identity
-- legal, accessibility, and operational obligations
+- legal and operational obligations
 
-These may still change, but only with explicit impact accounting and adequate authority.
+Accessibility auditing and improvements are excluded by default, but existing required checks
+and obligations remain intact. Uncertain behavior or changes to protected contracts require a
+separate decision; report them rather than silently expanding a conservative refactor.
 
 ## Working-tree safety
 

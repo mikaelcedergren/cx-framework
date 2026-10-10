@@ -1,6 +1,8 @@
 # Audit catalogue
 
-Use every relevant category during planning. Absence of evidence is not evidence of a defect.
+Use every relevant category during planning. Require demonstrable benefit before changing code;
+absence of evidence is not evidence of a defect. Native applications and accessibility audits are
+excluded unless explicitly requested.
 
 ## 1. Architecture and ownership
 
@@ -17,10 +19,10 @@ Use every relevant category during planning. Absence of evidence is not evidence
 - dead, unreachable, obsolete, commented-out, deprecated, or duplicated code
 - parallel implementations of the same responsibility
 - abstractions that add indirection without removing complexity
-- helpers used once when direct code is clearer
+- redundant computation, unnecessary repeated I/O, or complexity with a demonstrably simpler equivalent
 - no-op branches, misleading fallbacks, impossible states, and swallowed errors
 - verified correctness, validation, concurrency, lifecycle, cleanup, and error-handling problems
-- naming that hides ownership or gives one concept several terms
+- inconsistent contracts that demonstrably break callers or misrepresent ownership
 
 ## 3. Dependencies and toolchain
 
@@ -56,16 +58,16 @@ Do not alter live services or production configuration without explicit authorit
 
 Do not add speculative tests solely to increase counts. Add or repair tests when they protect a real current contract.
 
-## 6. UI, UX, accessibility, and shared systems
+## 6. Shared systems and preserved UI
 
 - one-off UI that duplicates an available local component, supported configuration, or supported composition
 - consumer overrides of shared-component internals
 - duplicated tokens, fonts, assets, icons, or component behavior
-- broken hierarchy, affordance, responsive behavior, keyboard access, focus, contrast, semantics, or reachable states
+- incorrect interaction state, missing data, and runtime failures in reachable workflows
 - stale UI routes and unreachable screens
 - accidental visual drift versus deliberate product identity
 
-Cleaner may correct verified implementation defects and system drift. It must not invent a redesign, require an exact component name or API from another platform, or blindly convert an intentional visual exception. Before classifying custom UI as debt, discover the consuming product's local system and exhaust its supported components, configurations, and compositions. If no viable option remains, judge the custom solution against local authority and whether it is the smallest documented departure that preserves local system behavior.
+Preserve rendered UI and SEO. Do not perform accessibility auditing or accessibility focused improvements unless explicitly requested, and do not weaken existing checks. Cleaner may correct verified implementation defects and system drift within those boundaries. It must not invent a redesign, require an exact component name or API from another platform, or blindly convert an intentional visual exception. Before classifying custom UI as debt, discover the consuming product's local system and exhaust its supported components, configurations, and compositions. If no viable option remains, judge the custom solution against local authority and whether it is the smallest documented departure that preserves local system behavior.
 
 ## 7. Data, security, and external contracts
 
@@ -101,9 +103,9 @@ Classify each supported finding by ownership and disposition:
 Prioritize in this order:
 
 1. Data loss, security, broken ownership, and misleading success
-2. Architectural drift, duplicated truth, and compatibility debt
-3. Verified bugs and failing canonical workflows
+2. Verified bugs, runtime failures, and failing canonical workflows
+3. Demonstrable architectural drift and duplicated authoritative state
 4. Dead code, unnecessary dependencies, stale automation, and documentation drift
-5. Local clarity and low-risk polish
+5. Proven simplification or performance gains with minimal risk
 
 Group symptoms under one root finding. Do not inflate the plan with repeated manifestations of the same cause.

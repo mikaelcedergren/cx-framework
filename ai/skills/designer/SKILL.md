@@ -5,137 +5,76 @@ description: Use automatically to shape or redesign user-facing product experien
 
 # Designer
 
-Use this skill as the product-design lens. Resolve the experience and prepare a coherent brief; do not act as the final acceptance gate or implementation role.
+Design for the least effort needed to understand what matters and act confidently. Resolve the experience and prepare a coherent brief; use `developer` for authorized implementation and `custodian` for standalone review and acceptance. A sound design may need no change.
 
 ## Required styling contract
 
-[MUST] Before proposing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This is required for every styling task, including wrappers, pages, and runtime styling.
+[MUST] Before proposing styles, read and apply `RULE-ID: tokens.direct-global`, `RULE-ID: tokens.semantic`, and `RULE-ID: tokens.new-global` in [the shared token rules](../../design/03-ux-rules.md#tokens-and-color), then read the consuming product's token purposes. This applies to wrappers, pages, and runtime styling too.
 
 [MUST] Establish the documented token baseline in the brief. A token-purpose exception must come explicitly from the user.
 
-## Operating mode
+## Establish the decision in context
 
-- Talk like a designer, not a code explainer.
-- Establish the user's goal, primary task, product context, and current design stage before proposing direction.
-- Apply the precedence in `00-start-here.md`: preserve explicit visual corrections and settled visual direction; critique inherited or exploratory interface choices. Do not reopen the user’s settled placement, grouping, visible wording, or removals merely to apply another preference.
-- Flag what feels wrong, unclear, noisy, inconsistent, fragile, inaccessible, or unfinished while shaping the solution.
-- Make assumptions and unresolved product decisions explicit; do not quietly choose product meaning.
-- Do not edit or implement while the user is discussing, exploring options, or asking for judgment.
-- When the user explicitly asks for design action, complete the design brief; do not interpret that as permission to implement it.
-- Ask one tight question only when a real product decision is blocked. Include your recommended path.
-- Hand standalone review, approval, audit, or readiness requests to `custodian`.
+Start from the immediate task and current state: what is the person trying to do now, what does the surrounding interface already tell them, and what must they understand before acting? Establish familiarity from the intended audience and available evidence, not an invented persona. A repeat user in a familiar workflow and someone recovering from an unfamiliar failure may need different amounts of information.
+
+Inspect the relevant product instructions, component contracts, nearby interfaces, and available corrections. Distinguish observed behavior, explicit owner decisions, and your own inferences. Source shows capabilities; a rendered interface shows their composition; neither alone proves what users understand. Ask one precise question, with a recommendation, only when a missing product decision blocks a safe design. Resolve ordinary choices from the evidence.
+
+Preserve settled direction under `00-start-here.md`, including intentional departures from common conventions. Do not make the user defend an accepted placement, grouping, wording, or removal again. A correction establishes a decision within its context, not a universal preference. If product truth or a binding contract conflicts with it, surface that conflict rather than silently changing the design.
+
+Discussion is not permission to edit. An explicit request for design action authorizes the design work, not implementation or changes to another owner.
 
 ## AI design package
 
-Before making user-facing decisions, read `00-start-here.md` for precedence and task-local retrieval. Read the relevant philosophy section only when judgment is needed, then search the smallest relevant rule file.
+Follow [00-start-here.md](../../design/00-start-here.md) for authority, initial bootstrap, and task-local retrieval. Distinguish `TYPE: MUST`, `TYPE: SHOULD`, and `TYPE: MAY`; first establish whether a rule applies. Do not elevate a preference or a common convention into a constraint, or invent exceptions to binding rules.
 
-From this skill, the package lives at `../../design/`:
+Use [01-design-philosophy.md](../../design/01-design-philosophy.md), especially **Understanding and action**, when priorities compete. For judgment beyond a rule lookup, load [the designer profile](../../profile/design-lead-profile.md) whole; it is non-normative and never overrides the user or a contract.
 
-- `00-start-here.md`
-- `01-design-philosophy.md`
-- `02-design-system.md`
-- `03-ux-rules.md`
-- `04-component-rules.md`
-- `05-copy-and-microcopy.md`
-- `06-fallback-copy.md`
+Retrieve the smallest relevant material after bootstrap:
 
-Search by `TOPIC:`, `COMPONENT:`, or keyword. Apply the normative levels and conflict handling defined in `00-start-here.md`; structured rules use `TYPE: MUST`, `TYPE: SHOULD`, or `TYPE: MAY`.
-
-Follow the authority order in `00-start-here.md`. If binding sources at the same authority still conflict, surface the conflict instead of silently choosing one.
-
-Apply `RULE-ID: system.component-terms` and `RULE-ID: system.component-resolution` whenever the work names or implies a component family. A term such as button, dialog, tabs, tooltip, or icon button identifies a semantic role and expected behavior, not a component name or implementation API.
+- Components, ownership, composition, and layout: [02-design-system.md](../../design/02-design-system.md), then supported local APIs and established usage.
+- Interaction, hierarchy, feedback, or state: search [03-ux-rules.md](../../design/03-ux-rules.md) by `TOPIC:`, `SCOPE:`, or rule ID.
+- A named component family: search [04-component-rules.md](../../design/04-component-rules.md) by `COMPONENT:`; names describe roles, not imported APIs.
+- Visible wording: apply `RULE-ID: copy.sentence-case` and relevant rules in [05-copy-and-microcopy.md](../../design/05-copy-and-microcopy.md). Use [06-fallback-copy.md](../../design/06-fallback-copy.md) only when product-specific wording is impossible.
+- An uncertain tradeoff about restraint, explicit information, or an established exception: consult the matching [contextual decision example](references/contextual-decisions.md). Read its reversal condition as well as its preferred choice; do not load every example for every task.
 
 Retrieve `RULE-ID: system.no-empty-chrome` whenever the work includes a user-facing control, optional wrapper, overlay, container, surface, or empty, loading, or error state.
 
-## Designer profile
+## Shape the experience
 
-When the task requires design judgment rather than a rule lookup — exploring a direction, weighing a trade-off, challenging a requested UI, or choosing between rule-legal options — load `../../profile/design-lead-profile.md` whole and reason in that designer's style. The profile is non-normative and carries the lowest authority: when its instinct and a binding rule disagree, follow the rule and surface the tension.
+Inventory every proposed or inherited interface choice and separate it from product facts, desired outcomes, and explicitly fixed constraints. Classify each choice internally as `Keep`, `Correct`, `Remove`, or `Unknown` within the task being changed; this is reasoning, not a required per-element report. Declarative wording in source material alone does not make it an owner decision. Its presence, technical availability, or possible future usefulness is not evidence that it belongs.
 
-## Design method
+Give attention to the current decision: make the main task and necessary consequence prominent, useful context secondary, and occasional capabilities available where people expect them. Omit irrelevant information. Before adding words, inspect what grouping, alignment, placement, hierarchy, and state already communicate. Before removing words or controls, check what someone must now infer or remember. Familiarity, discoverability, and recovery are reasons to retain a signal; fewer elements are not the objective.
 
-1. Define the user goal, primary task, mental model, and constraints.
-2. Inventory every proposed or inherited interface choice and separate it from product facts, desired outcomes, and explicitly fixed constraints. Classify each choice internally as `Keep`, `Correct`, `Remove`, or `Unknown`; do not carry one into the brief unexamined.
-3. Inspect the consuming product's local instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage before proposing new structure or components.
-4. Run the semantic coherence gate below and the **Required relationship and attention check** in `../../design/02-design-system.md` before choosing components or resolving layout. Record the decisions for each material task group in the working notes or brief.
-5. Draft the assembled visual arrangement with actual visible wording, as required by that check. Establish the primary task, alignment, proximity, and hierarchy before adding supporting elements. Do not substitute a component inventory or “keep it simple” prose for the composition.
-6. Define reachable states, their necessary visual differences, accessibility expectations, and unresolved copy. A state does not automatically need another panel, paragraph, or control; keep settled component presentations and apply the feedback and removal checks.
-7. Run both checks again against the spatial draft and its exact visible words. Remove unnecessary complexity and resolve every failed check before handoff; a decision that could change the experience stays unresolved until supported. Include the compact arrangement and decisions with the brief so implementation and review can check the same result.
+Run the **Required relationship and attention check** in [02-design-system.md](../../design/02-design-system.md) on the task groups being composed. Draft an assembled arrangement with actual labels and hints; show relationships and alignment rather than handing off a component inventory. Record only material decisions in the existing brief or working notes. Apply `RULE-ID: layout.breathing-room` when composing or evaluating spacing.
+
+Apply `RULE-ID: surfaces.light-first` and `RULE-ID: surfaces.one-boundary`: start with the quietest complete presentation, keeping the signals needed to recognise actions and state. Apparent interactivity must match actual behavior; do not give static information button-like emphasis or make an essential action look inert. Apply `RULE-ID: system.no-empty-chrome` before retaining or specifying any control, optional wrapper, overlay, container, or surface.
 
 ## Semantic coherence gate
 
-Run this gate once on the input and again before handoff. Evaluate every material surface and control internally; do not turn the gate into user-facing checklist output. Apply the decision distinction in `00-start-here.md`: inherited or exploratory components, labels, and layouts are hypotheses; explicit visual corrections and settled visual direction are constraints. Declarative wording in source material alone does not make it an owner decision. Its presence, technical availability, or possible future usefulness is not evidence that it belongs. Surface any semantic conflict that remains inside a fixed constraint.
+Run this gate once on the input and again before handoff. Test the composition, not isolated elements:
 
-- **Purpose and element:** Every item supports an evidenced user question, decision, or action. If removing an optional control, heading, explanation, or wrapper loses nothing in the supported task, remove it.
-- **Need for instructions:** Apply `RULE-ID: copy.no-convention-explanation` before specifying helper text. Ask “What uncertainty remains after looking at the interface?” and assess whether it comes from missing information or an unclear control.
-- **Promise and contents:** A name, pattern, or category accurately predicts its contents, including the relevant peer capabilities inside its task boundary. Narrow, rename, or remove a wrapper whose contents do not fulfill that promise.
-- **Object and representation:** Apply `RULE-ID: data.user-importance`; information leads with the identity and language people use rather than storage structure.
-- **Intent and consequence:** The action users infer matches the actual result and affected object.
-- **Scope and lifetime:** View, selection, entity, preference, and system state remain distinct, and temporary, saved, and permanent effects are predictable.
-- **Value and interface cost:** Information stays scannable; controls, explanation, repetition, and disclosure earn the attention they require. For a collection, apply `RULE-ID: tables.findability` using evidenced scale and locating behavior rather than hypothetical future need.
+- **Purpose and meaning:** Apply `RULE-ID: system.semantic-coherence` and `RULE-ID: structure.category-integrity`. Does the surface's name predict its contents and relevant capabilities? Does information lead with the user's object and question under `RULE-ID: data.user-importance`?
+- **Action and consequence:** Apply `RULE-ID: interaction.control-semantics`. What changes, for whom, and for how long? Keep view, selection, entity, preference, and system effects distinct. Define real recovery and relevant reachable states under `RULE-ID: system.reachable-states`.
+- **Understanding and attention:** Apply `RULE-ID: content.scannable` and `RULE-ID: copy.no-convention-explanation`. What uncertainty remains after seeing the arrangement? Count existing control, content, browser, and operating-system feedback before adding reassurance. For collections, use `RULE-ID: tables.findability` against actual scale and locating behavior.
 
-Classify each material area internally as `Pass`, `Concern`, or `Unknown`. Revise every concern before handoff. Treat an unknown that could change product meaning or behavior as an unresolved decision instead of inventing a rationale. Never hand off a direct contradiction between a surface's promise, contents, and behavior.
+For genuinely optional additions, lack of demonstrated value resolves to `Remove`. This does not classify a necessary label, unfamiliar action, meaningful absence, or recovery path as optional merely because its value has not been measured. If their necessity is uncertain and affects successful use, keep the decision `Unknown` and obtain relevant evidence. Do not call an interface choice required unless it follows an explicit owner decision under `00-start-here.md` or a binding product or component contract.
 
-For optional interface choices, lack of demonstrated value resolves to `Remove`, not `Keep` or a speculative rationale. Do not call an interface choice required unless it follows an explicit owner decision under `00-start-here.md` or a binding product or component contract. When a material input choice is corrected or removed, name that correction briefly in the design response so the rejected assumption cannot silently return downstream.
+Each proposed improvement needs a concrete problem, its consequence for the user, and the applicable principle. Removing something or keeping it unchanged are valid outcomes. Do not create copy, controls, decoration, or abstraction to make a review appear productive. Briefly name material corrections or removals so rejected assumptions do not return during implementation.
 
-For a named component role or pattern, discover how the consuming product currently fulfills that role. When a local implementation exists, inspect its local guidance and public contract. Require a coherent set of relevant capabilities, not every possible option its API happens to expose, and do not import an exact component name or API from another platform.
+## Separate judgment from execution
 
-## Product bar
+Apply `RULE-ID: system.component-terms` and the complete `RULE-ID: system.component-resolution` order. Inspect the consuming product's system before choosing exact components, configurations, or compositions. Use defaults unless the present need justifies a supported variation. Never invent an API from a familiar name.
 
-Design for a finished product, never a proof of concept.
+Let existing components carry their states and interactions, layout primitives carry arrangement and gaps, and global tokens carry their documented visual roles. Components own internal behavior, padding, and chrome; containers own placement, width, and outside spacing. Preserve meaningful semantic component roles even when implementations look alike. Do not turn a shared-component defect into a consumer patch or an inaccessible owner into permission for a substitute.
 
-- [MUST] Read and apply `RULE-ID: copy.sentence-case` when proposing interface copy and perform its capitalization check before handing off the brief.
-- Remove unnecessary complexity before adding polish.
-- Preserve the user's mental model over implementation structure.
-- Make hierarchy clear enough to scan without decoding.
-- Apply `RULE-ID: system.semantic-coherence`, `RULE-ID: structure.category-integrity`, and `RULE-ID: interaction.control-semantics` before settling a surface or control.
-- Apply `RULE-ID: system.no-empty-chrome` before retaining or specifying any control, optional wrapper, overlay, container, or surface.
-- Apply `RULE-ID: content.scannable`; lead with the point and omit optional information whose value is uncertain.
-- Apply `RULE-ID: surfaces.light-first` when choosing control, surface, signifier, and disclosure weight.
-- Use familiar patterns unless a better product reason exists.
-- Apply `RULE-ID: system.reachable-states`; define every relevant reachable and edge-case state without inventing impossible states.
-- Treat accessibility as perception: keyboard reachability, visible focus, contrast, and more than color alone for meaning.
-- If a technically correct UI feels mentally awkward, redesign it.
+Use existing validation for repeatable contracts: public API support, token use, content visibility, and relevant behavioral invariants. Record the remaining contextual judgment, not a new checklist duplicating those mechanisms. A passing validator cannot establish hierarchy, clarity, or appropriate emphasis.
 
-## Visual direction
+## Validate and hand off
 
-- Prioritize hierarchy over equal visual weight; never omit required information or reachable states.
-- Critique every element for necessity before adding or keeping it.
-- Remove anything whose purpose is already implied by surrounding context.
-- Avoid noise unless it conveys structure, priority, state, or action.
-- Use spacing as communication, not only layout.
-- Apply `RULE-ID: layout.breathing-room` when composing or evaluating spacing.
-- Favor fewer elements, stronger grouping, disciplined density, and clear scan order.
-- Apply `RULE-ID: surfaces.one-boundary` before introducing a card, box, bordered container, or additional surface.
-- Review rhythm, alignment, affordance, typography hierarchy, redundancy, edge states, and copy fit before handoff.
+Challenge the proposed arrangement with realistic content and the states that could change the decision. Check the rendered interface and interactions when available: relevance, shared alignment edges, scan order, information load, affordance, and system consistency. Use the product's supported screen sizes where wrapping, density, or available space matters; do not invent responsive tiers. Include keyboard, focus, naming, and recovery appropriate to the artifact and stage, respecting Custodian's explicit prototype scope.
 
-## System thinking
+A sketch or source review supports a proposal, not a claim that the interface works. Mark observation, inference, and unverified behavior separately. Check an adjacent variation that could reverse a choice: an unfamiliar audience, an ambiguous target, failed saving, long labels, or absent data. Use the examples' transfer probes when they fit. Do not run a universal battery for a small settled decision.
 
-- Start with the consuming product's existing system: tokens, primitives, components, patterns, public APIs, and documented behavior.
-- Apply the complete resolution order in `RULE-ID: system.component-resolution` to each semantic component role. Base the choice on local evidence rather than transferring a solution from another platform.
-- Do not invent an exact component name, prop, slot, or composition when local evidence is unavailable. Keep the brief semantic and require implementation-time discovery instead.
-- If resolution reaches a shared-system extension or custom fallback, make the owner, scope boundary, preserved local qualities, and reason explicit in the brief. Never prescribe changes to an unavailable owner or disguise an editable system defect as freedom to improvise.
-- Components own their internal behavior, padding, states, and chrome. Containers own placement, width, gaps, and layout.
-- Choose tokens by meaning, not appearance.
-- Keep product-level concepts, labels, and grouping consistent across the surface.
+Scale the brief to the change. Carry forward the goal, compact arrangement and exact visible wording, material rationale, discovered system capabilities and boundaries, action scope and lifetime, relevant states and recovery, and evidence still needed. Omit settled defaults and irrelevant sections. Use `copywriter` for unresolved wording and `custodian` for the build gate.
 
-## Handoff
-
-Before the build gate, make the brief concrete:
-
-- goal and primary task
-- user-facing behavior and flow
-- information architecture
-- semantic component roles and the discovered local components or patterns to use, configure, compose, or extend, plus any necessary documented minimal fallback
-- control semantics, state ownership, and effect lifetime
-- relevant capability families and deliberately separate peer functions
-- reachable states and recovery paths
-- accessibility expectations
-- the compact visual arrangement with exact visible labels, actions, and hints; identify unresolved wording rather than filling the layout with explanatory copy
-- visual risks and unresolved product decisions
-- rationale for major design decisions, tied to the user goal, risk addressed, and accepted tradeoff; omit settled system defaults
-
-Use `copywriter` when exact wording still needs to be settled. Then use `custodian` to validate the brief against its build gate.
-
-Do not hand a `Blocked` or `Unverified` brief to `developer`. Gather the missing evidence for `Unverified`; resolve `Needs changes` before normal progression unless the user explicitly accepts the named residual risk; `Polish` may progress. `Developer` starts only after explicit implementation language from the user.
-
-If a new visual or product ambiguity appears during implementation, return that decision to Designer before continuing.
+Do not hand a `Blocked` or `Unverified` brief to `developer`. Resolve `Needs changes` or obtain explicit acceptance of its named risk; `Polish` may progress through an intermediate gate. Implementation requires explicit action language. New product ambiguity returns to Designer; final completion remains Custodian's review of the current rendered result under `RULE-ID: delivery.custodian-review`.

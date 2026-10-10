@@ -10,12 +10,14 @@ Create exactly one `<scope-root>/temp/CLEANUP.md` with this structure:
 ## Objective
 
 ## Scope
+
 - Root:
 - Mode: single repository | multi-repository workspace
 - Included:
 - Excluded or protected:
 
 ## Authority and ownership
+
 - Applicable instructions:
 - Project memory:
 - Repository roles:
@@ -24,6 +26,7 @@ Create exactly one `<scope-root>/temp/CLEANUP.md` with this structure:
 ## Cleanup standard summary
 
 ## Baseline
+
 - Runtime and package-manager state:
 - Build:
 - Tests:
@@ -31,16 +34,20 @@ Create exactly one `<scope-root>/temp/CLEANUP.md` with this structure:
 - Existing failures:
 
 ## Findings
-| ID | Priority | Classification | Owner | Evidence | Decision | Status |
-| --- | --- | --- | --- | --- | --- | --- |
+
+| ID  | Priority | Classification | Owner | Evidence | Decision | Status |
+| --- | -------- | -------------- | ----- | -------- | -------- | ------ |
 
 ## Cleanup plan
+
 1.
 
 ## Checklist
+
 - [ ]
 
 ## Current progress
+
 - Active item:
 - Last completed item:
 - Next item:
@@ -49,17 +56,21 @@ Create exactly one `<scope-root>/temp/CLEANUP.md` with this structure:
 
 ## Upstream findings
 
-## Intentional breakages
+## Protected contracts and scope limits
 
 ## Verification progress
 
+- Workflow, risk, synthetic fixture, command, result, and limits:
+
 ## Independent anti-drift audit
+
 - Purpose and ownership re-read:
 - Fresh-system findings:
 - Superseded names, paths, commands, labels, artifacts, and copied guidance searched:
 - New findings resolved or reported:
 
 ## Completion state
+
 - Status: planning | executing | verifying | blocked | complete
 - Blocker or remaining work:
 ```
@@ -90,37 +101,19 @@ Only one item may be `active` at a time.
 
 ## Final report
 
-Report through these sections, omitting empty detail but never hiding a required issue:
+Give a concise summary covering:
 
-```markdown
-## Summary
+1. Issues identified and fixed, with the affected repositories.
+2. Refactoring and optimization performed and their demonstrated benefit.
+3. Architectural inconsistencies corrected through existing shared contracts.
+4. Validation performed, results, and the limits of that evidence.
+5. Remaining issues that could not be safely resolved, including uncertain or untested behavior.
 
-## Repositories and files changed
-
-## Deletions and simplifications
-
-## Verified bugs fixed
-
-## Intentional breakages
-
-## Verification
-
-## 🚨 Upstream action required
-
-For each upstream issue:
-- Issue
-- Owning repository or layer
-- Why it belongs there
-- Proposed durable improvement
-- Affected repositories or components
-- Evidence
-
-## Unresolved or unverified
-
-## Future improvements
-```
-
-Lead with what remains wrong, risky, blocked, or uncertain. If nothing remains wrong, finish with one short, lively confirmation.
+Use sections only when they help. Make material blockers prominent. For an **upstream action
+required**, state the evidence, owning layer, affected products, smallest durable correction, and
+missing authority. Do not add a speculative improvement backlog or claim all functionality works
+because builds pass. Distinguish source verification, isolated functional proof, development
+delivery, and production publication.
 
 ## Cleanup completion
 

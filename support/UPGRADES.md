@@ -10,7 +10,7 @@ This file records what changed about **using** the library, version by version, 
 agent working in a consuming product. Read the section for every version between the one
 the product currently has and the one it is moving to.
 
-Scope: public component APIs, defaults, required markup, and behaviour a consumer can
+Scope: public component APIs, defaults, required markup, portable working rules, and behaviour a consumer can
 observe or must adapt to. Not internals, not visual refinement, not source-side tooling.
 `components/guidance.json` remains the authority for how to use a component _now_; this
 file only explains what moved and what to do about it.
@@ -19,6 +19,17 @@ Entries name the component, state the change, and give the action to take. Every
 version has a section, including one that only says nothing changed for consumers: a
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
+
+## 0.17.5
+
+- Designer now resolves experience decisions from the product's purpose, context, and existing
+  system, with source-backed component guidance. Use the updated packaged skill for design work.
+- Cleaner now handles `refactor` as a conservative web codebase audit with a strict evidence
+  threshold, preserved UI and SEO, and deep isolated functional verification. Native applications
+  and accessibility auditing are excluded by default. Use the updated packaged skill and retain
+  the consuming product's own authority and operational boundaries.
+- Browser and Node runtime APIs are unchanged; no application code migration is required for
+  this release.
 
 ## 0.17.4
 

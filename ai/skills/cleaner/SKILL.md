@@ -1,11 +1,11 @@
 ---
 name: cleaner
-description: Use automatically when explicitly invoked as Cleaner or when asked to clean, optimize, simplify, maintain, or perform a repository-wide sanity check. Inspect and improve either the current repository or every active repository in the current workspace, reducing architectural entropy, deleting proven dead or duplicated work, correcting ownership and dependency drift, verifying changes, and reporting upstream issues. Run the complete lifecycle autonomously; do not offer quick, deep, audit-only, or implementation modes.
+description: Use when invoked as Cleaner or asked to refactor, clean, optimize, simplify, maintain, or audit a codebase with fixes. Conservatively inspect the requested web repository or workspace, fix only demonstrable issues, preserve UI, SEO and intended behavior, and verify real workflows. Native applications and accessibility auditing are excluded unless explicitly requested.
 ---
 
 # Cleaner
 
-Run the complete cleanup lifecycle when invoked: discover, inspect, plan, clean, verify, report, and finish. Do not present mode choices and do not stop after the plan.
+Run the complete lifecycle: discover, inspect, plan, fix, verify, and report. A refactor request means a conservative codebase audit with high-confidence fixes and deep functional verification, not a redesign or a mandate to change sound code. Do not present mode choices or stop after the plan.
 
 ## Required styling contract
 
@@ -21,7 +21,7 @@ Do not treat it as permission to:
 
 - change Git history, stage, commit, push, merge, switch branches, or discard user work
 - install a new dependency
-- deploy, restart services, alter live systems, send messages, or make external changes
+- deploy, restart services, alter live systems, send messages, or make external changes beyond authority already granted by the user or applicable local contract
 - use secrets, administrator access, or destructive data operations
 - modify an off-limits or upstream owner merely because a downstream symptom exists
 
@@ -43,7 +43,8 @@ When the cleanup scope includes user-facing UI, also read `../../design/00-start
 Run `scripts/discover_workspace.py` from the invocation location and inspect its JSON output.
 
 - When invoked inside one repository, clean that repository.
-- When invoked at a workspace containing multiple repositories, clean every active repository in that workspace.
+- When invoked at a workspace containing multiple repositories, inspect every active web repository and its relevant supporting source tooling.
+- Native macOS and iOS applications and accessibility auditing or accessibility focused improvements are excluded unless explicitly requested. Classify excluded repositories without auditing their implementation.
 - When a workspace contains source, packaged, consumer, operations, retired, or excluded repositories, classify them before planning changes.
 - Respect explicit exclusions and protected ownership declared by local instructions or workspace documentation.
 - Never scan dependency stores, generated build directories, vendored code, archives, or retired repositories as active source unless the local contract explicitly includes them.
@@ -71,7 +72,7 @@ Before changing source:
 1. Map repository roles, dependency direction, public boundaries, generated sources, deliberate exceptions, and verification commands. When UI is in scope, discover each product's local system from its instructions, design-system documentation, dependencies, public APIs, imports, and established nearby usage.
 2. Capture relevant build, test, typecheck, lint, package-manager, and runtime state.
 3. Distinguish existing failures from failures introduced later.
-4. Audit the complete scope using `references/audit-catalogue.md`.
+4. Audit the complete scope using `references/audit-catalogue.md`. Similar implementations in other repositories are references only after their authority and intent have been established.
 5. Record every supported finding, classify it, prioritize it, and build the complete cleanup plan.
 
 Do not change source until the complete plan exists. Do not ask the user to approve the plan; invocation already authorizes in-scope cleanup.
@@ -86,31 +87,26 @@ For every item:
 2. Reconfirm the evidence and owning layer.
 3. Execute exactly one cleanup item.
 4. Verify the affected behavior and an adjacent risk.
-5. Update findings, decisions, intentional breakages, progress, and verification in the ledger.
+5. Update findings, decisions, preserved contracts, progress, and verification in the ledger.
 6. Read the ledger again before continuing.
 
 Never execute multiple cleanup items simultaneously. Read-only discovery may be parallelized when it cannot obscure ownership or evidence.
 
-Prefer deletion and direct simplification over preserving obsolete behavior. Remove dead code, duplication, compatibility shims, aliases, wrappers, redirects, stale routes, abandoned assets, misleading commands, redundant documentation, and local workarounds when evidence proves they are unnecessary.
+Require a clear, demonstrable benefit to correctness, reliability, maintainability, consistency, or performance. Establish a failing regression before a behavioral fix where practical. Remove dead code or redundancy only when the evidence establishes that it is unnecessary and safe to remove. Do not change code merely because it could be shorter, looks similar elsewhere, or uses a different local name.
 
 Do not replace one workaround with another. For a semantic component role, apply the complete order in `RULE-ID: system.component-resolution` using the local evidence captured at baseline. Never transfer an exact component name or API from another platform without local evidence.
 
 When resolution reaches a repeatable need in an in-scope, editable shared owner, fix that owner. When the owner is off limits or external, leave the consumer honest, record the issue under **🚨 Upstream action required**, and follow local authority. A custom solution is not automatically debt when the resolution rule legitimately reaches its fallback; preserve or create it only as that rule and local authority permit.
 
-Maintain one canonical implementation. Add a shared abstraction only when it simplifies the current system now.
+Use established shared solutions within their intended ownership boundaries. Do not introduce new dependencies, unnecessary abstractions, competing architecture, broad rewrites, or cosmetic changes. Do not consolidate code across repositories merely because implementations resemble one another.
 
 ### Close completed transitions completely
 
-When a migration, replacement, consolidation, or architectural transition is already complete,
-the cleanup is not finished while the old route still exists in the current checkout. Prove and
-remove every superseded implementation, compatibility surface, one-time operator, source gate,
-configuration entry, scheduled job, generated artifact, test fixture, runbook, and rollback target
-that can return the system to the replaced design.
-
-Git history is historical evidence, not current authority. Do not keep executable or instructional
-remnants “just in case.” Preserve user data, legally required records, external contracts, schema
-migrations needed to open current data, current-architecture backups, and current-architecture
-recovery. Distinguish those protections explicitly from a fallback to superseded code.
+When evidence proves a migration complete, remove superseded source and misleading instructions
+within the authorized scope. Follow the deletion evidence in `references/cleanup-standard.md`;
+an old name, absent import, or similar replacement alone is insufficient. Scheduled jobs, installed
+definitions, retained releases, and recovery targets have operational and data consequences:
+report them when their removal is not independently authorized and verified safe.
 
 After deleting a completed transition, search the complete active scope for its old names, paths,
 commands, labels, flags, terminology, copied guidance, and retained artifacts. A passing build does
@@ -118,9 +114,9 @@ not prove closure if another agent can still discover and follow the old route.
 
 ## 5. Protect deliberate product truth
 
-Compatibility is not a goal for stale internal implementation. External contracts, user data, migrations, security boundaries, public URLs, SEO behavior, integrations, and deliberate UX require evidence and explicit impact accounting before breakage.
+Preserve existing functionality, interfaces, intended behavior, visual identity, UI, SEO, user data, migrations, security boundaries, public URLs, and integrations. Consumer migrations follow current supported framework contracts; they do not justify changing the framework to restore stale behavior.
 
-Cleaner is not a redesign skill. Do not normalize a deliberate visual identity merely because another repository uses a shared UI system. When cleanup affects rendered UI, interaction, responsiveness, or accessibility, verify the actual experience rather than relying only on source inspection or a passing build.
+Cleaner is not a redesign skill. Do not normalize deliberate visual differences. If a proposed change needs a product decision, changes a protected contract, or carries substantial regression risk, leave it unchanged and document the evidence and needed decision. Verify affected rendered behavior rather than relying only on source inspection or a passing build.
 
 ## 6. Verify the completed scope
 
@@ -129,9 +125,21 @@ Use the repository's pinned toolchain and canonical commands. Match verification
 - references and ownership searches for deletion claims
 - tests for behavior
 - typechecks and builds for integration
-- rendered browser checks for uncertain UI, interaction, responsive, or accessibility changes
+- isolated browser checks for affected interaction and rendered behavior, preserving UI and SEO
 - frozen or equivalent dependency installs when manifests or lockfiles changed
 - final Git diffs and status for unintended files or generated drift
+
+Build a risk-based workflow matrix covering the important functions of each audited product.
+Exercise the applicable success, empty, failure, retry, concurrency, navigation, and persistence
+paths with synthetic data and isolated providers. Prioritize authentication, editing, saving,
+deletion, background updates, and external-effect boundaries where the product has them. Verify
+both the visible outcome and authoritative state when that is the contract. Use the canonical
+hermetic runner; do not operate on real records or send real notifications as automated checks.
+Record what ran, what it proved, and what remains unverified. A build or a mocked response does not
+prove every workflow or an external provider works.
+
+Run existing required checks even when they include an excluded audit category. Report such
+failures without weakening or skipping the gate, and do not expand into the excluded work.
 
 Then perform one independent anti-drift pass after every planned item is complete:
 

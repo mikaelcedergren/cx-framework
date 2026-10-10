@@ -10,7 +10,7 @@ The skills define how an agent should behave. The design documents define the du
 - `copywriter` writes or revises product copy while preserving product truth and settled terminology.
 - `custodian` reviews existing work as an evidence-led quality gate and separates defects from unverified areas.
 - `developer` implements an accepted scope without broadening it and verifies claims proportionally to risk.
-- `cleaner` autonomously inspects, simplifies, cleans, and verifies a repository or multi-repository workspace.
+- `cleaner` performs conservative, evidence-based refactoring and functional verification across the requested web repositories.
 
 Route by the user's current verb and the artifact's stage:
 
@@ -18,7 +18,7 @@ Route by the user's current verb and the artifact's stage:
 - requested replacement wording → `copywriter`
 - review, audit, approval, readiness verdict, or implemented-feature completion → `custodian`
 - explicit implementation of a settled outcome → `developer`
-- repository or workspace cleanup, optimization, maintenance, or structural sanity check → `cleaner`
+- repository or workspace refactoring, cleanup, optimization, maintenance, or codebase audit with fixes → `cleaner`
 
 Do not restart settled design stages for a task that starts later in the lifecycle. The final Custodian review is mandatory under `RULE-ID: delivery.custodian-review`, including work that starts directly in Developer; it needs no separate user request. Other role changes depend on unresolved product direction, wording, evidence, or implementation. Implementation still starts only after explicit action language.
 
