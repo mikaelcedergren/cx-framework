@@ -141,8 +141,9 @@ Estuary is a light coastal profile: `--surface` is `#F2F6F6`, `--surface-alt`
 is navy `#102F42`, which also anchors text. Pastel green `#A4E2C6` supplies
 primary actions, with pastel tangerine `#F3C6B0` as the supporting accent. It uses
 the existing elegant sans-serif heading face, restrained round corners, and subtle shadows. Its pastel palette uses
-navy `--ink` for readable content on hue fills; success uses soft lime separately
-from the green primary. Alternate hue shades remain pastel for hover states. Use
+navy `--ink` for readable content on hue fills. Success, warning, danger, and info
+use Light's explicit colour values, including their alternate shades and opacity
+tints, independently of the pastel palette. Alternate hue shades remain pastel for hover states. Use
 `cx-text-ink` on authored text that sits on a pastel fill. `--on-ink` resolves to
 the same navy as `--ink`, so controls that consume it have dark labels.
 

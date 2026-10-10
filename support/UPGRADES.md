@@ -20,6 +20,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.6
+
+- Estuary's `success`, `warning`, `danger`, and `info` now use Light's explicit
+  status colours, including alternate shades and opacity tints. Its pastel hue
+  palette, primary green, accent tangerine, surfaces, and foregrounds are unchanged.
+  Use semantic roles for status and hue tokens for intentional pastel fills.
+  No component API or markup migration is required.
+
 ## 0.17.5
 
 - Designer now resolves experience decisions from the product's purpose, context, and existing

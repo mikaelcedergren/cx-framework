@@ -304,9 +304,19 @@
   --accent: var(--tangerine);
   --accent-alt: var(--tangerine-alt);
   --accent-opacity: var(--tangerine-opacity);
-  --success: var(--lime);
-  --success-alt: var(--lime-alt);
-  --success-opacity: var(--lime-opacity);
+  /* Status roles retain Light's definitive colours independently of pastel hues. */
+  --success: #37c45b;
+  --success-alt: #299143;
+  --success-opacity: rgb(55 196 91 / 10%);
+  --warning: #ff980a;
+  --warning-alt: #b26b05;
+  --warning-opacity: rgb(255 152 10 / 10%);
+  --danger: #ff4043;
+  --danger-alt: #992629;
+  --danger-opacity: rgb(255 64 67 / 10%);
+  --info: #057dff;
+  --info-alt: #0358b2;
+  --info-opacity: rgb(5 125 255 / 10%);
   --opacity-high: #506776;
   --opacity-mid: rgb(16 47 66 / 20%);
   --opacity-low: rgb(16 47 66 / 6%);
