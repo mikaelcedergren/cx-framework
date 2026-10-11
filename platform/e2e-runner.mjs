@@ -633,7 +633,10 @@ async function guardWebKitContext(context) {
     ]) {
       Object.defineProperty(globalThis, name, {
         configurable: false,
-        get() {
+        writable: false,
+        // Frameworks inspect globals and prototypes while detecting support.
+        // Only invocation can create an unguarded transport or worker realm.
+        value: function blockedTransport() {
           throw new Error(`E2E network isolation blocked ${name}.`);
         },
       });

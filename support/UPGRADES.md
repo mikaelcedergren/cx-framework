@@ -20,6 +20,16 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.7
+
+- Inline `cx-validation-message` text now uses the readable supporting-text token;
+  its icon retains the semantic mood. Estuary's status palette is unchanged.
+  Consumers need no markup changes and should not recolour message text locally.
+- The isolated WebKit guard now permits reading transport globals and their
+  prototypes during framework support detection. Calling or constructing those
+  transports still fails closed, and the replacements remain immutable. Keep
+  using the shared Playwright fixture adapter; no consumer workaround is needed.
+
 ## 0.17.6
 
 - Estuary's `success`, `warning`, `danger`, and `info` now use Light's explicit

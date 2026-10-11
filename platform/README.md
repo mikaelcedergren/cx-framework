@@ -108,7 +108,9 @@ rejects an unwrapped Playwright test import before launching the controller.
 The shared fixture guards each context before pages are created. WebKit cannot disable raw
 peer-to-peer networking through a supported Playwright launch option, so the guard rejects
 `RTCPeerConnection`, `WebTransport`, and their unguarded worker realms with explicit isolation
-errors. Frames, popups, and contexts from `createHermeticBrowserContext` receive the same guard.
+errors on construction or invocation. Reading the globals and inspecting their prototypes remains
+safe for framework feature detection; the replacements cannot be overwritten or reconfigured.
+Frames, popups, and contexts from `createHermeticBrowserContext` receive the same guard.
 Tests requiring these transports or browser workers are unsupported in this WebKit mode.
 Chromium retains its native transport controls. Install the browser matched to the repository's
 pinned Playwright with `pnpm exec playwright install webkit`; run Cortex's guarded suite with
