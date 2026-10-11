@@ -44,7 +44,8 @@ export function installCxKeyboardFocus(document: Document): () => void {
     document.documentElement.toggleAttribute(KEYBOARD_NAVIGATION_ATTRIBUTE, active);
   };
   const onKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Tab' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    // Option-Tab is native link navigation in macOS WebKit.
+    if (event.key === 'Tab' && !event.ctrlKey && !event.metaKey) {
       setKeyboardNavigation(true);
     }
   };

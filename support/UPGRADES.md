@@ -20,6 +20,14 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.8
+
+- The shared keyboard-focus tracker now recognises Option-Tab and Shift-Option-Tab,
+  macOS WebKit's native link-navigation shortcuts. Keyboard focus rings remain
+  visible during those journeys; pointer input still clears keyboard mode and
+  Ctrl/Command-Tab does not enable it. Keep `provideCxKeyboardFocus()` installed;
+  no consumer markup or styling change is required.
+
 ## 0.17.7
 
 - Inline `cx-validation-message` text now uses the readable supporting-text token;
