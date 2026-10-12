@@ -20,6 +20,13 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.9
+
+- Dialogs opened from a menu now retain the menu trigger as a focus return target
+  after the menu disappears. Closing a conditionally rendered dialog also restores
+  focus before its ownership is torn down. Consumers need no new inputs or local
+  focus handlers; keep using the dialog's open state and action outputs.
+
 ## 0.17.8
 
 - The shared keyboard-focus tracker now recognises Option-Tab and Shift-Option-Tab,

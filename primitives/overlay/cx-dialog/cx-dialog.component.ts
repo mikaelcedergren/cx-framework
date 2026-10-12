@@ -120,8 +120,8 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopFocusOwnership();
     this.releaseOverlay();
+    this.stopFocusOwnership();
   }
 
   protected isModal(): boolean {

@@ -44,6 +44,8 @@ export declare class CxOverlayStateService {
     private readonly interactivityChecker;
     private readonly stack;
     private readonly focusAncestry;
+    private readonly focusOwners;
+    private readonly lastActiveSurfaces;
     private readonly stackVersion;
     private nextId;
     private modalDepth;
@@ -68,7 +70,9 @@ export declare class CxOverlayStateService {
     isTopmost(handle: CxOverlayStateHandle | undefined): boolean;
     private onDocumentKeydown;
     private onDocumentClick;
+    private rememberActivation;
     private recentActivationTarget;
+    private captureFocusOwners;
     private captureFocusAncestry;
     private restoreFocusAfterRender;
     private isFocusParent;

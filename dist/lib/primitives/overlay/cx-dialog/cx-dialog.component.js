@@ -77,8 +77,8 @@ export class CxDialogComponent {
         this.syncOpen(this.openInput);
     }
     ngOnDestroy() {
-        this.stopFocusOwnership();
         this.releaseOverlay();
+        this.stopFocusOwnership();
     }
     isModal() {
         return this.variant === 'confirm';

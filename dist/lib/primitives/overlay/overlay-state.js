@@ -10,6 +10,8 @@ export class CxOverlayStateService {
     interactivityChecker = inject(InteractivityChecker);
     stack = [];
     focusAncestry = new WeakMap();
+    focusOwners = new WeakMap();
+    lastActiveSurfaces = new WeakMap();
     stackVersion = signal(0, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "stackVersion" }] : /* istanbul ignore next */ []));
     nextId = 0;
@@ -40,7 +42,7 @@ export class CxOverlayStateService {
         const activeElement = this.document.activeElement;
         const activationTarget = restoreFocus ? this.recentActivationTarget() : undefined;
         const focusOrigin = restoreFocus
-            ? activationTarget ?? (activeElement instanceof HTMLElement ? activeElement : undefined)
+            ? activationTarget?.element ?? (activeElement instanceof HTMLElement ? activeElement : undefined)
             : undefined;
         if (activationTarget) {
             this.activationTarget = undefined;
@@ -67,7 +69,12 @@ export class CxOverlayStateService {
             this.modalDepth += 1;
         }
         this.stack.push(handle);
-        this.focusAncestry.set(handle, this.captureFocusAncestry(focusOrigin));
+        const owners = activationTarget?.owners ?? this.captureFocusOwners(focusOrigin);
+        this.focusOwners.set(handle, owners);
+        this.focusAncestry.set(handle, [
+            ...this.captureFocusAncestry(focusOrigin),
+            ...owners.flatMap(owner => [owner, ...this.captureFocusAncestry(owner)]),
+        ]);
         this.stackVersion.update(version => version + 1);
         return handle;
     }
@@ -96,8 +103,14 @@ export class CxOverlayStateService {
         if (!handle || handle.released) {
             return;
         }
-        const wasTop = this.topmostActiveHandle() === handle;
+        const activeTop = this.topmostActiveHandle();
+        const lastSurface = this.lastActiveSurfaces.get(handle);
+        // Angular may detach a conditional surface before its destroy hook releases
+        // ownership. A removed top surface still owes focus restoration; a hidden
+        // connected surface or a newer active overlay must not surrender focus.
+        const wasTop = activeTop === handle || (!!lastSurface && !lastSurface.isConnected && (!activeTop || activeTop.id < handle.id));
         handle.released = true;
+        this.lastActiveSurfaces.delete(handle);
         const index = this.stack.indexOf(handle);
         if (index >= 0) {
             this.stack.splice(index, 1);
@@ -119,12 +132,20 @@ export class CxOverlayStateService {
         }
         else {
             this.focusAncestry.delete(handle);
+            this.focusOwners.delete(handle);
         }
     }
     isTopmost(handle) {
         return !!handle && !handle.released && this.topmostActiveHandle() === handle;
     }
     onDocumentKeydown(event) {
+        if ((event.key === 'Enter' || event.key === ' ')
+            && !event.isComposing
+            && !event.altKey
+            && !event.ctrlKey
+            && !event.metaKey) {
+            this.rememberActivation(event);
+        }
         if (event.key !== 'Escape'
             || event.isComposing
             || event.altKey
@@ -142,6 +163,9 @@ export class CxOverlayStateService {
         owner.onEscape?.(event);
     }
     onDocumentClick(event) {
+        this.rememberActivation(event);
+    }
+    rememberActivation(event) {
         const activationTarget = event.composedPath().find(target => target instanceof HTMLElement
             && target !== this.document.body
             && target !== this.document.documentElement
@@ -150,7 +174,11 @@ export class CxOverlayStateService {
         if (!(activationTarget instanceof HTMLElement)) {
             return;
         }
-        const captured = { element: activationTarget, capturedAt: Date.now() };
+        const captured = {
+            element: activationTarget,
+            owners: this.captureFocusOwners(activationTarget),
+            capturedAt: Date.now(),
+        };
         this.activationTarget = captured;
         afterNextRender(() => {
             if (this.activationTarget === captured) {
@@ -164,13 +192,32 @@ export class CxOverlayStateService {
             return undefined;
         }
         if (Date.now() - captured.capturedAt > CxOverlayStateService.activationTargetMaxAgeMs
-            || !captured.element.isConnected
-            || !isHostVisible(captured.element)
-            || !this.interactivityChecker.isFocusable(captured.element)) {
+            || ![captured.element, ...captured.owners].some(element => element.isConnected
+                && isHostVisible(element)
+                && this.interactivityChecker.isFocusable(element))) {
             this.activationTarget = undefined;
             return undefined;
         }
-        return captured.element;
+        return captured;
+    }
+    captureFocusOwners(origin) {
+        const owners = [];
+        let target = origin;
+        // Portaled menu items disappear when their action opens a modal. Preserve
+        // the logical invoker chain while those transient surfaces still exist.
+        for (let index = this.stack.length - 1; index >= 0 && target; index -= 1) {
+            const handle = this.stack[index];
+            if (!handle || handle.released || handle.kind !== 'transient'
+                || !this.surfaceFor(handle)?.contains(target)) {
+                continue;
+            }
+            const owner = handle.owner ?? handle.focusedElement;
+            if (owner && owner !== target && !owners.includes(owner)) {
+                owners.push(owner);
+                target = owner;
+            }
+        }
+        return owners;
     }
     captureFocusAncestry(origin) {
         const ancestry = [];
@@ -204,13 +251,16 @@ export class CxOverlayStateService {
                 }
                 const invoker = releasedHandle.focusedElement;
                 const parentSurface = exposedParent ? this.surfaceFor(exposedParent) : undefined;
-                if (this.tryFocus(invoker && (!parentSurface || parentSurface.contains(invoker)) ? invoker : undefined)) {
-                    return;
+                for (const target of [invoker, ...(this.focusOwners.get(releasedHandle) ?? [])]) {
+                    if (this.tryFocus(target && (!parentSurface || parentSurface.contains(target)) ? target : undefined)) {
+                        return;
+                    }
                 }
                 this.tryFocus(this.resolveFallbackTarget(releasedHandle, exposedParent), true);
             }
             finally {
                 this.focusAncestry.delete(releasedHandle);
+                this.focusOwners.delete(releasedHandle);
             }
         };
         const scheduleFinalRestore = () => {
@@ -432,6 +482,10 @@ export class CxOverlayStateService {
         for (let index = this.stack.length - 1; index >= 0; index -= 1) {
             const handle = this.stack[index];
             if (handle && !handle.released && handle.isActive()) {
+                const surface = this.surfaceFor(handle);
+                if (surface) {
+                    this.lastActiveSurfaces.set(handle, surface);
+                }
                 return handle;
             }
         }
