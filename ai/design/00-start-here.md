@@ -52,6 +52,7 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 - A named component family such as buttons, dialogs, or tabs: treat the name as a semantic role, inspect the consuming product's local components and established usage, then search `04-component-rules.md` by `COMPONENT:` for applicable role behavior. Never infer a selector, import, property name, or code structure from the portable term.
 - Labels, buttons, guidance, validation, errors, empty states, dates, or tone: read `RULE-ID: copy.sentence-case` in `05-copy-and-microcopy.md` before drafting, implementing, or reviewing copy, then search that file for the other relevant rules.
 - Generic validation or request-failure wording: use `06-fallback-copy.md` only after product-specific copy is impossible.
+- Translation or localization: apply `RULE-ID: copy.translation-natural` and `RULE-ID: copy.linguistic-correctness` in `05-copy-and-microcopy.md`; use the translation workflow in `../skills/copywriter/SKILL.md` when producing the wording.
 
 [NOTE] Useful searches to run from this directory:
 

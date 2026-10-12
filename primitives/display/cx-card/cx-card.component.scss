@@ -34,12 +34,12 @@
 }
 
 :host(.cx-card-host--interactive) {
-  // The hover lift grows the card past its layout box; keep a raised card above
-  // later siblings so a flush grid cannot clip the grown edge.
+  // Keep elevated cards above later siblings without changing the layout.
   position: relative;
 }
 
-:host(.cx-card-host--interactive:has(.cx-card__activation:hover)) {
+:host(.cx-card-host--interactive:has(.cx-card__activation:hover)),
+:host(.cx-card-host--interactive:has(.cx-card__activation:focus-visible)) {
   z-index: 1;
 }
 
@@ -140,6 +140,7 @@
 // Discreet cards retain one transparent plane. Only interaction earns elevation.
 :host(.cx-card-host--discreet) .cx-card {
   background-color: transparent;
+  transition-duration: var(--motion-slower);
 }
 
 :host(.cx-card-host--discreet) .cx-card__footer {
@@ -149,13 +150,15 @@
 @media (hover: hover) {
   :host(.cx-card-host--discreet.cx-card-host--interactive)
     .cx-card:has(.cx-card__activation:hover:not(:active)) {
-    box-shadow: var(--shadow-low);
+    transform: translateY(calc(-1 * var(--space-2xs)));
+    box-shadow: var(--shadow-high);
   }
 }
 
 :host(.cx-card-host--discreet.cx-card-host--interactive)
   .cx-card:has(.cx-card__activation:focus-visible:not(:active)) {
-  box-shadow: var(--shadow-low);
+  transform: translateY(calc(-1 * var(--space-2xs)));
+  box-shadow: var(--shadow-high);
 }
 
 // A press releases the lift back to rest rather than dipping below the surface.
@@ -165,7 +168,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :host(.cx-card-host--discreet.cx-card-host--interactive)
+    .cx-card:has(.cx-card__activation:is(:hover, :focus-visible):not(:active)),
   :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:hover),
+  :host(.cx-card-host--interactive)
+    .cx-card:has(.cx-card__activation:focus-visible),
   :host(.cx-card-host--interactive) .cx-card:has(.cx-card__activation:active) {
     transform: none;
   }

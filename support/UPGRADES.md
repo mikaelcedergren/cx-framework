@@ -20,6 +20,15 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.10
+
+- Interactive discreet cards now lift with a stronger shadow on hover and keyboard focus,
+  using the slower motion token. Reduced-motion preferences suppress the lift. Keep using
+  the existing `discreet` variant; no consumer markup or local styling is needed.
+- Copywriter guidance now covers natural, faithful translation and terminology consistency.
+  Use the packaged translation reference when reviewing multilingual product copy.
+- Public component APIs and Node runtime contracts are unchanged.
+
 ## 0.17.9
 
 - Dialogs opened from a menu now retain the menu trigger as a focus return target

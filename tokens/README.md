@@ -133,6 +133,14 @@ Semantic circles and pills stay round regardless of the rectangular corner profi
 
 Use named shadows only for real elevation: low for raised controls, mid for menus and popovers, and high for dialogs and strong overlays. Motion uses named tokens, clarifies change, and never moves the page around someone who is reading.
 
+Motion durations range from `--motion-fast` (120ms), through `--motion-base`
+(180ms) and `--motion-slow` (240ms), to `--motion-slower` (400ms). Use
+`--motion-slower` for deliberate spatial transitions whose movement should be
+easy to perceive, such as a card lifting from the page. Keep immediate control
+feedback on the shorter durations. Pair durations with the shared cubic Bézier
+easing tokens; do not use linear easing for interface transitions. Respect
+reduced-motion preferences when moving content.
+
 Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours, type, density, control sizes, and motion, then changes only visual character: conventional round corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost, and crisp shadows. It is a transition profile, never a component variant.
 
 ## Estuary

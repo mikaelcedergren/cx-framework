@@ -1,6 +1,6 @@
 interface:
   display_name: "Copywriter"
-  short_description: "Clear, concise product copy"
-  default_prompt: "Use $copywriter to write or improve clear UI copy, validation, alerts, empty states, and guidance without inventing product behavior."
+  short_description: "Natural product copy and translations"
+  default_prompt: "Use $copywriter to write, improve, or translate natural product copy while preserving meaning and checking linguistic correctness."
 policy:
   allow_implicit_invocation: true
