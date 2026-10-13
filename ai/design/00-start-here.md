@@ -44,6 +44,8 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 [MUST] Start with the task, not the documents:
 
 - Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, `RULE-ID: layout.start-alignment`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.
+- Before placing information or actions: apply `RULE-ID: system.surface-purpose` and `RULE-ID: system.workflow-home` in `03-ux-rules.md`; establish the task boundary before applying reuse guidance.
+- Before adding explanatory wording or choosing an icon-only action: apply `RULE-ID: communication.context-first` in `03-ux-rules.md`.
 - Before choosing components or handing off a user-facing design: complete the **Required relationship and attention check** in `02-design-system.md`; repeat it against the finished output during implementation and review.
 - Feature completion: apply `RULE-ID: delivery.custodian-review` in `03-ux-rules.md` and use `../skills/custodian/SKILL.md` before reporting the feature done.
 - Product direction, hierarchy, flow, or visual judgment: read the relevant section of `01-design-philosophy.md`, then search `03-ux-rules.md`.
@@ -53,6 +55,7 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 - Cross-cutting behavior, accessibility, layout, feedback, forms, navigation, or state: search `03-ux-rules.md` by `TOPIC:`, `SCOPE:`, or keyword.
 - A named component family such as buttons, dialogs, or tabs: treat the name as a semantic role, inspect the consuming product's local components and established usage, then search `04-component-rules.md` by `COMPONENT:` for applicable role behavior. Never infer a selector, import, property name, or code structure from the portable term.
 - Labels, buttons, guidance, validation, errors, empty states, dates, or tone: read `RULE-ID: copy.sentence-case` in `05-copy-and-microcopy.md` before drafting, implementing, or reviewing copy, then search that file for the other relevant rules.
+- Prose or mixed prose and interface content: apply `RULE-ID: copy.prose-scope` in `05-copy-and-microcopy.md` before drafting or reviewing, so interface brevity and style constraints do not override the passage's purpose.
 - Generic validation or request-failure wording: use `06-fallback-copy.md` only after product-specific copy is impossible.
 - Translation or localization: apply `RULE-ID: copy.translation-natural` and `RULE-ID: copy.linguistic-correctness` in `05-copy-and-microcopy.md`; use the translation workflow in `../skills/copywriter/SKILL.md` when producing the wording.
 

@@ -211,3 +211,10 @@
     display: none;
   }
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  :host, .cx-dialog-backdrop {
+    display: none !important;
+  }
+}

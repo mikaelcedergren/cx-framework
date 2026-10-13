@@ -159,3 +159,23 @@
     transition: none;
   }
 }
+
+// Include rendered disclosure content on paper without changing screen state.
+@media print {
+  :host {
+    break-inside: avoid;
+  }
+
+  .cx-expansion-panel__content-shell {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+
+  .cx-expansion-panel__content-clip {
+    overflow: visible;
+  }
+
+  .cx-expansion-panel__toggle {
+    display: none;
+  }
+}

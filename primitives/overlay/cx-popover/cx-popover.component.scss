@@ -132,3 +132,10 @@
     animation: none;
   }
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  .cx-popover {
+    display: none !important;
+  }
+}

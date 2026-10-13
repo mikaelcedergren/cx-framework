@@ -48,7 +48,7 @@
         <ng-content select="[actions], [cxMastheadActions]" />
       </div>
 
-      @if (items.length) {
+      @if (hasMenuNavigation()) {
         <div #menuSlot class="cx-masthead__toggle-slot">
           <div
             #menuSurface
@@ -93,17 +93,81 @@
                 "
               >
                 <nav class="cx-masthead__drawer-nav" aria-label="Primary">
-                  <ul class="cx-masthead__drawer-links">
-                    @for (item of items; track item.id) {
-                      <li class="cx-masthead__links-item">
-                        <ng-container
-                          [ngTemplateOutlet]="navLink"
-                          [ngTemplateOutletContext]="{ $implicit: item }"
-                        />
-                      </li>
+                  @if (menuGroups.length) {
+                    @for (
+                      group of menuGroups;
+                      track group.id;
+                      let index = $index
+                    ) {
+                      @let expanded = groupExpanded(group);
+                      @let groupId = panelId + "-group-" + index;
+                      <div
+                        class="cx-masthead__group"
+                        role="group"
+                        [attr.aria-labelledby]="
+                          group.label?.trim() ? groupId + '-heading' : null
+                        "
+                      >
+                        @if (group.label?.trim()) {
+                          @if (group.collapsible) {
+                            <button
+                              class="cx-masthead__link cx-masthead__group-toggle"
+                              [class.cx-masthead__link--active]="
+                                groupContainsActive(group)
+                              "
+                              type="button"
+                              [id]="groupId + '-heading'"
+                              [attr.aria-expanded]="expanded"
+                              [attr.aria-controls]="groupId"
+                              (click)="toggleGroup(group)"
+                            >
+                              {{ group.label }}
+                              <cx-icon
+                                class="cx-masthead__group-chevron"
+                                [class.cx-masthead__group-chevron--expanded]="
+                                  expanded
+                                "
+                                icon="chevron-down"
+                                [size]="16"
+                              />
+                            </button>
+                          } @else {
+                            <span
+                              class="cx-masthead__group-label"
+                              [id]="groupId + '-heading'"
+                              >{{ group.label }}</span
+                            >
+                          }
+                        }
+                        <div
+                          class="cx-masthead__group-items"
+                          [class.cx-masthead__group-items--nested]="
+                            group.collapsible
+                          "
+                          [class.cx-masthead__group-items--expanded]="expanded"
+                          [id]="groupId"
+                          [inert]="!expanded"
+                          [attr.aria-hidden]="expanded ? null : 'true'"
+                        >
+                          <ng-container
+                            [ngTemplateOutlet]="menuLinks"
+                            [ngTemplateOutletContext]="{
+                              $implicit: group.items,
+                            }"
+                          />
+                        </div>
+                      </div>
                     }
-                  </ul>
+                  } @else {
+                    <ng-container
+                      [ngTemplateOutlet]="menuLinks"
+                      [ngTemplateOutletContext]="{ $implicit: items }"
+                    />
+                  }
                 </nav>
+                <div class="cx-masthead__menu-footer">
+                  <ng-content select="[menuFooter], [cxMastheadMenuFooter]" />
+                </div>
               </section>
             </div>
           </div>
@@ -112,6 +176,19 @@
     </div>
   </div>
 </header>
+
+<ng-template #menuLinks let-menuItems>
+  <ul class="cx-masthead__drawer-links">
+    @for (item of menuItems; track item.id) {
+      <li class="cx-masthead__links-item">
+        <ng-container
+          [ngTemplateOutlet]="navLink"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        />
+      </li>
+    }
+  </ul>
+</ng-template>
 
 <ng-template #brandContent>
   @if (logoSrc) {

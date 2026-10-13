@@ -2,6 +2,7 @@
 
 cx-masthead {
   display: block;
+  container-type: inline-size;
 }
 
 cx-masthead.cx-masthead-host--overlay {
@@ -19,7 +20,6 @@ cx-masthead.cx-masthead-host--sticky {
 
 .cx-masthead {
   display: block;
-  container-type: inline-size;
   min-width: 0;
   border-bottom: var(--line);
   background: var(--surface);
@@ -363,7 +363,9 @@ cx-masthead.cx-masthead-host--sticky {
   width: min(var(--measure-sm), calc(100% - var(--space-xl)));
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  // Navigation scrolls independently at ordinary heights. At very short
+  // heights the whole drawer can scroll so the footer remains reachable.
+  overflow: auto;
   padding: max(var(--space-lg), env(safe-area-inset-top))
     max(var(--space-lg), env(safe-area-inset-right))
     max(var(--space-lg), env(safe-area-inset-bottom)) var(--space-lg);
@@ -380,7 +382,8 @@ cx-masthead.cx-masthead-host--sticky {
 }
 
 .cx-masthead__drawer-nav {
-  min-height: 0;
+  flex: 1 1 auto;
+  min-height: var(--controller-size-large);
   overflow: auto;
   overscroll-behavior: contain;
   padding: var(--space-xs);
@@ -391,7 +394,7 @@ cx-masthead.cx-masthead-host--sticky {
 .cx-masthead__drawer-links {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-2xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -399,12 +402,72 @@ cx-masthead.cx-masthead-host--sticky {
 
 .cx-masthead__drawer .cx-masthead__link {
   width: 100%;
-  min-height: var(--controller-size-large);
+  min-height: var(--controller-size);
   box-sizing: border-box;
-  padding: var(--space-sm);
-  font-size: var(--font-size-title-3);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-body);
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.cx-masthead__group + .cx-masthead__group {
+  margin-top: var(--space-md);
+}
+
+.cx-masthead__group-label {
+  display: block;
+  padding: var(--space-sm);
+  color: var(--opacity-high);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.cx-masthead__group-toggle {
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.cx-masthead__group-chevron {
+  flex: 0 0 auto;
+  transform: rotate(-90deg);
+  transition: transform var(--motion-slow) var(--ease-out-strong);
+}
+
+.cx-masthead__group-chevron--expanded {
+  transform: rotate(0deg);
+}
+
+.cx-masthead__group-items {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--motion-slow) var(--ease-out-strong),
+    visibility 0s var(--motion-slow);
+}
+
+.cx-masthead__group-items--expanded {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.cx-masthead__group-items--nested {
+  padding-inline-start: var(--space-md);
+}
+
+.cx-masthead__group-items > .cx-masthead__drawer-links {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cx-masthead__menu-footer {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
+.cx-masthead__menu-footer:empty {
+  display: none;
 }
 
 /* ---- Collapse below the available inline width ----
@@ -419,6 +482,14 @@ cx-masthead.cx-masthead-host--sticky {
  */
 
 @container (max-width: #{breakpoints.$mobile - 1px}) {
+  .cx-masthead:has(.cx-masthead__toggle-slot) {
+    display: block;
+  }
+
+  .cx-masthead__cluster:has(.cx-masthead__toggle-slot) {
+    display: inline-flex;
+  }
+
   .cx-masthead__inner {
     max-height: calc(
       var(--controller-size-large) + var(--space-sm) * 2 - var(--border-width)
@@ -441,7 +512,9 @@ cx-masthead.cx-masthead-host--sticky {
   .cx-masthead__drawer,
   .cx-masthead__link,
   .cx-masthead__toggle,
-  .cx-masthead__toggle-line {
+  .cx-masthead__toggle-line,
+  .cx-masthead__group-chevron,
+  .cx-masthead__group-items {
     transition: none;
   }
 }

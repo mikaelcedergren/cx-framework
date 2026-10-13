@@ -101,3 +101,23 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+
+// Printed documents keep semantic colour and settle motion before capture.
+@media print {
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+}

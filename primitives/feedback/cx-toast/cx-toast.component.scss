@@ -133,3 +133,10 @@
     transition: none;
   }
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  :host, .cx-toast {
+    display: none !important;
+  }
+}

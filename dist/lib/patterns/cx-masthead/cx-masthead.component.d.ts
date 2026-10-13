@@ -27,18 +27,29 @@ export type CxMastheadItem = {
     active?: boolean;
     disabled?: boolean;
 };
+/** Navigation sections for the compact menu, independent of the desktop links. */
+export type CxMastheadGroup = {
+    id: string;
+    label?: string;
+    /** A labelled section can disclose its links instead of showing them all. */
+    collapsible?: boolean;
+    items: CxMastheadItem[];
+};
 /**
- * Landing-page masthead: brand on the left, primary navigation on the right.
+ * Masthead: brand on the left, primary navigation and actions on the right.
  *
  * Distinct from `cx-top-bar` (in-app page chrome). The masthead is the
- * identity-and-wayfinding banner for a marketing or portfolio surface. Below a
- * narrow container width it collapses its links behind a menu toggle, so it can
- * sit on any page width without overflowing.
+ * identity-and-wayfinding banner. Below a narrow container width it collapses
+ * links into its menu; larger products can supply grouped compact navigation
+ * and a menu footer without changing the desktop links or drawer behavior.
  */
 export declare class CxMastheadComponent implements OnDestroy {
     private readonly document;
     private readonly host;
     private readonly overlayState;
+    private readonly router;
+    private readonly route;
+    private readonly activeUrl;
     private overlayHandle?;
     private portaledMenu?;
     private closingAnimationsPending;
@@ -65,6 +76,8 @@ export declare class CxMastheadComponent implements OnDestroy {
     private syncMenuPosition;
     private keepFocusInside;
     private itemsValue;
+    private menuGroupsValue;
+    private readonly expandedGroups;
     /** Brand title shown next to the logo, e.g. a name or product wordmark. */
     heading: string;
     /** Icon used as the brand mark when no `[brand]` slot or `logoSrc` is provided. */
@@ -80,6 +93,12 @@ export declare class CxMastheadComponent implements OnDestroy {
     /** Primary navigation links. */
     set items(value: CxMastheadItem[]);
     get items(): CxMastheadItem[];
+    /**
+     * Compact-menu sections. Nonempty sections replace `items` inside the drawer;
+     * desktop links are unchanged. Empty sections are omitted.
+     */
+    set menuGroups(value: CxMastheadGroup[]);
+    get menuGroups(): CxMastheadGroup[];
     /** Surface treatment. Frosted uses a translucent, theme-aware surface with backdrop blur. */
     variant: CxMastheadVariant;
     /** Sticks the component host to the top of its scroll container. */
@@ -96,6 +115,10 @@ export declare class CxMastheadComponent implements OnDestroy {
     protected readonly menuOpen: import("@angular/core").WritableSignal<boolean>;
     private readonly menuToggle;
     protected hasDefaultBrand(): boolean;
+    protected hasMenuNavigation(): boolean;
+    protected groupContainsActive(group: CxMastheadGroup): boolean;
+    protected groupExpanded(group: CxMastheadGroup): boolean;
+    protected toggleGroup(group: CxMastheadGroup): void;
     protected activeOptions(item: CxMastheadItem): {
         exact: boolean;
     } | IsActiveMatchOptions;
@@ -106,7 +129,7 @@ export declare class CxMastheadComponent implements OnDestroy {
     protected onBackdrop(event: MouseEvent): void;
     protected onItemClick(event: MouseEvent, item: CxMastheadItem): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxMastheadComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "overlay": { "alias": "overlay"; "required": false; }; "frostOnScroll": { "alias": "frostOnScroll"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxMastheadComponent, "cx-masthead", never, { "heading": { "alias": "heading"; "required": false; }; "logo": { "alias": "logo"; "required": false; }; "logoSrc": { "alias": "logoSrc"; "required": false; }; "homeHref": { "alias": "homeHref"; "required": false; }; "items": { "alias": "items"; "required": false; }; "menuGroups": { "alias": "menuGroups"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "sticky": { "alias": "sticky"; "required": false; }; "overlay": { "alias": "overlay"; "required": false; }; "frostOnScroll": { "alias": "frostOnScroll"; "required": false; }; "menuAriaLabel": { "alias": "menuAriaLabel"; "required": false; }; }, { "itemSelect": "itemSelect"; }, never, ["[brand], [cxMastheadBrand]", "[actions], [cxMastheadActions]", "[menuFooter], [cxMastheadMenuFooter]"], true, never>;
     static ngAcceptInputType_sticky: unknown;
     static ngAcceptInputType_overlay: unknown;
     static ngAcceptInputType_frostOnScroll: unknown;

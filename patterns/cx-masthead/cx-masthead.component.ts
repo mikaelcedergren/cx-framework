@@ -7,6 +7,7 @@ import {
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   EventEmitter,
   Input,
   Output,
@@ -16,6 +17,10 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 import {
+  ActivatedRoute,
+  NavigationEnd,
+  NavigationError,
+  Router,
   RouterLink,
   RouterLinkActive,
   type IsActiveMatchOptions,
@@ -56,15 +61,24 @@ export type CxMastheadItem = {
   disabled?: boolean;
 };
 
+/** Navigation sections for the compact menu, independent of the desktop links. */
+export type CxMastheadGroup = {
+  id: string;
+  label?: string;
+  /** A labelled section can disclose its links instead of showing them all. */
+  collapsible?: boolean;
+  items: CxMastheadItem[];
+};
+
 let nextPanelId = 0;
 
 /**
- * Landing-page masthead: brand on the left, primary navigation on the right.
+ * Masthead: brand on the left, primary navigation and actions on the right.
  *
  * Distinct from `cx-top-bar` (in-app page chrome). The masthead is the
- * identity-and-wayfinding banner for a marketing or portfolio surface. Below a
- * narrow container width it collapses its links behind a menu toggle, so it can
- * sit on any page width without overflowing.
+ * identity-and-wayfinding banner. Below a narrow container width it collapses
+ * links into its menu; larger products can supply grouped compact navigation
+ * and a menu footer without changing the desktop links or drawer behavior.
  */
 @Component({
   selector: "cx-masthead",
@@ -91,6 +105,9 @@ export class CxMastheadComponent implements OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly overlayState = inject(CxOverlayStateService);
+  private readonly router = inject(Router, { optional: true });
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly activeUrl = signal(this.router?.url ?? "");
   private overlayHandle?: CxOverlayStateHandle;
   private portaledMenu?: HTMLElement;
   private closingAnimationsPending = false;
@@ -134,6 +151,16 @@ export class CxMastheadComponent implements OnDestroy {
   protected readonly trapsFocus = signal(false);
 
   constructor() {
+    const navigation = this.router?.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.activeUrl.set(event.urlAfterRedirects);
+        this.expandedGroups.set(new Map());
+        this.closeMenu();
+      } else if (event instanceof NavigationError) {
+        this.closeMenu();
+      }
+    });
+    inject(DestroyRef).onDestroy(() => navigation?.unsubscribe());
     afterEveryRender(() => {
       if (!this.resizeObserver && typeof ResizeObserver !== "undefined") {
         const header =
@@ -258,6 +285,10 @@ export class CxMastheadComponent implements OnDestroy {
   }
 
   private itemsValue: CxMastheadItem[] = [];
+  private menuGroupsValue: CxMastheadGroup[] = [];
+  private readonly expandedGroups = signal<ReadonlyMap<string, boolean>>(
+    new Map(),
+  );
 
   /** Brand title shown next to the logo, e.g. a name or product wordmark. */
   @Input() heading = "";
@@ -275,10 +306,30 @@ export class CxMastheadComponent implements OnDestroy {
   @Input()
   public set items(value: CxMastheadItem[]) {
     this.itemsValue = validateMastheadItems(value);
-    if (!this.itemsValue.length) this.finishClose();
+    if (!this.hasMenuNavigation()) this.finishClose();
   }
   public get items(): CxMastheadItem[] {
     return this.itemsValue;
+  }
+  /**
+   * Compact-menu sections. Nonempty sections replace `items` inside the drawer;
+   * desktop links are unchanged. Empty sections are omitted.
+   */
+  @Input()
+  public set menuGroups(value: CxMastheadGroup[]) {
+    this.menuGroupsValue = validateMastheadGroups(value);
+    const previous = this.expandedGroups();
+    this.expandedGroups.set(
+      new Map(
+        this.menuGroupsValue
+          .filter((group) => previous.has(group.id))
+          .map((group) => [group.id, previous.get(group.id)!]),
+      ),
+    );
+    if (!this.hasMenuNavigation()) this.finishClose();
+  }
+  public get menuGroups(): CxMastheadGroup[] {
+    return this.menuGroupsValue;
   }
   /** Surface treatment. Frosted uses a translucent, theme-aware surface with backdrop blur. */
   @Input() variant: CxMastheadVariant = "default";
@@ -301,6 +352,44 @@ export class CxMastheadComponent implements OnDestroy {
 
   protected hasDefaultBrand(): boolean {
     return Boolean(this.heading?.trim() || this.logo || this.logoSrc);
+  }
+
+  protected hasMenuNavigation(): boolean {
+    return this.menuGroups.length > 0 || this.items.length > 0;
+  }
+
+  protected groupContainsActive(group: CxMastheadGroup): boolean {
+    this.activeUrl();
+    return group.items.some((item) => {
+      if (item.disabled) return false;
+      if (item.href !== undefined || item.routerLink === undefined)
+        return Boolean(item.active);
+      if (!this.router) return false;
+      const tree = this.router.createUrlTree(
+        typeof item.routerLink === "string"
+          ? [item.routerLink]
+          : [...item.routerLink],
+        { relativeTo: this.route, fragment: item.fragment },
+      );
+      const options = this.activeOptions(item);
+      return "exact" in options
+        ? this.router.isActive(tree, options.exact)
+        : this.router.isActive(tree, options);
+    });
+  }
+
+  protected groupExpanded(group: CxMastheadGroup): boolean {
+    return (
+      !group.collapsible ||
+      (this.expandedGroups().get(group.id) ?? this.groupContainsActive(group))
+    );
+  }
+
+  protected toggleGroup(group: CxMastheadGroup): void {
+    const expanded = !this.groupExpanded(group);
+    this.expandedGroups.update((groups) =>
+      new Map(groups).set(group.id, expanded),
+    );
   }
 
   protected activeOptions(
@@ -403,12 +492,15 @@ export class CxMastheadComponent implements OnDestroy {
   }
 }
 
-function validateMastheadItems(value: CxMastheadItem[]): CxMastheadItem[] {
+function validateMastheadItems(
+  value: CxMastheadItem[],
+  context = "items",
+  ids = new Set<string>(),
+): CxMastheadItem[] {
   if (!Array.isArray(value)) {
-    throw new Error("[cx-masthead] items must be an array.");
+    throw new Error(`[cx-masthead] ${context} must be an array.`);
   }
 
-  const ids = new Set<string>();
   const labels = new Set<string>();
   value.forEach((item, index) => {
     const id = typeof item?.id === "string" ? item.id.trim() : "";
@@ -423,6 +515,9 @@ function validateMastheadItems(value: CxMastheadItem[]): CxMastheadItem[] {
     ids.add(id);
 
     const label = typeof item?.label === "string" ? item.label.trim() : "";
+    if (!label) {
+      throw new Error(`[cx-masthead] item "${id}" requires a non-empty label.`);
+    }
     const labelKey = label.toLowerCase();
     if (labels.has(labelKey)) {
       throw new Error(`[cx-masthead] item label "${label}" must be unique.`);
@@ -431,4 +526,44 @@ function validateMastheadItems(value: CxMastheadItem[]): CxMastheadItem[] {
   });
 
   return [...value];
+}
+
+function validateMastheadGroups(value: CxMastheadGroup[]): CxMastheadGroup[] {
+  if (!Array.isArray(value)) {
+    throw new Error("[cx-masthead] menuGroups must be an array.");
+  }
+  const groupIds = new Set<string>();
+  const itemIds = new Set<string>();
+  return value
+    .map((group, index) => {
+      const id = typeof group?.id === "string" ? group.id.trim() : "";
+      if (!id) {
+        throw new Error(
+          `[cx-masthead] menuGroups[${index}] requires a non-empty id.`,
+        );
+      }
+      if (groupIds.has(id)) {
+        throw new Error(`[cx-masthead] menu group id "${id}" must be unique.`);
+      }
+      groupIds.add(id);
+      if (group.label !== undefined && typeof group.label !== "string") {
+        throw new Error(
+          `[cx-masthead] menu group "${id}" label must be a string.`,
+        );
+      }
+      if (group.collapsible && !group.label?.trim()) {
+        throw new Error(
+          `[cx-masthead] collapsible menu group "${id}" requires a label.`,
+        );
+      }
+      return {
+        ...group,
+        items: validateMastheadItems(
+          group.items,
+          `menuGroups[${index}].items`,
+          itemIds,
+        ),
+      };
+    })
+    .filter((group) => group.items.length > 0);
 }

@@ -44,6 +44,17 @@ at setup.
 
 ## Install
 
+### Print ownership
+
+Components own their presentation in the print medium: tables fit content instead of retaining
+screen column widths, table views omit controls, rendered disclosures include their content, and
+transient overlays are hidden. Print shows the currently loaded rows; it does not load further
+pages or change application state. Shared base styles settle motion and preserve semantic colour.
+Products own paper margins, application chrome, document titles, and theme selection. Do not
+override component internals from a product print stylesheet.
+
+### Package setup
+
 Install the package from GitHub:
 
 ```json

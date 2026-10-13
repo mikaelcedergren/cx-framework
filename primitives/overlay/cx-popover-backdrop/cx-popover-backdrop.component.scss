@@ -12,3 +12,10 @@
   touch-action: none;
   cursor: default;
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  :host, .cx-popover-backdrop__surface {
+    display: none !important;
+  }
+}

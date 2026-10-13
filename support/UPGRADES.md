@@ -20,6 +20,51 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.12
+
+- The portable bootstrap now requires checking surface purpose, workflow ownership,
+  and meaning conveyed by context before placing actions or adding interface copy.
+  Keep each full workflow in its designated home and use contextual quick actions
+  only for self-contained decisions. Read the updated bootstrap before product work.
+  Classify prose separately from operational interface copy: English labels,
+  validation, errors, status messages, and fallback patterns use full forms such as
+  `do not` and `cannot`; explanatory, narrative, editorial, and persuasive prose may
+  use natural contractions under `copy.prose-scope`.
+
+- The portable `layout.no-page-horizontal-scroll` rule now explicitly covers
+  component layouts as well as pages. Use supported wrapping and stacking by
+  default; reserve bounded horizontal scrolling for content or established
+  interactions that need it, and fix overflow instead of concealing it. Existing
+  intentional scrolling patterns, including tabs, remain supported. Existing spacing
+  rules now clarify that responsive gaps reuse the shared scale and breakpoint:
+  components own internal changes, and layout primitives own surrounding gaps.
+  Compact layouts do not require every gap to shrink.
+
+- `cx-masthead` adds optional `menuGroups` for grouped navigation in its compact
+  drawer and a `[menuFooter]` / `[cxMastheadMenuFooter]` slot for account or appearance
+  controls. Groups use `id`, optional `label` and `collapsible`, and an `items` array
+  of `CxMastheadItem`; empty groups are omitted. Desktop `items`, the existing flat
+  menu, and header defaults stay unchanged. Compact navigation now uses the standard
+  body text and control sizes with tighter spacing between items. Applications with a desktop sidebar
+  can supply the same destinations to the masthead and remove consumer-owned mobile
+  toggles, drawers, and responsive menu styling. The masthead owns disclosure,
+  dismissal, keyboard focus, and compact-menu motion.
+  Every navigation item must have a non-empty label; blank labels are now rejected.
+
+- Tables, table views, disclosures, cards, metrics, page layout, and transient overlays now own
+  their print presentation. Tables wrap without screen column widths; rendered disclosure content
+  is included; interaction controls and overlays are omitted. Printing retains the current loaded
+  rows rather than fetching additional pages. Remove consumer print overrides of component internals.
+  Shared base styles preserve colour, settle motion, and keep headings with following content.
+  Products still own paper margins, application chrome, titles, and print-theme selection.
+
+- `cx-kpi` now fills the height allocated by its layout container, so stretched
+  grid rows display equal-height cards. No consumer changes are required.
+
+- `cx-markdown-editor` now indents across adjacent lists of the same kind with Tab,
+  retaining nested children, checkbox state, cursor position and Undo/Redo.
+  Shift+Tab moves an item back out. No consumer changes are required.
+
 ## 0.17.11
 
 - `cx-assistant` now starts in its resting bar and plays the existing gradient

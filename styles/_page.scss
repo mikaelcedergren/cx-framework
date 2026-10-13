@@ -68,3 +68,13 @@
     gap: var(--space-md);
   }
 }
+
+@media print {
+  .cx-page,
+  .cx-page--bounded {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}

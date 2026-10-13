@@ -140,7 +140,7 @@ export class CxPopoverBackdropComponent {
       (wheel)="onWheel($event)"
       (touchmove)="onTouchMove($event)"
     ></div>
-  `, isInline: true, styles: [":host{display:contents}.cx-popover-backdrop__surface{display:block;position:fixed;inset:0;z-index:var(--z-index-popover-backdrop);background:rgba(0,0,0,0);pointer-events:auto;touch-action:none;cursor:default}"], changeDetection: i0.ChangeDetectionStrategy.OnPush });
+  `, isInline: true, styles: [":host{display:contents}.cx-popover-backdrop__surface{display:block;position:fixed;inset:0;z-index:var(--z-index-popover-backdrop);background:rgba(0,0,0,0);pointer-events:auto;touch-action:none;cursor:default}@media print{:host,.cx-popover-backdrop__surface{display:none !important}}"], changeDetection: i0.ChangeDetectionStrategy.OnPush });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImport: i0, type: CxPopoverBackdropComponent, decorators: [{
             type: Component,
@@ -153,7 +153,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "22.2.2", ngImpor
       (wheel)="onWheel($event)"
       (touchmove)="onTouchMove($event)"
     ></div>
-  `, changeDetection: ChangeDetectionStrategy.OnPush, styles: [":host{display:contents}.cx-popover-backdrop__surface{display:block;position:fixed;inset:0;z-index:var(--z-index-popover-backdrop);background:rgba(0,0,0,0);pointer-events:auto;touch-action:none;cursor:default}"] }]
+  `, changeDetection: ChangeDetectionStrategy.OnPush, styles: [":host{display:contents}.cx-popover-backdrop__surface{display:block;position:fixed;inset:0;z-index:var(--z-index-popover-backdrop);background:rgba(0,0,0,0);pointer-events:auto;touch-action:none;cursor:default}@media print{:host,.cx-popover-backdrop__surface{display:none !important}}"] }]
         }], propDecorators: { pressed: [{
                 type: Output
             }] } });

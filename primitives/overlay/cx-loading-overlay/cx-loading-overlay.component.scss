@@ -88,3 +88,10 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  :host {
+    display: none !important;
+  }
+}

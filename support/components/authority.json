@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 138,
-  "catalogSha256": "bbb5763fcc734ced054ee548cf1c51b960ef360c9af0001970b48649b656c9c6",
+  "catalogSha256": "bba21e0f075da964359f30a701f11eb5141d3d9653cd86b3837abc746b14fed0",
   "components": [
     {
       "name": "cx-account-control",
@@ -1883,7 +1883,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "974b2dc6ad2523cdefbfd054b76882c4e7f542e9ef76a2b49ed6d90a1e486a7d"
+            "sha256": "f34151bee8fdc1a4cde54afa17eaefbd2cd356a8bda139622d4803ac70b743f4"
           }
         ]
       }
@@ -3746,7 +3746,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "5a154817516060755463f8d3f4d778d1d5c668490db4e30e1b46ed597beb19bf"
+            "sha256": "12fd2dbfde90fccd55b17bd652c65e44658de53dcc26955f17a179e4cb0a4764"
           }
         ]
       }
@@ -4492,7 +4492,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a5eda3289b0d950b50e5b13c7c70aee668f0c7ba69d629b35b44ddef11354957"
+            "sha256": "11ecdf894340c151d74aee2028d0e2bec358c3b3b1d07b0eae5d38f8976f9e1c"
           }
         ]
       }
@@ -6437,7 +6437,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "0f5b1cd1554275dc2f3b82ffced8174712e26296eb74e4eac842fd709ddd6162"
+            "sha256": "d23aba3fe19561cbb9af3ea9a8c3bfd185b7bcfda49bf29ffd49b6bfd285abf2"
           }
         ]
       }
@@ -7175,7 +7175,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "b03d50a421ad634700d41f3e80e5cab6911c41cf080386fea8a8c1534c48ee28"
+            "sha256": "d18107bdd4f9d1f6f7fcad42f51a95454d982c169038ee526f73cf8099aae89a"
           }
         ]
       }
@@ -7595,6 +7595,15 @@
             "source": "decorator"
           },
           {
+            "binding": "menuGroups",
+            "member": "menuGroups",
+            "type": "CxMastheadGroup[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
             "binding": "overlay",
             "member": "overlay",
             "type": "boolean",
@@ -7639,21 +7648,25 @@
         {
           "ordinal": 2,
           "selector": "[actions], [cxMastheadActions]"
+        },
+        {
+          "ordinal": 3,
+          "selector": "[menuFooter], [cxMastheadMenuFooter]"
         }
       ],
       "evidence": {
         "source": {
-          "sha256": "e5bb96bab9583a8d193c2ba4c55b3a73d19585b9cdddd60fb4c688fc228db224"
+          "sha256": "e0ea7cf19b3df5adac5cbe4144ec3daeed7bfe7238479a148298ef5af7f33a2b"
         },
         "template": {
           "kind": "external",
-          "sha256": "939d27cfa45c6a7d57818d6771326b00b991dc5dc1b6524db7fece2269ea439b"
+          "sha256": "076ce95be2c006eb8a8843b6f3ec78b416d5108e7beedb75f2c6d8f21d4338df"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "e9582720fe75cebff9d6661b94a96993b9a48002774571f30d2046d0e1bdb994"
+            "sha256": "27f6bfeecf864c27d75d2b0a80eb14b5b8c5f009b1d265089ca65ba16a3c24c2"
           }
         ]
       }
@@ -7830,7 +7843,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "665f12258715233000e41c1879b5010cc930c040fa3026f4383f128506a8ae43"
+            "sha256": "64b0d88b7bf8a48105497c412ad6267b6c9f71bad7338b4ffbd7a9c48536fde8"
           }
         ]
       }
@@ -7919,7 +7932,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d59d7914e73524601b75e91e20db7396fe4f52994574160c23c2069f7eee4533"
+            "sha256": "afd476d126fc02dae34be3c3fa06bff6736c8b5e6e105a8a66f5dd96c868e414"
           }
         ]
       }
@@ -9310,7 +9323,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "b7b2a286b6463f82ca418205681cf3102b09ff2dfde67b871205d876edad60b3"
+            "sha256": "4cabc8460214973929be9507e02ab72a4e5099bb3bbf1708e821807db4cdd50f"
           }
         ]
       }
@@ -12485,7 +12498,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "9b48e89447dc6b7da1f621318aa4b42fdb3fb0488c9b449011069a42dffa6604"
+            "sha256": "d964d201fb3eda640b13a05d677ebfea8de24c7190441635ded9257731463769"
           }
         ]
       }
@@ -13204,7 +13217,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "bd5dbc4158775f5bde9c62ae329f8410c84d8d209e0e0c536f41f608abc03472"
+            "sha256": "9daefce6460adb49cd1e5768d65344173c2bb3aac2bd740c36439a9f43416893"
           }
         ]
       }
@@ -14452,7 +14465,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "31837c5ba9d1d01299aa16aabfb1639a80cbd34e982971125225f331e8d4a0f9"
+            "sha256": "1bf37f7961eef45e9f6b38e2a1f504dc29c4c321d44e107fdf4e738c80c63fe3"
           }
         ]
       }

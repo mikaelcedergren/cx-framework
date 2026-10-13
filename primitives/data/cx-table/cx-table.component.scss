@@ -589,3 +589,46 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+@media print {
+  .cx-table {
+    overflow: visible;
+  }
+
+  .cx-table__column-resizer,
+  .cx-table__cell--menu,
+  .cx-table__head-cell--menu {
+    display: none;
+  }
+
+  // Inline screen measurements cannot constrain the paper's content width.
+  .cx-table__table {
+    table-layout: auto;
+  }
+
+  .cx-table__table col,
+  .cx-table__head-cell[data-column-id],
+  .cx-table__cell[data-column-id] {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .cx-table .cx-table__head-cell,
+  .cx-table__cell--pinned {
+    position: static;
+    left: auto !important;
+  }
+
+  .cx-table__text-value,
+  .cx-table__head-label,
+  .cx-table__cell-content,
+  .cx-table__measure-target {
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .cx-table__row {
+    break-inside: avoid;
+  }
+}

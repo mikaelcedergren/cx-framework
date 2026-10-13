@@ -4,6 +4,10 @@ This file owns portable user-facing language rules. Search by `RULE-ID:`, `SCOPE
 
 > **Normative language:** `TYPE: MUST` is mandatory; `TYPE: SHOULD` is the default unless a concrete product reason justifies departure; `TYPE: MAY` is optional. `DESCRIPTION` is `[NOTE]`; `[NOTE]` is non-normative and cannot override a rule. A marker governs only its paragraph or list item and any unmarked entries in one list, table, or code block it directly introduces; it never crosses a paragraph or heading boundary. Unlabelled prose with no inherited marker is `[NOTE]`. See `00-start-here.md` for the canonical definitions, precedence, and conflict handling.
 
+## Prose and interface copy
+
+RULE-ID: copy.prose-scope SCOPE: copy-classification TYPE: MUST TOPIC: scope RULE: Identify prose by its explanatory, narrative, editorial, or persuasive purpose, regardless of location or length; treat each passage as a whole and respect explicit prose designations. Exempt prose from interface-specific brevity and style constraints unless a rule explicitly includes prose, while retaining truth, linguistic correctness, clarity, and necessary consequence information. Apply the exemption only to the passage, never automatically to surrounding controls. When classification is uncertain, do not report a violation of an interface-specific style rule on that basis. DESCRIPTION: Labels, action text, validation, errors, and status messages remain operational interface copy even when written as sentences. Prose may use natural contractions, developed explanations, and purposeful repetition; copy.truth, copy.linguistic-correctness, copy.concrete-meaning, copy.first-read-understanding, and rules expressly governing prose such as copy.paragraph-flow still apply.
+
 ## Truth, voice, and terminology
 
 RULE-ID: copy.truth SCOPE: copy TYPE: MUST TOPIC: trust RULE: Preserve known product behavior and consequence in the words. DESCRIPTION: Never invent capability, guarantee, policy, terminology, recovery, or outcome to make copy sound complete.
@@ -18,7 +22,7 @@ RULE-ID: copy.translation-natural SCOPE: translation TYPE: MUST TOPIC: localizat
 
 RULE-ID: copy.us-english SCOPE: english-copy TYPE: MUST TOPIC: copy RULE: Use US English spelling, grammar, and vocabulary for English-language copy. DESCRIPTION: Keep established proper names and quoted source text intact; this language choice does not override explicit date, time, unit, or other formatting contracts.
 
-RULE-ID: copy.contractions SCOPE: english-copy TYPE: MUST TOPIC: voice RULE: Write words in full rather than using contractions, such as `do not` instead of `don't`. DESCRIPTION: Apply the length threshold to one continuous guidance block, not to separate labels or unrelated messages combined. EXCEPT: Familiar contractions are allowed in operational UI copy, including validation, errors, status messages, and fallback patterns; do not expand a chosen contraction in these messages solely to satisfy this rule. Contractions are also allowed in descriptive guidance longer than 40 words; at exactly 40 words or fewer, descriptive guidance uses the full forms.
+RULE-ID: copy.contractions SCOPE: english-copy TYPE: MUST TOPIC: voice RULE: Write English interface copy in full forms, including validation, errors, status messages, and fallback patterns. DESCRIPTION: Use `do not` instead of `don't` and `cannot` instead of `can't`; the rule does not depend on word count. EXCEPT: Prose identified under copy.prose-scope may use natural contractions.
 
 RULE-ID: copy.plain-language SCOPE: copy TYPE: SHOULD TOPIC: copy RULE: Use the plainest accurate words. DESCRIPTION: Remove business jargon, technical leakage, marketing gloss, and decorative phrasing.
 

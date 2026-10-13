@@ -59,3 +59,12 @@
   justify-content: flex-end;
   padding-top: var(--space-sm);
 }
+
+// Print the current result, without query controls or pagination chrome.
+@media print {
+  .cx-table-view__filters,
+  .cx-table-view__footer,
+  .cx-table-view__header:not(:has(.cx-table-view__heading)) {
+    display: none;
+  }
+}

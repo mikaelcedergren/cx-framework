@@ -142,9 +142,10 @@ look cramped — so let them take a row of their own instead.
 
 One breakpoint: **mobile is below 720px**; desktop is 720px and up (the `--breakpoint-mobile` token). Every responsive feature in the system flips at this same width.
 
-- **Primitives** — give a base value plus a `*Mobile` override: `[columnsMobile]="1"`, `gapMobile="sm"`. The base applies everywhere; the mobile value takes over below 720.
+- **Primitives** — give a base value plus a `*Mobile` override: `[columnsMobile]="1"`, `gapMobile="sm"`. The base applies everywhere; the mobile value takes over below 720. Choose both gaps from the shared spacing scale by the relationship between the elements; a narrower layout does not require every gap to shrink.
 - **Visibility** — `cx-hide-mobile` hides below 720, `cx-hide-desktop` hides at 720 and up. Put these on your own wrapper, not on a component.
-- **Page frame** — `.cx-page` tightens its padding and gap one step on mobile automatically.
+- **Page frame** — `.cx-page` uses the responsive `--gutter-page` token and tightens its gap on mobile automatically. Reuse that gutter for aligned page chrome rather than adding a second mobile inset.
+- **Component internals** — components own their responsive padding and gaps at the same shared breakpoint. Consumers use supported props and surrounding layout primitives; they never adjust internal spacing from a page.
 
 `align` and `justify` aren't responsive. When a row needs to become a column on mobile, restructure or use a grid with `[columnsMobile]="1"`, which covers most cases.
 

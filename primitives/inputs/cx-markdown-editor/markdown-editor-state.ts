@@ -311,6 +311,29 @@ export function moveMarkdownBlock(direction: -1 | 1): Command {
   };
 }
 
+/** Treat adjacent lists of the same kind as one list for an explicit indent. */
+const indentAcrossLists: Command = (state, dispatch) => {
+  const { selection } = state;
+  if (!(selection instanceof TextSelection)) return false;
+  const { $from, $to } = selection;
+  const range = $from.blockRange($to, node => node.firstChild?.type === schema.nodes['list_item']);
+  if (!range || range.startIndex !== 0) return false;
+  const list = range.parent;
+  const listStart = $from.before(range.depth);
+  const previous = state.doc.resolve(listStart).nodeBefore;
+  if (previous?.type !== list.type) return false;
+
+  // Reuse the ordinary list command on the joined document, then publish both
+  // steps as one edit. Joining alone would leave the bullet at the wrong level.
+  const joined = closeHistory(state.tr).join(listStart);
+  return sinkListItem(schema.nodes['list_item'])(state.apply(joined), dispatch && (nested => {
+    for (const step of nested.steps) joined.step(step);
+    joined.setSelection(nested.selection.getBookmark().resolve(joined.doc));
+    joined.setStoredMarks(state.storedMarks);
+    dispatch(joined.setMeta(blockMoveHistoryKey, true).scrollIntoView());
+  }));
+};
+
 function buildKeymap(): Plugin {
   // Shift-Enter breaks the line without leaving the current block — inside a
   // list item it continues the same bullet. In a code block (which cannot hold
@@ -376,7 +399,7 @@ function buildKeymap(): Plugin {
           }),
       );
     },
-    Tab: sinkListItem(schema.nodes['list_item']),
+    Tab: chainCommands(sinkListItem(schema.nodes['list_item']), indentAcrossLists),
     'Shift-Tab': liftListItem(schema.nodes['list_item']),
   });
 }

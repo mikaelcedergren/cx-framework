@@ -108,3 +108,10 @@
     animation: none;
   }
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  :host, .cx-tooltip__surface {
+    display: none !important;
+  }
+}

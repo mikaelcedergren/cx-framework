@@ -112,3 +112,10 @@
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);
 }
+
+// Transient interaction surfaces are not document content.
+@media print {
+  .cx-menu {
+    display: none !important;
+  }
+}

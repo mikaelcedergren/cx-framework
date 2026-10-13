@@ -37,9 +37,9 @@ This file is the last-resort wording catalog in the framework spec.
 | Known disallowed content | `Remove [known disallowed content].` |
 | Known requirement | `[Field] must [known requirement]. [Known recovery].` |
 | Known duplicate | `[Thing] already exists. [Known recovery].` |
-| Known unsupported value | `[Thing] isn't supported. Use [known supported option].` |
+| Known unsupported value | `[Thing] is not supported. Use [known supported option].` |
 | Known size or length limit | `[Thing] is too [large/long/short]. [Known recovery].` |
-| Known temporary failure | `[Thing] can't be [completed/reached] right now. [Known recovery].` |
+| Known temporary failure | `[Thing] cannot be [completed/reached] right now. [Known recovery].` |
 
 [MUST] Do not leave bracketed text in shipped copy.
 
@@ -68,8 +68,8 @@ This file is the last-resort wording catalog in the framework spec.
 | Required | `Enter a URL.` |
 | Invalid | `Enter a valid URL.` |
 | Known required protocol | `Use a URL that starts with [supported protocol].` |
-| Unreachable | `The URL can't be reached. Check the address or try again.` |
-| Validation unavailable | `The URL can't be validated right now. Try again.` |
+| Unreachable | `The URL cannot be reached. Check the address or try again.` |
+| Validation unavailable | `The URL cannot be validated right now. Try again.` |
 
 [MUST] Do not claim that one protocol, credential shape, hostname, or URL length is unsupported unless the product enforces that rule.
 
@@ -82,7 +82,7 @@ This file is the last-resort wording catalog in the framework spec.
 | Required | `Enter an email address.` |
 | Invalid | `Enter a valid email address.` |
 | Known duplicate | `Email address is already in use. Use a different email address.` |
-| Known domain restriction | `Email domain isn't allowed. Use an allowed email address.` |
+| Known domain restriction | `Email domain is not allowed. Use an allowed email address.` |
 
 ### Password
 
@@ -92,8 +92,8 @@ This file is the last-resort wording catalog in the framework spec.
 | --- | --- |
 | Required | `Enter a password.` |
 | Known requirement | `Password must [known requirement].` |
-| Confirmation mismatch | `Passwords don't match. Enter the same password in both fields.` |
-| Known reuse restriction | `Password can't match [known previous-password rule]. Use a different password.` |
+| Confirmation mismatch | `Passwords do not match. Enter the same password in both fields.` |
+| Known reuse restriction | `Password cannot match [known previous-password rule]. Use a different password.` |
 
 [MUST] Never invent length, complexity, character-set, language, symbol, or password-history policy. State only the requirements enforced by the product.
 
@@ -106,8 +106,8 @@ This file is the last-resort wording catalog in the framework spec.
 | Required | `Enter [identifier name].` |
 | Invalid format | `Enter [identifier name] in [known format] format.` |
 | Known duplicate | `[Identifier name] already exists. Enter a different value.` |
-| Known unsupported version | `[Version] isn't supported. Use [supported version].` |
-| Known blocked value | `This [identifier name] isn't allowed. Enter a different value.` |
+| Known unsupported version | `[Version] is not supported. Use [supported version].` |
+| Known blocked value | `This [identifier name] is not allowed. Enter a different value.` |
 
 [MUST] Do not assume IPv4, IPv6, port, protocol, range, or address policy without product evidence.
 
@@ -147,8 +147,8 @@ This file is the last-resort wording catalog in the framework spec.
 | Known situation | Fallback |
 | --- | --- |
 | Required | `Select a date.` |
-| Future disallowed | `Date can't be in the future. Select today or an earlier date.` |
-| Past disallowed | `Date can't be in the past. Select today or a later date.` |
+| Future disallowed | `Date cannot be in the future. Select today or an earlier date.` |
+| Past disallowed | `Date cannot be in the past. Select today or a later date.` |
 | Known range | `Select a date between [known start] and [known end].` |
 | End before start | `End date must be after the start date. Select a later end date.` |
 
@@ -158,9 +158,9 @@ This file is the last-resort wording catalog in the framework spec.
 
 | Known situation | Fallback |
 | --- | --- |
-| Known unsupported type | `File type isn't supported. Choose [known supported type].` |
+| Known unsupported type | `File type is not supported. Choose [known supported type].` |
 | Known size limit | `File is too large. Choose a file smaller than [known limit].` |
-| Unreadable file | `File can't be read. Choose another file.` |
+| Unreadable file | `File cannot be read. Choose another file.` |
 | Upload failure | `Upload failed. Try again.` |
 
 ## Form- and request-level alerts
@@ -172,10 +172,10 @@ This file is the last-resort wording catalog in the framework spec.
 | Known situation | Fallback |
 | --- | --- |
 | Unknown request failure | `The request failed. Try again.` |
-| Known unavailable service | `The service can't be reached right now. Try again later.` |
+| Known unavailable service | `The service cannot be reached right now. Try again later.` |
 | Known timeout | `The request took too long. Try again.` |
-| Known permission failure | `You don't have permission to [known action].` |
-| Known policy restriction | `This action isn't allowed by [known policy name].` |
+| Known permission failure | `You do not have permission to [known action].` |
+| Known policy restriction | `This action is not allowed by [known policy name].` |
 | Known conflict | `This conflicts with another change. Refresh and try again.` |
 | Server-side field validation | `Review the highlighted fields and try again.` |
 | Known rate limit | `Too many requests. Try again [known retry time].` |
