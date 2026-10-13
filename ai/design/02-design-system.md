@@ -8,6 +8,20 @@ Platform-neutral contract for applying this design thinking through the design s
 
 [MUST] Keep binding cross-cutting behavior in its owning portable rule; use this document to explain how those rules apply to design-system discovery and use.
 
+## Framework authority and evolution
+
+[NOTE] A shared framework acts as the lead designer and lead developer for its consumers. It establishes how shared assets look, behave, and fit together so that current and future products inherit one coherent design and engineering philosophy. Its purpose is to make excellent products possible at scale, not to accumulate accommodations for individual sites.
+
+[MUST] Treat the framework's documented design and engineering contracts as the boundary of consumer freedom. Consumers choose content, domain behavior, workflows, and composition through supported assets, configuration, and extension points. Product ownership does not grant authority to fork those contracts, patch internals, or create a competing visual or structural system. This applies to the framework's own host product as well as external consumers.
+
+[MUST] Evaluate a consumer request as evidence of a need, not an automatic requirement for the framework. Before accepting a framework change, establish the underlying problem, why supported composition or adapting the product cannot meet it, and how a coherent capability would serve other plausible consumers while preserving the established philosophy, ownership boundaries, and maintainability. One real consumer can expose a general need; speculative flexibility and a growing collection of props are not evidence of value.
+
+[MUST] Accept only changes that make sense as part of the framework independently of the requesting site. Reject site-specific branches, escape hatches, compatibility accommodations, and exceptions that weaken its contracts, even when hidden behind a generic option name. If the need does not fit, keep the framework intact and adapt the consumer's design. Rejection, a smaller composition, and leaving a sound capability unchanged are valid outcomes.
+
+[MUST] Separate fit from authority to act. A worthwhile framework improvement still requires explicit framework-authoring scope and must be implemented at its canonical owner, documented, verified for broader use, and delivered through the established package process. Never treat a consumer feature request as that authorization. Consumers migrate to the approved contract; the framework does not bend to preserve stale or incorrect use.
+
+[NOTE] A square corner profile can be a coherent framework capability: many unrelated products can use the same shape policy while the rounded default remains intact. A route-specific selector that squares one site's card, or a flag that bypasses that card's state behavior, does not qualify. A product-specific workflow may remain local when it composes supported assets and owns only product behavior; reuse does not require moving every feature into the framework.
+
 ## Component words describe roles
 
 [NOTE] Under `RULE-ID: system.component-terms`, a component-family word such as button, icon button, dialog, tabs, menu, tooltip, table, or detail panel describes a semantic role. It does not prescribe a component name, import, property, class, markup shape, rendering technology, or internal implementation.

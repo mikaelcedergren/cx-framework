@@ -44,7 +44,7 @@
           "const": "angular"
         },
         "rendering": {
-          "enum": ["ssg", "csr"]
+          "enum": ["ssg", "csr", "ssr"]
         },
         "designSystem": {
           "enum": ["cx-framework", "cx-framework-source"]

@@ -1,11 +1,11 @@
 ---
 name: copywriter
-description: Use automatically to write, revise, translate, or localize product copy and UX writing, including UI labels, buttons, headings, descriptions, alerts, errors, validation, empty states, form help, tooltips, guidance, component reference copy, and notifications. Trigger for new or replacement wording, clearer copy, and natural translations faithful to product meaning. Do not use for final approval, audit, or readiness review of finished work; use custodian. Do not implement settled copy without an explicit action request; use developer.
+description: Use automatically to write, revise, translate, or localize product copy and UX writing, including public sales pages, marketing prose, in-app upsells, UI labels, buttons, headings, descriptions, alerts, errors, validation, empty states, form help, tooltips, guidance, component reference copy, and notifications. Trigger for new or replacement wording, clearer copy, and natural translations faithful to product meaning. Do not use for final approval, audit, or readiness review of finished work; use custodian. Do not implement settled copy without an explicit action request; use developer.
 ---
 
 # Copywriter
 
-Use this skill as the UX-writing lens. Make words clear, natural, useful, and specific without changing product truth. Grammatical correctness alone is insufficient: the wording should sound like something the intended reader would actually encounter in their language and context.
+Use this skill for product copy, persuasive prose, and UX writing. Make words clear, natural, useful, and specific without changing product truth. Grammatical correctness alone is insufficient: the wording should sound like something the intended reader would actually encounter in their language and context.
 
 ## Operating mode
 
@@ -58,12 +58,12 @@ When tone or wording judgment is not settled by the copy rules, `../../profile/d
 - Prefer concise labels, short blocks, and progressive disclosure. Omit optional explanation when its value is uncertain; keep longer prose only when reading is the task.
 - Keep operational surfaces concise and professional.
 - Use warmth only where it helps, such as onboarding, first-use empty states, setup guidance, and learning surfaces.
-- Avoid business jargon, marketing gloss, cleverness, filler, decorative adjectives, blame, shame, and vague system language.
+- Avoid business jargon, empty marketing claims, filler, decorative adjectives, blame, shame, and vague system language. On operational surfaces, avoid cleverness that slows understanding; in persuasive prose, a memorable framing earns its place when it makes real value clearer.
 - Use fallback wording only when tailored copy cannot be written from known product behavior.
 
 ## Workflow
 
-1. Identify the copy surface, state, audience, surrounding context, and available space.
+1. Identify the copy surface, state, audience, surrounding context, and available space. For public sales pages or in-app upsell prose, apply the persuasive-copy guidance below; a public location or long paragraph alone does not make copy promotional.
 2. Confirm the product truth and existing terminology the words must preserve. For translation or localization, follow the translation workflow below before drafting.
 3. If an unresolved product, flow, or interaction decision would materially change the wording, use `designer` before writing.
 4. Search the AI design package for the relevant topic or component.
@@ -71,6 +71,18 @@ When tone or wording judgment is not settled by the copy rules, `../../profile/d
 6. Check linguistic correctness and read related copy as a whole. Stress-test concrete meaning in context, first-read understanding, and paragraph flow using `copy.concrete-meaning`, `copy.first-read-understanding`, and `copy.paragraph-flow`, alongside fit, scannability, chunking, adjacent repetition, ambiguity, tone, neighboring terminology, long values, and failure states that are in scope.
 7. Use `custodian` when the finalized wording needs an acceptance verdict.
 8. Hand settled copy to `developer` only after explicit implementation language from the user; otherwise propose the wording and stop.
+
+## Persuasive prose: public pages and upsells
+
+Use Donald Miller’s StoryBrand principles and Rory Sutherland’s behavioral perspective as the primary lenses when the copy’s purpose is to help someone choose an offer. This includes landing pages, service and product sales pages, and in-app upsell prose. Informational articles, help, errors, settings, and ordinary task instructions retain their own purpose; do not turn them into pitches.
+
+**StoryBrand: make the reader’s story clear.** Establish what the customer wants, the obstacle they recognize, and the practical or emotional improvement they seek. Position the business as a credible, empathetic guide, supported by real evidence. Make the route forward and next action understandable; describe believable success and proportionate stakes. Use these elements to clarify the message, not to force seven sections, invented pain, or a dramatic story into every page. An upsell can simply connect the user’s current need with the additional benefit and a clear next step.
+
+**Sutherland: understand perceived value and hesitation.** Look beyond features and price to the reader’s context, effort, uncertainty, trust, and sense of risk. Consider whether a concrete example, relevant comparison, or truthful reassurance makes existing value easier to appreciate. A useful reframing can matter more than another feature claim or discount. Ground the choice in audience evidence; treat untested behavioral explanations as hypotheses, not universal laws or guaranteed conversion gains.
+
+Combine the two: a clear customer-centered message, expressed in a way that addresses the reader’s actual reason to act or hesitate. Keep the established natural-language and translation standards. Allow connected prose enough room to persuade without padding. Never fabricate proof, scarcity, guarantees, or results; keep price, limitations, and commitments clear. In upsells, preserve an understandable way to decline and keep functional controls literal. Validate comprehension and credibility first; use observed results to assess effectiveness when available.
+
+Foundations: [Donald Miller, Your Brand Is Not the Hero](https://storybrand.com/downloads/your-brand-is-not-the-hero.pdf) and [Rory Sutherland’s discussion of buyer behavior](https://www.ogilvy.com/uk/ideas/creative-conversations-qa-rory-sutherland). The guidance above applies these ideas to this skill; it does not claim to reproduce either author’s complete method.
 
 ## Translation and localization
 

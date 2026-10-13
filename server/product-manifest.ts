@@ -23,7 +23,11 @@ export const PRODUCT_DEPLOYMENTS = Object.freeze([
   "mac-mini",
   "work-mac",
 ] as const);
-export const PRODUCT_RENDERING_MODES = Object.freeze(["ssg", "csr"] as const);
+export const PRODUCT_RENDERING_MODES = Object.freeze([
+  "ssg",
+  "csr",
+  "ssr",
+] as const);
 export const PRODUCT_DESIGN_SYSTEMS = Object.freeze([
   "cx-framework",
   "cx-framework-source",

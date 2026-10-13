@@ -8,6 +8,11 @@ This repository is generated from the authoritative Markdown and framework sourc
 on the next package export. Make UI, portable AI-guidance, and Node runtime changes in Cortex, then
 run the gated packaging command.
 
+Read [Framework authority](README.md#framework-authority) before framework or consumer work.
+It is the foundation for every current and future consumer, not optional design advice. The
+framework sets shared design and engineering contracts; consumers compose supported assets.
+Requests are assessed for general fit, and site-specific hacks or exceptions are rejected.
+
 ## Role in the Cortex -> cx-framework -> projects loop
 
 Cortex is the source layer for components, tokens, AI skills, guidelines, design-system decisions,
@@ -25,9 +30,10 @@ imports, package dependencies, local `file:` links, scripts, styles, or copied s
 
 If a consuming project reveals a framework gap during feature work, stop, explain the exact gap and
 natural owner, and ask what the user wants to do. Do not change Cortex or create a consumer
-workaround automatically. Only after the user explicitly authorises that framework work, make the
-source fix in Cortex, package this repo again, obtain explicit push authorisation, push it to
-GitHub, then reinstall and rebuild the consumer.
+workaround automatically. Assess the request under the linked authority contract; explicit
+framework scope permits evaluation, not a site-specific exception. When the change fits and the
+user has authorized that framework work, make the source fix in Cortex, package this repo again,
+obtain explicit push authorisation, push it to GitHub, then reinstall and rebuild the consumer.
 
 Rules that still apply:
 

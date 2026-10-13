@@ -47,7 +47,6 @@ export declare class CxAssistantComponent {
     protected readonly activeChoice: import("@angular/core").Signal<CxAssistantAction | undefined>;
     protected readonly hovered: import("@angular/core").WritableSignal<boolean>;
     protected readonly picking: import("@angular/core").WritableSignal<boolean>;
-    protected readonly greeting: import("@angular/core").WritableSignal<boolean>;
     protected readonly mode: import("@angular/core").Signal<Mode>;
     protected readonly motion: import("@angular/core").WritableSignal<Motion>;
     protected readonly moving: import("@angular/core").WritableSignal<boolean>;

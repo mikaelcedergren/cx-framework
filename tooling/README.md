@@ -18,6 +18,12 @@ The workbench is a literal public-API inspector. It must not make a component ap
 - Keep preview width, preview height, alignment, and other shell controls in the shared workbench shell.
 - Omit an individual shell control through its positive `show*Control` input only when changing it cannot expose meaningful behavior.
 
+The shared **Site corners** preview selects **Theme default** or **Square**. It
+borrows the document-root `cx-corners-square` profile so specimens, variants, and
+portaled overlays agree. All mounted workbenches share this temporary selection;
+when the last workbench closes, the prior root profile is restored. It never
+persists a product appearance preference or changes the component’s radius prop.
+
 ## Control mapping
 
 Controls reveal the public type:

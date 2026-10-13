@@ -2,7 +2,7 @@ export declare const PRODUCT_MANIFEST_FILENAME = "cx-product.json";
 export declare const MAX_PRODUCT_MANIFEST_BYTES: number;
 export declare const PRODUCT_PROFILES: readonly ["static-site", "hybrid-site", "web-app"];
 export declare const PRODUCT_DEPLOYMENTS: readonly ["mac-mini", "work-mac"];
-export declare const PRODUCT_RENDERING_MODES: readonly ["ssg", "csr"];
+export declare const PRODUCT_RENDERING_MODES: readonly ["ssg", "csr", "ssr"];
 export declare const PRODUCT_DESIGN_SYSTEMS: readonly ["cx-framework", "cx-framework-source"];
 export declare const PRODUCT_VISUAL_SYSTEMS: readonly ["framework", "product-skin"];
 export declare const PRODUCT_AUTHENTICATION_MODES: readonly ["none", "gate", "owner", "accounts"];

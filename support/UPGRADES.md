@@ -20,6 +20,30 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.11
+
+- `cx-assistant` now starts in its resting bar and plays the existing gradient
+  sweep once. It opens the ribbon on hover instead of showing it automatically
+  on page load. No consumer changes are required.
+- `cx-image` now accepts `"none"` for `image.borderRadius`. It
+  removes rounding from images and their loading/error surfaces. Existing defaults
+  and other radius choices are unchanged.
+- To make a site square, add `cx-corners-square` to the document root alongside
+  its theme class (`--corner-softness: 0px`). Avatar and
+  Launcher inset corners now honour zero as well. Explicit circle
+  and pill modes remain round; no per-component overrides are needed.
+- Framework authority and evolution is now explicit in the portable bootstrap.
+  Consumer requests are evaluated for general fit; local feature work never
+  authorizes a site-specific exception or substitute. Route repository agents to
+  the packaged `ai/design/00-start-here.md` and its linked authority contract.
+
+- Product manifests now accept `frontend.rendering: "ssr"` for hybrid sites and web apps
+  whose public HTML is rendered per request. Static sites still require `ssg`. Use a
+  product-owned Angular server renderer with the framework's existing HTTP, identity,
+  storage and release primitives; no renderer or browser dependency is added to the
+  portable Node runtime. Deploy changes affecting both rendering and browser code as
+  a paired release.
+
 ## 0.17.10
 
 - Interactive discreet cards now lift with a stronger shadow on hover and keyboard focus,

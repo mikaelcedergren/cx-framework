@@ -70,6 +70,7 @@ cx-workbench.cx-workbench--overflow-visible .cx-workbench {
 }
 
 .cx-workbench__meta-label {
+  white-space: nowrap;
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);

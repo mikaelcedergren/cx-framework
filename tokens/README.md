@@ -129,6 +129,14 @@ A theme is a complete visual profile. Components keep the same roles, states, be
 - `--frost-softness` controls backdrop blur. A flat theme may set it to zero.
 - `--shadow-low`, `--shadow-mid`, and `--shadow-high` keep their semantic elevation roles while a profile may render them softly, crisply, or flat.
 
+For a square site, add `cx-corners-square` to the document root alongside its
+theme class. This optional profile sets `--corner-softness: 0px`. This makes the rectangular radius scale zero, including proportional
+avatars and inset composite surfaces. Keep the override on the root so the derived
+radius tokens and portaled overlays share it. Omit the class to retain the theme’s rounded
+defaults. Components with an explicit radius can opt out individually using
+`none`. Card's existing numeric radius also accepts zero; an explicit positive
+Card radius or Image `round` still expresses that deliberate shape.
+
 Semantic circles and pills stay round regardless of the rectangular corner profile. The default radius scale derives from `--corner-softness: 4px`: `--radius-none` is 0; `xs`, `sm`, `md`, `lg`, `media-lg`, `xl`, and `2xl` are respectively 1×, 2×, 3×, 4×, 6×, 8×, and 16× softness; `--radius-pill` is 999px.
 
 Use named shadows only for real elevation: low for raised controls, mid for menus and popovers, and high for dialogs and strong overlays. Motion uses named tokens, clarifies change, and never moves the page around someone who is reading.

@@ -2,7 +2,7 @@ import { EventEmitter } from "@angular/core";
 import * as i0 from "@angular/core";
 export type CxImageSize = "auto" | "80" | "160" | "320";
 export type CxImageFit = "cover" | "contain" | "fill" | "none" | "scale-down";
-export type CxImageRadius = "small" | "default" | "large" | "round";
+export type CxImageRadius = "none" | "small" | "default" | "large" | "round";
 export type CxImageClickBehavior = "default" | "click" | "fullScreen";
 export interface CxImage {
     src: string;

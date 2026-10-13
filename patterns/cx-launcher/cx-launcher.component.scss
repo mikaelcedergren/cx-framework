@@ -37,9 +37,10 @@
   flex-direction: column;
   overflow: hidden;
   border: var(--floating-surface-border);
-  // Keep the frame, list, and Option corners concentric through both insets.
+  // Preserve concentric insets when rounded, but no inset may round a square profile.
   border-radius: calc(
-    var(--radius-sm) + var(--space-xs) + var(--surface-separation)
+    (var(--radius-sm) + var(--space-xs) + var(--surface-separation)) *
+      sign(var(--corner-softness))
   );
   background: var(--surface-alt);
   box-shadow: var(--shadow-mid);
@@ -50,7 +51,9 @@
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  border-radius: calc(var(--radius-sm) + var(--space-xs));
+  border-radius: calc(
+    (var(--radius-sm) + var(--space-xs)) * sign(var(--corner-softness))
+  );
   background: var(--surface);
   padding: var(--space-xs);
 }
@@ -73,7 +76,9 @@
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-lg);
-  border-radius: calc(var(--radius-sm) + var(--space-xs));
+  border-radius: calc(
+    (var(--radius-sm) + var(--space-xs)) * sign(var(--corner-softness))
+  );
   background: var(--surface);
   color: var(--ink);
   font-size: var(--font-size-body);

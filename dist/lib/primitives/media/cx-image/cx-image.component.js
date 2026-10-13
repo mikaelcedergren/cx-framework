@@ -148,6 +148,8 @@ function resolveImageSizeValue(size) {
 }
 function resolveImageRadiusValue(radius) {
     switch (radius) {
+        case "none":
+            return "var(--radius-none)";
         case "small":
             return "var(--radius-sm)";
         case "default":

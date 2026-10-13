@@ -37,6 +37,8 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 
 [MUST] Treat the order above as authoritative. A portable-spec `[MUST]` does not override a higher-authority product contract.
 
+[MUST] For a product using a shared framework, apply [Framework authority and evolution](02-design-system.md#framework-authority-and-evolution) during discovery and every capability request. Local product truth governs its domain and use of supported assets; it is not permission to override the framework's contracts. A request to build a feature does not implicitly authorize an exception or a framework change. Surface a conflict before acting.
+
 ## Task-local retrieval
 
 [MUST] Start with the task, not the documents:

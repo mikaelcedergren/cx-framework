@@ -1,9 +1,13 @@
-import { type CxDropdownOption } from '../../primitives/inputs/cx-dropdown';
+import { type CxDropdownOption } from "../../primitives/inputs/cx-dropdown";
+import { CxWorkbenchCornersService } from "./cx-workbench-corners.service";
 import * as i0 from "@angular/core";
-export type CxWorkbenchAlign = 'top' | 'center' | 'bottom';
-export type CxWorkbenchPreviewHeight = 'auto' | 'small' | 'medium' | 'large';
-export type CxWorkbenchPreviewWidth = 'auto' | 'small' | 'medium' | 'large' | 'full';
+export type CxWorkbenchAlign = "top" | "center" | "bottom";
+export type CxWorkbenchPreviewHeight = "auto" | "small" | "medium" | "large";
+export type CxWorkbenchPreviewWidth = "auto" | "small" | "medium" | "large" | "full";
 export declare class CxWorkbenchComponent {
+    protected readonly corners: CxWorkbenchCornersService;
+    protected readonly cornerOptions: CxDropdownOption[];
+    constructor();
     protected readonly align$: import("@angular/core").WritableSignal<CxWorkbenchAlign>;
     protected readonly previewHeight$: import("@angular/core").WritableSignal<CxWorkbenchPreviewHeight>;
     protected readonly previewWidth$: import("@angular/core").WritableSignal<CxWorkbenchPreviewWidth>;

@@ -142,13 +142,8 @@ export class CxAssistantComponent {
   );
   protected readonly hovered = signal(false);
   protected readonly picking = signal(false);
-  protected readonly greeting = signal(true);
   protected readonly mode = computed<Mode>(() =>
-    this.open()
-      ? "open"
-      : this.hovered() || this.picking() || this.greeting()
-        ? "ribbon"
-        : "idle",
+    this.open() ? "open" : this.hovered() || this.picking() ? "ribbon" : "idle",
   );
   protected readonly motion = signal<Motion>("morph");
   protected readonly moving = signal(false);
@@ -159,7 +154,7 @@ export class CxAssistantComponent {
   protected readonly shownPhase = signal<Phase>("empty");
   protected readonly leavingPhase = signal<Phase | null>(null);
   protected readonly ringPoured = signal(false);
-  protected readonly blinking = signal(false);
+  protected readonly blinking = signal(true);
   protected readonly trapsFocus = signal(false);
   protected readonly pickTarget = signal<{
     element: HTMLElement;
@@ -270,7 +265,8 @@ export class CxAssistantComponent {
         cleanup(() => observer.unobserve(el));
       }
     });
-    this.later("greeting", () => this.greeting.set(false), 1500);
+    // Greet in the resting bar with the same sweep used after a collapse.
+    this.later("blink", () => this.blinking.set(false), 1100);
     let previous: Mode = "idle";
     effect(() => {
       const mode = this.mode();
@@ -390,8 +386,6 @@ export class CxAssistantComponent {
       this.openWindow();
   }
   protected openWindow(): void {
-    this.cancel("greeting");
-    this.greeting.set(false);
     this.picking.set(false);
     this.pickTarget.set(null);
     this.open.set(true);
@@ -400,7 +394,6 @@ export class CxAssistantComponent {
     this.request?.abort();
     this.cancel("hover");
     this.hovered.set(false);
-    this.greeting.set(false);
     this.hoverArmed = false;
     if (this.busy) {
       this.busy = false;

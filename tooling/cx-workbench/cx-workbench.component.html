@@ -17,46 +17,54 @@
       </div>
     </div>
 
-    @if (showPreviewHeightControl || showPreviewWidthControl || showAlignControl) {
-      <div class="cx-workbench__meta">
-        @if (showPreviewHeightControl) {
-          <div class="cx-workbench__meta-field">
-            <span class="cx-workbench__meta-label">previewHeight</span>
-            <cx-dropdown
-              label=""
-              ariaLabel="previewHeight"
-              [availableValues]="previewHeightOptions"
-              [value]="previewHeight$()"
-              (valueChange)="onPreviewHeightChange($event)"
-            />
-          </div>
-        }
-        @if (showPreviewWidthControl) {
-          <div class="cx-workbench__meta-field">
-            <span class="cx-workbench__meta-label">previewWidth</span>
-            <cx-dropdown
-              label=""
-              ariaLabel="previewWidth"
-              [availableValues]="previewWidthOptions"
-              [value]="previewWidth$()"
-              (valueChange)="onPreviewWidthChange($event)"
-            />
-          </div>
-        }
-        @if (showAlignControl) {
-          <div class="cx-workbench__meta-field">
-            <span class="cx-workbench__meta-label">align</span>
-            <cx-dropdown
-              label=""
-              ariaLabel="align"
-              [availableValues]="alignOptions"
-              [value]="align$()"
-              (valueChange)="onAlignChange($event)"
-            />
-          </div>
-        }
+    <div class="cx-workbench__meta">
+      <div class="cx-workbench__meta-field">
+        <span class="cx-workbench__meta-label">Site corners</span>
+        <cx-dropdown
+          label=""
+          ariaLabel="Site corners"
+          [availableValues]="cornerOptions"
+          [value]="corners.square() ? 'square' : 'default'"
+          (valueChange)="corners.setSquare($event === 'square')"
+        />
       </div>
-    }
+      @if (showPreviewHeightControl) {
+        <div class="cx-workbench__meta-field">
+          <span class="cx-workbench__meta-label">previewHeight</span>
+          <cx-dropdown
+            label=""
+            ariaLabel="previewHeight"
+            [availableValues]="previewHeightOptions"
+            [value]="previewHeight$()"
+            (valueChange)="onPreviewHeightChange($event)"
+          />
+        </div>
+      }
+      @if (showPreviewWidthControl) {
+        <div class="cx-workbench__meta-field">
+          <span class="cx-workbench__meta-label">previewWidth</span>
+          <cx-dropdown
+            label=""
+            ariaLabel="previewWidth"
+            [availableValues]="previewWidthOptions"
+            [value]="previewWidth$()"
+            (valueChange)="onPreviewWidthChange($event)"
+          />
+        </div>
+      }
+      @if (showAlignControl) {
+        <div class="cx-workbench__meta-field">
+          <span class="cx-workbench__meta-label">align</span>
+          <cx-dropdown
+            label=""
+            ariaLabel="align"
+            [availableValues]="alignOptions"
+            [value]="align$()"
+            (valueChange)="onAlignChange($event)"
+          />
+        </div>
+      }
+    </div>
   </div>
 
   <aside class="cx-workbench__controls">

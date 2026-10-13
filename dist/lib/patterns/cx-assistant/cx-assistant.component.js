@@ -104,13 +104,7 @@ export class CxAssistantComponent {
     ...(ngDevMode ? [{ debugName: "hovered" }] : /* istanbul ignore next */ []));
     picking = signal(false, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "picking" }] : /* istanbul ignore next */ []));
-    greeting = signal(true, /* @ts-ignore */
-    ...(ngDevMode ? [{ debugName: "greeting" }] : /* istanbul ignore next */ []));
-    mode = computed(() => this.open()
-        ? "open"
-        : this.hovered() || this.picking() || this.greeting()
-            ? "ribbon"
-            : "idle", /* @ts-ignore */
+    mode = computed(() => this.open() ? "open" : this.hovered() || this.picking() ? "ribbon" : "idle", /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "mode" }] : /* istanbul ignore next */ []));
     motion = signal("morph", /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "motion" }] : /* istanbul ignore next */ []));
@@ -130,7 +124,7 @@ export class CxAssistantComponent {
     ...(ngDevMode ? [{ debugName: "leavingPhase" }] : /* istanbul ignore next */ []));
     ringPoured = signal(false, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "ringPoured" }] : /* istanbul ignore next */ []));
-    blinking = signal(false, /* @ts-ignore */
+    blinking = signal(true, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "blinking" }] : /* istanbul ignore next */ []));
     trapsFocus = signal(false, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "trapsFocus" }] : /* istanbul ignore next */ []));
@@ -226,7 +220,8 @@ export class CxAssistantComponent {
                 cleanup(() => observer.unobserve(el));
             }
         });
-        this.later("greeting", () => this.greeting.set(false), 1500);
+        // Greet in the resting bar with the same sweep used after a collapse.
+        this.later("blink", () => this.blinking.set(false), 1100);
         let previous = "idle";
         effect(() => {
             const mode = this.mode();
@@ -338,8 +333,6 @@ export class CxAssistantComponent {
             this.openWindow();
     }
     openWindow() {
-        this.cancel("greeting");
-        this.greeting.set(false);
         this.picking.set(false);
         this.pickTarget.set(null);
         this.open.set(true);
@@ -348,7 +341,6 @@ export class CxAssistantComponent {
         this.request?.abort();
         this.cancel("hover");
         this.hovered.set(false);
-        this.greeting.set(false);
         this.hoverArmed = false;
         if (this.busy) {
             this.busy = false;

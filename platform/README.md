@@ -119,3 +119,13 @@ release has been tested.
 
 The permanent rationale and architecture live in the development root
 `WEB-ARCHITECTURE.md`. Mac mini operations remain in `server-ops` and the root server documents.
+
+## Public rendering modes
+
+The product manifest declares `ssg` for build-time generated public HTML, `csr` for
+client-rendered applications, or `ssr` for request-time rendered public HTML. A hybrid site
+may render public routes on the server while keeping authenticated routes client-rendered.
+The static-site profile remains SSG-only. Product-owned renderers belong in the product's
+server artifact, alongside its API, and must use the selected matching browser release.
+The portable framework Node runtime stays independent of Angular. Updates affecting the
+renderer and browser use the paired release contract.

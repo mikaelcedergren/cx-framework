@@ -24,6 +24,24 @@ The three packaged surfaces have different scopes. Angular component documentati
 assuming Angular, a selector, an import, or a dedicated component implementation. The `server/`
 surface owns portable operating behavior while leaving product policy and data with the product.
 
+## Framework authority
+
+Cortex is the authoring authority; `cx-framework` delivers its design and engineering decisions to
+every consumer. The framework acts as the lead designer and lead developer. Consumers create
+products by composing its supported capabilities, within its philosophy and architecture.
+
+Every consumer and framework author must apply
+[Framework authority and evolution](ai/design/02-design-system.md#framework-authority-and-evolution).
+That contract governs which requests become shared capabilities and which are rejected. No site,
+including Cortex itself, earns a private exception. A reusable need must improve the framework on
+its own merits before an authorized source change is packaged outward.
+
+Keep this foundation discoverable in every consuming repository's `AGENTS.md`: route agents to
+the installed package's `ai/design/00-start-here.md` and expose its skills through the bootstrap
+below. Read the installed authority rather than copying rules into a second source. Existing
+consumers receive revisions when they update their package; new consumers establish these routes
+at setup.
+
 ## Install
 
 Install the package from GitHub:
@@ -478,7 +496,9 @@ import {
 export class SettingsPage {}
 ```
 
-Use framework components before building local UI. If a shared component is missing a repeatable behavior, extend the framework component instead of patching a page.
+Use framework components before building local UI. Assess missing capabilities through the
+[framework authority contract](#framework-authority); a repeatable need alone does not authorize
+an extension or a page patch.
 
 Install the keyboard-focus provider once in the application config. It keeps the primary focus ring exclusive to Tab navigation, while pointer-focused controls retain their quieter active state:
 
@@ -590,7 +610,9 @@ import {
 <cx-icon icon="settings" /> <cx-button text="Export report" icon="export" />
 ```
 
-Do not draw one-off app icons when a framework icon exists. If a reusable icon is missing, add it to the framework icon source and regenerate the manifest.
+Do not draw one-off app icons when a framework icon exists. A missing reusable icon follows the
+same framework acceptance and authoring boundary; once accepted and authorized, add it at the
+framework source and regenerate the manifest.
 
 ## Development favicons
 

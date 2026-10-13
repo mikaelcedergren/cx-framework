@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
   "componentCount": 138,
-  "catalogSha256": "96b6076528b8a3f2da3431b146127471a3a1af77d902ac45183452f954ea7634",
+  "catalogSha256": "bbb5763fcc734ced054ee548cf1c51b960ef360c9af0001970b48649b656c9c6",
   "components": [
     {
       "name": "cx-account-control",
@@ -531,7 +531,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "0f90c4af92e20bc6487a8f2f042d23e2d4d9a31df683bfad92ad477b7f99ce54"
+          "sha256": "0c731c071238ed24f32f808ecfe222f4bb2a515e2f404f4eb655ebb62f24622d"
         },
         "template": {
           "kind": "external",
@@ -627,7 +627,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "422fb9667b894a62d84e387b399bdfd2f708095f9d85a95966e8a1b446a2b3fe"
+            "sha256": "dc073585d9a111fcb71206425a2c38c89c4103772586f7068ee0f12c2d78a3d7"
           }
         ]
       }
@@ -6004,7 +6004,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "186c5f1672fedd744d28012eab0960b75f43bfd128ee826659a3cd0c41b14f0a"
+          "sha256": "00cb031d57e402bc25d4f2b7ee458bbdeac85bd813b188c22d0a9ff2144de25e"
         },
         "template": {
           "kind": "external",
@@ -6762,7 +6762,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "192570f91103ce970adfffa890fae06d5978d19ed1eef8569a958573a1975050"
+            "sha256": "d9da0f8e23f803b370db48d630e6e87cd2f17f5e2c3c290dfece66da5981674b"
           }
         ]
       }
@@ -15663,17 +15663,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "bc19f412975d7a1a7388a2d9aaa91c792a99dff272025dab3ad39bce72ab34dd"
+          "sha256": "228749bf500ef9fcb36d0310194656876e9ee5f031c49ffd920be5696eff6e45"
         },
         "template": {
           "kind": "external",
-          "sha256": "3043fd50de2b2099cf3affccbd83d866b1ade194a2306ba9b106f9d120766eb3"
+          "sha256": "c9743beada2663af43f9db62af8490e47f90c31d8e90eae60818c67c7b3933c1"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "0f56e19283bca4ebeb1da55dc4c3766ba961a76eaee84c0e6e72de31028eaa64"
+            "sha256": "3d041abc478ae6c3af3f676674066be3049dfcd45fac8472f632848a4df011df"
           }
         ]
       }
