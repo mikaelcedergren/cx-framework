@@ -242,12 +242,13 @@ export class CxMastheadComponent {
         // Measure the unshrunk brand synchronously, even when its name was hidden.
         // Reusing its compact width would oscillate between the two presentations.
         brand.classList.add("cx-masthead__brand--measuring");
-        const fullWidth = brand.getBoundingClientRect().width;
+        // Use layout dimensions throughout, so a scaled preview has the same fit.
+        const fullWidth = brand.offsetWidth;
         const style = this.document.defaultView.getComputedStyle(inner);
         const available = inner.clientWidth -
             parseFloat(style.paddingLeft) -
             parseFloat(style.paddingRight) -
-            cluster.getBoundingClientRect().width -
+            cluster.offsetWidth -
             parseFloat(style.columnGap);
         brand.classList.remove("cx-masthead__brand--measuring");
         brand.classList.toggle("cx-masthead__brand--symbol-only", fullWidth > available + 0.5);

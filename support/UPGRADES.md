@@ -20,6 +20,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.14
+
+- `cx-masthead` uses layout dimensions for brand fitting, keeping the same
+  symbol-only threshold inside scaled previews and presentations. No consumer
+  changes are needed beyond the custom-brand markers documented in 0.17.13.
+
 ## 0.17.13
 
 - `cx-masthead` keeps only the brand symbol when the full brand cannot fit beside
