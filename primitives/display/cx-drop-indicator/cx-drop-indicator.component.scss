@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  position: relative;
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  background: var(--primary-opacity);
+  pointer-events: none;
+}
+
+:host::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: calc(var(--border-width) * 2) dashed var(--primary);
+  border-radius: inherit;
+}
+
+.cx-drop-indicator__sizer {
+  visibility: hidden;
+}
+
+.cx-drop-indicator__sizer:empty {
+  height: var(--controller-size);
+}

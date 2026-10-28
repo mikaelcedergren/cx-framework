@@ -19,7 +19,13 @@
   <div class="cx-card__header">
     <div class="cx-card__identity">
       @if (icon; as iconName) {
-        <cx-icon class="cx-card__icon" [icon]="iconName" [size]="20" />
+        <cx-icon
+          class="cx-card__icon"
+          [icon]="iconName"
+          [size]="iconShape === 'none' ? 20 : 32"
+          [mood]="mood"
+          [shape]="iconShape"
+        />
       }
       @if (hasHeading()) {
         <div class="cx-card__heading">{{ heading!.trim() }}</div>

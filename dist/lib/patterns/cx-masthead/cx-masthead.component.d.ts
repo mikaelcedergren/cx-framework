@@ -56,6 +56,10 @@ export declare class CxMastheadComponent implements OnDestroy {
     private readonly positionListener;
     private readonly visibilityObserver;
     private resizeObserver?;
+    private brandResizeObserver?;
+    private brandObservedElements;
+    private brandMutationObserver?;
+    private readonly fontListener;
     private scrollTarget?;
     protected readonly headerHeight: import("@angular/core").WritableSignal<number>;
     protected readonly scrolled: import("@angular/core").WritableSignal<boolean>;
@@ -78,7 +82,13 @@ export declare class CxMastheadComponent implements OnDestroy {
     private itemsValue;
     private menuGroupsValue;
     private readonly expandedGroups;
-    /** Brand title shown next to the logo, e.g. a name or product wordmark. */
+    private observeBrandFit;
+    /**
+     * Custom brands opt in with cxMastheadSymbol and cxMastheadName on their
+     * symbol and name. The name remains in the accessibility tree when compact.
+     */
+    private syncBrandFit;
+    /** Brand name. With a logo, it becomes visually hidden when the full brand no longer fits. */
     heading: string;
     /** Icon used as the brand mark when no `[brand]` slot or `logoSrc` is provided. */
     logo: CxIconName | undefined;

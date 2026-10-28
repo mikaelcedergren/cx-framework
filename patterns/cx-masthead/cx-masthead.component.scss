@@ -71,6 +71,7 @@ cx-masthead.cx-masthead-host--sticky {
 /* ---- Brand ---- */
 
 .cx-masthead__brand {
+  position: relative;
   display: inline-flex;
   min-width: 0;
   align-items: center;
@@ -131,6 +132,31 @@ cx-masthead.cx-masthead-host--sticky {
   line-height: var(--line-height-heading);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// Custom brands mark the two parts rather than exposing product-specific selectors.
+.cx-masthead__brand [cxMastheadSymbol] {
+  flex-shrink: 0;
+}
+
+.cx-masthead__brand [cxMastheadName] {
+  white-space: nowrap;
+}
+
+.cx-masthead__brand--measuring {
+  flex: 0 0 auto;
+  width: max-content;
+}
+
+.cx-masthead__brand--symbol-only [cxMastheadName] {
+  // Keep the original link name and focus target without occupying row space.
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
 /* ---- Right cluster ---- */

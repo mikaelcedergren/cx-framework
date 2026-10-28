@@ -119,6 +119,10 @@ export class CxMastheadComponent implements OnDestroy {
     },
   );
   private resizeObserver?: ResizeObserver;
+  private brandResizeObserver?: ResizeObserver;
+  private brandObservedElements: Element[] = [];
+  private brandMutationObserver?: MutationObserver;
+  private readonly fontListener = () => this.syncBrandFit();
   private scrollTarget?: HTMLElement | Document;
   protected readonly headerHeight = signal(0);
   protected readonly scrolled = signal(false);
@@ -162,6 +166,7 @@ export class CxMastheadComponent implements OnDestroy {
     });
     inject(DestroyRef).onDestroy(() => navigation?.unsubscribe());
     afterEveryRender(() => {
+      this.observeBrandFit();
       if (!this.resizeObserver && typeof ResizeObserver !== "undefined") {
         const header =
           this.host.nativeElement.querySelector<HTMLElement>(".cx-masthead")!;
@@ -205,6 +210,9 @@ export class CxMastheadComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.finishClose();
     this.resizeObserver?.disconnect();
+    this.brandResizeObserver?.disconnect();
+    this.brandMutationObserver?.disconnect();
+    this.document.fonts?.removeEventListener("loadingdone", this.fontListener);
     this.scrollTarget?.removeEventListener("scroll", this.scrollListener);
   }
 
@@ -290,7 +298,83 @@ export class CxMastheadComponent implements OnDestroy {
     new Map(),
   );
 
-  /** Brand title shown next to the logo, e.g. a name or product wordmark. */
+  private observeBrandFit(): void {
+    const inner = this.host.nativeElement.querySelector<HTMLElement>(
+      ".cx-masthead__inner",
+    );
+    const brand = inner?.querySelector<HTMLElement>(".cx-masthead__brand");
+    const cluster = inner?.querySelector<HTMLElement>(".cx-masthead__cluster");
+    if (!inner || !brand || !cluster || typeof ResizeObserver === "undefined")
+      return;
+    const parts = Array.from(
+      brand.querySelectorAll<HTMLElement>(
+        "[cxMastheadName], [cxMastheadSymbol]",
+      ),
+    );
+    const elements = [inner, cluster, brand, ...parts];
+    if (
+      elements.length === this.brandObservedElements.length &&
+      elements.every(
+        (element, index) => element === this.brandObservedElements[index],
+      )
+    )
+      return;
+
+    if (!this.brandResizeObserver) {
+      this.brandResizeObserver = new ResizeObserver(() => this.syncBrandFit());
+      this.brandMutationObserver = new MutationObserver(() => {
+        this.observeBrandFit();
+        this.syncBrandFit();
+      });
+      this.document.fonts?.addEventListener("loadingdone", this.fontListener);
+    }
+    this.brandResizeObserver.disconnect();
+    // Observe available space and intrinsic parts, not the brand wrapper whose
+    // width we change. Content changes also matter while the name is clipped.
+    [inner, cluster, ...parts].forEach((element) =>
+      this.brandResizeObserver!.observe(element),
+    );
+    this.brandMutationObserver!.disconnect();
+    this.brandMutationObserver!.observe(brand, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+    this.brandObservedElements = elements;
+    this.syncBrandFit();
+  }
+
+  /**
+   * Custom brands opt in with cxMastheadSymbol and cxMastheadName on their
+   * symbol and name. The name remains in the accessibility tree when compact.
+   */
+  private syncBrandFit(): void {
+    const [inner, cluster, brand] = this.brandObservedElements as HTMLElement[];
+    if (!brand) return;
+    const name = brand.querySelector<HTMLElement>("[cxMastheadName]");
+    const symbol = brand.querySelector<HTMLElement>("[cxMastheadSymbol]");
+    brand.classList.remove("cx-masthead__brand--symbol-only");
+    if (!name || !symbol) return;
+
+    // Measure the unshrunk brand synchronously, even when its name was hidden.
+    // Reusing its compact width would oscillate between the two presentations.
+    brand.classList.add("cx-masthead__brand--measuring");
+    const fullWidth = brand.getBoundingClientRect().width;
+    const style = this.document.defaultView!.getComputedStyle(inner);
+    const available =
+      inner.clientWidth -
+      parseFloat(style.paddingLeft) -
+      parseFloat(style.paddingRight) -
+      cluster.getBoundingClientRect().width -
+      parseFloat(style.columnGap);
+    brand.classList.remove("cx-masthead__brand--measuring");
+    brand.classList.toggle(
+      "cx-masthead__brand--symbol-only",
+      fullWidth > available + 0.5,
+    );
+  }
+
+  /** Brand name. With a logo, it becomes visually hidden when the full brand no longer fits. */
   @Input() heading = "";
   /** Icon used as the brand mark when no `[brand]` slot or `logoSrc` is provided. */
   @Input() logo: CxIconName | undefined;

@@ -67,7 +67,8 @@
   align-items: center;
   justify-content: center;
   border: var(--line);
-  border-radius: var(--radius-sm);
+  // Preserve the square silhouette even without squircle support.
+  border-radius: min(var(--radius-xs), calc(var(--choice-control-size) / 4));
   background: var(--opacity-low);
   color: var(--on-choice-control);
   flex: 0 0 auto;

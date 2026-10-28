@@ -1,5 +1,6 @@
 import { AfterViewInit, EventEmitter, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { type CxIconName } from "../../../icons/manifest";
+import { type CxIconShape } from "../../media/cx-icon";
 import { type CxTabItem } from "../../navigation/cx-tabs";
 import { type CxMenuItem } from "../../overlay/cx-menu";
 import * as i0 from "@angular/core";
@@ -21,6 +22,8 @@ export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDest
     private cardMetaRef?;
     heading: string | undefined;
     icon: CxIconName | undefined;
+    /** Optional header icon treatment, delegated to cx-icon. */
+    iconShape: CxIconShape;
     mood: CxCardMood;
     variant: CxCardVariant;
     /** Preset outer inset; default preserves the original section spacing. */
@@ -76,7 +79,7 @@ export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDest
     protected resolvedMenuAriaLabel(): string;
     protected onMenuItemSelect(itemId: string): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxCardComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxCardComponent, "cx-card", never, { "heading": { "alias": "heading"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "previewHeight": { "alias": "previewHeight"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; }, { "menuItemSelect": "menuItemSelect"; "pressed": "pressed"; "selectedTabIdChange": "selectedTabIdChange"; }, never, ["[slot=meta], [cxCardMeta]", "*", "[slot=footer], [cxCardFooter]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxCardComponent, "cx-card", never, { "heading": { "alias": "heading"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "iconShape": { "alias": "iconShape"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "variant": { "alias": "variant"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "borderRadius": { "alias": "borderRadius"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "menuItems": { "alias": "menuItems"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "previewHeight": { "alias": "previewHeight"; "required": false; }; "tabs": { "alias": "tabs"; "required": false; }; "selectedTabId": { "alias": "selectedTabId"; "required": false; }; "tabsAriaLabel": { "alias": "tabsAriaLabel"; "required": false; }; }, { "menuItemSelect": "menuItemSelect"; "pressed": "pressed"; "selectedTabIdChange": "selectedTabIdChange"; }, never, ["[slot=meta], [cxCardMeta]", "*", "[slot=footer], [cxCardFooter]"], true, never>;
     static ngAcceptInputType_interactive: unknown;
     static ngAcceptInputType_expandable: unknown;
 }

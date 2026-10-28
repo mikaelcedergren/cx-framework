@@ -20,6 +20,32 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.13
+
+- `cx-masthead` keeps only the brand symbol when the full brand cannot fit beside
+  navigation and actions, restoring the name when space returns. The accessible
+  name and home link remain unchanged. Built-in logo/heading brands need no changes;
+  text-only brands remain named. Custom brand links opt in by marking their sibling
+  symbol and plain-text name with `cxMastheadSymbol` and `cxMastheadName`. Omit the
+  built-in brand inputs and keep the symbol decorative. No viewport breakpoint or
+  consumer CSS override is needed.
+
+- `cx-checkbox` retains a square silhouette with small rounded corners in browsers
+  without `corner-shape` support, including Safari. Its API is unchanged; consumers
+  need no overrides. Radius guidance now explicitly accounts for element size,
+  perceived roundness and the control's semantic shape.
+
+- `cx-drop-indicator` adds a visual landing marker for block reordering. Project
+  an inert sizing copy through the default content slot to match the destination
+  footprint; without content it reserves one standard control height. Render only
+  the current valid destination. The collection still owns drag handling, sorting,
+  cancellation and accessible announcements. No inputs or events are required.
+
+- `cx-card` adds `iconShape`, default `none`, using the existing `CxIconShape`
+  square and circle treatments. Card mood colors the icon and its shape through
+  `cx-icon`. Bare icons retain their 20px size; shaped icons use a 32px frame
+  with a 20px glyph. Existing cards keep their current presentation.
+
 ## 0.17.12
 
 - The portable bootstrap now requires checking surface purpose, workflow ownership,

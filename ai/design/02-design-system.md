@@ -71,12 +71,12 @@ purpose → role → information → component role → local implementation →
 
 [MUST] Before selecting components and again before handing off a design, apply the following check to each material task group. Keep a compact decision record in working notes or the existing brief; this is not a new user-facing checklist or approval step.
 
-| Check         | Decision to establish                                                                                                        | Owning rules                                                                                           |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Relationship  | What does each action affect, and which field owns each hint? Keep that group together.                                      | `RULE-ID: layout.relationships`, `RULE-ID: forms.action-scope`, `RULE-ID: field-hints.start-alignment` |
-| Feedback      | What already communicates activity, completion, or failure, including the surrounding platform? Identify any remaining need. | `RULE-ID: interaction.visible-response`, `RULE-ID: feedback.sufficient`                                |
-| Removal       | What would the user lose if each optional text, control, or container disappeared? No loss means remove it. Check the visible words against their surrounding context as well as removing whole elements. | `RULE-ID: content.scannable`, `RULE-ID: copy.minimal-first`, `RULE-ID: copy.no-context-restatement` |
-| Repeat action | Can the original available control already repeat or retry the same action?                                                  | `RULE-ID: interaction.repeat-action`                                                                   |
+| Check         | Decision to establish                                                                                                                                                                                     | Owning rules                                                                                           |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Relationship  | What does each action affect, and which field owns each hint? Keep that group together.                                                                                                                   | `RULE-ID: layout.relationships`, `RULE-ID: forms.action-scope`, `RULE-ID: field-hints.start-alignment` |
+| Feedback      | What already communicates activity, completion, or failure, including the surrounding platform? Identify any remaining need.                                                                              | `RULE-ID: interaction.visible-response`, `RULE-ID: feedback.sufficient`                                |
+| Removal       | What would the user lose if each optional text, control, or container disappeared? No loss means remove it. Check the visible words against their surrounding context as well as removing whole elements. | `RULE-ID: content.scannable`, `RULE-ID: copy.minimal-first`, `RULE-ID: copy.no-context-restatement`    |
+| Repeat action | Can the original available control already repeat or retry the same action?                                                                                                                               | `RULE-ID: interaction.repeat-action`                                                                   |
 
 [MUST] Evaluate these checks on an assembled visual arrangement with the actual visible labels and hint text, not only a list of components or intentions. A compact spatial sketch in the working notes is enough; no extra user-facing deliverable is required. For a field and its action, show their order, shared row, input/button alignment, and the hint’s attachment to the field. Align the action with the input box, not the combined height of input and hint. Use `RULE-ID: copy.labels.object` and `RULE-ID: copy.buttons.object` to trim wording in that visible context.
 
@@ -157,6 +157,8 @@ purpose → role → information → component role → local implementation →
 [SHOULD] Use ordinary body text for most component copy. Reserve smaller roles for labels, helper text, metadata, captions, badges, shortcut keys, chart ticks, and other genuinely secondary content.
 
 [MUST] Use radius and shadow according to their semantic roles. [SHOULD] Reserve stronger depth for floating surfaces; grounded regions rely on surfaces, spacing, opacity, and restrained boundaries.
+
+[MUST] Apply `RULE-ID: tokens.radius-perception` in `03-ux-rules.md` when choosing corner radii for differently sized elements and verifying browser fallbacks.
 
 [MUST] Motion uses the consuming product's named motion roles and clarifies state, orientation, or continuity. It never delays interaction or moves the page around someone who is reading.
 

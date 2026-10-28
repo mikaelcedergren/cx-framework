@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 138,
-  "catalogSha256": "bba21e0f075da964359f30a701f11eb5141d3d9653cd86b3837abc746b14fed0",
+  "componentCount": 139,
+  "catalogSha256": "03f62b350e56e1c2b13b617ec238fda5a0aa3d8486fa8c1eca5af652ff466067",
   "components": [
     {
       "name": "cx-account-control",
@@ -1737,6 +1737,15 @@
             "source": "decorator"
           },
           {
+            "binding": "iconShape",
+            "member": "iconShape",
+            "type": "CxIconShape",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"none\"",
+            "source": "decorator"
+          },
+          {
             "binding": "interactive",
             "member": "interactive",
             "type": "boolean",
@@ -1873,17 +1882,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "f9a3c031764a15408694e08fb3649b4834195c99aab7cdc13c34cab194d842d4"
+          "sha256": "096b1c09b17ac347b7ec09cc0fcee153aa66ce9ca12422ef1699af879a1aea8d"
         },
         "template": {
           "kind": "external",
-          "sha256": "12b8ea89e5eb5a44a317cad2f8eadd57d766085f23c0f55b4993630af8476200"
+          "sha256": "3d36539b56ee2ac8c93ae90a8b08fe9bc82f77365c686d30710f149edac361b1"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "f34151bee8fdc1a4cde54afa17eaefbd2cd356a8bda139622d4803ac70b743f4"
+            "sha256": "1539a9abee6f90ade8b736480b6de31616eb6c2cd5e4935ee033163354cdb0c8"
           }
         ]
       }
@@ -2160,7 +2169,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "aeef1ef903e6f522348c3c9fc08d6c256b3644550d45e65e97db7c0a7ee17fbc"
+            "sha256": "17f42b621cd7fe5a23dc1920eb4bca84476adba0e2d2de2ab369d38ebccfdc45"
           }
         ]
       }
@@ -3797,6 +3806,42 @@
             "ordinal": 1,
             "kind": "external",
             "sha256": "cb2792afb1b3289fc601f8c3a530557a1339f8e487bdd52a80678243914bb67a"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-drop-indicator",
+      "area": "primitive",
+      "category": "display",
+      "kind": "component",
+      "selectors": [
+        "cx-drop-indicator"
+      ],
+      "publicApi": {
+        "symbol": "CxDropIndicatorComponent",
+        "inputs": [],
+        "outputs": []
+      },
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "*"
+        }
+      ],
+      "evidence": {
+        "source": {
+          "sha256": "9044d6c9e3f22574346ecc020e56b1214243813280c3a918cabab13bc04134db"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "fefccd64c3ffd6c9c11575f01e03721c3712b4f7f8ff0fa725f35ad771342008"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "42728c72c36a3e56563c10848a1941e2aead2a2daaedf37bf3ec8b008b08da5c"
           }
         ]
       }
@@ -7656,17 +7701,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "e0ea7cf19b3df5adac5cbe4144ec3daeed7bfe7238479a148298ef5af7f33a2b"
+          "sha256": "b05a04ea0bf194168f95f26beed57239b41ac2654739bdede4d1da45af03cdf2"
         },
         "template": {
           "kind": "external",
-          "sha256": "076ce95be2c006eb8a8843b6f3ec78b416d5108e7beedb75f2c6d8f21d4338df"
+          "sha256": "780d69669d09f50133d94a40763af391ab3ddd591243f656d9fcea65eecef96e"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "27f6bfeecf864c27d75d2b0a80eb14b5b8c5f009b1d265089ca65ba16a3c24c2"
+            "sha256": "4d5a936a5c94be93941248ff2229ecb4f8622268ab7ab83e28f8b7897421b062"
           }
         ]
       }

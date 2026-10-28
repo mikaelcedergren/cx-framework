@@ -55,6 +55,7 @@ export * from './primitives/display/cx-card/index.js';
 export * from './primitives/display/cx-avatar/index.js';
 export * from './primitives/display/cx-code-block/index.js';
 export * from './primitives/display/cx-divider/index.js';
+export * from './primitives/display/cx-drop-indicator/index.js';
 export * from './primitives/display/cx-expansion-panel/index.js';
 export * from './primitives/display/cx-log/index.js';
 export * from './primitives/display/cx-log-step/index.js';

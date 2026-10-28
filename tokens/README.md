@@ -139,6 +139,8 @@ Card radius or Image `round` still expresses that deliberate shape.
 
 Semantic circles and pills stay round regardless of the rectangular corner profile. The default radius scale derives from `--corner-softness: 4px`: `--radius-none` is 0; `xs`, `sm`, `md`, `lg`, `media-lg`, `xl`, and `2xl` are respectively 1×, 2×, 3×, 4×, 6×, 8×, and 16× softness; `--radius-pill` is 999px.
 
+Choose from this scale using `tokens.radius-perception` in [the shared token rules](../ai/design/03-ux-rules.md#tokens-and-color). For example, the 16px checkbox uses `--radius-xs` (4px by default), capped at one quarter of its size. An 8px conventional radius would turn that square into a circle. The square profile still resolves its corners to zero. Check the conventional rounded fallback as well as `squircle`; browser support must not change a control's recognisable shape.
+
 Use named shadows only for real elevation: low for raised controls, mid for menus and popovers, and high for dialogs and strong overlays. Motion uses named tokens, clarifies change, and never moves the page around someone who is reading.
 
 Motion durations range from `--motion-fast` (120ms), through `--motion-base`

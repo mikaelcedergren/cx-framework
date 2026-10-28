@@ -192,12 +192,23 @@
 
 <ng-template #brandContent>
   @if (logoSrc) {
-    <img class="cx-masthead__logo" [src]="logoSrc" alt="" aria-hidden="true" />
+    <img
+      cxMastheadSymbol
+      class="cx-masthead__logo"
+      [src]="logoSrc"
+      alt=""
+      aria-hidden="true"
+    />
   } @else if (logo) {
-    <cx-icon class="cx-masthead__logo-icon" [icon]="logo" [size]="24" />
+    <cx-icon
+      cxMastheadSymbol
+      class="cx-masthead__logo-icon"
+      [icon]="logo"
+      [size]="24"
+    />
   }
   @if (heading) {
-    <span class="cx-masthead__title" data-cx-tooltip-overflow>{{
+    <span cxMastheadName class="cx-masthead__title" data-cx-tooltip-overflow>{{
       heading
     }}</span>
   }

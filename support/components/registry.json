@@ -372,6 +372,13 @@
       "path": "primitives/display/cx-divider/cx-divider.component.ts"
     },
     {
+      "name": "cx-drop-indicator",
+      "selectors": ["cx-drop-indicator"],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-drop-indicator/cx-drop-indicator.component.ts"
+    },
+    {
       "name": "cx-expansion-panel",
       "selectors": ["cx-expansion-panel"],
       "area": "primitive",

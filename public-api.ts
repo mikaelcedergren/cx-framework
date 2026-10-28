@@ -60,6 +60,7 @@ export * from './primitives/display/cx-card';
 export * from './primitives/display/cx-avatar';
 export * from './primitives/display/cx-code-block';
 export * from './primitives/display/cx-divider';
+export * from './primitives/display/cx-drop-indicator';
 export * from './primitives/display/cx-expansion-panel';
 export * from './primitives/display/cx-log';
 export * from './primitives/display/cx-log-step';

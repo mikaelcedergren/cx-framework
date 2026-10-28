@@ -15,7 +15,7 @@ import {
 } from "@angular/core";
 import { type CxIconName } from "../../../icons/manifest";
 import { CxIconButtonComponent } from "../../actions/cx-icon-button";
-import { CxIconComponent } from "../../media/cx-icon";
+import { CxIconComponent, type CxIconShape } from "../../media/cx-icon";
 import { CxTabsComponent, type CxTabItem } from "../../navigation/cx-tabs";
 import {
   CxMenuComponent,
@@ -54,12 +54,6 @@ let nextCardContentId = 0;
     "[class.cx-card-host--frosted]": 'variant === "frosted"',
     "[class.cx-card-host--border]": 'variant === "border"',
     "[class.cx-card-host--interactive]": "activatable",
-    "[class.cx-card-host--mood-primary]": 'mood === "primary"',
-    "[class.cx-card-host--mood-accent]": 'mood === "accent"',
-    "[class.cx-card-host--mood-info]": 'mood === "info"',
-    "[class.cx-card-host--mood-success]": 'mood === "success"',
-    "[class.cx-card-host--mood-warning]": 'mood === "warning"',
-    "[class.cx-card-host--mood-danger]": 'mood === "danger"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -84,6 +78,8 @@ export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   @Input() heading: string | undefined;
   @Input() icon: CxIconName | undefined;
+  /** Optional header icon treatment, delegated to cx-icon. */
+  @Input() iconShape: CxIconShape = "none";
   @Input() mood: CxCardMood = "default";
   @Input() variant: CxCardVariant = "default";
   /** Preset outer inset; default preserves the original section spacing. */
