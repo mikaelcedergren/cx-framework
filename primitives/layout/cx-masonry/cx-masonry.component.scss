@@ -24,7 +24,10 @@ cx-masonry > .cx-masonry:empty {
 // swallows the trailing item margin of every column.
 
 cx-masonry > .cx-masonry > * {
-  display: block;
+  // Atomic inline boxes keep an item and its trailing gap together at column
+  // breaks. WebKit can carry a block item margin into the next column.
+  display: inline-block;
+  vertical-align: top;
   width: 100%;
   box-sizing: border-box;
   break-inside: avoid;

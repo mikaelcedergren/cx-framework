@@ -20,6 +20,12 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.15
+
+- `cx-masonry` keeps the first item in every column aligned to the top in Safari,
+  while preserving natural item heights and the configured gaps. No consumer
+  markup or API changes are needed.
+
 ## 0.17.14
 
 - `cx-masthead` uses layout dimensions for brand fitting, keeping the same
