@@ -7,7 +7,7 @@
  * makes the name lie; `condensed` and `slab` are deliberate exceptions, because
  * width and serif structure are genuinely why those faces get picked.
  *
- * The values live in `tokens/_typography.scss` as `--typeface-*`. This file is
+ * The values live in `tokens/_core.scss` as `--typeface-*`. This file is
  * the same menu for code that has to name a face — a Playground project
  * declaring the one it opens in, say — so nothing has to hardcode the custom
  * property name or the font itself.

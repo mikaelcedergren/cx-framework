@@ -9,13 +9,13 @@
   height: var(--controller-size);
   padding: 0 var(--space-sm);
   border: var(--border-width) solid var(--opacity-mid);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: transparent;
   color: var(--ink);
   font-family: inherit;
   font-size: var(--font-size-body);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   cursor: pointer;
   transition:
     border-color var(--motion-fast) ease,
@@ -34,7 +34,7 @@
 }
 
 button.cx-reaction:hover {
-  border-color: var(--border-hover);
+  border-color: var(--opacity-mid);
   background: var(--opacity-low);
 }
 
@@ -62,7 +62,7 @@ button.cx-reaction--selected:hover {
 }
 
 button.cx-reaction:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   cursor: not-allowed;
 }
 

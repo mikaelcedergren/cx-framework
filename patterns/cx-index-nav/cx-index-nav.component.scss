@@ -18,7 +18,7 @@
 }
 
 .cx-index-nav--collapsed {
-  width: var(--controller-size-large);
+  width: 48px;
 }
 
 .cx-index-nav--transparent {
@@ -54,7 +54,7 @@
   color: var(--ink);
   font-size: var(--font-size-title-3);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-heading);
+  line-height: var(--line-height-tight);
   overflow-wrap: anywhere;
 }
 
@@ -225,8 +225,8 @@ button.cx-index-nav__folder--toggle {
 }
 
 .cx-index-nav__item:active:not(.cx-index-nav__item--disabled) {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-index-nav__item--active {
@@ -243,7 +243,7 @@ button.cx-index-nav__folder--toggle {
   top: 4px;
   bottom: 4px;
   width: 2px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--primary);
 }
@@ -252,7 +252,7 @@ button.cx-index-nav__folder--toggle {
   color: var(--ink);
   cursor: default;
   pointer-events: none;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-index-nav__label {
@@ -279,7 +279,7 @@ button.cx-index-nav__folder--toggle {
   align-items: center;
   justify-content: center;
   padding: 0 var(--space-2xs);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);

@@ -51,12 +51,12 @@
 }
 
 .cx-file-upload__zone:hover {
-  border-color: var(--border-hover);
+  border-color: var(--opacity-mid);
   background: var(--opacity-low);
 }
 
 .cx-file-upload__zone:focus-within {
-  border-color: var(--border-open);
+  border-color: var(--opacity-mid);
 }
 
 .cx-file-upload__zone--dragging,
@@ -68,7 +68,7 @@
 
 .cx-file-upload__zone--disabled {
   cursor: not-allowed;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-file-upload__zone--disabled:hover {
@@ -139,5 +139,5 @@
   flex: 0 0 auto;
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }

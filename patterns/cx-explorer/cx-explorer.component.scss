@@ -68,7 +68,7 @@
   inset-inline-end: var(--space-xs);
   width: 3px;
   height: calc(100% - (var(--space-sm) * 2));
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: transparent;
   content: "";

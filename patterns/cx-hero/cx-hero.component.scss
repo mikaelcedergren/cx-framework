@@ -19,7 +19,7 @@ cx-hero .cx-hero {
   padding-block: var(--space-2xl);
   // Match a cx-container in the same region, including narrower embedded heroes.
   // Cover media remains attached to the full header bounds.
-  padding-inline: max(var(--gutter-page), calc((100% - var(--measure-xl)) / 2));
+  padding-inline: max(var(--gutter-page), calc((100% - var(--content-width-xl)) / 2));
   background: var(--surface);
   color: var(--ink);
 }
@@ -28,7 +28,7 @@ cx-hero .cx-hero__copy {
   position: relative;
   z-index: 1;
   display: grid;
-  width: min(100%, var(--measure-lg));
+  width: min(100%, var(--content-width-lg));
   min-width: 0;
   align-content: center;
   justify-self: start;
@@ -37,7 +37,7 @@ cx-hero .cx-hero__copy {
 
 cx-hero .cx-hero--under-masthead {
   padding-top: calc(
-    var(--space-2xl) + var(--controller-size-large) + var(--space-md) * 2
+    var(--space-2xl) + 48px + var(--space-md) * 2
   );
 }
 
@@ -48,7 +48,7 @@ cx-hero .cx-hero__message {
   // additional characters of room, independent of its smaller type size.
   max-width: 18ch;
   font-family: var(--font-family-heading);
-  font-size: var(--font-size-display);
+  font-size: var(--font-size-hero);
   min-width: 0;
   gap: var(--space-lg);
 }
@@ -57,7 +57,7 @@ cx-hero .cx-hero__heading {
   max-width: 16ch;
   color: var(--ink);
   font-family: var(--font-family-heading);
-  font-size: var(--font-size-display);
+  font-size: var(--font-size-hero);
   font-weight: var(--font-weight-editorial-heading);
   line-height: var(--line-height-display);
   overflow-wrap: anywhere;
@@ -89,7 +89,7 @@ cx-hero .cx-hero__body {
   font-family: var(--font-family-base);
   color: var(--opacity-high);
   font-size: var(--font-size-editorial-lead);
-  line-height: var(--line-height-editorial-lead);
+  line-height: var(--line-height-relaxed);
 }
 
 cx-hero .cx-hero__actions {
@@ -100,7 +100,7 @@ cx-hero .cx-hero__meta {
   gap: var(--space-md);
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 cx-hero .cx-hero__context:empty,
@@ -174,7 +174,7 @@ cx-hero .cx-hero--center .cx-hero__meta {
 }
 
 cx-hero .cx-hero--stacked .cx-hero__media {
-  max-width: var(--measure-xl);
+  max-width: var(--content-width-xl);
   justify-self: center;
 }
 
@@ -208,14 +208,14 @@ cx-hero .cx-hero--flush .cx-hero__copy {
   padding-block: var(--space-2xl);
   padding-inline: max(
       var(--gutter-page),
-      calc((100cqw - var(--measure-xl)) / 2)
+      calc((100cqw - var(--content-width-xl)) / 2)
     )
     var(--space-2xl);
 }
 
 cx-hero .cx-hero--flush.cx-hero--media-start .cx-hero__copy {
   padding-inline: var(--space-2xl)
-    max(var(--gutter-page), calc((100cqw - var(--measure-xl)) / 2));
+    max(var(--gutter-page), calc((100cqw - var(--content-width-xl)) / 2));
 }
 
 // The copy owns masthead clearance in a flush split; the image still reaches
@@ -226,7 +226,7 @@ cx-hero .cx-hero--flush.cx-hero--under-masthead {
 
 cx-hero .cx-hero--flush.cx-hero--under-masthead .cx-hero__copy {
   padding-top: calc(
-    var(--space-2xl) + var(--controller-size-large) + var(--space-md) * 2
+    var(--space-2xl) + 48px + var(--space-md) * 2
   );
 }
 
@@ -375,7 +375,7 @@ cx-hero[data-media-position="bottom"]
 @container (max-width: #{breakpoints.$mobile - 1px}) {
   cx-hero .cx-hero--under-masthead {
     padding-top: calc(
-      var(--space-2xl) + var(--controller-size-large) + var(--space-sm) * 2
+      var(--space-2xl) + 48px + var(--space-sm) * 2
     );
   }
 
@@ -401,7 +401,7 @@ cx-hero[data-media-position="bottom"]
 
   cx-hero .cx-hero--flush.cx-hero--under-masthead .cx-hero__copy {
     padding-top: calc(
-      var(--space-2xl) + var(--controller-size-large) + var(--space-sm) * 2
+      var(--space-2xl) + 48px + var(--space-sm) * 2
     );
   }
 }

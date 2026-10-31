@@ -73,7 +73,7 @@ cx-markdown-editor.cx-markdown-editor-host--document,
 cx-markdown-editor.cx-markdown-editor-host--document
   .cx-markdown-editor__placeholder {
   font-size: var(--font-size-editorial-body);
-  line-height: var(--line-height-editorial-body);
+  line-height: var(--line-height-relaxed);
 }
 
 cx-markdown-editor.cx-markdown-editor-host--disabled .ProseMirror {

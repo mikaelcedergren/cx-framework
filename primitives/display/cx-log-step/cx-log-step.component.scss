@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   border: 2px solid var(--opacity-mid);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--surface);
   color: var(--ink);
@@ -166,5 +166,5 @@
 
 .cx-log-step__description {
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }

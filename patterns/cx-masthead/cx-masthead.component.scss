@@ -59,7 +59,7 @@ cx-masthead.cx-masthead-host--sticky {
   min-width: 0;
   // Include the masthead's bottom border in the total height limit.
   max-height: calc(
-    var(--controller-size-large) + var(--space-md) * 2 - var(--border-width)
+    48px + var(--space-md) * 2 - var(--border-width)
   );
   align-items: center;
   justify-content: space-between;
@@ -129,7 +129,7 @@ cx-masthead.cx-masthead-host--sticky {
   color: var(--ink);
   font-size: var(--font-size-title-3);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-heading);
+  line-height: var(--line-height-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -241,8 +241,8 @@ cx-masthead.cx-masthead-host--sticky {
 }
 
 .cx-masthead__link:active:not(.cx-masthead__link--disabled) {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-masthead__link--active {
@@ -252,19 +252,19 @@ cx-masthead.cx-masthead-host--sticky {
 .cx-masthead__link--disabled {
   cursor: default;
   pointer-events: none;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 /* ---- Collapsed-navigation toggle ---- */
 
 .cx-masthead__toggle-slot {
   display: none;
-  width: var(--controller-size-large);
-  height: var(--controller-size-large);
+  width: 48px;
+  height: 48px;
   flex: 0 0 auto;
   /* Align the visible icon to the page gutter while retaining its full touch target. */
   margin-inline-end: calc(
-    (var(--icon-size-lg) - var(--controller-size-large)) / 2
+    (24px - 48px) / 2
   );
 }
 
@@ -298,8 +298,8 @@ cx-masthead.cx-masthead-host--sticky {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--controller-size-large);
-  height: var(--controller-size-large);
+  width: 48px;
+  height: 48px;
   padding: 0;
   flex: 0 0 auto;
   border: 0;
@@ -317,8 +317,8 @@ cx-masthead.cx-masthead-host--sticky {
 .cx-masthead__toggle-icon {
   position: relative;
   display: block;
-  width: var(--icon-size-lg);
-  height: var(--icon-size-lg);
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
 }
 
@@ -328,7 +328,7 @@ cx-masthead.cx-masthead-host--sticky {
   left: 0;
   width: 100%;
   height: calc(var(--border-width) * 2);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: currentColor;
   transform: translateY(-50%);
   transform-origin: center;
@@ -386,7 +386,7 @@ cx-masthead.cx-masthead-host--sticky {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: min(var(--measure-sm), calc(100% - var(--space-xl)));
+  width: min(var(--content-width-sm), calc(100% - var(--space-xl)));
   height: 100%;
   min-height: 0;
   // Navigation scrolls independently at ordinary heights. At very short
@@ -409,12 +409,12 @@ cx-masthead.cx-masthead-host--sticky {
 
 .cx-masthead__drawer-nav {
   flex: 1 1 auto;
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   overflow: auto;
   overscroll-behavior: contain;
   padding: var(--space-xs);
   // Keep long labels out of the floating toggle's touch target.
-  padding-inline-end: calc(var(--controller-size-large) + var(--space-sm));
+  padding-inline-end: calc(48px + var(--space-sm));
 }
 
 .cx-masthead__drawer-links {
@@ -518,7 +518,7 @@ cx-masthead.cx-masthead-host--sticky {
 
   .cx-masthead__inner {
     max-height: calc(
-      var(--controller-size-large) + var(--space-sm) * 2 - var(--border-width)
+      48px + var(--space-sm) * 2 - var(--border-width)
     );
     padding-block: var(--space-sm);
   }

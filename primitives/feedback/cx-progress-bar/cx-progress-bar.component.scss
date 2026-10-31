@@ -55,7 +55,7 @@
   width: 100%;
   height: var(--space-sm);
   overflow: hidden;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--opacity-low);
 }
@@ -83,7 +83,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
   text-align: start;
 }
 

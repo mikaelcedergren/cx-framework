@@ -736,7 +736,7 @@ const html = `<!doctype html>
 
       .page {
         margin: 0 auto;
-        max-width: var(--measure-xl);
+        max-width: var(--content-width-xl);
         padding: var(--gutter-page);
       }
 
@@ -772,7 +772,7 @@ const html = `<!doctype html>
         gap: var(--space-md);
         grid-template-columns: minmax(160px, 220px) minmax(0, 1fr) auto;
         margin: 0 calc(50% - 50vw) var(--space-md);
-        padding: var(--space-sm) max(var(--gutter-page), calc((100vw - var(--measure-xl)) / 2 + var(--gutter-page)));
+        padding: var(--space-sm) max(var(--gutter-page), calc((100vw - var(--content-width-xl)) / 2 + var(--gutter-page)));
         position: sticky;
         top: 0;
         z-index: 20;
@@ -815,7 +815,7 @@ const html = `<!doctype html>
         appearance: none;
         background: var(--surface);
         border: 1px solid var(--opacity-mid);
-        border-radius: var(--radius-pill);
+        border-radius: var(--radius-full);
         corner-shape: round;
         color: var(--ink);
         cursor: pointer;
@@ -903,7 +903,7 @@ const html = `<!doctype html>
         align-items: center;
         background: var(--danger-opacity);
         border: var(--border-width) solid var(--danger-opacity);
-        border-radius: var(--radius-pill);
+        border-radius: var(--radius-full);
         corner-shape: round;
         color: var(--red);
         display: inline-flex;

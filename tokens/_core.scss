@@ -1,0 +1,293 @@
+// Core tokens: the approved defaults used by Cortex and the published framework.
+// Read README.md for token purposes and the direct-use workflow. New names require
+// explicit approval under tokens.new-global in ../ai/design/03-ux-rules.md.
+// Light is the default colour profile; its explicit selectors preserve that profile.
+// Shared keyboard and responsive treatments override existing tokens below.
+
+@use "breakpoints-scale" as scale;
+
+/* Palette: colour as data or deliberate user choice. Semantic roles reference these hues when they fit.
+   Each hue has a base, alternate shade and transparent fill; themes tune the family together. */
+
+:root,
+:root.theme-light {
+  --blue: #057dff; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #057dff1a; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #0358b2; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #00ccc5; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #00ccc51a; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #018a86; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #88d33d; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #88d33d1a; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #6da82f; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #37c45b; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #37c45b1a; // Translucent green fill that retains the underlying surface.
+  --green-alt: #299143; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #edc31c; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #edc31c1a; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #a68712; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #ff980a; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #ff980a1a; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #b26b05; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #ff6c2e; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #ff6c2e1a; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #b24b20; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #ff4043; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #ff40431a; // Translucent red fill that retains the underlying surface.
+  --red-alt: #992629; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #f2559c; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #f2559c1a; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #a83d6d; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #ae4ede; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #ae4ede1a; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #7a3d99; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #3057f2; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #3057f21a; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #223da8; // Alternate violet shade for hover or stronger hue treatment.
+}
+
+/* Semantic colour: components use these roles directly to express intent.
+   Reference the palette when it supplies the colour; deliberate theme-specific hex values are allowed.
+   Transparency uses #RRGGBBAA. Disabled appearance belongs to each component, not this vocabulary. */
+
+:root,
+:root.theme-light {
+  --primary: var(--blue); // Main forward action and selected choice controls.
+  --primary-opacity: var(--blue-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--blue-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--cyan); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--cyan-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--cyan-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #ffffff; // Main application plane.
+  --surface-alt: #f8f8f8; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #1f1f1f; // Prominent, selected or actionable content.
+  --on-ink: #ffffff; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #fff; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #171717; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--on-emphasis); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #15202f9e; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #15202f14; // Borders, separators and medium-strength structure.
+  --opacity-low: #15202f08; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #16181d04; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--blue); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #1a1a1a66; // Example or empty-state text inside fields; never replaces a label.
+}
+
+/* Spacing: shared proximity and grouping choices. Use the size that expresses the relationship.
+   Surface separation is a separate purpose, even when it has the same numeric value. */
+
+:root {
+  --space-2xs: 2px; // Fine separation within tightly related details.
+  --space-xs: 4px; // Small inset or closely related detail spacing.
+  --space-sm: 8px; // Default gap between close, text-like relationships.
+  --space-md: 16px; // Default gap between separate or visually heavier groups.
+  --space-lg: 24px; // Larger group separation and desktop page-edge breathing room.
+  --space-xl: 32px; // A clear pause between substantial groups.
+  --space-2xl: 64px; // Major separation between page sections.
+  --surface-separation: var(--space-xs); // Inset and seams between framed surfaces; not content padding.
+}
+
+/* Layout and controls: shared content widths and page alignment, plus the two core control heights.
+   Icon dimensions belong to cx-icon; exceptional control sizes belong to their component. */
+
+:root {
+  --controller-size: 32px; // Standard control height for everyday product UI.
+  --controller-size-small: 24px; // Compact control height where the context warrants smaller controls.
+
+  /* Content width — maximum width of a centred content column (cx-measure-*).
+     xl is the page-container measure (cx-container). */
+  --content-width-sm: 360px; // Maximum width for a compact content group or narrow column.
+  --content-width-md: 640px; // Maximum width for a readable text column or focused form.
+  --content-width-lg: 960px; // Maximum width for a broader content section.
+  --content-width-xl: 1180px; // Maximum width of the main centred page content.
+
+  /* Page gutter — horizontal air between content and the viewport edge. The centred variant
+     pads a full-bleed section so its content lines up with a cx-container column. */
+  --gutter-page: var(--space-lg); // Minimum horizontal breathing room at the page edges; smaller on phones.
+  --gutter-centered: max(var(--gutter-page), calc((100vw - var(--content-width-xl)) / 2)); // Aligns full-bleed section content with the centred page column.
+}
+
+@media (max-width: #{scale.$mobile - 1px}) {
+  :root {
+    --gutter-page: var(--space-md); // Minimum horizontal breathing room at the page edges; smaller on phones.
+  }
+}
+
+/* Shape: radius-xs supplies the base amount; corner-softness names the rounding intensity.
+   Named radii are explicit pixel values; themes set their own scale. Components choose by perceived shape. */
+
+:root {
+  --corner-shape: squircle; // Curve technique for rectangular corners: squircle or conventional round.
+  --corner-softness: var(--radius-xs); // Theme rounding intensity; follows radius-xs for proportional component geometry.
+  --radius-none: 0; // Deliberately square corners.
+  --radius-xs: 4px; // Base small radius; keeps tiny controls recognisably rectangular.
+  --radius-sm: 8px; // Small rounded elements.
+  --radius-md: 12px; // Medium rounded elements.
+  --radius-lg: 16px; // Larger rounded elements and surfaces.
+  --radius-media-lg: 24px; // Roomier corner radius for large media.
+  --radius-xl: 32px; // Broad rounding on large surfaces.
+  --radius-2xl: 64px; // Most generous rectangular rounding on large compositions.
+  --radius-full: 999px; // Fully rounded shape, including circles and capsules, independent of corner profile.
+}
+
+/* Shared boundaries: these complete treatments have a purpose across components.
+   Component hover and active states use core colours directly, without extra state aliases. */
+
+:root {
+  --border-width: 1px; // Shared thickness for ordinary structural lines.
+  --line: var(--border-width) solid var(--opacity-mid); // Standard structural border, including medium-contrast separators.
+  --line-discreet: var(--border-width) solid var(--opacity-low); // Quiet structural border for low-emphasis boundaries.
+  --floating-surface-border: 0 solid transparent; // Theme-controlled edge on elevated panels, menus and popovers.
+  --outline-tab: none; // Keyboard-navigation ring; appears only in keyboard-navigation mode.
+  --outline-tab-offset: -2px; // Insets the keyboard ring so it follows the control boundary.
+}
+
+:root[data-cx-keyboard-navigation] {
+  --outline-tab: 2px solid var(--primary); // Keyboard-navigation ring; appears only in keyboard-navigation mode.
+}
+
+/* Typography: separate the everyday application hierarchy from deliberate editorial reading.
+   Five line-height roles cover heroes, controls, tight text, body text and relaxed reading. */
+
+:root {
+  // The fixed half of a product's identity. Body and mono do not vary: every
+  // product reads in Inter and shows code in Roboto Mono, so these are literal
+  // values rather than entries in the typeface menu below.
+  --font-family-base: "Inter", sans-serif; // Shared application and body-text face.
+  --font-family-mono: "Roboto Mono", monospace; // Code, identifiers and other monospaced content.
+
+  // The heading menu — the faces --font-family-heading may point at, named by
+  // voice rather than by font, so swapping the file never makes the name lie.
+  // Exactly one is live per product: an identity here is Inter plus one of
+  // these, never two heading faces on the same page.
+  //
+  // `condensed` and `slab` name construction rather than voice on purpose.
+  // Width and serif structure are the reasons you reach for those faces, so
+  // those are the honest names; less useful construction labels do not belong
+  // here.
+  --typeface-editorial: "Literata", serif; // Literary serif voice for headings.
+  --typeface-friendly: "Raleway", sans-serif; // Open, friendly sans-serif heading voice.
+  --typeface-elegant: "Plus Jakarta Sans", sans-serif; // Refined sans-serif heading voice.
+  --typeface-condensed: "Archivo Narrow", sans-serif; // Narrow heading voice when width is part of the identity.
+  --typeface-slab: "Zilla Slab", serif; // Slab-serif heading voice with a more constructed character.
+
+  // The one role that varies — what .cx-editorial headings and cx-font-serif
+  // render in. A consuming product overrides this single token to pick its
+  // face, and should point it at a --typeface-* entry rather than naming a
+  // font directly, so it inherits whatever that voice resolves to.
+  //
+  // Every face carries real heading weights, including the editorial default.
+  --font-family-heading: var(--typeface-editorial); // Active heading voice; selects one of the shared typefaces.
+
+  --font-size-hero: clamp(40px, 5vw, 72px); // Hero headline: fluid at 5% of viewport width, bounded between 40px and 72px.
+  --font-size-title-1: 24px; // Primary application page heading.
+  --font-size-title-2: 20px; // Section heading below the page title.
+  --font-size-title-3: 18px; // Smaller section or group heading.
+  --font-size-body-lg: 16px; // Larger application body text when hierarchy calls for it.
+  --font-size-body: 14px; // Default application and component text.
+  --font-size-body-sm: 12px; // Secondary labels, hints and metadata.
+  --font-size-body-xs: 10px; // Smallest secondary details, such as compact badges or shortcuts.
+
+  // Editorial roles are deliberately separate from application typography.
+  // An article, landing page, or public information page opts into these as
+  // one reading system; product UI continues to use the fixed scale above.
+  --font-size-editorial-body: 18px; // Body text within the shared article and marketing reading mode.
+  --font-size-editorial-lead: 22px; // Introductory text within the shared editorial reading mode.
+
+  --font-weight-regular: 450; // Normal reading weight.
+  --font-weight-medium: 550; // Moderate emphasis for labels and hierarchy.
+  --font-weight-bold: 700; // Strong emphasis in application typography.
+  --font-weight-editorial-heading: 700; // Heading weight within the shared editorial reading mode.
+
+  --line-height-display: 1.05; // Compact rhythm for large hero headlines.
+  --line-height-control: 1.1; // Compact single-line rhythm inside controls.
+  --line-height-tight: 1.2; // Tight rhythm shared by headings and small text.
+  --line-height-body: 1.3; // Default application text rhythm.
+  --line-height-relaxed: 1.5; // Airier multiline rhythm for reading, hints and messages.
+}
+
+/* Depth: use elevation only when a surface is actually raised above another.
+   Shadow geometry stays coordinated; themes can change its colour and strength. */
+
+:root {
+  --frost-softness: 2px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --shadow-low: 0 1px 1px #0000000e, 0 2px 2px #00000009, 0 4px 4px #00000005; // Low elevation for raised controls and small surfaces.
+  --shadow-mid: 0 1px 1px #0000000f, 0 2px 2px #0000000b, 0 4px 4px #00000009, 0 8px 8px #00000006, 0 16px 16px #00000005; // Floating elevation for menus and popovers.
+  --shadow-high: 0 1px 1px #00000011, 0 3px 3px #0000000d, 0 8px 8px #0000000a, 0 16px 16px #00000008, 0 32px 32px #00000006; // Strong elevation for dialogs and prominent overlays.
+}
+
+/* Motion: short feedback and longer spatial changes share a small duration and easing vocabulary.
+   Components still respect reduced-motion preferences. */
+
+:root {
+  --motion-fast: 120ms; // Immediate control feedback.
+  --motion-base: 180ms; // Standard interface transition.
+  --motion-slow: 240ms; // More visible state or surface transition.
+  --motion-slower: 400ms; // Deliberate spatial movement, such as lifting a card.
+
+  --ease-out: cubic-bezier(0, 0.3, 0.3, 1); // Standard transition that settles gently.
+  --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1); // Pronounced deceleration for arriving surfaces.
+  --ease-out-in: cubic-bezier(0.4, 0, 0.15, 1); // Smooth change between interface states.
+  --ease-in: cubic-bezier(0, 0.4, 0.15, 1); // Acceleration for departure or withdrawal.
+}
+
+/* Layers: one coordinated stacking order keeps overlays and their backdrops in the intended sequence. */
+
+:root {
+  /* Canonical stack: sticky app chrome, nav overlay, detail panel, dialogs,
+     popovers, tooltips, toasts, debug-only layer. */
+  --z-index-sticky: 80; // Sticky content above the normal page plane.
+  --z-index-nav-overlay-backdrop: 90; // Dimming plane behind overlay navigation.
+  --z-index-nav-overlay: 95; // Overlay navigation above its backdrop.
+  --z-index-detail: 100; // Detail panels above ordinary navigation.
+  --z-index-dialog: 1200; // Dialogs above the application layers.
+  --z-index-popover-backdrop: 1250; // Dismissal or dimming plane behind popovers.
+  --z-index-popover: 1300; // Popover surfaces above dialogs.
+  --z-index-tooltip: 1400; // Tooltips above controls and popovers.
+  --z-index-toast: 1500; // Transient notifications above ordinary overlays.
+  --z-index-debug: 9999; // Internal debugging surfaces above the interface.
+}
+
+/* Responsive threshold: exposes the shared Sass breakpoint for inspection and runtime use. */
+
+// Mirror the CSS-free Sass breakpoint for runtime inspection. Component media
+// queries import breakpoints-scale directly, without emitting token definitions.
+:root {
+  --breakpoint-mobile: #{scale.$mobile}; // Phone-layout threshold; Sass uses the same value for media queries.
+}

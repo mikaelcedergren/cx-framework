@@ -22,7 +22,7 @@
   border-radius: var(--radius-sm);
 }
 :host(.cx-icon--circle) {
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
 }
 :host(.cx-icon--subtle) {
@@ -62,13 +62,13 @@
 }
 
 :host(.cx-icon--size-24.cx-icon--shaped) .cx-icon {
-  width: var(--icon-size-sm);
-  height: var(--icon-size-sm);
+  width: 16px;
+  height: 16px;
 }
 
 :host(.cx-icon--size-32.cx-icon--shaped) .cx-icon {
-  width: var(--icon-size-md);
-  height: var(--icon-size-md);
+  width: 20px;
+  height: 20px;
 }
 
 :host(.cx-icon--size-64.cx-icon--shaped) .cx-icon {

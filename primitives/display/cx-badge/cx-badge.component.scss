@@ -37,7 +37,7 @@
   transform: translate(25%, -25%);
   pointer-events: none;
   background: var(--primary);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   color: var(--on-ink);
   box-sizing: border-box;
@@ -79,7 +79,7 @@
 .cx-badge__indicator--dot {
   width: 8px;
   height: 8px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
 }
 
@@ -95,7 +95,7 @@
   right: -2px;
   height: 16px;
   min-width: 16px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   color: var(--surface);
 }

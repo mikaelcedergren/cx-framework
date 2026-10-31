@@ -29,7 +29,7 @@
 
 .cx-tag-field__field-shell:hover:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error),
 .cx-tag-field__field-shell:focus-within:not(.cx-tag-field__field-shell--disabled):not(.cx-tag-field__field-shell--error) {
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
   outline-offset: 0;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .cx-tag-field--large .cx-tag-field__field-shell {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   padding-block: var(--space-sm);
   border-radius: var(--radius-xl);
 }

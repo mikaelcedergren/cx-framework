@@ -69,34 +69,34 @@
 
 .cx-text-area--document {
   .cx-text-area__gutter {
-    line-height: var(--line-height-editorial-body);
+    line-height: var(--line-height-relaxed);
   }
 
   .cx-text-area__gutter-row {
-    min-height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
+    min-height: calc(var(--font-size-editorial-body) * var(--line-height-relaxed));
   }
 
   .cx-text-area__highlight-line {
-    height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
+    height: calc(var(--font-size-editorial-body) * var(--line-height-relaxed));
   }
 
   .cx-text-area__range-mirror {
     font-size: var(--font-size-editorial-body);
-    line-height: var(--line-height-editorial-body);
+    line-height: var(--line-height-relaxed);
   }
 
   .cx-text-area__range-line {
-    min-height: calc(var(--font-size-editorial-body) * var(--line-height-editorial-body));
+    min-height: calc(var(--font-size-editorial-body) * var(--line-height-relaxed));
   }
 
   .cx-text-area__field {
     font-size: var(--font-size-editorial-body);
-    line-height: var(--line-height-editorial-body);
+    line-height: var(--line-height-relaxed);
   }
 
   .cx-text-area__markdown {
     font-size: var(--font-size-editorial-body);
-    line-height: var(--line-height-editorial-body);
+    line-height: var(--line-height-relaxed);
   }
 }
 

@@ -7,6 +7,6 @@
 //
 // Kept CSS-less so compile-time consumers (layout mixins, utility classes) can
 // read the value without re-emitting the --breakpoint-* custom properties,
-// which live in _breakpoints.scss.
+// which live in _core.scss.
 
-$mobile: 720px;
+$mobile: 720px; // Switch from desktop composition to the phone layout below this width.

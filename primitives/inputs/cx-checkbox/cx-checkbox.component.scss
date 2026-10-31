@@ -15,19 +15,19 @@
 
 .cx-checkbox {
   display: inline-grid;
-  grid-template-columns: var(--choice-control-size);
+  grid-template-columns: 16px;
   align-items: flex-start;
   cursor: pointer;
   outline: none;
 }
 
 .cx-checkbox--has-content {
-  grid-template-columns: var(--choice-control-size) minmax(0, auto);
+  grid-template-columns: 16px minmax(0, auto);
   column-gap: var(--space-sm);
 }
 
 .cx-checkbox-wrapper--disabled {
-  opacity: var(--opacity-disabled, 0.45);
+  opacity: 0.55;
   pointer-events: none;
   user-select: none;
 }
@@ -35,8 +35,8 @@
 .cx-checkbox__input {
   grid-column: 1;
   grid-row: 1;
-  width: var(--choice-control-size);
-  height: var(--choice-control-size);
+  width: 16px;
+  height: 16px;
   padding: 0;
   border: 0;
   margin: 0;
@@ -60,17 +60,17 @@
   grid-column: 1;
   grid-row: 1;
   box-sizing: border-box;
-  width: var(--choice-control-size);
-  height: var(--choice-control-size);
-  min-width: var(--choice-control-size);
-  min-height: var(--choice-control-size);
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
   align-items: center;
   justify-content: center;
   border: var(--line);
   // Preserve the square silhouette even without squircle support.
-  border-radius: min(var(--radius-xs), calc(var(--choice-control-size) / 4));
+  border-radius: min(var(--radius-xs), calc(16px / 4));
   background: var(--opacity-low);
-  color: var(--on-choice-control);
+  color: var(--on-ink);
   flex: 0 0 auto;
   line-height: 0;
   pointer-events: none;
@@ -85,14 +85,14 @@
 
 .cx-checkbox--selected .cx-checkbox__icon,
 .cx-checkbox--indeterminate .cx-checkbox__icon {
-  border-color: var(--choice-control-selected);
-  background: var(--choice-control-selected);
+  border-color: var(--primary);
+  background: var(--primary);
 }
 
 .cx-checkbox--selected:hover .cx-checkbox__icon,
 .cx-checkbox--indeterminate:hover .cx-checkbox__icon {
-  border-color: var(--choice-control-selected-hover);
-  background: var(--choice-control-selected-hover);
+  border-color: var(--primary-alt);
+  background: var(--primary-alt);
 }
 
 .cx-checkbox__check {
@@ -114,7 +114,7 @@
   left: 50%;
   display: block;
   border-radius: var(--radius-xs);
-  background: var(--on-choice-control);
+  background: var(--on-ink);
 }
 
 .cx-checkbox__check::before {
@@ -140,7 +140,7 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-xs);
-  background: var(--on-choice-control);
+  background: var(--on-ink);
   transform: translate(-50%, -50%);
 }
 
@@ -157,10 +157,10 @@
 }
 
 .cx-checkbox__hint {
-  padding-left: calc(var(--choice-control-size) + var(--space-sm));
+  padding-left: calc(16px + var(--space-sm));
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-align: start;
 }

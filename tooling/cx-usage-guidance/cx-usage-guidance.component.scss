@@ -27,14 +27,14 @@
   font-size: var(--font-size-title-2);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0;
-  line-height: var(--line-height-heading);
+  line-height: var(--line-height-tight);
 }
 
 .cx-usage-guidance__status {
   flex: 0 0 auto;
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-usage-guidance__status--error {

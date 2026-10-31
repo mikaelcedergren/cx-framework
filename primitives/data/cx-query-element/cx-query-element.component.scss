@@ -19,7 +19,7 @@
   color: var(--opacity-high);
   cursor: pointer;
   font: inherit;
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   user-select: none;
   white-space: nowrap;
 }
@@ -91,7 +91,7 @@
 }
 
 .cx-query-element--disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   cursor: default;
 }
 

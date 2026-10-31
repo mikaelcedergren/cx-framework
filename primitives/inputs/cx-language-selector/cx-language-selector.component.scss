@@ -28,12 +28,12 @@
 
 .cx-language-selector__trigger:hover {
   border-color: var(--opacity-mid);
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
 }
 
 .cx-language-selector__trigger--open {
-  border-color: var(--border-open);
-  outline: var(--outline-field-interaction);
+  border-color: var(--opacity-mid);
+  outline: 2px solid var(--opacity-low);
 }
 
 :host-context([data-cx-keyboard-navigation])
@@ -64,7 +64,7 @@
   justify-content: center;
   font-family:
     "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-  font-size: var(--icon-size-sm);
+  font-size: var(--font-size-body-lg);
   font-weight: var(--font-weight-regular);
   line-height: 1;
 }

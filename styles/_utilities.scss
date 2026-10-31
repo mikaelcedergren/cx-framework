@@ -20,26 +20,26 @@
 @use "../tokens/spacing-scale" as space;
 @use "../tokens/breakpoints-scale" as breakpoints;
 
-// < $mobile is the phone range; $mobile and up is desktop (tokens/_breakpoints.scss).
+// < $mobile is the phone range; $mobile and up is desktop (tokens/_breakpoints-scale.scss).
 $mobile-max: breakpoints.$mobile - 1px;
 
 // Type ramp — each size pairs a font-size token with its line-height token.
 $text-sizes: (
   "display": (
-    "size": var(--font-size-display),
+    "size": var(--font-size-hero),
     "line": var(--line-height-display),
   ),
   "title-1": (
     "size": var(--font-size-title-1),
-    "line": var(--line-height-heading),
+    "line": var(--line-height-tight),
   ),
   "title-2": (
     "size": var(--font-size-title-2),
-    "line": var(--line-height-heading),
+    "line": var(--line-height-tight),
   ),
   "title-3": (
     "size": var(--font-size-title-3),
-    "line": var(--line-height-heading),
+    "line": var(--line-height-tight),
   ),
   "body-lg": (
     "size": var(--font-size-body-lg),
@@ -51,11 +51,11 @@ $text-sizes: (
   ),
   "body-sm": (
     "size": var(--font-size-body-sm),
-    "line": var(--line-height-small),
+    "line": var(--line-height-tight),
   ),
   "body-xs": (
     "size": var(--font-size-body-xs),
-    "line": var(--line-height-small),
+    "line": var(--line-height-tight),
   ),
 );
 
@@ -81,10 +81,10 @@ $text-colors: (
 
 // Content measure — max width of a centred content column.
 $measures: (
-  "sm": var(--measure-sm),
-  "md": var(--measure-md),
-  "lg": var(--measure-lg),
-  "xl": var(--measure-xl),
+  "sm": var(--content-width-sm),
+  "md": var(--content-width-md),
+  "lg": var(--content-width-lg),
+  "xl": var(--content-width-xl),
 );
 
 @layer cx-utilities {
@@ -166,7 +166,7 @@ $measures: (
   // Line height — the semantic leading tokens, for the rare case where a size's
   // paired leading is wrong (e.g. a tightened display line outside an article).
   .cx-leading-heading {
-    line-height: var(--line-height-heading) !important;
+    line-height: var(--line-height-tight) !important;
   }
 
   .cx-leading-body {
@@ -174,7 +174,7 @@ $measures: (
   }
 
   .cx-leading-small {
-    line-height: var(--line-height-small) !important;
+    line-height: var(--line-height-tight) !important;
   }
 
   // Headline wrapping — evens out multi-line headings so no line strands a
@@ -226,7 +226,7 @@ $measures: (
   .cx-container {
     inline-size: 100% !important;
     max-inline-size: calc(
-      var(--measure-xl) + (var(--gutter-page) * 2)
+      var(--content-width-xl) + (var(--gutter-page) * 2)
     ) !important;
     margin-inline: auto !important;
     padding-inline: var(--gutter-page) !important;

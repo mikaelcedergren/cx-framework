@@ -74,7 +74,7 @@
 .cx-lightbox__caption {
   color: var(--on-ink);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
   text-align: center;
 }
 
@@ -82,12 +82,12 @@
   color: var(--on-ink);
   font-size: var(--font-size-body-xs);
   font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   opacity: 0.64;
 }
 
 .cx-lightbox__control {
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   box-shadow: var(--shadow-low);
 }

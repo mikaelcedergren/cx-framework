@@ -23,7 +23,7 @@
   color: var(--ink);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-column-filter-editor__clear,
@@ -39,7 +39,7 @@
 .cx-column-filter-editor__clear {
   flex: 0 0 auto;
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-column-filter-editor__clear:hover,
@@ -57,7 +57,7 @@
 
 .cx-column-filter-editor__clear:disabled,
 .cx-column-filter-editor__load-more:disabled {
-  opacity: var(--opacity-disabled, 0.45);
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -127,7 +127,7 @@
 .cx-column-filter-editor__hint {
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-column-filter-editor__hint {

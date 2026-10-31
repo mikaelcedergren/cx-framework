@@ -40,7 +40,7 @@
 .cx-date-picker__field:focus:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error),
 .cx-date-picker__field--open:not(.cx-date-picker__field--disabled):not(.cx-date-picker__field--loading):not(.cx-date-picker__field--error) {
   border-color: var(--opacity-high);
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
   outline-offset: 0;
 }
 
@@ -62,12 +62,12 @@
 }
 
 .cx-date-picker__field--open {
-  border-color: var(--border-open);
+  border-color: var(--opacity-mid);
 }
 
 .cx-date-picker__field--disabled {
   cursor: default;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -92,7 +92,7 @@
   color: var(--ink);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

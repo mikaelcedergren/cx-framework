@@ -25,7 +25,7 @@
   font-family: var(--font-family-base);
   font-size: var(--font-size-editorial-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-editorial-body);
+  line-height: var(--line-height-relaxed);
   overflow-wrap: anywhere;
 
   @include editorial-type.cx-editorial-type;

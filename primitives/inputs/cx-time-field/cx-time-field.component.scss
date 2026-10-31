@@ -51,13 +51,13 @@
 }
 
 .cx-time-field--large .cx-time-field__field-shell {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   border-radius: var(--radius-xl);
 }
 
 .cx-time-field__field-shell:hover:not(.cx-time-field__field-shell--disabled):not(.cx-time-field__field-shell--error),
 .cx-time-field__field-shell:focus-within:not(.cx-time-field__field-shell--disabled):not(.cx-time-field__field-shell--error) {
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
   outline-offset: 0;
 }
 
@@ -135,7 +135,7 @@
 .cx-time-field__meridiem {
   display: inline-flex;
   min-width: var(--controller-size);
-  height: var(--icon-size-md);
+  height: 20px;
   align-items: center;
   justify-content: center;
   padding: 0 var(--space-xs);
@@ -165,11 +165,11 @@
 }
 
 .cx-time-field--small .cx-time-field__meridiem {
-  height: var(--icon-size-sm);
+  height: 16px;
 }
 
 .cx-time-field--large .cx-time-field__meridiem {
-  height: var(--icon-size-lg);
+  height: 24px;
   font-size: var(--font-size-body);
 }
 

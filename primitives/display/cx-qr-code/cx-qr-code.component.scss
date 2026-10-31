@@ -26,7 +26,7 @@
   place-items: center;
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-qr-code__svg {
@@ -56,7 +56,7 @@
 .cx-qr-code__error-label {
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-qr-code__error-detail {
@@ -64,5 +64,5 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-xs);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }

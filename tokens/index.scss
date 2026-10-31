@@ -1,12 +1,6 @@
-@use "scheme";
-@use "color";
-@use "spacing";
-@use "size";
-@use "radius";
-@use "border";
-@use "typography";
-@use "shadow";
-@use "theme";
-@use "motion";
-@use "z-index";
-@use "breakpoints";
+// Public entry point: load once in the application stylesheet.
+// _core.scss owns the approved vocabulary and defaults; _themes.scss overrides
+// those values by theme. See README.md for purposes and approval requirements.
+
+@use "core";
+@use "themes";

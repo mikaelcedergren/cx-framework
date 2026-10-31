@@ -152,7 +152,7 @@
 }
 
 .cx-number-field__stepper:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   cursor: default;
 }
 
@@ -168,7 +168,7 @@
   gap: var(--space-xs);
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
 }
 
 .cx-number-field__validation--info {

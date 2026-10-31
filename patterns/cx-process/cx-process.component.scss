@@ -26,7 +26,7 @@
 }
 
 .cx-process__row::-webkit-scrollbar-thumb {
-  border-radius: var(--radius-pill, 999px);
+  border-radius: var(--radius-full, 999px);
   corner-shape: round;
   background: var(--opacity-mid);
 }
@@ -38,7 +38,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-pill, 999px);
+  border-radius: var(--radius-full, 999px);
   corner-shape: round;
   background: transparent;
   color: inherit;

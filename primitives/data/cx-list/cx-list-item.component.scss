@@ -13,7 +13,7 @@
 }
 
 :host(.cx-list-item-host--disabled) {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-list-item {
@@ -110,7 +110,7 @@
 }
 
 .cx-list-item--with-icon .cx-list-item__description {
-  padding-inline-start: calc(var(--icon-size-sm) + var(--space-sm));
+  padding-inline-start: calc(16px + var(--space-sm));
 }
 
 .cx-list-item__chevron {

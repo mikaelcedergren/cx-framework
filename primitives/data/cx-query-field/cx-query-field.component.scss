@@ -37,7 +37,7 @@
 }
 
 .cx-query-field--large .cx-query-field__container {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   border-radius: var(--radius-xl);
 }
 
@@ -47,7 +47,7 @@
 .cx-query-field__container:focus-within:not(
     .cx-query-field__container--disabled
   ):not(.cx-query-field__container--error) {
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
   outline-offset: 0;
 }
 
@@ -231,7 +231,7 @@
   font: inherit;
   font-size: var(--font-size-body-xs);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-query-field__join:hover:not(:disabled),
@@ -273,7 +273,7 @@
   caret-color: var(--ink);
   font: inherit;
   font-size: var(--font-size-body);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-query-field--small .cx-query-field__editor {
@@ -322,7 +322,7 @@
   padding-inline-start: var(--space-xs);
   color: var(--ink);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -370,7 +370,7 @@
   font: inherit;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-align: left;
 }
 

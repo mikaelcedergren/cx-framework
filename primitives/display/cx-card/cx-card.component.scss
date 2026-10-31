@@ -94,13 +94,13 @@
 // Its border carries hover and press feedback instead of introducing a fill.
 :host(.cx-card-host--interactive.cx-card-host--border)
   .cx-card:has(.cx-card__activation:hover) {
-  border-color: var(--border-hover);
+  border-color: var(--opacity-mid);
   background-color: transparent;
 }
 
 :host(.cx-card-host--interactive.cx-card-host--border)
   .cx-card:has(.cx-card__activation:active) {
-  border-color: var(--border-active);
+  border-color: var(--opacity-mid);
   background-color: transparent;
 }
 
@@ -395,7 +395,7 @@
   box-sizing: border-box;
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-card__footer:empty {

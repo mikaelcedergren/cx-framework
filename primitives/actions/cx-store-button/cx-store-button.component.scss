@@ -9,7 +9,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
-  padding: calc(var(--controller-size-large) / 4);
+  padding: calc(48px / 4);
   cursor: pointer;
   text-decoration: none;
   // Clear space belongs to the badge; the page still owns gaps between components.
@@ -24,7 +24,7 @@
 .cx-store-button__artwork {
   position: relative;
   display: block;
-  height: var(--controller-size-large);
+  height: 48px;
   flex: 0 0 auto;
 }
 
@@ -37,11 +37,11 @@
 }
 
 .cx-store-button--large {
-  padding: calc((var(--controller-size-large) + var(--space-md)) / 4);
+  padding: calc((48px + var(--space-md)) / 4);
 }
 
 .cx-store-button--large .cx-store-button__artwork {
-  height: calc(var(--controller-size-large) + var(--space-md));
+  height: calc(48px + var(--space-md));
 }
 
 .cx-store-button--unavailable {
@@ -49,7 +49,7 @@
 }
 
 .cx-store-button--unavailable .cx-store-button__artwork {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-store-button__availability {

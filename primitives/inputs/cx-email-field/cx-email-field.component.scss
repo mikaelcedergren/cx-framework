@@ -28,7 +28,7 @@
 
 .cx-email-field__field-shell:hover:not(.cx-email-field__field-shell--disabled):not(.cx-email-field__field-shell--error),
 .cx-email-field__field-shell:focus-within:not(.cx-email-field__field-shell--disabled):not(.cx-email-field__field-shell--error) {
-  outline: var(--outline-field-interaction);
+  outline: 2px solid var(--opacity-low);
   outline-offset: 0;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .cx-email-field--large .cx-email-field__field-shell {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   border-radius: var(--radius-xl);
 }
 

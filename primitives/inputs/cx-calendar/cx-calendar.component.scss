@@ -94,7 +94,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-calendar__day {
@@ -111,7 +111,7 @@
   font: inherit;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   cursor: default;
   transition:
     background-color var(--motion-fast) ease,
@@ -133,24 +133,24 @@
 
 .cx-calendar__day--today:not(:disabled) {
   border-color: var(--ink);
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-calendar__day--selected {
-  border-color: var(--choice-control-selected);
-  background: var(--choice-control-selected);
-  color: var(--on-choice-control);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-ink);
 }
 
 .cx-calendar__day--selected:hover:not(:disabled) {
-  background: var(--choice-control-selected-hover);
+  background: var(--primary-alt);
 }
 
 .cx-calendar__day--range {
   border-radius: 0;
   background: color-mix(
     in srgb,
-    var(--choice-control-selected) 22%,
+    var(--primary) 22%,
     transparent
   );
 }
@@ -158,38 +158,38 @@
 .cx-calendar__day--range:hover:not(:disabled) {
   background: color-mix(
     in srgb,
-    var(--choice-control-selected) 38%,
+    var(--primary) 38%,
     transparent
   );
 }
 
 .cx-calendar__day--range-start,
 .cx-calendar__day--range-end {
-  border-color: var(--choice-control-selected);
+  border-color: var(--primary);
   border-radius: var(--radius-sm);
-  background: var(--choice-control-selected);
-  color: var(--on-choice-control);
+  background: var(--primary);
+  color: var(--on-ink);
 }
 
 .cx-calendar__day--range-start:hover:not(:disabled),
 .cx-calendar__day--range-end:hover:not(:disabled) {
-  background: var(--choice-control-selected-hover);
+  background: var(--primary-alt);
 }
 
 .cx-calendar__day--range-preview-end {
-  border-color: var(--choice-control-selected);
+  border-color: var(--primary);
   border-radius: var(--radius-sm);
 }
 
 .cx-calendar__day:disabled,
 .cx-calendar--disabled {
-  opacity: var(--opacity-disabled, 0.55);
+  opacity: 0.55;
 }
 
 .cx-calendar__day:disabled {
   color: var(--ink);
   -webkit-text-fill-color: var(--ink);
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-calendar--disabled,

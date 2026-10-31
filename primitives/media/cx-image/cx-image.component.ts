@@ -221,6 +221,6 @@ function resolveImageRadiusValue(radius: CxImageRadius): string {
     case "large":
       return "var(--radius-media-lg)";
     case "round":
-      return "var(--radius-pill)";
+      return "var(--radius-full)";
   }
 }

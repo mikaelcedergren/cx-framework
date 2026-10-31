@@ -32,19 +32,19 @@
 .cx-step__number,
 .cx-steps__measure-number {
   display: flex;
-  width: var(--icon-size-md);
-  height: var(--icon-size-md);
-  min-width: var(--icon-size-md);
-  min-height: var(--icon-size-md);
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--opacity-low);
   color: inherit;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   transition:
     background-color var(--motion-base) ease,
     color var(--motion-base) ease;
@@ -76,11 +76,11 @@
 
 .cx-step__badge {
   padding: 0 var(--space-xs);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--opacity-low);
   color: var(--ink);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   white-space: nowrap;
 }
 
@@ -119,8 +119,8 @@
 
 .cx-step__divider,
 .cx-steps__measure-divider {
-  width: var(--icon-size-xl);
-  min-width: var(--icon-size-xl);
+  width: 32px;
+  min-width: 32px;
   height: 1px;
   margin-left: var(--space-sm);
   background: var(--opacity-mid);
@@ -148,8 +148,8 @@
 
 :host(.cx-steps--fill) .cx-step__divider {
   width: auto;
-  min-width: var(--icon-size-xl);
-  flex: 1 1 var(--icon-size-xl);
+  min-width: 32px;
+  flex: 1 1 32px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -202,6 +202,6 @@
 }
 
 :host(.cx-steps--compact) .cx-step__divider {
-  flex: 1 1 var(--icon-size-xl);
+  flex: 1 1 32px;
   min-width: var(--space-xs);
 }

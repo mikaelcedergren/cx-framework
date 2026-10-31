@@ -98,8 +98,8 @@
 }
 
 .cx-pagination__page-button:active:not(:disabled) {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-pagination__page-button:disabled {

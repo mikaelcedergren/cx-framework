@@ -26,11 +26,11 @@
     margin: 0 0 0.5em;
     color: var(--ink);
     font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-heading);
+    line-height: var(--line-height-tight);
   }
 
   h1 {
-    font-size: var(--font-size-display);
+    font-size: var(--font-size-hero);
     line-height: var(--line-height-display);
   }
 
@@ -56,7 +56,7 @@
   h1 + p {
     margin-bottom: 1.25em;
     font-size: var(--font-size-editorial-lead);
-    line-height: var(--line-height-editorial-lead);
+    line-height: var(--line-height-relaxed);
   }
 
   small {

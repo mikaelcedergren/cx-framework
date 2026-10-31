@@ -84,7 +84,7 @@
   top: var(--space-xs);
   bottom: var(--space-xs);
   width: 2px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--primary);
   content: "";
@@ -158,7 +158,7 @@
 }
 
 .cx-table__row--disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -305,7 +305,7 @@
 .cx-table__person-detail {
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-table__progress {
@@ -327,7 +327,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-align: end;
 }
 
@@ -435,7 +435,7 @@
   cursor: pointer;
   font: inherit;
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-table__header-menu-clear:hover,
@@ -466,7 +466,7 @@
   right: 0;
   width: 3px;
   height: calc(100% - (var(--space-xs) * 2));
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: transparent;
   content: "";

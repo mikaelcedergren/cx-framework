@@ -1,9 +1,0 @@
-@use 'breakpoints-scale' as scale;
-@forward 'breakpoints-scale';
-
-// Mirror the $mobile Sass value (tokens/_breakpoints-scale.scss) as a custom
-// property for any runtime/JS consumer. The @forward keeps `<module>.$mobile`
-// resolvable for stylesheets that @use this module for the value.
-:root {
-  --breakpoint-mobile: #{scale.$mobile};
-}

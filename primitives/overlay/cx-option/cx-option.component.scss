@@ -85,8 +85,8 @@
 }
 
 .cx-option:active:not(.cx-option--disabled, .cx-option--static) {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-option--primary {
@@ -192,7 +192,7 @@
 }
 
 .cx-option--disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   cursor: default;
 }
 
@@ -209,15 +209,15 @@
   position: relative;
   display: inline-flex;
   box-sizing: border-box;
-  width: var(--choice-control-size);
-  height: var(--choice-control-size);
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border: var(--line);
   border-radius: var(--radius-sm);
   background: var(--opacity-low);
-  color: var(--on-choice-control);
+  color: var(--on-ink);
   transition:
     border-color var(--motion-base) ease,
     background-color var(--motion-base) ease;
@@ -229,14 +229,14 @@
 }
 
 .cx-option__checkbox--selected {
-  border-color: var(--choice-control-selected);
-  background: var(--choice-control-selected);
+  border-color: var(--primary);
+  background: var(--primary);
 }
 
 .cx-option__row:hover .cx-option__checkbox--selected,
 .cx-option__row--active .cx-option__checkbox--selected {
-  border-color: var(--choice-control-selected-hover);
-  background: var(--choice-control-selected-hover);
+  border-color: var(--primary-alt);
+  background: var(--primary-alt);
 }
 
 .cx-option__checkbox-check {
@@ -307,7 +307,7 @@
   color: currentColor;
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -320,7 +320,7 @@
   flex: 1 1 auto;
   color: var(--placeholder);
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-body-relaxed);
+  line-height: var(--line-height-relaxed);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -382,7 +382,7 @@
 }
 
 .cx-option__row--large .cx-option {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   padding: var(--space-sm);
 }
 

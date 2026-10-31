@@ -85,8 +85,8 @@
 }
 
 .cx-variant__tab:active {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-variant__tab--active::after {

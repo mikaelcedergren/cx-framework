@@ -45,7 +45,7 @@
 
 .cx-sso-button:disabled {
   cursor: default;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-sso-button--small {
@@ -61,7 +61,7 @@
 }
 
 .cx-sso-button--large {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
   padding: 0 var(--space-lg);
   font-size: var(--font-size-body-lg);
 }
@@ -116,7 +116,7 @@
   transform: translate(-50%, -50%);
   border: var(--line);
   border-block-start-color: transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   animation: cx-sso-button-spin calc(var(--motion-slow) * 4) linear infinite;
   pointer-events: none;

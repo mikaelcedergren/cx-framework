@@ -20,6 +20,19 @@ version has a section, including one that only says nothing changed for consumer
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
 
+## 0.17.16
+
+Use the [complete core inventory](../tokens/README.md#complete-core-inventory) directly. Token definitions now include purpose comments; new shared roles still require explicit design approval. There are no compatibility aliases.
+
+- All default definitions now live in `tokens/_core.scss`; named themes and the optional corner profile override them in `tokens/_themes.scss`. Keep loading `@mikaelcedergren/cx-framework/tokens` once from the application stylesheet. The former category partials are removed. For component media queries, import `tokens/breakpoints-scale`; for spacing iteration, import `tokens/spacing-scale`. These helpers emit no global token CSS.
+- Rename `--radius-pill` to `--radius-full`, `--font-size-display` to `--font-size-hero`, and `--measure-sm`, `--measure-md`, `--measure-lg`, `--measure-xl` to `--content-width-sm`, `--content-width-md`, `--content-width-lg`, `--content-width-xl`. Existing utility class names remain unchanged.
+- `--corner-softness` stays core and references `--radius-xs`. The six larger named radii now use explicit pixel values, with matching overrides preserving Estuary, Legacy and square-corner appearance. Custom corner profiles must set their intended named radii explicitly; changing only `--radius-xs` or `--corner-softness` no longer recalculates that scale. The hero font-size clamp and centered-gutter calculation are unchanged.
+- Replace heading/small line-height tokens with `--line-height-tight` (1.2), and body-relaxed/editorial-body/editorial-lead with `--line-height-relaxed` (1.5). The former 1.4 relaxed text now has more breathing room. The unused body-lg line-height token is removed.
+- The utility bar uses the new core semantic pair `--admin` / `--on-admin`, replacing `--utility-bar-surface` / `--on-utility-bar`. Use it for visibly distinct internal, admin or prototype controls. It does not add a component mood or control access.
+- Choice fills use `--primary`, `--primary-alt` and `--on-ink` directly. Border hover/open/active colours use `--opacity-mid`. Field interaction outlines use `2px solid var(--opacity-low)`. Focus/active outline aliases are removed; components retain their direct `none` and `-2px` declarations. Keyboard rings still use `--outline-tab` and `--outline-tab-offset`.
+- Disabled treatment, 16px choice geometry and exceptional 48px controls belong to their components. The global disabled-opacity, choice-size and large-control tokens are removed. Icon sizes belong to the public `cx-icon` size API; global icon-size tokens are removed. Standard and small controller sizes remain core.
+- Transparent palette, neutral, backdrop and shadow colours use hex alpha. Alpha rounding is intentional. Neutral blue-tinted mixes are fixed theme hex colours now, so overriding blue no longer recalculates neutral structure. Semantic colours reference palette entries when appropriate; deliberate custom theme colours, including Estuary statuses, remain supported.
+
 ## 0.17.15
 
 - `cx-masonry` keeps the first item in every column aligned to the top in Safari,

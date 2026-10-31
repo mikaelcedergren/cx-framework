@@ -43,7 +43,7 @@
     .cx-drop-zone__surface--readonly
   ):hover {
   border-style: solid;
-  border-color: var(--border-hover);
+  border-color: var(--opacity-mid);
   background: var(--opacity-low);
 }
 
@@ -75,7 +75,7 @@
 
 .cx-drop-zone__surface--disabled {
   cursor: not-allowed;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-drop-zone__surface--uploading {
@@ -158,7 +158,7 @@
 
 .cx-drop-zone__constraints {
   font-size: var(--font-size-body-sm);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-drop-zone__primary-action {
@@ -209,7 +209,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
 }
 
 .cx-drop-zone__file-state {

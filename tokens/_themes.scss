@@ -1,0 +1,643 @@
+// Theme overrides: change the values of approved core tokens, never their names or roles.
+// index.scss loads this after _core.scss. Light inherits the core colour profile.
+// Keep purpose comments on every override; new tokens require explicit approval.
+// Explicit profile values are retained even when equal to a default, preserving
+// their priority when a product customises the default profile.
+
+/* Dark */
+:root.theme-dark {
+  /* Palette */
+
+  --blue: #057dff; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #057dff1a; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #0358b2; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #00ccc5; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #00ccc51a; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #018a86; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #88d33d; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #88d33d1a; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #6da82f; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #37c45b; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #37c45b1a; // Translucent green fill that retains the underlying surface.
+  --green-alt: #299143; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #edc31c; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #edc31c1a; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #a68712; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #ff980a; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #ff980a1a; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #b26b05; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #ff6c2e; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #ff6c2e1a; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #b24b20; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #ff4043; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #ff40431a; // Translucent red fill that retains the underlying surface.
+  --red-alt: #992629; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #f2559c; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #f2559c1a; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #a83d6d; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #ae4ede; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #ae4ede1a; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #7a3d99; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #3057f2; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #3057f21a; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #223da8; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* Dark keeps blue-tinted neutral structure on deep violet surfaces. */
+
+  --primary: var(--violet); // Main forward action and selected choice controls.
+  --primary-opacity: var(--violet-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--violet-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--cyan); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--cyan-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--cyan-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #1a1a2b; // Main application plane.
+  --surface-alt: #141424; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #f4f7fc; // Prominent, selected or actionable content.
+  --on-ink: #ffffff; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #fff; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #171717; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--on-emphasis); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #ebf5ff99; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #ebf5ff14; // Borders, separators and medium-strength structure.
+  --opacity-low: #ebf5ff08; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #0000000d; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--blue); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #f4f7fc4d; // Example or empty-state text inside fields; never replaces a label.
+}
+
+/* Night */
+:root.theme-night {
+  /* Palette */
+
+  --blue: #057dff; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #057dff26; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #0358b2; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #00ccc5; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #00ccc526; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #018a86; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #88d33d; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #88d33d26; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #6da82f; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #37c45b; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #37c45b26; // Translucent green fill that retains the underlying surface.
+  --green-alt: #299143; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #edc31c; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #edc31c26; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #a68712; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #ff980a; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #ff980a26; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #b26b05; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #ff6c2e; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #ff6c2e26; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #b24b20; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #ff4043; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #ff404326; // Translucent red fill that retains the underlying surface.
+  --red-alt: #992629; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #f2559c; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #f2559c26; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #a83d6d; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #ae4ede; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #ae4ede26; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #7a3d99; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #3057f2; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #3057f226; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #223da8; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* Night uses darker surfaces and stronger quiet structure than Dark. */
+
+  --primary: var(--violet); // Main forward action and selected choice controls.
+  --primary-opacity: var(--violet-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--violet-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--cyan); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--cyan-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--cyan-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #000000; // Main application plane.
+  --surface-alt: #0f0f0f; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #f4f7fc; // Prominent, selected or actionable content.
+  --on-ink: #ffffff; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #fff; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #171717; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--on-emphasis); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #e1edfc99; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #e1edfc24; // Borders, separators and medium-strength structure.
+  --opacity-low: #e1edfc12; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #0000000d; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #05070ccc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--blue); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #f4f7fc4d; // Example or empty-state text inside fields; never replaces a label.
+}
+
+/* Aqua */
+:root.theme-aqua {
+  /* Palette */
+
+  /* Aqua pairs ocean blue, turquoise, and peach with a complete dark-surface
+     palette. Lighter alternate shades preserve dark-label contrast on hover. */
+
+  --blue: #00a1e4; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #00a1e426; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #39b8ed; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #00d3c8; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #00d3c826; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #45e1d8; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #abd866; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #abd86626; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #c4e790; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #6ac987; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #6ac98726; // Translucent green fill that retains the underlying surface.
+  --green-alt: #91d9a6; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #edcf6a; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #edcf6a26; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #f5df93; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #f2ad63; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #f2ad6326; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #f8c58b; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #ff9f71; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #ff9f7126; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #ffbb99; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #ff7c82; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #ff7c8226; // Translucent red fill that retains the underlying surface.
+  --red-alt: #ff9da2; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #ea8ebc; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #ea8ebc26; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #f2afd0; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #bf9beb; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #bf9beb26; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #d4b8f2; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #9ca8f3; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #9ca8f326; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #bdc5f8; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* Aqua uses deep ocean surfaces with blue actions, lime accents, and
+     warm peach links. The bright palette carries dark labels on filled controls. */
+
+  color-scheme: dark;
+
+  --primary: var(--blue); // Main forward action and selected choice controls.
+  --primary-opacity: var(--blue-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--blue-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--lime); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--lime-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--lime-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #001922; // Main application plane.
+  --surface-alt: #00141b; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #ffffff; // Prominent, selected or actionable content.
+  --on-ink: #00131a; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #fff; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #171717; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--on-emphasis); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #ffffffb3; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #ffffff24; // Borders, separators and medium-strength structure.
+  --opacity-low: #ffffff0f; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #00000014; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #000c12cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--tangerine); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #ffffff8c; // Example or empty-state text inside fields; never replaces a label.
+
+  /* Shape, boundaries and depth */
+
+  /* Aqua separates floating surfaces with a light edge and deep neutral shadow.
+     Component geometry and the shared elevation roles stay unchanged. */
+
+  --floating-surface-border: var(--line); // Theme-controlled edge on elevated panels, menus and popovers.
+  --shadow-low: 0 1px 2px #00080c3d, 0 2px 4px #00080c29; // Low elevation for raised controls and small surfaces.
+  --shadow-mid: 0 2px 4px #00080c3d, 0 8px 16px #00080c3d; // Floating elevation for menus and popovers.
+  --shadow-high: 0 4px 8px #00080c3d, 0 16px 32px #00080c52; // Strong elevation for dialogs and prominent overlays.
+}
+
+/* High contrast */
+:root.theme-high-contrast {
+  /* Palette */
+
+  --blue: #0047b8; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #0047b824; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #00358a; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #005f5c; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #005f5c24; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #004543; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #345607; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #34560724; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #243d05; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #0a652d; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #0a652d24; // Translucent green fill that retains the underlying surface.
+  --green-alt: #074a20; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #6f5500; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #6f550024; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #544100; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #8d4300; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #8d430024; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #693100; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #963300; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #96330024; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #702600; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #b00020; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #b0002024; // Translucent red fill that retains the underlying surface.
+  --red-alt: #7f0017; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #9a1a62; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #9a1a6224; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #701247; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #6a2ac0; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #6a2ac024; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #4d1f8c; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #1c3ebe; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #1c3ebe24; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #142d8a; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* High contrast strengthens neutral structure and uses a light admin foreground. */
+
+  --primary: var(--violet); // Main forward action and selected choice controls.
+  --primary-opacity: var(--violet-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--violet-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--cyan); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--cyan-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--cyan-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #ffffff; // Main application plane.
+  --surface-alt: #ffffff; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #000000; // Prominent, selected or actionable content.
+  --on-ink: #ffffff; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #000; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #ffffff; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--on-emphasis); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #000307bd; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #00030780; // Borders, separators and medium-strength structure.
+  --opacity-low: #00030714; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #00000008; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--blue); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #000000a8; // Example or empty-state text inside fields; never replaces a label.
+}
+
+/* Wireframe */
+:root.theme-wireframe {
+  /* Palette */
+
+  --blue: #111111; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #1111111a; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #333333; // Alternate blue shade for hover or stronger hue treatment.
+
+  --cyan: #111111; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #1111111a; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #333333; // Alternate cyan shade for hover or stronger hue treatment.
+
+  --lime: #111111; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #1111111a; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #333333; // Alternate lime shade for hover or stronger hue treatment.
+
+  --green: #111111; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #1111111a; // Translucent green fill that retains the underlying surface.
+  --green-alt: #333333; // Alternate green shade for hover or stronger hue treatment.
+
+  --yellow: #b8b8b8; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #1111111a; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #555555; // Alternate yellow shade for hover or stronger hue treatment.
+
+  --orange: #111111; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #1111111a; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #333333; // Alternate orange shade for hover or stronger hue treatment.
+
+  --tangerine: #111111; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #1111111a; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #333333; // Alternate tangerine shade for hover or stronger hue treatment.
+
+  --red: #111111; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #1111111a; // Translucent red fill that retains the underlying surface.
+  --red-alt: #333333; // Alternate red shade for hover or stronger hue treatment.
+
+  --pink: #111111; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #1111111a; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #333333; // Alternate pink shade for hover or stronger hue treatment.
+
+  --purple: #111111; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #1111111a; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #333333; // Alternate purple shade for hover or stronger hue treatment.
+
+  --violet: #111111; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #1111111a; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #333333; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* Wireframe uses greyscale colours; its admin foreground must stay dark. */
+
+  --primary: var(--blue); // Main forward action and selected choice controls.
+  --primary-opacity: var(--blue-opacity); // Quiet translucent fill carrying primary meaning.
+  --primary-alt: var(--blue-alt); // Alternate primary shade, normally the matching palette alternate.
+
+  --accent: var(--cyan); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-opacity: var(--cyan-opacity); // Quiet translucent fill carrying accent meaning.
+  --accent-alt: var(--cyan-alt); // Alternate accent shade, normally the matching palette alternate.
+
+  --surface: #ffffff; // Main application plane.
+  --surface-alt: #f3f3f3; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+
+  --ink: #111111; // Prominent, selected or actionable content.
+  --on-ink: #ffffff; // Foreground for ink and filled controls; themes choose a legible colour.
+  // Paired fills: emphasis is product content; admin marks internal controls.
+  --emphasis: #111111; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #ffffff; // Readable foreground on the emphasis fill.
+  --admin: var(--yellow); // Distinct fill for admin, internal and prototype controls outside the product UI.
+  --on-admin: var(--ink); // Readable foreground on the admin fill, including the utility bar.
+
+  // Supporting content and structure: alpha colours blend with their surface.
+  --opacity-high: #000000b8; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #00000061; // Borders, separators and medium-strength structure.
+  --opacity-low: #00000012; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #0000000a; // Subtle shading layered over an existing surface.
+  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Status roles remain distinct from primary and accent actions.
+  --success: var(--green); // Completion or healthy status.
+  --success-opacity: var(--green-opacity); // Quiet translucent fill carrying success meaning.
+  --success-alt: var(--green-alt); // Alternate success shade, normally the matching palette alternate.
+
+  --warning: var(--orange); // Caution that needs attention.
+  --warning-opacity: var(--orange-opacity); // Quiet translucent fill carrying warning meaning.
+  --warning-alt: var(--orange-alt); // Alternate warning shade, normally the matching palette alternate.
+
+  --danger: var(--red); // Destructive action, risk or failure.
+  --danger-opacity: var(--red-opacity); // Quiet translucent fill carrying danger meaning.
+  --danger-alt: var(--red-alt); // Alternate danger shade, normally the matching palette alternate.
+
+  --info: var(--blue); // Neutral information or guidance.
+  --info-opacity: var(--blue-opacity); // Quiet translucent fill carrying info meaning.
+  --info-alt: var(--blue-alt); // Alternate info shade, normally the matching palette alternate.
+
+  --link: var(--ink); // Standalone navigation or brand link colour; ordinary text links may inherit.
+  --placeholder: #00000080; // Example or empty-state text inside fields; never replaces a label.
+}
+
+/* Estuary */
+:root.theme-estuary {
+  /* Palette */
+
+  --blue: #c5e4f2; // Blue palette hue for colour as data, user choice or semantic mapping.
+  --blue-opacity: #c5e4f259; // Translucent blue fill that retains the underlying surface.
+  --blue-alt: #accfdf; // Alternate blue shade for hover or stronger hue treatment.
+  --cyan: #bae7e5; // Cyan palette hue for colour as data, user choice or semantic mapping.
+  --cyan-opacity: #bae7e559; // Translucent cyan fill that retains the underlying surface.
+  --cyan-alt: #9fd3d0; // Alternate cyan shade for hover or stronger hue treatment.
+  --lime: #d8e7ac; // Lime palette hue for colour as data, user choice or semantic mapping.
+  --lime-opacity: #d8e7ac59; // Translucent lime fill that retains the underlying surface.
+  --lime-alt: #bfd18f; // Alternate lime shade for hover or stronger hue treatment.
+  --green: #a4e2c6; // Green palette hue for colour as data, user choice or semantic mapping.
+  --green-opacity: #a4e2c659; // Translucent green fill that retains the underlying surface.
+  --green-alt: #8ccfaf; // Alternate green shade for hover or stronger hue treatment.
+  --yellow: #f3e4aa; // Yellow palette hue for colour as data, user choice or semantic mapping.
+  --yellow-opacity: #f3e4aa59; // Translucent yellow fill that retains the underlying surface.
+  --yellow-alt: #decd8d; // Alternate yellow shade for hover or stronger hue treatment.
+  --orange: #f2d1aa; // Orange palette hue for colour as data, user choice or semantic mapping.
+  --orange-opacity: #f2d1aa59; // Translucent orange fill that retains the underlying surface.
+  --orange-alt: #dfb88d; // Alternate orange shade for hover or stronger hue treatment.
+  --tangerine: #f3c6b0; // Tangerine palette hue for colour as data, user choice or semantic mapping.
+  --tangerine-opacity: #f3c6b059; // Translucent tangerine fill that retains the underlying surface.
+  --tangerine-alt: #dfa98f; // Alternate tangerine shade for hover or stronger hue treatment.
+  --red: #f0bfc4; // Red palette hue for colour as data, user choice or semantic mapping.
+  --red-opacity: #f0bfc459; // Translucent red fill that retains the underlying surface.
+  --red-alt: #dca2a9; // Alternate red shade for hover or stronger hue treatment.
+  --pink: #eec6de; // Pink palette hue for colour as data, user choice or semantic mapping.
+  --pink-opacity: #eec6de59; // Translucent pink fill that retains the underlying surface.
+  --pink-alt: #d8acc7; // Alternate pink shade for hover or stronger hue treatment.
+  --purple: #dccdee; // Purple palette hue for colour as data, user choice or semantic mapping.
+  --purple-opacity: #dccdee59; // Translucent purple fill that retains the underlying surface.
+  --purple-alt: #c3b1da; // Alternate purple shade for hover or stronger hue treatment.
+  --violet: #cbcff0; // Violet palette hue for colour as data, user choice or semantic mapping.
+  --violet-opacity: #cbcff059; // Translucent violet fill that retains the underlying surface.
+  --violet-alt: #b0b6dc; // Alternate violet shade for hover or stronger hue treatment.
+
+  /* Semantic colours */
+
+  /* Estuary pairs pastel actions with navy content; definitive status hues stay custom. */
+
+  color-scheme: light;
+  --surface: #f2f6f6; // Main application plane.
+  --surface-alt: #102f42; // Alternate plane for recessed or framed groups; pair with a readable foreground.
+  --ink: #102f42; // Prominent, selected or actionable content.
+  --on-ink: var(--ink); // Foreground for ink and filled controls; themes choose a legible colour.
+  --emphasis: #ffffff; // Strong contrasting fill for emphasised content.
+  --on-emphasis: #102f42; // Readable foreground on the emphasis fill.
+  --on-admin: var(--ink); // Readable foreground on the admin fill, including the utility bar.
+  --primary: var(--green); // Main forward action and selected choice controls.
+  --primary-alt: var(--green-alt); // Alternate primary shade, normally the matching palette alternate.
+  --primary-opacity: var(--green-opacity); // Quiet translucent fill carrying primary meaning.
+  --accent: var(--tangerine); // Rare supporting emphasis, subordinate to the primary action.
+  --accent-alt: var(--tangerine-alt); // Alternate accent shade, normally the matching palette alternate.
+  --accent-opacity: var(--tangerine-opacity); // Quiet translucent fill carrying accent meaning.
+  /* Status roles retain Light's definitive colours independently of pastel hues. */
+  --success: #37c45b; // Completion or healthy status.
+  --success-alt: #299143; // Alternate success shade, normally the matching palette alternate.
+  --success-opacity: #37c45b1a; // Quiet translucent fill carrying success meaning.
+  --warning: #ff980a; // Caution that needs attention.
+  --warning-alt: #b26b05; // Alternate warning shade, normally the matching palette alternate.
+  --warning-opacity: #ff980a1a; // Quiet translucent fill carrying warning meaning.
+  --danger: #ff4043; // Destructive action, risk or failure.
+  --danger-alt: #992629; // Alternate danger shade, normally the matching palette alternate.
+  --danger-opacity: #ff40431a; // Quiet translucent fill carrying danger meaning.
+  --info: #057dff; // Neutral information or guidance.
+  --info-alt: #0358b2; // Alternate info shade, normally the matching palette alternate.
+  --info-opacity: #057dff1a; // Quiet translucent fill carrying info meaning.
+  --opacity-high: #506776; // Readable supporting text and subdued icons; a colour, not numeric opacity.
+  --opacity-mid: #102f4233; // Borders, separators and medium-strength structure.
+  --opacity-low: #102f420f; // Quiet fills and the soft field-interaction outline.
+  --opacity-darken: #0000000f; // Subtle shading layered over an existing surface.
+  --placeholder: #506776; // Example or empty-state text inside fields; never replaces a label.
+  --overlay-backdrop: #0c2939b3; // Dims the underlying screen while an overlay holds attention.
+  --link: var(--ink); // Standalone navigation or brand link colour; ordinary text links may inherit.
+
+  /* Shape, boundaries and depth */
+
+  --font-family-heading: var(--typeface-elegant); // Active heading voice; selects one of the shared typefaces.
+  --corner-shape: round; // Curve technique for rectangular corners: squircle or conventional round.
+  --radius-xs: 2px; // Base small radius; keeps tiny controls recognisably rectangular.
+  --radius-sm: 4px; // Small rounded elements.
+  --radius-md: 6px; // Medium rounded elements.
+  --radius-lg: 8px; // Larger rounded elements and surfaces.
+  --radius-media-lg: 12px; // Roomier corner radius for large media.
+  --radius-xl: 16px; // Broad rounding on large surfaces.
+  --radius-2xl: 32px; // Most generous rectangular rounding on large compositions.
+  --frost-softness: 0px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --floating-surface-border: var(--line); // Theme-controlled edge on elevated panels, menus and popovers.
+  --shadow-low: 0 1px 3px #0c293914; // Low elevation for raised controls and small surfaces.
+  --shadow-mid: 0 4px 12px #0c29391f; // Floating elevation for menus and popovers.
+  --shadow-high: 0 12px 32px #0c293929; // Strong elevation for dialogs and prominent overlays.
+}
+
+/* Legacy */
+:root.theme-legacy {
+  /* Shape, boundaries and depth */
+
+  --corner-shape: round; // Curve technique for rectangular corners: squircle or conventional round.
+  --radius-xs: 1px; // Base small radius; keeps tiny controls recognisably rectangular.
+  --radius-sm: 2px; // Small rounded elements.
+  --radius-md: 3px; // Medium rounded elements.
+  --radius-lg: 4px; // Larger rounded elements and surfaces.
+  --radius-media-lg: 6px; // Roomier corner radius for large media.
+  --radius-xl: 8px; // Broad rounding on large surfaces.
+  --radius-2xl: 16px; // Most generous rectangular rounding on large compositions.
+  --surface-separation: 1px; // Inset and seams between framed surfaces; not content padding.
+  --line-discreet: var(--line); // Quiet structural border for low-emphasis boundaries.
+  --floating-surface-border: var(--line-discreet); // Theme-controlled edge on elevated panels, menus and popovers.
+  --frost-softness: 0px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --shadow-low: 0 1px 1px #0000001f; // Low elevation for raised controls and small surfaces.
+  --shadow-mid: 0 2px 4px #00000029; // Floating elevation for menus and popovers.
+  --shadow-high: 0 3px 6px #00000033; // Strong elevation for dialogs and prominent overlays.
+}
+
+/* Optional rectangular corner profile, independent of the chosen colour theme. */
+:root.cx-corners-square {
+  --radius-xs: 0px; // Base small radius; keeps tiny controls recognisably rectangular.
+  --radius-sm: 0px; // Small rounded elements.
+  --radius-md: 0px; // Medium rounded elements.
+  --radius-lg: 0px; // Larger rounded elements and surfaces.
+  --radius-media-lg: 0px; // Roomier corner radius for large media.
+  --radius-xl: 0px; // Broad rounding on large surfaces.
+  --radius-2xl: 0px; // Most generous rectangular rounding on large compositions.
+}

@@ -38,7 +38,7 @@
   color: var(--ink);
   font-size: var(--font-size-title-1);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-heading);
+  line-height: var(--line-height-tight);
   overflow-wrap: anywhere;
 }
 
@@ -55,7 +55,7 @@
   color: var(--opacity-high);
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   overflow-wrap: anywhere;
 }
 

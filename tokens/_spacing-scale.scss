@@ -2,7 +2,7 @@
 //
 // Single compile-time source for code that iterates the spacing steps: the
 // layout primitives (gap options) and the utility classes (padding helpers).
-// The values live in _spacing.scss as the --space-* custom properties; this
+// The values live in _core.scss as the --space-* custom properties; this
 // map only references them, so @use-ing it emits no CSS of its own.
 
 $scale: (

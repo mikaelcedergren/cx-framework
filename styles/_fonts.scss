@@ -11,7 +11,7 @@
 //   Roboto Mono       — code / mono   (--font-family-mono),  variable 100–700
 //
 // The rest are the heading menu — the faces `--font-family-heading` may point
-// at, one per product (see `--typeface-*` in tokens/_typography.scss). They are
+// at, one per product (see `--typeface-*` in tokens/_core.scss). They are
 // all declared here, but a browser only fetches a face when rendered text
 // actually matches it, so a product pays for the one face it chose and nothing
 // for the four it did not. A specimen page showing all five is the exception,

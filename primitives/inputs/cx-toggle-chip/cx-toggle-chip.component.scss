@@ -10,7 +10,7 @@
   gap: 0;
   padding: 0 calc(var(--space-sm) + var(--space-xs));
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: var(--opacity-low);
   color: var(--opacity-high);
@@ -74,7 +74,7 @@
 
 .cx-toggle-chip:disabled {
   cursor: default;
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-toggle-chip__check {
@@ -91,16 +91,16 @@
 }
 
 .cx-toggle-chip--selected .cx-toggle-chip__check {
-  max-width: var(--icon-size-md);
+  max-width: 20px;
   opacity: 1;
 }
 
 .cx-toggle-chip--selected.cx-toggle-chip--small .cx-toggle-chip__check {
-  max-width: var(--icon-size-sm);
+  max-width: 16px;
 }
 
 .cx-toggle-chip--selected.cx-toggle-chip--large .cx-toggle-chip__check {
-  max-width: var(--icon-size-lg);
+  max-width: 24px;
 }
 
 .cx-toggle-chip__label {

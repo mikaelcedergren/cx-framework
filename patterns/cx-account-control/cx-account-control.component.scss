@@ -48,8 +48,8 @@
 }
 
 .cx-account-control:active {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-account-control--open {
@@ -62,7 +62,7 @@
 }
 
 .cx-account-control:disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
   cursor: default;
 }
 

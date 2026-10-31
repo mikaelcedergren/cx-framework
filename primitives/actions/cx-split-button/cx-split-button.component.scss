@@ -210,16 +210,16 @@
 }
 
 .cx-split-button--large {
-  min-height: var(--controller-size-large);
+  min-height: 48px;
 }
 
 .cx-split-button--rounded {
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
 }
 
 .cx-split-button--disabled {
-  opacity: var(--opacity-disabled);
+  opacity: 0.55;
 }
 
 .cx-split-button__main,
@@ -275,7 +275,7 @@
 }
 
 .cx-split-button--large .cx-split-button__trigger {
-  width: var(--controller-size-large);
+  width: 48px;
 }
 
 .cx-split-button__main:is(:hover, :focus-visible):not(:disabled),
@@ -292,8 +292,8 @@
 
 .cx-split-button__main:active:not(:disabled),
 .cx-split-button__trigger:active:not(:disabled) {
-  outline: var(--outline-active);
-  outline-offset: var(--outline-active-offset);
+  outline: none;
+  outline-offset: -2px;
 }
 
 .cx-split-button__main:disabled,

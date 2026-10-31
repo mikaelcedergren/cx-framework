@@ -11,7 +11,7 @@
   width: max-content;
   max-width: 100%;
   min-width: var(--controller-size-small);
-  min-height: var(--icon-size-md);
+  min-height: 20px;
   align-items: center;
   gap: var(--space-xs);
   padding: 0 var(--space-xs);
@@ -71,7 +71,7 @@
   cursor: inherit;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   outline: none;
   text-align: left;
 }
@@ -89,7 +89,7 @@
   overflow: hidden;
   font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-small);
+  line-height: var(--line-height-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -108,7 +108,7 @@
   justify-content: center;
   padding: 0;
   border: var(--line);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   corner-shape: round;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
   backdrop-filter: blur(calc(var(--frost-softness) * 2));
