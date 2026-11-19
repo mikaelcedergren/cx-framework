@@ -1,5 +1,10 @@
 # Upgrade notes for cx-framework consumers
 
+## 0.18.1
+
+Backspace in an empty heading immediately after a list removes the heading and returns the
+cursor to the final item. The writer can continue that item or press Enter to start the next one.
+
 ## 0.18.0
 
 ### Markdown list alignment and Backspace

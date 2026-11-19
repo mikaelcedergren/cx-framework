@@ -783,10 +783,12 @@ function buildKeymap(): Plugin {
       const $cursor = selection instanceof TextSelection ? selection.$cursor : null;
       if (!$cursor || $cursor.parent.content.size !== 0) return false;
       const before = state.doc.resolve($cursor.before()).nodeBefore;
-      if ($cursor.parent.type === schema.nodes['paragraph'] && before && isList(before)) {
+      // Blank headings are editable list content too. The default backward join
+      // would wrap the heading in a new list item, reversing the previous press.
+      if (before && isList(before) && !$cursor.parent.type.spec.code) {
         return removeBlockBackward(state, dispatch, $cursor.before(), $cursor.after());
       }
-      // An empty item's first paragraph exits one list level. Let ordinary
+      // An empty item's first text block exits one list level. Let ordinary
       // deletion handle text, selections, and later paragraphs within an item.
       if (
         $cursor.depth < 2 ||
