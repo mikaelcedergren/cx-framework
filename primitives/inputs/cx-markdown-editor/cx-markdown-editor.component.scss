@@ -76,6 +76,11 @@ cx-markdown-editor.cx-markdown-editor-host--document
   line-height: var(--line-height-relaxed);
 }
 
+cx-markdown-editor.cx-markdown-editor-host--document .ProseMirror
+  > :is(ol, ul:has(> li:not(.cx-markdown-editor__task))) {
+  margin-inline-start: var(--space-sm);
+}
+
 cx-markdown-editor.cx-markdown-editor-host--disabled .ProseMirror {
   color: var(--opacity-high);
   cursor: default;

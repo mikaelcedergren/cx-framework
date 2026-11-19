@@ -62,6 +62,10 @@ RULE-ID: menus.declared-meaning SCOPE: component COMPONENT: menus TYPE: MUST TOP
 
 RULE-ID: menus.real-trigger SCOPE: component COMPONENT: menus TYPE: MUST TOPIC: accessibility RULE: Put trigger behavior and menu state on the real button. DESCRIPTION: The actual focusable control owns disabled state, popup relationships, activation, and focus restoration rather than a generic wrapper.
 
+## Dropdowns
+
+RULE-ID: dropdowns.create-and-select SCOPE: component COMPONENT: dropdowns TYPE: SHOULD TOPIC: interaction RULE: When someone choosing an item can create a missing one for immediate use, put the create action in the dropdown footer and label it with the kind of item it creates. Select the new item after a successful save and preserve the previous selection on cancel. DESCRIPTION: A style picker can offer “Add preset” below its choices. In a preset library, creating a preset is a page-level task and can have a page-level action.
+
 ## Dialogs
 
 RULE-ID: dialogs.contained-task SCOPE: component COMPONENT: dialogs TYPE: SHOULD TOPIC: components RULE: Use a dialog for a contained decision or task that benefits from keeping background context. DESCRIPTION: A large multi-destination workflow belongs on a page rather than inside an oversized interruption.

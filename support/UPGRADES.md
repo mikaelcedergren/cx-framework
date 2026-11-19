@@ -1,5 +1,15 @@
 # Upgrade notes for cx-framework consumers
 
+## 0.18.2
+
+Use the dropdown footer when someone needs to create a missing item and select it immediately.
+The README includes a style preset example. The shared design instructions now guide agents
+through learning from concrete corrections during active work, including fixes the owner
+makes directly.
+
+Top-level bullets and numbered lists in the Markdown editor's document mode now have an
+extra 8px of left indent. Existing consumers can adopt this release without code changes.
+
 ## 0.18.1
 
 Backspace in an empty heading immediately after a list removes the heading and returns the

@@ -184,11 +184,4 @@ Keep recommendations directional unless the user asks for a redesign.
 
 ## Design-system feedback
 
-When the same issue appears more than once, flag it as a recurring lesson. Recommend where it belongs:
-
-- UX behavior or principle: AI design philosophy or UX rules
-- Component-specific rule: component rules
-- Reusable fallback wording: fallback copy
-- Primitive or pattern behavior: the consuming product's shared UI system, when one exists
-
-Do not update durable guidance automatically during a review unless the user explicitly asks to make the change.
+Apply [Learning from design corrections](../../design/02-design-system.md#learning-from-design-corrections) when a correction surfaces during review. Identify what allowed the issue through. Where the authoring repository grants documentation scope, hand the finding to the implementation role for a same-task update. In a review-only task, keep the finding in the verdict.

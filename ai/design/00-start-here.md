@@ -41,6 +41,8 @@ Structured `RULE-ID` entries express the normative levels as `TYPE: MUST`, `TYPE
 
 ## Task-local retrieval
 
+[MUST] When the owner corrects a design or makes a relevant fix during the work, apply [Learning from design corrections](02-design-system.md#learning-from-design-corrections) while the reason and surrounding context are available.
+
 [MUST] Start with the task, not the documents:
 
 - Any user-facing decision: read `RULE-ID: system.semantic-coherence`, `RULE-ID: system.no-empty-chrome`, `RULE-ID: system.default-first`, `RULE-ID: surfaces.light-first`, `RULE-ID: content.scannable`, `RULE-ID: layout.start-alignment`, and `RULE-ID: layout.breathing-room` in `03-ux-rules.md` before making or judging the result.

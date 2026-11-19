@@ -105,6 +105,27 @@ output while excluding raw `patterns/`, `primitives/`, and `tooling/` trees. Usa
 in `support/components/guidance.json`, and version-to-version migration instructions remain in
 `support/UPGRADES.md`.
 
+### Create an item from a dropdown
+
+This style picker enables the footer action with `creatable`, labels it through
+`translations.createLabel`, and opens the preset form when the dropdown emits `create`.
+
+```html
+<cx-dropdown
+  label="Style"
+  [availableValues]="presets()"
+  [value]="selectedPresetId()"
+  (valueChange)="selectedPresetId.set($event)"
+  [creatable]="true"
+  [translations]="{ createLabel: 'Add preset' }"
+  (create)="openPresetForm()"
+/>
+```
+
+After saving, add the returned preset to the options and select its ID. Canceling the
+form keeps the current selection. Search is optional. If search is enabled, the
+`create` event supplies the trimmed search text as a suggested name.
+
 ## Structured logging
 
 `server/logging` provides the Node-only logger. Construct one identity per process role from trusted

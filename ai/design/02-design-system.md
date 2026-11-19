@@ -22,6 +22,22 @@ Platform-neutral contract for applying this design thinking through the design s
 
 [NOTE] A square corner profile can be a coherent framework capability: many unrelated products can use the same shape policy while the rounded default remains intact. A route-specific selector that squares one site's card, or a flag that bypasses that card's state behavior, does not qualify. A product-specific workflow may remain local when it composes supported assets and owns only product behavior; reuse does not require moving every feature into the framework.
 
+## Learning from design corrections
+
+[MUST] During active work, examine a concrete design correction when it happens. Use the owner's comment or their relevant before-and-after change to identify what became easier, clearer, or more consistent for the person using the product. Distinguish observed behavior from an inferred reason. Limit inspection to the affected workflow.
+
+[MUST] Validate a candidate lesson before adding it to shared guidance:
+
+1. Identify the decision the correction improves and the evidence for its effect. Check a claim about an interaction against observed behavior or a relevant test. Verify a claim about an API or capability against its public contract.
+2. Find the guidance and resources an agent would use to make that decision today. Check the candidate against the design and engineering philosophy, existing rules, supported components, patterns, and helpers. Explain what the current guidance missed or made hard to find.
+3. Apply the proposed guidance to another plausible consumer with different content or implementation, then identify a case where the advice should stop applying. The guidance must help an agent choose a supported approach using the resources available in its own product.
+
+[MUST] Keep a candidate out of shared guidance while evidence or general fit is missing. If two plausible interpretations would lead to different decisions, or applicable authorities conflict, ask one focused question. A clear correction can meet these checks on its first occurrence.
+
+[MUST] During authorised guidance work, including a standing documentation grant from the authoring repository's owner, make the smallest useful update in the same task. Improve an existing rule, example, or discovery pointer at its source when that addresses the cause. Add a rule only when a reusable decision is missing. If the guidance already makes the decision clear, apply it to the work. Keep product-specific choices with their product. From a consumer checkout, surface a general lesson to the framework owner through the product's permitted handoff.
+
+[MUST] Read the proposed edit as instructions for a consumer that lacks the original conversation. Verify that it leads to the intended decision in the original case, transfers to the other consumer, and respects the boundary case. Run the owning documentation checks and verify any affected resource references before accepting the edit. When guidance changes, tell the owner briefly what decision future work will inherit and where it was recorded.
+
 ## Component words describe roles
 
 [NOTE] Under `RULE-ID: system.component-terms`, a component-family word such as button, icon button, dialog, tabs, menu, tooltip, table, or detail panel describes a semantic role. It does not prescribe a component name, import, property, class, markup shape, rendering technology, or internal implementation.
