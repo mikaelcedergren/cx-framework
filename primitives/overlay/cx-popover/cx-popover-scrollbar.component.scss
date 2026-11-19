@@ -28,16 +28,12 @@
 }
 
 :host-context(.cx-popover:hover) .cx-popover-scrollbar__thumb,
-.cx-popover-scrollbar__thumb:focus-visible,
 .cx-popover-scrollbar__thumb--active {
   opacity: 1;
   pointer-events: auto;
 }
 
-.cx-popover-scrollbar__thumb:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: var(--outline-tab-offset);
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   .cx-popover-scrollbar__thumb {

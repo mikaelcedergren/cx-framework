@@ -13,6 +13,7 @@ export declare class CxToastComponent implements OnChanges, OnDestroy {
     private openInput;
     private requestedOpen;
     private dismissibleValue;
+    private timedValue;
     private pointerInside;
     private focusInside;
     private readonly openState;
@@ -31,6 +32,8 @@ export declare class CxToastComponent implements OnChanges, OnDestroy {
     set open(value: boolean);
     set dismissible(value: boolean);
     get dismissible(): boolean;
+    set timed(value: boolean | undefined);
+    get timed(): boolean | undefined;
     readonly openChange: EventEmitter<boolean>;
     readonly actionEmitter: EventEmitter<CxFeedbackAction>;
     readonly secondaryActionEmitter: EventEmitter<CxFeedbackAction>;
@@ -72,6 +75,6 @@ export declare class CxToastComponent implements OnChanges, OnDestroy {
     private clearHideTimer;
     private cancelTiming;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxToastComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxToastComponent, "cx-toast", never, { "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "action": { "alias": "action"; "required": false; }; "secondaryAction": { "alias": "secondaryAction"; "required": false; }; "open": { "alias": "open"; "required": false; }; "dismissible": { "alias": "dismissible"; "required": false; }; }, { "openChange": "openChange"; "actionEmitter": "action"; "secondaryActionEmitter": "secondaryAction"; "dismissed": "dismissed"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxToastComponent, "cx-toast", never, { "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "mood": { "alias": "mood"; "required": false; }; "action": { "alias": "action"; "required": false; }; "secondaryAction": { "alias": "secondaryAction"; "required": false; }; "open": { "alias": "open"; "required": false; }; "dismissible": { "alias": "dismissible"; "required": false; }; "timed": { "alias": "timed"; "required": false; }; }, { "openChange": "openChange"; "actionEmitter": "action"; "secondaryActionEmitter": "secondaryAction"; "dismissed": "dismissed"; }, never, never, true, never>;
 }
 //# sourceMappingURL=cx-toast.component.d.ts.map

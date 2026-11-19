@@ -1,3 +1,5 @@
+import { InteractivityChecker } from "@angular/cdk/a11y";
+import { ContentFocusObserver } from "../../primitives/shared/content-focus";
 import {
   AfterViewChecked,
   booleanAttribute,
@@ -63,6 +65,8 @@ export type CxDetailPanelMood = CxIconMood;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
+  private readonly interactivity = inject(InteractivityChecker);
+  private contentFocus?: ContentFocusObserver;
   private static nextId = 0;
 
   private readonly host = inject(ElementRef<HTMLElement>);
@@ -184,7 +188,18 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
     return this.selectedTabIdValue;
   }
 
-  public ngAfterViewChecked(): void {}
+  public ngAfterViewChecked(): void {
+    if (!this.contentFocus && this.contentViewport) {
+      this.contentFocus = new ContentFocusObserver(
+        this.contentViewport.nativeElement,
+        this.interactivity,
+        () =>
+          this.normalizedHeading
+            ? `${this.normalizedHeading} content`
+            : "Detail content",
+      );
+    }
+  }
 
   @HostBinding("style.width") get resolvedWidth(): string {
     return `min(max(380px, ${this.minWidth ?? "0px"}, ${this.resizedWidth$() ?? this.width ?? "450px"}), 100%)`;
@@ -439,6 +454,7 @@ export class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.contentFocus?.disconnect();
     this.stopResizeSession();
     this.clearDismissSchedule();
     this.overlayState.release(this.overlayHandle);

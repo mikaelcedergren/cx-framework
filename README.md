@@ -238,6 +238,12 @@ marks every success and error response `private, no-store`; static-file caching 
 contract. The shared site gate preserves an upstream cache header that already contains
 `no-store`, so a locked API response cannot weaken that private policy.
 
+Use `noindexHeader(["/private"])` from `server/security` to exclude path subtrees from search,
+or `noindexHeader("all")` before routes to mark every response `noindex, nofollow`, including
+assets and errors. The default marks no paths; `"/"` remains invalid in a path list so whole-site
+exclusion requires the explicit mode. This is a search instruction, not access control. Crawlers
+must be allowed to retrieve a URL to read its indexing instruction.
+
 Every external provider response must be bounded before it is buffered or decoded. The
 `server/bounded-response` readers require an explicit byte ceiling, consume the Fetch body as a
 stream, cancel and unlock it on overflow or abort, and decode UTF-8 and JSON without replacement or

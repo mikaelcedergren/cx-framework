@@ -33,8 +33,8 @@
 .cx-tag--interactive {
   cursor: pointer;
   transition:
-    background var(--motion-fast) var(--ease-out-in),
-    color var(--motion-fast) var(--ease-out-in);
+    background var(--motion-fast) var(--ease-in-out),
+    color var(--motion-fast) var(--ease-in-out);
 }
 
 /* Hover strengthens the tint while keeping the semantic ink colour. Filling
@@ -44,9 +44,9 @@
   color: var(--ink);
 }
 
-/* The ring belongs to the whole tag: --outline-tab-offset draws inside the
-   box, so tracing the tag's border rather than the inner button keeps the
-   focused control and the visible object the same shape. */
+/* The ring belongs to the whole tag: tracing its boundary rather than the
+   inner button keeps the focused control and the visible object the same
+   shape. The shared offset sets the gap outside the tag. */
 .cx-tag--interactive:has(.cx-tag__body:focus-visible) {
   outline: var(--outline-tab);
   outline-offset: var(--outline-tab-offset);
@@ -111,8 +111,8 @@
   border-radius: var(--radius-full);
   corner-shape: round;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
-  backdrop-filter: blur(calc(var(--frost-softness) * 2));
-  -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 2));
+  backdrop-filter: blur(var(--frost-softness));
+  -webkit-backdrop-filter: blur(var(--frost-softness));
   color: var(--ink);
   cursor: pointer;
   margin: 0;
@@ -120,10 +120,10 @@
   pointer-events: none;
   translate: 0 -50%;
   transition:
-    opacity var(--motion-fast) var(--ease-out-in),
-    transform var(--motion-fast) var(--ease-out-in),
-    background var(--motion-fast) var(--ease-out-in),
-    border-color var(--motion-fast) var(--ease-out-in);
+    opacity var(--motion-fast) var(--ease-in-out),
+    transform var(--motion-fast) var(--ease-in-out),
+    background var(--motion-fast) var(--ease-in-out),
+    border-color var(--motion-fast) var(--ease-in-out);
 }
 
 /* :focus-visible (not :focus-within) so a pointer click can never leave the

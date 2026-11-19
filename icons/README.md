@@ -23,6 +23,9 @@ Every source SVG must be a clean outline icon:
 
 The design source is the owner's design tooling (Figma where applicable); `svg/` holds the clean exports used for implementation and review.
 
+Loading indicators use `cx-spinner`, never an animated icon. Components with a public
+`loading` state own their spinner presentation; consumers use that state.
+
 ## Workflow
 
 After adding or changing an icon in `svg/`:

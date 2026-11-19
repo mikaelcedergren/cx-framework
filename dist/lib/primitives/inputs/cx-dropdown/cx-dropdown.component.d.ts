@@ -70,6 +70,8 @@ export declare class CxDropdownComponent implements AfterViewInit, OnDestroy {
     private readonly hasMoreState;
     private readonly loadingMoreState;
     private readonly placeholderState;
+    private readonly labelState;
+    private readonly ariaLabelState;
     private readonly translationsState;
     private readonly validationState;
     private readonly searchQueryState;
@@ -133,8 +135,10 @@ export declare class CxDropdownComponent implements AfterViewInit, OnDestroy {
     protected readonly labelText$: import("@angular/core").Signal<string>;
     protected readonly searchEnabled$: import("@angular/core").Signal<boolean>;
     protected readonly createValue$: import("@angular/core").Signal<string>;
-    label: string;
-    ariaLabel: string | undefined;
+    set label(value: string);
+    get label(): string;
+    set ariaLabel(value: string | undefined);
+    get ariaLabel(): string | undefined;
     name: string | undefined;
     transparent: boolean;
     set translations(value: CxDropdownTranslations | null | undefined);

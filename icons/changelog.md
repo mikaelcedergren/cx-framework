@@ -19,6 +19,12 @@ Use this shape for new entries:
 
 Keep entries short. The important part is whether an icon's purpose, name, or availability changed.
 
+## 2026-11-10
+
+- Added `skill.svg` — skill marker; imported the owner's UX Foundation artwork and normalized it to the Cortex icon contract.
+- Added `pick-element.svg` — select an element on the page; imported the owner's UX Foundation artwork and normalized it to the Cortex icon contract.
+- Removed `spinner.svg` — loading indicators use the `cx-spinner` component.
+
 ## 2026-09-01
 
 - Changed `folder.svg` — lifted the artwork by 0.5px for optical vertical alignment; meaning unchanged.

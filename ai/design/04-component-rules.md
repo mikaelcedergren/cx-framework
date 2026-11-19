@@ -74,6 +74,8 @@ RULE-ID: dialogs.dismissal-request SCOPE: component COMPONENT: dialogs TYPE: MUS
 
 RULE-ID: dialogs.focus SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: accessibility RULE: Move focus into an opened modal and restore it deliberately on close. DESCRIPTION: Modal focus remains within the topmost active dialog while it is open. After child teardown and parent focus maintenance settle, return focus to the exact invoking control when it remains connected, visible, and focusable; parent containment or initial-focus routines may not overwrite it, though a newly opened top overlay takes precedence. Otherwise move focus to the established deterministic target inside the owning surviving parent surface, never the document body, removed content, or behind another active modal.
 
+RULE-ID: dialogs.form-focus SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: accessibility RULE: On opening a form dialog, focus its first visible, enabled, editable field in reading order. DESCRIPTION: Optional fields participate in order. Set the starting focus once per opening and preserve the user’s place while editing. EXCEPT: An intentionally designated starting control may take precedence for a specific task.
+
 RULE-ID: dialogs.viewport SCOPE: component COMPONENT: dialogs TYPE: MUST TOPIC: layout RULE: Keep dialog content and actions reachable within the viewport. DESCRIPTION: Preserve edge space and provide an intentional inner scroll region when content is taller than the available area.
 
 ## Detail panels
@@ -177,6 +179,8 @@ RULE-ID: switches.state SCOPE: component COMPONENT: switches TYPE: MUST TOPIC: s
 RULE-ID: switches.effect SCOPE: component COMPONENT: switches TYPE: MUST TOPIC: feedback RULE: Make it clear whether a switch applies immediately or waits for a separate save. DESCRIPTION: Do not mix both behaviors without visible feedback.
 
 ## Tables
+
+RULE-ID: tables.content-alignment SCOPE: component COMPONENT: tables TYPE: MUST TOPIC: layout RULE: Align table headers and cell content to the reading start by default, including numbers, currency, percentages, and dates. DESCRIPTION: In left-to-right tables, the header and values in each column share a left edge. EXCEPT: Use right alignment for a specific column only when explicitly requested by the product owner.
 
 RULE-ID: tables.row-navigation SCOPE: component COMPONENT: tables TYPE: MAY TOPIC: interaction RULE: Let a row open details when the row has a clear navigation affordance. DESCRIPTION: A row is not automatically clickable merely because detail content exists.
 

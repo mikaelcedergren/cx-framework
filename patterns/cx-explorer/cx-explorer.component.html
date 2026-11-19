@@ -162,6 +162,13 @@
               <div
                 class="cx-explorer__row cx-explorer__row--folder"
                 cdkDragHandle
+                cdkDropList
+                [id]="folderDropId(folder.id)"
+                [cdkDropListData]="folder"
+                [cdkDropListDisabled]="!editable || !movable"
+                [cdkDropListSortingDisabled]="true"
+                [cdkDropListEnterPredicate]="acceptsFolderItem"
+                (cdkDropListDropped)="onItemFolderDrop($event)"
               >
                 @if (isRenaming(folder.id)) {
                   <span class="cx-explorer__row-icon" aria-hidden="true">
@@ -251,6 +258,8 @@
                     cdkDropList
                     cdkDropListLockAxis="y"
                     [cdkDropListData]="folder.items"
+                    [cdkDropListConnectedTo]="folderDropConnections(folder.id)"
+                    [cdkDropListHasAnchor]="movable"
                     (cdkDropListDropped)="onItemDrop($event, folder.id)"
                   >
                     @for (item of folder.items; track item.id) {

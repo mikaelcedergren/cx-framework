@@ -101,20 +101,6 @@
   border-radius: var(--radius-md);
 }
 
-:host(.cx-icon--spinner) .cx-icon {
-  animation: cx-icon-spin 1.05s linear infinite;
-}
-
-@keyframes cx-icon-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 :host(.cx-icon--mood-primary) {
   color: var(--primary);
 }
@@ -179,10 +165,4 @@
 :host(.cx-icon--mood-danger.cx-icon--solid) {
   background: var(--danger);
   color: var(--on-ink);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host(.cx-icon--spinner) .cx-icon {
-    animation: none;
-  }
 }

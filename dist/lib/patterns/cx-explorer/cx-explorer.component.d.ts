@@ -1,5 +1,5 @@
 import { EventEmitter, OnDestroy } from "@angular/core";
-import { type CdkDragDrop } from "@angular/cdk/drag-drop";
+import { CdkDrag, CdkDropList, type CdkDragDrop } from "@angular/cdk/drag-drop";
 import { type CxIconName } from "../../icons/manifest";
 import { type CxTagColor } from "../../primitives/display/cx-tag";
 import { type CxMenuItem } from "../../primitives/overlay/cx-menu";
@@ -26,6 +26,11 @@ export interface CxExplorerItemOrderChange {
     folderId: string;
     itemIds: readonly string[];
 }
+export interface CxExplorerItemMove {
+    itemId: string;
+    fromFolderId: string;
+    folderId: string;
+}
 export type CxExplorerFolderChange = {
     id: string;
     name: string;
@@ -49,6 +54,8 @@ type CxExplorerRenameTarget = {
  * nothing — the consumer owns persisted effects.
  */
 export declare class CxExplorerComponent implements OnDestroy {
+    private static instanceCounter;
+    private readonly dropScope;
     private readonly host;
     private readonly explorerSurface?;
     private set explorerContent(value);
@@ -87,6 +94,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     loading: boolean;
     /** Enables built-in reordering plus create, rename, restyle, and delete controls. */
     editable: boolean;
+    /** Enables moving folder items; consumers persist itemMove and echo folders. */
+    movable: boolean;
     /** Accessible name of the rail region. Name it after the content it manages. */
     ariaLabel: string;
     /** Optional width / minimum-width overrides as CSS lengths. */
@@ -126,6 +135,8 @@ export declare class CxExplorerComponent implements OnDestroy {
     readonly folderOrderChange: EventEmitter<readonly string[]>;
     /** Controlled item order within one folder; never moves items across folders. */
     readonly itemOrderChange: EventEmitter<CxExplorerItemOrderChange>;
+    /** Append this item to another folder without changing its identity or pins. */
+    readonly itemMove: EventEmitter<CxExplorerItemMove>;
     /** Controlled shortcut order, independent of folder item order. */
     readonly pinnedItemOrderChange: EventEmitter<readonly string[]>;
     /** The item's icon or color changed; emits the updated item. */
@@ -163,6 +174,11 @@ export declare class CxExplorerComponent implements OnDestroy {
     protected onFolderDrop(event: CdkDragDrop<readonly CxExplorerFolder[]>): void;
     protected onFolderMoveByKeyboard(event: Event, folder: CxExplorerFolder, offset: -1 | 1): void;
     protected onItemDrop(event: CdkDragDrop<readonly CxExplorerItem[]>, folderId?: string): void;
+    protected folderDropId(folderId: string): string;
+    protected folderDropConnections(sourceId: string): string[];
+    protected readonly acceptsFolderItem: (drag: CdkDrag<CxExplorerItem>, target: CdkDropList<CxExplorerFolder>) => boolean;
+    protected onItemFolderDrop(event: CdkDragDrop<CxExplorerFolder, readonly CxExplorerItem[], CxExplorerItem>): void;
+    private requestItemMove;
     protected onItemMoveByKeyboard(event: Event, item: CxExplorerItem, offset: -1 | 1, folder?: CxExplorerFolder): void;
     private moveItem;
     protected isSelected(item: CxExplorerItem): boolean;
@@ -202,8 +218,9 @@ export declare class CxExplorerComponent implements OnDestroy {
     private setExpandedFolder;
     private reconcileExpandedFolder;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxExplorerComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "pinnedItemIds": { "alias": "pinnedItemIds"; "required": false; }; "folders": { "alias": "folders"; "required": false; }; "rootItems": { "alias": "rootItems"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "searchable": { "alias": "searchable"; "required": false; }; "searchValue": { "alias": "searchValue"; "required": false; }; "searchAriaLabel": { "alias": "searchAriaLabel"; "required": false; }; "persistenceKey": { "alias": "persistenceKey"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "widthChange": "widthChange"; "searchValueChange": "searchValueChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "folderOrderChange": "folderOrderChange"; "itemOrderChange": "itemOrderChange"; "pinnedItemOrderChange": "pinnedItemOrderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxExplorerComponent, "cx-explorer", never, { "pinnedItemIds": { "alias": "pinnedItemIds"; "required": false; }; "folders": { "alias": "folders"; "required": false; }; "rootItems": { "alias": "rootItems"; "required": false; }; "selectedItemId": { "alias": "selectedItemId"; "required": false; }; "loading": { "alias": "loading"; "required": false; }; "editable": { "alias": "editable"; "required": false; }; "movable": { "alias": "movable"; "required": false; }; "ariaLabel": { "alias": "ariaLabel"; "required": false; }; "width": { "alias": "width"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "searchable": { "alias": "searchable"; "required": false; }; "searchValue": { "alias": "searchValue"; "required": false; }; "searchAriaLabel": { "alias": "searchAriaLabel"; "required": false; }; "persistenceKey": { "alias": "persistenceKey"; "required": false; }; "createItemText": { "alias": "createItemText"; "required": false; }; "itemIcons": { "alias": "itemIcons"; "required": false; }; "folderMenuItems": { "alias": "folderMenuItems"; "required": false; }; "itemMenuItems": { "alias": "itemMenuItems"; "required": false; }; }, { "selectedItemIdChange": "selectedItemIdChange"; "widthChange": "widthChange"; "searchValueChange": "searchValueChange"; "folderCreate": "folderCreate"; "itemCreate": "itemCreate"; "folderChange": "folderChange"; "folderOrderChange": "folderOrderChange"; "itemOrderChange": "itemOrderChange"; "itemMove": "itemMove"; "pinnedItemOrderChange": "pinnedItemOrderChange"; "itemChange": "itemChange"; "folderDelete": "folderDelete"; "itemDelete": "itemDelete"; "menuAction": "menuAction"; }, never, ["[header]"], true, never>;
     static ngAcceptInputType_editable: unknown;
+    static ngAcceptInputType_movable: unknown;
     static ngAcceptInputType_resizable: unknown;
     static ngAcceptInputType_searchable: unknown;
 }

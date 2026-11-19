@@ -10,7 +10,8 @@
   border: var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
-  overflow: hidden;
+  // Rows preserve the corner shape; their focus rings may extend past the frame.
+  overflow: visible;
 }
 
 .cx-list--flat {

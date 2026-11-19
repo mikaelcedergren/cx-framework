@@ -1,3 +1,5 @@
+import { InteractivityChecker } from "@angular/cdk/a11y";
+import { ContentFocusObserver } from "../../shared/content-focus";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,6 +21,8 @@ let nextScrollRegionId = 0;
 })
 export class CxPopoverScrollbarComponent {
   readonly viewport = input.required<HTMLElement>();
+  readonly label = input("Popover content");
+  private readonly interactivity = inject(InteractivityChecker);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly regionId = `cx-popover-scroll-${++nextScrollRegionId}`;
   protected readonly metrics = signal({
@@ -40,6 +44,15 @@ export class CxPopoverScrollbarComponent {
       if (!window) return;
       const previousId = viewport.id;
       if (!previousId) viewport.id = this.regionId;
+      const contentFocus = new ContentFocusObserver(
+        viewport,
+        this.interactivity,
+        () => this.label(),
+        () =>
+          !!viewport.closest(
+            '[role="menu"], [role="listbox"], [role="tree"], [role="grid"]',
+          ),
+      );
       let frame: number | undefined;
       let idle: number | undefined;
 
@@ -101,6 +114,7 @@ export class CxPopoverScrollbarComponent {
       observeSizes();
 
       cleanup(() => {
+        contentFocus.disconnect();
         resize.disconnect();
         mutations.disconnect();
         viewport.removeEventListener("scroll", onScroll);
@@ -120,7 +134,6 @@ export class CxPopoverScrollbarComponent {
     event.preventDefault();
     event.stopPropagation();
     const thumb = event.currentTarget as HTMLElement;
-    thumb.focus({ preventScroll: true });
     thumb.setPointerCapture(event.pointerId);
     this.drag = {
       pointerId: event.pointerId,
@@ -145,39 +158,6 @@ export class CxPopoverScrollbarComponent {
     const thumb = event.currentTarget as HTMLElement;
     if (thumb.hasPointerCapture(event.pointerId))
       thumb.releasePointerCapture(event.pointerId);
-  }
-
-  protected onKeydown(event: KeyboardEvent): void {
-    const viewport = this.viewport();
-    const step = Number.parseFloat(
-      getComputedStyle(viewport).getPropertyValue("--controller-size"),
-    );
-    let next: number;
-    switch (event.key) {
-      case "ArrowDown":
-        next = viewport.scrollTop + step;
-        break;
-      case "ArrowUp":
-        next = viewport.scrollTop - step;
-        break;
-      case "PageDown":
-        next = viewport.scrollTop + viewport.clientHeight;
-        break;
-      case "PageUp":
-        next = viewport.scrollTop - viewport.clientHeight;
-        break;
-      case "Home":
-        next = 0;
-        break;
-      case "End":
-        next = this.metrics().maximum;
-        break;
-      default:
-        return;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    viewport.scrollTop = next;
   }
 
   protected onWheel(event: WheelEvent): void {

@@ -17,6 +17,7 @@ import { isHostVisible } from '../../shared/host-visibility';
 import { CxPopoverBackdropComponent } from '../cx-popover-backdrop/cx-popover-backdrop.component';
 import { CxOverlayStateService, type CxOverlayStateHandle } from '../overlay-state';
 import { CxPopoverScrollbarComponent } from './cx-popover-scrollbar.component';
+import { observeOverlayZoom, overlayZoom } from '../overlay-zoom';
 
 export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 
@@ -29,6 +30,10 @@ export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 })
 export class CxPopoverComponent {
   private readonly document = inject(DOCUMENT);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly ownerState = signal<HTMLElement | undefined>(undefined);
+  protected readonly coordinateZoom = signal(1);
+  protected readonly surfaceZoom = signal(1);
   private readonly overlayState = inject(CxOverlayStateService);
   private readonly openState = signal(false);
   private readonly showBackdropState = signal(true);
@@ -48,7 +53,7 @@ export class CxPopoverComponent {
   constructor() {
     const destroyRef = inject(DestroyRef);
 
-    afterRenderEffect(() => {
+    afterRenderEffect((onCleanup) => {
       const body = this.document?.body;
       if (!body) return;
       const showBackdrop = this.showBackdropState();
@@ -56,11 +61,19 @@ export class CxPopoverComponent {
         this.releasePortaledNodes();
         return;
       }
+      const origin = this.ownerState() ?? this.host;
+      const syncZoom = () => {
+        const zoom = overlayZoom(origin);
+        this.coordinateZoom.set(zoom);
+        this.surfaceZoom.set(zoom / overlayZoom(body));
+      };
+      syncZoom();
+      onCleanup(observeOverlayZoom(origin, syncZoom));
       // Order matters: backdrop must come BEFORE surface in the body so the
       // surface paints on top in every engine. Chromium honours the z-index
       // (popover 1110 > backdrop 1100) regardless of DOM order, but WebKit
       // hit-tests the later-painted sibling and swallows clicks on options.
-      const backdrop = showBackdrop ? this.backdropRef?.nativeElement ?? null : null;
+      const backdrop = showBackdrop ? (this.backdropRef?.nativeElement ?? null) : null;
       this.portaledBackdrop = this.syncPortaledNode(this.portaledBackdrop, backdrop, body);
       const surface = this.surfaceRef?.nativeElement ?? null;
       this.portaledSurface = this.syncPortaledNode(this.portaledSurface, surface, body);
@@ -137,6 +150,7 @@ export class CxPopoverComponent {
   @Input()
   public set owner(value: HTMLElement | undefined) {
     this.ownerElement = value;
+    this.ownerState.set(value);
     this.overlayState.assignOwner(this.overlayHandle, value);
   }
   public get owner(): HTMLElement | undefined {
@@ -167,22 +181,35 @@ export class CxPopoverComponent {
     return this.surfaceRef?.nativeElement;
   }
 
+  /** Position and measured dimensions are viewport pixels; content retains its owner's zoom. */
+  protected surfaceLength(value: number | undefined): number | undefined {
+    return value === undefined ? undefined : value / this.coordinateZoom();
+  }
+
+  protected get viewportHeightLimit(): string {
+    return `calc(100dvh / ${this.coordinateZoom()} - (var(--space-md) * 2))`;
+  }
+
+  protected get viewportWidthLimit(): string {
+    return `calc(100vw / ${this.coordinateZoom()} - (var(--space-md) * 2))`;
+  }
+
   protected get resolvedMaxHeight(): string {
     if (typeof this.maxHeight === 'number' && Number.isFinite(this.maxHeight)) {
-      return `min(${Math.max(Math.floor(this.maxHeight), 0)}px, calc(100dvh - (var(--space-md) * 2)))`;
+      return `min(${Math.max(this.surfaceLength(this.maxHeight)!, 0)}px, ${this.viewportHeightLimit})`;
     }
-    return 'calc(100dvh - (var(--space-md) * 2))';
+    return this.viewportHeightLimit;
   }
 
   protected get resolvedMaxWidth(): string | null {
     if (typeof this.maxWidth === 'number' && Number.isFinite(this.maxWidth)) {
-      return `min(${Math.max(Math.floor(this.maxWidth), 0)}px, calc(100vw - (var(--space-md) * 2)))`;
+      return `min(${Math.max(Math.floor(this.maxWidth), 0)}px, ${this.viewportWidthLimit})`;
     }
     if (typeof this.width === 'number' && Number.isFinite(this.width)) {
       // Explicit width wins over the compact content cap; only the viewport clamps it.
-      return 'calc(100vw - (var(--space-md) * 2))';
+      return this.viewportWidthLimit;
     }
-    return null;
+    return `min(320px, ${this.viewportWidthLimit})`;
   }
 
   protected get normalizedTitle(): string | undefined {
@@ -203,9 +230,7 @@ export class CxPopoverComponent {
         const backdropSurface = this.backdropRef?.nativeElement.querySelector<HTMLElement>(
           '.cx-popover-backdrop__surface',
         );
-        return [backdropSurface, this.surfaceRef?.nativeElement].filter(
-          (surface): surface is HTMLElement => !!surface,
-        );
+        return [backdropSurface, this.surfaceRef?.nativeElement].filter((surface): surface is HTMLElement => !!surface);
       },
       isActive: () => this.openState() && isHostVisible(this.surfaceRef?.nativeElement),
       onEscape: () => this.backdropPressed.emit(),
@@ -223,8 +248,9 @@ export class CxPopoverComponent {
     if (!this.overlayHandle) {
       return;
     }
-    this.overlayHandle.restoreFocus = activeElement === this.document.body
-      || activeElement === this.document.documentElement
-      || (activeElement instanceof HTMLElement && !!surface && surface.contains(activeElement));
+    this.overlayHandle.restoreFocus =
+      activeElement === this.document.body ||
+      activeElement === this.document.documentElement ||
+      (activeElement instanceof HTMLElement && !!surface && surface.contains(activeElement));
   }
 }

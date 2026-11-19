@@ -1,0 +1,53 @@
+<div class="cx-file-card">
+  @if (interactive) {
+    <button
+      type="button"
+      class="cx-file-card__activation"
+      [attr.aria-label]="file.name"
+      [cxTooltip]="file.name"
+      (click)="pressed.emit()"
+    ></button>
+  }
+  <div class="cx-file-card__content">
+    <cx-thumbnail
+      [file]="file"
+      [previewSrc]="previewSrc"
+      [variant]="thumbnailVariant"
+      [loading]="loading"
+      borderRadius="none"
+    />
+    <div class="cx-file-card__caption">
+      <div class="cx-file-card__identity">
+        <div
+          class="cx-file-card__name"
+          [cxTooltip]="file.name"
+          [cxTooltipOverflow]="true"
+        >
+          {{ file.name }}
+        </div>
+        <div class="cx-file-card__metadata">
+          <ng-content select="[slot=meta]">{{
+            metadata?.trim() || fileFormat
+          }}</ng-content>
+        </div>
+      </div>
+      @if (menuItems.length) {
+        <cx-menu
+          class="cx-file-card__menu"
+          [presentation]="{ kind: 'trigger' }"
+          [items]="menuItems"
+          [ariaLabel]="file.name + ' actions'"
+          align="end"
+          (itemSelect)="menuItemSelect.emit($event)"
+        >
+          <cx-icon-button
+            cxMenuTrigger
+            icon="menu-vertical"
+            variant="transparent"
+            [ariaLabel]="'Actions for ' + file.name"
+          />
+        </cx-menu>
+      }
+    </div>
+  </div>
+</div>

@@ -1,35 +1,45 @@
 @if (isOpen$()) {
-  @if (currentImage$(); as image) {
+  @if (currentFile$(); as file) {
     <div
       class="cx-lightbox"
-      [class.cx-lightbox--gallery]="hasNavigation$()"
+      [class.cx-lightbox--caption]="!!file.caption"
       role="dialog"
       aria-modal="true"
       cdkTrapFocus
       [cdkTrapFocusAutoCapture]="true"
       [attr.aria-label]="ariaLabel"
-      [attr.aria-keyshortcuts]="hasNavigation$() ? 'Escape ArrowLeft ArrowRight' : 'Escape'"
+      [attr.aria-keyshortcuts]="
+        hasNavigation$() ? 'Escape ArrowLeft ArrowRight' : 'Escape'
+      "
+      (pointerdown)="onBackdropPointerDown($event)"
+      (pointermove)="onBackdropPointerMove($event)"
       (click)="onBackdropClick($event)"
     >
-      @if (hasNavigation$()) {
-        <cx-icon-button
-          class="cx-lightbox__control cx-lightbox__navigation cx-lightbox__previous"
-          icon="chevron-left"
-          variant="emphasis"
-          [rounded]="true"
-          [ariaLabel]="previousAriaLabel"
-          [disabled]="!canGoPrevious$()"
-          (pressed)="showPreviousImage()"
-        />
-      }
-
-      <figure class="cx-lightbox__surface" tabindex="-1" cdkFocusInitial>
-        <img class="cx-lightbox__image" [src]="image.src" [alt]="image.alt" />
-        @if (image.caption || hasNavigation$()) {
-          <figcaption class="cx-lightbox__meta">
-            @if (image.caption) {
-              <span class="cx-lightbox__caption">{{ image.caption }}</span>
-            }
+      <header class="cx-lightbox__header">
+        <div class="cx-lightbox__identity">
+          <span
+            class="cx-lightbox__name"
+            [cxTooltip]="file.name"
+            [cxTooltipOverflow]="true"
+            data-cx-tooltip-overflow
+            >{{ file.name }}</span
+          >
+          @if (metadata$()) {
+            <span class="cx-lightbox__metadata">{{ metadata$() }}</span>
+          }
+        </div>
+        @if (
+          hasNavigation$() ||
+          (state$() === "ready" &&
+            (kind$() === "image" ||
+              kind$() === "text" ||
+              kind$() === "markdown"))
+        ) {
+          <div
+            class="cx-lightbox__toolbar"
+            role="group"
+            aria-label="Preview controls"
+          >
             @if (hasNavigation$()) {
               <span
                 class="cx-lightbox__position"
@@ -37,24 +47,307 @@
                 aria-live="polite"
                 aria-atomic="true"
                 [attr.aria-label]="positionLabel$()"
+                >{{ positionText$() }}</span
               >
-                {{ positionText$() }}
-              </span>
             }
-          </figcaption>
+            @if (state$() === "ready") {
+              @if (kind$() === "image") {
+                <div
+                  class="cx-lightbox__group"
+                  role="group"
+                  aria-label="Image zoom"
+                >
+                  <cx-icon-button
+                    icon="minus"
+                    variant="transparent"
+                    ariaLabel="Zoom out"
+                    cxTooltip="Zoom out"
+                    [disabled]="scale$() <= 0.1"
+                    (pressed)="zoomBy(-0.25)"
+                  />
+                  <span class="cx-lightbox__position" aria-live="polite">{{
+                    zoomText$()
+                  }}</span>
+                  <cx-icon-button
+                    icon="plus"
+                    variant="transparent"
+                    ariaLabel="Zoom in"
+                    cxTooltip="Zoom in"
+                    [disabled]="scale$() >= 4"
+                    (pressed)="zoomBy(0.25)"
+                  />
+                  <cx-icon-button
+                    icon="minimize"
+                    variant="transparent"
+                    ariaLabel="Fit to view"
+                    cxTooltip="Fit to view"
+                    (pressed)="fit()"
+                  />
+                </div>
+              }
+              @if (kind$() === "text" || kind$() === "markdown") {
+                <div
+                  class="cx-lightbox__group"
+                  role="group"
+                  aria-label="Text view"
+                >
+                  @if (kind$() === "text" || showSource$()) {
+                    <cx-icon-button
+                      icon="text"
+                      variant="transparent"
+                      ariaLabel="Wrap lines"
+                      cxTooltip="Wrap lines"
+                      [selected]="wrap$()"
+                      [ariaPressed]="wrap$()"
+                      (pressed)="wrap$.set(!wrap$())"
+                    />
+                  }
+                  @if (kind$() === "markdown") {
+                    <cx-icon-button
+                      icon="braces"
+                      variant="transparent"
+                      ariaLabel="Show source"
+                      cxTooltip="Show source"
+                      [selected]="showSource$()"
+                      [ariaPressed]="showSource$()"
+                      (pressed)="showSource$.set(!showSource$())"
+                    />
+                  }
+                </div>
+              }
+            }
+          </div>
         }
-      </figure>
+        <div class="cx-lightbox__actions">
+          @if (source$()) {
+            <cx-icon-button
+              icon="download"
+              variant="transparent"
+              ariaLabel="Download original"
+              cxTooltip="Download original"
+              (pressed)="downloadOriginal()"
+            />
+            @if (kind$() === "pdf") {
+              <cx-icon-button
+                icon="open-new"
+                variant="transparent"
+                ariaLabel="Open PDF in new tab"
+                cxTooltip="Open PDF in new tab"
+                (pressed)="openSeparately()"
+              />
+            }
+          }
+          <cx-icon-button
+            icon="remove"
+            variant="transparent"
+            ariaLabel="Close preview"
+            cxTooltip="Close preview"
+            (pressed)="closeFromUser()"
+          />
+        </div>
+      </header>
 
-      @if (hasNavigation$()) {
-        <cx-icon-button
-          class="cx-lightbox__control cx-lightbox__navigation cx-lightbox__next"
-          icon="chevron-right"
-          variant="emphasis"
-          [rounded]="true"
-          [ariaLabel]="nextAriaLabel"
-          [disabled]="!canGoNext$()"
-          (pressed)="showNextImage()"
-        />
+      <div
+        class="cx-lightbox__stage"
+        [class.cx-lightbox__stage--navigation]="hasNavigation$()"
+      >
+        @if (hasNavigation$()) {
+          <cx-icon-button
+            icon="chevron-left"
+            class="cx-lightbox__previous"
+            variant="emphasis"
+            [rounded]="true"
+            [ariaLabel]="previousAriaLabel"
+            [cxTooltip]="previousAriaLabel"
+            [disabled]="!canGoPrevious$()"
+            (pressed)="navigate(-1)"
+          />
+        }
+        <section
+          class="cx-lightbox__surface"
+          tabindex="-1"
+          cdkFocusInitial
+          [attr.aria-label]="file.name"
+          [class.cx-lightbox__surface--document]="
+            kind$() === 'pdf' ||
+            kind$() === 'text' ||
+            kind$() === 'markdown' ||
+            kind$() === 'table'
+          "
+        >
+          @for (key of [renderKey$()]; track key) {
+            @if (state$() === "loading") {
+              <div class="cx-lightbox__state">
+                <cx-spinner ariaLabel="Loading preview" />
+              </div>
+            }
+            @if (
+              state$() === "error" ||
+              state$() === "unsupported" ||
+              state$() === "empty"
+            ) {
+              <div class="cx-lightbox__state">
+                <div class="cx-lightbox__state-content">
+                  <cx-state-message
+                    visual="none"
+                    [heading]="
+                      state$() === 'empty'
+                        ? 'This file is empty'
+                        : 'Preview unavailable'
+                    "
+                    [description]="
+                      state$() === 'unsupported'
+                        ? 'Download the original to open it in another app.'
+                        : message$() || undefined
+                    "
+                  />
+                  @if (retryable$()) {
+                    <cx-icon-button
+                      icon="reload"
+                      ariaLabel="Retry preview"
+                      cxTooltip="Retry preview"
+                      (pressed)="retry()"
+                    />
+                  }
+                </div>
+              </div>
+            } @else {
+              @switch (kind$()) {
+                @case ("image") {
+                  <div
+                    #viewport
+                    class="cx-lightbox__viewport"
+                    tabindex="0"
+                    aria-label="Image preview"
+                    [class.cx-lightbox__viewport--pannable]="canPan$()"
+                    [class.cx-lightbox__viewport--dragging]="dragging$()"
+                    (pointerdown)="startPan($event)"
+                    (pointermove)="pan($event)"
+                    (pointerup)="endPan()"
+                    (pointercancel)="endPan()"
+                    (lostpointercapture)="endPan()"
+                  >
+                    <div class="cx-lightbox__image-plane">
+                      @if (source$()) {
+                        <img
+                          class="cx-lightbox__image"
+                          [src]="source$()"
+                          [alt]="file.alt || file.name"
+                          [draggable]="false"
+                          [style.width.px]="imageWidth$() || null"
+                          [style.height.px]="imageHeight$() || null"
+                          [style.visibility]="
+                            state$() === 'ready' ? 'visible' : 'hidden'
+                          "
+                          (load)="imageLoaded($event, key)"
+                          (error)="mediaFailed(key)"
+                        />
+                      }
+                    </div>
+                  </div>
+                }
+                @case ("pdf") {
+                  @if (pdfUrl$(); as url) {
+                    <iframe
+                      class="cx-lightbox__pdf cx-lightbox__document"
+                      [src]="url"
+                      [title]="file.name"
+                      (load)="ready(key)"
+                      (error)="mediaFailed(key)"
+                    ></iframe>
+                  }
+                }
+                @case ("video") {
+                  @if (source$()) {
+                    <video
+                      class="cx-lightbox__video"
+                      [src]="source$()"
+                      controls
+                      playsinline
+                      preload="metadata"
+                      [attr.aria-label]="file.name"
+                      (loadedmetadata)="ready(key)"
+                      (error)="mediaFailed(key)"
+                    ></video>
+                  }
+                }
+                @case ("audio") {
+                  @if (source$()) {
+                    <audio
+                      class="cx-lightbox__audio"
+                      [src]="source$()"
+                      controls
+                      preload="metadata"
+                      [attr.aria-label]="file.name"
+                      (loadedmetadata)="ready(key)"
+                      (error)="mediaFailed(key)"
+                    ></audio>
+                  }
+                }
+                @default {
+                  @if (state$() === "ready") {
+                    <div
+                      class="cx-lightbox__document"
+                      tabindex="0"
+                      [attr.aria-label]="file.name"
+                    >
+                      @if (textLimited$() && kind$() !== "table") {
+                        <p class="cx-lightbox__notice">
+                          Showing the first part of this file. Download the
+                          original for the full text.
+                        </p>
+                      }
+                      @if (kind$() === "table") {
+                        @if (tableLimited$()) {
+                          <p class="cx-lightbox__notice">
+                            Showing the first 200 rows and up to 40 columns.
+                            Download the original for the full table.
+                          </p>
+                        }
+                        <cx-table
+                          [columns]="tableColumns$()"
+                          [rows]="tableRows$()"
+                          density="compact"
+                          [columnsResizable]="false"
+                          [columnsReorderable]="false"
+                          [showRowActions]="false"
+                          [rightClickMenu]="false"
+                          [emptyState]="{
+                            heading: 'No data rows',
+                            description:
+                              'This file contains only column headings.',
+                          }"
+                        />
+                      } @else if (kind$() === "markdown" && !showSource$()) {
+                        <cx-markdown [markdown]="text$()" />
+                      } @else {
+                        <cx-code-block [code]="text$()" [wrap]="wrap$()" />
+                      }
+                    </div>
+                  }
+                }
+              }
+            }
+          }
+        </section>
+        @if (hasNavigation$()) {
+          <cx-icon-button
+            icon="chevron-right"
+            class="cx-lightbox__next"
+            variant="emphasis"
+            [rounded]="true"
+            [ariaLabel]="nextAriaLabel"
+            [cxTooltip]="nextAriaLabel"
+            [disabled]="!canGoNext$()"
+            (pressed)="navigate(1)"
+          />
+        }
+      </div>
+
+      @if (file.caption) {
+        <footer class="cx-lightbox__footer">
+          <p class="cx-lightbox__caption">{{ file.caption }}</p>
+        </footer>
       }
     </div>
   }

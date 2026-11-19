@@ -82,9 +82,9 @@
   background: var(--info);
 }
 
+// The visible resize line is also the keyboard-focus indicator.
 .cx-explorer__resize-handle:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: calc(-1 * var(--outline-tab-offset));
+  outline: none;
 }
 
 .cx-explorer__search {
@@ -154,6 +154,16 @@
   gap: var(--space-2xs);
 }
 
+.cx-explorer__row--folder.cdk-drop-list-dragging {
+  background: var(--opacity-low);
+  border-radius: var(--radius-sm);
+  outline: var(--line);
+}
+
+.cx-explorer__row--folder > .cdk-drag-placeholder {
+  display: none;
+}
+
 .cx-explorer__folder.cdk-drag-preview,
 .cx-explorer__row.cdk-drag-preview {
   border-radius: var(--radius-md);
@@ -166,6 +176,7 @@
 }
 
 .cx-explorer__folder.cdk-drag-placeholder,
+.cx-explorer__row.cdk-drag-anchor,
 .cx-explorer__row.cdk-drag-placeholder {
   opacity: 0;
 }
@@ -337,7 +348,7 @@
   gap: var(--space-2xs);
   padding-right: var(--space-2xs);
   opacity: 0;
-  transition: opacity var(--motion-fast) var(--ease-out-in);
+  transition: opacity var(--motion-fast) var(--ease-in-out);
 }
 
 .cx-explorer__row:hover .cx-explorer__row-actions,

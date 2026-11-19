@@ -1,6 +1,122 @@
 # Upgrade notes for cx-framework consumers
 
-## Assistant
+## 0.18.0
+
+### Markdown list alignment and Backspace
+
+Numbered lists use the same indentation as bullets. Multi-digit numbers reserve extra marker
+space only when needed. Backspace on the blank paragraph after a list returns to its final
+item. If the item ends with a divider, Backspace selects it. Pressing Backspace again removes
+the divider and keeps the cursor in that item. Undo and Redo preserve the transition.
+No consumer migration is required.
+
+### Form dialogs open ready for input
+
+`cx-dialog` focuses the first editable field in its body when it opens.
+Remove local first-field focus handlers and redundant `cdkFocusInitial` markers.
+Keep an explicit marker only when the task calls for a different starting point.
+
+### Popovers in zoomed layouts
+
+`cx-popover` retains its owner's effective CSS zoom when its surface moves to the document
+body. Content, spacing, and corners therefore keep the trigger's scale, including nested zoom
+and changes while open. The shared floating-surface controller measures in that logical space
+and continues to supply viewport-pixel positions and measured dimensions. Pass the existing
+`owner` element for anchored surfaces; otherwise the popover's host supplies its zoom.
+`maxWidth` remains a logical content cap. No new input or consumer migration is required.
+
+### Live dropdown labels
+
+`cx-dropdown` now updates its visible label, accessible name, and automatic selection prompt
+when `label` or `ariaLabel` changes after rendering. Clearing the label removes its header;
+explicit accessible names and placeholders keep their existing precedence. Selected values,
+search, and open state are preserved. No consumer migration is required.
+
+### Spinner icon removed
+
+The `spinner` icon and `cx-icon` spinning animation are removed. Replace loading
+icons with `cx-spinner`, or use the owning control's public `loading` state.
+Spinner sizes are `small` (16px), `default` (24px), `large` (32px), `xlarge`
+(64px), and `auto`. Keep the existing mood. When surrounding status text already
+announces the work, mark the spinner `aria-hidden="true"` to avoid a second announcement.
+
+### Structured pasting in the Markdown editor
+
+Normal paste recognizes common visual bullet and checkbox characters as real lists. A short
+standalone label directly above a plain-text list becomes a level-three section heading; full
+sentences, separated introductory paragraphs and explicit Markdown keep their existing meaning.
+Soft-wrapped plain-text prose joins into paragraphs. Rich HTML keeps headings, links and emphasis;
+visual lists made with paragraphs or line breaks become lists, and double line breaks become
+paragraph boundaries. Deliberate single HTML line breaks remain intact for addresses and verse.
+Nested items, numbering, checkbox state, inline spaces and active formatting survive conversion.
+Internal editor copies, code blocks and explicit paste-as-plain-text keep their literal structure.
+This is local structural conversion, with no AI call or wording changes. No consumer migration.
+
+### Predictable Markdown editing
+
+The Markdown editor keeps adjacent bullet lists as one list and joins consecutively numbered
+lists. Explicit numbering restarts and real paragraph, heading or divider boundaries remain.
+Simple items save compactly; items with multiple paragraphs retain the required blank lines.
+Backspace and Delete at sibling-item boundaries join the text without extra hidden paragraphs.
+Enter splits paragraphs and items without carrying separator spaces into the new block. Undo,
+checkbox state, nested content and active formatting remain intact. Existing values normalize
+inside the editor; consumers continue to store the emitted plain Markdown string.
+
+### Document ingress
+
+Document blockquotes now use the shared 22px editorial lead size, normal weight and upright
+text, with the normal text color and no quotation rule or indentation. In the editor, type
+`>` followed by Space to begin one. The Markdown remains a standard blockquote. Compact
+UI Markdown retains its existing quotation styling.
+
+### Markdown editor divider selection
+
+Selected dividers now use the primary color. Click a divider and press Backspace or Delete
+to remove it; the editor’s existing Undo restores it. No consumer changes are required.
+
+### Mural picker
+
+Mural thumbnails no longer show visible captions, including preset gradients. Image labels remain
+accessible button names. Opening the picker focuses its search field; cancelling or applying
+returns focus to the settings control as before.
+
+### Moving Explorer items and document spacing
+
+`cx-explorer` adds `movable` (false by default) and `itemMove`. Enable it on an editable
+Explorer to move items using folder-header drop targets or the keyboard-accessible **Move to**
+menu. Closed and empty folders accept drops. Persist `{ itemId, fromFolderId, folderId }`,
+append the item to the destination, and echo `folders`; selection and pinned identity stay intact.
+Existing within-folder and pinned reordering are unchanged.
+
+Shared editorial typography now uses progressively smaller top gaps for H1–H4 and no added
+top gap for the first heading. Heading bottom spacing is unchanged. List-item spacing is tighter,
+including paragraph-wrapped bullets in document editors.
+
+### Optional toast timer
+
+`cx-toast` accepts `timed: boolean | undefined`. Leave it omitted for existing behavior:
+plain non-dismissible notifications close after five seconds, while actionable or dismissible
+notifications persist. Set `timed` to `true` for a five-second countdown even with actions, or
+`false` to keep a notification open. Hover and keyboard focus pause the remaining time. Handle
+`openChange` for timer expiry as well as manual dismissal. Use timed actions only where expiry
+is safe and recovery remains available elsewhere.
+
+### Whole-site search exclusion
+
+`noindexHeader("all")` from `server/security` explicitly marks every response `noindex, nofollow`.
+Mount it before routes when the entire product should stay out of search. Existing path-list calls
+and their defaults are unchanged; a `"/"` path entry remains invalid. This does not restrict access,
+and crawlers must be able to fetch URLs to read the header.
+
+### Thumbnail and file card
+
+`CxThumbnailComponent` (`cx-thumbnail`) accepts a required `file` with `src` and `name`, optional `mimeType` and `alt`, an optional `previewSrc`, `variant` (default or page), `fit` (contain by default, or cover), `borderRadius` (default or none), and `loading`. Use none when an enclosing surface owns the corners. The page variant has a common top and side inset, rounded content corners and no bottom gap; it crops from the top. The default variant keeps an inset on every side and uses fit to preserve or crop images. It renders images, escaped text excerpts and bounded CSV/TSV previews; unsupported, empty and failed previews retain a stable footprint. Text fetches are capped at 1 MiB and PDFs at 25 MiB. Requests are cancelled on replacement or destruction.
+
+For PDF first pages, provide `CX_THUMBNAIL_PDF_RENDERER` with a `CxThumbnailPdfRenderer`: an async function receiving bounded PDF bytes and an `AbortSignal`, returning an image `Blob`. The adapter owns its PDF engine and must honour cancellation and release its resources. Without a provider, supply `previewSrc` or accept the labelled fallback. Cortex uses its existing PDF.js dependency; the framework adds no PDF dependency.
+
+`CxFileCardComponent` (`cx-file-card`) composes Thumbnail with the filename, optional `metadata`, a `[slot=meta]` content slot, `menuItems` and `thumbnailVariant` (default or page). The footer has no file icon. Small, discreet text beneath the filename shows the detected file format by default; metadata replaces it, and projected meta content takes precedence over both. Keep the slot read-only. The menu button uses its default size. One rounded border surrounds the preview and footer, separated by an opacity-low line; the filename truncates on one line with the shared full-name tooltip. It is passive by default; `interactive` exposes a button emitting `pressed`, and the separate menu emits `menuItemSelect`. Bind these to product-owned viewing and downloading. Files are structurally compatible with Lightbox. Compose with `cx-grid`; the File card Attachments example uses three columns at a constrained panel-sized width, with `thumbnailVariant="page"`.
+
+### Assistant
 
 `cx-assistant` provides an application-wide hairline, ribbon and answer window. Mount one per app. Supply `actions`, `quickActions`, `context`, and a `respond(request)` callback; handle `select` to perform actions. `query` actions prefill without sending. A `pick(element)` callback opts into contextual picking. `shortcut` defaults to true (Cmd/Ctrl+K); turn it off for additional embedded specimens. `open` supports two-way binding. `maxInputTokens` defaults to 512; UTF-8 byte length supplies a conservative token upper bound, and oversized questions stay editable without submission. The host must enforce its own request budget. Project additional answer content with `[cxAssistantAnswer]`. The component makes no network calls and owns no product data. Abort signals invalidate dismissed or superseded answers.
 
@@ -19,6 +135,24 @@ Entries name the component, state the change, and give the action to take. Every
 version has a section, including one that only says nothing changed for consumers: a
 forgotten note and a quiet release must not look the same from here. Packaging refuses to
 apply a version whose section is missing.
+
+### Additional component and token changes
+
+- Lightbox places previous/next at the sides of the preview and file-specific controls in its header. Existing inputs and navigation behavior are unchanged.
+
+- `cx-list-item` adds `padding="default|sm|md|lg|xl|2xl"`. Default preserves parent list density (compact uses sm, comfortable uses md) and standalone md spacing. Explicit presets apply to both the row and expanded content, overriding list density.
+
+- `cx-lightbox` now previews files. Replace `[images]` with `[files]` and `CxLightboxImage` with `CxLightboxFile`; each item needs `src` and `name`, with optional `mimeType`, byte `size`, `alt`, and `caption`. Navigation and open/index bindings are unchanged. Defaults now say “File preview”, “Previous file”, and “Next file”. Images gain zoom/fit; PDFs use the browser viewer with open-in-new-tab fallback; audio/video use native controls; text, Markdown, CSV and TSV have bounded read-only previews. Other formats keep the original download available. Text fetches are limited to 1 MiB, PDFs to 25 MiB; text rendering stops at 2,000 lines or 200,000 characters, tables at 200 data rows and 40 columns. Bind `(download)` to handle authenticated or cross-origin downloads; otherwise the component uses a native download link. PDF/text fetches require same-origin access or CORS. No Office conversion, remote preview service, or compatibility alias is provided.
+
+- `--outline-tab-offset` now defaults to `2px` instead of `-2px`, placing keyboard focus rings outside controls with a 2px gap when consumed directly. Components consume it directly. List rows and tree controls keep their outward rings visible; Cards and Detail panels preserve necessary content entry points without redundant stops. Resize handles use the existing visible info-colored line as focus feedback. Popover scrollbar thumbs no longer take keyboard or pointer focus; keyboard scrolling belongs to the content.
+
+- Light and High contrast now use `#0000001a` for `--overlay-backdrop` (approximately 10% black per overlay); Dark and Night use `#00000026` (approximately 15%), replacing the heavy 80% dimming. Nested overlays add dimming progressively. Legacy inherits the lighter default; Aqua, Wireframe and Estuary are unchanged. Backdrop blur remains separate. Custom themes can keep their own opacity through the same token.
+
+- Toasts now use layer `1400` and tooltips layer `1500`, so the tooltip role sits above transient notifications. Existing token names stay the same. Custom themes should preserve this order.
+
+- Rename `--ease-out-in` to `--ease-in-out`. Its curve remains `cubic-bezier(0.4, 0, 0.15, 1)`; update custom theme definitions and references to the new name. No compatibility alias is provided.
+
+- Blur now has two independent roles. `--frost-softness` is the final glass-surface blur (`24px`); the new `--overlay-backdrop-blur` is the final blur behind overlays (`2px`). Consume each directly, without calculations. Custom themes that previously used frost softness to control overlay blur must now set the overlay token explicitly. `--overlay-backdrop` still controls only colour and dimming. Estuary and Legacy set both blur tokens to `0px`. See [Choosing the blur role](../tokens/README.md#choosing-the-blur-role) for usage.
 
 ## 0.17.16
 
@@ -1741,8 +1875,6 @@ menu is open, focus returns to it on close, and a side placement hugs its rect.`
   control chooses and the icon APIs used by the rest of the framework. Replace
   `name="settings"` with `icon="settings"` and `[name]="value"` with `[icon]="value"`.
   The old input is removed rather than retained as an alias.
-- `cx-icon` — the spinner icon now remains still when the user prefers reduced motion.
-  No consumer change is required.
 - `cx-dropdown` — keyboard typeahead and Home/End now work reliably on virtualized lists
   (more than 80 options). The scroll jump no longer strands keyboard focus on the page
   body, and Enter or Space on the closed-looking field commits a pending single-select

@@ -5,7 +5,8 @@ export declare function hardenApplication<T extends HardenableApplication>(appli
 export declare function securityHeaders({ frameOptions, }?: {
     frameOptions?: "DENY" | "SAMEORIGIN";
 }): Middleware;
-export declare function noindexHeader(paths?: readonly string[]): Middleware;
+/** Exclude selected path subtrees, or explicitly every response, from search. */
+export declare function noindexHeader(paths?: readonly string[] | "all"): Middleware;
 export declare function noStoreHeader(): Middleware;
 export declare function setStaticCacheHeaders(response: Pick<HttpResponse, "getHeader" | "setHeader">, filePath: string): void;
 export declare function hasNoStoreCacheDirective(value: HeaderValue | undefined): boolean;

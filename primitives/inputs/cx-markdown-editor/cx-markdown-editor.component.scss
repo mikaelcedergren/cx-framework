@@ -90,10 +90,8 @@ cx-markdown-editor .ProseMirror li {
   position: relative;
 }
 
-// Outside markers must fit inside the editor's scrolling viewport, including
-// multi-digit numbers. Keep wrapped lines aligned with the item text.
-cx-markdown-editor .ProseMirror ol {
-  padding-inline-start: 3em;
+cx-markdown-editor .ProseMirror .ProseMirror-selectednode > hr {
+  border-color: var(--primary);
 }
 
 cx-markdown-editor .ProseMirror-hideselection *::selection {

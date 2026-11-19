@@ -113,16 +113,10 @@ export class CxMuralComponent {
     this.pending.set(this.valueState);
     this.query.set('');
     this.pickerOpen.set(true);
-    // The chosen thumbnail (or the first, or the search field when nothing is
-    // offered) takes focus so keyboard users land inside the picker they just
-    // opened.
     this.afterRender(() => {
-      const selected = this.host.nativeElement.querySelector<HTMLElement>(
-        '.cx-mural__option[aria-pressed="true"]',
-      );
-      const first = this.host.nativeElement.querySelector<HTMLElement>('.cx-mural__option');
+      if (!this.pickerOpen()) return;
       const field = this.host.nativeElement.querySelector<HTMLElement>('.cx-mural__search input');
-      (selected ?? first ?? field)?.focus();
+      field?.focus();
     });
   }
 

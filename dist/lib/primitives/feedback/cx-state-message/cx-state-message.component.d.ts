@@ -25,8 +25,8 @@ export declare class CxStateMessageComponent implements AfterViewChecked {
     readonly actionEmitter: EventEmitter<CxStateMessageAction>;
     readonly secondaryActionEmitter: EventEmitter<CxStateMessageAction>;
     ngAfterViewChecked(): void;
-    /** The state carries the mark that matches it; an icon of the consumer's own always wins. */
-    protected get resolvedIcon(): CxIconName;
+    /** Pending uses cx-spinner; other states allow a consumer-supplied icon. */
+    protected get resolvedIcon(): CxIconName | undefined;
     protected get resolvedHeading(): string;
     protected get resolvedDescription(): string;
     protected get hasHeading(): boolean;

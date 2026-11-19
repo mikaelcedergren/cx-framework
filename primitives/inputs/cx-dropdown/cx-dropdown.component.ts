@@ -149,6 +149,8 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   private readonly hasMoreState = signal(false);
   private readonly loadingMoreState = signal(false);
   private readonly placeholderState = signal('');
+  private readonly labelState = signal('Entity');
+  private readonly ariaLabelState = signal<string | undefined>(undefined);
   private readonly translationsState = signal<CxDropdownTranslations>({});
   private readonly validationState = signal<CxFieldValidation | undefined>(undefined);
   private readonly searchQueryState = signal('');
@@ -336,8 +338,23 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   protected readonly searchEnabled$ = this.searchableState.asReadonly();
   protected readonly createValue$ = computed(() => this.searchQueryState().trim());
 
-  @Input() label = 'Entity';
-  @Input() ariaLabel: string | undefined;
+  @Input()
+  public set label(value: string) {
+    this.labelState.set(value);
+  }
+
+  public get label(): string {
+    return this.labelState();
+  }
+
+  @Input()
+  public set ariaLabel(value: string | undefined) {
+    this.ariaLabelState.set(value);
+  }
+
+  public get ariaLabel(): string | undefined {
+    return this.ariaLabelState();
+  }
   @Input() name: string | undefined;
   @Input() transparent = false;
 
@@ -1598,7 +1615,7 @@ export class CxDropdownComponent implements AfterViewInit, OnDestroy {
   }
 
   private updateOptionHeight(): void {
-    const height = this.optionRefs?.first?.nativeElement.getBoundingClientRect().height;
+    const height = this.optionRefs?.first?.nativeElement.offsetHeight;
     if (!height || !Number.isFinite(height)) {
       return;
     }

@@ -9,6 +9,26 @@ export function createListItemViews(
   elementInjector: Injector,
 ) {
   const refreshers = new Set<() => void>();
+  const orderedList: NodeViewConstructor = (initialNode, view): NodeView => {
+    const dom = view.dom.ownerDocument.createElement('ol');
+    const refresh = (node: ProseMirrorNode) => {
+      dom.start = node.attrs['order'];
+      const digits = String(dom.start + node.childCount - 1).length;
+      // Use the same typography indent as bullets. Only unusually wide
+      // numbers need more room so their outside markers are not clipped.
+      dom.style.paddingInlineStart = digits > 1 ? `max(1.5em, ${digits + 1}ch)` : '';
+    };
+    refresh(initialNode);
+    return {
+      dom,
+      contentDOM: dom,
+      update(node) {
+        if (node.type !== initialNode.type) return false;
+        refresh(node);
+        return true;
+      },
+    };
+  };
   const listItem: NodeViewConstructor = (initialNode, view: EditorView, getPos): NodeView => {
     const document = view.dom.ownerDocument;
     const dom = document.createElement('li');
@@ -75,7 +95,7 @@ export function createListItemViews(
     };
   };
   return {
-    nodeViews: { list_item: listItem },
+    nodeViews: { list_item: listItem, ordered_list: orderedList },
     refresh: () => refreshers.forEach(refresh => refresh()),
   };
 }

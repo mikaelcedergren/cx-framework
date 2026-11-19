@@ -3,6 +3,10 @@ import * as i0 from "@angular/core";
 export type CxPopoverSurfaceVariant = 'default' | 'raised' | 'grouped';
 export declare class CxPopoverComponent {
     private readonly document;
+    private readonly host;
+    private readonly ownerState;
+    protected readonly coordinateZoom: import("@angular/core").WritableSignal<number>;
+    protected readonly surfaceZoom: import("@angular/core").WritableSignal<number>;
     private readonly overlayState;
     private readonly openState;
     private readonly showBackdropState;
@@ -42,6 +46,10 @@ export declare class CxPopoverComponent {
     surfaceVariant: CxPopoverSurfaceVariant;
     readonly backdropPressed: EventEmitter<void>;
     surfaceElement(): HTMLElement | undefined;
+    /** Position and measured dimensions are viewport pixels; content retains its owner's zoom. */
+    protected surfaceLength(value: number | undefined): number | undefined;
+    protected get viewportHeightLimit(): string;
+    protected get viewportWidthLimit(): string;
     protected get resolvedMaxHeight(): string;
     protected get resolvedMaxWidth(): string | null;
     protected get normalizedTitle(): string | undefined;

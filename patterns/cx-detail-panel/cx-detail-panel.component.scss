@@ -33,7 +33,8 @@
   min-height: 0;
   max-width: 100%;
   flex-direction: column;
-  overflow: hidden;
+  // Content owns clipping; the outer surface leaves room for focus rings.
+  overflow: visible;
   border: var(--floating-surface-border);
   border-radius: var(--radius-xl);
   background: var(--surface-alt);
@@ -103,9 +104,9 @@
   background: var(--info);
 }
 
+// The visible resize line is also the keyboard-focus indicator.
 .cx-detail-panel__resize-handle:focus-visible {
-  outline: var(--outline-tab);
-  outline-offset: calc(-1 * var(--outline-tab-offset));
+  outline: none;
 }
 
 // Below the mobile breakpoint the panel always fills the frame, so there is
@@ -193,7 +194,7 @@
 
 .cx-detail-panel__content-viewport:focus-visible {
   outline: var(--outline-tab);
-  outline-offset: calc(-1 * var(--outline-tab-offset));
+  outline-offset: var(--outline-tab-offset);
 }
 
 .cx-detail-panel__content {

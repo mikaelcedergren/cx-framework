@@ -129,7 +129,7 @@
 .cx-expansion-panel__content-shell {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--motion-base) var(--ease-out-in);
+  transition: grid-template-rows var(--motion-base) var(--ease-in-out);
 }
 
 .cx-expansion-panel__content-shell--expanded {

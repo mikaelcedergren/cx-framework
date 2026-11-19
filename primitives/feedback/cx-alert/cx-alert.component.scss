@@ -122,7 +122,7 @@
 }
 
 .cx-alert__surface--expandable .cx-alert__body {
-  transition: grid-template-rows var(--motion-base) var(--ease-out-in);
+  transition: grid-template-rows var(--motion-base) var(--ease-in-out);
 }
 
 .cx-alert__body--visible {

@@ -13,6 +13,8 @@ import { type CxIconName } from '../../../icons/manifest';
 import { CxIconComponent } from '../../media/cx-icon';
 import { CxTooltipDirective } from '../../overlay/cx-tooltip';
 
+export type CxListItemPadding = 'default' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
 let nextListItemId = 0;
 
 /**
@@ -34,7 +36,7 @@ export interface CxListItemContext {
   styleUrl: './cx-list-item.component.scss',
   host: {
     role: 'listitem',
-    '[class.cx-list-item-host--compact]': 'context$().density === "compact"',
+    '[attr.data-padding]': 'resolvedPadding',
     '[class.cx-list-item-host--divided]': 'context$().divided',
     '[class.cx-list-item-host--expanded]': 'expanded$()',
     '[class.cx-list-item-host--disabled]': 'disabled',
@@ -57,6 +59,8 @@ export class CxListItemComponent implements OnChanges {
    */
   @Input() itemId: string | undefined;
   @Input() heading = 'List item';
+  /** Default follows the parent list density, or md for a standalone item. */
+  @Input() padding: CxListItemPadding = 'default';
   @Input() description: string | undefined;
   /** Short trailing value such as a count, status word, or timestamp. */
   @Input() meta: string | undefined;
@@ -84,6 +88,12 @@ export class CxListItemComponent implements OnChanges {
   protected readonly descriptionId = `${this.contentId}-description`;
   protected readonly expanded$ = this.expandedState.asReadonly();
   protected readonly context$ = this.contextState.asReadonly();
+
+  protected get resolvedPadding(): Exclude<CxListItemPadding, 'default'> {
+    return this.padding === 'default'
+      ? (this.context$().density === 'compact' ? 'sm' : 'md')
+      : this.padding;
+  }
 
   ngOnChanges(_changes: SimpleChanges): void {
     this.warnInvalidCombinations();

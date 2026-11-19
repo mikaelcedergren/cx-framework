@@ -87,8 +87,8 @@
   overflow: hidden;
   pointer-events: none;
   transition:
-    background var(--motion-fast) var(--ease-out-in),
-    border var(--motion-fast) var(--ease-out-in);
+    background var(--motion-fast) var(--ease-in-out),
+    border var(--motion-fast) var(--ease-in-out);
 }
 
 .cx-switch:hover:not(.cx-switch--selected) .cx-switch__track {
@@ -125,8 +125,8 @@
   border-radius: var(--radius-xs);
   background: var(--on-ink);
   transition:
-    transform var(--motion-fast) var(--ease-out-in),
-    background var(--motion-fast) var(--ease-out-in);
+    transform var(--motion-fast) var(--ease-in-out),
+    background var(--motion-fast) var(--ease-in-out);
 }
 
 .cx-switch--selected .cx-switch__thumb {

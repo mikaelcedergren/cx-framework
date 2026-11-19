@@ -41,6 +41,8 @@ export declare class CxFloatingSurfaceController {
     private readonly placementState;
     private triggerElement?;
     private resizeObserver?;
+    private stopZoomObservation?;
+    private measuredZoom;
     private measurePassFrame?;
     private lockedPlacement?;
     readonly width$: import("@angular/core").Signal<number | undefined>;

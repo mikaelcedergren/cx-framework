@@ -61,7 +61,6 @@ function resolveIconSize(value: Exclude<CxIconSizeInput, undefined>): {
     '[class.cx-icon--size-32]': 'resolvedSizeClass === "32"',
     '[class.cx-icon--size-64]': 'resolvedSizeClass === "64"',
     '[class.cx-icon--size-auto]': 'resolvedSizeClass === "auto"',
-    '[class.cx-icon--spinner]': 'icon === "spinner"',
     '[class.cx-icon--shaped]': 'shape !== "none"',
     '[class.cx-icon--square]': 'shape.startsWith("square")',
     '[class.cx-icon--circle]': 'shape.startsWith("circle")',

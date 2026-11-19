@@ -1,0 +1,59 @@
+<div
+  class="cx-thumbnail"
+  [class.cx-thumbnail--square]="borderRadius === 'none'"
+  [class.cx-thumbnail--page]="variant === 'page'"
+  role="img"
+  [attr.aria-label]="label"
+  [attr.aria-busy]="state() === 'loading'"
+  [attr.data-state]="state()"
+>
+  <div class="cx-thumbnail__content" aria-hidden="true">
+    @for (image of images(); track image.key) {
+      <img
+        class="cx-thumbnail__image"
+        [class.cx-thumbnail__image--cover]="fit === 'cover'"
+        [src]="image.src"
+        alt=""
+        draggable="false"
+        (load)="imageLoaded(image.key)"
+        (error)="imageFailed(image.key)"
+      />
+    }
+    @if (state() === "ready" && text()) {
+      <pre class="cx-thumbnail__text">{{ text() }}</pre>
+    }
+    @if (state() === "ready" && rows().length) {
+      <div class="cx-thumbnail__sheet">
+        <table>
+          <tbody>
+            @for (row of rows(); track $index; let first = $first) {
+              <tr>
+                @for (cell of row; track $index) {
+                  @if (first) {
+                    <th>{{ cell }}</th>
+                  } @else {
+                    <td>{{ cell }}</td>
+                  }
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (state() === "loading") {
+      <div class="cx-thumbnail__state">
+        <cx-spinner size="small" /><span>Loading preview</span>
+      </div>
+    } @else if (state() === "unavailable" || state() === "empty") {
+      <div class="cx-thumbnail__state">
+        @if (state() === "empty") {
+          <cx-icon icon="document" size="32" /><span>{{ fileType }}</span>
+        }
+        <span>{{
+          state() === "empty" ? "Empty file" : "Preview unavailable"
+        }}</span>
+      </div>
+    }
+  </div>
+</div>

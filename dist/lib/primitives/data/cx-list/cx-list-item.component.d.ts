@@ -1,6 +1,7 @@
 import { EventEmitter, type OnChanges, type SimpleChanges } from '@angular/core';
 import { type CxIconName } from '../../../icons/manifest';
 import * as i0 from "@angular/core";
+export type CxListItemPadding = 'default' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 /**
  * List-level presentation owned by the parent `cx-list`. Content projection
  * puts the row outside the list's style scope, so the list pushes these values
@@ -22,6 +23,8 @@ export declare class CxListItemComponent implements OnChanges {
      */
     itemId: string | undefined;
     heading: string;
+    /** Default follows the parent list density, or md for a standalone item. */
+    padding: CxListItemPadding;
     description: string | undefined;
     /** Short trailing value such as a count, status word, or timestamp. */
     meta: string | undefined;
@@ -46,6 +49,7 @@ export declare class CxListItemComponent implements OnChanges {
     protected readonly descriptionId: string;
     protected readonly expanded$: import("@angular/core").Signal<boolean>;
     protected readonly context$: import("@angular/core").Signal<CxListItemContext>;
+    protected get resolvedPadding(): Exclude<CxListItemPadding, 'default'>;
     ngOnChanges(_changes: SimpleChanges): void;
     /** Key the parent list tracks this row by. */
     get key(): string;
@@ -60,7 +64,7 @@ export declare class CxListItemComponent implements OnChanges {
     protected onLinkClick(event: MouseEvent): void;
     private warnInvalidCombinations;
     static ɵfac: i0.ɵɵFactoryDeclaration<CxListItemComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CxListItemComponent, "cx-list-item", never, { "itemId": { "alias": "itemId"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "description": { "alias": "description"; "required": false; }; "meta": { "alias": "meta"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; }, { "pressed": "pressed"; "expandedChange": "expandedChange"; "expandToggle": "expandToggle"; }, never, ["[actions]", "*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CxListItemComponent, "cx-list-item", never, { "itemId": { "alias": "itemId"; "required": false; }; "heading": { "alias": "heading"; "required": false; }; "padding": { "alias": "padding"; "required": false; }; "description": { "alias": "description"; "required": false; }; "meta": { "alias": "meta"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "interactive": { "alias": "interactive"; "required": false; }; "href": { "alias": "href"; "required": false; }; "target": { "alias": "target"; "required": false; }; "rel": { "alias": "rel"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; }, { "pressed": "pressed"; "expandedChange": "expandedChange"; "expandToggle": "expandToggle"; }, never, ["[actions]", "*"], true, never>;
     static ngAcceptInputType_interactive: unknown;
     static ngAcceptInputType_expandable: unknown;
     static ngAcceptInputType_disabled: unknown;

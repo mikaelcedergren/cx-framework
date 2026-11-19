@@ -54,31 +54,6 @@
   </svg>
 </ng-template>
 
-<ng-template #pickIcon>
-  <svg
-    viewBox="0 0 16 16"
-    aria-hidden="true"
-    focusable="false"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-  >
-    <rect
-      x="1.5"
-      y="1.5"
-      width="9"
-      height="9"
-      rx="1.5"
-      stroke-dasharray="2.4 1.8"
-    />
-    <path
-      d="M7 7l6.5 2.6-2.7 1.1-1.1 2.7L7 7Z"
-      fill="currentColor"
-      stroke-linejoin="round"
-    />
-  </svg>
-</ng-template>
-
 <div
   class="assistant__veil"
   [class.is-visible]="open()"
@@ -199,7 +174,7 @@
             aria-label="Pick an element on the page"
             (click)="togglePick($event)"
           >
-            <ng-container [ngTemplateOutlet]="pickIcon" />
+            <cx-icon icon="pick-element" />
           </button>
         }
       </div>
@@ -245,7 +220,7 @@
                 aria-label="Pick an element on the page"
                 (click)="togglePick($event)"
               >
-                <ng-container [ngTemplateOutlet]="pickIcon" />
+                <cx-icon icon="pick-element" />
               </button>
             }
             <button

@@ -160,16 +160,16 @@
 .assistant--ribbon {
   background: color-mix(in srgb, var(--surface) 78%, transparent);
   box-shadow: var(--shadow-mid);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(var(--frost-softness)) saturate(1.3);
+  backdrop-filter: blur(var(--frost-softness)) saturate(1.3);
 }
 
 .assistant--open {
   cursor: default;
   background: color-mix(in srgb, var(--surface) 84%, transparent);
   box-shadow: var(--shadow-high);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--frost-softness)) saturate(1.4);
+  backdrop-filter: blur(var(--frost-softness)) saturate(1.4);
 }
 
 // The idle hairline: plain ink at low opacity (owner direction), on its own layer so it can fade
@@ -430,7 +430,6 @@
     color 120ms ease;
 }
 
-.assistant__pick svg,
 .assistant__ghost svg {
   width: 16px;
   height: 16px;

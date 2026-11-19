@@ -26,6 +26,7 @@ export class CxToastComponent implements OnChanges, OnDestroy {
   private openInput = false;
   private requestedOpen = false;
   private dismissibleValue = false;
+  private timedValue: boolean | undefined;
   private pointerInside = false;
   private focusInside = false;
   private readonly openState = signal(false);
@@ -82,6 +83,17 @@ export class CxToastComponent implements OnChanges, OnDestroy {
     return this.dismissibleValue;
   }
 
+  @Input()
+  public set timed(value: boolean | undefined) {
+    const wasTimed = this.effectiveTimed;
+    this.timedValue = value;
+    this.syncTimingPolicy(wasTimed);
+  }
+
+  public get timed(): boolean | undefined {
+    return this.timedValue;
+  }
+
   @Output() readonly openChange = new EventEmitter<boolean>();
   @Output('action') readonly actionEmitter = new EventEmitter<CxFeedbackAction>();
   @Output('secondaryAction') readonly secondaryActionEmitter = new EventEmitter<CxFeedbackAction>();
@@ -101,7 +113,7 @@ export class CxToastComponent implements OnChanges, OnDestroy {
   }
 
   protected get effectiveTimed(): boolean {
-    return !this.effectiveDismissible;
+    return this.timed ?? !this.effectiveDismissible;
   }
 
   protected get hasHeading(): boolean {

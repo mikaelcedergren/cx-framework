@@ -14,7 +14,6 @@
   // viewport set the ceiling. An explicit width binding overrides all of it.
   width: max-content;
   min-width: 0;
-  max-width: min(320px, calc(100vw - (var(--space-md) * 2)));
   min-height: 0;
   flex-direction: column;
   box-sizing: border-box;
@@ -138,4 +137,16 @@
   .cx-popover {
     display: none !important;
   }
+}
+
+/* Text-only scrolling has one content stop, never a second stop on the thumb. */
+.cx-popover__body:focus-visible,
+.cx-popover__content:focus-visible {
+  outline: none;
+}
+
+.cx-popover:has(> .cx-popover__body:focus-visible),
+.cx-popover:has(> .cx-popover__body > .cx-popover__content:focus-visible) {
+  outline: var(--outline-tab);
+  outline-offset: var(--outline-tab-offset);
 }

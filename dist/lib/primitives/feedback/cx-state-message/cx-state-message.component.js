@@ -7,7 +7,7 @@ import { CxIconComponent } from '../../media/cx-icon/index.js';
 import * as i0 from "@angular/core";
 const CX_STATE_MESSAGE_ICONS = {
     default: 'placeholder',
-    pending: 'spinner',
+    pending: undefined,
     success: 'check',
     scheduled: 'schedule',
     danger: 'error',
@@ -31,7 +31,7 @@ export class CxStateMessageComponent {
     ngAfterViewChecked() {
         this.syncIconInkOffset();
     }
-    /** The state carries the mark that matches it; an icon of the consumer's own always wins. */
+    /** Pending uses cx-spinner; other states allow a consumer-supplied icon. */
     get resolvedIcon() {
         return this.icon ?? CX_STATE_MESSAGE_ICONS[this.state];
     }

@@ -3,6 +3,27 @@ import { CxCheckboxComponent } from '../cx-checkbox/cx-checkbox.component.js';
 /** Project the existing checkbox into ProseMirror's otherwise editor-owned DOM. */
 export function createListItemViews(environmentInjector, elementInjector) {
     const refreshers = new Set();
+    const orderedList = (initialNode, view) => {
+        const dom = view.dom.ownerDocument.createElement('ol');
+        const refresh = (node) => {
+            dom.start = node.attrs['order'];
+            const digits = String(dom.start + node.childCount - 1).length;
+            // Use the same typography indent as bullets. Only unusually wide
+            // numbers need more room so their outside markers are not clipped.
+            dom.style.paddingInlineStart = digits > 1 ? `max(1.5em, ${digits + 1}ch)` : '';
+        };
+        refresh(initialNode);
+        return {
+            dom,
+            contentDOM: dom,
+            update(node) {
+                if (node.type !== initialNode.type)
+                    return false;
+                refresh(node);
+                return true;
+            },
+        };
+    };
     const listItem = (initialNode, view, getPos) => {
         const document = view.dom.ownerDocument;
         const dom = document.createElement('li');
@@ -67,7 +88,7 @@ export function createListItemViews(environmentInjector, elementInjector) {
         };
     };
     return {
-        nodeViews: { list_item: listItem },
+        nodeViews: { list_item: listItem, ordered_list: orderedList },
         refresh: () => refreshers.forEach(refresh => refresh()),
     };
 }

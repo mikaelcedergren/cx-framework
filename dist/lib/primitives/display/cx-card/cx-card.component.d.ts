@@ -10,6 +10,8 @@ export type CxCardPadding = "default" | "md" | "lg" | "xl" | "2xl";
 /** Theme corners, square corners, shared radius presets, or a custom non-negative radius in pixels. */
 export type CxCardBorderRadius = "default" | "none" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | number;
 export declare class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
+    private readonly interactivity;
+    private contentFocus?;
     private warnedInvalidActivation;
     private warnedInvalidExpansion;
     private warnedInvalidTabs;

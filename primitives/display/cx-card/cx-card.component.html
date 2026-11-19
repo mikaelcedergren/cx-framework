@@ -83,7 +83,6 @@
     [attr.aria-label]="
       hasTabs && !selectedTabButtonId ? resolvedTabsAriaLabel : null
     "
-    [attr.tabindex]="hasTabs ? '0' : null"
     (focusin)="onViewportFocusIn($event)"
   >
     <div #cardContent class="cx-card__content">

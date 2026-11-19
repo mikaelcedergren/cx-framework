@@ -73,7 +73,7 @@ Surface and ink roles are:
 - `--opacity-mid`: borders, separators, and medium structure
 - `--opacity-low`: quiet fills and near-background hierarchy, never readable body text
 - `--opacity-darken`: subtle pressed or shaded effects
-- `--overlay-backdrop`: dimming backdrop for modal and navigation overlays
+- `--overlay-backdrop`: dimming colour applied once per modal or navigation overlay; additional layers compound the dimming
 
 Ordinary text links inherit their surrounding text colour in every theme. An underline identifies
 them as links, including their visited, hover, and active states. Component controls retain their
@@ -124,7 +124,9 @@ A theme is a complete visual profile. Components keep the same roles, states, be
 - `--corner-softness` follows `--radius-xs` and informs proportional component geometry. Named radius tokens have their own explicit pixel values; changing softness does not recalculate them.
 - `--surface-separation` controls the inset and seam between separate surfaces in framed composites. It does not replace content padding or layout gaps.
 - `--floating-surface-border` owns elevated-surface boundaries; grounded structure continues to use `--line` or `--line-discreet`.
-- `--frost-softness` controls backdrop blur. A flat theme may set it to zero.
+- `--frost-softness` controls the glass effect on translucent surfaces: `24px` by default.
+- `--overlay-backdrop-blur` controls blur of the screen behind an overlay: `2px` by default. It is independent of the backdrop colour and dimming supplied by `--overlay-backdrop`.
+- Both blur tokens are final values. Use them directly in `blur(var(...))`, without multipliers, calculations or intermediate aliases. Estuary and Legacy set both to `0px`; other themes inherit the defaults.
 - `--shadow-low`, `--shadow-mid`, and `--shadow-high` keep their semantic elevation roles while a profile may render them softly, crisply, or flat.
 
 For a square site, add `cx-corners-square` to the document root alongside its
@@ -161,7 +163,7 @@ feedback on the shorter durations. Pair durations with the shared cubic Bézier
 easing tokens; do not use linear easing for interface transitions. Respect
 reduced-motion preferences when moving content.
 
-Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours, type, density, control sizes, and motion, then changes only visual character: conventional round corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost, and crisp shadows. It is a transition profile, never a component variant.
+Legacy is the final theme in every theme selector. It inherits Light's palette, semantic colours, type, density, control sizes, and motion, then changes only visual character: conventional round corners at 1px softness, 1px surface separation, visible floating boundaries, zero frost and overlay blur, and crisp shadows. It is a transition profile, never a component variant.
 
 ## Estuary
 
@@ -382,45 +384,70 @@ Notable overrides: Legacy sets `--radius-xs` and surface separation to 1px; Estu
 
 ### Elevation and blur
 
-| Token                              | Default/Light definition                                                                                      | Purpose                                                                |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [`--frost-softness`](_core.scss) | `2px`                                                                                                         | Backdrop blur for translucent surfaces; zero creates a flat treatment. |
-| [`--shadow-low`](_core.scss)     | `0 1px 1px #0000000e, 0 2px 2px #00000009, 0 4px 4px #00000005`                                               | Low elevation for raised controls and small surfaces.                  |
-| [`--shadow-mid`](_core.scss)     | `0 1px 1px #0000000f, 0 2px 2px #0000000b, 0 4px 4px #00000009, 0 8px 8px #00000006, 0 16px 16px #00000005`   | Floating elevation for menus and popovers.                             |
-| [`--shadow-high`](_core.scss)    | `0 1px 1px #00000011, 0 3px 3px #0000000d, 0 8px 8px #0000000a, 0 16px 16px #00000008, 0 32px 32px #00000006` | Strong elevation for dialogs and prominent overlays.                   |
+| Token                              | Default/Light definition                                                                                      | Purpose                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`--frost-softness`](_core.scss)   | `24px`                                                                                                        | Glass blur on translucent surfaces; use directly without scaling. Zero removes frost. |
+| [`--shadow-low`](_core.scss)       | `0 1px 1px #0000000e, 0 2px 2px #00000009, 0 4px 4px #00000005`                                               | Low elevation for raised controls and small surfaces.                                 |
+| [`--shadow-mid`](_core.scss)       | `0 1px 1px #0000000f, 0 2px 2px #0000000b, 0 4px 4px #00000009, 0 8px 8px #00000006, 0 16px 16px #00000005`   | Floating elevation for menus and popovers.                                            |
+| [`--shadow-high`](_core.scss)      | `0 1px 1px #00000011, 0 3px 3px #0000000d, 0 8px 8px #0000000a, 0 16px 16px #00000008, 0 32px 32px #00000006` | Strong elevation for dialogs and prominent overlays.                                  |
+
+### Choosing the blur role
+
+Choose by purpose, not by the CSS property name: both effects use `backdrop-filter`.
+
+- Use `--frost-softness` on the translucent surface itself: frosted cards and mastheads, translucent toasts, tag dismiss controls, table column-drag previews, and the Assistant ribbon and open panel. It blurs only what shows through that surface.
+- Use `--overlay-backdrop-blur` on the layer behind dialogs, wizard dialogs, fullscreen dialogs, lightboxes, loading overlays and Launcher. It softens the underlying screen while the overlay holds attention.
+- Keep `--overlay-backdrop` for backdrop colour and dimming. Changing it does not change either blur strength.
+- Changing one blur token must not change the other treatment. Do not derive one from the other or introduce component-specific strengths. Theme overrides set each final value explicitly when they differ from the core default.
+- Preserve existing no-blur states, print styles and reduced-transparency fallbacks. A `0px` theme override removes blur; it does not make a translucent fill opaque.
 
 ### Motion
 
-| Token                               | Default/Light definition       | Purpose                                              |
-| ----------------------------------- | ------------------------------ | ---------------------------------------------------- |
-| [`--motion-fast`](_core.scss)     | `120ms`                        | Immediate control feedback.                          |
-| [`--motion-base`](_core.scss)     | `180ms`                        | Standard interface transition.                       |
-| [`--motion-slow`](_core.scss)     | `240ms`                        | More visible state or surface transition.            |
-| [`--motion-slower`](_core.scss)   | `400ms`                        | Deliberate spatial movement, such as lifting a card. |
-| [`--ease-out`](_core.scss)        | `cubic-bezier(0, .3, .3, 1)`   | Standard transition that settles gently.             |
-| [`--ease-out-strong`](_core.scss) | `cubic-bezier(.22, 1, .36, 1)` | Pronounced deceleration for arriving surfaces.       |
-| [`--ease-out-in`](_core.scss)     | `cubic-bezier(.4, 0, .15, 1)`  | Smooth change between interface states.              |
-| [`--ease-in`](_core.scss)         | `cubic-bezier(0, .4, .15, 1)`  | Acceleration for departure or withdrawal.            |
+| Token                               | Default/Light definition        | Purpose                                              |
+| ----------------------------------- | ------------------------------- | ---------------------------------------------------- |
+| [`--motion-fast`](_core.scss)       | `120ms`                         | Immediate control feedback.                          |
+| [`--motion-base`](_core.scss)       | `180ms`                         | Standard interface transition.                       |
+| [`--motion-slow`](_core.scss)       | `240ms`                         | More visible state or surface transition.            |
+| [`--motion-slower`](_core.scss)     | `400ms`                         | Deliberate spatial movement, such as lifting a card. |
+| [`--ease-out`](_core.scss)          | `cubic-bezier(0, .3, .3, 1)`    | Standard transition that settles gently.             |
+| [`--ease-out-strong`](_core.scss)   | `cubic-bezier(.22, 1, .36, 1)`  | Pronounced deceleration for arriving surfaces.       |
+| [`--ease-in-out`](_core.scss)       | `cubic-bezier(0.4, 0, 0.15, 1)` | Smooth change between interface states.              |
+| [`--ease-in`](_core.scss)           | `cubic-bezier(0, .4, .15, 1)`   | Acceleration for departure or withdrawal.            |
 
 ### Layer order
 
+Toasts sit above ordinary overlays; tooltips sit above toasts so help remains visible for controls within notifications.
+
 | Token                                             | Default/Light definition | Purpose                                          |
 | ------------------------------------------------- | ------------------------ | ------------------------------------------------ |
-| [`--z-index-sticky`](_core.scss)               | `80`                     | Sticky content above the normal page plane.      |
-| [`--z-index-nav-overlay-backdrop`](_core.scss) | `90`                     | Dimming plane behind overlay navigation.         |
-| [`--z-index-nav-overlay`](_core.scss)          | `95`                     | Overlay navigation above its backdrop.           |
-| [`--z-index-detail`](_core.scss)               | `100`                    | Detail panels above ordinary navigation.         |
-| [`--z-index-dialog`](_core.scss)               | `1200`                   | Dialogs above the application layers.            |
-| [`--z-index-popover-backdrop`](_core.scss)     | `1250`                   | Dismissal or dimming plane behind popovers.      |
-| [`--z-index-popover`](_core.scss)              | `1300`                   | Popover surfaces above dialogs.                  |
-| [`--z-index-tooltip`](_core.scss)              | `1400`                   | Tooltips above controls and popovers.            |
-| [`--z-index-toast`](_core.scss)                | `1500`                   | Transient notifications above ordinary overlays. |
-| [`--z-index-debug`](_core.scss)                | `9999`                   | Internal debugging surfaces above the interface. |
+| [`--z-index-sticky`](_core.scss)                  | `80`                     | Sticky content above the normal page plane.      |
+| [`--z-index-nav-overlay-backdrop`](_core.scss)    | `90`                     | Dimming plane behind overlay navigation.         |
+| [`--z-index-nav-overlay`](_core.scss)             | `95`                     | Overlay navigation above its backdrop.           |
+| [`--z-index-detail`](_core.scss)                  | `100`                    | Detail panels above ordinary navigation.         |
+| [`--z-index-dialog`](_core.scss)                  | `1200`                   | Dialogs above the application layers.            |
+| [`--z-index-popover-backdrop`](_core.scss)        | `1250`                   | Dismissal or dimming plane behind popovers.      |
+| [`--z-index-popover`](_core.scss)                 | `1300`                   | Popover surfaces above dialogs.                  |
+| [`--z-index-toast`](_core.scss)                   | `1400`                   | Transient notifications above ordinary overlays. |
+| [`--z-index-tooltip`](_core.scss)                 | `1500`                   | Tooltips above controls, popovers and toasts.    |
+| [`--z-index-debug`](_core.scss)                   | `9999`                   | Internal debugging surfaces above the interface. |
 
 ### Backdrop and keyboard focus
 
-| Token                                  | Default/Light definition | Purpose                                                             |
-| -------------------------------------- | ------------------------ | ------------------------------------------------------------------- |
-| [`--overlay-backdrop`](_core.scss)    | `#000000cc`              | Dims the underlying screen while an overlay holds attention.        |
-| [`--outline-tab`](_core.scss)        | `none`                   | Keyboard-navigation ring; appears only in keyboard-navigation mode. |
-| [`--outline-tab-offset`](_core.scss) | `-2px`                   | Insets the keyboard ring so it follows the control boundary.        |
+Keyboard outlines consume `--outline-tab` and the positive `--outline-tab-offset` directly: a `2px` gap outside the focused control. Never negate the offset to compensate for clipping; keep the focus decoration visible at its owning surface. Explorer and Detail panel resize handles use their existing `--info` line as the keyboard-focus indicator instead of an outline.
+
+Tab stops belong to useful controls and necessary content entry points. Text-only tab panels and otherwise unreachable scrolling content retain an entry point; ordinary passive blocks and scrollbar thumbs do not add redundant stops.
+
+Light and High contrast use `#0000001a`: black at approximately 10% opacity per overlay (10.2% after hex-alpha rounding). Dark and Night use `#00000026`: approximately 15% black (14.9% after rounding), giving the underlying content more separation in darker themes.
+
+Each newly opened dialog dims the page and earlier dialogs beneath it; it does not replace the earlier backdrop. Two layers dim the original page by approximately 19% in Light and High contrast or 28% in Dark and Night; five layers produce approximately 42% or 55%, respectively. The top dialog keeps its normal surface and text colours.
+
+Legacy inherits Light's backdrop colour. Aqua, Wireframe and Estuary keep their explicit backdrop colours and strengths. Dimming and `--overlay-backdrop-blur` are independent; Light, High contrast, Dark and Night retain `2px` blur per layer.
+
+On Cortex's Dialog page, the **Stacked dialogs** example opens up to five dialogs, one from the previous dialog. Close or Escape removes only the top dialog and returns to the previous one. Use it to compare the backdrop in each theme.
+
+| Token                                   | Default/Light definition | Purpose                                                                                           |
+| --------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------- |
+| [`--overlay-backdrop`](_core.scss) | `#0000001a` | About 10% black per overlay; stacked layers gently compound the dimming. |
+| [`--overlay-backdrop-blur`](_core.scss) | `2px`                    | Blurs the screen behind an overlay, independently of surface frost; use directly without scaling. |
+| [`--outline-tab`](_core.scss)           | `none`                   | Keyboard-navigation ring; appears only in keyboard-navigation mode.                               |
+| [`--outline-tab-offset`](_core.scss)    | `2px`                    | Places the keyboard ring outside the control with a 2px gap.                                       |

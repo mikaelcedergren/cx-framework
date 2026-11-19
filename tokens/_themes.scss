@@ -80,7 +80,7 @@
   --opacity-mid: #ebf5ff14; // Borders, separators and medium-strength structure.
   --opacity-low: #ebf5ff08; // Quiet fills and the soft field-interaction outline.
   --opacity-darken: #0000000d; // Subtle shading layered over an existing surface.
-  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+  --overlay-backdrop: #00000026; // About 15% black per overlay; stacked layers gently compound the dimming.
 
   // Status roles remain distinct from primary and accent actions.
   --success: var(--green); // Completion or healthy status.
@@ -179,7 +179,7 @@
   --opacity-mid: #e1edfc24; // Borders, separators and medium-strength structure.
   --opacity-low: #e1edfc12; // Quiet fills and the soft field-interaction outline.
   --opacity-darken: #0000000d; // Subtle shading layered over an existing surface.
-  --overlay-backdrop: #05070ccc; // Dims the underlying screen while an overlay holds attention.
+  --overlay-backdrop: #00000026; // About 15% black per overlay; stacked layers gently compound the dimming.
 
   // Status roles remain distinct from primary and accent actions.
   --success: var(--green); // Completion or healthy status.
@@ -393,7 +393,7 @@
   --opacity-mid: #00030780; // Borders, separators and medium-strength structure.
   --opacity-low: #00030714; // Quiet fills and the soft field-interaction outline.
   --opacity-darken: #00000008; // Subtle shading layered over an existing surface.
-  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+  --overlay-backdrop: #0000001a; // About 10% black per overlay; stacked layers gently compound the dimming.
 
   // Status roles remain distinct from primary and accent actions.
   --success: var(--green); // Completion or healthy status.
@@ -603,7 +603,8 @@
   --radius-media-lg: 12px; // Roomier corner radius for large media.
   --radius-xl: 16px; // Broad rounding on large surfaces.
   --radius-2xl: 32px; // Most generous rectangular rounding on large compositions.
-  --frost-softness: 0px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --frost-softness: 0px; // Glass blur on translucent surfaces; use directly without scaling. Zero removes frost.
+  --overlay-backdrop-blur: 0px; // Keeps the screen behind overlays unblurred, independently of surface frost.
   --floating-surface-border: var(--line); // Theme-controlled edge on elevated panels, menus and popovers.
   --shadow-low: 0 1px 3px #0c293914; // Low elevation for raised controls and small surfaces.
   --shadow-mid: 0 4px 12px #0c29391f; // Floating elevation for menus and popovers.
@@ -625,7 +626,8 @@
   --surface-separation: 1px; // Inset and seams between framed surfaces; not content padding.
   --line-discreet: var(--line); // Quiet structural border for low-emphasis boundaries.
   --floating-surface-border: var(--line-discreet); // Theme-controlled edge on elevated panels, menus and popovers.
-  --frost-softness: 0px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --frost-softness: 0px; // Glass blur on translucent surfaces; use directly without scaling. Zero removes frost.
+  --overlay-backdrop-blur: 0px; // Keeps the screen behind overlays unblurred, independently of surface frost.
   --shadow-low: 0 1px 1px #0000001f; // Low elevation for raised controls and small surfaces.
   --shadow-mid: 0 2px 4px #00000029; // Floating elevation for menus and popovers.
   --shadow-high: 0 3px 6px #00000033; // Strong elevation for dialogs and prominent overlays.

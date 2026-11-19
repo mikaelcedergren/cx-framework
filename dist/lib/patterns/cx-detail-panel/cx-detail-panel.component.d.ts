@@ -9,6 +9,8 @@ export type CxDetailPanelVariant = "floating" | "fixed";
 export type CxDetailPanelFooterMode = "default" | "custom";
 export type CxDetailPanelMood = CxIconMood;
 export declare class CxDetailPanelComponent implements AfterViewChecked, OnDestroy {
+    private readonly interactivity;
+    private contentFocus?;
     private static nextId;
     private readonly host;
     private readonly overlayState;

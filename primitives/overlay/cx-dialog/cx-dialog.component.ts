@@ -29,6 +29,16 @@ let cxDialogId = 0;
 const CX_DIALOG_PRIMARY_SHORTCUT = ['Mod', 'Enter'] as const;
 const CX_DIALOG_SECONDARY_SHORTCUT = ['Esc'] as const;
 
+// Discover editable controls by their semantics, including composite value pickers.
+const FORM_FIELDS = [
+  'input:not([type="button"], [type="reset"], [type="submit"], [type="image"], [type="hidden"])',
+  'select', 'textarea', '[contenteditable=""]', '[contenteditable="true"]', '[contenteditable="plaintext-only"]',
+  '[role="textbox"]', '[role="searchbox"]', '[role="combobox"]', '[role="listbox"]',
+  '[role="checkbox"]', '[role="radio"]', '[role="switch"]', '[role="slider"]', '[role="spinbutton"]',
+  'button[aria-haspopup="listbox"]', 'button[aria-pressed]',
+  'cx-date-span-picker button[aria-haspopup="dialog"]', 'cx-file-upload button', 'cx-drop-zone button',
+].join(',');
+
 export type CxDialogVariant = 'confirm' | 'info';
 export type CxDialogMood = CxButtonMood;
 export type CxDialogSize = 'small' | 'default' | 'large';
@@ -377,9 +387,29 @@ export class CxDialogComponent implements OnChanges, OnDestroy {
     if (!this.canOwnFocus(dialogElement)) {
       return;
     }
-    if (!this.hasValidOwnedFocus(dialogElement)) {
-      this.rehomeFocus();
+    if (this.hasValidOwnedFocus(dialogElement)) {
+      return;
     }
+
+    const body = dialogElement.querySelector('.cx-dialog__body');
+    // An intentional starting point in projected content takes precedence over discovery.
+    if (body?.querySelector('[cdkFocusInitial], [cdk-focus-initial]')) {
+      this.focusTrapDirective?.focusTrap.focusInitialElement({ preventScroll: true });
+      if (this.hasValidOwnedFocus(dialogElement)) return;
+    }
+
+    for (const field of body?.querySelectorAll<HTMLElement>(FORM_FIELDS) ?? []) {
+      if (
+        field.closest('[role="dialog"], [role="alertdialog"]') !== dialogElement
+        || field.closest('[hidden], [inert], [aria-hidden="true"], [aria-disabled="true"], [aria-readonly="true"]')
+        || field.matches(':disabled, [readonly]')
+        || (field.hasAttribute('tabindex') && field.tabIndex < 0)
+        || !this.interactivityChecker.isFocusable(field)
+      ) continue;
+      field.focus({ preventScroll: true });
+      if (this.document.activeElement === field) return;
+    }
+    this.rehomeFocus();
   }
 
   private queueFocusOwnershipCheck(): void {

@@ -30,11 +30,13 @@
   }
 
   h1 {
+    margin-top: var(--space-xl);
     font-size: var(--font-size-hero);
     line-height: var(--line-height-display);
   }
 
   h2 {
+    margin-top: var(--space-lg);
     font-size: var(--font-size-title-2);
   }
 
@@ -43,6 +45,15 @@
   h5,
   h6 {
     font-size: var(--font-size-title-3);
+    margin-top: var(--space-sm);
+  }
+
+  h3 {
+    margin-top: var(--space-md);
+  }
+
+  > :nth-child(1 of h1, h2, h3, h4, h5, h6) {
+    margin-top: 0;
   }
 
   p,
@@ -81,7 +92,15 @@
   }
 
   li {
-    margin-bottom: var(--space-xs);
+    margin-bottom: var(--space-2xs);
+  }
+
+  li > p {
+    margin-bottom: var(--space-sm);
+  }
+
+  li:last-child > p:last-child {
+    margin-bottom: 0;
   }
 
   li:last-child {
@@ -107,12 +126,13 @@
   }
 
   blockquote {
-    padding-inline-start: 1em;
-    border-inline-start: calc(var(--border-width) * 3) solid var(--accent);
-    color: var(--opacity-high);
-    font-size: 1.1111em;
-    font-style: italic;
-    line-height: 1.5;
+    padding: 0;
+    border: 0;
+    color: var(--ink);
+    font-size: var(--font-size-editorial-lead);
+    font-weight: var(--font-weight-regular);
+    font-style: normal;
+    line-height: var(--line-height-relaxed);
   }
 
   blockquote p {

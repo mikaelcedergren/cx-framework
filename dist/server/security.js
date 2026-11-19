@@ -25,12 +25,14 @@ export function securityHeaders({ frameOptions = "DENY", } = {}) {
         next();
     };
 }
+/** Exclude selected path subtrees, or explicitly every response, from search. */
 export function noindexHeader(paths = []) {
-    const prefixes = paths.map(normalizePathPrefix);
+    const prefixes = paths === "all" ? [] : paths.map(normalizePathPrefix);
     return (request, response, next) => {
         const requestPath = decodeSafeRequestPathname(String(request.path ?? request.url ?? ""))?.toLowerCase();
-        if (requestPath &&
-            prefixes.some((prefix) => requestPath === prefix || requestPath.startsWith(`${prefix}/`))) {
+        if (paths === "all" ||
+            (requestPath &&
+                prefixes.some((prefix) => requestPath === prefix || requestPath.startsWith(`${prefix}/`)))) {
             response.setHeader("X-Robots-Tag", "noindex, nofollow");
         }
         next();

@@ -4,6 +4,7 @@ import type { NodeViewConstructor } from 'prosemirror-view';
 export declare function createListItemViews(environmentInjector: EnvironmentInjector, elementInjector: Injector): {
     nodeViews: {
         list_item: NodeViewConstructor;
+        ordered_list: NodeViewConstructor;
     };
     refresh: () => void;
 };

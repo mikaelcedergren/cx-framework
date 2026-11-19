@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "entrypoint": "@mikaelcedergren/cx-framework",
-  "componentCount": 139,
-  "catalogSha256": "8b3e4fdebbc1e00e106b2334089461fd2e2e999f76d2c324be0d702698b1d283",
+  "componentCount": 141,
+  "catalogSha256": "6480a6db2209fca60cd20d9e775a65c2f2476562175f90f95513d066dd459482",
   "components": [
     {
       "name": "cx-account-control",
@@ -404,7 +404,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "2987f9a4afd92a36c65a9caca887c80a21bd33a831eaa9818b29fe92b3d5d351"
+            "sha256": "c43261fc962dfb9679230a483a797f8f96ee488837530f311fbf2b18004ee5c4"
           }
         ]
       }
@@ -535,13 +535,13 @@
         },
         "template": {
           "kind": "external",
-          "sha256": "9e0a6736930a353d979421316c07887ab6042e782db46fce6a10b8acb9ea03f3"
+          "sha256": "bae4191f3f0a1c2a1663d9a6907cab1267ce5607f4d9b3b571e5170a5e555c28"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "f46f04e640a73e45821755d632c0b2eb4c5828d3a4e0773358ee3a1df697164c"
+            "sha256": "2219d4c203b377755ce61feebeb302e5ec3440b6f33f8a06d6e9e3a69d67e29b"
           }
         ]
       }
@@ -1882,17 +1882,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "096b1c09b17ac347b7ec09cc0fcee153aa66ce9ca12422ef1699af879a1aea8d"
+          "sha256": "a52812b3cbe6fb60ad6d22ebc46145968c41485a83f2b4fe406e332e673f0c77"
         },
         "template": {
           "kind": "external",
-          "sha256": "3d36539b56ee2ac8c93ae90a8b08fe9bc82f77365c686d30710f149edac361b1"
+          "sha256": "c6ce16c4438e10d50a2db6dacb15c10f1f4ad2fbdc34d2c9e12655d5b514128c"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "ccdc7a033729d22c09fb6f91c4e0c90eaba0e19bbe40ef8eba1a1e9285372bbe"
+            "sha256": "8cebe8457561509b25c1034f3195b31f029fe689f59ef739a1b11a5327d38074"
           }
         ]
       }
@@ -3491,17 +3491,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "ad202c1784dfd9648ad5392158f1a3d4c3a8cb7b3aa3658361443b8258543b28"
+          "sha256": "b8574499931f4228fc9c04958e9a4d4a81a93b66990fedc2f868c85f6c10146a"
         },
         "template": {
           "kind": "external",
-          "sha256": "f4f2176f1bb9d9fac650a66ee320840255320fbc53e615c17186235b05ef7b02"
+          "sha256": "2d0119bed18303c06c2c241e915ea65114b8eb5e631ba58eabd47419216552dc"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "f63cb58f599ca72450d4404b5d832408985230cda5cc5ae7a1a289b3bb66e2ae"
+            "sha256": "3dd417b40c6d6111ba06a4135d140727d19bfb40eba58af81ca43029259c8ea9"
           }
         ]
       }
@@ -3745,7 +3745,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "793715503dce2c9026bca165361e3c0e580ae3d0bfdb883e95631a2c02767ba8"
+          "sha256": "a82194dd28f1426cb1b13639cea5d730563f27d3fff2baa6fffb9df57ce12262"
         },
         "template": {
           "kind": "external",
@@ -3755,7 +3755,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "12fd2dbfde90fccd55b17bd652c65e44658de53dcc26955f17a179e4cb0a4764"
+            "sha256": "4cd5c1476a3ad970b892c9e4142b3928c0fd556df87454e867ea176cbb27ac6e"
           }
         ]
       }
@@ -4070,7 +4070,7 @@
             "type": "string",
             "required": false,
             "transform": null,
-            "defaultValue": "'Entity'",
+            "defaultValue": null,
             "source": "decorator"
           },
           {
@@ -4245,7 +4245,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "89725e8ea26d3834523ff0e88f1fa77c4d07ad3ab93cd34256368d95f38e7c49"
+          "sha256": "ec1bc331251058a1bb6e735852f218b92c6e648a635753df920b8e7d7775c985"
         },
         "template": {
           "kind": "external",
@@ -4537,7 +4537,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "1d12ec388fe6e6a7bfc6c25b9f7e5879e273e27ea8a813d03f0765d6889447c1"
+            "sha256": "6f6d4d4f56c3086219a8fcde546f5ebe3c7813ee46496e437756564ca684506d"
           }
         ]
       }
@@ -4632,6 +4632,15 @@
             "required": false,
             "transform": null,
             "defaultValue": "null",
+            "source": "decorator"
+          },
+          {
+            "binding": "movable",
+            "member": "movable",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
             "source": "decorator"
           },
           {
@@ -4760,6 +4769,12 @@
             "source": "decorator"
           },
           {
+            "binding": "itemMove",
+            "member": "itemMove",
+            "type": "CxExplorerItemMove",
+            "source": "decorator"
+          },
+          {
             "binding": "itemOrderChange",
             "member": "itemOrderChange",
             "type": "CxExplorerItemOrderChange",
@@ -4805,17 +4820,130 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "aaae1e07dd6a844a7751fe1c63dfb5b875092b3f8554362c20ff2d8894383c61"
+          "sha256": "a040c2e3a9a9fa67e8673d5999ec1cfac76bbd95a5154799e41b706065bb8df4"
         },
         "template": {
           "kind": "external",
-          "sha256": "042a3560e524b736842be69f1879f33c4ac8d0a3da788f408e0271b9be9e14da"
+          "sha256": "7a2b974d17d9519362d8a874480ae30107e20adab736ec56f28ad7ee01332bab"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "4e9f00fb350e0017e2a2dd1e1dd4a97a2e7d5a73711ea3a9c0e5d70cf190d946"
+            "sha256": "3e7f3805efab28065955b0ec8b72403f83cc49aa2b090f93d073f09edc42e8ee"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cx-file-card",
+      "area": "primitive",
+      "category": "display",
+      "kind": "component",
+      "selectors": [
+        "cx-file-card"
+      ],
+      "publicApi": {
+        "symbol": "CxFileCardComponent",
+        "inputs": [
+          {
+            "binding": "file",
+            "member": "file",
+            "type": "CxThumbnailFile",
+            "required": true,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "interactive",
+            "member": "interactive",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
+            "binding": "loading",
+            "member": "loading",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
+            "binding": "menuItems",
+            "member": "menuItems",
+            "type": "readonly CxMenuItem[]",
+            "required": false,
+            "transform": null,
+            "defaultValue": "[]",
+            "source": "decorator"
+          },
+          {
+            "binding": "metadata",
+            "member": "metadata",
+            "type": "string | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "previewSrc",
+            "member": "previewSrc",
+            "type": "string | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "thumbnailVariant",
+            "member": "thumbnailVariant",
+            "type": "CxThumbnailVariant",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          }
+        ],
+        "outputs": [
+          {
+            "binding": "menuItemSelect",
+            "member": "menuItemSelect",
+            "type": "string",
+            "source": "decorator"
+          },
+          {
+            "binding": "pressed",
+            "member": "pressed",
+            "type": "void",
+            "source": "decorator"
+          }
+        ]
+      },
+      "contentProjection": [
+        {
+          "ordinal": 1,
+          "selector": "[slot=meta]"
+        }
+      ],
+      "evidence": {
+        "source": {
+          "sha256": "37abc17d2a8b4f18c49eefaff2afb5fe297d918a118fde6f235f1d482e8db4df"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "cd0d6ae0b8720f9961696d195e718245520d69cd65c6674f75b03304ca22fc79"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "7f566a065b2c2e6c7c188ee18fdd81083f4c537c844f35630cb5140c604e361c"
           }
         ]
       }
@@ -5471,7 +5599,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "c081e495caafbe636bfc1f78f5f7aee28fae73a3e6b336ab2fee8e570139623b"
+            "sha256": "9613e9b836d40cd8713e127e85cf347a558dbb07f302f41ca3d6d761e5da829a"
           }
         ]
       }
@@ -5785,7 +5913,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "35a114051a54d0527cc1d61916d980f1293044358041866609b4d9d8daaed2ab"
+          "sha256": "aac558d6be1d70a3b72ea30d2b5fafb3d20fdc7608da3aaf291a8c531d674312"
         },
         "template": {
           "kind": "external",
@@ -5795,7 +5923,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "2ec4425d028bb14f1be74af56f846e45c371362185bef3df1216a678c66b91dd"
+            "sha256": "6d167d84a04c25e7084379b519327ead3d13ff4886f2542642f7a1747f43d533"
           }
         ]
       }
@@ -6807,7 +6935,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d9da0f8e23f803b370db48d630e6e87cd2f17f5e2c3c290dfece66da5981674b"
+            "sha256": "d3bffe987f649e2bbc8524887ce7dba3112abcff2ba480ccaa4563f70a7b5139"
           }
         ]
       }
@@ -6833,9 +6961,9 @@
             "source": "decorator"
           },
           {
-            "binding": "images",
-            "member": "images",
-            "type": "readonly CxLightboxImage[] | null | undefined",
+            "binding": "files",
+            "member": "files",
+            "type": "readonly CxLightboxFile[]",
             "required": false,
             "transform": null,
             "defaultValue": null,
@@ -6880,6 +7008,12 @@
         ],
         "outputs": [
           {
+            "binding": "download",
+            "member": "download",
+            "type": "CxLightboxFile",
+            "source": "decorator"
+          },
+          {
             "binding": "indexChange",
             "member": "indexChange",
             "type": "number",
@@ -6896,17 +7030,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "0cd1895d2dde2e631531708f58360f05d27d261939e248fbc85b28d55055192c"
+          "sha256": "8cd45b2c42f182d1864336f08362bbc1de0db875910307f95108faba6635ba90"
         },
         "template": {
           "kind": "external",
-          "sha256": "036549abdcdd528fc900605f60e5ee869b19d6bd07abf27e6cd6e2c1a544a169"
+          "sha256": "6d512e4b7ea82310c927d9ad7635298547ac0c31a8fba810fb6f376848178cf2"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a4233ef722b572915234031ed11b50d0238d75256dabda9609923553962edafb"
+            "sha256": "a68f91df0bc4bfd7e42339f50394a6890fa7d18896c4f230acbc7a0014c1e054"
           }
         ]
       }
@@ -6995,7 +7129,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "45ae0a6759be16bf0d0c5187c68d76ddca76a838da2b16ff18e6c709488bf216"
+            "sha256": "754e8fe4ef52733605930330cf0b395a7027e6f9cd414f49c72fb8a393625cb6"
           }
         ]
       }
@@ -7093,6 +7227,15 @@
             "source": "decorator"
           },
           {
+            "binding": "padding",
+            "member": "padding",
+            "type": "CxListItemPadding",
+            "required": false,
+            "transform": null,
+            "defaultValue": "'default'",
+            "source": "decorator"
+          },
+          {
             "binding": "rel",
             "member": "rel",
             "type": "string | undefined",
@@ -7144,7 +7287,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "cce495a901e8abd358320d452d3e3de95d4bd67d23adc395e871fc2e2143c668"
+          "sha256": "deb92a7479eacc0f6023b4e8ba558c43d1e5623138bb65c9c033ee3e320925d2"
         },
         "template": {
           "kind": "external",
@@ -7154,7 +7297,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "874a58c13cf766aeb34b34a5011419079459e07b6458fc86bd3796a8643845fb"
+            "sha256": "4dd032e4df55f16163c03a3530cdcd5a5055088dd78e88c18c3fd8122f09d218"
           }
         ]
       }
@@ -7220,7 +7363,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "d18107bdd4f9d1f6f7fcad42f51a95454d982c169038ee526f73cf8099aae89a"
+            "sha256": "008b1e53ee8affc677908e4afd5c636cad468aaba8c3d4424b222ef41130b091"
           }
         ]
       }
@@ -7496,7 +7639,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "cb21a8c112db8dc1fa9b02e7f2f19a5a9156a24f570d24f5373ce62053fcdd53"
+            "sha256": "e1f89a5a4425984885bc3f3ced706ad855cdc7374d02860246baca5ce84eb3a6"
           }
         ]
       }
@@ -7711,7 +7854,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "302bf10a96ccb572c61ce132d9ccbc242216eded3f732255bb94f8f004876162"
+            "sha256": "d56dcfef620058d3558b63c415c48eb9ed227d9fb11b0139b008b7c9b517e214"
           }
         ]
       }
@@ -8063,17 +8206,17 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "6a025625ffaaafcb915ebd74cbcdc662b3265d6668089ed4aee2a601ed5757b8"
+          "sha256": "e1c3f715137ffb6867173c8f084ec2db43ee6309fd517dc27cdb4540bd3c6dfa"
         },
         "template": {
           "kind": "external",
-          "sha256": "f9c4301d577e14b34b09988af5f4c3dfccaa5b3205fe036d34dcd96f736b3ea4"
+          "sha256": "8e07521beca1469d94008af471c70433d782e982c44896cd59ec81f1d474f110"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "250ce760f2511f6ed47e9b2e0b9c39761d67bd78e5040f4466c8a32aeddca639"
+            "sha256": "58c0ed282d8fc16fbeeafa2c3cc7055a1e2173393a86c0f991c7341b6f7959e7"
           }
         ]
       }
@@ -9358,17 +9501,17 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "da0bd980189ac7cf2453a4f60b1aa6c797c77b08775e1c82387a4aeb7e4e83c6"
+          "sha256": "7271c4de6e628f3c75cdbd7b5a71a6d32707f9ed84ae8bce9644eccf2dadbcf6"
         },
         "template": {
           "kind": "external",
-          "sha256": "c208b6ab297757484a9c5214af00368644096454ce58f226d6e8a7cf6be28360"
+          "sha256": "947ab887f12e4834aa1d04b068bb278eb7dbb99f2d97f85ca677a3a054c4bb34"
         },
         "styles": [
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "4cabc8460214973929be9507e02ab72a4e5099bb3bbf1708e821807db4cdd50f"
+            "sha256": "4b7cac4eb5f255654518d7c41d0039f63c7ad03c4b970d46e31db14da8a59c33"
           }
         ]
       }
@@ -11906,7 +12049,7 @@
       ],
       "evidence": {
         "source": {
-          "sha256": "89641992a92e83498ed06e8d7604bd30ed872799dc36a37e6ad1ecd1c8eff44b"
+          "sha256": "6166254c92b95e2325b525094dc9d5285d07ba01e970e46bc5b7822ebd39cb3b"
         },
         "template": {
           "kind": "external",
@@ -12246,7 +12389,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "6ccb34e002b54527ea4ed14620019159b5ec7f2395c23da7f47b175b631f652a"
+            "sha256": "bf5b1473be38133b00e311ad38ac328f8d06b7c470771838bcba6e85a2bab0fd"
           }
         ]
       }
@@ -13490,7 +13633,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "6e837b2aecae90b706a946263183faa26d549724dd9044fa1f8883c7b3c9d51f"
+            "sha256": "803dc5447329cdfed0f93c903feb152ee3ba97c79f2b8b403caec4efcbef123b"
           }
         ]
       }
@@ -14201,6 +14344,92 @@
       }
     },
     {
+      "name": "cx-thumbnail",
+      "area": "primitive",
+      "category": "media",
+      "kind": "component",
+      "selectors": [
+        "cx-thumbnail"
+      ],
+      "publicApi": {
+        "symbol": "CxThumbnailComponent",
+        "inputs": [
+          {
+            "binding": "borderRadius",
+            "member": "borderRadius",
+            "type": "\"default\" | \"none\"",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "file",
+            "member": "file",
+            "type": "CxThumbnailFile",
+            "required": true,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "fit",
+            "member": "fit",
+            "type": "CxThumbnailFit",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"contain\"",
+            "source": "decorator"
+          },
+          {
+            "binding": "loading",
+            "member": "loading",
+            "type": "boolean",
+            "required": false,
+            "transform": "booleanAttribute",
+            "defaultValue": "false",
+            "source": "decorator"
+          },
+          {
+            "binding": "previewSrc",
+            "member": "previewSrc",
+            "type": "string | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
+          },
+          {
+            "binding": "variant",
+            "member": "variant",
+            "type": "CxThumbnailVariant",
+            "required": false,
+            "transform": null,
+            "defaultValue": "\"default\"",
+            "source": "decorator"
+          }
+        ],
+        "outputs": []
+      },
+      "contentProjection": [],
+      "evidence": {
+        "source": {
+          "sha256": "7edc5fd2c8aaf8290184ae6fbb100cc2a82f412012bc7ea130dc945a3e485407"
+        },
+        "template": {
+          "kind": "external",
+          "sha256": "01b7e7d91084918667c84063082aaf50e665d31a674b1389a86c570a1d82d561"
+        },
+        "styles": [
+          {
+            "ordinal": 1,
+            "kind": "external",
+            "sha256": "30aa8d0ac7101fd306f922c330e81c41d3f485f91f901e4ffbb52899508655cd"
+          }
+        ]
+      }
+    },
+    {
       "name": "cx-time-field",
       "area": "primitive",
       "category": "inputs",
@@ -14468,6 +14697,15 @@
             "transform": null,
             "defaultValue": null,
             "source": "decorator"
+          },
+          {
+            "binding": "timed",
+            "member": "timed",
+            "type": "boolean | undefined",
+            "required": false,
+            "transform": null,
+            "defaultValue": null,
+            "source": "decorator"
           }
         ],
         "outputs": [
@@ -14500,7 +14738,7 @@
       "contentProjection": [],
       "evidence": {
         "source": {
-          "sha256": "ba847228c86dbad1c7c097f868cc67e46de1f936b7edc6dc87a51f3a62bc4066"
+          "sha256": "a19e031bf0468ad463f2e1a20d8b3d345486d1c8afe42dafa3603ab74754876c"
         },
         "template": {
           "kind": "external",
@@ -14510,7 +14748,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "c1f7844c4076cf52c28981335198d0837bde4014f6267244369da24fd5304871"
+            "sha256": "58fdba149731938dcd8c3fdde58200eb759d6050b15117f951227a7dd288e181"
           }
         ]
       }
@@ -15139,7 +15377,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "bcde0aab47c4a85458344a36f7b80b31a10d79ee69bac79a84c14495bd9fddd5"
+            "sha256": "9cd22e221d6d38ee42d98c87d9092b4da2dd40c9724f80948c1fe0acfc624246"
           }
         ]
       }
@@ -15597,7 +15835,7 @@
           {
             "ordinal": 1,
             "kind": "external",
-            "sha256": "a0f9d7299573071dae03dade827a5e710f18402d8a3e4f8899c6adcde4bd945b"
+            "sha256": "d2963e937b088865720bc09d20d24985175455ce6b5930526d186df7a7aa9586"
           }
         ]
       }

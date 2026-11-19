@@ -61,6 +61,12 @@ export interface CxExplorerItemOrderChange {
   itemIds: readonly string[];
 }
 
+export interface CxExplorerItemMove {
+  itemId: string;
+  fromFolderId: string;
+  folderId: string;
+}
+
 export type CxExplorerFolderChange = { id: string; name: string };
 
 /** A consumer-added menu entry was chosen on a folder or item row. */
@@ -78,6 +84,7 @@ const RESERVED_MENU_PREFIX = "cx-explorer:";
 const MENU_RENAME = `${RESERVED_MENU_PREFIX}rename`;
 const MENU_STYLE = `${RESERVED_MENU_PREFIX}style`;
 const MENU_DELETE = `${RESERVED_MENU_PREFIX}delete`;
+const MENU_MOVE = `${RESERVED_MENU_PREFIX}move:`;
 
 const DEFAULT_ITEM_ICON: CxIconName = "document";
 const PICKER_ESTIMATED_HEIGHT = 332;
@@ -120,6 +127,8 @@ type CxExplorerRenameTarget = { id: string };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxExplorerComponent implements OnDestroy {
+  private static instanceCounter = 0;
+  private readonly dropScope = `cx-explorer-${++CxExplorerComponent.instanceCounter}`;
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
   @ViewChild("explorerSurface", { read: ElementRef })
@@ -257,7 +266,16 @@ export class CxExplorerComponent implements OnDestroy {
   public set folders(value: readonly CxExplorerFolder[] | null | undefined) {
     const folders = validateExplorerFolders(value ?? []);
     assertUniqueExplorerItemIds(this.rootItemsState(), folders);
+    const selected = this.selectedItemIdState();
+    const previousFolder = this.foldersState().find((folder) =>
+      folder.items.some((item) => item.id === selected),
+    );
     this.foldersState.set(folders);
+    const nextFolder = folders.find((folder) =>
+      folder.items.some((item) => item.id === selected),
+    );
+    if (previousFolder && nextFolder && previousFolder.id !== nextFolder.id)
+      this.setExpandedFolder(nextFolder.id);
     this.reconcileExpandedFolder();
     const baseline = this.folderCreateBaseline;
     if (!baseline) return;
@@ -285,6 +303,8 @@ export class CxExplorerComponent implements OnDestroy {
 
   /** Enables built-in reordering plus create, rename, restyle, and delete controls. */
   @Input({ transform: booleanAttribute }) editable = true;
+  /** Enables moving folder items; consumers persist itemMove and echo folders. */
+  @Input({ transform: booleanAttribute }) movable = false;
 
   /** Accessible name of the rail region. Name it after the content it manages. */
   @Input() ariaLabel = "Explorer";
@@ -371,6 +391,8 @@ export class CxExplorerComponent implements OnDestroy {
   /** Controlled item order within one folder; never moves items across folders. */
   @Output() readonly itemOrderChange =
     new EventEmitter<CxExplorerItemOrderChange>();
+  /** Append this item to another folder without changing its identity or pins. */
+  @Output() readonly itemMove = new EventEmitter<CxExplorerItemMove>();
   /** Controlled shortcut order, independent of folder item order. */
   @Output() readonly pinnedItemOrderChange = new EventEmitter<
     readonly string[]
@@ -609,6 +631,58 @@ export class CxExplorerComponent implements OnDestroy {
     );
   }
 
+  protected folderDropId(folderId: string): string {
+    return `${this.dropScope}-target-${folderId}`;
+  }
+
+  protected folderDropConnections(sourceId: string): string[] {
+    return this.editable && this.movable
+      ? this.foldersState()
+          .filter((folder) => folder.id !== sourceId)
+          .map((folder) => this.folderDropId(folder.id))
+      : [];
+  }
+
+  protected readonly acceptsFolderItem = (
+    drag: CdkDrag<CxExplorerItem>,
+    target: CdkDropList<CxExplorerFolder>,
+  ): boolean => {
+    return (
+      this.editable &&
+      this.movable &&
+      this.foldersState().some(
+        (folder) =>
+          folder.id !== target.data.id &&
+          folder.items.some((item) => item.id === drag.data.id),
+      )
+    );
+  };
+
+  protected onItemFolderDrop(
+    event: CdkDragDrop<
+      CxExplorerFolder,
+      readonly CxExplorerItem[],
+      CxExplorerItem
+    >,
+  ): void {
+    if (!event.isPointerOverContainer) return;
+    this.requestItemMove(event.item.data.id, event.container.data.id);
+  }
+
+  private requestItemMove(itemId: string, folderId: string): void {
+    if (!this.editable || !this.movable) return;
+    const source = this.foldersState().find((folder) =>
+      folder.items.some((item) => item.id === itemId),
+    );
+    if (
+      !source ||
+      source.id === folderId ||
+      !this.foldersState().some((folder) => folder.id === folderId)
+    )
+      return;
+    this.itemMove.emit({ itemId, fromFolderId: source.id, folderId });
+  }
+
   protected onItemMoveByKeyboard(
     event: Event,
     item: CxExplorerItem,
@@ -692,8 +766,26 @@ export class CxExplorerComponent implements OnDestroy {
   protected itemMenu(item: CxExplorerItem): readonly CxMenuItem[] {
     const extra = item.menuItems ?? this.itemMenuItemsState();
     if (!this.editable) return extra;
+    const destinations = this.movable
+      ? this.foldersState().filter(
+          (folder) => !folder.items.some((entry) => entry.id === item.id),
+        )
+      : [];
     return [
       { id: MENU_STYLE, label: "Icon & color", prependIcon: "squares-rotated" },
+      ...(destinations.length
+        ? [
+            {
+              id: `${MENU_MOVE}folder`,
+              label: "Move to",
+              prependIcon: "folder" as CxIconName,
+              items: destinations.map((folder) => ({
+                id: `${MENU_MOVE}${folder.id}`,
+                label: folder.name,
+              })),
+            },
+          ]
+        : []),
       ...extra,
       {
         id: MENU_DELETE,
@@ -733,6 +825,10 @@ export class CxExplorerComponent implements OnDestroy {
     actionId: string,
     row: HTMLElement,
   ): void {
+    if (actionId.startsWith(MENU_MOVE)) {
+      this.requestItemMove(item.id, actionId.slice(MENU_MOVE.length));
+      return;
+    }
     if (actionId === MENU_STYLE) {
       this.openPicker(item, row);
       return;

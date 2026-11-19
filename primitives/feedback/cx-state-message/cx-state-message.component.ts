@@ -25,9 +25,9 @@ export type CxStateMessageLayout = 'vertical' | 'horizontal';
 /** A state message answers with solid buttons; transparency is not one of its choices. */
 export type CxStateMessageAction = Omit<CxFeedbackAction, 'transparent'>;
 
-const CX_STATE_MESSAGE_ICONS: Record<CxStateMessageState, CxIconName> = {
+const CX_STATE_MESSAGE_ICONS: Record<CxStateMessageState, CxIconName | undefined> = {
   default: 'placeholder',
-  pending: 'spinner',
+  pending: undefined,
   success: 'check',
   scheduled: 'schedule',
   danger: 'error',
@@ -75,8 +75,8 @@ export class CxStateMessageComponent implements AfterViewChecked {
     this.syncIconInkOffset();
   }
 
-  /** The state carries the mark that matches it; an icon of the consumer's own always wins. */
-  protected get resolvedIcon(): CxIconName {
+  /** Pending uses cx-spinner; other states allow a consumer-supplied icon. */
+  protected get resolvedIcon(): CxIconName | undefined {
     return this.icon ?? CX_STATE_MESSAGE_ICONS[this.state];
   }
 

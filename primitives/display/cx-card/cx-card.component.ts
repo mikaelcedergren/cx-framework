@@ -1,3 +1,5 @@
+import { InteractivityChecker } from "@angular/cdk/a11y";
+import { ContentFocusObserver } from "../../shared/content-focus";
 import {
   AfterViewInit,
   booleanAttribute,
@@ -6,6 +8,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  inject,
   OnChanges,
   OnDestroy,
   Output,
@@ -58,6 +61,8 @@ let nextCardContentId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
+  private readonly interactivity = inject(InteractivityChecker);
+  private contentFocus?: ContentFocusObserver;
   private warnedInvalidActivation = false;
   private warnedInvalidExpansion = false;
   private warnedInvalidTabs = false;
@@ -181,9 +186,14 @@ export class CxCardComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   public ngAfterViewInit(): void {
     this.syncContentObserver();
+    this.contentFocus = new ContentFocusObserver(
+      this.cardViewportRef!.nativeElement,
+      this.interactivity,
+    );
   }
 
   public ngOnDestroy(): void {
+    this.contentFocus?.disconnect();
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
   }

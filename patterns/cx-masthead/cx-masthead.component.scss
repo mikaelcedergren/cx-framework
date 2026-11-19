@@ -25,10 +25,10 @@ cx-masthead.cx-masthead-host--sticky {
   background: var(--surface);
   box-sizing: border-box;
   transition:
-    background-color var(--motion-slow) var(--ease-out-in),
-    border-color var(--motion-slow) var(--ease-out-in),
-    -webkit-backdrop-filter var(--motion-slow) var(--ease-out-in),
-    backdrop-filter var(--motion-slow) var(--ease-out-in);
+    background-color var(--motion-slow) var(--ease-in-out),
+    border-color var(--motion-slow) var(--ease-in-out),
+    -webkit-backdrop-filter var(--motion-slow) var(--ease-in-out),
+    backdrop-filter var(--motion-slow) var(--ease-in-out);
 }
 
 .cx-masthead--transparent {
@@ -48,8 +48,8 @@ cx-masthead.cx-masthead-host--sticky {
 
   .cx-masthead--frosted {
     background: color-mix(in srgb, var(--ink) 12%, transparent);
-    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 12));
-    backdrop-filter: blur(calc(var(--frost-softness) * 12));
+    -webkit-backdrop-filter: blur(var(--frost-softness));
+    backdrop-filter: blur(var(--frost-softness));
   }
 }
 
@@ -333,8 +333,8 @@ cx-masthead.cx-masthead-host--sticky {
   transform: translateY(-50%);
   transform-origin: center;
   transition:
-    transform calc(var(--motion-slow) * 2) var(--ease-out-in),
-    opacity calc(var(--motion-base) * 2) var(--ease-out-in);
+    transform calc(var(--motion-slow) * 2) var(--ease-in-out),
+    opacity calc(var(--motion-base) * 2) var(--ease-in-out);
 }
 
 .cx-masthead__toggle-line:first-child {

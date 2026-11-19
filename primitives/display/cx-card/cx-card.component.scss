@@ -14,7 +14,8 @@
   min-height: 0;
   flex-direction: column;
   gap: var(--surface-separation);
-  overflow: hidden;
+  // Content owns clipping; the outer surface leaves room for focus rings.
+  overflow: visible;
   border: 0;
   border-radius: var(--radius-lg);
   background-color: var(--opacity-low);
@@ -114,8 +115,8 @@
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   :host(.cx-card-host--frosted) .cx-card {
     background-color: color-mix(in srgb, var(--ink) 12%, transparent);
-    -webkit-backdrop-filter: blur(calc(var(--frost-softness) * 12));
-    backdrop-filter: blur(calc(var(--frost-softness) * 12));
+    -webkit-backdrop-filter: blur(var(--frost-softness));
+    backdrop-filter: blur(var(--frost-softness));
   }
 }
 
@@ -304,12 +305,12 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: inherit;
-  transition: max-height var(--motion-base) var(--ease-out-in);
+  transition: max-height var(--motion-base) var(--ease-in-out);
 }
 
 .cx-card__viewport:focus-visible {
   outline: var(--outline-tab);
-  outline-offset: calc(-1 * var(--outline-tab-offset));
+  outline-offset: var(--outline-tab-offset);
 }
 
 .cx-card__content {
@@ -334,7 +335,7 @@
 }
 
 // Fade the content itself so transparent cards never need a painted fade tile.
-.cx-card__viewport--clamped {
+.cx-card__viewport--clamped:not(:focus-visible) {
   -webkit-mask-image: linear-gradient(
     to bottom,
     #000 calc(100% - 48px),

@@ -972,6 +972,20 @@
       "area": "pattern",
       "category": "cx-launcher",
       "path": "patterns/cx-launcher/cx-launcher.component.ts"
+    },
+    {
+      "name": "cx-thumbnail",
+      "selectors": ["cx-thumbnail"],
+      "area": "primitive",
+      "category": "media",
+      "path": "primitives/media/cx-thumbnail/cx-thumbnail.component.ts"
+    },
+    {
+      "name": "cx-file-card",
+      "selectors": ["cx-file-card"],
+      "area": "primitive",
+      "category": "display",
+      "path": "primitives/display/cx-file-card/cx-file-card.component.ts"
     }
   ]
 }

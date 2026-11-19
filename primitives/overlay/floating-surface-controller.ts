@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { observeOverlayZoom, overlayZoom } from './overlay-zoom';
 import {
   measureCxFloatingSurface,
   type CxFloatingSurfaceAlign,
@@ -51,6 +52,8 @@ export class CxFloatingSurfaceController {
   private readonly placementState = signal<CxFloatingSurfacePlacement>('bottom');
   private triggerElement?: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  private stopZoomObservation?: () => void;
+  private measuredZoom = 1;
   private measurePassFrame?: number;
   private lockedPlacement?: CxFloatingSurfacePlacement;
 
@@ -88,17 +91,26 @@ export class CxFloatingSurfaceController {
     if (!activeTrigger || typeof window === 'undefined') {
       return;
     }
+    const zoom = overlayZoom(activeTrigger);
+    const bounds = activeTrigger.getBoundingClientRect();
+    const triggerRect = new DOMRect(bounds.x / zoom, bounds.y / zoom, bounds.width / zoom, bounds.height / zoom);
     const viewport: CxFloatingSurfaceViewport = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: window.innerWidth / zoom,
+      height: window.innerHeight / zoom,
     };
-    const request = this.measure(activeTrigger.getBoundingClientRect(), viewport);
+    const request = this.measure(triggerRect, viewport);
     if (!request) {
       return;
     }
-    const measuredWidth = this.measureSurfaceWidth();
+    // Retain the content's logical width when its owner's zoom changes while open.
+    const lockedWidth = this.widthState();
+    const measuredWidth =
+      zoom !== this.measuredZoom && lockedWidth !== undefined
+        ? lockedWidth / this.measuredZoom
+        : this.measureSurfaceWidth(zoom);
+    this.measuredZoom = zoom;
     const surface = measureCxFloatingSurface({
-      triggerRect: activeTrigger.getBoundingClientRect(),
+      triggerRect,
       viewportWidth: viewport.width,
       viewportHeight: viewport.height,
       width: measuredWidth ?? request.width,
@@ -118,20 +130,21 @@ export class CxFloatingSurfaceController {
       // the rendered width for the session. Until the surface exists, keep
       // width unset (the surface auto-sizes) and schedule one post-render pass.
       if (measuredWidth !== undefined) {
-        this.widthState.set(surface.width);
+        this.widthState.set(surface.width * zoom);
       } else {
         this.scheduleMeasurePass();
       }
     } else {
-      this.widthState.set(surface.width);
+      this.widthState.set(surface.width * zoom);
     }
-    this.minWidthState.set(request.minWidth);
+    this.minWidthState.set(request.minWidth === undefined ? undefined : request.minWidth * zoom);
     this.maxHeightState.set(
-      request.maxHeightCap !== undefined ? Math.min(surface.maxHeight, request.maxHeightCap) : surface.maxHeight,
+      (request.maxHeightCap !== undefined ? Math.min(surface.maxHeight, request.maxHeightCap) : surface.maxHeight) *
+        zoom,
     );
-    this.leftState.set(surface.left);
-    this.topState.set(surface.top);
-    this.bottomState.set(surface.bottom);
+    this.leftState.set(surface.left * zoom);
+    this.topState.set(surface.top === undefined ? undefined : surface.top * zoom);
+    this.bottomState.set(surface.bottom === undefined ? undefined : surface.bottom * zoom);
     this.placementState.set(surface.placement);
   }
 
@@ -155,12 +168,12 @@ export class CxFloatingSurfaceController {
     this.lockedPlacement = undefined;
   }
 
-  private measureSurfaceWidth(): number | undefined {
+  private measureSurfaceWidth(zoom: number): number | undefined {
     const surfaceElement = this.surface?.();
     if (!surfaceElement) {
       return undefined;
     }
-    const width = surfaceElement.getBoundingClientRect().width;
+    const width = surfaceElement.getBoundingClientRect().width / zoom;
     return Number.isFinite(width) && width > 0 ? Math.ceil(width) : undefined;
   }
 
@@ -194,6 +207,8 @@ export class CxFloatingSurfaceController {
       return;
     }
     this.resizeObserver?.disconnect();
+    this.stopZoomObservation?.();
+    this.stopZoomObservation = observeOverlayZoom(activeTrigger, onResize);
     this.resizeObserver = new ResizeObserver(onResize);
     this.resizeObserver.observe(activeTrigger);
   }
@@ -201,6 +216,8 @@ export class CxFloatingSurfaceController {
   stopObservingTrigger(): void {
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
+    this.stopZoomObservation?.();
+    this.stopZoomObservation = undefined;
   }
 
   destroy(): void {

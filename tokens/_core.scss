@@ -86,7 +86,10 @@
   --opacity-mid: #15202f14; // Borders, separators and medium-strength structure.
   --opacity-low: #15202f08; // Quiet fills and the soft field-interaction outline.
   --opacity-darken: #16181d04; // Subtle shading layered over an existing surface.
-  --overlay-backdrop: #000000cc; // Dims the underlying screen while an overlay holds attention.
+
+  // Overlay backdrop: colour and blur soften the screen behind an active overlay.
+  --overlay-backdrop: #0000001a; // About 10% black per overlay; stacked layers gently compound the dimming.
+  --overlay-backdrop-blur: 2px; // Blurs the screen behind an overlay, independently of surface frost; use directly without scaling.
 
   // Status roles remain distinct from primary and accent actions.
   --success: var(--green); // Completion or healthy status.
@@ -175,7 +178,7 @@
   --line-discreet: var(--border-width) solid var(--opacity-low); // Quiet structural border for low-emphasis boundaries.
   --floating-surface-border: 0 solid transparent; // Theme-controlled edge on elevated panels, menus and popovers.
   --outline-tab: none; // Keyboard-navigation ring; appears only in keyboard-navigation mode.
-  --outline-tab-offset: -2px; // Insets the keyboard ring so it follows the control boundary.
+  --outline-tab-offset: 2px; // Places the keyboard ring outside the control with a 2px gap.
 }
 
 :root[data-cx-keyboard-navigation] {
@@ -242,11 +245,12 @@
   --line-height-relaxed: 1.5; // Airier multiline rhythm for reading, hints and messages.
 }
 
-/* Depth: use elevation only when a surface is actually raised above another.
-   Shadow geometry stays coordinated; themes can change its colour and strength. */
+/* Surface frost and depth: glass softens what shows through a translucent surface.
+   Overlay backdrops have their own blur; neither blur role is scaled by components.
+   Use elevation only when a surface is raised; themes control shadow colour and strength. */
 
 :root {
-  --frost-softness: 2px; // Backdrop blur for translucent surfaces; zero creates a flat treatment.
+  --frost-softness: 24px; // Glass blur on translucent surfaces; use directly without scaling. Zero removes frost.
   --shadow-low: 0 1px 1px #0000000e, 0 2px 2px #00000009, 0 4px 4px #00000005; // Low elevation for raised controls and small surfaces.
   --shadow-mid: 0 1px 1px #0000000f, 0 2px 2px #0000000b, 0 4px 4px #00000009, 0 8px 8px #00000006, 0 16px 16px #00000005; // Floating elevation for menus and popovers.
   --shadow-high: 0 1px 1px #00000011, 0 3px 3px #0000000d, 0 8px 8px #0000000a, 0 16px 16px #00000008, 0 32px 32px #00000006; // Strong elevation for dialogs and prominent overlays.
@@ -263,7 +267,7 @@
 
   --ease-out: cubic-bezier(0, 0.3, 0.3, 1); // Standard transition that settles gently.
   --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1); // Pronounced deceleration for arriving surfaces.
-  --ease-out-in: cubic-bezier(0.4, 0, 0.15, 1); // Smooth change between interface states.
+  --ease-in-out: cubic-bezier(0.4, 0, 0.15, 1); // Smooth change between interface states.
   --ease-in: cubic-bezier(0, 0.4, 0.15, 1); // Acceleration for departure or withdrawal.
 }
 
@@ -271,7 +275,7 @@
 
 :root {
   /* Canonical stack: sticky app chrome, nav overlay, detail panel, dialogs,
-     popovers, tooltips, toasts, debug-only layer. */
+     popovers, toasts, tooltips, debug-only layer. */
   --z-index-sticky: 80; // Sticky content above the normal page plane.
   --z-index-nav-overlay-backdrop: 90; // Dimming plane behind overlay navigation.
   --z-index-nav-overlay: 95; // Overlay navigation above its backdrop.
@@ -279,8 +283,8 @@
   --z-index-dialog: 1200; // Dialogs above the application layers.
   --z-index-popover-backdrop: 1250; // Dismissal or dimming plane behind popovers.
   --z-index-popover: 1300; // Popover surfaces above dialogs.
-  --z-index-tooltip: 1400; // Tooltips above controls and popovers.
-  --z-index-toast: 1500; // Transient notifications above ordinary overlays.
+  --z-index-toast: 1400; // Transient notifications above ordinary overlays.
+  --z-index-tooltip: 1500; // Tooltips above controls, popovers and toasts.
   --z-index-debug: 9999; // Internal debugging surfaces above the interface.
 }
 

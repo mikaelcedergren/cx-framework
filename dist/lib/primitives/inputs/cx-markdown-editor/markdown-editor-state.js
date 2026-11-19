@@ -1,14 +1,24 @@
-import { baseKeymap, chainCommands, exitCode, joinTextblockBackward, toggleMark } from 'prosemirror-commands';
+import { baseKeymap, chainCommands, exitCode, joinTextblockBackward, joinTextblockForward, toggleMark } from 'prosemirror-commands';
 import { closeHistory, history, redo, undo } from 'prosemirror-history';
 import { InputRule, inputRules, textblockTypeInputRule, undoInputRule, wrappingInputRule, } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import { defaultMarkdownParser, defaultMarkdownSerializer, MarkdownParser, MarkdownSerializer, schema as commonmarkSchema, } from 'prosemirror-markdown';
 import { Fragment, Schema, Slice, } from 'prosemirror-model';
 import { liftListItem, sinkListItem, splitListItem } from 'prosemirror-schema-list';
-import { EditorState, Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import { EditorState, NodeSelection, Plugin, PluginKey, Selection, TextSelection } from 'prosemirror-state';
+import { canJoin, findWrapping, Transform } from 'prosemirror-transform';
 // Extend the document model locally; the shared CommonMark parser stays unchanged.
 const schema = new Schema({
-    nodes: commonmarkSchema.spec.nodes.update('list_item', {
+    nodes: commonmarkSchema.spec.nodes
+        .update('bullet_list', {
+        ...commonmarkSchema.nodes['bullet_list'].spec,
+        attrs: { tight: { default: true } },
+    })
+        .update('ordered_list', {
+        ...commonmarkSchema.nodes['ordered_list'].spec,
+        attrs: { order: { default: 1 }, tight: { default: true } },
+    })
+        .update('list_item', {
         ...commonmarkSchema.nodes['list_item'].spec,
         attrs: { checked: { default: null } },
         parseDOM: [
@@ -57,6 +67,17 @@ const parser = new MarkdownParser(schema, tokenizer, {
 });
 const serializer = new MarkdownSerializer({
     ...defaultMarkdownSerializer.nodes,
+    ordered_list(state, node, parent, index) {
+        // Alternate delimiters only for adjacent, deliberately restarted lists.
+        // CommonMark otherwise merges them and loses the restart on reopening.
+        let adjacent = 0;
+        for (let i = index - 1; i >= 0 && parent.child(i).type === node.type; i--)
+            adjacent++;
+        const delimiter = adjacent % 2 ? ') ' : '. ';
+        const start = node.attrs['order'];
+        const width = String(start + node.childCount - 1).length;
+        state.renderList(node, ' '.repeat(width + 2), i => `${String(start + i).padStart(width)}${delimiter}`);
+    },
     list_item(state, node) {
         if (node.attrs['checked'] !== null)
             state.write(node.attrs['checked'] ? '[x] ' : '[ ] ');
@@ -71,6 +92,124 @@ const serializer = new MarkdownSerializer({
         expelEnclosingWhitespace: true,
     },
 });
+function isList(node) {
+    return node.type === schema.nodes['bullet_list'] || node.type === schema.nodes['ordered_list'];
+}
+function continuesList(before, after) {
+    return (isList(before) &&
+        before.type === after.type &&
+        (before.type === schema.nodes['bullet_list'] ||
+            after.attrs['order'] === before.attrs['order'] + before.childCount));
+}
+/** One list for adjacent items; blank lines only when an item has multiple paragraphs. */
+function normalizeLists(tr) {
+    const joins = [];
+    tr.doc.descendants((node, pos) => {
+        if (node.isLeaf)
+            return;
+        let previous = null;
+        node.forEach((child, offset) => {
+            if (previous && continuesList(previous, child))
+                joins.push(pos + 1 + offset);
+            previous = child;
+        });
+    });
+    let previous = null;
+    tr.doc.forEach((node, pos) => {
+        if (previous && continuesList(previous, node))
+            joins.push(pos);
+        previous = node;
+    });
+    for (const pos of joins.sort((a, b) => b - a)) {
+        if (canJoin(tr.doc, pos))
+            tr.join(pos);
+    }
+    tr.doc.descendants((node, pos) => {
+        if (!isList(node))
+            return;
+        let tight = true;
+        node.forEach((item) => {
+            let paragraphs = 0;
+            item.forEach((block) => {
+                if (block.isTextblock)
+                    paragraphs++;
+                else if (!isList(block))
+                    tight = false;
+            });
+            if (paragraphs !== 1)
+                tight = false;
+        });
+        if (node.attrs['tight'] !== tight)
+            tr.setNodeMarkup(pos, undefined, { ...node.attrs, tight });
+    });
+    return tr;
+}
+function cleanListStructure() {
+    return new Plugin({
+        appendTransaction(transactions, _oldState, state) {
+            if (!transactions.some((tr) => tr.docChanged))
+                return null;
+            const tr = normalizeLists(state.tr);
+            tr.setStoredMarks(state.storedMarks);
+            return tr.docChanged ? tr : null;
+        },
+    });
+}
+function listInputRule(pattern, type, attrs = () => ({})) {
+    return new InputRule(pattern, (state, match, start, end) => {
+        const tr = state.tr.delete(start, end);
+        const range = tr.doc.resolve(start).blockRange();
+        const wrapping = range && findWrapping(range, type, attrs(match));
+        if (!range || !wrapping)
+            return null;
+        // Keep wrapping and joining in one edit so Backspace can undo the conversion.
+        return normalizeLists(tr.wrap(range, wrapping));
+    });
+}
+/** Remove only separator whitespace exposed by an explicit paragraph/item split. */
+function trimSplitWhitespace(tr) {
+    const current = tr.selection.$from;
+    if (!current.parent.isTextblock || current.parent.type.spec['code'])
+        return tr;
+    const leading = current.parent.firstChild?.isText
+        ? (/^[ \t]+/.exec(current.parent.firstChild.text)?.[0].length ?? 0)
+        : 0;
+    if (leading)
+        tr.delete(current.start(), current.start() + leading);
+    const start = tr.selection.$from.before();
+    let previousEnd = -1;
+    let trailing = 0;
+    tr.doc.nodesBetween(0, start, (node, pos) => {
+        if (!node.isTextblock || node.type.spec['code'] || pos + node.nodeSize > start)
+            return;
+        previousEnd = pos + node.nodeSize - 1;
+        trailing = node.lastChild?.isText ? (/[ \t]+$/.exec(node.lastChild.text)?.[0].length ?? 0) : 0;
+    });
+    if (trailing && previousEnd >= 0)
+        tr.delete(previousEnd - trailing, previousEnd);
+    return tr;
+}
+const joinSiblingItemText = (forward) => (state, dispatch, view) => {
+    const cursor = state.selection instanceof TextSelection ? state.selection.$cursor : null;
+    if (!cursor || cursor.depth < 3 || cursor.node(-1).type !== schema.nodes['list_item'])
+        return false;
+    const item = cursor.node(-1), list = cursor.node(-2), index = cursor.index(-2);
+    if (forward) {
+        if (cursor.parentOffset !== cursor.parent.content.size ||
+            cursor.index(-1) !== item.childCount - 1 ||
+            index === list.childCount - 1)
+            return false;
+        if (!list.child(index + 1).firstChild?.isTextblock)
+            return false;
+        return joinTextblockForward(state, dispatch, view);
+    }
+    if (cursor.parentOffset !== 0 ||
+        cursor.index(-1) !== 0 ||
+        index === 0 ||
+        !list.child(index - 1).lastChild?.isTextblock)
+        return false;
+    return joinTextblockBackward(state, dispatch, view);
+};
 function taskInputRule() {
     // The preceding '- ' has already converted into a normal list item.
     return new InputRule(/^\[([ xX])\]\s$/, (state, match, start, end) => {
@@ -99,18 +238,246 @@ function dividerInputRule() {
     });
 }
 function markdownPaste() {
+    let internalClipboard = false;
     return new Plugin({
         props: {
-            clipboardTextParser(text, $context, plain) {
+            transformPastedHTML(html) {
+                internalClipboard = /\bdata-pm-slice=/.test(html);
+                return html;
+            },
+            clipboardTextParser(text, $context, plain, view) {
+                const inherited = view.state.storedMarks ?? $context.marks();
                 if (plain) {
                     return Slice.maxOpen(Fragment.from(text
                         .split(/\r\n?|\n/)
-                        .map(line => schema.nodes['paragraph'].create(null, line ? schema.text(line, $context.marks()) : undefined))));
+                        .map(line => schema.nodes['paragraph'].create(null, line ? schema.text(line, inherited) : undefined))));
                 }
-                return Slice.maxOpen(parseMarkdown(text).content);
+                if (/^[ \t]+$/.test(text))
+                    return new Slice(Fragment.from(schema.text(text, inherited)), 0, 0);
+                const doc = parseMarkdown(normalizeClipboardText(text));
+                if (!/[\r\n]/.test(text) &&
+                    doc.childCount === 1 &&
+                    doc.firstChild?.type === schema.nodes['paragraph']) {
+                    let content = Fragment.empty;
+                    doc.firstChild.content.forEach(node => {
+                        content = content.append(Fragment.from(node.mark(node.marks.reduce((marks, mark) => mark.addToSet(marks), inherited))));
+                    });
+                    if ($context.parent.content.size) {
+                        const leading = /^[ \t]+/.exec(text)?.[0];
+                        const trailing = /[ \t]+$/.exec(text)?.[0];
+                        if (leading)
+                            content = Fragment.from(schema.text(leading, inherited)).append(content);
+                        if (trailing)
+                            content = content.append(Fragment.from(schema.text(trailing, inherited)));
+                    }
+                    return Slice.maxOpen(Fragment.from(doc.firstChild.copy(content)));
+                }
+                return Slice.maxOpen(doc.content);
+            },
+            transformPasted(slice, _view, plain) {
+                // Plain text has already been parsed above. Code and Shift-paste stay literal.
+                return plain || internalClipboard ? slice : normalizeRichClipboard(slice);
             },
         },
     });
+}
+const visualBullet = /^([ \t]*)([•◦▪‣⁃●○■]|[☐☑☒])[ \t\u00a0]+/u;
+const clipboardList = /^([ \t]*)(?:[-+*] |\d{1,9}[.)] )/;
+function sectionLabel(text) {
+    const label = text.trim();
+    return (label.length > 0 &&
+        label.length <= 80 &&
+        label.split(/\s+/).length <= 10 &&
+        !/[.!?;]$/.test(label) &&
+        !/^[#>*\-`~\d]/.test(label));
+}
+/** Interpret copied visual structure without rewriting the author's words. */
+function normalizeClipboardText(text) {
+    const lines = text.replace(/\r\n?/g, '\n').split('\n');
+    const literal = new Set();
+    let fence;
+    let inList = false;
+    for (let i = 0; i < lines.length; i++) {
+        const match = /^ {0,3}(`{3,}|~{3,})/.exec(lines[i]);
+        if (fence) {
+            literal.add(i);
+            if (match &&
+                match[1][0] === fence.marker &&
+                match[1].length >= fence.length &&
+                !lines[i].slice(match[0].length).trim())
+                fence = undefined;
+            continue;
+        }
+        if (match) {
+            literal.add(i);
+            inList = false;
+            fence = { marker: match[1][0], length: match[1].length };
+            continue;
+        }
+        // An indented code excerpt is already meaningful Markdown. Nested visual bullets
+        // remain list items, but ordinary code lines must not acquire inferred headings.
+        if (/^( {4}|\t)/.test(lines[i]) && (!inList || !visualBullet.test(lines[i]))) {
+            literal.add(i);
+            continue;
+        }
+        lines[i] = lines[i]
+            .replace(/\u00a0/g, ' ')
+            .replace(visualBullet, (_all, indent, marker) => `${indent}- ${marker === '☐' ? '[ ] ' : /[☑☒]/.test(marker) ? '[x] ' : ''}`);
+        if (lines[i].trim())
+            inList = clipboardList.test(lines[i]);
+    }
+    for (let i = 0; i < lines.length - 1; i++) {
+        if (literal.has(i) || literal.has(i + 1))
+            continue;
+        // A short label directly above a list is a section; a blank line or a sentence
+        // is not evidence for a heading. Explicit Markdown always takes precedence.
+        if ((i === 0 || !lines[i - 1].trim()) &&
+            sectionLabel(lines[i]) &&
+            !/^\s/.test(lines[i]) &&
+            clipboardList.test(lines[i + 1])) {
+            lines[i] = `### ${lines[i]}`;
+        }
+    }
+    return lines.join('\n');
+}
+function normalizeRichClipboard(slice) {
+    const blocks = [];
+    let changed = false;
+    slice.content.forEach(node => {
+        if (node.type !== schema.nodes['paragraph']) {
+            blocks.push(node);
+            return;
+        }
+        const lines = [];
+        let start = 0;
+        node.forEach((child, offset) => {
+            if (child.type === schema.nodes['hard_break']) {
+                lines.push(node.content.cut(start, offset));
+                start = offset + child.nodeSize;
+            }
+        });
+        lines.push(node.content.cut(start));
+        const hasList = lines.some(line => richClipboardPrefix(line));
+        const hasParagraphBreak = lines.some((line, i) => !line.size && i > 0 && i < lines.length - 1);
+        if (!hasList && !hasParagraphBreak) {
+            blocks.push(node);
+            return;
+        }
+        changed = true;
+        // Single breaks remain intentional inside prose (addresses, poems). Two breaks
+        // mean a paragraph; list-shaped lines mean individual items. Inline marks survive.
+        if (hasList)
+            lines.forEach(line => blocks.push(node.copy(line)));
+        else {
+            let paragraph = Fragment.empty;
+            lines.forEach(line => {
+                if (!line.size) {
+                    if (paragraph.size)
+                        blocks.push(node.copy(paragraph));
+                    paragraph = Fragment.empty;
+                }
+                else {
+                    if (paragraph.size)
+                        paragraph = paragraph.append(Fragment.from(schema.nodes['hard_break'].create()));
+                    paragraph = paragraph.append(line);
+                }
+            });
+            if (paragraph.size)
+                blocks.push(node.copy(paragraph));
+        }
+    });
+    const result = [];
+    for (let i = 0; i < blocks.length; i++) {
+        const node = blocks[i];
+        const prefix = node.type === schema.nodes['paragraph'] && richClipboardPrefix(node.content);
+        if (!prefix) {
+            const next = blocks[i + 1];
+            if (node.type === schema.nodes['paragraph'] &&
+                sectionLabel(node.textContent) &&
+                next?.type === schema.nodes['paragraph'] &&
+                richClipboardPrefix(next.content)) {
+                result.push(schema.nodes['heading'].create({ level: 3 }, node.content));
+                changed = true;
+            }
+            else
+                result.push(node);
+            continue;
+        }
+        changed = true;
+        const entries = [];
+        for (; i < blocks.length; i++) {
+            const candidate = blocks[i];
+            const marker = candidate.type === schema.nodes['paragraph'] && richClipboardPrefix(candidate.content);
+            if (marker)
+                entries.push({ node: candidate, prefix: marker });
+            else if (!candidate.content.size &&
+                blocks[i + 1]?.type === schema.nodes['paragraph'] &&
+                richClipboardPrefix(blocks[i + 1].content))
+                continue;
+            else
+                break;
+        }
+        i--;
+        let cursor = 0;
+        const readLevel = (indent) => {
+            const lists = [];
+            while (cursor < entries.length && entries[cursor].prefix.indent >= indent) {
+                const { node: line, prefix: marker } = entries[cursor];
+                const previous = lists.at(-1);
+                if (marker.indent > indent && previous) {
+                    const item = previous.lastChild;
+                    const nested = Fragment.from(readLevel(marker.indent));
+                    lists[lists.length - 1] = previous.copy(previous.content.replaceChild(previous.childCount - 1, item.copy(item.content.append(nested))));
+                    continue;
+                }
+                cursor++;
+                const item = schema.nodes['list_item'].create({ checked: marker.checked }, line.copy(line.content.cut(marker.length)));
+                const type = schema.nodes[marker.order === null ? 'bullet_list' : 'ordered_list'];
+                if (previous?.type === type &&
+                    (marker.order === null || marker.order === previous.attrs['order'] + previous.childCount)) {
+                    lists[lists.length - 1] = previous.copy(previous.content.append(Fragment.from(item)));
+                }
+                else
+                    lists.push(type.create({ tight: true, ...(marker.order !== null ? { order: marker.order } : {}) }, item));
+            }
+            return lists;
+        };
+        result.push(...readLevel(0));
+    }
+    return changed ? Slice.maxOpen(Fragment.from(result)) : slice;
+}
+function richClipboardPrefix(content) {
+    const prefix = clipboardPrefix(content.textBetween(0, content.size));
+    if (!prefix)
+        return null;
+    let literal = false;
+    content.forEach((node, offset) => {
+        if (offset < prefix.length && node.marks.some(mark => mark.type === schema.marks['code']))
+            literal = true;
+    });
+    return literal ? null : prefix;
+}
+function clipboardPrefix(text) {
+    text = text.replace(/\u00a0/g, ' ');
+    const visual = visualBullet.exec(text);
+    const ordinary = /^\s*(?:([-+*])|([0-9]{1,9})[.)])[ \t\u00a0]+/.exec(text);
+    const match = visual ?? ordinary;
+    if (!match)
+        return null;
+    const marker = visual?.[2];
+    const task = /^\[([ xX])\] /.exec(text.slice(match[0].length));
+    return {
+        length: match[0].length + (task?.[0].length ?? 0),
+        indent: /^\s*/.exec(text)[0].replace(/\t/g, '    ').length,
+        order: ordinary?.[2] ? Number(ordinary[2]) : null,
+        checked: task
+            ? task[1].toLowerCase() === 'x'
+            : marker === '☐'
+                ? false
+                : marker && /[☑☒]/.test(marker)
+                    ? true
+                    : null,
+    };
 }
 // Bear-style live formatting: each rule fires as its closing markdown
 // characters are typed, replacing the raw syntax with the formatted result.
@@ -181,8 +548,8 @@ function buildInputRules() {
                 level: match[1].length,
             })),
             wrappingInputRule(/^\s*>\s$/, schema.nodes['blockquote']),
-            wrappingInputRule(/^(\d+)\.\s$/, schema.nodes['ordered_list'], match => ({ order: +match[1] }), (match, node) => node.childCount + node.attrs['order'] === +match[1]),
-            wrappingInputRule(/^\s*([-+*])\s$/, schema.nodes['bullet_list']),
+            listInputRule(/^(\d+)\.\s$/, schema.nodes['ordered_list'], match => ({ order: +match[1] })),
+            listInputRule(/^\s*([-+*])\s$/, schema.nodes['bullet_list']),
             textblockTypeInputRule(/^```$/, schema.nodes['code_block']),
             markInputRule(/\*\*([^*]+)\*\*$/, schema.marks['strong']),
             markInputRule(/__([^_]+)__$/, schema.marks['strong']),
@@ -283,6 +650,16 @@ const indentAcrossLists = (state, dispatch) => {
         dispatch(joined.setMeta(blockMoveHistoryKey, true).scrollIntoView());
     }));
 };
+/** Backspace at a list boundary must leave the caret on the preceding content. */
+function removeBlockBackward(state, dispatch, from, to) {
+    if (dispatch) {
+        const tr = state.tr.delete(from, to);
+        const boundary = tr.doc.resolve(tr.mapping.map(from, -1));
+        tr.setSelection(Selection.near(boundary, -1));
+        dispatch(tr.scrollIntoView());
+    }
+    return true;
+}
 function buildKeymap() {
     // Shift-Enter breaks the line without leaving the current block — inside a
     // list item it continues the same bullet. In a code block (which cannot hold
@@ -301,15 +678,18 @@ function buildKeymap() {
         'Shift-Mod-z': redo,
         'Mod-y': redo,
         Backspace: chainCommands(undoInputRule, (state, dispatch) => {
-            const $cursor = state.selection instanceof TextSelection ? state.selection.$cursor : null;
+            const { selection } = state;
+            if (selection instanceof NodeSelection &&
+                selection.node.isAtom &&
+                selection.$from.parent.type === schema.nodes['list_item']) {
+                return removeBlockBackward(state, dispatch, selection.from, selection.to);
+            }
+            const $cursor = selection instanceof TextSelection ? selection.$cursor : null;
             if (!$cursor || $cursor.parent.content.size !== 0)
                 return false;
             const before = state.doc.resolve($cursor.before()).nodeBefore;
-            if ($cursor.parent.type === schema.nodes['paragraph'] &&
-                (before?.type === schema.nodes['bullet_list'] || before?.type === schema.nodes['ordered_list'])) {
-                // Delete the blank paragraph into the last item's text. The general
-                // join command wraps it in a new item, reversing the preceding lift.
-                return joinTextblockBackward(state, dispatch);
+            if ($cursor.parent.type === schema.nodes['paragraph'] && before && isList(before)) {
+                return removeBlockBackward(state, dispatch, $cursor.before(), $cursor.after());
             }
             // An empty item's first paragraph exits one list level. Let ordinary
             // deletion handle text, selections, and later paragraphs within an item.
@@ -318,13 +698,14 @@ function buildKeymap() {
                 $cursor.index(-1) !== 0)
                 return false;
             return liftListItem(schema.nodes['list_item'])(state, dispatch);
-        }),
+        }, joinSiblingItemText(false)),
+        Delete: joinSiblingItemText(true),
         'Mod-b': toggleMark(schema.marks['strong']),
         'Mod-i': toggleMark(schema.marks['em']),
         'Mod-e': toggleMark(schema.marks['code']),
         // List bindings return false outside lists and fall through to baseKeymap
         // (or, for Tab, to the browser's focus order).
-        Enter: (state, dispatch) => {
+        Enter: chainCommands((state, dispatch) => {
             const { $from } = state.selection;
             const checked = $from.depth >= 2 ? $from.node(-1).attrs['checked'] : null;
             return splitListItem(schema.nodes['list_item'], {
@@ -337,15 +718,15 @@ function buildKeymap() {
                         next.node(-1).type === schema.nodes['list_item']) {
                         tr.setNodeMarkup(next.before(-1), undefined, { checked: false });
                     }
-                    dispatch(tr);
+                    dispatch(trimSplitWhitespace(tr));
                 }));
-        },
-        Tab: chainCommands(sinkListItem(schema.nodes['list_item']), indentAcrossLists),
-        'Shift-Tab': liftListItem(schema.nodes['list_item']),
+        }, (state, dispatch, view) => baseKeymap['Enter'](state, dispatch && (tr => dispatch(trimSplitWhitespace(tr))), view)),
+        Tab: (state, dispatch) => chainCommands(sinkListItem(schema.nodes['list_item']), indentAcrossLists)(state, dispatch && (tr => dispatch(tr.setStoredMarks(state.storedMarks)))),
+        'Shift-Tab': (state, dispatch) => liftListItem(schema.nodes['list_item'])(state, dispatch && (tr => dispatch(tr.setStoredMarks(state.storedMarks)))),
     });
 }
 export function parseMarkdown(markdown) {
-    return parser.parse(markdown) ?? schema.topNodeType.createAndFill();
+    return normalizeLists(new Transform(parser.parse(markdown) ?? schema.topNodeType.createAndFill())).doc;
 }
 export function serializeMarkdown(doc) {
     return serializer.serialize(doc);
@@ -359,6 +740,6 @@ export function isDocEmpty(doc) {
 export function createMarkdownEditorState(markdown) {
     return EditorState.create({
         doc: parseMarkdown(markdown),
-        plugins: [buildInputRules(), buildKeymap(), keymap(baseKeymap), markdownPaste(), blockMoveHistory(), history()],
+        plugins: [buildInputRules(), buildKeymap(), keymap(baseKeymap), markdownPaste(), cleanListStructure(), blockMoveHistory(), history()],
     });
 }

@@ -46,18 +46,22 @@ export function securityHeaders({
   };
 }
 
-export function noindexHeader(paths: readonly string[] = []): Middleware {
-  const prefixes = paths.map(normalizePathPrefix);
+/** Exclude selected path subtrees, or explicitly every response, from search. */
+export function noindexHeader(
+  paths: readonly string[] | "all" = [],
+): Middleware {
+  const prefixes = paths === "all" ? [] : paths.map(normalizePathPrefix);
   return (request, response, next) => {
     const requestPath = decodeSafeRequestPathname(
       String(request.path ?? request.url ?? ""),
     )?.toLowerCase();
     if (
-      requestPath &&
-      prefixes.some(
-        (prefix) =>
-          requestPath === prefix || requestPath.startsWith(`${prefix}/`),
-      )
+      paths === "all" ||
+      (requestPath &&
+        prefixes.some(
+          (prefix) =>
+            requestPath === prefix || requestPath.startsWith(`${prefix}/`),
+        ))
     ) {
       response.setHeader("X-Robots-Tag", "noindex, nofollow");
     }

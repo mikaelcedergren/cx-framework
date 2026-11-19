@@ -11,7 +11,7 @@
   min-height: 0;
   padding: var(--space-xl) var(--space-xl) 0;
   background: var(--overlay-backdrop);
-  backdrop-filter: blur(var(--frost-softness));
+  backdrop-filter: blur(var(--overlay-backdrop-blur));
   box-sizing: border-box;
   outline: none;
 }

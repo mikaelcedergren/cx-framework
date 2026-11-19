@@ -74,6 +74,10 @@ export class CxDropdownComponent {
     ...(ngDevMode ? [{ debugName: "loadingMoreState" }] : /* istanbul ignore next */ []));
     placeholderState = signal('', /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "placeholderState" }] : /* istanbul ignore next */ []));
+    labelState = signal('Entity', /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "labelState" }] : /* istanbul ignore next */ []));
+    ariaLabelState = signal(undefined, /* @ts-ignore */
+    ...(ngDevMode ? [{ debugName: "ariaLabelState" }] : /* istanbul ignore next */ []));
     translationsState = signal({}, /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "translationsState" }] : /* istanbul ignore next */ []));
     validationState = signal(undefined, /* @ts-ignore */
@@ -267,8 +271,18 @@ export class CxDropdownComponent {
     searchEnabled$ = this.searchableState.asReadonly();
     createValue$ = computed(() => this.searchQueryState().trim(), /* @ts-ignore */
     ...(ngDevMode ? [{ debugName: "createValue$" }] : /* istanbul ignore next */ []));
-    label = 'Entity';
-    ariaLabel;
+    set label(value) {
+        this.labelState.set(value);
+    }
+    get label() {
+        return this.labelState();
+    }
+    set ariaLabel(value) {
+        this.ariaLabelState.set(value);
+    }
+    get ariaLabel() {
+        return this.ariaLabelState();
+    }
     name;
     transparent = false;
     set translations(value) {
@@ -1419,7 +1433,7 @@ export class CxDropdownComponent {
         });
     }
     updateOptionHeight() {
-        const height = this.optionRefs?.first?.nativeElement.getBoundingClientRect().height;
+        const height = this.optionRefs?.first?.nativeElement.offsetHeight;
         if (!height || !Number.isFinite(height)) {
             return;
         }

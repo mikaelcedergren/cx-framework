@@ -1,6 +1,25 @@
+@use "sass:map";
+@use "../../../tokens/spacing-scale" as spacing;
+
 :host {
   display: block;
   min-width: 0;
+  border-radius: 0;
+}
+
+:host(:first-child) {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+
+:host(:last-child) {
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+
+:host(:focus-within) {
+  position: relative;
+  z-index: 1;
 }
 
 /* The list draws separators from the row so projected content stays sealed. */
@@ -19,9 +38,11 @@
 .cx-list-item {
   display: block;
   min-width: 0;
+  border-radius: inherit;
 }
 
 .cx-list-item__row {
+  border-radius: inherit;
   position: relative;
   isolation: isolate;
   display: flex;
@@ -32,8 +53,9 @@
   transition: background-color var(--motion-fast) var(--ease-out);
 }
 
-:host(.cx-list-item-host--compact) .cx-list-item__row {
-  padding: var(--space-sm);
+:host(.cx-list-item-host--expanded) .cx-list-item__row {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
 }
 
 :host(:not(.cx-list-item-host--disabled)) .cx-list-item__row:has(.cx-list-item__heading--interactive:hover) {
@@ -80,9 +102,10 @@
   z-index: 1;
 }
 
-.cx-list-item__heading--interactive:focus-visible::after {
+/* The row owns the ring; truncating the heading must not clip it. */
+.cx-list-item__row:has(.cx-list-item__heading--interactive:focus-visible) {
   outline: var(--outline-tab);
-  outline-offset: calc(var(--outline-tab-offset) * -1);
+  outline-offset: var(--outline-tab-offset);
 }
 
 :host(.cx-list-item-host--disabled) .cx-list-item__heading {
@@ -115,7 +138,7 @@
 
 .cx-list-item__chevron {
   margin-inline-start: auto;
-  transition: transform var(--motion-base) var(--ease-out-in);
+  transition: transform var(--motion-base) var(--ease-in-out);
 }
 
 :host(.cx-list-item-host--expanded) .cx-list-item__chevron {
@@ -139,9 +162,10 @@
 }
 
 .cx-list-item__content-shell {
+  border-radius: inherit;
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--motion-base) var(--ease-out-in);
+  transition: grid-template-rows var(--motion-base) var(--ease-in-out);
 }
 
 .cx-list-item__content-shell--expanded {
@@ -149,6 +173,8 @@
 }
 
 .cx-list-item__content-clip {
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
   min-height: 0;
   overflow: hidden;
 }
@@ -162,8 +188,14 @@
   transition: opacity var(--motion-fast) var(--ease-out);
 }
 
-:host(.cx-list-item-host--compact) .cx-list-item__content {
-  padding: 0 var(--space-sm) var(--space-sm);
+@each $size in "sm", "md", "lg", "xl", "2xl" {
+  :host([data-padding='#{$size}']) .cx-list-item__row {
+    padding: map.get(spacing.$scale, $size);
+  }
+
+  :host([data-padding='#{$size}']) .cx-list-item__content {
+    padding: 0 map.get(spacing.$scale, $size) map.get(spacing.$scale, $size);
+  }
 }
 
 .cx-list-item__content-shell--expanded .cx-list-item__content {

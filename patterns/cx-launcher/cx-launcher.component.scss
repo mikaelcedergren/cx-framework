@@ -12,7 +12,7 @@
   box-sizing: border-box;
   padding: min(12dvh, 96px) var(--space-md) var(--space-md);
   background: var(--overlay-backdrop);
-  backdrop-filter: blur(var(--frost-softness));
+  backdrop-filter: blur(var(--overlay-backdrop-blur));
   overscroll-behavior: contain;
 }
 
